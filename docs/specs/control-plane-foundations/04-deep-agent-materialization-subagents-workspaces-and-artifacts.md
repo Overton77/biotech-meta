@@ -8,7 +8,7 @@ amendments:
   - id: AMD-RRM-001
     recorded_at: 2026-10-01
     base_revision: c48867a
-    status: proposed_for_acceptance  # RRM-001 independent review pending; not yet accepted
+    status: accepted  # RRM-001 accepted 2026-10-01 after independent review (user pre-authorization)
     summary: qualified checkpoint identity and namespaces, invocation transition CAS, terminal reconstruction versus resume, async-subagent hosting and settlement touchpoints
 depends_on: [SPEC-CP-DEFINITIONS, SPEC-CP-RUN-CONTROL, SPEC-CP-DURABLE-EXECUTION]
 sources:
@@ -162,10 +162,10 @@ An async-subagent spawn MUST create an immutable `AsyncSubagentContract`, exact 
 - **Identity.** The provider thread ID is the BellLabs `child_execution_id`.
 - **One provider run.** Each child has at most one provider run. Submission is fenced per child, so at most one submitter runs at a time. A submitter first looks up an existing run by its BellLabs spawn key and creates a run only if none exists.
 - **Ambiguity.** An ambiguous outcome is classified `in_doubt` and reconciled by observation, never by a second spawn. Ambiguous outcomes are a submission whose result is unknown, more than one provider run carrying the spawn key, or a served graph identity mismatch.
-- **Leaving `in_doubt`.** `in_doubt` is a new `CON-CP-ASYNC-SUBAGENT-V1` lifecycle value. An observation resolves it to `submitted` or `running` when exactly one provider run with the spawn key exists, or to `orphaned` when no provider run exists. Otherwise one of two typed operator decisions, recorded through the parent's authority, resolves it:
+- **Leaving `in_doubt`.** `in_doubt` is a new `CON-CP-ASYNC-SUBAGENT-V1` lifecycle value. An observation resolves it to `submitted` or `running` when exactly one provider run with the spawn key exists and its served graph identity verifies under REQ-CP-DA-019, or to `orphaned` when no provider run exists. Otherwise one of two typed operator decisions, recorded through the parent's authority, resolves it:
   - `adopt_provider_run(run_id)` binds the named run. Every other provider run carrying the spawn key is cancelled, and its usage is recorded as pending.
-  - `orphan_child` disposes the child under its link policy.
-- **`orphaned`.** A child becomes `orphaned` only after reconciliation records that no provider run exists and the link policy says so. A raised submission error alone never makes it `orphaned`.
+  - `orphan_child` cancels every provider run carrying the spawn key, records their usage as pending, then disposes the child under its link policy.
+- **`orphaned`.** A child becomes `orphaned` only after reconciliation records that no provider run exists and the link policy says so, or after `orphan_child`. A raised submission error alone never makes it `orphaned`.
 - **Interrupted submission.** A child left `admitted` without a provider binding after a crash is resumed by the same fenced submission path.
 - **Agent Server restart.** After a restart, the parent reconciles from the server's durable thread and run state.
 - **Inspection.** Child lineage is exposed through REQ-CP-RUN-011.
@@ -245,7 +245,7 @@ For each unit generation, the adapter path MUST:
 
 The observation links `unit_key`, generation, claim fence, namespace, source key, result key with its ancestry to the source, binding digest, state schema digest, result manifest ref and digest, and a redacted summary digest.
 
-The namespace head is the `result_key` of the last accepted transition observation for the namespace, or none. The checkpointer's latest checkpoint is evidence only. Every submission and resumption MUST pass in config the `checkpoint_id` of the expected source, or of the resumed checkpoint. A stamped root checkpoint that does not descend from the head classifies `in_doubt`.
+The namespace head is the `result_key` of the last accepted transition observation for the namespace, or none. The checkpointer's latest checkpoint is evidence only. Every submission and resumption MUST pass in config the `checkpoint_id` of the expected source, or of the resumed checkpoint. A stamped root checkpoint of the unit generation that does not descend from that generation's expected source classifies `in_doubt`.
 
 A namespace has at most one in-flight invocation. A conflicting, duplicate-with-different-content, or out-of-order observation MUST fail closed. An exact duplicate MUST be idempotent. The `RuntimeResult`, the operation result, and the settlement MUST reference the result checkpoint key of the transition they settle.
 
@@ -414,7 +414,7 @@ This document preserves the provider-neutral runtime, workspace, artifact, and s
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-CP-DA-004, 008, 011, and 015. Changed contract: `CON-CP-ASYNC-SUBAGENT-V1` gains contract schema fields (REQ-CP-DA-019), the new lifecycle value `in_doubt`, and the operator decisions `adopt_provider_run` and `orphan_child` (REQ-CP-DA-008). New: REQ-CP-DA-016, 017, 018, and 019; `CON-CP-CHECKPOINT-LINEAGE-V1`. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
+| AMD-RRM-001 | 2026-10-01 | accepted 2026-10-01 (independent review `accept`; user pre-authorized acceptance after review) | Clarified: REQ-CP-DA-004, 008, 011, and 015. Changed contract: `CON-CP-ASYNC-SUBAGENT-V1` gains contract schema fields (REQ-CP-DA-019), the new lifecycle value `in_doubt`, and the operator decisions `adopt_provider_run` and `orphan_child` (REQ-CP-DA-008). New: REQ-CP-DA-016, 017, 018, and 019; `CON-CP-CHECKPOINT-LINEAGE-V1`. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
 
 The notation follows `SPEC-CP-DURABLE-EXECUTION` § Amendment record.
 

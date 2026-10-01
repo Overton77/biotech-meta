@@ -1,7 +1,7 @@
 ---
 id: ADR-0004
 title: Exact cognitive state and runtime-context schemas for Deep Agent materialization
-status: proposed  # acceptance commit changes only this line (to accepted)
+status: accepted
 recorded_at: 2026-08-09
 deferred_decisions: ["5", "2 (Workflow Type / WorkflowConfiguration pack declaration only)"]  # remain proposed and are not authority when this ADR is accepted
 supersedes: []
@@ -106,7 +106,7 @@ Pre-production: extend profile/binding contracts and the Deep Agents adapter; no
 
 ## RRM-001 disposition recommendation (AMD-RRM-001, 2026-10-01)
 
-Status remains `proposed`. AMD-RRM-001 recommends **acceptance narrowed** to the decisions that the executing system already depends on and that exact checkpoint lineage requires. The status change is recorded only by the reviewer. **Acceptance mechanism:** the acceptance commit changes only `status: proposed` to `status: accepted`. The frontmatter key `deferred_decisions` already names decision 5 and the Workflow Type / WorkflowConfiguration part of decision 2. Those stay proposed and are not authority.
+Status: **accepted 2026-10-01, narrowed** under AMD-RRM-001. Acceptance is narrowed to the decisions that the executing system already depends on and that exact checkpoint lineage requires. The key `deferred_decisions` already names decision 5 and the Workflow Type / WorkflowConfiguration part of decision 2. Those stay proposed and are not authority.
 
 | Decision | Recommendation | Reason |
 |---|---|---|

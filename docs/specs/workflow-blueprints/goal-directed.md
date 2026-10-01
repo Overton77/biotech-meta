@@ -8,7 +8,7 @@ amendments:
   - id: AMD-RRM-001
     recorded_at: 2026-10-01
     base_revision: c48867a
-    status: proposed_for_acceptance  # RRM-001 independent review pending; not yet accepted
+    status: accepted  # RRM-001 accepted 2026-10-01 after independent review (user pre-authorization)
     summary: durable pause and resume, shared-session ordering
 depends_on: [SPEC-CP-DEFINITIONS, SPEC-CP-RUN-CONTROL, SPEC-CP-DURABLE-EXECUTION, SPEC-CP-DEEP-AGENT-RUNTIME]
 sources:
@@ -160,7 +160,7 @@ A pause requested while a unit is active is `delivered` immediately and `applied
 
 Executor units that share a governed session MUST execute strictly in goal-iteration order, with at most one in-flight invocation per cognitive session namespace. Each unit's expected source checkpoint MUST be the namespace head: the `result_key` of the previous unit's accepted transition in that namespace. Its invocation MUST be pinned to that checkpoint (REQ-CP-DA-017).
 
-Verifier units MUST use a namespace distinct from the executor's. A rollover or fresh-from-handoff mode MUST start a new session generation and namespace rather than branch the existing thread. A generation boundary on a GoalDirected unit keeps its `unit_key`. That generation runs fresh-from-handoff in the namespace `belllabs/goal/{run}/epoch/{epoch}/unit/{unit_key}/gen/{execution_generation}`. The next iteration is admitted into a new `session_generation`. Session reuse is intentional, recorded state. A checkpoint in a shared namespace is attributed to the unit whose stamped invocation wrote it.
+Verifier units MUST use a namespace distinct from the executor's. A rollover or fresh-from-handoff mode MUST start a new session generation and namespace rather than branch the existing thread. A generation boundary on a GoalDirected unit keeps its `unit_key`. That generation runs fresh-from-handoff, unless the accepted decision names a seed under REQ-CP-EXEC-005, in the namespace `belllabs/goal/{run}/epoch/{epoch}/unit/{unit_key}/gen/{execution_generation}`. The next iteration is admitted into a new `session_generation`. Session reuse is intentional, recorded state. A checkpoint in a shared namespace is attributed to the unit whose stamped invocation wrote it.
 
 **Amendment:** AMD-RRM-001, new (ordering protocol for REQ-BP-GD-005 and 006).
 
@@ -211,6 +211,6 @@ This specification extracts and supersedes all GoalDirected semantic material fr
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | New IDs: REQ-BP-GD-011 (clarifies already-mandated pause semantics) and REQ-BP-GD-012 (new ordering protocol). The fork boundary for this family is defined by REQ-CP-EXEC-016. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
+| AMD-RRM-001 | 2026-10-01 | accepted 2026-10-01 (independent review `accept`; user pre-authorized acceptance after review) | New IDs: REQ-BP-GD-011 (clarifies already-mandated pause semantics) and REQ-BP-GD-012 (new ordering protocol). The fork boundary for this family is defined by REQ-CP-EXEC-016. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
 
 The notation follows `SPEC-CP-DURABLE-EXECUTION` § Amendment record.

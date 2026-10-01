@@ -22,7 +22,7 @@ This directory is the canonical specification authority for the BellLabs control
 2. [SPEC-CP-RUN-CONTROL](02-transactional-admission-lifecycle-budgets-and-events.md) — admission, lifecycle, commands, budgets, effects, settlement, terminality, and product events.
 3. [SPEC-CP-DURABLE-EXECUTION](03-temporal-run-operation-continuity-and-linked-runs.md) — `BellLabsRunWorkflow`, family and operation hierarchy, messages, cancellation, linked runs, recovery, and Continue-As-New.
 4. [SPEC-CP-DEEP-AGENT-RUNTIME](04-deep-agent-materialization-subagents-workspaces-and-artifacts.md) — Deep Agent profiles and exact bindings, execution placement, capabilities, synchronous and asynchronous subagents, workspaces, artifacts, and snapshots.
-5. [SPEC-CP-COGNITIVE-SCHEMAS](05-deep-agent-cognitive-state-and-context-schemas.md) — Deep Agents `state_schema` / `context_schema` packs, digests, and materialization (draft; governed by proposed ADR-0004; AMD-RRM-001 recommends narrowed acceptance, review pending).
+5. [SPEC-CP-COGNITIVE-SCHEMAS](05-deep-agent-cognitive-state-and-context-schemas.md) — Deep Agents `state_schema` / `context_schema` packs, digests, and materialization (canonical with narrowed scope per AMD-RRM-001, accepted 2026-10-01; REQ-CP-CS-006/008 deferred; governed by ADR-0004, accepted with decision 5 deferred).
 6. [SPEC-BP-STAGEGRAPH](../workflow-blueprints/stagegraph.md) — StageGraph semantics.
 7. [SPEC-BP-GOAL-DIRECTED](../workflow-blueprints/goal-directed.md) — GoalDirected semantics.
 
@@ -76,7 +76,7 @@ The detailed governed catalogs and promotion workflows for those capabilities ar
 
 ## Pending amendment AMD-RRM-001 (research-runtime lifecycle)
 
-Status: **proposed for acceptance (RRM-001 review pending)**. Recorded 2026-10-01 on branch `spec/research-runtime-lifecycle`, based on `c48867a`. It is not accepted authority until a reviewer records acceptance. Implementation of its new contracts waits for that record.
+Status: **accepted 2026-10-01**. Authored on branch `spec/research-runtime-lifecycle`, based on `c48867a`. An independent review returned `accept_with_fixes`; the fixes were applied and re-verified, and the final wording fixes landed in the acceptance commit. The user pre-authorized acceptance after independent review (coordinator session answer, recorded verbatim: "Pre-authorize after review (Recommended)").
 
 | Specification | Clarified (already mandated) | New |
 |---|---|---|

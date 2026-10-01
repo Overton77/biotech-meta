@@ -8,7 +8,7 @@ amendments:
   - id: AMD-RRM-001
     recorded_at: 2026-10-01
     base_revision: c48867a
-    status: proposed_for_acceptance  # RRM-001 independent review pending; not yet accepted
+    status: accepted  # RRM-001 accepted 2026-10-01 after independent review (user pre-authorization)
     summary: runtime-unit identity, Activity attempt fencing, command receipts, cancellation saga detail, Visibility join, safe macro snapshots and forks
 depends_on: [SPEC-CP-DEFINITIONS, SPEC-CP-RUN-CONTROL]
 sources:
@@ -231,7 +231,7 @@ The attributes are supplied by a composition-level Search Attribute policy:
 - **`required`** — for production and persistent qualification namespaces. Attributes are registered by the administrative step, and every start sets them.
 - **`disabled`** — for the time-skipping test server and captured-history replay, where workflows start without attributes. `WorkflowEnvironment.start_local` fixtures may register the attributes with its `search_attributes` argument and use `required`.
 
-A captured history is replayed under the policy it was recorded with, so existing replay fixtures are unaffected.
+A captured history is replayed under the policy it was recorded with, so existing replay fixtures are unaffected. The policy is carried in the root, family and `OperationWorkflow` inputs and through Continue-As-New, and workflow code never reads it from worker configuration. An absent field means `disabled`, which covers existing histories. Production composition rejects `disabled`.
 
 **Amendment:** AMD-RRM-001, new (API and deployment detail).
 
@@ -386,6 +386,6 @@ This document extracts the shared orchestration and linked-run material from pre
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-CP-EXEC-005, 006, 007, 008, 011, and 012; `CON-CP-TEMPORAL-IDENTITY-V1`, `CON-CP-WORKFLOW-MESSAGE-V1`, and `CON-CP-CONTINUATION-V1`. New: REQ-CP-EXEC-013, 014, 015, and 016; `CON-CP-RUNTIME-UNIT-V1`. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date and are recorded in the RRM-001 traceability document. |
+| AMD-RRM-001 | 2026-10-01 | accepted 2026-10-01 (independent review `accept`; user pre-authorized acceptance after review) | Clarified: REQ-CP-EXEC-005, 006, 007, 008, 011, and 012; `CON-CP-TEMPORAL-IDENTITY-V1`, `CON-CP-WORKFLOW-MESSAGE-V1`, and `CON-CP-CONTINUATION-V1`. New: REQ-CP-EXEC-013, 014, 015, and 016; `CON-CP-RUNTIME-UNIT-V1`. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date and are recorded in the RRM-001 traceability document. |
 
 Notation: "clarified" means the behavior was already mandated by the cited requirement and the amendment adds exact states, fields, or ordering. "New" means a newly specified storage, API, or protocol detail. Until the amendment is accepted, implementation of the new contracts remains gated, per the RRM-001 ticket. The disposition of existing implementation contracts is recorded in the RRM-001 application traceability document (`docs/migrations_instructions/implementation_work_packages_v2/research-runtime-mission/RRM-001-contract-authority.md` in the application repository) and mirrored in [the control-plane index](README.md#amd-rrm-001-contract-disposition).

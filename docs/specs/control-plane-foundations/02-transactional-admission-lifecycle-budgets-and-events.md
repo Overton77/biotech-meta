@@ -8,7 +8,7 @@ amendments:
   - id: AMD-RRM-001
     recorded_at: 2026-10-01
     base_revision: c48867a
-    status: proposed_for_acceptance  # RRM-001 independent review pending; not yet accepted
+    status: accepted  # RRM-001 accepted 2026-10-01 after independent review (user pre-authorization)
     summary: requested-versus-applied lifecycle axes, in_doubt effect disposition, async-child usage settlement, scoped inspection reads and freshness
 depends_on: [SPEC-CP-DEFINITIONS]
 sources:
@@ -247,6 +247,6 @@ This specification extracts and supersedes pre-research foundation 02 while addi
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-CP-RUN-004, 007, and 009; `CON-CP-LIFECYCLE-V1` projection fields. New: REQ-CP-RUN-011 and 012; `CON-CP-INSPECTION-READ-V1`; the `reconcile_unit` command and the `operator_reconciliation` wait condition in `CON-CP-LIFECYCLE-V1`. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
+| AMD-RRM-001 | 2026-10-01 | accepted 2026-10-01 (independent review `accept`; user pre-authorized acceptance after review) | Clarified: REQ-CP-RUN-004, 007, and 009; `CON-CP-LIFECYCLE-V1` projection fields. New: REQ-CP-RUN-011 and 012; `CON-CP-INSPECTION-READ-V1`; the `reconcile_unit` command and the `operator_reconciliation` wait condition in `CON-CP-LIFECYCLE-V1`. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
 
 The notation follows `SPEC-CP-DURABLE-EXECUTION` § Amendment record.

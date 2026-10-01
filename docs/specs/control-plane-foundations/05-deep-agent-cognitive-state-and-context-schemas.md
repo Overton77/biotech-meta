@@ -1,7 +1,7 @@
 ---
 id: SPEC-CP-COGNITIVE-SCHEMAS
 title: Deep Agent cognitive state and runtime-context schemas
-status: draft  # acceptance commit changes only this line (to canonical) and the AMD-RRM-001 status below
+status: canonical
 version: 2
 deferred_requirements: [REQ-CP-CS-006, REQ-CP-CS-008]  # remain draft text and are not authority when this spec is canonical
 governed_by: [ADR-0003, ADR-0004]
@@ -9,7 +9,7 @@ amendments:
   - id: AMD-RRM-001
     recorded_at: 2026-10-01
     base_revision: c48867a
-    status: proposed_for_acceptance  # narrowed acceptance recommended; RRM-001 independent review pending; status flip is the reviewer's
+    status: accepted  # RRM-001 accepted 2026-10-01 after independent review (user pre-authorization)
     summary: narrow to the implemented and mission-required core; split and defer Workflow Type pack declaration (REQ-CP-CS-008) and sync-subagent seed projection (REQ-CP-CS-006)
 depends_on: [SPEC-CP-DEFINITIONS, SPEC-CP-DEEP-AGENT-RUNTIME]
 sources:
@@ -292,4 +292,4 @@ Extracts the cognitive-schema decisions from ADR-0004 and the 2026-08-09 archite
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending); narrowed | Recommends narrowed acceptance per § Acceptance scope. REQ-CP-CS-004 amended; REQ-CP-CS-008 split from it and deferred; REQ-CP-CS-006 deferred; REQ-CP-CS-007 amended to the stamped digest. The document `status` stays `draft` until the reviewer records the disposition. |
+| AMD-RRM-001 | 2026-10-01 | accepted 2026-10-01, narrowed (independent review `accept`; user pre-authorized acceptance after review) | Recommends narrowed acceptance per § Acceptance scope. REQ-CP-CS-004 amended; REQ-CP-CS-008 split from it and deferred; REQ-CP-CS-006 deferred; REQ-CP-CS-007 amended to the stamped digest. The document is `canonical` for the accepted scope; REQ-CP-CS-006 and REQ-CP-CS-008 remain deferred draft text and are not authority. |

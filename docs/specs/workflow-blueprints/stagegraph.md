@@ -8,7 +8,7 @@ amendments:
   - id: AMD-RRM-001
     recorded_at: 2026-10-01
     base_revision: c48867a
-    status: proposed_for_acceptance  # RRM-001 independent review pending; not yet accepted
+    status: accepted  # RRM-001 accepted 2026-10-01 after independent review (user pre-authorization)
     summary: governed declared-wait release and wait continuity
 depends_on: [SPEC-CP-DEFINITIONS, SPEC-CP-RUN-CONTROL, SPEC-CP-DURABLE-EXECUTION, SPEC-CP-DEEP-AGENT-RUNTIME]
 sources:
@@ -320,6 +320,6 @@ This specification extracts and supersedes all StageGraph semantic material from
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-BP-SG-009 (governed wait release, receipts, Continue-As-New continuity). No new requirement IDs. |
+| AMD-RRM-001 | 2026-10-01 | accepted 2026-10-01 (independent review `accept`; user pre-authorized acceptance after review) | Clarified: REQ-BP-SG-009 (governed wait release, receipts, Continue-As-New continuity). No new requirement IDs. |
 
 The notation follows `SPEC-CP-DURABLE-EXECUTION` § Amendment record.
