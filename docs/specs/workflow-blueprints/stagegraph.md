@@ -2,8 +2,14 @@
 id: SPEC-BP-STAGEGRAPH
 title: StageGraph blueprint semantics
 status: canonical
-version: 2
+version: 3
 governed_by: [ADR-0003]
+amendments:
+  - id: AMD-RRM-001
+    recorded_at: 2026-10-01
+    base_revision: c48867a
+    status: accepted  # RRM-001 accepted 2026-10-01 after independent review (user pre-authorization)
+    summary: governed declared-wait release and wait continuity
 depends_on: [SPEC-CP-DEFINITIONS, SPEC-CP-RUN-CONTROL, SPEC-CP-DURABLE-EXECUTION, SPEC-CP-DEEP-AGENT-RUNTIME]
 sources:
   - path: ../pre-research/control-plane-foundations/03-durable-blueprint-orchestration-and-linked-runs.md
@@ -123,6 +129,13 @@ An accepted workflow-cycle decision MUST declare an invalidation frontier; the i
 Local waits MUST leave unrelated runnable stages active, cancellation MUST follow the shared reconciliation saga, and slow/late sibling results MUST receive exactly one frozen-policy `admit`, `reject`, or `quarantine` decision with the projection, liability, settlement, and completion effects defined by `CON-BP-STAGEGRAPH-V2`. No late decision may retroactively mutate terminal state or the frozen inputs of already admitted work.
 
 **Verification:** mixed wait, pause, cancel, late result, and Continue-As-New cases.
+
+**AMD-RRM-001 (clarified):** A declared wait MUST be released only by one of the following:
+
+- an accepted run-control `satisfy_wait` command, delivered to the StageGraph family and applied at the wait boundary, with the receipts of REQ-CP-EXEC-006;
+- a declared timer or dependency fact accepted by authority.
+
+The `applied` receipt is recorded when the wait is consumed. A raw Temporal signal is not a public release path (REQ-CP-EXEC-007). While running, a held wait is inspectable through REQ-CP-RUN-011, with its scope, condition, and pending commands. Satisfied and pending wait state is carried across Continue-As-New (REQ-CP-EXEC-011). A release whose target wait identity is not active is rejected `not_applicable`, and a release with a stale run version is rejected `stale_version`. A stage-scoped wait never blocks unrelated admissible stages (REQ-CP-RUN-004). The safe fork boundaries for this family are defined by REQ-CP-EXEC-016.
 
 ### REQ-BP-SG-010 — Completion is obligation-based
 
@@ -302,3 +315,11 @@ The initial implementation uses Temporal `StageGraphWorkflow` and `StageGraphInt
 ## Source lineage and supersession
 
 This specification extracts and supersedes all StageGraph semantic material from the old combined foundation 03 and the frozen Stage 4 package family.
+
+## Amendment record
+
+| Amendment | Recorded | Status | Scope |
+|---|---|---|---|
+| AMD-RRM-001 | 2026-10-01 | accepted 2026-10-01 (independent review `accept`; user pre-authorized acceptance after review) | Clarified: REQ-BP-SG-009 (governed wait release, receipts, Continue-As-New continuity). No new requirement IDs. |
+
+The notation follows `SPEC-CP-DURABLE-EXECUTION` § Amendment record.

@@ -2,8 +2,14 @@
 id: SPEC-BP-GOAL-DIRECTED
 title: GoalDirected blueprint semantics
 status: canonical
-version: 1
+version: 2
 governed_by: [ADR-0003]
+amendments:
+  - id: AMD-RRM-001
+    recorded_at: 2026-10-01
+    base_revision: c48867a
+    status: accepted  # RRM-001 accepted 2026-10-01 after independent review (user pre-authorization)
+    summary: durable pause and resume, shared-session ordering
 depends_on: [SPEC-CP-DEFINITIONS, SPEC-CP-RUN-CONTROL, SPEC-CP-DURABLE-EXECUTION, SPEC-CP-DEEP-AGENT-RUNTIME]
 sources:
   - path: ../pre-research/control-plane-foundations/03-durable-blueprint-orchestration-and-linked-runs.md
@@ -23,6 +29,8 @@ requirements:
   - REQ-BP-GD-008
   - REQ-BP-GD-009
   - REQ-BP-GD-010
+  - REQ-BP-GD-011
+  - REQ-BP-GD-012
 contracts:
   - CON-BP-GOAL-DIRECTED-V1
   - CON-BP-GOAL-HANDOFF-V1
@@ -131,6 +139,33 @@ The interpreter MUST emit a typed terminalization/continuation proposal binding 
 
 **Verification:** valid completion, partial completion, failure, cancellation, iteration exhaustion, and stale proposal.
 
+### REQ-BP-GD-011 — Pause is a durable, resumable state
+
+When convergence policy selects `pause`, or an accepted run-control pause targets the run, the GoalDirected family MUST do the following:
+
+1. quiesce at an iteration boundary, with no executor or verifier unit active;
+2. persist a durable paused state that binds the active Goal Revision, next iteration, session generation and mode, handoff ref, effect frontier, and held reservations;
+3. record the pause's `applied` receipt;
+4. wait without failing, terminating, or raising a workflow error until an accepted resume is delivered.
+
+A resume MUST continue from that exact frontier. It MUST NOT re-run settled iterations, mutate frozen bindings, or change the envelope. A reused session continues from the namespace head recorded before the pause (REQ-BP-GD-012). A policy-selected rollover instead continues fresh from the handoff. A paused run remains cancellable under the shared saga. The paused state survives worker restart and Continue-As-New.
+
+A pause requested while a unit is active is `delivered` immediately and `applied` only at the next boundary. Reservations for iterations not yet started are released on pause and re-reserved on resume. A resume that cannot re-reserve is rejected `insufficient_budget`, and the run stays paused. A policy-selected pause enters run control as a pause proposal bound to the convergence decision.
+
+**Amendment:** AMD-RRM-001. Clarified: `paused` with explicit resume is already mandated by `SPEC-CP-RUN-CONTROL` § State and lifecycle and REQ-CP-RUN-004, and `pause` is already a convergence decision here. The new ID gives the family a testable owner.
+
+**Verification:** policy and command pauses persist across worker restart and forced Continue-As-New; no workflow failure is reported for a pause; resume continues at the recorded next iteration with an unchanged revision and bindings; cancellation while paused completes the saga.
+
+### REQ-BP-GD-012 — Shared-session transitions are ordered
+
+Executor units that share a governed session MUST execute strictly in goal-iteration order, with at most one in-flight invocation per cognitive session namespace. Each unit's expected source checkpoint MUST be the namespace head: the `result_key` of the previous unit's accepted transition in that namespace. Its invocation MUST be pinned to that checkpoint (REQ-CP-DA-017).
+
+Verifier units MUST use a namespace distinct from the executor's. A rollover or fresh-from-handoff mode MUST start a new session generation and namespace rather than branch the existing thread. A generation boundary on a GoalDirected unit keeps its `unit_key`. That generation runs fresh-from-handoff, unless the accepted decision names a seed under REQ-CP-EXEC-005, in the namespace `belllabs/goal/{run}/epoch/{epoch}/unit/{unit_key}/gen/{execution_generation}`. The next iteration is admitted into a new `session_generation`. Session reuse is intentional, recorded state. A checkpoint in a shared namespace is attributed to the unit whose stamped invocation wrote it.
+
+**Amendment:** AMD-RRM-001, new (ordering protocol for REQ-BP-GD-005 and 006).
+
+**Verification:** iterations N and N+1 in one session produce a linear stamped lineage; a concurrent second invocation of the session is rejected; rollover produces a new empty namespace; a generation boundary keeps the `unit_key`, runs in the unit-generation namespace, and moves the next iteration to a new session generation; a recovered iteration never re-appends its input into the shared thread.
+
 ## Contracts
 
 `CON-BP-GOAL-DIRECTED-V1` defines the objective envelope, revision policy, operation/subgoal classes, session modes, iteration/convergence limits, verifier, snapshots, and stopping policy. `CON-BP-GOAL-HANDOFF-V1` defines the fresh-session handoff and context rollover record. `CON-BP-GOAL-VERIFICATION-V1` defines verifier binding, evidence/rubric, decision, and applicability.
@@ -171,3 +206,11 @@ reuse domain handlers but not the current direct activity or OpenAI Agents SDK s
 ## Source lineage and supersession
 
 This specification extracts and supersedes all GoalDirected semantic material from the old combined foundation 03 and the frozen Stage 5 package family.
+
+## Amendment record
+
+| Amendment | Recorded | Status | Scope |
+|---|---|---|---|
+| AMD-RRM-001 | 2026-10-01 | accepted 2026-10-01 (independent review `accept`; user pre-authorized acceptance after review) | New IDs: REQ-BP-GD-011 (clarifies already-mandated pause semantics) and REQ-BP-GD-012 (new ordering protocol). The fork boundary for this family is defined by REQ-CP-EXEC-016. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
+
+The notation follows `SPEC-CP-DURABLE-EXECUTION` § Amendment record.
