@@ -102,3 +102,18 @@ Pre-production: extend profile/binding contracts and the Deep Agents adapter; no
 - Deep Agents changes built-in state channels or subagent inheritance semantics.
 - A Workflow Type needs a universal channel that cannot live in a pack without forcing every operation to carry it.
 - Evidence that `artifact_index` should be middleware-private rather than graph-shared.
+
+## RRM-001 disposition recommendation (AMD-RRM-001, 2026-10-01)
+
+Status remains `proposed`. AMD-RRM-001 recommends **acceptance narrowed** to the decisions that the executing system already depends on and that exact checkpoint lineage requires. The status change is recorded only by the reviewer.
+
+| Decision | Recommendation | Reason |
+|---|---|---|
+| 1. Two cognitive schema kinds | accept | Implemented on the exact binding and materializer; WP-CP-040 evidence |
+| 2. Ownership on the spine | accept the binding and adapter pinning; **defer** Workflow Type / WorkflowConfiguration pack declaration | Pinning is implemented; no Workflow Type declares packs and no mission ticket needs it |
+| 3. Inherit built-ins plus three base channels | accept | Implemented and inspected |
+| 4. Placement rule for fields | accept | Already enforced by reference-only context validation and sensitive-key rejection |
+| 5. Subagent default is projection | **defer** | Projected seeding is not implemented; sync subagents stay bounded by REQ-CP-DA-007 |
+| 6. Compatibility: digest change makes a new binding; restore requires agreement | accept | Required by exact checkpoint lineage; enforced through the stamped digest (REQ-CP-DA-016, REQ-CP-CS-007) |
+
+Excluding the ADR entirely was rejected: accepted runtime code and evidence (WP-CP-040) already depend on decisions 1, 3, 4, and 6. Accepting it unchanged was also rejected, because decisions 2 (in part) and 5 are unproven and outside the mission. The spec-level mirror is `SPEC-CP-COGNITIVE-SCHEMAS` § Acceptance scope.

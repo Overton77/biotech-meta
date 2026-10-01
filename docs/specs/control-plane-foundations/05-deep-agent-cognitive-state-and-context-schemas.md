@@ -2,8 +2,14 @@
 id: SPEC-CP-COGNITIVE-SCHEMAS
 title: Deep Agent cognitive state and runtime-context schemas
 status: draft
-version: 1
+version: 2
 governed_by: [ADR-0003, ADR-0004]
+amendments:
+  - id: AMD-RRM-001
+    recorded_at: 2026-10-01
+    base_revision: c48867a
+    status: proposed_for_acceptance  # narrowed acceptance recommended; RRM-001 independent review pending; status flip is the reviewer's
+    summary: narrow to the implemented and mission-required core; split and defer Workflow Type pack declaration (REQ-CP-CS-008) and sync-subagent seed projection (REQ-CP-CS-006)
 depends_on: [SPEC-CP-DEFINITIONS, SPEC-CP-DEEP-AGENT-RUNTIME]
 sources:
   - path: ../../adr/0004-deep-agent-cognitive-state-and-context-schemas.md
@@ -21,6 +27,7 @@ requirements:
   - REQ-CP-CS-005
   - REQ-CP-CS-006
   - REQ-CP-CS-007
+  - REQ-CP-CS-008
 contracts:
   - CON-CP-COGNITIVE-STATE-SCHEMA-V1
   - CON-CP-COGNITIVE-CONTEXT-SCHEMA-V1
@@ -34,6 +41,23 @@ qualification_obligations:
 ## Purpose
 
 Define how BellLabs authors, compiles, and materializes Deep Agents `state_schema` and `context_schema` when an operation is built from a Workflow Type → ERC → operation binding → Temporal activity.
+
+## Acceptance scope (AMD-RRM-001 recommendation)
+
+This specification remains `draft` until a reviewer records a disposition. AMD-RRM-001 recommends **narrowed acceptance**: promote the core that the executing system already depends on and that checkpoint lineage needs, and keep the rest draft.
+
+| Requirement | Recommended disposition | Evidence (application repository) |
+|---|---|---|
+| REQ-CP-CS-001 distinct schema kinds | accept | `DeepAgentExecutionBinding` carries both schemas (`app/domain/operation_execution/contracts.py`, binding model); WP-CP-040 tests |
+| REQ-CP-CS-002 adapter sole composition root | accept | `ExactDeepAgentMaterializer` builds the `DeepAgentState` subclass and context type from digests (`app/integrations/agents/deep_agents/materializer.py`) |
+| REQ-CP-CS-003 built-ins plus base channels | accept | The base channels are seeded and inspected in WP-CP-040 evidence |
+| REQ-CP-CS-004 channel packs compose exactly (narrowed) | accept, narrowed | `compose_cognitive_state_schema` unions packs and fails on collision (`app/domain/operation_execution/materialization.py`) |
+| REQ-CP-CS-005 middleware channels frozen | accept | The binding validator rejects middleware channel drift |
+| REQ-CP-CS-006 sync-subagent projection seeds | **defer; remains draft** | Dictionary subagents are materialized without a BellLabs-seeded state slice, so the framework default applies; the projection is unproven |
+| REQ-CP-CS-007 checkpoint digest gate | accept, amended | No resume digest gate exists yet. The mission needs it, and REQ-CP-DA-016 supplies the stamped digest RRM-003/004 must check |
+| REQ-CP-CS-008 Workflow Type pack allowlists and stage overrides (split from CS-004) | **defer; remains draft** | No Workflow Type or WorkflowConfiguration pack declaration exists in definitions; no mission ticket needs it |
+
+The three contracts are recommended for acceptance as implemented: `CON-CP-COGNITIVE-CHANNEL-PACK-V1`, `CON-CP-COGNITIVE-STATE-SCHEMA-V1`, and `CON-CP-COGNITIVE-CONTEXT-SCHEMA-V1`. The Workflow Type declaration surface in § State and lifecycle remains draft. Prior package traceability that lists REQ-CP-CS-001..007 as accepted under WP-CP-040 records package acceptance against a draft specification. It is not specification acceptance.
 
 ## Boundary and explicit non-ownership
 
@@ -150,11 +174,13 @@ Effective state schemas MUST subclass `DeepAgentState`, preserve built-in channe
 
 **Verification:** binding fixture digest and invoke seed checks.
 
-### REQ-CP-CS-004 — Workflow packs compile exactly
+### REQ-CP-CS-004 — Channel packs compose exactly
 
-Workflow Type / WorkflowConfiguration pack allowlists and stage overrides MUST be intersected into the effective schemas at compile time; unknown, forbidden, or colliding channels MUST fail closed.
+The compiler MUST compose the effective state and context schemas from exact, content-addressed channel packs. Unknown or colliding channels MUST fail closed, unless the colliding channels have identical type and reducer digests.
 
-**Verification:** compiler fixtures for allow, forbid, collide, and stage override.
+**Verification:** compiler fixtures for exact union, unknown channel, and collision.
+
+**AMD-RRM-001 (narrowed):** The Workflow Type / WorkflowConfiguration allowlist and stage-override clause moved to REQ-CP-CS-008, which remains draft.
 
 ### REQ-CP-CS-005 — Middleware channels are frozen
 
@@ -168,11 +194,23 @@ Synchronous dictionary subagents MUST receive an exact `SubagentStateSlice` and 
 
 **Verification:** child invoke seed contains only allowlisted channels; secret fields absent.
 
+**AMD-RRM-001:** Deferred; remains draft. The behavior is unproven in the current materializer. No mission ticket depends on it, because sync subagents stay bounded by REQ-CP-DA-007 tool and workspace ceilings.
+
 ### REQ-CP-CS-007 — Checkpoint compatibility is digest-gated
 
 Resume/restore of cognitive checkpoints MUST require binding `cognitive_state_schema_digest` agreement; mismatch MUST fail closed without silent channel coercion.
 
 **Verification:** digest-mismatch restore rejected.
+
+**AMD-RRM-001 (amended):** Agreement is checked against the `belllabs_state_schema_digest` stamped on the checkpoint (REQ-CP-DA-016). The check applies to resume, terminal reconstruction, historical reads, and fork seeding. A missing or mismatched stamp classifies the unit `in_doubt` (REQ-CP-DA-018), or returns an incompatible-checkpoint error for a read.
+
+### REQ-CP-CS-008 — Workflow Type pack allowlists and stage overrides
+
+Workflow Type / WorkflowConfiguration pack allowlists and stage overrides MUST be intersected into the effective schemas at compile time; unknown, forbidden, or colliding channels MUST fail closed.
+
+**Verification:** compiler fixtures for allow, forbid, collide, and stage override.
+
+**AMD-RRM-001:** Split verbatim from the original REQ-CP-CS-004. Deferred; remains draft until a Workflow Type specification needs a pack.
 
 ## Contracts
 
@@ -246,3 +284,9 @@ Covered by `QUAL-CP-DEEP-AGENT-MATERIALIZATION`: compile packs → freeze digest
 ## Source lineage and supersession
 
 Extracts the cognitive-schema decisions from ADR-0004 and the 2026-08-09 architecture discussion grounded in `BELLLABS_AGENT_WORKFLOW_CONTRACT_ARCHITECTURE.md` and Deep Agents customization/context-engineering docs. Complements, does not replace, `SPEC-CP-DEEP-AGENT-RUNTIME`.
+
+## Amendment record
+
+| Amendment | Recorded | Status | Scope |
+|---|---|---|---|
+| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending); narrowed | Recommends narrowed acceptance per § Acceptance scope. REQ-CP-CS-004 narrowed; REQ-CP-CS-008 split from it and deferred; REQ-CP-CS-006 deferred; REQ-CP-CS-007 amended to the stamped digest. The document `status` stays `draft` until the reviewer records the disposition. |
