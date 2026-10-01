@@ -102,7 +102,7 @@ Added by AMD-RRM-001:
 
 Operation preparation validates the run/config/control revision and reservation, materializes read-only inputs/capabilities and owned writable slots, persists the binding, then invokes the exact placement adapter. Execution emits typed progress/effects/usage and returns a result proposal. Artifact promotion and result settlement are separate authoritative decisions.
 
-An async subordinate follows `proposed -> admitted -> submitted -> running | waiting -> completed | failed | cancelled | orphaned -> result_admitted | result_rejected | result_deferred`. Provider observations cannot skip BellLabs admission, reconciliation, or parent result admission.
+An async subordinate follows `proposed -> admitted -> submitted -> running | waiting -> completed | failed | cancelled | orphaned -> result_admitted | result_rejected | result_deferred`. Provider observations cannot skip BellLabs admission, reconciliation, or parent result admission. AMD-RRM-001 adds the lifecycle value `in_doubt`. A child may enter it from `admitted`, `submitted`, `running`, or `waiting`, and leaves it only as REQ-CP-DA-008 prescribes.
 
 ## Requirements
 
@@ -162,6 +162,9 @@ An async-subagent spawn MUST create an immutable `AsyncSubagentContract`, exact 
 - **Identity.** The provider thread ID is the BellLabs `child_execution_id`.
 - **One provider run.** Each child has at most one provider run. Submission is fenced per child, so at most one submitter runs at a time. A submitter first looks up an existing run by its BellLabs spawn key and creates a run only if none exists.
 - **Ambiguity.** An ambiguous outcome is classified `in_doubt` and reconciled by observation, never by a second spawn. Ambiguous outcomes are a submission whose result is unknown, more than one provider run carrying the spawn key, or a served graph identity mismatch.
+- **Leaving `in_doubt`.** `in_doubt` is a new `CON-CP-ASYNC-SUBAGENT-V1` lifecycle value. An observation resolves it to `submitted` or `running` when exactly one provider run with the spawn key exists, or to `orphaned` when no provider run exists. Otherwise one of two typed operator decisions, recorded through the parent's authority, resolves it:
+  - `adopt_provider_run(run_id)` binds the named run. Every other provider run carrying the spawn key is cancelled, and its usage is recorded as pending.
+  - `orphan_child` disposes the child under its link policy.
 - **`orphaned`.** A child becomes `orphaned` only after reconciliation records that no provider run exists and the link policy says so. A raised submission error alone never makes it `orphaned`.
 - **Interrupted submission.** A child left `admitted` without a provider binding after a crash is resumed by the same fenced submission path.
 - **Agent Server restart.** After a restart, the parent reconciles from the server's durable thread and run state.
@@ -223,7 +226,7 @@ Every local Deep Agent invocation MUST address exactly one cognitive session nam
 **Namespaces** (in `CON-CP-CHECKPOINT-LINEAGE-V1`):
 
 - A StageGraph unit owns one namespace per unit generation.
-- A GoalDirected executor or verifier role owns one namespace per session generation, shared intentionally by that session's ordered units (REQ-BP-GD-012).
+- A GoalDirected executor or verifier role owns one namespace per session generation, shared intentionally by that session's ordered units (REQ-BP-GD-012). A later generation of a GoalDirected unit owns its own unit-generation namespace.
 - An async child's namespace is its provider thread.
 
 **Root and subgraph namespaces.** A custom root `checkpoint_ns` is prohibited. The installed LangGraph treats a non-empty namespace as a subgraph path when reading state. Checkpoints written under non-root namespaces of the same thread (subgraphs and synchronous subagents) are recorded as nested evidence only. They never count as root-namespace descendants.
@@ -242,6 +245,8 @@ For each unit generation, the adapter path MUST:
 
 The observation links `unit_key`, generation, claim fence, namespace, source key, result key with its ancestry to the source, binding digest, state schema digest, result manifest ref and digest, and a redacted summary digest.
 
+The namespace head is the `result_key` of the last accepted transition observation for the namespace, or none. The checkpointer's latest checkpoint is evidence only. Every submission and resumption MUST pass in config the `checkpoint_id` of the expected source, or of the resumed checkpoint. A stamped root checkpoint that does not descend from the head classifies `in_doubt`.
+
 A namespace has at most one in-flight invocation. A conflicting, duplicate-with-different-content, or out-of-order observation MUST fail closed. An exact duplicate MUST be idempotent. The `RuntimeResult`, the operation result, and the settlement MUST reference the result checkpoint key of the transition they settle.
 
 **Amendment:** AMD-RRM-001, new (storage and protocol detail). It completes the checkpoint/runtime lineage obligation of `QUAL-CP-DEEP-AGENT-MATERIALIZATION`.
@@ -250,7 +255,7 @@ A namespace has at most one in-flight invocation. A conflicting, duplicate-with-
 
 ### REQ-CP-DA-018 — Terminal reconstruction versus interrupted resume
 
-On every Activity attempt, before any provider work, the adapter path MUST classify the unit generation from BellLabs records and the checkpointer, and MUST act exactly as `CON-CP-CHECKPOINT-LINEAGE-V1` prescribes. A checkpoint written by the current submission never authorizes appending that input again. Any state other than the unique cases listed MUST create an `in_doubt` reconciliation incident and MUST NOT invoke the model. Ambiguous states include more than one stamped leaf, a head that does not descend from the source, a metadata or digest mismatch, a recorded checkpoint that is missing, or a checkpointer that cannot be classified. Resolution requires a privileged, typed operator reconciliation command (REQ-CP-RUN-011).
+On every Activity attempt, before any provider work, the adapter path MUST classify the unit generation from BellLabs records and the checkpointer, and MUST act exactly as `CON-CP-CHECKPOINT-LINEAGE-V1` prescribes. A checkpoint written by the current submission never authorizes appending that input again. Any state other than the unique cases listed MUST create an `in_doubt` reconciliation incident and MUST NOT invoke the model. Ambiguous states include more than one stamped leaf, a head that does not descend from the source, a metadata or digest mismatch, a recorded checkpoint that is missing, or a checkpointer that cannot be classified. Resolution requires the privileged, typed operator command `reconcile_unit` (`CON-CP-LIFECYCLE-V1`).
 
 **Amendment:** AMD-RRM-001, new (protocol detail). It implements REQ-CP-EXEC-005 and REQ-CP-RUN-007 for local cognition.
 
@@ -293,12 +298,15 @@ Define logical slots and ownership, candidate-to-admitted artifact state, and im
 ```text
 stage_graph unit:      belllabs/stage/{unit_key}/gen/{execution_generation}
 goal_directed role:    belllabs/goal/{belllabs_run_id}/epoch/{execution_epoch}/session/{session_generation}/role/{executor|verifier}
+goal_directed unit generation >= 2:
+                       belllabs/goal/{belllabs_run_id}/epoch/{execution_epoch}/unit/{unit_key}/gen/{execution_generation}
 async child:           provider thread = child_execution_id   (checkpoint_ns as reported by the provider)
 ```
 
 The rules for these namespaces are:
 
-- A GoalDirected generation boundary, rollover, or fresh-from-handoff selection starts a new `session_generation`, and therefore a new namespace. An existing thread is never branched.
+- A GoalDirected rollover or fresh-from-handoff selection starts a new `session_generation`, and therefore a new namespace. An existing thread is never branched.
+- A generation boundary on a GoalDirected unit keeps its `unit_key`. That generation runs fresh-from-handoff in the namespace `belllabs/goal/{run}/epoch/{epoch}/unit/{unit_key}/gen/{execution_generation}`. The next iteration is admitted into a new `session_generation`.
 - A derived (forked) run uses its own run ID, and therefore its own namespaces.
 - The binding records the namespace it was bound with. Workers MUST NOT derive a different one.
 
@@ -333,9 +341,9 @@ The CAS key is `(namespace, expected head)`.
 |---|---|---|
 | `settled` | An authoritative settlement exists for the unit generation | Return the stored result; no provider work |
 | `observed_unsettled` | A transition observation with a result manifest exists, but no settlement | Settle from the recorded manifest; no invocation |
-| `not_submitted` | No stamped root-namespace checkpoint exists, and the namespace head equals the expected source | Submit: invoke once with the unit's input |
-| `interrupted` | Exactly one stamped root-namespace lineage descends from the source, and its latest checkpoint has pending tasks | Resume: invoke with no input from that checkpoint; never append the input again |
-| `terminal_unobserved` | Exactly one stamped lineage descends from the source, and its latest checkpoint has no pending tasks or interrupts | Reconstruct the result from that checkpoint's state after the metadata and digest checks, record the observation by CAS, then settle; no invocation |
+| `not_submitted` | No root-namespace checkpoint descends from the expected source (for a new namespace, the namespace has no root checkpoint), and the expected source is the namespace head | Submit: invoke once with the unit's input, pinned to the expected source's `checkpoint_id` |
+| `interrupted` | Exactly one stamped root-namespace lineage descends from the expected source (the head), with no unstamped or foreign descendants, and its latest checkpoint has pending tasks | Resume: invoke with no input, pinned to that latest stamped checkpoint's `checkpoint_id`; never append the input again |
+| `terminal_unobserved` | Exactly one stamped lineage descends from the expected source (the head), with no unstamped or foreign descendants, and its latest checkpoint has no pending tasks or interrupts | Reconstruct the result from that checkpoint's state after the metadata and digest checks, record the observation by CAS, then settle; no invocation |
 | `in_doubt` | Anything else, including a pending LangGraph interrupt, which remains outside this mission's scope | Create an incident; no invocation; wait for operator reconciliation |
 
 **Crash windows.** Recovery after a crash at each point is as follows.
@@ -352,7 +360,7 @@ Provider calls made after the last durable checkpoint may repeat after a crash; 
 
 **Operator reconciliation decisions.** These are typed and audited:
 
-- `accept_descendant`, with an exact qualified key;
+- `accept_descendant`, with an exact qualified key. The named key must be a stamped root-namespace descendant of the source. The unit is then reclassified as if that key were the unique leaf: it either resumes pinned to that key, or is reconstructed from it.
 - `abandon_unit`, which settles the unit `failed` with reason `in_doubt_abandoned`;
 - `start_new_generation`, which crosses a generation boundary under REQ-CP-EXEC-005.
 
@@ -406,7 +414,7 @@ This document preserves the provider-neutral runtime, workspace, artifact, and s
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-CP-DA-004, 008, 011, and 015; `CON-CP-ASYNC-SUBAGENT-V1` (contract schema fields). New: REQ-CP-DA-016, 017, 018, and 019; `CON-CP-CHECKPOINT-LINEAGE-V1`. |
+| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-CP-DA-004, 008, 011, and 015. Changed contract: `CON-CP-ASYNC-SUBAGENT-V1` gains contract schema fields (REQ-CP-DA-019), the new lifecycle value `in_doubt`, and the operator decisions `adopt_provider_run` and `orphan_child` (REQ-CP-DA-008). New: REQ-CP-DA-016, 017, 018, and 019; `CON-CP-CHECKPOINT-LINEAGE-V1`. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
 
 The notation follows `SPEC-CP-DURABLE-EXECUTION` § Amendment record.
 

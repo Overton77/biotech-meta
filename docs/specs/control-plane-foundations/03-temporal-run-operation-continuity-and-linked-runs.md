@@ -126,7 +126,7 @@ Technical workflow/activity retries MUST preserve the semantic operation attempt
 
 **Verification:** retry, repair, intervention, and late-old-generation result tests.
 
-**AMD-RRM-001 (clarified; behavior already mandated):** The semantic operation attempt is the runtime unit of REQ-CP-EXEC-013. Activity attempts, worker restarts, and Continue-As-New segments never change `unit_key` or `execution_generation`. A generation boundary is crossed only by an accepted recovery or intervention decision recorded through run control. It fences every earlier generation: their late observations, checkpoints, results, usage, and effects are quarantined under REQ-CP-EXEC-008 and can never settle the unit. A new generation of a Deep Agent unit starts a new cognitive checkpoint lineage (REQ-CP-DA-016) unless the accepted decision names one exact compatible source checkpoint. Added verification: a stale-generation observation is rejected after a boundary, and three Activity attempts of one unit share one `unit_key`.
+**AMD-RRM-001 (clarified; behavior already mandated):** The semantic operation attempt is the runtime unit of REQ-CP-EXEC-013. Activity attempts, worker restarts, and Continue-As-New segments never change `unit_key` or `execution_generation`. A generation boundary is crossed only by an accepted recovery or intervention decision recorded through run control. It fences every earlier generation: their late observations, checkpoints, results, usage, and effects are quarantined under REQ-CP-EXEC-008 and can never settle the unit. A new generation of a Deep Agent unit starts a new cognitive checkpoint lineage (REQ-CP-DA-016), unless the accepted decision names a terminal result checkpoint, seeded under the `cognitive_seed` rules of REQ-CP-EXEC-012. A new generation of a GoalDirected unit keeps its `unit_key` and runs in its own unit-generation namespace (REQ-BP-GD-012). This reinterprets the base text's "disruptive restart": only an accepted recovery or intervention decision is disruptive and advances the generation. An ordinary worker restart, Activity retry, or claim takeover (REQ-CP-EXEC-014) is not disruptive. Added verification: a stale-generation observation is rejected after a boundary, and three Activity attempts of one unit share one `unit_key`.
 
 ### REQ-CP-EXEC-006 — Authoritative message ledger
 
@@ -154,7 +154,7 @@ Cancellation MUST authorize and journal intent, request subordinate quiescence/c
 
 1. Run control authorizes the cancel command and records its `accepted` receipt; the run enters `cancelling`. No Temporal or provider request precedes this record.
 2. The command is delivered to the root, the family, and every active `OperationWorkflow`, with `delivered` receipts.
-3. Every cognitive `operation.execute` Activity declares a heartbeat timeout and heartbeats compact progress (`unit_key`, generation, Activity attempt, latest qualified checkpoint key, phase; no prompts, transcripts, or secrets). Cancellation reaches an executing Activity through heartbeat. The adapter stops at the next safe point between graph steps and records the latest checkpoint. A pre-dispatch cancel flag alone is not evidence that cognition stopped.
+3. Every cognitive `operation.execute` Activity declares a heartbeat timeout and heartbeats compact progress (`unit_key`, generation, Activity attempt, latest qualified checkpoint key, phase; no prompts, transcripts, or secrets). Cancellation reaches an executing Activity through heartbeat. The adapter stops cognition, interrupting the in-flight step if necessary, and records the latest durable checkpoint. A pre-dispatch cancel flag alone is not evidence that cognition stopped.
 4. Async children are cancelled according to their link's propagation policy. The provider's acknowledgement, or its absence, is recorded as an observation.
 5. Usage, reservations, and effect claims are reconciled. Usage of a provider call that was in flight is recorded as pending. An ambiguous consequential effect creates an `in_doubt` incident for operator reconciliation and is never re-executed speculatively.
 6. Late outputs and superseded generations are quarantined.
@@ -198,7 +198,7 @@ A product fork or edited-state start MUST use an immutable `RunSnapshotManifest`
   - it is not quarantined;
   - its unit's binding digest, cognitive state schema digest, and input digests are unchanged by the patch.
 
-  The fork references a reused result by immutable ref and records each reuse decision. It never re-settles that result in the parent.
+  A candidate matches a derived-run unit whose `CON-CP-RUNTIME-UNIT-V1` identity is equal after substituting `belllabs_run_id` and `execution_epoch`. The fork references a reused result by immutable ref and records each reuse decision. It never re-settles that result in the parent.
 - **Admission.** The derived run starts at epoch 1, with its own admission, reservation, unit keys, and cognitive session namespaces.
 - **Nothing implicit is copied.** Pending commands, message ledgers, effect claims, reservations, and provider tasks are never copied. A source run's active `OperationWorkflow`s, async children, and linked runs are never transferred, cloned, or re-parented; they remain parent-owned.
 - **Cognition in the fork.** By default, cognition in the derived run starts in a fresh namespace or, for GoalDirected, fresh from a typed handoff (REQ-BP-GD-005). The patch may instead declare an explicit `cognitive_seed`. A seed names the terminal result checkpoint of a settled source unit, and the target binding must carry the same cognitive state schema digest. The seeded state is written into the derived run's own new namespace, and the derived run records `seeded_from` lineage. A seed from a non-terminal or intermediate checkpoint is not supported until resume/patch compatibility is separately qualified.
@@ -225,6 +225,13 @@ A later attempt MAY take over only an expired or released claim, and only by adv
 ### REQ-CP-EXEC-015 — Visibility join uses Search Attributes only
 
 Root, family, and `OperationWorkflow` executions MUST be started with the BellLabs Search Attributes declared in `CON-CP-TEMPORAL-IDENTITY-V1`. Inspection MUST join PostgreSQL authority to Temporal executions only through Temporal's Visibility and Workflow APIs. No component may read Temporal's persistence database. Visibility or Temporal unavailability MUST degrade inspection freshness and MUST NOT fail reads served from persisted authority.
+
+The attributes are supplied by a composition-level Search Attribute policy:
+
+- **`required`** — for production and persistent qualification namespaces. Attributes are registered by the administrative step, and every start sets them.
+- **`disabled`** — for the time-skipping test server and captured-history replay, where workflows start without attributes. `WorkflowEnvironment.start_local` fixtures may register the attributes with its `search_attributes` argument and use `required`.
+
+A captured history is replayed under the policy it was recorded with, so existing replay fixtures are unaffected.
 
 **Amendment:** AMD-RRM-001, new (API and deployment detail).
 
@@ -275,7 +282,7 @@ location (exactly one, matching family):
 unit_key = "bl-unit-v1:" + lowercase hex SHA-256 of the canonical serialization (SPEC-CP-DEFINITIONS)
 ```
 
-`execution_generation` is not part of the unit identity. The fence key is `(unit_key, execution_generation)`. The `OperationWorkflow` ID remains `operation/{semantic_attempt_id}`, because published wire identities are not renamed; the unit identity travels beside it. An operation that is not one of the listed unit kinds requires a contract revision before it may run as a runtime unit.
+`execution_generation` is not part of the unit identity. The fence key is `(unit_key, execution_generation)`. The `OperationWorkflow` ID remains `operation/{semantic_attempt_id}`, because published wire identities are not renamed; the unit identity travels beside it. An operation that is not one of the listed unit kinds requires a contract revision before it may run as a runtime unit. Workflows that are not `OperationWorkflow`, such as the generic artifact workflow submitted through the run-control API, are outside REQ-CP-EXEC-013.
 
 **`CON-CP-TEMPORAL-IDENTITY-V1`** (clarified). It adds the Activity attempt observation and the claim fence of REQ-CP-EXEC-014, and the Search Attributes of REQ-CP-EXEC-015:
 
@@ -288,7 +295,9 @@ unit_key = "bl-unit-v1:" + lowercase hex SHA-256 of the canonical serialization 
 | `BellLabsExecutionEpoch` | Int | root, family, operation |
 | `BellLabsParentRunId` | Keyword | fork and linked roots |
 | `BellLabsUnitKey`, `BellLabsUnitKind` | Keyword | operation |
-| `BellLabsSemanticAttempt`, `BellLabsExecutionGeneration` | Int | operation |
+| `BellLabsExecutionGeneration` | Int | operation |
+
+This set uses 7 Keyword and 2 Int custom attributes per namespace. The repository's Temporal `1.31.0` uses the `postgres12` SQL visibility store, which pre-allocates 3 Int and 10 Keyword custom columns per namespace (`Int01`–`Int03`, `Keyword01`–`Keyword10` in `schema/postgresql/v12/visibility/schema.sql` at tag `v1.31.0`). The semantic attempt is therefore not an attribute; it is read from the unit record in PostgreSQL. Registration MUST fail if the namespace lacks free slots.
 
 Attributes are set deterministically at workflow start, or upserted deterministically when an accepted generation boundary is applied. Checkpoint IDs, prompts, raw scopes, and secrets are never Search Attributes. Registration is an idempotent administrative step that fails on a name/type conflict. Worker readiness verifies the attributes and never mutates namespace configuration.
 
@@ -299,7 +308,12 @@ Attributes are set deterministically at workflow start, or upserted deterministi
 | `accepted` | Run control authorized the command and recorded it idempotently, bound to scope, target, expected version, and generation | run-control command service |
 | `delivered` | The exact target execution (root, then family or operation) acknowledged the command through a Temporal Update | idempotent activity/service write of the Update result |
 | `applied` | The target boundary applied the command: a family wait, pause, or resume point, an operation boundary, or a committed cognitive checkpoint for cognition-targeted messages | observed fact accepted by the reducer |
-| `rejected` | Terminal, with one typed reason: `stale_target`, `stale_generation`, `stale_version`, `not_applicable`, `terminal_run`, `superseded`, or `unauthorized` | run control |
+| `rejected` | Terminal, with one typed reason: `stale_target`, `stale_generation`, `stale_version`, `not_applicable`, `terminal_run`, `superseded`, `unauthorized`, or `insufficient_budget` (for example, a resume that cannot re-reserve under REQ-BP-GD-011) | run control |
+
+Two special cases apply:
+
+- A cancel command is `applied` when the reducer records the terminal outcome.
+- When run control is itself the target boundary, because no root execution has started, it records `delivered` and `applied` together.
 
 Existing async-child message receipts map as follows: `claimed` and `provider_applied` map to `delivered`; `checkpoint_committed` maps to `applied`; `terminal_rejected` maps to `rejected`.
 
@@ -372,6 +386,6 @@ This document extracts the shared orchestration and linked-run material from pre
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-CP-EXEC-005, 006, 007, 008, 011, and 012; `CON-CP-TEMPORAL-IDENTITY-V1`, `CON-CP-WORKFLOW-MESSAGE-V1`, and `CON-CP-CONTINUATION-V1`. New: REQ-CP-EXEC-013, 014, 015, and 016; `CON-CP-RUNTIME-UNIT-V1`. |
+| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-CP-EXEC-005, 006, 007, 008, 011, and 012; `CON-CP-TEMPORAL-IDENTITY-V1`, `CON-CP-WORKFLOW-MESSAGE-V1`, and `CON-CP-CONTINUATION-V1`. New: REQ-CP-EXEC-013, 014, 015, and 016; `CON-CP-RUNTIME-UNIT-V1`. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date and are recorded in the RRM-001 traceability document. |
 
 Notation: "clarified" means the behavior was already mandated by the cited requirement and the amendment adds exact states, fields, or ordering. "New" means a newly specified storage, API, or protocol detail. Until the amendment is accepted, implementation of the new contracts remains gated, per the RRM-001 ticket. The disposition of existing implementation contracts is recorded in the RRM-001 application traceability document (`docs/migrations_instructions/implementation_work_packages_v2/research-runtime-mission/RRM-001-contract-authority.md` in the application repository) and mirrored in [the control-plane index](README.md#amd-rrm-001-contract-disposition).

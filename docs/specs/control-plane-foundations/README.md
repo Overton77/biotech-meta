@@ -80,13 +80,15 @@ Status: **proposed for acceptance (RRM-001 review pending)**. Recorded 2026-10-0
 
 | Specification | Clarified (already mandated) | New |
 |---|---|---|
-| [SPEC-CP-RUN-CONTROL](02-transactional-admission-lifecycle-budgets-and-events.md) | REQ-CP-RUN-004, 007, 009; `CON-CP-LIFECYCLE-V1` | REQ-CP-RUN-011, 012; `CON-CP-INSPECTION-READ-V1` |
+| [SPEC-CP-RUN-CONTROL](02-transactional-admission-lifecycle-budgets-and-events.md) | REQ-CP-RUN-004, 007, 009; `CON-CP-LIFECYCLE-V1` projection fields | REQ-CP-RUN-011, 012; `CON-CP-INSPECTION-READ-V1`; `reconcile_unit` command and `operator_reconciliation` wait condition |
 | [SPEC-CP-DURABLE-EXECUTION](03-temporal-run-operation-continuity-and-linked-runs.md) | REQ-CP-EXEC-005, 006, 007, 008, 011, 012; `CON-CP-TEMPORAL-IDENTITY-V1`, `CON-CP-WORKFLOW-MESSAGE-V1`, `CON-CP-CONTINUATION-V1` | REQ-CP-EXEC-013, 014, 015, 016; `CON-CP-RUNTIME-UNIT-V1` |
-| [SPEC-CP-DEEP-AGENT-RUNTIME](04-deep-agent-materialization-subagents-workspaces-and-artifacts.md) | REQ-CP-DA-004, 008, 011, 015; `CON-CP-ASYNC-SUBAGENT-V1` | REQ-CP-DA-016, 017, 018, 019; `CON-CP-CHECKPOINT-LINEAGE-V1` |
-| [SPEC-CP-COGNITIVE-SCHEMAS](05-deep-agent-cognitive-state-and-context-schemas.md) | Narrowed acceptance recommended: CS-001, 002, 003, 004 (narrowed), 005, 007 (amended) | REQ-CP-CS-008 (split from CS-004, deferred); CS-006 deferred |
+| [SPEC-CP-DEEP-AGENT-RUNTIME](04-deep-agent-materialization-subagents-workspaces-and-artifacts.md) | REQ-CP-DA-004, 008, 011, 015 | REQ-CP-DA-016, 017, 018, 019; `CON-CP-CHECKPOINT-LINEAGE-V1`; `CON-CP-ASYNC-SUBAGENT-V1` changes (contract schema fields, the `in_doubt` lifecycle value, and the `adopt_provider_run` / `orphan_child` decisions) |
+| [SPEC-CP-COGNITIVE-SCHEMAS](05-deep-agent-cognitive-state-and-context-schemas.md) | Narrowed acceptance recommended: CS-001, 002, 003, 004 (amended), 005, 007 (amended) | REQ-CP-CS-008 (split from CS-004, deferred); CS-006 deferred |
 | [SPEC-BP-STAGEGRAPH](../workflow-blueprints/stagegraph.md) | REQ-BP-SG-009 | — |
 | [SPEC-BP-GOAL-DIRECTED](../workflow-blueprints/goal-directed.md) | REQ-BP-GD-011 (gives already-mandated pause a family owner) | REQ-BP-GD-012 |
 | [ADR-0004](../../adr/0004-deep-agent-cognitive-state-and-context-schemas.md) | Narrowed acceptance recommended; status stays `proposed` | — |
+
+Independent review returned `accept_with_fixes`, and the fixes are applied on this branch. Acceptance is mechanical: the acceptance commit changes only status lines. Spec 05 becomes `canonical`, with `deferred_requirements` kept as non-authority. ADR-0004 becomes `accepted`, with `deferred_decisions` kept proposed. Each amendment status becomes accepted.
 
 Out of scope for AMD-RRM-001: generalized framework extraction, company fixtures, arbitrary mid-invocation cognitive editing, HITL interrupt resumption, and executable forks from intermediate checkpoints.
 
@@ -98,7 +100,7 @@ Citations are to the application repository at integration commit `e946742`. **R
 |---|---|---|---|---|
 | **Identities** | | | | |
 | 1 | `BellLabsRunKey`, `ExecutionEpochKey` | `app/domain/graph_runtime/identities.py:15-28` | reuse | Scope, run, and epoch identity; a fork is a new run at epoch 1 |
-| 2 | `GraphIdentity` | `identities.py:31-34` | retire | Stage 3 RunPlan / graph-assembly identity; exact bindings carry the digests |
+| 2 | `GraphIdentity` | `identities.py:31-34` | reuse (out of mission) | Not inert: it is a field of `GraphAssemblyDefinition` (`app/domain/graph_runtime/definitions.py:411`), used by the coordinator `RunPlanV3` launch (`app/application/coordinator/coordinator_launch.py:36, 102`). Retained for coordinator `RunPlanV3`; no mission contract depends on it |
 | 3 | `DeploymentIdentity` | `identities.py:37-42` | version | Agent Server deployment identity moves into `AsyncSubagentContract` hosting fields (DA-019); never a macro binding |
 | 4 | `AgentThreadKey` | `identities.py:45-58` | retire | Agent Server thread with fork/linked relationships encoded in it; replaced by the cognitive session namespace and qualified key (DA-016), and by the async `child_execution_id` |
 | 5 | `AgentRunKey` | `identities.py:61-64` | retire | The provider run ID already lives on `AsyncSubagentExecution` (`app/domain/operation_execution/contracts.py:713`) |
@@ -116,12 +118,12 @@ Citations are to the application repository at integration commit `e946742`. **R
 | 16 | `OperationWorkflowRequest` / `Result` | `contracts.py:1293-1367` | version | Additive unit identity and heartbeat/cancel policy fields; no wire renames |
 | 17 | `AsyncSubagentContract` | `contracts.py:610-656` | version | Add `graph_revision`, `graph_binding_digest`, and a deployment credential ref (DA-019) |
 | 18 | `AsyncSubagentResultManifest` | `contracts.py:659-694` | version | Free-text `checkpoint_ref` (`:669`) becomes the qualified provider key; attributed or pending usage (DA-011) |
-| 19 | `AsyncSubagentExecution`, `ParentAsyncSubagentLink`, `AsyncSubagentMessage` receipts | `contracts.py:697-775` | reuse | Deterministic thread identity and parent link; message receipts map to EXEC-006 states |
+| 19 | `AsyncSubagentLifecycle`; `AsyncSubagentExecution`, `ParentAsyncSubagentLink`, `AsyncSubagentMessage` receipts | `contracts.py:598-607`; `contracts.py:697-775` | version (lifecycle) / reuse | `AsyncSubagentLifecycle` gains `in_doubt`, with exits by observation or the operator decisions `adopt_provider_run` / `orphan_child` (DA-008). The deterministic thread identity and parent link are reused; message receipts map to EXEC-006 states |
 | 20 | Sandbox snapshot contracts and service | `contracts.py:1676-1810`; `app/application/workspaces/sandbox_snapshots.py` | reuse | `CON-CP-SNAPSHOT-V1` covers workspace and sandbox state only; it is referenced by, and distinct from, `RunSnapshotManifest` (DA-015) |
 | 21 | `WorkflowMessage` / `WorkflowMessageReceipt`; root receipts | `orchestration/contracts.py:41-64`; `app/temporal/workflows/belllabs_run.py:31-58` | version | In-memory statuses are a transport cache; authoritative `accepted`/`delivered`/`applied`/`rejected` receipts live in PostgreSQL (EXEC-006) |
 | 22 | `RunContinuityState` | `orchestration/contracts.py:67-99` | version | Add satisfied waits, pause state, and the expected source checkpoint per active unit (EXEC-011) |
 | **graph_runtime contracts** | | | | |
-| 23 | `RuntimeExecutionBinding`, `RuntimeExecutionAttempt`, `RuntimeExecutionProjection` | `app/domain/graph_runtime/contracts.py:116-175` | retire | Per-epoch binding over `legacy_temporal`/`langgraph_agent_server`; replaced by the operation binding, runtime unit, and inspection reads (RUN-011) |
+| 23 | `RuntimeExecutionBinding`, `RuntimeExecutionAttempt`, `RuntimeExecutionProjection` | `app/domain/graph_runtime/contracts.py:116-175` | retire | Per-epoch binding over `legacy_temporal`/`langgraph_agent_server`; replaced by the operation binding, runtime unit, and inspection reads (RUN-011). Rows 23–27 are still exported by the production schema route `/v2/graph-runtime/schemas` (`app/server.py:23, 244`; `app/api/graph_runtime_schemas.py`). Retirement removes them from that export, or labels them non-authoritative there |
 | 24 | `InterventionBase`, `SatisfyWait`, `ResumePause`, `CancelRun` interventions | `graph_runtime/contracts.py:178-225` | retire | Replaced by run-control lifecycle actions (`app/domain/run_control/contracts.py:350-377`) plus receipts; their expected-version and expected-checkpoint checks are kept in that path |
 | 25 | `AppendInput`, `RespondToInterrupt`, `DurableInterrupt*` | `graph_runtime/contracts.py:198-220, 284-311` | retire | Mid-invocation editing and HITL are out of scope |
 | 26 | `ForkFromCheckpointIntervention`, `ForkRequest`, `ForkReceipt` | `graph_runtime/contracts.py:228-239, 334-352` | version | Add snapshot ref, patch digest, and target admission; a qualified seed key replaces `LangGraphCheckpointKey` and `AgentThreadKey` |
@@ -150,11 +152,11 @@ Citations are to the application repository at integration commit `e946742`. **R
 | 47 | `runtime_execution_bindings`, `runtime_execution_attempts`, `runtime_checkpoint_observations`, `runtime_intervention_commands`, `runtime_interrupt_*`, `runtime_async_tasks` | `app/migrations/0012_graph_runtime_operation_journal.sql:4-201`; `0014:1-17` | retire (inert) | Agent Server-shaped: `runtime_provider` (`0012:15-17`), one binding per epoch (`:32`), checkpoint key without namespace (`:101-104`); async tasks superseded by `0016`. A new forward-only migration adds unit, attempt, transition, and receipt records |
 | 48 | `operation_effect_claims`, `operation_journal_mutations`, `operation_execution_attempts`, `operation_settlements` | `0012:203-317`; `0018` | version | Active production journal; a forward migration adds the claim fence, unit key, and transition/result checkpoint refs |
 | 49 | `runtime_lineage_records` / `_edges` | `0014:25-67` | version | Reuse; extend the relationship CHECK (`:53-56`) additively |
-| 50 | `runtime_reconciliation_incidents`, `runtime_repair_audit`, `runtime_retention_deletion_audit` | `0014:153-189, 215-245` | reuse | Add a unit-key column; `binding_id` (FK to a retired table) stays nullable and unused |
-| 51 | `runtime_fork_requests` | `0014:191-213` | version | Add source snapshot and patch; drop the dependence on `source_binding_id` (`:208-209`) |
+| 50 | `runtime_reconciliation_incidents`, `runtime_repair_audit`, `runtime_retention_deletion_audit` | `0014:153-189, 215-245` | reuse | Add a unit-key column. The new migration MUST drop the FK from `runtime_reconciliation_incidents.binding_id` to the retired `runtime_execution_bindings` (`0014:176-177`); the column stays nullable and unused |
+| 51 | `runtime_fork_requests` | `0014:191-213` | version | Add source snapshot and patch. The new migration MUST make `source_binding_id` nullable and drop its FK to the retired `runtime_execution_bindings` (`:195, 208-209`) |
 | 52 | `runtime_decision_requests` / `_responses` | `0014:110-151` | retire (inert) | HITL is out of scope |
 | 53 | `execution_resource_leases` | `0014:69-108` | reuse | Unchanged |
-| 54 | `async_subagent_authority`, `_commands`, `_facts`, `_messages` | `app/migrations/0016_async_subagent_parent_child_v1.sql:4-61` | version | Reuse; a forward migration adds the per-child submission fence and the `in_doubt` lifecycle fact |
+| 54 | `async_subagent_authority`, `_commands`, `_facts`, `_messages` | `app/migrations/0016_async_subagent_parent_child_v1.sql:4-61` | version | Reuse. A forward migration adds the per-child submission fence, the `in_doubt` lifecycle fact, and the `adopt_provider_run` / `orphan_child` decisions. These widen the `command_kind` CHECK (`0016:30`) |
 | **Workflows (mechanics)** | | | | |
 | 55 | Root `request_cancel`, `deliver_message`, `signal_message` | `app/temporal/workflows/belllabs_run.py:60-73` | version | Become delivery targets of recorded commands; a raw cancel bypasses journaled intent (EXEC-008) |
 | 56 | StageGraph `satisfy_wait` / `resume_pause` | `app/temporal/workflows/stagegraph.py:51-61, 456-464` | version | Delivery of recorded commands; waits carried across Continue-As-New; `_resumed_pauses` is never read |

@@ -1,8 +1,9 @@
 ---
 id: ADR-0004
 title: Exact cognitive state and runtime-context schemas for Deep Agent materialization
-status: proposed
+status: proposed  # acceptance commit changes only this line (to accepted)
 recorded_at: 2026-08-09
+deferred_decisions: ["5", "2 (Workflow Type / WorkflowConfiguration pack declaration only)"]  # remain proposed and are not authority when this ADR is accepted
 supersedes: []
 superseded_by: []
 source_documents:
@@ -105,7 +106,7 @@ Pre-production: extend profile/binding contracts and the Deep Agents adapter; no
 
 ## RRM-001 disposition recommendation (AMD-RRM-001, 2026-10-01)
 
-Status remains `proposed`. AMD-RRM-001 recommends **acceptance narrowed** to the decisions that the executing system already depends on and that exact checkpoint lineage requires. The status change is recorded only by the reviewer.
+Status remains `proposed`. AMD-RRM-001 recommends **acceptance narrowed** to the decisions that the executing system already depends on and that exact checkpoint lineage requires. The status change is recorded only by the reviewer. **Acceptance mechanism:** the acceptance commit changes only `status: proposed` to `status: accepted`. The frontmatter key `deferred_decisions` already names decision 5 and the Workflow Type / WorkflowConfiguration part of decision 2. Those stay proposed and are not authority.
 
 | Decision | Recommendation | Reason |
 |---|---|---|
@@ -113,7 +114,7 @@ Status remains `proposed`. AMD-RRM-001 recommends **acceptance narrowed** to the
 | 2. Ownership on the spine | accept the binding and adapter pinning; **defer** Workflow Type / WorkflowConfiguration pack declaration | Pinning is implemented; no Workflow Type declares packs and no mission ticket needs it |
 | 3. Inherit built-ins plus three base channels | accept | Implemented and inspected |
 | 4. Placement rule for fields | accept | Already enforced by reference-only context validation and sensitive-key rejection |
-| 5. Subagent default is projection | **defer** | Projected seeding is not implemented; sync subagents stay bounded by REQ-CP-DA-007 |
-| 6. Compatibility: digest change makes a new binding; restore requires agreement | accept | Required by exact checkpoint lineage; enforced through the stamped digest (REQ-CP-DA-016, REQ-CP-CS-007) |
+| 5. Subagent default is projection | **defer** | Projected seeding is not implemented, so the Deep Agents 0.7.5 default applies: every parent channel except `messages`, `todos`, `structured_response`, and private channels is passed to the child and merged back. Sync subagents stay bounded by REQ-CP-DA-007 |
+| 6. Compatibility: digest change makes a new binding; restore requires agreement | accept | Required by exact checkpoint lineage; to be enforced by RRM-003/004 through the stamped digest (REQ-CP-DA-016, REQ-CP-CS-007) |
 
 Excluding the ADR entirely was rejected: accepted runtime code and evidence (WP-CP-040) already depend on decisions 1, 3, 4, and 6. Accepting it unchanged was also rejected, because decisions 2 (in part) and 5 are unproven and outside the mission. The spec-level mirror is `SPEC-CP-COGNITIVE-SCHEMAS` § Acceptance scope.

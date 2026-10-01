@@ -1,8 +1,9 @@
 ---
 id: SPEC-CP-COGNITIVE-SCHEMAS
 title: Deep Agent cognitive state and runtime-context schemas
-status: draft
+status: draft  # acceptance commit changes only this line (to canonical) and the AMD-RRM-001 status below
 version: 2
+deferred_requirements: [REQ-CP-CS-006, REQ-CP-CS-008]  # remain draft text and are not authority when this spec is canonical
 governed_by: [ADR-0003, ADR-0004]
 amendments:
   - id: AMD-RRM-001
@@ -46,14 +47,16 @@ Define how BellLabs authors, compiles, and materializes Deep Agents `state_schem
 
 This specification remains `draft` until a reviewer records a disposition. AMD-RRM-001 recommends **narrowed acceptance**: promote the core that the executing system already depends on and that checkpoint lineage needs, and keep the rest draft.
 
+**Acceptance mechanism.** The reviewer's acceptance commit changes only two things: `status: draft` becomes `status: canonical`, and the AMD-RRM-001 amendment status becomes accepted. The frontmatter key `deferred_requirements` already names REQ-CP-CS-006 and REQ-CP-CS-008. In a canonical version of this specification, those requirements stay draft text and are not authority until a later amendment promotes them.
+
 | Requirement | Recommended disposition | Evidence (application repository) |
 |---|---|---|
 | REQ-CP-CS-001 distinct schema kinds | accept | `DeepAgentExecutionBinding` carries both schemas (`app/domain/operation_execution/contracts.py`, binding model); WP-CP-040 tests |
 | REQ-CP-CS-002 adapter sole composition root | accept | `ExactDeepAgentMaterializer` builds the `DeepAgentState` subclass and context type from digests (`app/integrations/agents/deep_agents/materializer.py`) |
 | REQ-CP-CS-003 built-ins plus base channels | accept | The base channels are seeded and inspected in WP-CP-040 evidence |
-| REQ-CP-CS-004 channel packs compose exactly (narrowed) | accept, narrowed | `compose_cognitive_state_schema` unions packs and fails on collision (`app/domain/operation_execution/materialization.py`) |
+| REQ-CP-CS-004 channel packs compose exactly (amended) | accept, amended | `compose_cognitive_state_schema` unions packs and fails on collision (`app/domain/operation_execution/materialization.py`) |
 | REQ-CP-CS-005 middleware channels frozen | accept | The binding validator rejects middleware channel drift |
-| REQ-CP-CS-006 sync-subagent projection seeds | **defer; remains draft** | Dictionary subagents are materialized without a BellLabs-seeded state slice, so the framework default applies; the projection is unproven |
+| REQ-CP-CS-006 sync-subagent projection seeds | **defer; remains draft** | Slices are declared and validated (`app/domain/operation_execution/materialization.py`), but dictionary subagents are materialized without a BellLabs-seeded slice. The framework default therefore applies: Deep Agents 0.7.5 passes every parent state channel except `messages`, `todos`, `structured_response`, and private channels to a sync child, and merges the child's returned channels back (`deepagents/middleware/subagents.py:537`, `:484`) |
 | REQ-CP-CS-007 checkpoint digest gate | accept, amended | No resume digest gate exists yet. The mission needs it, and REQ-CP-DA-016 supplies the stamped digest RRM-003/004 must check |
 | REQ-CP-CS-008 Workflow Type pack allowlists and stage overrides (split from CS-004) | **defer; remains draft** | No Workflow Type or WorkflowConfiguration pack declaration exists in definitions; no mission ticket needs it |
 
@@ -176,11 +179,11 @@ Effective state schemas MUST subclass `DeepAgentState`, preserve built-in channe
 
 ### REQ-CP-CS-004 — Channel packs compose exactly
 
-The compiler MUST compose the effective state and context schemas from exact, content-addressed channel packs. Unknown or colliding channels MUST fail closed, unless the colliding channels have identical type and reducer digests.
+The compiler MUST compose the effective state and context schemas from exact, content-addressed channel packs. Unknown or colliding channels MUST fail closed, unless the colliding channel definitions are identical.
 
 **Verification:** compiler fixtures for exact union, unknown channel, and collision.
 
-**AMD-RRM-001 (narrowed):** The Workflow Type / WorkflowConfiguration allowlist and stage-override clause moved to REQ-CP-CS-008, which remains draft.
+**AMD-RRM-001 (amended):** The Workflow Type / WorkflowConfiguration allowlist and stage-override clause moved to REQ-CP-CS-008, which remains draft.
 
 ### REQ-CP-CS-005 — Middleware channels are frozen
 
@@ -194,7 +197,7 @@ Synchronous dictionary subagents MUST receive an exact `SubagentStateSlice` and 
 
 **Verification:** child invoke seed contains only allowlisted channels; secret fields absent.
 
-**AMD-RRM-001:** Deferred; remains draft. The behavior is unproven in the current materializer. No mission ticket depends on it, because sync subagents stay bounded by REQ-CP-DA-007 tool and workspace ceilings.
+**AMD-RRM-001:** Deferred; remains draft. The current materializer does not seed a BellLabs slice, so the Deep Agents 0.7.5 default applies. That default passes every parent state channel except `messages`, `todos`, `structured_response`, and private channels to a sync child, and merges the child's returned channels back into the parent (`deepagents/middleware/subagents.py:537`, `:484`). No mission ticket depends on projection, because sync subagents stay bounded by REQ-CP-DA-007 tool and workspace ceilings.
 
 ### REQ-CP-CS-007 — Checkpoint compatibility is digest-gated
 
@@ -289,4 +292,4 @@ Extracts the cognitive-schema decisions from ADR-0004 and the 2026-08-09 archite
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending); narrowed | Recommends narrowed acceptance per § Acceptance scope. REQ-CP-CS-004 narrowed; REQ-CP-CS-008 split from it and deferred; REQ-CP-CS-006 deferred; REQ-CP-CS-007 amended to the stamped digest. The document `status` stays `draft` until the reviewer records the disposition. |
+| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending); narrowed | Recommends narrowed acceptance per § Acceptance scope. REQ-CP-CS-004 amended; REQ-CP-CS-008 split from it and deferred; REQ-CP-CS-006 deferred; REQ-CP-CS-007 amended to the stamped digest. The document `status` stays `draft` until the reviewer records the disposition. |

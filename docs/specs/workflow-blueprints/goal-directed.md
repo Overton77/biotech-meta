@@ -150,7 +150,7 @@ When convergence policy selects `pause`, or an accepted run-control pause target
 
 A resume MUST continue from that exact frontier. It MUST NOT re-run settled iterations, mutate frozen bindings, or change the envelope. A reused session continues from the namespace head recorded before the pause (REQ-BP-GD-012). A policy-selected rollover instead continues fresh from the handoff. A paused run remains cancellable under the shared saga. The paused state survives worker restart and Continue-As-New.
 
-A pause requested while a unit is active is `delivered` immediately and `applied` only at the next boundary. Reservations for iterations not yet started are released on pause and re-reserved on resume. A policy-selected pause enters run control as a pause proposal bound to the convergence decision.
+A pause requested while a unit is active is `delivered` immediately and `applied` only at the next boundary. Reservations for iterations not yet started are released on pause and re-reserved on resume. A resume that cannot re-reserve is rejected `insufficient_budget`, and the run stays paused. A policy-selected pause enters run control as a pause proposal bound to the convergence decision.
 
 **Amendment:** AMD-RRM-001. Clarified: `paused` with explicit resume is already mandated by `SPEC-CP-RUN-CONTROL` § State and lifecycle and REQ-CP-RUN-004, and `pause` is already a convergence decision here. The new ID gives the family a testable owner.
 
@@ -158,13 +158,13 @@ A pause requested while a unit is active is `delivered` immediately and `applied
 
 ### REQ-BP-GD-012 — Shared-session transitions are ordered
 
-Executor units that share a governed session MUST execute strictly in goal-iteration order, with at most one in-flight invocation per cognitive session namespace. Each unit's expected source checkpoint MUST equal the result checkpoint recorded for the previous unit in that namespace (REQ-CP-DA-017).
+Executor units that share a governed session MUST execute strictly in goal-iteration order, with at most one in-flight invocation per cognitive session namespace. Each unit's expected source checkpoint MUST be the namespace head: the `result_key` of the previous unit's accepted transition in that namespace. Its invocation MUST be pinned to that checkpoint (REQ-CP-DA-017).
 
-Verifier units MUST use a namespace distinct from the executor's. A rollover, fresh-from-handoff mode, or a generation boundary on an executor unit MUST start a new session generation and namespace rather than branch the existing thread. Session reuse is intentional, recorded state. A checkpoint in a shared namespace is attributed to the unit whose stamped invocation wrote it.
+Verifier units MUST use a namespace distinct from the executor's. A rollover or fresh-from-handoff mode MUST start a new session generation and namespace rather than branch the existing thread. A generation boundary on a GoalDirected unit keeps its `unit_key`. That generation runs fresh-from-handoff in the namespace `belllabs/goal/{run}/epoch/{epoch}/unit/{unit_key}/gen/{execution_generation}`. The next iteration is admitted into a new `session_generation`. Session reuse is intentional, recorded state. A checkpoint in a shared namespace is attributed to the unit whose stamped invocation wrote it.
 
 **Amendment:** AMD-RRM-001, new (ordering protocol for REQ-BP-GD-005 and 006).
 
-**Verification:** iterations N and N+1 in one session produce a linear stamped lineage; a concurrent second invocation of the session is rejected; rollover produces a new empty namespace; a recovered iteration never re-appends its input into the shared thread.
+**Verification:** iterations N and N+1 in one session produce a linear stamped lineage; a concurrent second invocation of the session is rejected; rollover produces a new empty namespace; a generation boundary keeps the `unit_key`, runs in the unit-generation namespace, and moves the next iteration to a new session generation; a recovered iteration never re-appends its input into the shared thread.
 
 ## Contracts
 
@@ -211,6 +211,6 @@ This specification extracts and supersedes all GoalDirected semantic material fr
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | New IDs: REQ-BP-GD-011 (clarifies already-mandated pause semantics) and REQ-BP-GD-012 (new ordering protocol). The fork boundary for this family is defined by REQ-CP-EXEC-016. |
+| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | New IDs: REQ-BP-GD-011 (clarifies already-mandated pause semantics) and REQ-BP-GD-012 (new ordering protocol). The fork boundary for this family is defined by REQ-CP-EXEC-016. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
 
 The notation follows `SPEC-CP-DURABLE-EXECUTION` § Amendment record.

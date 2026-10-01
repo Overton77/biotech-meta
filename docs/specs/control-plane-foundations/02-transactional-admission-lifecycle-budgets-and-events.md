@@ -130,8 +130,9 @@ Every consequential external effect MUST use a stable claim/idempotency identity
 
 **AMD-RRM-001 (clarified):**
 
-- **`in_doubt` disposition.** The `in_doubt` result disposition is the effect-level form of "ambiguous". A provider or runtime exception raised after dispatch, whose outcome is not proven, MUST be settled `in_doubt` with a reconciliation incident. It MUST NOT be settled as an authoritative `failed`.
-- **Operator resolution.** An `in_doubt` unit or effect is resolved only by a typed, audited operator reconciliation command (REQ-CP-RUN-011). It is never resolved by speculative re-execution.
+- **`in_doubt` disposition.** The `in_doubt` result disposition is the effect-level form of "ambiguous". After dispatch, a provider or runtime exception settles the unit `failed` only when the checkpoint classification (REQ-CP-DA-018) shows no terminal result and every effect claim of the unit is settled. Otherwise it settles `in_doubt` with a reconciliation incident. Not every post-dispatch exception becomes an incident.
+- **Operator resolution.** An `in_doubt` unit or effect is resolved only by the typed, audited operator command `reconcile_unit` (`CON-CP-LIFECYCLE-V1`). It is never resolved by speculative re-execution.
+- **Run phase while a unit is `in_doubt`.** The run stays in its phase. If no other work is admissible, it is `waiting` on a declared `operator_reconciliation` condition. A `cancelling` run stays `cancelling`, with reconciliation state `operator_required`.
 - **Checkpoint durability.** Checkpoint durability of a Deep Agent is not an effect settlement. A settlement references the result checkpoint (REQ-CP-DA-017) but derives its authority from this requirement.
 
 ### REQ-CP-RUN-008 — Product events are transactionally durable
@@ -158,7 +159,7 @@ Any terminal partial-output assembly MUST operate from a frozen eligible evidenc
 
 The application facade MUST expose authorized, request-scope-bound reads: a run list, run detail, unit detail, and a unit's checkpoint history with a selected historical checkpoint summary. These reads are served from PostgreSQL authority, immutable detail documents, and explicitly qualified runtime sources only (Temporal Visibility under REQ-CP-EXEC-015, and the checkpointer under REQ-CP-DA-016). They MUST use opaque cursors bound to scope and filter. They MUST NOT, as a side effect, mutate lifecycle, settle, reconcile, claim, create incidents, or write observations.
 
-Operator reconciliation of `in_doubt` units is a separate privileged, typed command that passes REQ-CP-RUN-003. A schema-export route is not an inspection read.
+Operator reconciliation of `in_doubt` units is a separate privileged, typed command (`reconcile_unit`, `CON-CP-LIFECYCLE-V1`) that passes REQ-CP-RUN-003. Historical checkpoint reads go through the registered saver (`aget_tuple`/`alist`) by qualified key. They never build or invoke an agent. A schema-export route is not an inspection read.
 
 **Amendment:** AMD-RRM-001, new (API detail).
 
@@ -198,7 +199,7 @@ Every inspection response MUST follow `CON-CP-INSPECTION-READ-V1`. For each sect
 
 `CON-CP-RUN-REQUEST-V1` binds exact request identity, caller/authority, Workflow Type, ERC, input manifest, sponsorship, approvals, correlation, and optional parent context. `CON-CP-LIFECYCLE-V1` defines commands, facts, transitions, phases, outcomes, and terminalization proposals. `CON-CP-BUDGET-LEDGER-V1` defines accounts, reservations, usage, liability, and settlement. `CON-CP-DOMAIN-EVENT-V1` defines the transport-neutral event envelope.
 
-**AMD-RRM-001.** `CON-CP-LIFECYCLE-V1` (clarified) adds pending-command and receipt fields to the run projection, and the operator reconciliation command `reconcile_unit`. `reconcile_unit` targets a `unit_key` and generation with one decision: `accept_descendant`, `abandon_unit`, or `start_new_generation`. It also carries the evidence refs and expected versions.
+**AMD-RRM-001.** `CON-CP-LIFECYCLE-V1` is clarified to add pending-command and receipt fields to the run projection. It also gains two new elements, which are new rather than clarifications. The first is the wait condition kind `operator_reconciliation` (REQ-CP-RUN-007). The second is the operator reconciliation command `reconcile_unit`, which targets a `unit_key` and generation with one decision: `accept_descendant`, `abandon_unit`, or `start_new_generation`. It also carries the evidence refs and expected versions.
 
 `CON-CP-INSPECTION-READ-V1` (new, schema `belllabs.inspection-read.v1`) is the response envelope. It carries `data` and a `sections` map. Each section records:
 
@@ -246,6 +247,6 @@ This specification extracts and supersedes pre-research foundation 02 while addi
 
 | Amendment | Recorded | Status | Scope |
 |---|---|---|---|
-| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-CP-RUN-004, 007, and 009; `CON-CP-LIFECYCLE-V1`. New: REQ-CP-RUN-011 and 012; `CON-CP-INSPECTION-READ-V1`. |
+| AMD-RRM-001 | 2026-10-01 | proposed for acceptance (RRM-001 review pending) | Clarified: REQ-CP-RUN-004, 007, and 009; `CON-CP-LIFECYCLE-V1` projection fields. New: REQ-CP-RUN-011 and 012; `CON-CP-INSPECTION-READ-V1`; the `reconcile_unit` command and the `operator_reconciliation` wait condition in `CON-CP-LIFECYCLE-V1`. Independent-review fixes (verdict `accept_with_fixes`) were applied on the same date. |
 
 The notation follows `SPEC-CP-DURABLE-EXECUTION` § Amendment record.
