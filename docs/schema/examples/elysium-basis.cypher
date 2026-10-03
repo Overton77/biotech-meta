@@ -5,6 +5,9 @@
 // status: statically-checked (syntax + per-statement variable binding); not executed, no Neo4j in the authoring environment.
 // It demonstrates how the same enduring product can have a historical study
 // intervention and a current formulation without collapsing their identities.
+// Executed 2026-10-03 on an embedded Neo4j 5.26 Community instance (authoring scratchpad): every statement ran, and the full
+// 0.2.0 validation suite (../neo4j/validation.cypher) returned zero failing rows with this fixture loaded alone and with all six
+// fixtures loaded together. Expected informational rows are listed in ../ontology-lab/proposal-index.md section 9.
 
 MERGE (elysium:Entity:Organization:LegalEntity {uid: 'hu:org:elysium-health-inc'})
 SET elysium.name = 'Elysium Health', elysium.legalName = 'Elysium Health, Inc.', elysium.createdAt = datetime();
@@ -31,10 +34,11 @@ MERGE (basisLabelSource:Entity:Source {uid: 'hu:source:elysium-basis-supplement-
 SET basisLabelSource.canonicalUri = 'https://www.elysiumhealth.com/pages/basis-supplement-facts', basisLabelSource.title = 'Basis Supplement Facts', basisLabelSource.sourceKind = 'MANUFACTURER_LABEL_PAGE', basisLabelSource.createdAt = datetime();
 
 MERGE (basisLabelSnapshot:InformationArtifact:SourceSnapshot:LabelSnapshot {uid: 'hu:snapshot:elysium-basis-label-2026-07-10'})
-SET basisLabelSnapshot.canonicalUri = 'https://www.elysiumhealth.com/pages/basis-supplement-facts', basisLabelSnapshot.observedAt = datetime('2026-07-10T00:00:00Z'), basisLabelSnapshot.retrievedAt = datetime('2026-07-10T00:00:00Z'), basisLabelSnapshot.jurisdiction = 'US', basisLabelSnapshot.createdAt = datetime();
+SET basisLabelSnapshot.canonicalUri = 'https://www.elysiumhealth.com/pages/basis-supplement-facts', basisLabelSnapshot.observedAt = datetime('2026-07-10T00:00:00Z'), basisLabelSnapshot.retrievedAt = datetime('2026-07-10T00:00:00Z'), basisLabelSnapshot.jurisdiction = 'US', basisLabelSnapshot.contentHash = 'sha256:283496a65daa5de294e80e62a549737b0e26936acc888565b666edb3b8f8e912', basisLabelSnapshot.contentHashBasis = 'SYNTHETIC_FIXTURE', basisLabelSnapshot.captureCompleteness = 'UNKNOWN', basisLabelSnapshot.createdAt = datetime();
+// contentHash above is a synthetic placeholder over the snapshot uid (SYNTHETIC_FIXTURE); a real capture hashes the bytes.
 
 MERGE (basisLabelLocator:InformationArtifact:SourceLocator {uid: 'hu:locator:elysium-basis-label-supplement-facts-panel-2026-07-10'})
-SET basisLabelLocator.uri = 'https://www.elysiumhealth.com/pages/basis-supplement-facts', basisLabelLocator.section = 'Supplement Facts', basisLabelLocator.createdAt = datetime();
+SET basisLabelLocator.uri = 'https://www.elysiumhealth.com/pages/basis-supplement-facts', basisLabelLocator.selectorKind = 'SECTION', basisLabelLocator.section = 'Supplement Facts', basisLabelLocator.createdAt = datetime();
 
 MATCH (basisLabelSource:Source {uid: 'hu:source:elysium-basis-supplement-facts'}),
       (basisLabelSnapshot:SourceSnapshot {uid: 'hu:snapshot:elysium-basis-label-2026-07-10'}),
@@ -90,6 +94,22 @@ MERGE (aNrSubstance)-[:HAS_SUBJECT]->(nrE)
 MERGE (aNrSubstance)-[:HAS_OBJECT]->(nrc)
 MERGE (aNrSubstance)-[:SUPPORTED_BY]->(basisLabelLocator);
 
+// Projected asserted edges for the composition (0.2.0): each names its authorizing assertion and recorded-time start.
+MATCH (nrComponent:IngredientComponent {uid: 'hu:component:basis-current-nr-e'}), (nrE:IngredientMaterial {uid: 'hu:material:elysium-nr-e'}),
+      (aNrMaterial:Assertion {uid: 'hu:assertion:basis-current-nr-component-uses-nr-e'})
+MERGE (nrComponent)-[u:USES_MATERIAL]->(nrE)
+SET u.assertionUid = aNrMaterial.uid, u.recordedFrom = aNrMaterial.recordedAt, u.relationshipUid = 'hu:rel:basis-current-nr-e-uses-material';
+
+MATCH (ptComponent:IngredientComponent {uid: 'hu:component:basis-current-pt'}), (pt:IngredientMaterial {uid: 'hu:material:pterostilbene-unspecified-current-basis'}),
+      (basisLabelLocator:SourceLocator {uid: 'hu:locator:elysium-basis-label-supplement-facts-panel-2026-07-10'})
+MERGE (aPtMaterial:Assertion {uid: 'hu:assertion:basis-current-pt-component-uses-pt'})
+SET aPtMaterial.predicate = 'USES_MATERIAL', aPtMaterial.status = 'PROPOSED', aPtMaterial.recordedAt = datetime(), aPtMaterial.polarity = 'POSITIVE'
+MERGE (aPtMaterial)-[:HAS_SUBJECT]->(ptComponent)
+MERGE (aPtMaterial)-[:HAS_OBJECT]->(pt)
+MERGE (aPtMaterial)-[:SUPPORTED_BY]->(basisLabelLocator)
+MERGE (ptComponent)-[u:USES_MATERIAL]->(pt)
+SET u.assertionUid = aPtMaterial.uid, u.recordedFrom = aPtMaterial.recordedAt, u.relationshipUid = 'hu:rel:basis-current-pt-uses-material';
+
 // The label supports the declaration. It does not create a measured composition.
 MATCH (basisLabelSnapshot:SourceSnapshot {uid: 'hu:snapshot:elysium-basis-label-2026-07-10'})
 MERGE (labelDeclaration:InformationArtifact:LabelDeclaration {uid: 'hu:label-declaration:basis-current-nr'})
@@ -110,3 +130,19 @@ MERGE (advisorySource:Entity:Source {uid: 'hu:source:elysium-advisory-board'})
 SET advisorySource.canonicalUri = 'https://www.elysiumhealth.com/pages/advisory-board', advisorySource.title = 'Elysium Scientific Advisory Board', advisorySource.sourceKind = 'ORGANIZATION_WEBPAGE', advisorySource.createdAt = datetime();
 
 // Intentionally absent: (:Person)-[:ENDORSES_PRODUCT]->(basis)
+
+// ---------------------------------------------------------------------------
+// Capture-fidelity acceptance (catalog 0.2.0, INV-103). Every ACCEPTED, REJECTED or DISPUTED status is a projection of a
+// CAPTURE_FIDELITY adjudication. This fixture records one policy adjudication (reviewerType POLICY) covering the captured
+// assertions it created; it says nothing about whether any proposition is true (that is a SUPPORT adjudication).
+// status: statically-checked, executed
+MATCH (a:Assertion)
+WHERE a.status IN ['ACCEPTED', 'REJECTED', 'DISPUTED']
+  AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
+MERGE (j:EvidenceAssessment:Adjudication {uid: 'hu:adjudication:elysium-basis-capture-fidelity-policy-2026-10-04'})
+ON CREATE SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
+    j.reviewerType = 'POLICY', j.methodVersion = 'fixture-capture-policy-1', j.status = 'FINAL',
+    j.rationale = 'Fixture capture policy: the recorded propositions match the cited spans as read by the authoring lane.',
+    j.reviewedAt = datetime('2026-10-04T00:00:00Z'), j.recordedAt = datetime('2026-10-04T00:00:00Z'), j.createdAt = datetime('2026-10-04T00:00:00Z'),
+    j.privacyClass = 'internal'
+MERGE (j)-[:EVALUATES]->(a);

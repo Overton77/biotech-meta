@@ -176,7 +176,7 @@ LICENSES_PATENT != OWNS_STUDY
 HOSTS_LISTING | LISTS_OFFER | FULFILLS_OFFER | AFFILIATE_FOR_OFFER != SELLS_PRODUCT   (SELLS_PRODUCT is derived from SELLER_OF_RECORD_FOR only)
 PROVIDES_INVESTIGATIONAL_PRODUCT != SUPPLIES_INGREDIENT_MATERIAL
 SPONSORS_CONTENT | any FINANCIAL_INTEREST != ENDORSES_PRODUCT
-RECOMMENDS_PRODUCT (a source) != BELLLABS_RECOMMENDS
+RECOMMENDS (a source) != BELLLABS_RECOMMENDS
 ```
 
 Financial relationships form one predicate family, FINANCIAL_INTEREST, with typed members. Whether a tie is relevant to a statement, and where it was disclosed, is a `ConflictRelevanceAssessment`. A disclosed tie never makes a claim false, and an undisclosed one never makes it true; "not found in a partial capture" is not "not disclosed".

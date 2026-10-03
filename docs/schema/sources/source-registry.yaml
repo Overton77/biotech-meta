@@ -305,7 +305,7 @@ sources:
     # Locator: paragraph "Until mid-2016, ChromaDex sold Elysium all the NR and pterostilbene it needed to make Basis, according to ChromaDex."
     authorityFor: [that_ChromaDex_made_the_reported_statement, that_Elysium_declined_comment]
     notAuthorityFor: [lot_level_supply_to_NCT02678611, chemical_equivalence_of_NIAGEN_and_NR_E, truth_of_ChromaDex_statement]
-    schemaConsequences: [attributed_Assertion_ASSERTED_BY_ChromaDex_status_DISPUTED, competing_ResolutionHypothesis_for_trial_material]
+    schemaConsequences: [attributed_Assertion_ASSERTED_BY_ChromaDex_status_ACCEPTED_as_record_truth_contested_via_hypotheses_and_SUPPORT_adjudication, competing_ResolutionHypothesis_for_trial_material]
     addedBy: rounds-0002-0003
 
   - id: SRC-CTGOV-NCT02712593

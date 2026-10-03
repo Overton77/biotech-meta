@@ -33,7 +33,7 @@ It is deliberately a **schema production system**, not a claim that the ontology
 
 ## Verification status
 
-Every Cypher statement in `examples/`, `neo4j/` and `ontology-lab/query-shapes.md` passed a syntax check with the Neo4j Cypher language-support parser and a per-statement variable-binding check (variables do not survive a `;` boundary). The GraphQL delta parses and extends the live schema without name or field collisions. Nothing was executed against a Neo4j instance; every query is marked statically-checked or illustrative. The live-stack facts that must be verified before implementation are listed at the end of `OPEN-QUESTIONS.md`.
+Every Cypher statement in `examples/`, `neo4j/` and `ontology-lab/query-shapes.md` passed a syntax check with the Neo4j Cypher language-support parser and a per-statement variable-binding check (variables do not survive a `;` boundary). The GraphQL delta parses and extends the live schema without name or field collisions. The constraints, the six fixtures and all validation queries were executed on an embedded Neo4j 5.26 Community instance on 2026-10-03: the suite returns zero failing rows for each fixture alone and for all six together, and four reintroduced collapses are caught (details in `ontology-lab/proposal-index.md`, section 9). Enterprise-only constraints and the deployed database were not exercised. The live-stack facts that must be verified before implementation are listed at the end of `OPEN-QUESTIONS.md`.
 
 ## Schema evolution loop
 

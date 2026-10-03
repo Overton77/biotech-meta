@@ -24,6 +24,9 @@
 //
 // Binding rule: every statement that creates a relationship MATCHes its endpoints by uid in the
 // same statement. No variable is reused across a ';' boundary.
+// Executed 2026-10-03 on an embedded Neo4j 5.26 Community instance (authoring scratchpad): every statement ran, and the full
+// 0.2.0 validation suite (../neo4j/validation.cypher) returned zero failing rows with this fixture loaded alone and with all six
+// fixtures loaded together. Expected informational rows are listed in ../ontology-lab/proposal-index.md section 9.
 
 // ---------------------------------------------------------------------------
 // Section 1: sources, snapshots, locators
@@ -59,67 +62,75 @@ SET s.canonicalUri = 'mcp://owkin/pathology_explorer', s.title = 'Owkin Patholog
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:loinc-4548-4-2026-10-03'})
-SET sn.canonicalUri = 'https://loinc.org/4548-4', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://loinc.org/4548-4', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:33b847450f1d17d1d16bf74faffbf4e69205c9fc510838ca442f1118a21b7694', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:loinc-59261-8-2026-10-03'})
-SET sn.canonicalUri = 'https://loinc.org/59261-8', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://loinc.org/59261-8', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:36480b2f88d5e61af42813d661fc41e3e7f41f9827b86bb00f619e991377873e', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:ngsp-ifcc-ngsp-2026-10-03'})
-SET sn.canonicalUri = 'https://ngsp.org/ifccngsp.asp', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://ngsp.org/ifccngsp.asp', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:36a8ef4de10020e5b07c054688b3def399a3364ddbc46237e4b5a701fc6d75ec', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:pmid-30669119'})
-SET sn.canonicalUri = 'https://doi.org/10.18632/aging.101684', sn.publishedAt = datetime('2019-01-21T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://doi.org/10.18632/aging.101684', sn.publishedAt = datetime('2019-01-21T00:00:00Z'), sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:889dd93f33d1a0b57bd7c9800cc2d6ffe077c8cd3102dfdb1d5ed2c1c2918bac', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:pmid-36516495'})
-SET sn.canonicalUri = 'https://doi.org/10.18632/aging.204434', sn.publishedAt = datetime('2022-12-14T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://doi.org/10.18632/aging.204434', sn.publishedAt = datetime('2022-12-14T00:00:00Z'), sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:01123cbaaebbb869115ca536c1b7422f15dcb1080f25536fa181ab4c9fe75b7a', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:synthetic-lab-a-method-notice-v1'})
-SET sn.canonicalUri = 'urn:synthetic:lab-a:method-change-notice', sn.retrievedAt = datetime('2025-07-15T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'urn:synthetic:lab-a:method-change-notice', sn.retrievedAt = datetime('2025-07-15T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:6c802bdaf56c03418008014be9e233438c78d482c5d3047661a61b03c24151f1', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:synthetic-lab-a-method-notice-v2'})
-SET sn.canonicalUri = 'urn:synthetic:lab-a:method-change-notice', sn.retrievedAt = datetime('2025-08-20T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'urn:synthetic:lab-a:method-change-notice', sn.retrievedAt = datetime('2025-08-20T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:1805a38e89ea4b2bfaeb0875025261b4775057728ac2f54508635a76f38284ae', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:owkin-pathology-explorer-2026-10-03'})
-SET sn.canonicalUri = 'mcp://owkin/pathology_explorer', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'mcp://owkin/pathology_explorer', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:861823760b822edee74dcf407c271b3f279f09e0f65499d7776f7a0c87864366', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:loinc-4548-4-part-model'})
-SET l.uri = 'https://loinc.org/4548-4', l.section = 'Part Model', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://loinc.org/4548-4', l.section = 'Part Model', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:loinc-59261-8-names'})
-SET l.uri = 'https://loinc.org/59261-8', l.section = 'LOINC Names', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://loinc.org/59261-8', l.section = 'LOINC Names', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:ngsp-master-equation-table-2'})
-SET l.uri = 'https://ngsp.org/ifccngsp.asp', l.section = 'Table 2', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://ngsp.org/ifccngsp.asp', l.section = 'Table 2', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:pmid-30669119-abstract'})
-SET l.uri = 'https://doi.org/10.18632/aging.101684', l.section = 'Abstract', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://doi.org/10.18632/aging.101684', l.section = 'Abstract', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:pmid-36516495-abstract'})
-SET l.uri = 'https://doi.org/10.18632/aging.204434', l.section = 'Abstract', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://doi.org/10.18632/aging.204434', l.section = 'Abstract', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:synthetic-lab-a-notice-v1-body'})
-SET l.uri = 'urn:synthetic:lab-a:method-change-notice', l.section = 'body (v1: switch effective 2025-07-01)', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'urn:synthetic:lab-a:method-change-notice', l.section = 'body (v1: switch effective 2025-07-01)', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:synthetic-lab-a-notice-v2-body'})
-SET l.uri = 'urn:synthetic:lab-a:method-change-notice', l.section = 'body (v2 correction: switch effective 2025-06-01)', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'urn:synthetic:lab-a:method-change-notice', l.section = 'body (v2 correction: switch effective 2025-06-01)', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:owkin-features-description-lymphocytes'})
-SET l.uri = 'mcp://owkin/pathology_explorer/features_description?cell_type=lymphocytes', l.section = 'density_lymphocytes_in_tumor', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'mcp://owkin/pathology_explorer/features_description?cell_type=lymphocytes', l.section = 'density_lymphocytes_in_tumor', l.createdAt = datetime();
 
 // status: statically-checked
 MATCH (s:Source {uid: 'hu:source:loinc-4548-4'}), (sn:SourceSnapshot {uid: 'hu:snapshot:loinc-4548-4-2026-10-03'}), (l:SourceLocator {uid: 'hu:locator:loinc-4548-4-part-model'})
@@ -285,7 +296,7 @@ MERGE (a)-[:CALIBRATION_TRACEABLE_TO]->(r);
 // status: statically-checked
 MATCH (ta:LabTest {uid: 'hu:lab-test:synthetic-lab-a-hba1c'}), (a1:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-tosoh-g8-5-24'}), (l1:SourceLocator {uid: 'hu:locator:synthetic-lab-a-notice-v1-body'}), (lab:Organization {uid: 'hu:org:synthetic-lab-a'})
 MERGE (x:Assertion {uid: 'hu:assertion:lab-a-hba1c-used-tosoh-g8-until-2025-07-01'})
-SET x.predicate = 'PERFORMED_WITH_ASSAY_VERSION', x.status = 'SUPERSEDED', x.recordedAt = datetime('2025-07-15T00:00:00Z'), x.validTo = datetime('2025-07-01T00:00:00Z')
+SET x.predicate = 'PERFORMED_WITH_ASSAY_VERSION', x.status = 'SUPERSEDED', x.recordedAt = datetime('2025-07-15T00:00:00Z'), x.recordedTo = datetime('2025-08-20T00:00:00Z'), x.validTo = datetime('2025-07-01T00:00:00Z'), x.validToBasis = 'STATED_BY_SOURCE', x.validToPrecision = 'DAY'
 MERGE (x)-[:HAS_SUBJECT]->(ta)
 MERGE (x)-[:HAS_OBJECT]->(a1)
 MERGE (x)-[:SUPPORTED_BY]->(l1)
@@ -294,16 +305,23 @@ MERGE (x)-[:ASSERTED_BY]->(lab);
 // status: statically-checked
 MATCH (ta:LabTest {uid: 'hu:lab-test:synthetic-lab-a-hba1c'}), (a1:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-tosoh-g8-5-24'}), (l2:SourceLocator {uid: 'hu:locator:synthetic-lab-a-notice-v2-body'}), (lab:Organization {uid: 'hu:org:synthetic-lab-a'})
 MERGE (x:Assertion {uid: 'hu:assertion:lab-a-hba1c-used-tosoh-g8-until-2025-06-01'})
-SET x.predicate = 'PERFORMED_WITH_ASSAY_VERSION', x.status = 'ACCEPTED', x.recordedAt = datetime('2025-08-20T00:00:00Z'), x.validTo = datetime('2025-06-01T00:00:00Z')
+SET x.predicate = 'PERFORMED_WITH_ASSAY_VERSION', x.status = 'ACCEPTED', x.recordedAt = datetime('2025-08-20T00:00:00Z'), x.validTo = datetime('2025-06-01T00:00:00Z'), x.validToBasis = 'STATED_BY_SOURCE', x.validToPrecision = 'DAY'
 MERGE (x)-[:HAS_SUBJECT]->(ta)
 MERGE (x)-[:HAS_OBJECT]->(a1)
 MERGE (x)-[:SUPPORTED_BY]->(l2)
 MERGE (x)-[:ASSERTED_BY]->(lab);
 
+// The v2 notice corrects the v1 date: the newer assertion SUPERSEDES the older one (SOURCE_CORRECTION); the older keeps its
+// valid time and is closed by recordedTo (round 0007 TM-R2).
+MATCH (newer:Assertion {uid: 'hu:assertion:lab-a-hba1c-used-tosoh-g8-until-2025-06-01'}), (older:Assertion {uid: 'hu:assertion:lab-a-hba1c-used-tosoh-g8-until-2025-07-01'})
+MERGE (newer)-[s:SUPERSEDES]->(older)
+SET s.supersessionKind = 'SOURCE_CORRECTION', s.recordedAt = datetime('2025-08-20T00:00:00Z');
+
+
 // status: statically-checked
 MATCH (ta:LabTest {uid: 'hu:lab-test:synthetic-lab-a-hba1c'}), (a2:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-cobas-c513'}), (l2:SourceLocator {uid: 'hu:locator:synthetic-lab-a-notice-v2-body'}), (lab:Organization {uid: 'hu:org:synthetic-lab-a'})
 MERGE (x:Assertion {uid: 'hu:assertion:lab-a-hba1c-uses-cobas-c513-from-2025-06-01'})
-SET x.predicate = 'PERFORMED_WITH_ASSAY_VERSION', x.status = 'ACCEPTED', x.recordedAt = datetime('2025-08-20T00:00:00Z'), x.validFrom = datetime('2025-06-01T00:00:00Z')
+SET x.predicate = 'PERFORMED_WITH_ASSAY_VERSION', x.status = 'ACCEPTED', x.recordedAt = datetime('2025-08-20T00:00:00Z'), x.validFrom = datetime('2025-06-01T00:00:00Z'), x.validFromBasis = 'STATED_BY_SOURCE', x.validFromPrecision = 'DAY'
 MERGE (x)-[:HAS_SUBJECT]->(ta)
 MERGE (x)-[:HAS_OBJECT]->(a2)
 MERGE (x)-[:SUPPORTED_BY]->(l2)
@@ -314,17 +332,17 @@ MERGE (x)-[:ASSERTED_BY]->(lab);
 // status: statically-checked
 MATCH (ta:LabTest {uid: 'hu:lab-test:synthetic-lab-a-hba1c'}), (a1:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-tosoh-g8-5-24'})
 MERGE (ta)-[e:PERFORMED_WITH_ASSAY_VERSION {relationshipUid: 'hu:rel:lab-a-a1-episode-1'}]->(a1)
-SET e.validFrom = null, e.validTo = datetime('2025-07-01T00:00:00Z'), e.recordedFrom = datetime('2025-07-15T00:00:00Z'), e.recordedTo = datetime('2025-08-20T00:00:00Z'), e.assertionUid = 'hu:assertion:lab-a-hba1c-used-tosoh-g8-until-2025-07-01';
+SET e.validFrom = null, e.validFromBasis = 'UNKNOWN', e.validTo = datetime('2025-07-01T00:00:00Z'), e.validToBasis = 'STATED_BY_SOURCE', e.validToPrecision = 'DAY', e.recordedFrom = datetime('2025-07-15T00:00:00Z'), e.recordedTo = datetime('2025-08-20T00:00:00Z'), e.assertionUid = 'hu:assertion:lab-a-hba1c-used-tosoh-g8-until-2025-07-01';
 
 // status: statically-checked
 MATCH (ta:LabTest {uid: 'hu:lab-test:synthetic-lab-a-hba1c'}), (a1:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-tosoh-g8-5-24'})
 MERGE (ta)-[e:PERFORMED_WITH_ASSAY_VERSION {relationshipUid: 'hu:rel:lab-a-a1-episode-2'}]->(a1)
-SET e.validFrom = null, e.validTo = datetime('2025-06-01T00:00:00Z'), e.recordedFrom = datetime('2025-08-20T00:00:00Z'), e.recordedTo = null, e.assertionUid = 'hu:assertion:lab-a-hba1c-used-tosoh-g8-until-2025-06-01';
+SET e.validFrom = null, e.validFromBasis = 'UNKNOWN', e.validTo = datetime('2025-06-01T00:00:00Z'), e.validToBasis = 'STATED_BY_SOURCE', e.validToPrecision = 'DAY', e.recordedFrom = datetime('2025-08-20T00:00:00Z'), e.recordedTo = null, e.assertionUid = 'hu:assertion:lab-a-hba1c-used-tosoh-g8-until-2025-06-01';
 
 // status: statically-checked
 MATCH (ta:LabTest {uid: 'hu:lab-test:synthetic-lab-a-hba1c'}), (a2:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-cobas-c513'})
 MERGE (ta)-[e:PERFORMED_WITH_ASSAY_VERSION {relationshipUid: 'hu:rel:lab-a-a2-episode-1'}]->(a2)
-SET e.validFrom = datetime('2025-06-01T00:00:00Z'), e.validTo = null, e.recordedFrom = datetime('2025-08-20T00:00:00Z'), e.recordedTo = null, e.assertionUid = 'hu:assertion:lab-a-hba1c-uses-cobas-c513-from-2025-06-01';
+SET e.validFrom = datetime('2025-06-01T00:00:00Z'), e.validFromBasis = 'STATED_BY_SOURCE', e.validFromPrecision = 'DAY', e.validTo = null, e.validToBasis = 'UNKNOWN', e.recordedFrom = datetime('2025-08-20T00:00:00Z'), e.recordedTo = null, e.assertionUid = 'hu:assertion:lab-a-hba1c-uses-cobas-c513-from-2025-06-01';
 
 // Lab B: one episode; assertion source not modeled in this fixture beyond the lab itself.
 // status: statically-checked
@@ -402,12 +420,12 @@ MERGE (v2)-[:OUTPUTS_METRIC]->(m2);
 // status: statically-checked
 MATCH (v1:AlgorithmVersion {uid: 'hu:algorithm-version:grimage-v1-lu-2019'}), (v2:AlgorithmVersion {uid: 'hu:algorithm-version:grimage2-lu-2022'}), (l:SourceLocator {uid: 'hu:locator:pmid-36516495-abstract'})
 MERGE (x:Assertion {uid: 'hu:assertion:grimage2-derived-from-grimage-v1'})
-SET x.predicate = 'DERIVED_FROM_ALGORITHM_VERSION', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-03T00:00:00Z'), x.validFrom = datetime('2022-12-14T00:00:00Z')
+SET x.predicate = 'DERIVED_FROM_ALGORITHM_VERSION', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-03T00:00:00Z'), x.validFromBasis = 'PUBLICATION_PROXY', x.validFromPrecision = 'DAY', x.validFrom = datetime('2022-12-14T00:00:00Z')
 MERGE (x)-[:HAS_SUBJECT]->(v2)
 MERGE (x)-[:HAS_OBJECT]->(v1)
 MERGE (x)-[:SUPPORTED_BY]->(l)
 MERGE (v2)-[d:DERIVED_FROM_ALGORITHM_VERSION]->(v1)
-SET d.assertionUid = 'hu:assertion:grimage2-derived-from-grimage-v1';
+SET d.assertionUid = 'hu:assertion:grimage2-derived-from-grimage-v1', d.recordedFrom = datetime('2026-10-03T00:00:00Z'), d.relationshipUid = 'hu:rel:grimage2-derived-from-grimage-v1';
 
 // Model-derived feature from an unversioned service endpoint.
 // status: statically-checked
@@ -500,7 +518,7 @@ MERGE (r)-[:COMPUTED_BY_ALGORITHM_VERSION]->(v);
 // status: statically-checked
 MATCH (r1:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-a-2025-01-10'}), (r2:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-b-2025-01-20'})
 MERGE (r1)-[c:COMPARED_TO]->(r2)
-SET c.derivationRule = 'INV-L3-01 via hu:comparability:lab-a-a1-vs-lab-b-b1-hba1c';
+SET c.derivationRule = 'INV-301 comparability-licensed comparison', c.derivedFromAssessmentUids = ['hu:comparability:lab-a-a1-vs-lab-b-b1-hba1c'];
 
 // Competing proposals for the vendor "GrimAge" label: two UNRESOLVED assertions of the result-to-version link,
 // each backed by a competing ResolutionHypothesis. No COMPUTED_BY_ALGORITHM_VERSION edge until one is accepted.
@@ -659,3 +677,42 @@ MATCH (x:Assertion)-[:HAS_SUBJECT]->(r:DiagnosticResult)
 WHERE x.predicate = 'COMPUTED_BY_ALGORITHM_VERSION' AND x.status = 'UNRESOLVED'
 MATCH (x)-[:HAS_OBJECT]->(v:AlgorithmVersion)
 RETURN r.uid AS resultUid, collect(v.uid) AS candidateVersions;
+
+
+// ---------------------------------------------------------------------------
+// Assertions behind terminology and lab-catalog edges
+// Asserted edges are projections of assertions (catalog 0.2.0 asserted_edge profile). The record-derived facts below were
+// created as bare edges by the lane; each now has its authorizing assertion, cited to the registry, publication or page
+// snapshot it was read from, and the edge carries assertionUid, recordedFrom and relationshipUid.
+// status: statically-checked, executed
+UNWIND [
+  {pred: 'IDENTIFIED_BY', s: 'hu:metric:hba1c-mfr-bld', o: 'hu:identifier:loinc-4548-4', loc: 'hu:locator:loinc-4548-4-part-model'},
+  {pred: 'IDENTIFIED_BY', s: 'hu:metric:hba1c-ifcc-sfr-bld', o: 'hu:identifier:loinc-59261-8', loc: 'hu:locator:loinc-59261-8-names'},
+  {pred: 'MEASURES_METRIC', s: 'hu:lab-test:synthetic-lab-a-hba1c', o: 'hu:metric:hba1c-mfr-bld', loc: 'hu:locator:synthetic-lab-a-notice-v2-body'},
+  {pred: 'MEASURES_METRIC', s: 'hu:lab-test:synthetic-lab-b-hba1c-ifcc', o: 'hu:metric:hba1c-ifcc-sfr-bld', loc: 'hu:locator:ngsp-master-equation-table-2'}
+] AS row
+MATCH (s {uid: row.s}), (o {uid: row.o}), (l:SourceLocator {uid: row.loc})
+MERGE (a:Assertion {uid: 'hu:assertion:' + toLower(replace(row.pred, '_', '-')) + '-' + split(row.s, ':')[2] + '-' + split(row.o, ':')[2]})
+ON CREATE SET a.predicate = row.pred, a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.privacyClass = 'public'
+MERGE (a)-[:HAS_SUBJECT]->(s)
+MERGE (a)-[:HAS_OBJECT]->(o)
+MERGE (a)-[:SUPPORTED_BY]->(l)
+WITH row, s, o, a
+MATCH (s)-[r]->(o) WHERE type(r) = row.pred
+SET r.assertionUid = a.uid, r.recordedFrom = a.recordedAt, r.relationshipUid = 'hu:rel:' + split(a.uid, ':')[2];
+
+// ---------------------------------------------------------------------------
+// Capture-fidelity acceptance (catalog 0.2.0, INV-103). Every ACCEPTED, REJECTED or DISPUTED status is a projection of a
+// CAPTURE_FIDELITY adjudication. This fixture records one policy adjudication (reviewerType POLICY) covering the captured
+// assertions it created; it says nothing about whether any proposition is true (that is a SUPPORT adjudication).
+// status: statically-checked, executed
+MATCH (a:Assertion)
+WHERE a.status IN ['ACCEPTED', 'REJECTED', 'DISPUTED']
+  AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
+MERGE (j:EvidenceAssessment:Adjudication {uid: 'hu:adjudication:diagnostic-comparison-capture-fidelity-policy-2026-10-04'})
+ON CREATE SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
+    j.reviewerType = 'POLICY', j.methodVersion = 'fixture-capture-policy-1', j.status = 'FINAL',
+    j.rationale = 'Fixture capture policy: the recorded propositions match the cited spans as read by the authoring lane.',
+    j.reviewedAt = datetime('2026-10-04T00:00:00Z'), j.recordedAt = datetime('2026-10-04T00:00:00Z'), j.createdAt = datetime('2026-10-04T00:00:00Z'),
+    j.privacyClass = 'internal'
+MERGE (j)-[:EVALUATES]->(a);

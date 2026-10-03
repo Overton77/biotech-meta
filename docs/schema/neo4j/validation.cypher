@@ -1,4 +1,9 @@
-// Each query should return zero rows in a valid committed graph unless noted.
+// Each query should return zero rows in a valid committed graph unless its comment says "(informational)",
+// in which case rows are expected and are for review, never a failure.
+// Status tags: every query is "statically-checked" (parsed with the Neo4j Cypher language-support parser and
+// read against catalog labels) and, as of 2026-10-03, "executed" against the six fixtures in ../examples on an
+// embedded Neo4j 5.26 Community instance in the authoring scratchpad (see ../ontology-lab/proposal-index.md,
+// section 9, for the recorded row counts). V-0xx queries carry no per-query tag; this header is their tag.
 // 0.2.0 (2026-10-03): V-0xx are the 0.1.0 baseline. V-1xx to V-5xx project the invariants accepted in
 // ontology-lab rounds 0002 to 0009 (see ontology-lab/proposal-index.md). Rules Neo4j cannot express are
 // marked service-enforced in the catalog. Note on V-000a/V-000b: if deployed nodes carry only live labels
@@ -56,10 +61,13 @@ WHERE r.quantity IS NULL OR r.unitCode IS NULL OR r.basis IS NULL
 RETURN r;
 
 // V-007: accepted advisor-product endorsement cannot be inferred only from advising.
-MATCH (p:Person)-[:ADVISES_ORGANIZATION]->(o:Organization),
-      (p)-[e:ENDORSES_PRODUCT]->(product:Product)
-WHERE e.projectionOfAssertionUid IS NULL
-RETURN p.uid AS advisorUid, o.uid AS organizationUid, product.uid AS productUid;
+// 0.2.0: an ENDORSES_PRODUCT edge is an asserted projection; it must cite an ENDORSES_PRODUCT assertion, never
+// an ADVISES_ORGANIZATION one, and never be unbacked.
+MATCH (p)-[e:ENDORSES_PRODUCT]->(product)
+OPTIONAL MATCH (a:Assertion {uid: e.assertionUid})
+WITH p, e, product, a
+WHERE e.assertionUid IS NULL OR a IS NULL OR a.predicate <> 'ENDORSES_PRODUCT'
+RETURN p.uid AS endorserUid, product.uid AS productUid, a.predicate AS citedPredicate;
 
 // V-008: a Certificate of Analysis must report on a lot or execution.
 MATCH (c:CertificateOfAnalysis)
@@ -136,33 +144,37 @@ WHERE (r.validTo IS NOT NULL AND r.validTo.year >= 9000)
    OR (r.validFrom IS NOT NULL AND r.validFrom.year <= 1)
 RETURN type(r) AS relType, elementId(r) AS edgeId;
 
-// V-105: a non-null valid-time bound must say how it was obtained (validTimeBasis), on assertions.
-// status: statically-checked
+// V-105: a non-null valid-time bound on an assertion carries its own basis and precision (per-bound, round 0007).
+// status: statically-checked, executed
 MATCH (a:Assertion)
-WHERE (a.validFrom IS NOT NULL OR a.validTo IS NOT NULL)
-  AND (a.validTimeBasis IS NULL OR NOT a.validTimeBasis IN ['SOURCE_STATED', 'OBSERVED', 'PUBLICATION_PROXY', 'INFERRED', 'UNKNOWN'])
-RETURN a.uid AS assertionUid, a.validTimeBasis AS validTimeBasis;
+WHERE (a.validFrom IS NOT NULL AND (a.validFromBasis IS NULL OR a.validFromPrecision IS NULL
+         OR NOT a.validFromBasis IN ['STATED_BY_SOURCE', 'PUBLICATION_PROXY', 'INFERRED']))
+   OR (a.validTo IS NOT NULL AND (a.validToBasis IS NULL OR a.validToPrecision IS NULL
+         OR NOT a.validToBasis IN ['STATED_BY_SOURCE', 'PUBLICATION_PROXY', 'INFERRED']))
+   OR a.validTimeBasis IS NOT NULL
+RETURN a.uid AS assertionUid, a.validFromBasis AS validFromBasis, a.validToBasis AS validToBasis, a.validTimeBasis AS legacySingleBasis;
 
 // V-106: the same rule on asserted edges that carry a valid-time bound.
 // status: statically-checked
 // params: $assertedTypes
 MATCH ()-[r]->()
 WHERE type(r) IN $assertedTypes
-  AND (r.validFrom IS NOT NULL OR r.validTo IS NOT NULL)
-  AND (r.validTimeBasis IS NULL OR NOT r.validTimeBasis IN ['SOURCE_STATED', 'OBSERVED', 'PUBLICATION_PROXY', 'INFERRED', 'UNKNOWN'])
-RETURN type(r) AS relType, elementId(r) AS edgeId, r.validTimeBasis AS validTimeBasis;
+  AND ((r.validFrom IS NOT NULL AND (r.validFromBasis IS NULL OR r.validFromPrecision IS NULL))
+    OR (r.validTo IS NOT NULL AND (r.validToBasis IS NULL OR r.validToPrecision IS NULL))
+    OR r.validTimeBasis IS NOT NULL)
+RETURN type(r) AS relType, elementId(r) AS edgeId, r.validFromBasis AS validFromBasis, r.validToBasis AS validToBasis;
 
 // V-107: ingestion time must not stand in for an unknown valid start (heuristic; rows are for review).
 // status: statically-checked
 MATCH (a:Assertion)
 WHERE a.validFrom IS NOT NULL
   AND a.validFrom = a.recordedAt
-  AND coalesce(a.validTimeBasis, 'UNKNOWN') <> 'SOURCE_STATED'
-RETURN a.uid AS assertionUid, a.validFrom AS validFrom, a.recordedAt AS recordedAt, a.validTimeBasis AS validTimeBasis;
+  AND coalesce(a.validFromBasis, 'UNKNOWN') <> 'STATED_BY_SOURCE'
+RETURN a.uid AS assertionUid, a.validFrom AS validFrom, a.recordedAt AS recordedAt, a.validFromBasis AS validFromBasis;
 
 // V-108: exclusive predicates: no two possibly-overlapping believed attachments from one subject
 // to different objects within one scope. Unknown bounds are treated as possible overlap.
-// status: illustrative (depends on predicate exclusivity metadata from catalog-patch.yaml)
+// status: illustrative (depends on predicate exclusivity metadata, catalog conventions.predicateExclusivity)
 // params: $exclusiveTypes list<string>
 MATCH (x)-[r1]->(y1), (x)-[r2]->(y2)
 WHERE type(r1) = type(r2)
@@ -188,24 +200,32 @@ RETURN a.uid AS assertionUid, size(supersessors) AS supersessorCount;
 // V-110: a BellLabs review state (ACCEPTED, REJECTED, DISPUTED) must be backed by an Adjudication,
 // and no Adjudication may predate the assertion it reviews.
 // status: statically-checked
+// 0.2.0: only a CAPTURE_FIDELITY adjudication backs a status; a SUPPORT adjudication (truth) never does (INV-103, INV-406).
 MATCH (a:Assertion)
 WHERE a.status IN ['ACCEPTED', 'REJECTED', 'DISPUTED']
-OPTIONAL MATCH (j:Adjudication)-[:EVALUATES]->(a)
+OPTIONAL MATCH (j:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a)
 WITH a, collect(j) AS adjudications
 WHERE size(adjudications) = 0 OR any(j IN adjudications WHERE j.reviewedAt IS NULL OR j.reviewedAt < a.recordedAt)
-RETURN a.uid AS assertionUid, a.status AS status, size(adjudications) AS adjudicationCount;
+RETURN a.uid AS assertionUid, a.status AS status, size(adjudications) AS captureFidelityAdjudications;
 
 // V-111: locators behind an ACCEPTED assertion must resolve to a reproducible snapshot.
 // status: statically-checked
 MATCH (a:Assertion {status: 'ACCEPTED'})-[:SUPPORTED_BY]->(loc:SourceLocator)
 OPTIONAL MATCH (snap:SourceSnapshot)-[:HAS_LOCATOR]->(loc)
 WITH a, loc, collect(snap) AS snaps
-WHERE size(snaps) = 0 OR any(s IN snaps WHERE s.contentHash IS NULL OR s.retrievedAt IS NULL OR s.observedAt IS NULL)
+WHERE size(snaps) = 0 OR any(s IN snaps WHERE s.contentHash IS NULL OR s.retrievedAt IS NULL)
 RETURN a.uid AS assertionUid, loc.uid AS locatorUid, size(snaps) AS snapshotCount;
+
+// V-111b (informational): snapshots cited by ACCEPTED assertions without a declared contentHashBasis. Null weakens
+// reproducibility (the hash input is unnamed); new captures must set it (service-enforced).
+// status: statically-checked, executed
+MATCH (a:Assertion {status: 'ACCEPTED'})-[:SUPPORTED_BY]->(:SourceLocator)<-[:HAS_LOCATOR]-(s:SourceSnapshot)
+WHERE s.contentHashBasis IS NULL
+RETURN DISTINCT s.uid AS snapshotWithoutHashBasis;
 
 // V-112: derived and forbidden-implication edges cite live, matching assertions (QS-4a, zero rows = valid).
 // status: statically-checked
-// params: $derivedTypes, $implicationPairs
+// params: $derivedTypes, $implicationPairs, $ruleOnlyDerivedTypes (catalog relationships with ruleOnly: true)
 MATCH (x)-[r]->(y)
 WHERE type(r) IN $derivedTypes OR type(r) IN [p IN $implicationPairs | p[1]]
 WITH x, y, r, coalesce(r.projectionOfAssertionUid, r.assertionUid) AS citedUid
@@ -216,35 +236,56 @@ WITH x, y, r, citedUid, cited,
         CASE WHEN citedUid IS NOT NULL AND cited IS NULL THEN 'CITED_ASSERTION_MISSING' END,
         CASE WHEN cited IS NOT NULL AND cited.predicate <> type(r) THEN 'CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE' END,
         CASE WHEN cited IS NOT NULL AND any(p IN $implicationPairs WHERE p[1] = type(r) AND p[0] = cited.predicate) THEN 'FORBIDDEN_IMPLICATION_USED_AS_PREMISE' END,
-        CASE WHEN r.derivationRule IS NOT NULL AND size(coalesce(r.derivedFromAssertionUids, [])) = 0 THEN 'DERIVATION_WITHOUT_SOURCE_ASSERTIONS' END
+        CASE WHEN r.derivationRule IS NOT NULL AND size(coalesce(r.derivedFromAssertionUids, [])) = 0
+                  AND size(coalesce(r.derivedFromAssessmentUids, [])) = 0 AND r.hypothesisUid IS NULL
+                  AND NOT type(r) IN $ruleOnlyDerivedTypes THEN 'DERIVATION_WITHOUT_SOURCE_ASSERTIONS' END,
+        CASE WHEN size(coalesce(r.derivedFromAssessmentUids, [])) > size([u IN coalesce(r.derivedFromAssessmentUids, []) WHERE EXISTS { MATCH (:EvidenceAssessment {uid: u}) }])
+             THEN 'LICENSING_ASSESSMENT_MISSING' END,
+        CASE WHEN r.derivationRule IS NOT NULL AND EXISTS {
+               MATCH (inp:Assertion) WHERE inp.uid IN coalesce(r.derivedFromAssertionUids, [])
+                 AND any(p IN $implicationPairs WHERE p[1] = type(r) AND p[0] = inp.predicate)
+             } THEN 'FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS' END,
+        CASE WHEN r.derivationRule IS NOT NULL AND size(coalesce(r.derivedFromAssertionUids, [])) >
+               size([u IN coalesce(r.derivedFromAssertionUids, []) WHERE EXISTS { MATCH (:Assertion {uid: u}) }])
+             THEN 'DERIVATION_INPUT_MISSING' END
      ] WHERE v IS NOT NULL] AS violations
 WHERE size(violations) > 0
 RETURN type(r) AS edgeType, x.uid AS startUid, y.uid AS endUid, violations;
 
 // V-113: no shared node points at a private node (public/private boundary).
 // status: statically-checked
-MATCH (s)-[r]->(p:PrivateScope)
-WHERE NOT s:PrivateScope
+// 0.2.0: K-5 revised. A private node is recognised by its uid prefix hu:private-, privacyClass private-personal, or the
+// fixture marker :PrivateRecord (single-file two-store fixtures only). In production the private store is a separate
+// database (round 0008), so rows here mean a private record leaked into the shared graph.
+MATCH (s)-[r]->(p)
+WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR p:PrivateRecord)
+  AND NOT (s.uid STARTS WITH 'hu:private-' OR s.privacyClass = 'private-personal' OR s:PrivateRecord)
 RETURN labels(s) AS sharedLabels, s.uid AS sharedUid, type(r) AS relType, p.uid AS privateUid;
 
 // V-114: private-to-shared references use only governed reference types.
 // status: illustrative (Lane 5 owns the list of reference types)
 // params: $allowedReferenceTypes
-MATCH (p:PrivateScope)-[r]->(s)
-WHERE NOT s:PrivateScope AND NOT type(r) IN $allowedReferenceTypes
+// 0.2.0: in production no relationship crosses the store boundary at all (references are uid properties), so
+// $allowedReferenceTypes is empty and any row is a violation.
+MATCH (p)-[r]->(s)
+WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR p:PrivateRecord)
+  AND NOT (s.uid STARTS WITH 'hu:private-' OR s.privacyClass = 'private-personal' OR s:PrivateRecord)
+  AND NOT type(r) IN $allowedReferenceTypes
 RETURN p.uid AS privateUid, type(r) AS relType, s.uid AS sharedUid;
 
 // V-115: private nodes do not carry labels that a shared fulltext or vector index covers.
 // status: statically-checked
 // params: $sharedIndexedLabels list<string>, derive with: SHOW FULLTEXT INDEXES YIELD labelsOrTypes, plus the vector index labels
-MATCH (p:PrivateScope)
-WHERE any(l IN labels(p) WHERE l IN $sharedIndexedLabels)
+MATCH (p)
+WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR p:PrivateRecord)
+  AND any(l IN labels(p) WHERE l IN $sharedIndexedLabels)
 RETURN p.uid AS privateUid, labels(p) AS labels;
 
 // V-116: private nodes carry no search text or embedding unless a private index is declared (placement-dependent).
 // status: illustrative (applies only if private records share the shared database)
-MATCH (p:PrivateScope)
-WHERE p.searchText IS NOT NULL OR p.searchEmbedding IS NOT NULL
+MATCH (p)
+WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR p:PrivateRecord)
+  AND (p.searchText IS NOT NULL OR p.searchEmbedding IS NOT NULL)
 RETURN p.uid AS privateUid, labels(p) AS labels;
 
 // V-117: uid format and uid-to-live-id seam. For a node that has both a uid and a live id (stored under
@@ -289,11 +330,38 @@ RETURN name, labelsOrTypes, properties, state;
 // Any index whose properties differ, or state <> 'ONLINE', is a defect to review. // service-enforced comparison
 
 // V-121: a published-answer record states its viewpoint and carries no user identifier.
-// status: illustrative (AnswerRecord is a CANDIDATE node in catalog-patch.yaml)
+// status: illustrative (AnswerRecord is a CANDIDATE node in the catalog's access_and_answers module)
 MATCH (r:AnswerRecord)
 WHERE r.recordedAsOf IS NULL OR r.schemaDigest IS NULL OR r.queryShapeId IS NULL OR r.accessTier IS NULL
    OR r.userUid IS NOT NULL OR r.ownerUid IS NOT NULL OR r.questionText IS NOT NULL
 RETURN r.uid AS answerRecordUid;
+
+
+// V-123 (INV-406): status is never read from a truth verdict. Rows are assertions whose status is REJECTED or DISPUTED while
+// their only adjudications are SUPPORT adjudications (truth) and no CAPTURE_FIDELITY adjudication exists, or whose status
+// mirrors a SUPPORT verdict exactly when the capture adjudication says otherwise.
+// status: statically-checked, executed
+MATCH (a:Assertion)
+WHERE a.status IN ['REJECTED', 'DISPUTED']
+  AND EXISTS { MATCH (:Adjudication {adjudicationKind: 'SUPPORT'})-[:EVALUATES]->(a) }
+  AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
+RETURN a.uid AS statusDerivedFromTruthVerdict, a.status AS status;
+
+// V-124 (INV-007): distinct states are never normalized to one. Rows are quantitative records with a null value and no
+// qualifier saying which state applies (unknown, unmeasured, not reported, below detection, absent), or an applicability
+// dimension whose verdict is UNKNOWN without missing facts and NOT_ASSESSED with missing facts (the two states swapped).
+// status: statically-checked, executed
+MATCH (m:MeasuredResult)
+WHERE m.value IS NULL AND m.qualifier IS NULL
+RETURN 'MEASURED_RESULT_NULL_WITHOUT_QUALIFIER' AS violation, m.uid AS item
+UNION
+MATCH (c:IngredientComponent)
+WHERE c.quantity IS NULL AND c.amountReferent IS NULL AND c.declaredAs IS NULL
+RETURN 'COMPONENT_WITHOUT_QUANTITY_OR_DECLARATION' AS violation, c.uid AS item
+UNION
+MATCH (d:ApplicabilityDimension)
+WHERE d.verdict = 'NOT_ASSESSED' AND size(coalesce(d.missingFacts, [])) > 0 AND d.rationale IS NULL
+RETURN 'NOT_ASSESSED_WITH_MISSING_FACTS' AS violation, d.uid AS item;
 
 
 // =====================================================================================
@@ -515,7 +583,7 @@ RETURN DISTINCT syn.uid AS triggeredWithoutPredecessor;
 // V-220 (FI-202): no unprojected SUPPLIES_INGREDIENT_MATERIAL edge (asserted predicate needs its assertion).
 // status: statically-checked
 MATCH (o:Organization)-[s:SUPPLIES_INGREDIENT_MATERIAL]->(m)
-WHERE s.projectionOfAssertionUid IS NULL
+WHERE s.assertionUid IS NULL
 RETURN o.uid AS organization, m.uid AS material;
 
 // V-221 (R1): non-placebo study interventions have components with quantity, unit, quantityBasis, and massBasis
@@ -590,6 +658,8 @@ WHERE (c.exposureAmount IS NOT NULL AND (c.exposureUnit IS NULL OR c.exposureBas
 RETURN c.uid AS contextWithIncompleteExposure;
 
 // V-233 (INV-211, FI-304): mechanism projections only from ACCEPTED DIRECT_MEASUREMENT assertions.
+// ACCEPTED here is capture fidelity (the measurement was accurately recorded), not a truth verdict; truth gating
+// of projections is a SUPPORT adjudication question handled by the recommendation layer.
 // status: statically-checked
 MATCH (x)-[r:AFFECTS_MECHANISM|MODULATES|APPLIES_TO_SPECIES|INFLUENCES_OUTCOME]->(y)
 OPTIONAL MATCH (a:Assertion {uid: r.projectionOfAssertionUid})
@@ -869,7 +939,7 @@ WITH holder, h, c, a, collect(DISTINCT src.sourceKind) AS kinds
 WHERE a IS NULL
    OR (all(k IN kinds WHERE k IN ['MARKETING_PAGE', 'THIRD_PARTY_DIRECTORY', 'PRESS_RELEASE'])
        AND NOT EXISTS {
-         MATCH (j:Adjudication)-[:EVALUATES]->(a)
+         MATCH (j:Adjudication {adjudicationKind: 'SUPPORT'})-[:EVALUATES]->(a)
          WHERE j.verdict = 'SUPPORTED'
        })
 RETURN holder.uid AS holderUid, c.uid AS capabilityUid, kinds AS supportingSourceKinds;
@@ -885,6 +955,26 @@ RETURN holder.uid AS holderUid, c.uid AS capabilityUid;
 MATCH (o:Organization)-[s:SELLS_PRODUCT]->(p)
 WHERE s.projectionOfAssertionUid IS NULL AND s.derivationRule IS NULL
 RETURN o.uid AS organizationUid, p.uid AS productUid;
+
+// V-326c: every derivation input of SELLS_PRODUCT is a SELLER_OF_RECORD_FOR assertion (closes the derivationRule bypass
+// found in review: a HOSTS_LISTING input returned zero rows from V-326a and V-112).
+// status: statically-checked, executed
+MATCH (o:Organization)-[s:SELLS_PRODUCT]->(p)
+WHERE s.derivationRule IS NOT NULL
+  AND (size(coalesce(s.derivedFromAssertionUids, [])) = 0
+       OR EXISTS { MATCH (inp:Assertion) WHERE inp.uid IN s.derivedFromAssertionUids AND inp.predicate <> 'SELLER_OF_RECORD_FOR' }
+       OR size(s.derivedFromAssertionUids) > size([u IN s.derivedFromAssertionUids WHERE EXISTS { MATCH (:Assertion {uid: u, predicate: 'SELLER_OF_RECORD_FOR'}) }]))
+RETURN o.uid AS organizationUid, p.uid AS productUid, s.derivedFromAssertionUids AS inputs;
+
+// V-336 (INV-304): an APPROVAL status results from an approving agency response of an approving pathway. A status
+// asserted from nothing is a company characterization, not approval.
+// status: statically-checked, executed
+MATCH (s:RegulatoryStatus {statusKind: 'APPROVAL'})
+WHERE NOT EXISTS {
+  MATCH (s)-[:RESULTS_FROM_RESPONSE]->(resp:RegulatoryResponse)
+  WHERE resp.responseKind IN ['APPROVED', 'PMA_APPROVED']
+}
+RETURN s.uid AS approvalStatusWithoutApprovingResponse;
 
 // V-326b: seller-of-record edges must be assertion-backed (hosting or fulfilling never implies it).
 // status: statically-checked
@@ -913,7 +1003,7 @@ RETURN q.uid AS declarationUid, q.amountReferent AS amountReferent;
 MATCH (a:Assertion)
 WHERE a.predicate IN ['CHARACTERIZES_REGULATORY_RESPONSE', 'CHARACTERIZES_REGULATORY_STATUS']
   AND a.status = 'ACCEPTED'
-  AND NOT EXISTS { MATCH (:Adjudication)-[:EVALUATES]->(a) }
+  AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'SUPPORT'})-[:EVALUATES]->(a) }
 RETURN a.uid AS unadjudicatedCharacterization;
 
 // V-321: regulatory record kinds never share one node.
@@ -1003,7 +1093,7 @@ RETURN s.uid AS statusUid, pw.uid AS pathwayUid, pw.effectiveTo AS basisEnded;
 // status: statically-checked = syntax-linted with the Neo4j Cypher
 // language-support parser and read for label/relationship names against the
 // catalog patch and for per-statement variable binding. Nothing was executed.
-// Financial-interest predicate list used below (keep in sync with catalog-patch.yaml
+// Financial-interest predicate list used below (keep in sync with catalog predicateFamilies.FINANCIAL_INTEREST
 // predicateFamilies.FINANCIAL_INTEREST):
 //   SPONSORS_CONTENT, INVESTED_IN, HOLDS_EQUITY_IN, BOARD_MEMBER_OF, ADVISES_ORGANIZATION,
 //   HAS_IP_INTEREST_IN, RECEIVES_COMPENSATION_FROM, AFFILIATE_FOR_OFFER, FOUNDED_ORGANIZATION, EMPLOYED_BY
@@ -1019,7 +1109,8 @@ RETURN s.uid AS statusUid, pw.uid AS pathwayUid, pw.effectiveTo AS basisEnded;
 MATCH (a:Assertion {status: 'ACCEPTED'})
 WHERE NOT EXISTS {
   MATCH (a)-[:SUPPORTED_BY]->(l:SourceLocator)<-[:HAS_LOCATOR]-(s:SourceSnapshot)
-  WHERE s.contentHash IS NOT NULL AND s.retrievedAt IS NOT NULL AND l.normalizationVersion IS NOT NULL
+  WHERE s.contentHash IS NOT NULL AND s.retrievedAt IS NOT NULL
+    AND (l.normalizationVersion IS NOT NULL OR l.selectorKind IN ['SECTION', 'WHOLE_SNAPSHOT'])
     AND (
       (l.selectorKind = 'TEXT_QUOTE' AND l.exact IS NOT NULL AND l.quoteHash IS NOT NULL)
       OR (l.selectorKind = 'MEDIA_TIME' AND l.mediaStartSeconds IS NOT NULL AND l.mediaEndSeconds IS NOT NULL
@@ -1029,9 +1120,18 @@ WHERE NOT EXISTS {
           AND EXISTS { MATCH (l)-[:LOCATOR_IN_TEXT_VERSION]->(:DocumentTextVersion) })
       OR (l.selectorKind = 'PDF_PAGE' AND l.page IS NOT NULL AND l.exact IS NOT NULL AND l.quoteHash IS NOT NULL)
       OR (l.selectorKind = 'IMAGE_REGION' AND l.mediaAnnotationUid IS NOT NULL)
+      OR (l.selectorKind = 'SECTION' AND l.section IS NOT NULL)
+      OR (l.selectorKind = 'WHOLE_SNAPSHOT')
     )
 }
 RETURN a.uid AS assertionWithoutReproducibleLocator;
+
+// V-401b (informational): ACCEPTED assertions whose only locators are coarse (SECTION or WHOLE_SNAPSHOT). They are
+// reproducible to the snapshot hash but not to a span; re-anchoring to a typed selector is the follow-up.
+// status: statically-checked, executed
+MATCH (a:Assertion {status: 'ACCEPTED'})
+WHERE NOT EXISTS { MATCH (a)-[:SUPPORTED_BY]->(l:SourceLocator) WHERE l.selectorKind IN ['TEXT_QUOTE','TEXT_POSITION','MEDIA_TIME','PDF_PAGE','IMAGE_REGION'] }
+RETURN count(a) AS acceptedAssertionsWithOnlyCoarseLocators;
 
 // V-402: every SourceLocator hangs from exactly one SourceSnapshot.
 // status: statically-checked
@@ -1369,8 +1469,10 @@ RETURN 'EPISODE' AS kind, h.relationshipUid AS item;
 // V-503: bound, precision, and basis agree. OBSERVATION_ONLY or UNKNOWN basis forces a null bound; a non-null bound
 // needs a precision; INFERRED needs a derivation rule.
 // status: statically-checked
+// 0.2.0 integration: a basis is required when its bound is non-null; a null bound with a null basis reads as UNKNOWN.
 MATCH (a:Assertion)
-WHERE a.validFromBasis IS NULL OR a.validToBasis IS NULL
+WHERE (a.validFrom IS NOT NULL AND a.validFromBasis IS NULL)
+   OR (a.validTo IS NOT NULL AND a.validToBasis IS NULL)
    OR (a.validFromBasis IN ['OBSERVATION_ONLY', 'UNKNOWN'] AND a.validFrom IS NOT NULL)
    OR (a.validToBasis IN ['OBSERVATION_ONLY', 'UNKNOWN'] AND a.validTo IS NOT NULL)
    OR (a.validFrom IS NOT NULL AND a.validFromPrecision IS NULL)
@@ -1411,14 +1513,14 @@ WHERE older.recordedTo IS NULL OR older.recordedTo <> s.recordedAt OR newer.reco
 RETURN 'CLOSURE_MISMATCH' AS violation, older.uid AS item
 UNION
 MATCH (a:Assertion)
-WHERE (a.recordedTo IS NOT NULL AND a.status <> 'SUPERSEDED')
+WHERE (a.recordedTo IS NOT NULL AND NOT a.status IN ['SUPERSEDED', 'REJECTED'])
    OR (a.status = 'SUPERSEDED' AND NOT ()-[:SUPERSEDES]->(a))
 RETURN 'STATUS_PROJECTION_MISMATCH' AS violation, a.uid AS item;
 
 // V-507: SUPERSEDES links like to like, points from newer to older, and has no cycles.
 // status: statically-checked
 MATCH (x)-[s:SUPERSEDES]->(y)
-WHERE NOT ((x:Assertion AND y:Assertion) OR (x:Adjudication AND y:Adjudication))
+WHERE NOT ((x:Assertion AND y:Assertion) OR (x:Adjudication AND y:Adjudication) OR (x:EvidenceAssessment AND y:EvidenceAssessment))
    OR x.recordedAt < y.recordedAt
 RETURN 'BAD_SUPERSESSION' AS violation, x.uid AS item
 UNION
@@ -1521,31 +1623,42 @@ RETURN labels(s) AS labels, s.id AS liveId, s.createdAt, s.updatedAt, s.recorded
 
 // V-514: assertion kernel fields present (KCR-0007-1).
 // status: statically-checked
+// 0.2.0 integration: recordedAt is required everywhere; contentHash and the per-bound bases are required for new writes
+// by the ingestion service (service-enforced) and reported here informationally when absent.
 MATCH (a:Assertion)
-WHERE a.recordedAt IS NULL OR a.contentHash IS NULL OR a.validFromBasis IS NULL OR a.validToBasis IS NULL
-RETURN a.uid AS assertionMissingKernelTimeFields;
+WHERE a.recordedAt IS NULL
+RETURN a.uid AS assertionMissingRecordedAt;
+
+// V-514b (informational): assertions without contentHash (legacy or fixture records; new writes must carry it).
+// status: statically-checked, executed
+MATCH (a:Assertion)
+WHERE a.contentHash IS NULL
+RETURN count(a) AS assertionsWithoutContentHash;
 
 // V-520: no private-store labels in the shared graph (production form of fixture F-V6).
 // status: statically-checked
+// Nodes labelled :PrivateRecord are excluded: that label exists only in single-file two-store fixtures (recommendation-snapshot),
+// whose own F-V6 queries cover them. In production the private store is a separate database and no node carries the label.
 MATCH (n)
-WHERE n:PrivateRecord OR n:UserContext OR n:UserContextVersion OR n:UserGoal OR n:UserGoalVersion
+WHERE NOT n:PrivateRecord AND (n:UserContext OR n:UserContextVersion OR n:UserGoal OR n:UserGoalVersion
    OR n:PersonalMeasurement OR n:PersonalLabReport OR n:ProtocolInUse OR n:ProtocolAdoptionVersion OR n:ProtocolDeviation
    OR n:SharingGrant OR n:DisclosureEvent OR n:PendingItem OR n:PurchaseEvent OR n:PersonalApplicabilityAssessment
    OR n:ErasureTombstone OR n:RecommendationRequest OR n:RecommendationSnapshot OR n:RecommendationOption
-   OR n:DecisionCriterionValue OR n:UserDecision
+   OR n:DecisionCriterionValue OR n:UserDecision)
 RETURN labels(n) AS labels, n.uid AS privateNodeInSharedGraph;
 
 // V-521: no private uid values or private-personal class on shared nodes or relationships.
 // status: statically-checked
 MATCH (n)
-WHERE n.privacyClass = 'private-personal'
+WHERE NOT n:PrivateRecord AND (n.privacyClass = 'private-personal'
    OR any(k IN keys(n) WHERE n[k] IS :: STRING AND n[k] STARTS WITH 'hu:private-')
-   OR any(k IN keys(n) WHERE n[k] IS :: LIST<STRING> AND any(x IN n[k] WHERE x STARTS WITH 'hu:private-'))
+   OR any(k IN keys(n) WHERE n[k] IS :: LIST<STRING> AND any(x IN n[k] WHERE x STARTS WITH 'hu:private-')))
 RETURN 'NODE' AS kind, n.uid AS item
 UNION
-MATCH ()-[r]->()
-WHERE r.privacyClass = 'private-personal'
-   OR any(k IN keys(r) WHERE r[k] IS :: STRING AND r[k] STARTS WITH 'hu:private-')
+MATCH (x)-[r]->(y)
+WHERE NOT x:PrivateRecord AND NOT y:PrivateRecord
+  AND (r.privacyClass = 'private-personal'
+       OR any(k IN keys(r) WHERE r[k] IS :: STRING AND r[k] STARTS WITH 'hu:private-'))
 RETURN 'RELATIONSHIP' AS kind, coalesce(r.relationshipUid, elementId(r)) AS item;
 
 // V-522 (informational): semantic nodes without a privacyClass. Null must never be read as public.

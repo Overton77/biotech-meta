@@ -43,6 +43,9 @@
 // Neo4j Cypher language-support parser and read for per-statement variable
 // binding). Nothing here was executed against a database.
 // =====================================================================
+// Executed 2026-10-03 on an embedded Neo4j 5.26 Community instance (authoring scratchpad): every statement ran, and the full
+// 0.2.0 validation suite (../neo4j/validation.cypher) returned zero failing rows with this fixture loaded alone and with all six
+// fixtures loaded together. Expected informational rows are listed in ../ontology-lab/proposal-index.md section 9.
 
 // ---------------------------------------------------------------------
 // 1. Identities (nodes only)
@@ -143,13 +146,14 @@ MATCH (ch:Channel {uid: 'hu:channel:huberman-lab'}), (ep:Episode {uid: 'hu:episo
 MERGE (ch)-[:HAS_EPISODE]->(ep);
 
 // Appearance roles (live APPEARS_IN with RoleMetadata; HOST/GUEST are proposed RoleType values).
+// Each appearance is an asserted role backed by an assertion on the transcript page (statement placed after the locators exist).
 MATCH (p:Person {uid: 'hu:person:andrew-d-huberman'}), (ep:Episode {uid: 'hu:episode:huberman-lab-52-sinclair'})
 MERGE (p)-[r:APPEARS_IN]->(ep)
-SET r.roleType = 'HOST';
+SET r.roleType = 'HOST', r.assertionUid = 'hu:assertion:hl52-huberman-appears-as-host', r.recordedFrom = datetime('2026-10-03T12:00:00Z'), r.relationshipUid = 'hu:rel:hl52-huberman-appears-as-host';
 
 MATCH (p:Person {uid: 'hu:person:david-a-sinclair'}), (ep:Episode {uid: 'hu:episode:huberman-lab-52-sinclair'})
 MERGE (p)-[r:APPEARS_IN]->(ep)
-SET r.roleType = 'GUEST';
+SET r.roleType = 'GUEST', r.assertionUid = 'hu:assertion:hl52-sinclair-appears-as-guest', r.recordedFrom = datetime('2026-10-03T12:00:00Z'), r.relationshipUid = 'hu:rel:hl52-sinclair-appears-as-guest';
 
 // Snapshot of a mutable page. The page itself says its transcript is under
 // human review, so a later reviewed version is expected to differ.
@@ -339,7 +343,7 @@ MERGE (a)-[:WAS_GENERATED_BY]->(act);
 
 MATCH (a1:ClaimOccurrence {uid: 'hu:claim-occurrence:hl52-sinclair-self-reported-nmn-1g-daily'}), (a2:ClaimOccurrence {uid: 'hu:claim-occurrence:hl52-sinclair-individual-variation'})
 MERGE (a1)-[q:QUALIFIED_BY]->(a2)
-SET q.qualificationKind = 'INDIVIDUAL_VARIATION', q.relationshipUid = 'hu:rel:qualified-by:hl52-nmn-individual-variation';
+SET q.qualificationKind = 'INDIVIDUAL_VARIATION', q.relationshipUid = 'hu:rel:qualified-by-hl52-nmn-individual-variation';
 
 // A3/A4: on-air self-disclosure, one span, two role assertions (past board role; present role with verbatim title).
 MATCH (sp:Person {uid: 'hu:person:david-a-sinclair'}), (ep:Episode {uid: 'hu:episode:huberman-lab-52-sinclair'}),
@@ -395,7 +399,7 @@ MATCH (host:Person {uid: 'hu:person:andrew-d-huberman'}), (ep:Episode {uid: 'hu:
 MERGE (a:Assertion:ClaimOccurrence {uid: 'hu:claim-occurrence:hl52-host-read-insidetracker-sponsors-episode'})
 SET a.predicate = 'SPONSORS_CONTENT', a.status = 'ACCEPTED', a.polarity = 'POSITIVE',
     a.assertionBasis = 'UNSTATED', a.speechAct = 'STATES', a.segmentKind = 'SPONSOR_READ',
-    a.validFrom = datetime('2021-12-27T09:00:00Z'), a.validTo = NULL, a.validTimePrecision = 'DAY', a.validTimeBasis = 'PUBLICATION_PROXY',
+    a.validFrom = datetime('2021-12-27T09:00:00Z'), a.validFromPrecision = 'DAY', a.validFromBasis = 'PUBLICATION_PROXY', a.validTo = NULL, a.validToBasis = 'UNKNOWN',
     a.utteranceText = l.exact, a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
 MERGE (a)-[:HAS_SUBJECT]->(br)
 MERGE (a)-[:HAS_OBJECT]->(ep)
@@ -407,7 +411,7 @@ MERGE (a)-[:WAS_GENERATED_BY]->(act);
 // ---------------------------------------------------------------------
 // 5. Self-disclosure page: role assertions with year-precision bounds.
 //    Precision rule used here (to be ratified by Lane 5): with
-//    validTimePrecision YEAR, validFrom is the first instant of the start
+//    validFromPrecision YEAR, validFrom is the first instant of the start
 //    year and validTo is the first instant after the end year, i.e. the
 //    widest half-open interval consistent with the source. 'present' on a
 //    page observed 2026-10-03 is validTo NULL, not a claim about later dates.
@@ -419,8 +423,8 @@ MATCH (sp:Person {uid: 'hu:person:david-a-sinclair'}), (br:ConsumerBrand {uid: '
       (l:SourceLocator {uid: 'hu:locator:sinclair-affiliations-insidetracker-line'}), (act:Activity {uid: 'hu:activity:curation-2026-10-03-lane4'})
 MERGE (a:Assertion {uid: 'hu:assertion:affiliations-sinclair-board-insidetracker-2011-2017'})
 SET a.predicate = 'BOARD_MEMBER_OF', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.assertionBasis = 'PERSONAL_EXPERIENCE',
-    a.roleCodeVerbatim = 'B', a.validFrom = datetime('2011-01-01T00:00:00Z'), a.validTo = datetime('2018-01-01T00:00:00Z'),
-    a.validTimePrecision = 'YEAR', a.validTimeBasis = 'EXPLICIT_SOURCE', a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
+    a.roleTitleVerbatim = 'B', a.validFrom = datetime('2011-01-01T00:00:00Z'), a.validTo = datetime('2018-01-01T00:00:00Z'),
+    a.validFromPrecision = 'YEAR', a.validFromBasis = 'STATED_BY_SOURCE', a.validToPrecision = 'YEAR', a.validToBasis = 'STATED_BY_SOURCE', a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
 MERGE (a)-[:HAS_SUBJECT]->(sp)
 MERGE (a)-[:HAS_OBJECT]->(br)
 MERGE (a)-[:ASSERTED_BY]->(sp)
@@ -431,8 +435,8 @@ MATCH (sp:Person {uid: 'hu:person:david-a-sinclair'}), (br:ConsumerBrand {uid: '
       (l:SourceLocator {uid: 'hu:locator:sinclair-affiliations-insidetracker-line'}), (act:Activity {uid: 'hu:activity:curation-2026-10-03-lane4'})
 MERGE (a:Assertion {uid: 'hu:assertion:affiliations-sinclair-investor-insidetracker-2011-open'})
 SET a.predicate = 'INVESTED_IN', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.assertionBasis = 'PERSONAL_EXPERIENCE',
-    a.roleCodeVerbatim = 'I', a.validFrom = datetime('2011-01-01T00:00:00Z'), a.validTo = NULL,
-    a.validTimePrecision = 'YEAR', a.validTimeBasis = 'EXPLICIT_SOURCE', a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
+    a.roleTitleVerbatim = 'I', a.validFrom = datetime('2011-01-01T00:00:00Z'), a.validTo = NULL,
+    a.validFromPrecision = 'YEAR', a.validFromBasis = 'STATED_BY_SOURCE', a.validToBasis = 'UNKNOWN', a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
 MERGE (a)-[:HAS_SUBJECT]->(sp)
 MERGE (a)-[:HAS_OBJECT]->(br)
 MERGE (a)-[:ASSERTED_BY]->(sp)
@@ -443,8 +447,8 @@ MATCH (sp:Person {uid: 'hu:person:david-a-sinclair'}), (br:ConsumerBrand {uid: '
       (l:SourceLocator {uid: 'hu:locator:sinclair-affiliations-insidetracker-line'}), (act:Activity {uid: 'hu:activity:curation-2026-10-03-lane4'})
 MERGE (a:Assertion {uid: 'hu:assertion:affiliations-sinclair-advisor-insidetracker-2011-open'})
 SET a.predicate = 'ADVISES_ORGANIZATION', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.assertionBasis = 'PERSONAL_EXPERIENCE',
-    a.roleCodeVerbatim = 'A', a.validFrom = datetime('2011-01-01T00:00:00Z'), a.validTo = NULL,
-    a.validTimePrecision = 'YEAR', a.validTimeBasis = 'EXPLICIT_SOURCE', a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
+    a.roleTitleVerbatim = 'A', a.validFrom = datetime('2011-01-01T00:00:00Z'), a.validTo = NULL,
+    a.validFromPrecision = 'YEAR', a.validFromBasis = 'STATED_BY_SOURCE', a.validToBasis = 'UNKNOWN', a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
 MERGE (a)-[:HAS_SUBJECT]->(sp)
 MERGE (a)-[:HAS_OBJECT]->(br)
 MERGE (a)-[:ASSERTED_BY]->(sp)
@@ -455,8 +459,8 @@ MATCH (sp:Person {uid: 'hu:person:david-a-sinclair'}), (br:ConsumerBrand {uid: '
       (l:SourceLocator {uid: 'hu:locator:sinclair-affiliations-insidetracker-line'}), (act:Activity {uid: 'hu:activity:curation-2026-10-03-lane4'})
 MERGE (a:Assertion {uid: 'hu:assertion:affiliations-sinclair-ip-interest-insidetracker-2011-open'})
 SET a.predicate = 'HAS_IP_INTEREST_IN', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.assertionBasis = 'PERSONAL_EXPERIENCE',
-    a.roleCodeVerbatim = 'IP', a.validFrom = datetime('2011-01-01T00:00:00Z'), a.validTo = NULL,
-    a.validTimePrecision = 'YEAR', a.validTimeBasis = 'EXPLICIT_SOURCE', a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
+    a.roleTitleVerbatim = 'IP', a.validFrom = datetime('2011-01-01T00:00:00Z'), a.validTo = NULL,
+    a.validFromPrecision = 'YEAR', a.validFromBasis = 'STATED_BY_SOURCE', a.validToBasis = 'UNKNOWN', a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
 MERGE (a)-[:HAS_SUBJECT]->(sp)
 MERGE (a)-[:HAS_OBJECT]->(br)
 MERGE (a)-[:ASSERTED_BY]->(sp)
@@ -470,7 +474,7 @@ MATCH (sp:Person {uid: 'hu:person:david-a-sinclair'}), (er:Organization {uid: 'h
       (l:SourceLocator {uid: 'hu:locator:sinclair-affiliations-edenroc-line'}), (act:Activity {uid: 'hu:activity:curation-2026-10-03-lane4'})
 MERGE (a:Assertion {uid: 'hu:assertion:affiliations-sinclair-equity-edenroc'})
 SET a.predicate = 'HOLDS_EQUITY_IN', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.assertionBasis = 'PERSONAL_EXPERIENCE',
-    a.roleCodeVerbatim = 'E', a.validFrom = NULL, a.validTo = NULL, a.validTimeBasis = 'UNKNOWN',
+    a.roleTitleVerbatim = 'E', a.validFrom = NULL, a.validTo = NULL, a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN',
     a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
 MERGE (a)-[:HAS_SUBJECT]->(sp)
 MERGE (a)-[:HAS_OBJECT]->(er)
@@ -482,7 +486,7 @@ MATCH (sp:Person {uid: 'hu:person:david-a-sinclair'}), (mb:Organization {uid: 'h
       (l:SourceLocator {uid: 'hu:locator:sinclair-affiliations-metrobiotech-line'}), (act:Activity {uid: 'hu:activity:curation-2026-10-03-lane4'})
 MERGE (a:Assertion {uid: 'hu:assertion:affiliations-metrobiotech-edenroc-company'})
 SET a.predicate = 'AFFILIATED_WITH', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.roleTitleVerbatim = 'an EdenRoc Sciences company',
-    a.validFrom = datetime('2015-01-01T00:00:00Z'), a.validTo = NULL, a.validTimePrecision = 'YEAR', a.validTimeBasis = 'EXPLICIT_SOURCE',
+    a.validFrom = datetime('2015-01-01T00:00:00Z'), a.validTo = NULL, a.validFromPrecision = 'YEAR', a.validFromBasis = 'STATED_BY_SOURCE', a.validToBasis = 'UNKNOWN',
     a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
 MERGE (a)-[:HAS_SUBJECT]->(mb)
 MERGE (a)-[:HAS_OBJECT]->(er)
@@ -494,7 +498,7 @@ MATCH (sp:Person {uid: 'hu:person:david-a-sinclair'}), (mb:Organization {uid: 'h
       (l:SourceLocator {uid: 'hu:locator:sinclair-affiliations-metrobiotech-line'}), (act:Activity {uid: 'hu:activity:curation-2026-10-03-lane4'})
 MERGE (a:Assertion {uid: 'hu:assertion:affiliations-metrobiotech-works-on-nad-boosters'})
 SET a.predicate = 'DEVELOPS_PRODUCT_CLASS', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.valueString = 'NAD boosters',
-    a.validFrom = datetime('2015-01-01T00:00:00Z'), a.validTo = NULL, a.validTimePrecision = 'YEAR', a.validTimeBasis = 'EXPLICIT_SOURCE',
+    a.validFrom = datetime('2015-01-01T00:00:00Z'), a.validTo = NULL, a.validFromPrecision = 'YEAR', a.validFromBasis = 'STATED_BY_SOURCE', a.validToBasis = 'UNKNOWN',
     a.recordedAt = datetime('2026-10-03T12:00:00Z'), a.extractionMethod = 'manual'
 MERGE (a)-[:HAS_SUBJECT]->(mb)
 MERGE (a)-[:ASSERTED_BY]->(sp)
@@ -514,17 +518,29 @@ MERGE (a)-[:ASSERTED_BY]->(sp)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (a)-[:WAS_GENERATED_BY]->(act);
 
+// Appearance assertions (the transcript page names host and guest).
+UNWIND [
+  {a: 'hu:assertion:hl52-huberman-appears-as-host', p: 'hu:person:andrew-d-huberman', role: 'HOST'},
+  {a: 'hu:assertion:hl52-sinclair-appears-as-guest', p: 'hu:person:david-a-sinclair', role: 'GUEST'}
+] AS row
+MATCH (p:Person {uid: row.p}), (ep:Episode {uid: 'hu:episode:huberman-lab-52-sinclair'}), (l:SourceLocator {uid: 'hu:locator:hl52-page-nmn-gram-daily'})
+MERGE (a:Assertion {uid: row.a})
+SET a.predicate = 'APPEARS_IN', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.roleType = row.role, a.recordedAt = datetime('2026-10-03T12:00:00Z')
+MERGE (a)-[:HAS_SUBJECT]->(p)
+MERGE (a)-[:HAS_OBJECT]->(ep)
+MERGE (a)-[:SUPPORTED_BY]->(l);
+
 // Projected asserted edges (derived from accepted role assertions; each names its assertion).
 MATCH (sp:Person {uid: 'hu:person:david-a-sinclair'}), (br:ConsumerBrand {uid: 'hu:brand:insidetracker'})
 MERGE (sp)-[r:BOARD_MEMBER_OF {assertionUid: 'hu:assertion:affiliations-sinclair-board-insidetracker-2011-2017'}]->(br)
-SET r.relationshipUid = 'hu:rel:board-member-of:sinclair-insidetracker-2011-2017',
-    r.validFrom = datetime('2011-01-01T00:00:00Z'), r.validTo = datetime('2018-01-01T00:00:00Z'), r.validTimePrecision = 'YEAR',
+SET r.relationshipUid = 'hu:rel:board-member-of-sinclair-insidetracker-2011-2017',
+    r.validFrom = datetime('2011-01-01T00:00:00Z'), r.validFromPrecision = 'YEAR', r.validFromBasis = 'STATED_BY_SOURCE', r.validTo = datetime('2018-01-01T00:00:00Z'), r.validToPrecision = 'YEAR', r.validToBasis = 'STATED_BY_SOURCE',
     r.recordedFrom = datetime('2026-10-03T12:00:00Z'), r.recordedTo = NULL;
 
 MATCH (br:ConsumerBrand {uid: 'hu:brand:insidetracker'}), (ep:Episode {uid: 'hu:episode:huberman-lab-52-sinclair'})
 MERGE (br)-[r:SPONSORS_CONTENT {assertionUid: 'hu:claim-occurrence:hl52-host-read-insidetracker-sponsors-episode'}]->(ep)
-SET r.relationshipUid = 'hu:rel:sponsors-content:insidetracker-hl52',
-    r.validFrom = datetime('2021-12-27T09:00:00Z'), r.validTo = NULL, r.validTimePrecision = 'DAY', r.validTimeBasis = 'PUBLICATION_PROXY',
+SET r.relationshipUid = 'hu:rel:sponsors-content-insidetracker-hl52',
+    r.validFrom = datetime('2021-12-27T09:00:00Z'), r.validFromPrecision = 'DAY', r.validFromBasis = 'PUBLICATION_PROXY', r.validTo = NULL, r.validToBasis = 'UNKNOWN',
     r.recordedFrom = datetime('2026-10-03T12:00:00Z'), r.recordedTo = NULL;
 
 // ---------------------------------------------------------------------
@@ -553,7 +569,7 @@ SET i.derivationRule = 'manual-curation-v0.1';
 
 // The retelling cites no episode, so the link is a BellLabs match backed by a hypothesis.
 MATCH (r:Assertion {uid: 'hu:claim-occurrence:synthetic-digest-says-sinclair-recommends-nmn'}), (o:Assertion {uid: 'hu:claim-occurrence:hl52-sinclair-self-reported-nmn-1g-daily'})
-MERGE (h:EvidenceAssessment:ResolutionHypothesis {uid: 'hu:resolution:retelling-source:synthetic-digest-to-hl52-nmn'})
+MERGE (h:EvidenceAssessment:ResolutionHypothesis {uid: 'hu:resolution:retelling-source-synthetic-digest-to-hl52-nmn'})
 SET h.assessmentType = 'ResolutionHypothesis', h.resolutionType = 'RETELLING_SOURCE', h.resolutionStatus = 'PROPOSED',
     h.rationale = 'Same speaker, substance, amount and daily schedule; retelling cites no source.',
     h.methodVersion = 'lane4-manual-curation-v0.1', h.status = 'PROPOSED', h.createdAt = datetime('2026-10-03T12:00:00Z')
@@ -561,12 +577,12 @@ MERGE (h)-[:PROPOSES_MATCH]->(o)
 MERGE (h)-[:PROPOSES_MATCH]->(r)
 MERGE (r)-[x:RETELLS]->(o)
 SET x.retellingMode = 'PARAPHRASE', x.linkBasis = 'BELLLABS_MATCH', x.hypothesisUid = h.uid,
-    x.relationshipUid = 'hu:rel:retells:synthetic-digest-hl52-nmn';
+    x.relationshipUid = 'hu:rel:retells-synthetic-digest-hl52-nmn';
 
 // Qualification-loss flag lives on an assessment, not on either assertion.
 MATCH (r:Assertion {uid: 'hu:claim-occurrence:synthetic-digest-says-sinclair-recommends-nmn'}), (o:Assertion {uid: 'hu:claim-occurrence:hl52-sinclair-self-reported-nmn-1g-daily'}),
       (q:Assertion {uid: 'hu:claim-occurrence:hl52-sinclair-individual-variation'}), (cur:Agent {uid: 'hu:agent:belllabs-lane4-curator'})
-MERGE (f:EvidenceAssessment:RetellingFidelityAssessment {uid: 'hu:assessment:retelling-fidelity:synthetic-digest-vs-hl52-nmn'})
+MERGE (f:EvidenceAssessment:RetellingFidelityAssessment {uid: 'hu:assessment:retelling-fidelity-synthetic-digest-vs-hl52-nmn'})
 SET f.assessmentType = 'RetellingFidelityAssessment', f.methodVersion = 'retelling-fidelity-v0.1', f.status = 'PROPOSED',
     f.qualificationLost = true, f.lostQualificationKinds = ['INDIVIDUAL_VARIATION'],
     f.speechActChanged = true, f.speechActFrom = 'REPORTS_PRACTICE', f.speechActTo = 'RECOMMENDS',
@@ -588,7 +604,7 @@ MATCH (occ:Assertion {uid: 'hu:claim-occurrence:hl52-sinclair-insidetracker-offe
       (r2:Assertion {uid: 'hu:assertion:affiliations-sinclair-advisor-insidetracker-2011-open'}),
       (r3:Assertion {uid: 'hu:claim-occurrence:hl52-sinclair-says-scientific-lead-insidetracker'}),
       (r4:Assertion {uid: 'hu:claim-occurrence:hl52-host-read-insidetracker-sponsors-episode'})
-MERGE (c:EvidenceAssessment:ConflictRelevanceAssessment {uid: 'hu:assessment:conflict-relevance:hl52-insidetracker-mention'})
+MERGE (c:EvidenceAssessment:ConflictRelevanceAssessment {uid: 'hu:assessment:conflict-relevance-hl52-insidetracker-mention'})
 SET c.assessmentType = 'ConflictRelevanceAssessment', c.methodVersion = 'conflict-relevance-v0.1', c.status = 'PROPOSED',
     c.relevanceLevel = 'DIRECT', c.relevanceBasis = 'SAME_ORGANIZATION', c.temporalOverlap = 'OVERLAPS',
     c.disclosureFinding = 'DISCLOSED_IN_CONTAINER', c.createdAt = datetime('2026-10-03T12:00:00Z')
@@ -602,7 +618,7 @@ MATCH (occ:Assertion {uid: 'hu:claim-occurrence:hl52-sinclair-self-reported-nmn-
       (r1:Assertion {uid: 'hu:assertion:affiliations-sinclair-equity-edenroc'}),
       (r2:Assertion {uid: 'hu:assertion:affiliations-metrobiotech-edenroc-company'}),
       (r3:Assertion {uid: 'hu:assertion:affiliations-metrobiotech-works-on-nad-boosters'})
-MERGE (c:EvidenceAssessment:ConflictRelevanceAssessment {uid: 'hu:assessment:conflict-relevance:hl52-nmn-edenroc-metrobiotech'})
+MERGE (c:EvidenceAssessment:ConflictRelevanceAssessment {uid: 'hu:assessment:conflict-relevance-hl52-nmn-edenroc-metrobiotech'})
 SET c.assessmentType = 'ConflictRelevanceAssessment', c.methodVersion = 'conflict-relevance-v0.1', c.status = 'PROPOSED',
     c.relevanceLevel = 'INDIRECT', c.relevanceBasis = 'SAME_SUBSTANCE_CLASS_VIA_GROUP', c.temporalOverlap = 'UNKNOWN',
     c.scopeAmbiguity = 'Group-level role codes; per-company applicability not stated.',
@@ -614,7 +630,7 @@ MERGE (c)-[:ASSESSES_INTEREST]->(r3);
 
 MATCH (occ:Assertion {uid: 'hu:claim-occurrence:hl52-sinclair-self-reported-nmn-1g-daily'}),
       (r1:Assertion {uid: 'hu:claim-occurrence:hl52-host-read-insidetracker-sponsors-episode'})
-MERGE (c:EvidenceAssessment:ConflictRelevanceAssessment {uid: 'hu:assessment:conflict-relevance:hl52-nmn-insidetracker-sponsorship'})
+MERGE (c:EvidenceAssessment:ConflictRelevanceAssessment {uid: 'hu:assessment:conflict-relevance-hl52-nmn-insidetracker-sponsorship'})
 SET c.assessmentType = 'ConflictRelevanceAssessment', c.methodVersion = 'conflict-relevance-v0.1', c.status = 'PROPOSED',
     c.relevanceLevel = 'NOT_RELEVANT', c.relevanceBasis = 'NO_PATH_FOUND', c.temporalOverlap = 'OVERLAPS',
     c.disclosureFinding = 'DISCLOSED_IN_CONTAINER', c.createdAt = datetime('2026-10-03T12:00:00Z')
@@ -763,3 +779,19 @@ RETURN s.uid AS fromUid, type(r) AS relType, o.uid AS toUid;
 MATCH (p:Person)-[r:HOLDS_EQUITY_IN]->(o:Organization)
 WHERE NOT EXISTS { MATCH (a:Assertion {uid: r.assertionUid})-[:HAS_OBJECT]->(o) }
 RETURN p.uid AS holder, o.uid AS organizationWithoutDirectAssertion;
+
+// ---------------------------------------------------------------------------
+// Capture-fidelity acceptance (catalog 0.2.0, INV-103). Every ACCEPTED, REJECTED or DISPUTED status is a projection of a
+// CAPTURE_FIDELITY adjudication. This fixture records one policy adjudication (reviewerType POLICY) covering the captured
+// assertions it created; it says nothing about whether any proposition is true (that is a SUPPORT adjudication).
+// status: statically-checked, executed
+MATCH (a:Assertion)
+WHERE a.status IN ['ACCEPTED', 'REJECTED', 'DISPUTED']
+  AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
+MERGE (j:EvidenceAssessment:Adjudication {uid: 'hu:adjudication:claim-retelling-provenance-capture-fidelity-policy-2026-10-04'})
+ON CREATE SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
+    j.reviewerType = 'POLICY', j.methodVersion = 'fixture-capture-policy-1', j.status = 'FINAL',
+    j.rationale = 'Fixture capture policy: the recorded propositions match the cited spans as read by the authoring lane.',
+    j.reviewedAt = datetime('2026-10-04T00:00:00Z'), j.recordedAt = datetime('2026-10-04T00:00:00Z'), j.createdAt = datetime('2026-10-04T00:00:00Z'),
+    j.privacyClass = 'internal'
+MERGE (j)-[:EVALUATES]->(a);

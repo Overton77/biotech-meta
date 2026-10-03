@@ -5,7 +5,7 @@ Target: Neo4j 5 property graph, catalog `0.2.0` labels and relationship types (`
 
 These are the Cypher shapes every answer must be expressible in. They are the formal side of the competency questions: Grüninger and Fox treat competency questions as tests of a model's commitments, not as sources of commitments, and ask that informal questions be restated in the model's own terms ([SRC-GRUNINGER-FOX-1995]). A question marked Essential or Foundational in `competency-questions.md` is only accepted if it binds to one of these shapes (the binding table is at the end).
 
-> **Integration note (2026-10-03):** QS-5b and QS-6 were drafted with a `PrivateScope` marker label (round 0009 K-5). Round 0008 places all private-personal data outside the shared graph (catalog INV-506), so K-5 was revised: the authoritative boundary is placement, and the in-graph guard is the private uid prefix. Implementers read `NOT n:PrivateScope` as `NOT n.uid STARTS WITH 'hu:private-'` plus the label check as defence in depth. The two quantified-path-pattern statements in QS-5b bind their variables inside the pattern; the per-statement binding checker flags them as a known false positive.
+> **Integration note (2026-10-03):** QS-5b and QS-6 were drafted with a `PrivateScope` marker label (round 0009 K-5). Round 0008 places all private-personal data outside the shared graph (catalog INV-506), so K-5 was revised and the shapes below now test a private node by its `hu:private-` uid prefix or `privacyClass`, as the validation queries V-113 to V-116 do. QS-3a was rewritten after review to read `ApplicabilityDimension` nodes instead of the derived flat fields. Every block was re-parsed and executed with EXPLAIN on the embedded Neo4j used for the fixtures; QS-3a and QS-2b were run with results (see proposal-index section 9).
 
 ## How to read the status tags
 
@@ -22,7 +22,7 @@ These are the Cypher shapes every answer must be expressible in. They are the fo
 | `recordedAt` | Single instant on an `Assertion`: when BellLabs committed it. |
 | `recordedFrom`, `recordedTo` | System-time episode on a state attachment or asserted edge. `recordedTo` null means currently believed. |
 | `validFrom`, `validTo` | Domain time on assertions, states and asserted edges. Null means unknown, and an open end is also null, so the shapes never read a null end as "still true" (see below). |
-| `PrivateScope` | Marker label on every node of the private user partition (requested of Lane 5). |
+| private node | A node is private when `uid STARTS WITH 'hu:private-'` or `privacyClass = 'private-personal'` (or carries the fixture-only label `PrivateRecord`). Round 0008 keeps every such node out of the shared database, so in production these tests are defence in depth; the K-5 `PrivateScope` label was revised away. |
 
 Bounds are half-open: an interval contains V when `validFrom <= V < validTo`. A null `validFrom` is unknown, not "since the beginning".
 
@@ -104,7 +104,7 @@ RETURN a.uid AS assertionUid,
        subjectUid, subjectLabels, objectUid, objectLabels,
        a.valueString AS valueString, a.valueNumber AS valueNumber,
        a.valueBoolean AS valueBoolean, a.unitCode AS unitCode,
-       a.validFrom AS validFrom, a.validTo AS validTo, a.validTimeBasis AS validTimeBasis,
+       a.validFrom AS validFrom, a.validTo AS validTo, a.validFromBasis AS validFromBasis, a.validToBasis AS validToBasis,
        a.recordedAt AS recordedAt,
        a.status AS currentStatus,            // a cache of the latest state, NOT as-of R
        assertedBy, supports, contradictingLocatorUids,
@@ -220,7 +220,7 @@ RETURN a.uid AS assertionUid, a.predicate AS predicate, a.polarity AS polarity,
        o.uid AS objectUid, a.valueString AS valueString, a.valueNumber AS valueNumber,
        a.unitCode AS unitCode,
        validityClass,
-       a.validFrom AS validFrom, a.validTo AS validTo, a.validTimeBasis AS validTimeBasis,
+       a.validFrom AS validFrom, a.validTo AS validTo, a.validFromBasis AS validFromBasis, a.validToBasis AS validToBasis,
        lastObservedAt,
        a.recordedAt AS recordedAt,
        latestVerdict, adjudicationUid
@@ -261,7 +261,7 @@ WITH v, r, f, a, lastObservedAt,
 WHERE validityClass <> 'EXCLUDED'
 RETURN f.uid AS formulationUid,
        validityClass,
-       r.validFrom AS validFrom, r.validTo AS validTo, r.validTimeBasis AS validTimeBasis,
+       r.validFrom AS validFrom, r.validTo AS validTo, r.validFromBasis AS validFromBasis, r.validToBasis AS validToBasis,
        r.recordedFrom AS recordedFrom, r.recordedTo AS recordedTo,
        CASE WHEN r.recordedFrom IS NULL THEN 'LEGACY_UNDATED' ELSE 'RECORDED' END AS recordedClass,
        lastObservedAt,
@@ -291,7 +291,7 @@ WITH f, r,
      END AS overlapClass
 WHERE overlapClass <> 'EXCLUDED'
 RETURN f.uid AS formulationUid, overlapClass, r.validFrom AS validFrom, r.validTo AS validTo,
-       r.validTimeBasis AS validTimeBasis, r.recordedFrom AS recordedFrom
+       r.validFromBasis AS validFromBasis, r.validToBasis AS validToBasis, r.recordedFrom AS recordedFrom
 ORDER BY r.validFrom;
 ```
 
@@ -323,9 +323,9 @@ Fixture. The variant has one formulation attached with a start of 2025-06-01 (re
 CREATE (v:Entity:ProductVariant {uid: 'hu:product-variant:demo-v1', name: 'Demo variant', createdAt: datetime('2026-01-10T00:00:00Z')})
 CREATE (f0:VersionedState:FormulationVersion {uid: 'hu:formulation:demo-f0', versionName: 'Demo F0', createdAt: datetime('2026-07-02T00:00:00Z')})
 CREATE (f1:VersionedState:FormulationVersion {uid: 'hu:formulation:demo-f1', versionName: 'Demo F1', createdAt: datetime('2026-01-10T00:00:00Z')})
-CREATE (aOld:Assertion {uid: 'hu:assertion:demo-f1-attach-v1', predicate: 'HAS_FORMULATION_VERSION', status: 'SUPERSEDED', polarity: 'POSITIVE', recordedAt: datetime('2026-01-10T00:00:00Z'), validFrom: datetime('2025-06-01T00:00:00Z'), validTimeBasis: 'SOURCE_STATED'})
-CREATE (aNew:Assertion {uid: 'hu:assertion:demo-f1-attach-v2', predicate: 'HAS_FORMULATION_VERSION', status: 'ACCEPTED', polarity: 'POSITIVE', recordedAt: datetime('2026-06-20T00:00:00Z'), validFrom: datetime('2025-09-01T00:00:00Z'), validTimeBasis: 'SOURCE_STATED'})
-CREATE (aF0:Assertion {uid: 'hu:assertion:demo-f0-attach', predicate: 'HAS_FORMULATION_VERSION', status: 'ACCEPTED', polarity: 'POSITIVE', recordedAt: datetime('2026-07-02T00:00:00Z'), validFrom: datetime('2024-01-01T00:00:00Z'), validTo: datetime('2025-09-01T00:00:00Z'), validTimeBasis: 'SOURCE_STATED'})
+CREATE (aOld:Assertion {uid: 'hu:assertion:demo-f1-attach-v1', predicate: 'HAS_FORMULATION_VERSION', status: 'SUPERSEDED', polarity: 'POSITIVE', recordedAt: datetime('2026-01-10T00:00:00Z'), validFrom: datetime('2025-06-01T00:00:00Z'), validFromBasis: 'STATED_BY_SOURCE', validFromPrecision: 'DAY'})
+CREATE (aNew:Assertion {uid: 'hu:assertion:demo-f1-attach-v2', predicate: 'HAS_FORMULATION_VERSION', status: 'ACCEPTED', polarity: 'POSITIVE', recordedAt: datetime('2026-06-20T00:00:00Z'), validFrom: datetime('2025-09-01T00:00:00Z'), validFromBasis: 'STATED_BY_SOURCE', validFromPrecision: 'DAY'})
+CREATE (aF0:Assertion {uid: 'hu:assertion:demo-f0-attach', predicate: 'HAS_FORMULATION_VERSION', status: 'ACCEPTED', polarity: 'POSITIVE', recordedAt: datetime('2026-07-02T00:00:00Z'), validFrom: datetime('2024-01-01T00:00:00Z'), validTo: datetime('2025-09-01T00:00:00Z'), validFromBasis: 'STATED_BY_SOURCE', validFromPrecision: 'DAY'})
 CREATE (aNew)-[:SUPERSEDES]->(aOld)
 CREATE (l1:InformationArtifact:SourceLocator {uid: 'hu:locator:demo-1', uri: 'https://example.org/label', section: 'Supplement Facts'})
 CREATE (l2:InformationArtifact:SourceLocator {uid: 'hu:locator:demo-2', uri: 'https://example.org/label', section: 'Supplement Facts'})
@@ -335,9 +335,9 @@ CREATE (s1)-[:HAS_LOCATOR]->(l1)
 CREATE (s2)-[:HAS_LOCATOR]->(l2)
 CREATE (aOld)-[:SUPPORTED_BY]->(l1)
 CREATE (aNew)-[:SUPPORTED_BY]->(l2)
-CREATE (v)-[:HAS_FORMULATION_VERSION {assertionUid: 'hu:assertion:demo-f1-attach-v1', validFrom: datetime('2025-06-01T00:00:00Z'), validTimeBasis: 'SOURCE_STATED', recordedFrom: datetime('2026-01-10T00:00:00Z'), recordedTo: datetime('2026-06-20T00:00:00Z')}]->(f1)
-CREATE (v)-[:HAS_FORMULATION_VERSION {assertionUid: 'hu:assertion:demo-f1-attach-v2', validFrom: datetime('2025-09-01T00:00:00Z'), validTimeBasis: 'SOURCE_STATED', recordedFrom: datetime('2026-06-20T00:00:00Z')}]->(f1)
-CREATE (v)-[:HAS_FORMULATION_VERSION {assertionUid: 'hu:assertion:demo-f0-attach', validFrom: datetime('2024-01-01T00:00:00Z'), validTo: datetime('2025-09-01T00:00:00Z'), validTimeBasis: 'SOURCE_STATED', recordedFrom: datetime('2026-07-02T00:00:00Z')}]->(f0);
+CREATE (v)-[:HAS_FORMULATION_VERSION {assertionUid: 'hu:assertion:demo-f1-attach-v1', validFrom: datetime('2025-06-01T00:00:00Z'), validFromBasis: 'STATED_BY_SOURCE', validFromPrecision: 'DAY', recordedFrom: datetime('2026-01-10T00:00:00Z'), recordedTo: datetime('2026-06-20T00:00:00Z')}]->(f1)
+CREATE (v)-[:HAS_FORMULATION_VERSION {assertionUid: 'hu:assertion:demo-f1-attach-v2', validFrom: datetime('2025-09-01T00:00:00Z'), validFromBasis: 'STATED_BY_SOURCE', validFromPrecision: 'DAY', recordedFrom: datetime('2026-06-20T00:00:00Z')}]->(f1)
+CREATE (v)-[:HAS_FORMULATION_VERSION {assertionUid: 'hu:assertion:demo-f0-attach', validFrom: datetime('2024-01-01T00:00:00Z'), validTo: datetime('2025-09-01T00:00:00Z'), validFromBasis: 'STATED_BY_SOURCE', validFromPrecision: 'DAY', recordedFrom: datetime('2026-07-02T00:00:00Z')}]->(f0);
 ```
 
 Expected results of QS-2b, derived by reading the fixture:
@@ -358,41 +358,53 @@ The first two rows are the same question asked on two recorded dates. They give 
 
 Serves: CQ-EV-04, CQ-RC-03, CQ-RC-02, CQ-ID-01, CQ-AX-02.
 
-The shape never averages. It orders dimensions weakest first, and it reports separately which dimensions are unresolved. `NOT_ASSESSED` (null) is kept distinct from `UNKNOWN` (assessed, with facts missing). Ranking `MISMATCH` below `UNKNOWN` is a presentation choice: a known mismatch is a reason not to transfer evidence, an unknown is a reason to find out. The dimension list and value enum belong to Lane 2 (round 0002); the shape takes them as parameters and defaults unrecognized values to unresolved, so a new enum value cannot read as a match.
+The shape never averages. It orders dimensions weakest first, and it reports separately which dimensions are unresolved. `NOT_ASSESSED` (null) is kept distinct from `UNKNOWN` (assessed, with facts missing). Ranking `MISMATCH` below `UNKNOWN` is a presentation choice: a known mismatch is a reason not to transfer evidence, an unknown is a reason to find out. The dimension list and value enum are the catalog's (round 0002): dimensions are `ApplicabilityDimension` nodes reached by `HAS_DIMENSION`, and the required set depends on whether the evidence target is a study intervention or a mechanism assertion. Unrecognized verdicts rank as unresolved, so a new enum value cannot read as a match.
 
 ```cypher
 // QS-3a  Evidence applicability: surface the weakest dimension and the unresolved ones
 //        (never a single score; a score, if present, is returned separately with its method version)
-// status: statically-checked
+// status: statically-checked, executed (2026-10-03, embedded Neo4j 5.26, fixture study-vs-product-mismatch:
+//         on hu:applicability:nct02678611-1x-to-basis-current it returns 13 dimension nodes with their verdicts,
+//         weakest first; the flat identityMatch/doseMatch fields are not read because the catalog marks them derived)
 // params: $applicabilityUid string
-//         $dimensions list<string>  e.g. ['identityMatch','doseMatch','routeMatch','scheduleMatch',
-//                                         'durationMatch','populationMatch','outcomeMatch']
-// Dimension values assumed (Lane 2 round 0002 owns the enum): MATCH | PARTIAL | MISMATCH | UNKNOWN.
-// A null dimension means NOT_ASSESSED, which is different from UNKNOWN (assessed, facts insufficient).
+// Dimension verdicts (catalog applicabilityVerdict): MATCH | PARTIAL | MISMATCH | UNKNOWN | NOT_ASSESSED | NOT_SCORED.
+// A required dimension with no node is reported as MISSING_DIMENSION, which is different from UNKNOWN (assessed, facts
+// insufficient) and from NOT_ASSESSED (a node that records that nobody assessed it).
 MATCH (ea:EvidenceApplicability {uid: $applicabilityUid})
+OPTIONAL MATCH (ea)-[:HAS_EVIDENCE_TARGET]->(evTarget)
 OPTIONAL MATCH (ea)-[:ASSESSES_APPLICABILITY_TO]->(target)
 OPTIONAL MATCH (ea)-[:BASED_ON_EVIDENCE]->(evidence)
-WITH ea, collect(DISTINCT target.uid) AS targetUids, collect(DISTINCT evidence.uid) AS evidenceUids
-UNWIND $dimensions AS dim
-WITH ea, targetUids, evidenceUids, dim, ea[dim] AS dimValue
-WITH ea, targetUids, evidenceUids, dim,
-     CASE WHEN dimValue IS NULL THEN 'NOT_ASSESSED' ELSE dimValue END AS dimState,
-     CASE
-       WHEN dimValue = 'MISMATCH' THEN 0
-       WHEN dimValue IS NULL OR dimValue = 'UNKNOWN' THEN 1
-       WHEN dimValue = 'PARTIAL' THEN 2
-       WHEN dimValue = 'MATCH' THEN 3
-       ELSE 1
+WITH ea, evTarget, collect(DISTINCT target.uid) AS targetUids, collect(DISTINCT evidence.uid) AS evidenceUids,
+     CASE WHEN evTarget:Assertion
+          THEN ['MATERIAL_IDENTITY', 'EXPOSURE', 'ROUTE', 'DURATION', 'POPULATION', 'OUTCOME_RELEVANCE', 'STUDY_DESIGN_AND_QUALITY']
+          ELSE ['MATERIAL_IDENTITY', 'ACTIVE_COMPOSITION', 'DOSE', 'DOSAGE_FORM', 'ROUTE', 'SCHEDULE', 'DURATION', 'POPULATION', 'COMPARATOR', 'OUTCOME_RELEVANCE', 'STUDY_DESIGN_AND_QUALITY']
+     END AS required
+OPTIONAL MATCH (ea)-[:HAS_DIMENSION]->(d:ApplicabilityDimension)
+WITH ea, evTarget, targetUids, evidenceUids, required, collect(d) AS dims
+UNWIND required + [x IN [d IN dims | d.dimension] WHERE NOT x IN required] AS dimName
+WITH ea, evTarget, targetUids, evidenceUids, dimName, head([d IN dims WHERE d.dimension = dimName]) AS d
+WITH ea, evTarget, targetUids, evidenceUids, dimName, d,
+     CASE WHEN d IS NULL THEN 'MISSING_DIMENSION' ELSE coalesce(d.verdict, 'NOT_ASSESSED') END AS state
+WITH ea, evTarget, targetUids, evidenceUids, dimName, d, state,
+     CASE state
+       WHEN 'MISMATCH' THEN 0
+       WHEN 'MISSING_DIMENSION' THEN 1
+       WHEN 'UNKNOWN' THEN 1
+       WHEN 'NOT_ASSESSED' THEN 1
+       WHEN 'PARTIAL' THEN 2
+       WHEN 'MATCH' THEN 3
+       ELSE 4           // NOT_SCORED (explanation-only) and NOT_APPLICABLE never rank as weakest
      END AS strength
-ORDER BY strength ASC, dim ASC
-WITH ea, targetUids, evidenceUids,
-     collect({dimension: dim, state: dimState, strength: strength}) AS ranked
+ORDER BY strength ASC, dimName ASC
+WITH ea, evTarget, targetUids, evidenceUids,
+     collect({dimension: dimName, state: state, strength: strength, dimensionClass: d.dimensionClass,
+              identityLevel: d.identityLevel, ratio: d.ratio, missingFacts: coalesce(d.missingFacts, []), rationale: d.rationale}) AS ranked
 RETURN ea.uid AS applicabilityUid,
        ea.methodVersion AS methodVersion,
        ea.status AS assessmentStatus,
-       targetUids, evidenceUids,
-       [d IN ranked WHERE d.strength = ranked[0].strength] AS weakestDimensions,
-       [d IN ranked WHERE d.state IN ['UNKNOWN', 'NOT_ASSESSED']] AS unresolvedDimensions,
+       evTarget.uid AS evidenceTargetUid, targetUids, evidenceUids,
+       [x IN ranked WHERE x.strength = ranked[0].strength] AS weakestDimensions,
+       [x IN ranked WHERE x.state IN ['UNKNOWN', 'NOT_ASSESSED', 'MISSING_DIMENSION']] AS unresolvedDimensions,
        ranked AS allDimensionsWeakestFirst,
        ea.overallScore AS derivedScoreIfAny;
 ```
@@ -513,7 +525,7 @@ intent: >-
 competencyQuestionIds: [CQ-ID-01, CQ-EV-04, CQ-RC-03, CQ-AX-01, CQ-AX-02]
 requestedModules: [kernel, provenance, temporal, identity_resolution, products_and_formulations, studies_and_evidence]
 requestedElements: [EvidenceApplicability, FormulationVersion, StudyIntervention]
-excludedElements: [UserContext, RecommendationDecision, PrivateScope]
+excludedElements: [UserContext, RecommendationSnapshot, private_context module]
 temporalView:
   validAt: "2026-07-10T00:00:00Z"
   recordedAt: "2026-10-03T00:00:00Z"
@@ -530,7 +542,7 @@ traceDepth: ADJUDICATION         # NONE | LOCATOR | ADJUDICATION
 
 ### QS-5b Data query emitted from the request
 
-The module list becomes `$allowedLabels` and `$allowedRelTypes` through the catalog. The label expression `!PrivateScope` on every hop and the temporal predicates are applied by the compiler, never written by the agent.
+The module list becomes `$allowedLabels` and `$allowedRelTypes` through the catalog. The private-node test on every hop and the temporal predicates are applied by the compiler, never written by the agent.
 
 ```cypher
 // QS-5b  Data query a compiler emits from a purpose-bound projection request (see QS-5a)
@@ -539,10 +551,11 @@ The module list becomes `$allowedLabels` and `$allowedRelTypes` through the cata
 // params: $rootUid, $allowedLabels list<string>, $allowedRelTypes list<string>,
 //         $recordedAsOf (temporalView.recordedAt), $validAt (temporalView.validAt), $maxRelationships
 MATCH (root {uid: $rootUid})
-WHERE NOT root:PrivateScope
+WHERE NOT (root.uid STARTS WITH 'hu:private-' OR root.privacyClass = 'private-personal' OR root:PrivateRecord)
   AND any(l IN labels(root) WHERE l IN $allowedLabels)
-MATCH p = (root)((a)-[r]->(b:!PrivateScope)
-               WHERE type(r) IN $allowedRelTypes
+MATCH p = (root)((a)-[r]->(b)
+               WHERE NOT (b.uid STARTS WITH 'hu:private-' OR b.privacyClass = 'private-personal' OR b:PrivateRecord)
+                 AND type(r) IN $allowedRelTypes
                  AND any(l IN labels(b) WHERE l IN $allowedLabels)
                  AND (r.recordedFrom IS NULL
                       OR (r.recordedFrom <= $recordedAsOf AND (r.recordedTo IS NULL OR $recordedAsOf < r.recordedTo)))
@@ -561,18 +574,18 @@ Serves: CQ-AX-02, CQ-AX-12, CQ-AX-13, CQ-AX-21, CQ-RC-05.
 
 The rule: a shared-graph query must not traverse into private user context, and must not infer it from a path. Private records reference shared uids, so the dangerous direction is incoming. `UserContext -[:REFERENCES_PRODUCT_VARIANT]-> ProductVariant` is an incoming edge for the shared node. An undirected or incoming expansion from variant A through that private node reaches variant B, and the existence of the path says that one person is interested in both. Hiding the private node's properties does not hide the path.
 
-If Lane 5 places private context in a separate database or graph, QS-6a is satisfied by connection routing and the label test remains as defence in depth. If it shares the database, the label test is the only guard. Placement is Lane 5's decision; the shapes work for either.
+Round 0008 places private context in a separate transactional store, so QS-6a is satisfied by connection routing in production and the node test below is defence in depth. The test recognises a private node by its `hu:private-` uid prefix or `privacyClass = 'private-personal'` (plus the fixture-only `PrivateRecord` label); it never relied on a production marker label after K-5 was revised.
 
 ```cypher
 // QS-6a  Shared-graph traversal that cannot enter private user context
 // status: statically-checked
-// PrivateScope is the marker label every private-partition node carries (requested of Lane 5, see property-cards.md).
-// The label test sits on every hop, in both directions: an incoming private node
+// A private node is recognised by uid prefix, privacy class, or the fixture-only PrivateRecord label (see property-cards.md in this directory).
+// The test sits on every hop, in both directions: an incoming private node
 // (UserContext -[:ABOUT]-> Product) would otherwise act as a bridge between two shared nodes.
 // params: $uid string, $privateRelTypes list<string> (defence in depth), $maxHops is a compiler-substituted literal (2 here)
 MATCH (s {uid: $uid})
-WHERE NOT s:PrivateScope
-MATCH p = (s)(()-[r]-(n:!PrivateScope)){1,2}
+WHERE NOT (s.uid STARTS WITH 'hu:private-' OR s.privacyClass = 'private-personal' OR s:PrivateRecord)
+MATCH p = (s)(()-[r]-(n) WHERE NOT (n.uid STARTS WITH 'hu:private-' OR n.privacyClass = 'private-personal' OR n:PrivateRecord)){1,2}
 WHERE none(rel IN relationships(p) WHERE type(rel) IN $privateRelTypes)
 RETURN DISTINCT [x IN nodes(p) | x.uid] AS nodeUids, [rel IN relationships(p) | type(rel)] AS relTypes
 LIMIT 500;
@@ -583,22 +596,26 @@ Detectors for the invariants the traversal depends on (zero rows = valid):
 ```cypher
 // QS-6b-1  Leak detector: a shared node must never point at a private node (zero rows = valid)
 // status: statically-checked
-MATCH (s)-[r]->(p:PrivateScope)
-WHERE NOT s:PrivateScope
+MATCH (s)-[r]->(p)
+WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR p:PrivateRecord)
+  AND NOT (s.uid STARTS WITH 'hu:private-' OR s.privacyClass = 'private-personal' OR s:PrivateRecord)
 RETURN labels(s) AS sharedLabels, s.uid AS sharedUid, type(r) AS relType, p.uid AS privateUid;
 
 // QS-6b-2  Private-to-shared references are allowed only as governed reference types (zero rows = valid)
 // status: statically-checked
 // params: $allowedReferenceTypes list<string> (Lane 5 owns the list, e.g. REFERENCES_PRODUCT_VARIANT)
-MATCH (p:PrivateScope)-[r]->(s)
-WHERE NOT s:PrivateScope AND NOT type(r) IN $allowedReferenceTypes
+MATCH (p)-[r]->(s)
+WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR p:PrivateRecord)
+  AND NOT (s.uid STARTS WITH 'hu:private-' OR s.privacyClass = 'private-personal' OR s:PrivateRecord)
+  AND NOT type(r) IN $allowedReferenceTypes
 RETURN p.uid AS privateUid, type(r) AS relType, s.uid AS sharedUid;
 
 // QS-6b-3  A private node must not carry a label that a shared fulltext or vector index covers (zero rows = valid)
 // status: statically-checked
 // params: $sharedIndexedLabels list<string>  (derive from SHOW INDEXES, see V-110)
-MATCH (p:PrivateScope)
-WHERE any(l IN labels(p) WHERE l IN $sharedIndexedLabels)
+MATCH (p)
+WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR p:PrivateRecord)
+  AND any(l IN labels(p) WHERE l IN $sharedIndexedLabels)
 RETURN p.uid AS privateUid, labels(p) AS labels;
 ```
 
@@ -698,7 +715,7 @@ ORDER BY indexScore DESC;
 ## Assumptions this document depends on
 
 - Lane 5 round 0007 encodes supersession (QS-2a, QS-4b, QS-7 use `(:Assertion)-[:SUPERSEDES]->(:Assertion)`).
-- Lane 5 round 0008 owns `PrivateScope` and the governed reference types.
+- Round 0008 owns the private-context placement; in production no relationship crosses the store boundary, so `$allowedReferenceTypes` is empty and `$privateRelTypes` is defence in depth.
 - Lane 2 round 0002 owns the `EvidenceApplicability` dimension values.
 - `Identifier` and `HAS_IDENTIFIER` are decided by the coordinator and are not yet in `catalog/schema.yaml`.
 - Neo4j quantified path patterns (5.9 and later) and label expressions (`!Label`) are used. The author read them in the Neo4j Cypher manual ([SRC-NEO4J-CYPHER-QPP]) and did not run them.

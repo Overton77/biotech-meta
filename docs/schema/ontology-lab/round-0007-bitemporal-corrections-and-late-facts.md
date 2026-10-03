@@ -133,7 +133,7 @@ Rules:
 
 ### 3. (b) Asserted edges
 
-An asserted edge (for example `MARKETS_PRODUCT`) carries the same profile plus `projectionOfAssertionUid` (required). Its valid bounds, precisions, and bases are copied from the assertion at projection time and must equal them (V-505); a mismatch means someone edited one of them. `recordedFrom >= assertion.recordedAt`; the edge's `recordedTo` equals the assertion's `recordedTo` when the assertion is closed. The edge is a regenerable traversal projection; the assertion is the history.
+An asserted edge (for example `MARKETS_PRODUCT`) carries the same profile plus `assertionUid` (required; the integration owner renamed the lane's `projectionOfAssertionUid` here because that property is reserved for derived edges). Its valid bounds, precisions, and bases are copied from the assertion at projection time and must equal them (V-505); a mismatch means someone edited one of them. `recordedFrom >= assertion.recordedAt`; the edge's `recordedTo` equals the assertion's `recordedTo` when the assertion is closed. The edge is a regenerable traversal projection; the assertion is the history.
 
 ### 4. (c) `Assertion`: KCR-0007-1
 
@@ -153,15 +153,15 @@ Failing case that forces the change: a recommendation recorded 2026-04-10 cites 
 - An adjudication's `SUPPORTED_BY` / `CONTRADICTED_BY` locators belong to snapshots whose `retrievedAt <= adjudication.recordedAt` (V-511). Historical adjudications are never re-pointed to newer snapshots.
 - `reviewerType` gains `POLICY` for automated acceptance, so status transitions always have a record.
 
-Verdict to status projection:
+Verdict to status projection (as integrated): `Assertion.status` projects only adjudications with `adjudicationKind = CAPTURE_FIDELITY` and `SUPERSEDES` records. A SUPPORT adjudication (whether the proposition is supported by evidence) never changes status; the lane's original table, which mapped `CONTRADICTED` to `REJECTED`, was replaced on 2026-10-03 because it put truth into status (round 0006 KCR-4.6, catalog `assertionStatusMeaning`).
 
-| Latest adjudication verdict at `R` | Projected status at `R` |
+| Latest CAPTURE_FIDELITY adjudication at `R` | Projected status at `R` |
 |---|---|
-| `SUPPORTED`, `PARTIALLY_SUPPORTED` | `ACCEPTED` |
-| `CONTRADICTED` | `REJECTED` |
-| `INSUFFICIENT` | `UNRESOLVED` |
-| `NOT_APPLICABLE` | `REJECTED` for the stated use; the assertion stays available as a record |
-| two unsuperseded adjudications with different verdicts | `DISPUTED` |
+| `SUPPORTED` (the record accurately captures the source statement) | `ACCEPTED` |
+| `CONTRADICTED` (the record misreads the source) | `REJECTED` |
+| `PARTIALLY_SUPPORTED` or `INSUFFICIENT` | `UNRESOLVED` |
+| two unsuperseded capture-fidelity adjudications with different verdicts | `DISPUTED` |
+| `recordedTo <= R` with an incoming `SUPERSEDES` | `SUPERSEDED` |
 | none | `EXTRACTED` (or `PROPOSED` if a proposing agent run is recorded) |
 
 ### 6. (d) `SourceSnapshot` and source revisions: KCR-0007-3
@@ -389,7 +389,7 @@ GraphQL delta snippets are in the lane fragment `live-schema-decisions.md`.
 - Accepted semantic rule: valid time is immutable on every record; change in belief is a new recorded-time episode; a correction supersedes with `SOURCE_CORRECTION` and leaves the corrected state without a current attachment; a fact ending supersedes with `VALIDITY_BOUNDED` and keeps the old state attached for its bounded interval; recorded time is service-assigned and never backdated; historical adjudications and snapshots are immutable.
 - Rejected alternatives: in-place `validTo` update; status overwrite without history; sentinel maximum dates (used in one community Neo4j pattern); node-level recorded time as the only form (live `*Snapshot`); a separate "status episode" node type; storing witness observation times on the edge.
 - Residual uncertainty: cost of adjudication-per-transition at scale; whether Neo4j property-type constraints are available in the deployed edition; extraction accuracy for precision and basis.
-- Required catalog/schema changes: see lane fragment `catalog-patch.yaml` (temporal module, KCRs, enums, `SUPERSEDES`, `SourceRevisionEvent`, per-bound precision and basis).
+- Required catalog/schema changes: see `../catalog/schema.yaml` (0.2.0; merged from the lane's catalog-patch fragment) (temporal module, KCRs, enums, `SUPERSEDES`, `SourceRevisionEvent`, per-bound precision and basis).
 - Required ingestion changes: service-assigned `recordedFrom` / `recordedAt`; commit-time exclusivity check; `contentHash` and `payloadHash` at commit; revision-event detection for PubMed publication-type changes (`Retracted Publication`, `Retraction Notice`, `Published Erratum`, `Corrected and Republished Article`, `Expression of Concern`).
 - Required retrieval/API/MCP changes: every query binds a temporal viewpoint; answers report `KNOWN` / `POSSIBLE` and basis.
 - Changelog and migration references: 0.2.0. Migration: existing assertions get `recordedTo = null`, `contentHash` computed, and one synthetic `Adjudication {reviewerType: 'MIGRATION', recordedAt: migration time}` per non-`EXTRACTED` status so the projection reproduces current status; history before migration is declared unknown.

@@ -37,6 +37,9 @@
 // ON CREATE SET so that loading either file first is safe.
 // Every statement MATCHes or MERGEs each node it links; no variable crosses a ';'.
 // =============================================================================
+// Executed 2026-10-03 on an embedded Neo4j 5.26 Community instance (authoring scratchpad): every statement ran, and the full
+// 0.2.0 validation suite (../neo4j/validation.cypher) returned zero failing rows with this fixture loaded alone and with all six
+// fixtures loaded together. Expected informational rows are listed in ../ontology-lab/proposal-index.md section 9.
 
 
 // ---------------------------------------------------------------------------
@@ -131,9 +134,10 @@ UNWIND [
 MERGE (src:Entity:Source {uid: s.src})
 ON CREATE SET src.canonicalUri = s.uri, src.title = s.title, src.sourceKind = s.kind, src.entityType = 'Source', src.createdAt = datetime()
 MERGE (snap:InformationArtifact:SourceSnapshot {uid: s.snap})
-ON CREATE SET snap.canonicalUri = s.uri, snap.retrievedAt = datetime(s.at), snap.observedAt = datetime(s.at), snap.artifactType = 'SourceSnapshot', snap.createdAt = datetime()
+ON CREATE SET snap.canonicalUri = s.uri, snap.retrievedAt = datetime(s.at), snap.observedAt = datetime(s.at), snap.artifactType = 'SourceSnapshot', snap.createdAt = datetime(),
+              snap.contentHash = 'synthetic:' + s.snap, snap.contentHashBasis = 'SYNTHETIC_FIXTURE', snap.captureCompleteness = 'UNKNOWN'
 MERGE (loc:InformationArtifact:SourceLocator {uid: s.loc})
-ON CREATE SET loc.uri = s.uri, loc.section = s.section, loc.artifactType = 'SourceLocator', loc.createdAt = datetime()
+ON CREATE SET loc.uri = s.uri, loc.section = s.section, loc.selectorKind = CASE WHEN s.section IS NULL THEN 'WHOLE_SNAPSHOT' ELSE 'SECTION' END, loc.artifactType = 'SourceLocator', loc.createdAt = datetime()
 MERGE (src)-[:HAS_SNAPSHOT]->(snap)
 MERGE (snap)-[:HAS_LOCATOR]->(loc);
 
@@ -163,7 +167,8 @@ ON CREATE SET rv.observedAt = datetime('2026-10-03T00:00:00Z'),
               rv.siteCountries = ['CA'],
               rv.artifactType = 'RegistrationVersion', rv.createdAt = datetime()
 MERGE (study)-[:REGISTERED_AS]->(reg)
-MERGE (reg)-[:HAS_REGISTRATION_VERSION]->(rv)
+MERGE (reg)-[hrv:HAS_REGISTRATION_VERSION]->(rv)
+ON CREATE SET hrv.relationshipUid = 'hu:rel:' + split(rv.uid, ':')[2], hrv.recordedFrom = datetime('2026-10-03T00:00:00Z'), hrv.validFromBasis = 'OBSERVATION_ONLY', hrv.validToBasis = 'UNKNOWN'
 MERGE (aSponsor:Assertion {uid: 'hu:assertion:elysium-sponsors-nct02678611'})
 ON CREATE SET aSponsor.predicate = 'SPONSORS_STUDY', aSponsor.status = 'ACCEPTED', aSponsor.polarity = 'POSITIVE', aSponsor.recordedAt = datetime('2026-10-03T00:00:00Z')
 MERGE (aSponsor)-[:HAS_SUBJECT]->(elysium)
@@ -197,7 +202,15 @@ ON CREATE SET arm.name = r.armName, arm.armType = r.armType, arm.plannedSize = 4
 MERGE (si:VersionedState:StudyIntervention {uid: r.si})
 ON CREATE SET si.name = r.siName, si.route = 'ORAL', si.dosageForm = 'CAPSULE', si.dosesPerDay = 1, si.schedule = 'once daily at breakfast', si.durationIso = 'P8W', si.stateType = 'StudyIntervention', si.createdAt = datetime()
 MERGE (study)-[:HAS_ARM]->(arm)
-MERGE (arm)-[:ASSIGNS_INTERVENTION]->(si);
+MERGE (ai:Assertion {uid: r.si + '-assigned-assertion'})
+ON CREATE SET ai.predicate = 'ASSIGNS_INTERVENTION', ai.status = 'ACCEPTED', ai.polarity = 'POSITIVE', ai.recordedAt = datetime('2026-10-03T00:00:00Z')
+MERGE (ai)-[:HAS_SUBJECT]->(arm)
+MERGE (ai)-[:HAS_OBJECT]->(si)
+WITH study, arm, si, ai
+MATCH (armLoc:SourceLocator {uid: 'hu:locator:ctgov-nct02712593-arms'})
+MERGE (ai)-[:SUPPORTED_BY]->(armLoc)
+MERGE (arm)-[asg:ASSIGNS_INTERVENTION]->(si)
+ON CREATE SET asg.assertionUid = ai.uid, asg.recordedFrom = ai.recordedAt, asg.relationshipUid = 'hu:rel:' + split(ai.uid, ':')[2];
 
 // status: statically-checked
 UNWIND [
@@ -220,7 +233,7 @@ MERGE (a)-[:HAS_SUBJECT]->(ic)
 MERGE (a)-[:HAS_OBJECT]->(mat)
 MERGE (a)-[:SUPPORTED_BY]->(loc)
 MERGE (ic)-[u:USES_INTERVENTION_MATERIAL]->(mat)
-ON CREATE SET u.projectionOfAssertionUid = a.uid;
+ON CREATE SET u.assertionUid = a.uid, u.recordedFrom = a.recordedAt, u.relationshipUid = 'hu:rel:' + split(a.uid, ':')[2];
 
 // Who provided the investigational product (correction) vs who says it supplied the NR (C&EN).
 // PROVIDES_INVESTIGATIONAL_PRODUCT does not imply SUPPLIES_INGREDIENT_MATERIAL (FI-202).
@@ -246,8 +259,8 @@ MERGE (aProv2)-[:HAS_OBJECT]->(si2)
 MERGE (aProv2)-[:SUPPORTED_BY]->(corrLoc)
 // ChromaDex's attributed statement: supplier of Elysium's NR until mid-2016 (trial ran Jan-Jul 2016).
 MERGE (aSup:Assertion {uid: 'hu:assertion:chromadex-says-supplied-elysium-nr-until-mid-2016'})
-ON CREATE SET aSup.predicate = 'SUPPLIES_INGREDIENT_MATERIAL', aSup.status = 'DISPUTED', aSup.polarity = 'POSITIVE',
-              aSup.validFrom = null, aSup.validTo = date('2016-07-01'), aSup.validTimePrecision = 'MONTH',
+ON CREATE SET aSup.predicate = 'SUPPLIES_INGREDIENT_MATERIAL', aSup.status = 'ACCEPTED', aSup.polarity = 'POSITIVE',   // ACCEPTED = accurately captured; its truth is contested by the competing hypotheses below (0.2.0 status semantics)
+              aSup.validFrom = null, aSup.validFromBasis = 'UNKNOWN', aSup.validTo = datetime('2016-07-01T00:00:00Z'), aSup.validToPrecision = 'MONTH', aSup.validToBasis = 'STATED_BY_SOURCE',
               aSup.recordedAt = datetime('2026-10-03T00:00:00Z')
 MERGE (aSup)-[:HAS_SUBJECT]->(chromadex)
 MERGE (aSup)-[:HAS_OBJECT]->(elysium)
@@ -287,7 +300,8 @@ ON CREATE SET reg.registry = 'ClinicalTrials.gov', reg.registrationId = 'NCT0271
 MERGE (rv:InformationArtifact:RegistrationVersion {uid: 'hu:registration-version:nct02712593-observed-2026-10-03'})
 ON CREATE SET rv.observedAt = datetime('2026-10-03T00:00:00Z'), rv.overallStatus = 'COMPLETED', rv.enrollmentCount = 140, rv.resultsPosted = false, rv.studyType = 'INTERVENTIONAL', rv.phase = 'PHASE2', rv.siteCountries = ['CA'], rv.artifactType = 'RegistrationVersion', rv.createdAt = datetime()
 MERGE (study)-[:REGISTERED_AS]->(reg)
-MERGE (reg)-[:HAS_REGISTRATION_VERSION]->(rv)
+MERGE (reg)-[hrv:HAS_REGISTRATION_VERSION]->(rv)
+ON CREATE SET hrv.relationshipUid = 'hu:rel:' + split(rv.uid, ':')[2], hrv.recordedFrom = datetime('2026-10-03T00:00:00Z'), hrv.validFromBasis = 'OBSERVATION_ONLY', hrv.validToBasis = 'UNKNOWN'
 MERGE (pub:InformationArtifact:Publication {uid: 'hu:publication:pmid-31278280'})
 ON CREATE SET pub.title = 'Safety and Metabolism of Long-term Administration of NIAGEN (Nicotinamide Riboside Chloride) ...', pub.doi = '10.1038/s41598-019-46120-z', pub.pmid = '31278280', pub.publishedAt = date('2019-07-05'), pub.publicationKind = 'ARTICLE', pub.artifactType = 'Publication', pub.createdAt = datetime()
 MERGE (pub)-[:REPORTS_ON]->(study)
@@ -298,7 +312,12 @@ ON CREATE SET si.name = 'NIAGEN 300 mg/day', si.route = 'ORAL', si.dosageForm = 
 MERGE (ic:VersionedState:InterventionComponent {uid: 'hu:intervention-component:nct02712593-300-nr'})
 ON CREATE SET ic.quantity = 300.0, ic.unitCode = 'mg/d', ic.quantityBasis = 'PER_DAY', ic.massBasis = 'UNSPECIFIED', ic.verbatimDoseText = '300 mg NR', ic.stateType = 'InterventionComponent', ic.createdAt = datetime()
 MERGE (study)-[:HAS_ARM]->(arm)
-MERGE (arm)-[:ASSIGNS_INTERVENTION]->(si)
+MERGE (ai:Assertion {uid: 'hu:assertion:nct02712593-niagen-300-arm-assigned'})
+ON CREATE SET ai.predicate = 'ASSIGNS_INTERVENTION', ai.status = 'ACCEPTED', ai.polarity = 'POSITIVE', ai.recordedAt = datetime('2026-10-03T00:00:00Z')
+MERGE (ai)-[:HAS_SUBJECT]->(arm)
+MERGE (ai)-[:HAS_OBJECT]->(si)
+MERGE (arm)-[asg:ASSIGNS_INTERVENTION]->(si)
+ON CREATE SET asg.assertionUid = ai.uid, asg.recordedFrom = ai.recordedAt, asg.relationshipUid = 'hu:rel:nct02712593-niagen-300-arm-assigned'
 MERGE (si)-[:HAS_INTERVENTION_COMPONENT]->(ic)
 MERGE (a:Assertion {uid: 'hu:assertion:nct02712593-300-nr-uses-niagen'})
 ON CREATE SET a.predicate = 'USES_INTERVENTION_MATERIAL', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.recordedAt = datetime('2026-10-03T00:00:00Z')
@@ -307,8 +326,11 @@ MERGE (a)-[:HAS_OBJECT]->(niagen)
 MERGE (a)-[:SUPPORTED_BY]->(armLoc)
 MERGE (a)-[:SUPPORTED_BY]->(absLoc)
 MERGE (ic)-[u:USES_INTERVENTION_MATERIAL]->(niagen)
-ON CREATE SET u.projectionOfAssertionUid = a.uid
+ON CREATE SET u.assertionUid = a.uid, u.recordedFrom = a.recordedAt, u.relationshipUid = 'hu:rel:' + split(a.uid, ':')[2]
 MERGE (niagen)-[:HAS_CHEMICAL_FORM]->(crystal);
+
+MATCH (ai:Assertion {uid: 'hu:assertion:nct02712593-niagen-300-arm-assigned'}), (loc:SourceLocator {uid: 'hu:locator:pmid31278280-abstract'})
+MERGE (ai)-[:SUPPORTED_BY]->(loc);
 
 // Current product composition edges (asserted; projected with assertion uid).
 // status: statically-checked
@@ -324,7 +346,7 @@ MERGE (a)-[:HAS_SUBJECT]->(comp)
 MERGE (a)-[:HAS_OBJECT]->(mat)
 MERGE (a)-[:SUPPORTED_BY]->(loc)
 MERGE (comp)-[u:USES_MATERIAL]->(mat)
-ON CREATE SET u.projectionOfAssertionUid = a.uid;
+ON CREATE SET u.assertionUid = a.uid, u.recordedFrom = a.recordedAt, u.relationshipUid = 'hu:rel:' + split(a.uid, ':')[2];
 
 // status: statically-checked
 UNWIND [
@@ -342,8 +364,8 @@ ON CREATE SET af.predicate = 'HAS_FORMULATION_VERSION', af.status = 'ACCEPTED', 
 MERGE (af)-[:HAS_SUBJECT]->(v)
 MERGE (af)-[:HAS_OBJECT]->(f)
 MERGE (af)-[:SUPPORTED_BY]->(loc)
-MERGE (p)-[hv:HAS_VARIANT]->(v) ON CREATE SET hv.projectionOfAssertionUid = av.uid
-MERGE (v)-[hf:HAS_FORMULATION_VERSION]->(f) ON CREATE SET hf.projectionOfAssertionUid = af.uid;
+MERGE (p)-[hv:HAS_VARIANT]->(v) ON CREATE SET hv.assertionUid = av.uid, hv.recordedFrom = av.recordedAt, hv.relationshipUid = 'hu:rel:' + split(av.uid, ':')[2]
+MERGE (v)-[hf:HAS_FORMULATION_VERSION]->(f) ON CREATE SET hf.assertionUid = af.uid, hf.recordedFrom = af.recordedAt, hf.relationshipUid = 'hu:rel:' + split(af.uid, ':')[2];
 
 
 // ---------------------------------------------------------------------------
@@ -851,3 +873,47 @@ RETURN s.uid AS study, rv.observedAt AS registryObservedAt, pub.pmid AS resultsP
 MATCH (s:Study)
 WHERE s.overallStatus IS NOT NULL OR s.hasResults IS NOT NULL OR s.pmid IS NOT NULL OR s.doi IS NOT NULL OR s.evidenceLevel IS NOT NULL
 RETURN s.uid AS studyWithRegistryOrAssessmentFields;
+
+
+// ---------------------------------------------------------------------------
+// Assertions behind registry, publication and material-form edges
+// Asserted edges are projections of assertions (catalog 0.2.0 asserted_edge profile). The record-derived facts below were
+// created as bare edges by the lane; each now has its authorizing assertion, cited to the registry, publication or page
+// snapshot it was read from, and the edge carries assertionUid, recordedFrom and relationshipUid.
+// status: statically-checked, executed
+UNWIND [
+  {pred: 'REGISTERED_AS', s: 'hu:study:nct02678611-basis-nrpt', o: 'hu:trial-registration:ctgov-nct02678611', loc: 'hu:locator:ctgov-nct02678611-status'},
+  {pred: 'REGISTERED_AS', s: 'hu:study:nct02712593-niagen', o: 'hu:trial-registration:ctgov-nct02712593', loc: 'hu:locator:ctgov-nct02712593-arms'},
+  {pred: 'REPORTS_ON', s: 'hu:publication:pmid-29184669', o: 'hu:study:nct02678611-basis-nrpt', loc: 'hu:locator:pmid29184669-results-trial-overview'},
+  {pred: 'REPORTS_ON', s: 'hu:publication:pmid-31278280', o: 'hu:study:nct02712593-niagen', loc: 'hu:locator:pmid31278280-abstract'},
+  {pred: 'PRODUCED_DATASET', s: 'hu:study:nct02678611-basis-nrpt', o: 'hu:dataset:nct02678611-participant-data', loc: 'hu:locator:pmid29184669-results-trial-overview'},
+  {pred: 'ANALYZES_DATASET', s: 'hu:publication:pmid-29184669', o: 'hu:dataset:nct02678611-participant-data', loc: 'hu:locator:pmid29184669-results-trial-overview'},
+  {pred: 'CORRECTS', s: 'hu:publication:pmid-30155270', o: 'hu:publication:pmid-29184669', loc: 'hu:locator:pmid30155270-intervention-source'},
+  {pred: 'FORM_OF_SUBSTANCE', s: 'hu:chemical-form:nr-chloride-crystal-niagen', o: 'hu:substance:nicotinamide-riboside-chloride', loc: 'hu:locator:pmid31278280-abstract'},
+  {pred: 'HAS_CHEMICAL_FORM', s: 'hu:material:chromadex-niagen', o: 'hu:chemical-form:nr-chloride-crystal-niagen', loc: 'hu:locator:pmid31278280-abstract'}
+] AS row
+MATCH (s {uid: row.s}), (o {uid: row.o}), (l:SourceLocator {uid: row.loc})
+MERGE (a:Assertion {uid: 'hu:assertion:' + toLower(replace(row.pred, '_', '-')) + '-' + split(row.s, ':')[2] + '-' + split(row.o, ':')[2]})
+ON CREATE SET a.predicate = row.pred, a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.privacyClass = 'public'
+MERGE (a)-[:HAS_SUBJECT]->(s)
+MERGE (a)-[:HAS_OBJECT]->(o)
+MERGE (a)-[:SUPPORTED_BY]->(l)
+WITH row, s, o, a
+MATCH (s)-[r]->(o) WHERE type(r) = row.pred
+SET r.assertionUid = a.uid, r.recordedFrom = a.recordedAt, r.relationshipUid = 'hu:rel:' + split(a.uid, ':')[2];
+
+// ---------------------------------------------------------------------------
+// Capture-fidelity acceptance (catalog 0.2.0, INV-103). Every ACCEPTED, REJECTED or DISPUTED status is a projection of a
+// CAPTURE_FIDELITY adjudication. This fixture records one policy adjudication (reviewerType POLICY) covering the captured
+// assertions it created; it says nothing about whether any proposition is true (that is a SUPPORT adjudication).
+// status: statically-checked, executed
+MATCH (a:Assertion)
+WHERE a.status IN ['ACCEPTED', 'REJECTED', 'DISPUTED']
+  AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
+MERGE (j:EvidenceAssessment:Adjudication {uid: 'hu:adjudication:study-vs-product-mismatch-capture-fidelity-policy-2026-10-04'})
+ON CREATE SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
+    j.reviewerType = 'POLICY', j.methodVersion = 'fixture-capture-policy-1', j.status = 'FINAL',
+    j.rationale = 'Fixture capture policy: the recorded propositions match the cited spans as read by the authoring lane.',
+    j.reviewedAt = datetime('2026-10-04T00:00:00Z'), j.recordedAt = datetime('2026-10-04T00:00:00Z'), j.createdAt = datetime('2026-10-04T00:00:00Z'),
+    j.privacyClass = 'internal'
+MERGE (j)-[:EVALUATES]->(a);

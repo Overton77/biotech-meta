@@ -34,7 +34,7 @@ Status: `ACCEPTED` (integration owner, 2026-10-03). Lane recommendation was: OPE
 
 ## Builder proposal
 
-- Proposed terms: classification scheme (section 1 of the question fragment); six canonical query shapes plus two (QS-7, QS-8); `AnswerRecord` (candidate); `PrivateScope` marker label (Lane 5 to own).
+- Proposed terms: classification scheme (section 1 of the question fragment); six canonical query shapes plus two (QS-7, QS-8); `AnswerRecord` (candidate); `PrivateScope` marker label (Lane 5 to own). (K-5 revised at integration: no marker label; see the banner above)
 - Kernel-change requests, each with its failing case:
   - **K-1: temporal properties on asserted edges** (`assertionUid`, `recordedFrom`, `recordedTo`; `validTimeBasis`, `validTimePrecision` on assertions and edges). Failing case: formulation attached 2025-06-01 on 2026-01-10 and corrected on 2026-06-20. Without `recordedFrom` and `recordedTo` on the edge, a March as-of query and an August as-of query return the same row. The starter model names these properties and the catalog omits them.
   - **K-2: multi-hop derived edge citation** (`derivationRule` plus `derivedFromAssertionUids`). Failing case: `CONTAINS` rests on three assertions; one `projectionOfAssertionUid` cannot cite them. A second case: an `ENDORSES_PRODUCT` edge cites an `ADVISES_ORGANIZATION` assertion, passes `V-007`, and reintroduces the forbidden implication.
@@ -70,7 +70,7 @@ Not applicable to this round: it proposes questions and shapes, not scored asser
 - Projection request ID: `req-ax-trail-0001` (example in `query-shapes.md`, QS-5a)
 - Selected modules: kernel, provenance, temporal, identity_resolution, products_and_formulations, studies_and_evidence
 - Closure additions: the `Identifier` surface (pending coordinator)
-- Explicit exclusions: `UserContext`, `RecommendationDecision`, `PrivateScope`
+- Explicit exclusions: `UserContext`, `RecommendationDecision`, `PrivateScope` (K-5 revised at integration: the exclusion is by placement and uid prefix)
 - Budget result: not computed (no projection compiler exists yet)
 - Projection ID/digest: not computed
 
@@ -91,7 +91,7 @@ Not applicable to this round: it proposes questions and shapes, not scored asser
 - Outcome (recommended): accept the scheme and the shapes now; accept K-1, K-2, K-4 as the minimum for the first trail; hold K-3, K-6, K-7 until Lane 5 reports.
 - Rejected alternatives: one `confidence` for questions (no); a numeric priority (classes carry tests instead); storing answer logs per user (private).
 - Residual uncertainty: see `open-questions.md` section B.
-- Required catalog changes: `catalog-patch.yaml`.
+- Required catalog changes: `../catalog/schema.yaml` (0.2.0; merged from the lane's catalog-patch fragment).
 - Required ingestion changes: set `recordedFrom` and `assertionUid` on every asserted edge; write opaque uids and `id`; set `createdAt` and `updatedAt` on Cypher-written nodes.
 - Required retrieval/API changes: the compiler passes `temporalView` into the shapes and substitutes depth literals.
 - Changelog and migration references: none yet.

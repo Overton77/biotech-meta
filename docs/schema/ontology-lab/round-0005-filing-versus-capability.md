@@ -247,7 +247,7 @@ Live `Listing.priceAmount`, `currency`, `availabilityStatus`, `capturedAt` becom
   6. A declared amount refers to the entity named on the label line per 21 CFR 101.36; active-moiety and nutrient-equivalent amounts are calculated.
 - Rejected alternatives: one `RegulatoryStatus` node with string `statusCode` (fails C1 to C4); a `promoted` capability stage (fails C7); a `listRole` string on the live `LISTS` edge as the only role record (fails C9 for time and seller identity).
 - Residual uncertainty: whether NRC is in 503B Category 1 (unverified); FDA response letters for NDI 882 and 1062 not fetched (company-reported only); the botanical extract declaration rules beyond 101.36(b)(3)(ii) (OPEN-QUESTIONS P1-4); non-US label rules.
-- Required catalog/schema changes: `lanes/lane3/catalog-patch.yaml`; validation V-320 to V-335.
+- Required catalog/schema changes: `../catalog/schema.yaml` (0.2.0; the lane's catalog-patch fragment was merged there); validation V-320 to V-335.
 - Required ingestion changes: filing parsers emit Assertions attributed to the issuer with locators; agency parsers emit Submission/Response with verbatim conditions; listing scrapers emit Listing snapshot, Offer roles, PriceObservation with `priceKind`.
 - Required retrieval/API/MCP changes: any answer containing "approved", "cleared", "registered", "certified" must name the status kind, jurisdiction, scope, and source; capability answers must name the stage, valid time, source kind, and adjudication.
 - Changelog and migration references: live `Product.status = APPROVED`, `Product.approvedYear`, `Product.regulatoryAuthorizationId`, `Treatment.orphanDrugDesignation` become derived projections that must name the `RegulatoryStatus` they project (V-322).

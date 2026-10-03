@@ -182,8 +182,7 @@ FOR (n:SourceLocator) ON (n.quoteHash);
 CREATE INDEX source_snapshot_content_hash IF NOT EXISTS
 FOR (n:SourceSnapshot) ON (n.contentHash);
 
-CREATE INDEX activity_external_run IF NOT EXISTS
-FOR (n:Activity) ON (n.externalRunSystem, n.externalRunId);
+// (activity_external_run removed at integration: the unique constraint on (externalRunSystem, externalRunId) below provides the index and the two cannot coexist)
 
 CREATE INDEX assertion_basis IF NOT EXISTS
 FOR (n:Assertion) ON (n.assertionBasis);
@@ -199,8 +198,8 @@ FOR (n:Activity) REQUIRE (n.externalRunSystem, n.externalRunId) IS UNIQUE;
 CREATE CONSTRAINT source_locator_selector_kind_exists IF NOT EXISTS
 FOR (n:SourceLocator) REQUIRE n.selectorKind IS NOT NULL;
 
-CREATE CONSTRAINT source_locator_normalization_exists IF NOT EXISTS
-FOR (n:SourceLocator) REQUIRE n.normalizationVersion IS NOT NULL;
+// (source_locator_normalization_exists withdrawn at integration: normalizationVersion is required only for typed selector kinds; coarse SECTION and
+// WHOLE_SNAPSHOT locators carry none. The rule is service-enforced and checked by V-401.)
 
 CREATE CONSTRAINT source_locator_media_start_type IF NOT EXISTS
 FOR (n:SourceLocator) REQUIRE n.mediaStartSeconds IS :: FLOAT;

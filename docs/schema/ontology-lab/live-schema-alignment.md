@@ -12,6 +12,9 @@ Integration overrides applied to the rows below:
 - `UserContext` is never a target of a shared assessment (round 0008); rows mentioning it as a target are superseded by `UseContextProfile`.
 - Lane 1's `FDA_CLEARED_OR_APPROVED` forbidden implications are replaced by round 0005's split (clearance, De Novo authorization, approval).
 - `Observation` is owned by `protocols` (public, source-attributed); the private measurement store is `PersonalMeasurement`.
+- `PrivateScope` (round 0009 K-5) is not a production label; private records are recognised by the `hu:private-` uid prefix and `privacyClass` and live outside the shared graph (round 0008).
+- `SUPPORTED_BY` and `CONTRADICTED_BY` are structural, and the AssayVersion payload edges, `MEASURES_BIOMARKER`, `QUANTIFIES`, `VERSION_OF_ALGORITHM`, `OUTPUTS_METRIC`, `FOR_ASSAY_VERSION` and `FOR_METRIC` are structural (review, 2026-10-03).
+- The source-recommendation predicate is `RECOMMENDS` (live edge name); `RECOMMENDS_PRODUCT` is retired.
 
 
 ## Round 0009: search surface, shared interfaces, and the uid seam
@@ -44,7 +47,7 @@ Decision from the coordinator: catalog identity is `uid` (`hu:<type>:<opaque-sta
 
 1. **Both are stored.** `uid` is an additional stored property on every catalog-participating node. It is exposed to GraphQL as an additive nullable field `uid: String` with no `@id`, so the library never generates or overwrites it. It becomes `String!` after backfill.
 2. **Derivation.** `id` equals the opaque segment of `uid` (the text after the second colon). For nodes created through the GraphQL API, `uid = 'hu:' + token(label) + ':' + id`. For nodes created by ingestion, the writer generates an opaque, globally unique segment (UUID or ULID), sets `uid`, and sets `id` to the segment. No lookup table is needed in either direction, and the catalog's global uid uniqueness (V-000a) holds if the segment is globally unique.
-3. **Type token.** The `<type>` segment comes from a registry, `conventions.uidTypeTokens` in `catalog-patch.yaml`. It is not computed from the label. The existing fixtures use tokens such as `org`, `product`, `material`, `snapshot`.
+3. **Type token.** The `<type>` segment comes from a registry, `conventions.uidTypeTokens` in `../catalog/schema.yaml` (0.2.0; merged from the lane's catalog-patch fragment). It is not computed from the label. The existing fixtures use tokens such as `org`, `product`, `material`, `snapshot`.
 4. **Stored id property.** The `id` is stored under `id` except for `Document` (`documentId`), `DocumentTextVersion` (`documentTextVersionId`), `Segmentation` (`segmentationId`) and `Chunk` (`chunkId`). Cypher and the validator use `coalesce(n.id, n.documentId, n.documentTextVersionId, n.segmentationId, n.chunkId)`. V-117 checks the rule.
 5. **Immutability and merges.** Neither `uid` nor `id` changes. If two nodes are found to be one, the survivor keeps its uid and the other's uid stays resolvable as a tombstone with a recorded equivalence (an `EquivalenceAssessment`). Old answers that cite the tombstone uid remain interpretable.
 6. **Opaque in production.** The fixtures use readable segments (`hu:product:elysium-basis`). That is illustrative. Production segments must carry no name, because a segment that reads as a name invites identity by name. The seam adds no constraint that can detect this; it is an ingestion rule.
@@ -468,7 +471,7 @@ Decisions: keep | refine | merge | split | seam | defer.
 | `SUPPORTED_BY_DOCUMENT` / `SUPPORTED_BY_CHUNK` on snapshots | seam | `Assertion` -> `SourceLocator` | shortcut only; snapshot carries `assertionUids` (Lane 4 owns the evidence pipeline alignment) | CQ-EV-01 |
 | `TemporalMetadata` | refine | `asserted_edge` profile | add per-bound precision and basis, `assertionUid`, `relationshipUid`; stop writing `confidence` and `notes` for new records | CQ-TM-01, CQ-TM-04 |
 | `OwnershipMetadata`, `RoleMetadata` time fields | refine | `asserted_edge` profile | same time rules; role semantics owned by other lanes | CQ-TM-01 |
-| `RecommendationMetadata` (`strength`, `context`, `confidence`) | refine | source assertion predicate `RECOMMENDS_PRODUCT` (organizations module) | records that a source recommends; new writes require `assertionUid` and time; `strength`/`confidence` not written (no method) | CQ-RC-05 |
+| `RecommendationMetadata` (`strength`, `context`, `confidence`) | refine | source assertion predicate `RECOMMENDS` (0.1.0 name `RECOMMENDS_PRODUCT`) (organizations module) | records that a source recommends; new writes require `assertionUid` and time; `strength`/`confidence` not written (no method) | CQ-RC-05 |
 | `Person.recommends` (`RECOMMENDS`) | keep (restricted) | asserted edge projection | "a source recommends", never "BellLabs recommends" | CQ-RC-05 |
 | `union Recommendable` | keep | range of source `RECOMMENDS` | BellLabs recommendations are private `RecommendationOption.subjectUid` values, not edges | CQ-RC-05 |
 | (absent) `Product RECOMMENDED_FOR Goal` | forbidden | `RecommendationSnapshot` (private) | no person, time, evidence version, or policy | CQ-RC-04, CQ-RC-05 |

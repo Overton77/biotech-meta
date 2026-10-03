@@ -274,7 +274,7 @@ Qualification: price and availability depend on what was observed and when.
 2. **Example answer:** "P1 over P2 would reverse if the historical formulation matches P2's tested dose (identity `UNKNOWN`) or if assertion A9 (disputed) is accepted."
 3. **Distinctions:** missing versus disputed versus conflicting.
 4. **Evidence:** the unresolved dimensions and disputed assertions.
-5. **Model:** `EvidenceApplicability` dimensions; assertion status `DISPUTED`; missing-fact codes.
+5. **Model:** `EvidenceApplicability` dimensions with `missingFacts`; competing assertions and SUPPORT adjudication verdicts (an assertion's `status` is capture fidelity and never carries the dispute about truth); missing-fact codes.
 6. **Query:** QS-3a, QS-3b.
 7. **Prevents:** a ranking presented as settled.
 Qualification: the reversal test is computed by the decision service, which re-ranks under counterfactual values. The graph supplies the unknowns.
@@ -294,7 +294,7 @@ Qualification: the algorithm code is outside the graph.
 2. **Example answer:** "Evidence favors P1 for outcome O (`EvidenceAssessment`). BellLabs' policy v3 ranks P1 first (decision record). A named speaker recommends P2 (assertion from episode E, span S). A user selected P2 (private record)."
 3. **Distinctions:** assessment, decision, source recommendation, user choice.
 4. **Evidence:** four different record types.
-5. **Model:** `EvidenceAssessment`; `RecommendationDecision`; `Assertion` with predicate `RECOMMENDS_PRODUCT` and `ASSERTED_BY`; private selection (Lane 5). The live `Person.recommends` edge with `RecommendationMetadata.strength` is a source stance only.
+5. **Model:** `EvidenceAssessment`; `RecommendationDecision`; `Assertion` with predicate `RECOMMENDS` and `ASSERTED_BY`; private selection (Lane 5). The live `Person.recommends` edge with `RecommendationMetadata.strength` is a source stance only.
 6. **Query:** QS-1a with the record kind; QS-6a.
 7. **Prevents:** reading a speaker's recommendation as BellLabs' recommendation.
 
@@ -393,7 +393,7 @@ Format: Informational desire -> example answer -> necessary distinctions -> evid
 - **Example answer:** "Unresolved. Two competing hypotheses: ChromaDex NIAGEN (supported only by ChromaDex's attributed statement in C&EN) and Elysium NR-E (supported only by the current label naming). No lot-level source."
 - **Distinctions:** provided-the-product vs supplied-the-material; branded material vs chemical form vs substance.
 - **Evidence requirements:** correction text, trade-press statement attributed to its speaker, current label.
-- **Model:** `IngredientMaterial {materialKind: UNRESOLVED_MATERIAL}`; `ResolutionHypothesis -PROPOSES_MATCH->` x2, `COMPETES_WITH`; `PROVIDES_INVESTIGATIONAL_PRODUCT` assertion; `SUPPLIES_INGREDIENT_MATERIAL` assertion `ASSERTED_BY` ChromaDex, status `DISPUTED`.
+- **Model:** `IngredientMaterial {materialKind: UNRESOLVED_MATERIAL}`; `ResolutionHypothesis -PROPOSES_MATCH->` x2, `COMPETES_WITH`; `PROVIDES_INVESTIGATIONAL_PRODUCT` assertion; `SUPPLIES_INGREDIENT_MATERIAL` assertion `ASSERTED_BY` ChromaDex, status `ACCEPTED` (an accurate record of what ChromaDex said) while its truth is contested through the competing `ResolutionHypothesis` records and any SUPPORT adjudication.
 - **Query pattern:** `MATCH (h:ResolutionHypothesis)-[:PROPOSES_MATCH]->(:IngredientMaterial {uid: $trialMaterial}) MATCH (h)-[:PROPOSES_MATCH]->(c) WHERE c.uid <> $trialMaterial RETURN h.resolutionStatus, c.name, h.rationale`.
 - **Failure prevented:** merging trial material with a current branded material by name.
 
@@ -987,14 +987,16 @@ Needs outside the graph: source licenses and terms; policy contents.
 
 ## Recommendation and choice
 
+(Priority class and answerability for `CQ-RC-01` to `CQ-RC-06` follow the canonical classification in section 2; the integration owner aligned this table to it on 2026-10-03.)
+
 | ID | Question | Priority | Answerability | Round |
 |---|---|---|---|---|
-| `CQ-RC-01` | Why was one option preferred over another for a stated goal and decision context, and which options were rejected or blocked, for which reason? (extended) | Essential now | A | 0008 |
-| `CQ-RC-02` | Which evidence, applicability assessments, constraints, price/availability observations, and policy version affected the decision? | Essential now | A | 0008 |
-| `CQ-RC-03` | Which missing or disputed facts could change the ranking? | Foundational | Q (only facts named in `missingFactKeys` and disputed assertions; unnamed unknowns are not enumerable) | 0008 |
-| `CQ-RC-04` | Can a decision be replayed as of both its domain-time and system-time viewpoint? | Essential now | A | 0007, 0008 |
+| `CQ-RC-01` | Why was one option preferred over another for a stated goal and decision context, and which options were rejected or blocked, for which reason? (extended) | Essential now | Q | 0008 |
+| `CQ-RC-02` | Which evidence, applicability assessments, constraints, price/availability observations, and policy version affected the decision? | Foundational | Q | 0008 |
+| `CQ-RC-03` | Which missing or disputed facts could change the ranking? | Essential now | Q (only facts named in `missingFactKeys` and disputed assertions; unnamed unknowns are not enumerable) | 0008 |
+| `CQ-RC-04` | Can a decision be replayed as of both its domain-time and system-time viewpoint? | Foundational | Q | 0007, 0008 |
 | `CQ-RC-05` | Can the system distinguish "evidence favors", "BellLabs recommends", "a source recommends", and "a user selected"? | Essential now | A | 0008 |
-| `CQ-RC-06` | Can contraindications or interaction uncertainty block a recommendation rather than merely lower a score? | Foundational | A (as record shape); policy content is outside this lane | 0008 |
+| `CQ-RC-06` | Can contraindications or interaction uncertainty block a recommendation rather than merely lower a score? | Foundational | Q (as record shape); policy content is outside this lane | 0008 |
 | `CQ-RC-07` | (new) Which past recommendations relied on evidence or context that has since been corrected, superseded, re-adjudicated, or extended by new measurements, and would the decision differ now? | Foundational | Q (detection is A; "would it differ" requires re-running the policy, a counterfactual that is Research frontier for policies without stored criteria) | 0007, 0008 |
 
 ## Private context
@@ -1381,7 +1383,7 @@ Qualification: dataset sharing is often not declared; the count is a lower bound
 2. **Example answer:** "0 shared-to-private edges; 0 private nodes under shared indexes; 2,114 private-to-shared reference edges, all of allowed types."
 3. **Distinctions:** property hiding versus path existence; incoming edges from private nodes onto shared nodes; derived search text.
 4. **Evidence:** the graph and the index metadata.
-5. **Model:** `PrivateScope` marker (K-5); governed reference types (Lane 5).
+5. **Model:** private records recognised by the `hu:private-` uid prefix and `privacyClass` and kept in the private context store (K-5 revised by round 0008; no marker label in the shared graph); no governed reference edges cross the boundary, references are uid properties.
 6. **Query:** QS-6a, QS-6b; V-113 to V-116.
 7. **Prevents:** a co-interest inference through a private bridge node; a shared embedding built from private text.
 
@@ -1515,7 +1517,7 @@ Pairs 1 to 8 are in the existing file. Each pair below must produce different gr
 
 | # | Area | Statement A | Statement B | Delta A | Delta B | Evidence needed |
 |---|---|---|---|---|---|---|
-| 9 | Claims | "Speaker S says X improves sleep." | "Speaker S read a sponsor's script saying X improves sleep." | Occurrence with `UTTERED_BY` S and the assertion `ASSERTED_BY` S. | Occurrence with `UTTERED_BY` S, assertion `ASSERTED_BY` the sponsor, an attribution mode of "read aloud", and no `RECOMMENDS` edge from S. | Transcript span with surrounding segment, sponsor disclosure. |
+| 9 | Claims | "Speaker S says X improves sleep." | "Speaker S read a sponsor's script saying X improves sleep." | `ClaimOccurrence` `ASSERTED_BY` S with `assertionBasis` PERSONAL_EXPERIENCE or EXPERT_OPINION and `speechAct` STATES. | `ClaimOccurrence` `ASSERTED_BY` S (one asserter, KCR-4.3) with `assertionBasis` MANUFACTURER_CLAIM, `segmentKind` SPONSOR_READ, located in an `EpisodeSegment` of type SPONSOR_READ, a `SPONSORS_CONTENT` assertion by the sponsor, and no `RECOMMENDS` edge from S. (Restated at integration: the original delta gave the occurrence two asserters.) | Transcript span with surrounding segment, sponsor disclosure. |
 | 10 | Mechanisms | "Compound C raised NAD+ in mouse liver at 400 mg/kg." | "Product X raises NAD+." | Assertion with subject `ChemicalSubstance` C, qualifiers species, tissue, dose, and a result status "measured". | Assertion with subject `ProductVariant` X and no species or tissue. It is not entailed by A; the link between them is an `EvidenceApplicability` with identity `UNKNOWN`. | Paper methods and results with locator; label for X. |
 | 11 | Diagnostics | "Ferritin 45 ng/mL by assay A." | "Ferritin 45 ng/mL by assay B." | `MeasuredResult` `PRODUCED_RESULT` by an execution using method A. | Same number, execution using method B. No equivalence edge; a comparability assessment has dimension `UNKNOWN` until one is made. | Method identifiers (for example LOINC method part), reference intervals, manufacturer calibration statements. |
 | 12 | Regulatory | "Establishment registered and device listed with FDA." | "Device cleared by FDA." | `RegulatorySubmission` kind registration and listing, no `RegulatoryResponse` of kind clearance. | A clearance record with a number, a decision date and the cleared indication. | FDA registration database note and 21 CFR 807.39 for A ([SRC-FDA-807-39]); a clearance decision record for B. |

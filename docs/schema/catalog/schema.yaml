@@ -64,9 +64,57 @@ conventions:
     EpisodeSegment: episode-segment
     Channel: channel
     Series: series
+    # tokens used by the 0.2.0 fixtures (round files) and registered here so INV-106 can be checked; the key is the
+    # token itself where the fixture label is a lower-case alias of the catalog label (for example reg-status,
+    # study-arm, lab-test). Production ingestion uses the registered token for the node's primary label.
+    algorithm: algorithm
+    anatomical-context: anatomical-context
+    biomarker: biomarker
+    capability: capability
+    chemical-form: chemical-form
+    comparability: comparability
+    constraint: constraint
+    dataset: dataset
+    endpoint-classification: endpoint-classification
+    functional-goal: functional-goal
+    instrument: instrument
+    intervention-component: intervention-component
+    lab-test: lab-test
+    label-declaration: label-declaration
+    listing: listing
+    mech-context: mech-context
+    mechanism: mechanism
+    method: method
+    metric: metric
+    molecular-entity: molecular-entity
+    offer: offer
+    outcome: outcome
+    policy: policy
+    policy-version: policy-version
+    price-obs: price-obs
+    protocol-rule: protocol-rule
+    protocol-step: protocol-step
+    reference-system: reference-system
+    reg-pathway: reg-pathway
+    reg-response: reg-response
+    reg-status: reg-status
+    reg-submission: reg-submission
+    registration-version: registration-version
+    rel: rel
+    result: result
+    ri-version: ri-version
+    species: species
+    specimen-type: specimen-type
+    study-arm: study-arm
+    study-intervention: study-intervention
+    study-result: study-result
+    synthesis: synthesis
+    trade-id: trade-id
+    trial-registration: trial-registration
+    use-profile: use-profile
   liveSeamTypes:
     # Live GraphQL types referenced by relationships here but owned by no module yet (kept unchanged as seams).
-    [ToolOrInstrument, ReferenceRange, Device, Sensor, Modality, Conference, Event, Community, NarrativeArc, MediaAsset, MediaVariant, MediaAnnotation, MediaSource, GraphView, FigurePanel, ProductLabelRegion, Procedure, Treatment, FoodItem, Ingredient, FoodProduct, Exposure, Lifestyle, AdverseEffect, SafetySignal, RiskFactor, TechnologyPlatform, Material, CohortParticipant, ExperienceReport, Association]
+    [ToolOrInstrument, ReferenceRange, Listing, ListingSnapshot, OrganizationSnapshot, ProductSnapshot, Device, Sensor, Modality, Conference, Event, Community, NarrativeArc, MediaAsset, MediaVariant, MediaAnnotation, MediaSource, GraphView, FigurePanel, ProductLabelRegion, Procedure, Treatment, FoodItem, Ingredient, FoodProduct, Exposure, Lifestyle, AdverseEffect, SafetySignal, RiskFactor, TechnologyPlatform, Material, CohortParticipant, ExperienceReport, Association]
   liveIdProjection:
     # round 0009 seam: the live GraphQL `id: ID! @id` is the opaque segment of uid; uid is stored as its own property.
     rule: "live id = opaque segment of uid (text after the second colon); uid is stored beside id"
@@ -86,11 +134,18 @@ conventions:
     truth and support live on Adjudication.verdict (adjudicationKind SUPPORT) and on EvidenceAssessments. The
     stored status is a current projection of CAPTURE_FIDELITY adjudications and SUPERSEDES records; the
     historical status as of a recorded date is derived from those records, not from the stored field
-    (rounds 0006 and 0007).
+    (rounds 0006 and 0007). DISPUTED means reviewers disagree about the capture or attribution (what was said, by
+    whom, where); disagreement about whether the proposition is true is a SUPPORT adjudication with verdict
+    CONTRADICTED or PARTIALLY_SUPPORTED and never changes status.
   adjudicationKind: [CAPTURE_FIDELITY, SUPPORT]      # round 0006 and 0007 reconciliation (integration ruling)
   adjudicationVerdict: [SUPPORTED, PARTIALLY_SUPPORTED, CONTRADICTED, INSUFFICIENT, NOT_APPLICABLE]
   reviewerType: [HUMAN, AGENT, POLICY, MIGRATION]      # round 0007
   privacyClass: [public, internal, private-personal]  # round 0008; "synthetic" is fixtureProvenance, not a privacy class
+  privateRecordMarker: >
+    In production, private-personal records live in the private context store and never in the shared graph; a
+    private record is recognised by its uid prefix hu:private- and privacyClass private-personal. A single-file
+    fixture that models both stores additionally labels its private nodes :PrivateRecord so that the leak checks
+    (V-113 to V-116, V-520, V-521) can be exercised; that label is a fixture device, not a production label.
   privacyRule: >
     private-personal elements exist only in the private context store; internal elements live in the shared
     graph but are excluded from public projections; every node type and property declares a class
@@ -133,6 +188,8 @@ conventions:
       oneOf:
         - [projectionOfAssertionUid]                   # 1:1 projection of one asserted edge; cited predicate equals the edge type
         - [derivationRule, derivedFromAssertionUids]   # multi-hop derivation such as CONTAINS (round 0009 K-2)
+        - [derivationRule, derivedFromAssessmentUids]  # derivation licensed by an assessment, such as COMPARED_TO by a ComparabilityAssessment
+        - [derivationRule]                             # rule-only derivation, allowed only for relationship types whose catalog entry says ruleOnly: true (INSTANCE_OF matching rules)
       rule: the cited predicate is never the premise of a forbidden implication for the edge type
   predicateExclusivity:      # round 0009 K-6 and round 0007 TM-R5 (CQ-TM-05)
     HAS_FORMULATION_VERSION: {mode: EXCLUSIVE, scope: subject, partitionBy: [jurisdiction]}
@@ -149,8 +206,13 @@ conventions:
     LISTS_OFFER: {mode: NONEXCLUSIVE}
     default: NONEXCLUSIVE
   sourceKind: [PEER_REVIEWED_PUBLICATION, PREPRINT, CORRECTION_NOTICE, RETRACTION_NOTICE, EXPRESSION_OF_CONCERN, REGULATORY_RECORD, REGULATORY_GUIDANCE, SECURITIES_FILING, PRESS_RELEASE, MARKETING_PAGE, MANUFACTURER_LABEL_PAGE, ORGANIZATION_WEBPAGE, SELF_DISCLOSURE_PAGE, THIRD_PARTY_PROFILE_PAGE, THIRD_PARTY_DIRECTORY, CERTIFICATION_LISTING, AUDIT_REPORT, MARKETPLACE_LISTING, TERMINOLOGY_RECORD, STANDARDS_DOCUMENT, PODCAST_TRANSCRIPT_PAGE, VIDEO_RENDITION, AUDIO_FEED_ITEM, PODCAST_DIRECTORY_RECORD, NEWSLETTER, MODEL_SERVICE, LEGAL_RECORD]
-  selectorKind: [TEXT_QUOTE, TEXT_POSITION, MEDIA_TIME, PDF_PAGE, IMAGE_REGION]
-  contentHashBasis: [RAW_BYTES, NORMALIZED_TEXT, STORED_EXCERPT_TEXT]
+  selectorKind: [TEXT_QUOTE, TEXT_POSITION, MEDIA_TIME, PDF_PAGE, IMAGE_REGION, SECTION, WHOLE_SNAPSHOT]
+  # SECTION and WHOLE_SNAPSHOT are coarse locators (a named panel or section, or the whole captured record such as a
+  # registry entry). They are reproducible to the snapshot hash, not to a span, and V-401b reports assertions that
+  # rest on them alone. A 0.1.0 locator with only `section` migrates to SECTION.
+  contentHashBasis: [RAW_BYTES, NORMALIZED_TEXT, STORED_EXCERPT_TEXT, SYNTHETIC_FIXTURE]
+  # SYNTHETIC_FIXTURE: fixture-only basis. The value is either 'sha256:<hex>' over the snapshot uid or 'synthetic:<uid>' when the
+  # fixture builds snapshots from a list; it exists so reproducibility checks run on synthetic data and is never a production value.
   captureCompleteness: [COMPLETE, PARTIAL_EXCERPT, UNKNOWN]
   normalizationVersions:
     NFC-WS1: "Unicode NFC, every run of whitespace replaced by one U+0020, leading and trailing whitespace removed; sha256 over UTF-8; written 'sha256:<hex>'"
@@ -228,8 +290,10 @@ baseArchetypes:
     # Kernel changes accepted in 0.2.0: polarity (K-4), basisKind (KCR-3a, KCR-L3-001), recordedTo and contentHash
     # (KCR-0007-1), per-bound precision and basis (round 0007), assertionBasis and speechAct (KCR-4.2),
     # derivationRule for CALCULATED assertions. `confidence` is deprecated for new writes (INV-407).
-    required: [uid, predicate, status, recordedAt, contentHash, validFromBasis, validToBasis]
-    optional: [valueString, valueNumber, valueBoolean, unitCode, validFrom, validTo, validFromPrecision, validToPrecision, recordedTo, polarity, basisKind, predicateClass, assertionBasis, speechAct, reportedSpeechAct, quantityBasis, derivationRule, jurisdiction, extractionMethod, extractionConfidence, agentRunUid, roleTitleVerbatim, statedTense]
+    required: [uid, predicate, status, recordedAt]
+    requiredForNewWrites: [contentHash]   # service-enforced; absent on 0.1.0 and fixture records (V-514b reports)
+    requiredWhenBoundPresent: {validFrom: [validFromBasis, validFromPrecision], validTo: [validToBasis, validToPrecision]}   # INV-102; a null bound with no basis reads as UNKNOWN
+    optional: [valueString, valueNumber, valueBoolean, unitCode, validFrom, validTo, validFromBasis, validToBasis, validFromPrecision, validToPrecision, contentHash, recordedTo, polarity, basisKind, predicateClass, assertionBasis, speechAct, reportedSpeechAct, quantityBasis, derivationRule, jurisdiction, extractionMethod, extractionConfidence, agentRunUid, roleTitleVerbatim, statedTense, segmentKind]
     deprecated:
       confidence: "replaced by extractionConfidence, which requires WAS_GENERATED_BY an Activity with methodVersion; existing 0.1.0 values are read as extractionConfidence with unknown method"
       agentRunUid: "retained for 0.1.0 compatibility; new writes link WAS_GENERATED_BY an Activity"
@@ -260,7 +324,8 @@ modules:
         archetype: InformationArtifact
         description: Captured content from a Source at a known retrieval time, with a hash whose basis is named. Immutable; a change at the source is a new snapshot and a SourceRevisionEvent.
         properties: [canonicalUri, publishedAt, publishedAtPrecision, observedAt, retrievedAt, contentHash, contentHashBasis, captureCompleteness, storageUri, archiveUri, publisherRevisionNotice, mimeType, language]
-        requiredWhenCited: [contentHash, contentHashBasis, retrievedAt]   # round 0009 and 0006: reproducibility of an ACCEPTED assertion's support
+        requiredWhenCited: [contentHash, retrievedAt]   # round 0009 and 0006: reproducibility of an ACCEPTED assertion's support (V-111)
+        requiredForNewCaptures: [contentHashBasis, captureCompleteness]   # service-enforced; V-111b reports absence
         timeFields: {retrievedAt: when BellLabs fetched the bytes, observedAt: the instant the content is known to have been displayed (archive capture date for late sources), publishedAt: issue time stated by the source}
       SourceLocator:
         archetype: InformationArtifact
@@ -272,6 +337,8 @@ modules:
           MEDIA_TIME: [exact, quoteHash, normalizationVersion, mediaStartSeconds, mediaEndSeconds]
           PDF_PAGE: [page, exact, quoteHash, normalizationVersion]
           IMAGE_REGION: [mediaAnnotationUid, normalizationVersion]
+          SECTION: [section]
+          WHOLE_SNAPSHOT: []
         deprecated: {selector: "untyped; split into the fields above"}
       DocumentTextVersion:
         archetype: InformationArtifact
@@ -284,7 +351,8 @@ modules:
       Adjudication:
         archetype: EvidenceAssessment
         description: Immutable BellLabs evaluation of one or more assertions. adjudicationKind CAPTURE_FIDELITY judges whether the record is an accurate capture (feeds Assertion.status); SUPPORT judges whether evidence supports the proposition (verdict). A re-review is a new Adjudication linked by SUPERSEDES.
-        properties: [adjudicationKind, verdict, rationale, reviewerType, reviewedAt, recordedAt]
+        properties: [adjudicationKind, verdict, rationale, reviewerType, reviewedAt, recordedAt, humanReviewPending]
+        verdictSemantics: {CAPTURE_FIDELITY: "SUPPORTED = the record accurately captures what the asserter said in the cited span; CONTRADICTED = it does not; PARTIALLY_SUPPORTED = partly", SUPPORT: "verdict about the proposition's support by evidence"}
       ResolutionHypothesis:
         archetype: EvidenceAssessment
         description: Scored candidate identity, equivalence, or retelling-source resolution that may compete with alternatives.
@@ -307,8 +375,8 @@ modules:
       RENDITION_OF: {from: Source, to: "Episode|Publication", class: structural}
       HAS_SUBJECT: {from: Assertion, to: "Entity|VersionedState|Occurrence|InformationArtifact", class: structural, cardinality: exactly_one}
       HAS_OBJECT: {from: Assertion, to: "Entity|VersionedState|Occurrence|InformationArtifact", class: structural, cardinality: zero_or_one}
-      SUPPORTED_BY: {from: "Assertion|Adjudication|EvidenceAssessment", to: SourceLocator, class: asserted}
-      CONTRADICTED_BY: {from: "Assertion|Adjudication", to: SourceLocator, class: asserted}
+      SUPPORTED_BY: {from: "Assertion|Adjudication|EvidenceAssessment", to: SourceLocator, class: structural, note: part of the shape of the assertion record itself (reclassed from asserted in 0.2.0 after review; an edge from an assertion to its own support needs no second assertion)}
+      CONTRADICTED_BY: {from: "Assertion|Adjudication", to: SourceLocator, class: structural}
       ASSERTED_BY: {from: Assertion, to: "Person|Organization|Agent|PseudonymousActor|AnonymousActor", class: structural, cardinality: at_most_one, note: exactly_one for ClaimOccurrence}
       EVALUATES: {from: Adjudication, to: Assertion, class: structural}
       CONSIDERS_ASSESSMENT: {from: Adjudication, to: EvidenceAssessment, class: structural}
@@ -425,7 +493,7 @@ modules:
       - FULFILLS_OFFER
       - HOSTS_LISTING
       - SELLER_OF_RECORD_FOR
-      - RECOMMENDS_PRODUCT                 # a source's recommendation; never a BellLabs recommendation
+      - RECOMMENDS                         # a source's recommendation (live Person-[:RECOMMENDS]-> edge name kept); never a BellLabs recommendation. 0.1.0 name RECOMMENDS_PRODUCT retired.
       - AFFILIATE_FOR_OFFER
       - SPONSORS_CONTENT                   # round 0006: Organization|ConsumerBrand -> Episode|Series|Channel|Document|Conference
       - INVESTED_IN
@@ -455,7 +523,7 @@ modules:
       - [AUTHOR_AFFILIATED_WITH, FUNDS_STUDY]
       - [PROVIDES_INVESTIGATIONAL_PRODUCT, SUPPLIES_INGREDIENT_MATERIAL]
       - [SUPPLIES_INGREDIENT_MATERIAL, MANUFACTURES_PRODUCT]
-      - [RECOMMENDS_PRODUCT, BELLLABS_RECOMMENDS]
+      - [RECOMMENDS, BELLLABS_RECOMMENDS]
 
   products_and_commerce:
     maturity: provisional
@@ -610,7 +678,7 @@ modules:
       HAS_ANALYZED_COHORT: {from: StudyResult, to: StudyPopulation, class: structural}
       DEFINES_OUTCOME: {from: Study, to: OutcomeDefinition, class: structural}
       DEFINED_IN: {from: OutcomeDefinition, to: "RegistrationVersion|ProtocolVersion|Publication", class: structural}
-      MEASURES_BIOMARKER: {from: OutcomeDefinition, to: Biomarker, class: asserted}
+      MEASURES_BIOMARKER: {from: OutcomeDefinition, to: Biomarker, class: structural, note: payload of the outcome definition (what it measures)}
       RESULT_FOR: {from: StudyResult, to: OutcomeDefinition, class: structural}
       RESULT_FOR_ARM: {from: StudyResult, to: StudyArm, class: structural, qualifiers: [armRole]}
       REPORTS_ON: {from: Publication, to: Study, class: asserted}
@@ -620,6 +688,7 @@ modules:
       RETRACTS: {from: Publication, to: Publication, class: asserted}
       HAS_EVIDENCE_TARGET: {from: EvidenceApplicability, to: "StudyIntervention|Assertion", class: structural, cardinality: exactly_one}
       ASSESSES_APPLICABILITY_TO: {from: EvidenceApplicability, to: "Product|ProductVariant|FormulationVersion|ProductLot|IngredientMaterial|UseContextProfile", class: structural, cardinality: exactly_one, note: UserContext removed from the range in 0.2.0 (round 0008); a shared assessment never points at a private record}
+      FOR_USE_CONTEXT: {from: EvidenceApplicability, to: UseContextProfile, class: structural, cardinality: zero_or_one, note: the non-personal use profile an assessment assumes, separate from its single use target}
       BASED_ON_EVIDENCE: {from: EvidenceApplicability, to: "Study|StudyResult|Publication|Assertion", class: structural}
       HAS_DIMENSION: {from: EvidenceApplicability, to: ApplicabilityDimension, class: structural, cardinality: one_per_dimension}
       CONSIDERS: {from: ApplicabilityDimension, to: Assertion, class: structural}
@@ -650,7 +719,7 @@ modules:
   mechanisms:
     maturity: candidate
     privacyClass: public
-    dependencies: [kernel, provenance, substances_and_materials, studies_and_evidence]
+    dependencies: [kernel, provenance, substances_and_materials, studies_and_evidence, diagnostics]
     nodes:
       MechanismEvidenceContext: {archetype: Occurrence, properties: [setting, modelDescriptor, sexScope, ageDescriptor, sampleSize, exposureAmount, exposureUnit, exposureBasis, route, exposureDurationIso, exposureStatus], derivedProperties: [hedValue, hedMethod]}
       Mechanism: {archetype: Entity, properties: [name, mechanismKind], note: live type kept as reference}
@@ -709,22 +778,24 @@ modules:
       ComparabilityAssessment: {archetype: EvidenceAssessment, properties: [verdict, measurandMatch, unitConversionRule, traceabilityMatch, interferenceProfileMatch, referenceIntervalMatch, replicateNoiseBasis, rationale]}
       DiagnosticResult: {archetype: InformationArtifact, interfaceOnly: true, properties: [resultKind, valueNumber, valueString, unitCode, valueStatus, observedAt, reportedAt, privacyClass], note: a contract any result store must meet; PersonalMeasurement (private store) implements it for people, Observation (protocols) for public source-attributed results}
     relationships:
-      QUANTIFIES: {from: Metric, to: Biomarker, class: asserted}
+      QUANTIFIES: {from: Metric, to: Biomarker, class: structural, note: definitional (a LOINC component names the measured biomarker)}
       MEASURES_METRIC: {from: LabTest, to: Metric, class: asserted}
       PERFORMED_WITH_ASSAY_VERSION: {from: LabTest, to: AssayVersion, class: asserted, temporalProfile: asserted_edge}
-      ASSAY_FOR_METRIC: {from: AssayVersion, to: Metric, class: asserted}
-      ASSAY_OPERATED_BY: {from: AssayVersion, to: Organization, class: asserted, cardinality: exactly_one}
-      USES_METHOD: {from: AssayVersion, to: MeasurementMethod, class: asserted, cardinality: zero_or_one}
-      RUNS_ON_INSTRUMENT: {from: AssayVersion, to: ToolOrInstrument, class: asserted, cardinality: zero_or_one}
-      ACCEPTS_SPECIMEN_TYPE: {from: AssayVersion, to: Specimen, class: asserted}
-      CALIBRATION_TRACEABLE_TO: {from: AssayVersion, to: ReferenceSystem, class: asserted}
-      VERSION_OF_ALGORITHM: {from: AlgorithmVersion, to: Algorithm, class: asserted}
+      ASSAY_FOR_METRIC: {from: AssayVersion, to: Metric, class: structural}
+      # The six edges below define the AssayVersion state's payload (lab, method, instrument, specimen, metric, traceability) and
+      # are structural; the asserted fact is PERFORMED_WITH_ASSAY_VERSION, which says which lab test ran with that version and when.
+      ASSAY_OPERATED_BY: {from: AssayVersion, to: Organization, class: structural, cardinality: exactly_one}
+      USES_METHOD: {from: AssayVersion, to: MeasurementMethod, class: structural, cardinality: zero_or_one}
+      RUNS_ON_INSTRUMENT: {from: AssayVersion, to: ToolOrInstrument, class: structural, cardinality: zero_or_one}
+      ACCEPTS_SPECIMEN_TYPE: {from: AssayVersion, to: Specimen, class: structural}
+      CALIBRATION_TRACEABLE_TO: {from: AssayVersion, to: ReferenceSystem, class: structural}
+      VERSION_OF_ALGORITHM: {from: AlgorithmVersion, to: Algorithm, class: structural}
       DERIVED_FROM_ALGORITHM_VERSION: {from: AlgorithmVersion, to: AlgorithmVersion, class: asserted}
       REQUIRES_INPUT_METRIC: {from: AlgorithmVersion, to: Metric, class: asserted}
       COMPATIBLE_WITH_ASSAY_VERSION: {from: AlgorithmVersion, to: AssayVersion, class: asserted}
-      OUTPUTS_METRIC: {from: AlgorithmVersion, to: Metric, class: asserted}
-      FOR_ASSAY_VERSION: {from: ReferenceIntervalVersion, to: AssayVersion, class: asserted, cardinality: exactly_one}
-      FOR_METRIC: {from: ReferenceIntervalVersion, to: Metric, class: asserted}
+      OUTPUTS_METRIC: {from: AlgorithmVersion, to: Metric, class: structural}
+      FOR_ASSAY_VERSION: {from: ReferenceIntervalVersion, to: AssayVersion, class: structural, cardinality: exactly_one}
+      FOR_METRIC: {from: ReferenceIntervalVersion, to: Metric, class: structural}
       COMPARES: {from: ComparabilityAssessment, to: "AssayVersion|AlgorithmVersion|ReferenceIntervalVersion", class: structural, cardinality: exactly_two}
       INCLUDES_LABTEST: {from: PanelDefinition, to: LabTest, class: structural}
       PRODUCED_BY_ASSAY_VERSION: {from: DiagnosticResult, to: AssayVersion, class: structural}
@@ -871,7 +942,7 @@ modules:
       QUALIFIED_BY: {from: Assertion, to: Assertion, class: structural, requiredProperties: [qualificationKind], note: the qualifier is itself an occurrence in the same container with its own locator}
       RETELLS: {from: Assertion, to: Assertion, class: structural, requiredProperties: [retellingMode, linkBasis], conditionalProperties: {BELLLABS_MATCH: hypothesisUid, EXPLICIT_CITATION: citationLocatorUid}, alignment: "prov:wasDerivedFrom; VERBATIM_QUOTE = prov:wasQuotedFrom"}
       ATTRIBUTES_TO: {from: Assertion, to: "Person|Organization|PseudonymousActor|AnonymousActor", class: structural, note: the party a retelling credits; never the asserter of the retelling}
-      INSTANCE_OF: {from: Assertion, to: Claim, class: derived, oneOf: [derivationRule, hypothesisUid]}
+      INSTANCE_OF: {from: Assertion, to: Claim, class: derived, ruleOnly: true, oneOf: [derivationRule, hypothesisUid]}
       ASSESSES_CLAIM_EVIDENCE: {from: ClaimEvidenceAssessment, to: Claim, class: structural, cardinality: exactly_one}
       CLAIM_EVIDENCE_BASED_ON: {from: ClaimEvidenceAssessment, to: "Assertion|Study|StudyResult|Publication", class: structural}
       ASSESSES_RETELLING: {from: RetellingFidelityAssessment, to: Assertion, class: structural, cardinality: exactly_one}
@@ -948,6 +1019,7 @@ modules:
 
   recommendation_decisions:
     maturity: provisional
+    privacyClass: private-personal   # except PolicyVersion and DecisionCriterion, which are internal
     placement: private_context_store   # round 0008; PolicyVersion and DecisionCriterion are internal and live in the shared graph
     nodes:
       RecommendationRequest: {archetype: Occurrence, privacyClass: private-personal, properties: [requestedAt, goalVersionUids, intendedUse]}
@@ -971,7 +1043,6 @@ modules:
       decisionOutcome: [RECOMMENDED_ONE, RECOMMENDED_SEVERAL, RECOMMENDED_NONE, BLOCKED_BY_CONSTRAINT, INSUFFICIENT_EVIDENCE]
       userDecisionKind: [CHOSE, DECLINED, DEFERRED]
     forbiddenImplications:
-      - [RECOMMENDS, BELLLABS_RECOMMENDS]
       - [SELECTED_IN_SNAPSHOT, USER_CHOSE]
       - [RECOMMENDED_FOR, ANY]    # Product RECOMMENDED_FOR Goal is forbidden as a relationship type
 
@@ -979,7 +1050,7 @@ modules:
     maturity: provisional
     privacyClass: private-personal
     placement: private_context_store   # round 0008: transactional store (PostgreSQL recommended) is the system of record; zero private nodes in the shared graph
-    dependencies: [kernel, temporal, recommendation_decisions, protocols, diagnostics]
+    dependencies: [kernel, temporal, protocols, diagnostics]   # recommendation_decisions depends on this module, not the reverse
     nodes:
       UserContext: {archetype: Entity, properties: [], note: uid only; no name, email, or account id}
       UserContextVersion: {archetype: VersionedState, properties: [goalVersionUids, measurementUids, declaredConditionUids, declaredIntakeUids, preferenceKeys, payloadHash]}
@@ -1031,6 +1102,18 @@ modules:
       - [PERSONAL_MEASUREMENT_OUTSIDE_REFERENCE_RANGE, CONDITION_PRESENT]
       - [PERSONAL_MEASUREMENT, OBSERVATION]
 
+  media:
+    maturity: future
+    privacyClass: public
+    owns: [MediaAsset, MediaVariant, MediaAnnotation, MediaSource, GraphView, FigurePanel, ProductLabelRegion]
+    note: live media types kept as seams; MediaAnnotation may act as an IMAGE_REGION locator (round 0006); no round has opened media semantics
+
+  events_and_narrative:
+    maturity: future
+    privacyClass: public
+    owns: [Community, Conference, Event, NarrativeArc]
+    note: live types kept as seams; SPONSORS_CONTENT may target Conference
+
   access_and_answers:
     maturity: candidate
     privacyClass: internal
@@ -1065,7 +1148,7 @@ globalInvariants:
   - id: INV-001
     rule: Every committed node has exactly one globally stable uid and exactly one base archetype label.
   - id: INV-002
-    rule: Every ACCEPTED source-derived assertion has at least one reproducible SourceLocator (snapshot with contentHash, contentHashBasis, retrievedAt; selector fields complete for its selectorKind).
+    rule: Every ACCEPTED source-derived assertion has at least one reproducible SourceLocator (bound to a snapshot with contentHash and retrievedAt; selector fields complete for its selectorKind; coarse kinds SECTION and WHOLE_SNAPSHOT are allowed and reported by V-401b).
   - id: INV-003
     rule: An Assertion has exactly one subject and either one object or one typed literal value, and at most one asserter.
   - id: INV-004
@@ -1193,4 +1276,4 @@ migration:
   additiveChanges:
     - new modules temporal, identity_resolution (Identifier, Mention, EquivalenceAssessment), mechanisms, diagnostics (candidate), manufacturing_readiness (candidate), claims_and_documents, protocols, private_context, access_and_answers (candidate)
     - new kernel nodes Activity, SourceRevisionEvent; new kernel relationships SUPERSEDES, DERIVED_FROM_ASSERTION, WAS_GENERATED_BY, USED, WAS_ASSOCIATED_WITH, AUTHORIZED_BY
-  previouslyCommittedAssertions: remain interpretable; no 0.1.0 assertion is deleted or rewritten; the Elysium fixture (../examples/elysium-basis.cypher) still validates under V-0xx and is the 0.1.0 compatibility fixture
+  previouslyCommittedAssertions: remain interpretable; no 0.1.0 assertion is deleted or rewritten. The Elysium fixture (../examples/elysium-basis.cypher) was upgraded in place (snapshot hash, selector kind, projected USES_MATERIAL edges, capture-fidelity policy adjudication) and passes the full 0.2.0 suite; it remains the 0.1.0 compatibility fixture

@@ -158,7 +158,7 @@ Human-equivalent dose is never stored as asserted. If computed, it is a derived 
 - Accepted semantic rule: a mechanism step is answerable as measured only through a `DIRECT_MEASUREMENT` assertion with a context naming species, compartment, material, and exposure; product applicability of a mechanism needs an `EXPOSURE` dimension backed by human exposure evidence for the target's material and form.
 - Rejected alternatives: A (qualifiers on Assertion), B (VersionedState), C (preclinical experiments as Study), D (species on the mechanism concept); E deferred.
 - Residual uncertainty: mouse doses for Zhang 2016 and Ryu 2016 not extracted; whether muscle NAD+ itself rose in Elhassan not verified; retraction notice id for PMID 18789672 not retrieved; measurand behind "+39% mitochondrial renewal" unresolved.
-- Required catalog/schema changes: `lanes/lane2/catalog-patch.yaml` module `mechanisms`.
+- Required catalog/schema changes: `../catalog/schema.yaml` (0.2.0; the lane's catalog-patch fragment was merged there) module `mechanisms`.
 - Required ingestion changes: extractors label every mechanism proposition with `basisKind` and emit one context per exposure group; plasma and tissue measurands are never merged.
 - Required retrieval/API/MCP changes: mechanism answers list steps with status per setting (the table shape above) and always state the compartment.
 - Changelog and migration references: coordinator, 0.2.0.

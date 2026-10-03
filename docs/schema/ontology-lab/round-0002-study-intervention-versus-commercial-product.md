@@ -241,10 +241,10 @@ What the registry can and cannot establish (CQ-ST-08): it can establish register
 ## Decision
 
 - Outcome: recommend `ACCEPTED` for R1 to R12; `DEFERRED` for dose/duration ratio bands and composite scoring calibration.
-- Accepted semantic rules: R1 to R12 above; forbidden implications FI-201 to FI-207 in `catalog-patch.yaml`.
+- Accepted semantic rules: R1 to R12 above; forbidden implications FI-201 to FI-207 in `../catalog/schema.yaml` (0.2.0; merged from the lane's catalog-patch fragment).
 - Rejected alternatives: (a) direct `Study -EVALUATES-> Product` with a match-quality property (fails C2-01); (b) flat dimension properties only (fails C2-02); (c) surrogate status as a `Biomarker` property (fails C2-07); (d) `Study.pmid` and `Study.hasResults` as identity-node facts (fail C2-05 and the article-plus-correction case).
 - Residual uncertainty: trial-time NR supplier for NCT02678611; mass basis of "NR" doses in the Basis and Conze papers; registry history; MCID sources for ATLAS and ENERGIZE outcomes.
-- Required catalog/schema changes: `lanes/lane2/catalog-patch.yaml`.
+- Required catalog/schema changes: `../catalog/schema.yaml` (0.2.0; the lane's catalog-patch fragment was merged there).
 - Required ingestion changes: extract per-arm components with `massBasis`; extract outcome priority per source; extract AE tables with collection method; never write `EVALUATES` to a current product.
 - Required retrieval/API/MCP changes: applicability answers must list dimensions with `UNKNOWN` and their `missingFacts`; result answers must carry `analysisKind` and `comparisonKind`.
 - Changelog and migration references: coordinator to record under 0.2.0.

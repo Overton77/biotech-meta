@@ -1,6 +1,6 @@
 # Schema Changelog
 
-## 0.2.0 — 2026-10-03
+## 0.2.0 (2026-10-03)
 
 Provisional semantic contract integrating ontology-lab rounds 0002 to 0009. The live Neo4j GraphQL schema is unchanged; its alignment is recorded per type in `ontology-lab/live-schema-alignment.md` and as an additive projection in `neo4j/proposed-delta.graphql`. The integration record is `ontology-lab/proposal-index.md`.
 
@@ -25,8 +25,8 @@ Provisional semantic contract integrating ontology-lab rounds 0002 to 0009. The 
 - Studies and evidence: `ApplicabilityDimension` (categorical, continuous, explanation-only), `materialIdentityLevel`, `EndpointClassification` (BEST categories, surrogate validation level, context of use), `AdverseEventResult` with collection method, `analysisKind`, `comparisonKind`, `statisticalConclusion`, versioned `EvidenceSynthesis` with `TRIGGERED_BY`, `Dataset` reuse, `Publication.publicationKind`, `CORRECTS`, `RETRACTS`, `PROVIDES_INVESTIGATIONAL_PRODUCT`.
 - Labels and formulation: `amountReferent` on `QuantityDeclaration` and `IngredientComponent`; `massBasis`; `FORM_OF_SUBSTANCE`; `HAS_ACTIVE_MOIETY`.
 - Commerce: `PriceObservation.priceKind`, `AffiliateLink`, `SELLER_OF_RECORD_FOR`, `HOSTS_LISTING`.
-- Conventions: uid type tokens, live id projection seam, `privacyClass`, private uid prefix, `sourceKind`, predicate exclusivity, validation query families V-1xx to V-5xx (166 numbered queries in total), 42 new constraints and indexes (59 in total; Enterprise-only ones marked).
-- Forbidden implications: 65 new (73 in total), each cited to a source and a failing case in its round.
+- Conventions: uid type tokens, live id projection seam, `privacyClass`, private uid prefix, `sourceKind`, predicate exclusivity, validation query families V-1xx to V-5xx (174 numbered queries in total, including the review-driven V-111b, V-123, V-124, V-326c, V-336, V-401b, V-514b), 41 new constraints and indexes (58 in total; Enterprise-only ones marked).
+- Forbidden implications: 64 new (72 in total), each cited to a source and a failing case in its round.
 - Fixtures: `study-vs-product-mismatch.cypher`, `diagnostic-comparison.cypher`, `filing-vs-capability.cypher`, `claim-retelling-provenance.cypher`, `recommendation-snapshot.cypher`, each with intentionally absent edges and validation queries that return rows when a collapse is reintroduced.
 - Ontology lab: 106 new competency questions with priority classes and traces, 34 new adversarial pairs, `query-shapes.md` (QS-1 to QS-8), `live-schema-alignment.md`, `proposal-index.md`, rounds 0002 to 0009.
 - Source registry 0.2.0: 117 claim-scoped entries added (127 total).
@@ -35,10 +35,11 @@ Provisional semantic contract integrating ontology-lab rounds 0002 to 0009. The 
 
 - `examples/elysium-basis.cypher` referenced Cypher variables across statement boundaries in eight statements, which would have created blank nodes on a real run; every statement now binds its nodes by uid before MERGE-ing relationships.
 - `neo4j/validation.cypher` header notes that V-000a and V-000b pass vacuously if deployed nodes carry no base-archetype label.
+- Adversarial review (Lane 6, 2026-10-03) found that the merged suite failed its own fixtures and that several guards were dead or bypassable. Fixed: the single `validTimeBasis` queries (V-105 to V-107) rewritten per bound; `SUPPORTED_BY` and `CONTRADICTED_BY` reclassed structural so V-101 can hold; V-110 made kind-aware (`adjudicationKind = CAPTURE_FIDELITY`); V-113 to V-116 rewritten on the private uid prefix instead of the removed `PrivateScope` label; V-007 and V-220 keyed on `assertionUid`; V-112 extended to derivation inputs and assessment-licensed derivations; V-326c and V-336 added to close the `SELLS_PRODUCT` derivation bypass and the unbacked `APPROVAL` status; V-123 and V-124 added as detectors for INV-406 and INV-007; V-506 and V-507 corrected; QS-3a rewritten to read `ApplicabilityDimension` nodes (it had reported every dimension NOT_ASSESSED on its own fixture); a conflicting index removed from `constraints.cypher`; `modules.yaml` ownership regenerated from the catalog (one owner per node, no dependency cycle); every fixture repaired (asserted edges now carry `assertionUid` and `recordedFrom`, missing assertions created, adjudication kinds and `recordedAt` added, SUPERSEDES edge for the diagnostic correction, uid formats fixed, synthetic snapshot hashes and selector kinds added, capture-fidelity policy adjudications recorded); property cards merged into `ontology-lab/property-cards.md`; conflicting question classifications aligned; round 0007's verdict-to-status table replaced with the reconciled rule.
 
 ### Verification status
 
-All Cypher in `examples/`, `neo4j/` and `ontology-lab/query-shapes.md` passed a syntax check with the Neo4j Cypher language-support parser and a per-statement variable-binding check. The GraphQL delta parses and extends the live schema (directives stripped) without name or field collisions. Nothing was executed against a Neo4j instance; every query is marked statically-checked or illustrative.
+All Cypher in `examples/`, `neo4j/` and `ontology-lab/query-shapes.md` passed a syntax check with the Neo4j Cypher language-support parser and a per-statement variable-binding check. The GraphQL delta parses and extends the live schema (directives stripped) without name or field collisions. On 2026-10-03 the constraints, the six fixtures and all 174 validation queries were **executed** on an embedded Neo4j 5.26 Community instance in the authoring scratchpad: every statement ran; the suite returned zero failing rows with each fixture loaded alone and with all six loaded together (informational queries V-111b, V-212, V-223, V-331, V-401b, V-514b and V-522 return rows by design); the 16 query-shape blocks ran under EXPLAIN, and QS-2b and QS-3a were run with results on their fixtures. Four reintroduced collapses (a `SELLS_PRODUCT` derivation from a `HOSTS_LISTING` input, an `APPROVAL` status with no approving response, a shared node linked to a private record, an `ENDORSES_PRODUCT` edge citing an advisory assertion) were each caught by at least one query. Not executed: the thirteen Enterprise-only constraints (property existence and type), which the Community edition rejects, and anything against the deployed database.
 
 ### Known provisional boundaries
 
@@ -48,7 +49,7 @@ All Cypher in `examples/`, `neo4j/` and `ontology-lab/query-shapes.md` passed a 
 - Deployed Neo4j edition and `@neo4j/graphql` behaviour for `extend type` and additional labels (OPEN-QUESTIONS, live stack).
 - Media, events and narrative, consumer devices, safety and constraints remain seams or candidates.
 
-## 0.1.0 — 2026-07-13
+## 0.1.0 (2026-07-13)
 
 First provisional schema-production release.
 

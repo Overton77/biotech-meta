@@ -194,7 +194,7 @@ This round labels that contract `DiagnosticResult` in the catalog patch as an in
   5. Outside a reference interval is not a condition.
 - Rejected alternatives: one `Test` node keyed by name (fails C1, C3); reference ranges on `Biomarker` (fails C7); treating `formulaExpression` on `Metric` as the algorithm (fails C3, no version); merging `Metric` and `Biomarker` (fails C10).
 - Residual uncertainty: how much assay detail labs and consumer test vendors actually publish (C2); whether a vendor-level `AlgorithmVersion` should be distinct from the published version when the vendor reimplements it (proposed yes: vendor implementation is its own `AlgorithmVersion` with `DERIVED_FROM_ALGORITHM_VERSION` to the publication); the definition of surrogate and intermediate endpoints (Lane 2).
-- Required catalog/schema changes: see `lanes/lane3/catalog-patch.yaml` (module `diagnostics`), `live-schema-decisions.md`, and validation V-301 to V-313.
+- Required catalog/schema changes: see `../catalog/schema.yaml` (0.2.0; the lane's catalog-patch fragment was merged there) (module `diagnostics`), `live-schema-decisions.md`, and validation V-301 to V-313.
 - Required ingestion changes: lab and vendor parsers capture local test code, LOINC (as `Identifier`), method principle, instrument model, software version, printed reference interval, and algorithm version text; unknowns are stored as `NOT_REPORTED`.
 - Required retrieval/API/MCP changes: trend endpoints must group by version and return assessments; a "biological age" answer must name the algorithm version or say it is unresolved.
 - Changelog and migration references: additive; live `ReferenceRange` and `MeasurementMetadata.referenceRangeText` retained as raw text projections.

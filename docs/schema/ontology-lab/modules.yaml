@@ -33,7 +33,7 @@ modules:
   provenance:
     maturity: accepted
     dependencies: [kernel]
-    owns: [Source, SourceSnapshot, SourceLocator, SourceRevisionEvent, DocumentTextVersion, Agent, Activity, Adjudication, ResolutionHypothesis, SUPERSEDES, DERIVED_FROM_ASSERTION, CORRECTS_SOURCE, RETRACTS_SOURCE, EXPRESSES_CONCERN_ABOUT, REINSTATES_SOURCE]
+    owns: [Source, SourceSnapshot, SourceLocator, DocumentTextVersion, SourceRevisionEvent, Adjudication, ResolutionHypothesis, Agent, Activity, SUPERSEDES, DERIVED_FROM_ASSERTION, CORRECTS_SOURCE, RETRACTS_SOURCE, EXPRESSES_CONCERN_ABOUT, REINSTATES_SOURCE]
     alignments: [W3C_PROV_O, W3C_Web_Annotation_selectors, Biolink_source_provenance, NLM_publication_types]
     sharedBy: [all]
     rounds: [0006, 0007, 0009]
@@ -68,13 +68,13 @@ modules:
   organizations:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, identity_resolution]
-    owns: [Organization, LegalEntity, ConsumerBrand, Person, PseudonymousActor, AnonymousActor, Facility, FINANCIAL_INTEREST_predicate_family]
+    owns: [Organization, LegalEntity, ConsumerBrand, Facility, Person, PseudonymousActor, AnonymousActor, FINANCIAL_INTEREST_predicate_family]
     rounds: [0006]
 
   substances_and_materials:
     maturity: provisional
     dependencies: [kernel, provenance, identity_resolution]
-    owns: [IngredientMaterial, BrandedIngredientMaterial, ChemicalSubstance, ChemicalForm, BotanicalTaxon, BotanicalPreparation, MicrobialTaxon, MicrobialStrain, MicrobialPreparation, MaterialMixture, Constituent, Nutrient, FORM_OF_SUBSTANCE, HAS_ACTIVE_MOIETY]
+    owns: [IngredientMaterial, BrandedIngredientMaterial, ChemicalSubstance, ChemicalForm, BotanicalTaxon, BotanicalPreparation, MicrobialTaxon, MicrobialStrain, MicrobialPreparation, MaterialMixture, Constituent, Nutrient, REALIZES_SUBSTANCE, HAS_CHEMICAL_FORM, FORM_OF_SUBSTANCE, HAS_ACTIVE_MOIETY, DERIVED_FROM_TAXON, HAS_STRAIN, STRAIN_OF, HAS_MIXTURE_COMPONENT, PROVIDES_CONSTITUENT, QUANTITATIVELY_CONTAINS]
     externalAuthorities: [ChEBI, FDA_GSRS_UNII, PubChem, NCBI_Taxonomy]
     liveSeams: [Compound -> ChemicalSubstance (catalog name wins), CompoundForm -> ChemicalForm + IngredientMaterial + dosageForm]
     rounds: [0002]
@@ -82,38 +82,38 @@ modules:
   products_and_formulations:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, identity_resolution, organizations, substances_and_materials]
-    owns: [Product, ProductVariant, FormulationVersion, IngredientComponent, PackageConfiguration, ManufacturingSpecification, SpecificationVersion, ManufacturingProcess, ManufacturingStep, Trademark, CONTAINS, CONTAINS_COMPOUND_FORM]
+    owns: [FormulationVersion, IngredientComponent, ManufacturingSpecification, SpecificationVersion, ManufacturingProcess, ManufacturingStep, Trademark, HAS_FORMULATION_VERSION, USES_MATERIAL, GOVERNED_BY_SPECIFICATION, PRODUCED_BY_PROCESS, MARKETED_UNDER_MARK, CONTAINS, CONTAINS_COMPOUND_FORM]
     rounds: [0001, 0002, 0005]
 
   labels:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, products_and_formulations, substances_and_materials]
-    owns: [LabelSnapshot, LabelDeclaration, ServingDefinition, QuantityDeclaration, amountReferent]
+    owns: [LabelSnapshot, LabelDeclaration, ServingDefinition, QuantityDeclaration, LABEL_FOR, DECLARES_FORMULATION, DECLARATION_IDENTIFIES_MATERIAL]
     rounds: [0005]
 
-  commerce:
+  products_and_commerce:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, organizations, products_and_formulations]
-    owns: [MerchantListing, Offer, PriceObservation, SubscriptionPlan, Bundle, BundleComponent, InventoryItem, IndividualUnit, AffiliateLink, CommerceMatch, HOSTS_LISTING, LISTS_OFFER, SELLER_OF_RECORD_FOR, FULFILLS_OFFER, SELLS_PRODUCT]
+    owns: [Product, ProductVariant, PackageConfiguration, MerchantListing, Offer, PriceObservation, SubscriptionPlan, Bundle, BundleComponent, InventoryItem, IndividualUnit, AffiliateLink, CommerceMatch, HAS_VARIANT, HAS_PACKAGE_CONFIGURATION, IDENTIFIED_BY, LISTING_FOR, USES_SUBSCRIPTION_PLAN, HOSTS_LISTING, LISTS_OFFER, SELLER_OF_RECORD_FOR, FULFILLS_OFFER, AFFILIATE_FOR_OFFER, COMPONENT_PRODUCT, INVENTORY_INSTANCE_OF, UNIT_FROM_LOT, SELLS_PRODUCT]
     rounds: [0005]
 
   studies_and_evidence:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, identity_resolution, substances_and_materials, products_and_formulations, diagnostics]
-    owns: [Study, TrialRegistration, RegistrationVersion, ProtocolVersion, StudyArm, StudyIntervention, InterventionComponent, StudyPopulation, OutcomeDefinition, StudyResult, AdverseEventResult, Publication, Dataset, EvidenceApplicability, ApplicabilityDimension, UseContextProfile, EndpointClassification, ResultInterpretation, EvidenceSynthesis, EvidenceStrengthAssessment]
+    owns: [Study, TrialRegistration, RegistrationVersion, ProtocolVersion, StudyArm, StudyIntervention, InterventionComponent, StudyPopulation, OutcomeDefinition, StudyResult, AdverseEventResult, Publication, Dataset, EvidenceApplicability, ApplicabilityDimension, UseContextProfile, EndpointClassification, ResultInterpretation, EvidenceSynthesis, EvidenceStrengthAssessment, REGISTERED_AS, ASSIGNS_INTERVENTION, USES_INTERVENTION_MATERIAL, REPORTS_ON, PRODUCED_DATASET, ANALYZES_DATASET, CORRECTS, RETRACTS]
     externalAuthorities: [ClinicalTrialsGov, PubMed, DOI, FDA_NIH_BEST_glossary, FDA_surrogate_endpoint_table]
     rounds: [0002]
 
   mechanisms:
     maturity: candidate
     dependencies: [kernel, provenance, substances_and_materials, studies_and_evidence, diagnostics]
-    owns: [MechanismEvidenceContext, Mechanism, Pathway, MolecularEntity, Species, AnatomicalContext, Organ, Outcome, Condition, MEASURED_IN_MATRIX, mechanism_predicates]
+    owns: [MechanismEvidenceContext, Mechanism, Pathway, MolecularEntity, Species, AnatomicalContext, Organ, Outcome, Condition, AFFECTS_MECHANISM, MODULATES, APPLIES_TO_SPECIES, INFLUENCES_OUTCOME]
     rounds: [0003]
 
   diagnostics:
     maturity: candidate   # promoted from future in round 0004
     dependencies: [kernel, provenance, temporal, identity_resolution, organizations]
-    owns: [Biomarker, Metric, LabTest, PanelDefinition, MeasurementMethod, Specimen, ReferenceSystem, AssayVersion, Algorithm, AlgorithmVersion, ReferenceIntervalVersion, ComparabilityAssessment, DiagnosticResult_contract]
+    owns: [Biomarker, Metric, LabTest, PanelDefinition, MeasurementMethod, Specimen, ReferenceSystem, AssayVersion, Algorithm, AlgorithmVersion, ReferenceIntervalVersion, ComparabilityAssessment, DiagnosticResult, MEASURES_METRIC, PERFORMED_WITH_ASSAY_VERSION, DERIVED_FROM_ALGORITHM_VERSION, REQUIRES_INPUT_METRIC, COMPATIBLE_WITH_ASSAY_VERSION, COMPARED_TO, HAS_REFERENCE_RANGE, SAME_TEST_AS]
     externalAuthorities: [LOINC, NGSP, IFCC, CLSI_EP28]
     liveSeams: [ReferenceRange -> projection of ReferenceIntervalVersion, Observation -> owned by protocols]
     rounds: [0004]
@@ -127,13 +127,13 @@ modules:
   quality:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, products_and_formulations, substances_and_materials, organizations]
-    owns: [ProductLot, TestSample, TestExecution, TestMethod, TestingLaboratory, MeasuredResult, SpecificationCriterion, PassFailInterpretation, LotTestSummary, CertificateOfAnalysis, CertificationProgram, CertificationListing, CertificationScope]
+    owns: [ProductLot, TestSample, TestExecution, TestMethod, TestingLaboratory, MeasuredResult, SpecificationCriterion, PassFailInterpretation, LotTestSummary, CertificateOfAnalysis, CertificationProgram, CertificationListing, CertificationScope, LOT_OF, MANUFACTURED_UNDER, SAMPLE_FROM, USED_METHOD, PERFORMED_BY_LAB, EVALUATED_AGAINST, SUMMARIZES_TESTING, CERTIFIES_RESULTS_FOR, COVERS, CERTIFIED_UNDER]
     rounds: [0005]
 
   regulatory_and_ip:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, identity_resolution, organizations, products_and_formulations, diagnostics]
-    owns: [PatentFamily, PatentApplication, GrantedPatent, PatentClaim, PatentLicense, RegulatoryAgency, RegulatoryPathway, RegulatoryStep, RegulatorySubmission, RegulatoryResponse, RegulatoryStatus, OrphanDesignation, DrugApproval]
+    owns: [PatentFamily, PatentApplication, GrantedPatent, PatentClaim, PatentLicense, RegulatoryAgency, RegulatoryPathway, RegulatoryStep, RegulatorySubmission, RegulatoryResponse, RegulatoryStatus, OrphanDesignation, DrugApproval, APPLICATION_GRANTED_AS, LICENSE_COVERS, SUBMITTED_BY, SUBMISSION_ABOUT, SUPERSEDES_SUBMISSION, STATUS_OF, DESIGNATION_FOR, APPROVAL_FOR]
     externalAuthorities: [FDA_eCFR_21, FDA_GRAS_notice_inventory, FDA_NDI_notifications, FDA_510k_DeNovo_PMA_databases]
     rounds: [0005]
 
@@ -146,7 +146,7 @@ modules:
   claims_and_documents:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, identity_resolution, organizations]
-    owns: [Document, Episode, EpisodeSegment, Channel, Series, Platform, Segmentation, Chunk, Claim, ClaimOccurrence, RelationshipAssertion, ClaimEvidenceAssessment, RetellingFidelityAssessment, ConflictRelevanceAssessment, RETELLS, QUALIFIED_BY, ATTRIBUTES_TO, INSTANCE_OF, RESOLVES_TO_CHUNK, assertionBasis, speechAct]
+    owns: [Document, Episode, EpisodeSegment, Channel, Series, Platform, Segmentation, Chunk, Claim, ClaimOccurrence, RelationshipAssertion, ClaimEvidenceAssessment, RetellingFidelityAssessment, ConflictRelevanceAssessment, APPEARS_IN, RESOLVES_TO_CHUNK, INSTANCE_OF, SUPPORTED_BY_CHUNK, assertionBasis, speechAct]
     liveSeams: [Document -> Source, ClaimOccurrence -> (:Assertion:ClaimOccurrence), UTTERED_BY -> ASSERTED_BY, SUPPORTED_BY->Chunk -> derived with locatorUid, mongoResearchRunId -> Activity.externalRunId]
     rounds: [0006]
 
@@ -165,7 +165,7 @@ modules:
   protocols:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, identity_resolution, substances_and_materials, products_and_formulations, diagnostics]
-    owns: [Protocol, ProtocolEdition, ProtocolStep, Constraint, MeasurementPlan, ProtocolAdjustmentRule, Target, FunctionalGoal, Observation, ProtocolResult]
+    owns: [Protocol, ProtocolEdition, ProtocolStep, Constraint, MeasurementPlan, ProtocolAdjustmentRule, Target, FunctionalGoal, Observation, ProtocolResult, HAS_PROTOCOL_EDITION, HAS_FUNCTIONAL_GOAL, FOR_PROTOCOL]
     note: Observation ownership decided in round 0008 (public, protocol-linked, source-attributed); private measurements are PersonalMeasurement
     rounds: [0008]
 
@@ -185,7 +185,7 @@ modules:
 
   private_context:
     maturity: provisional
-    dependencies: [kernel, temporal, recommendation_decisions, protocols, diagnostics]
+    dependencies: [kernel, temporal, protocols, diagnostics]   # recommendation_decisions depends on this module, not the reverse
     owns: [UserContext, UserContextVersion, UserGoal, UserGoalVersion, PersonalMeasurement, PersonalLabReport, ProtocolInUse, ProtocolAdoptionVersion, ProtocolDeviation, SharingGrant, DisclosureEvent, PendingItem, PurchaseEvent, PersonalApplicabilityAssessment, ErasureTombstone]
     placement: private_context_store
     rounds: [0008]
@@ -193,7 +193,7 @@ modules:
   access_and_answers:
     maturity: candidate
     dependencies: [kernel, provenance, temporal]
-    owns: [AnswerRecord, accessTier, traceDepth]
+    owns: [AnswerRecord]
     rounds: [0009]
 
 projectionRules:

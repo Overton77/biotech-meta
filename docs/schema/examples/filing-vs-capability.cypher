@@ -22,6 +22,9 @@
 //
 // Binding rule: every statement that creates a relationship MATCHes its endpoints by uid in the
 // same statement. No variable is reused across a ';' boundary.
+// Executed 2026-10-03 on an embedded Neo4j 5.26 Community instance (authoring scratchpad): every statement ran, and the full
+// 0.2.0 validation suite (../neo4j/validation.cypher) returned zero failing rows with this fixture loaded alone and with all six
+// fixtures loaded together. Expected informational rows are listed in ../ontology-lab/proposal-index.md section 9.
 
 // ---------------------------------------------------------------------------
 // Section 1: sources, snapshots, locators
@@ -57,67 +60,74 @@ SET s.canonicalUri = 'urn:synthetic:fda-food-facility-registration', s.title = '
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:sec-nage-10k-fy2025-2026-10-03'})
-SET sn.canonicalUri = 'https://www.sec.gov/Archives/edgar/data/1386570/000138657026000013/cdxc-20251231.htm', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://www.sec.gov/Archives/edgar/data/1386570/000138657026000013/cdxc-20251231.htm', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:4c61a047df2e5bc123e2b8ec3cffcdcf087d5d363da0750cca85e5d709d2880f', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:niagen-bioscience-home-2026-10-03'})
-SET sn.canonicalUri = 'https://www.niagenbioscience.com', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://www.niagenbioscience.com', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:83cb99415925f73b76c5de172810421fe77224019133d6b866a321dc3f34f53c', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:fda-grn-000635-response-2026-10-03'})
-SET sn.canonicalUri = 'https://www.fda.gov/food/gras-notice-inventory/agency-response-letter-gras-notice-no-grn-000635', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://www.fda.gov/food/gras-notice-inventory/agency-response-letter-gras-notice-no-grn-000635', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:c0e8f4a7e8ffe7bec25a38938fed789a28a8c2e908646998b0cb991861585555', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:truniagen-regulatory-2026-10-03'})
-SET sn.canonicalUri = 'https://pages.truniagen.com/regulatory', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://pages.truniagen.com/regulatory', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:38bf163965afcd065287880c8d6aa4f33cb5047f907649a36d2a51e80270c704', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:fda-503b-bulks-2026-10-03'})
-SET sn.canonicalUri = 'https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding-under-section-503b-fdc-act', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding-under-section-503b-fdc-act', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:1040d165e16ff3c28e6424c1a9dfbb2e04938d519dcf53503ad538e328bd085b', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:amazon-b0fs82b35k-2026-10-03'})
-SET sn.canonicalUri = 'https://www.amazon.com/dp/B0FS82B35K', sn.observedAt = datetime('2026-10-03T00:00:00Z'), sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'https://www.amazon.com/dp/B0FS82B35K', sn.observedAt = datetime('2026-10-03T00:00:00Z'), sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:18bd9d47ac4d005186eb989bc436e66f82185f7812852f083f7b7eae159b3181', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (sn:InformationArtifact:SourceSnapshot {uid: 'hu:snapshot:synthetic-fda-ffr-record'})
-SET sn.canonicalUri = 'urn:synthetic:fda-food-facility-registration', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime();
+SET sn.canonicalUri = 'urn:synthetic:fda-food-facility-registration', sn.retrievedAt = datetime('2026-10-03T00:00:00Z'), sn.createdAt = datetime(),
+    sn.contentHash = 'sha256:f777ea658963b681de55ded4f38c80bc1b021d0f09b1c3bacf64e42b9fcd2a2e', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'UNKNOWN';
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:nage-10k-fy2025-risk-single-supplier-grace'})
-SET l.uri = 'https://www.sec.gov/Archives/edgar/data/1386570/000138657026000013/cdxc-20251231.htm', l.section = 'Item 1A Risk Factors: We rely on a single supplier, W.R. Grace, for NRC', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://www.sec.gov/Archives/edgar/data/1386570/000138657026000013/cdxc-20251231.htm', l.section = 'Item 1A Risk Factors: We rely on a single supplier, W.R. Grace, for NRC', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:nage-10k-fy2025-503b-authorized'})
-SET l.uri = 'https://www.sec.gov/Archives/edgar/data/1386570/000138657026000013/cdxc-20251231.htm', l.section = 'Pharmaceutical-grade Niagen is authorized by the FDA for compounding by 503B outsourcing facilities', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://www.sec.gov/Archives/edgar/data/1386570/000138657026000013/cdxc-20251231.htm', l.section = 'Pharmaceutical-grade Niagen is authorized by the FDA for compounding by 503B outsourcing facilities', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:niagen-home-every-ingredient-we-make'})
-SET l.uri = 'https://www.niagenbioscience.com', l.section = 'Unmatched quality and innovation: Every ingredient we make is clinically researched', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://www.niagenbioscience.com', l.section = 'Unmatched quality and innovation: Every ingredient we make is clinically researched', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:fda-grn-000635-response-body'})
-SET l.uri = 'https://www.fda.gov/food/gras-notice-inventory/agency-response-letter-gras-notice-no-grn-000635', l.section = 'response letter body', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://www.fda.gov/food/gras-notice-inventory/agency-response-letter-gras-notice-no-grn-000635', l.section = 'response letter body', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:truniagen-regulatory-gras-line'})
-SET l.uri = 'https://pages.truniagen.com/regulatory', l.section = 'FDA GRAS no objection for Niagen ... August 05, 2016; Dose: 180 mg/day', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://pages.truniagen.com/regulatory', l.section = 'FDA GRAS no objection for Niagen ... August 05, 2016; Dose: 180 mg/day', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:truniagen-regulatory-ndi-882-line'})
-SET l.uri = 'https://pages.truniagen.com/regulatory', l.section = 'FDA NDIN no objection ... November 03, 2015; Dose: 180 mg/day; NDI 882', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://pages.truniagen.com/regulatory', l.section = 'FDA NDIN no objection ... November 03, 2015; Dose: 180 mg/day; NDI 882', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:fda-503b-category-1-policy'})
-SET l.uri = 'https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding-under-section-503b-fdc-act', l.section = 'category 1 interim enforcement policy', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding-under-section-503b-fdc-act', l.section = 'category 1 interim enforcement policy', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:amazon-b0fs82b35k-buybox'})
-SET l.uri = 'https://www.amazon.com/dp/B0FS82B35K', l.section = 'One-time purchase $49.00; Ships from: Amazon; Sold by: TRU NIAGEN', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'https://www.amazon.com/dp/B0FS82B35K', l.section = 'One-time purchase $49.00; Ships from: Amazon; Sold by: TRU NIAGEN', l.createdAt = datetime();
 
 // status: statically-checked
 MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:synthetic-ffr-confirmation'})
-SET l.uri = 'urn:synthetic:fda-food-facility-registration', l.section = 'registration confirmation', l.createdAt = datetime();
+SET l.selectorKind = 'SECTION', l.uri = 'urn:synthetic:fda-food-facility-registration', l.section = 'registration confirmation', l.createdAt = datetime();
 
 // status: statically-checked
 MATCH (s:Source {uid: 'hu:source:sec-nage-10k-fy2025'}), (sn:SourceSnapshot {uid: 'hu:snapshot:sec-nage-10k-fy2025-2026-10-03'}), (l1:SourceLocator {uid: 'hu:locator:nage-10k-fy2025-risk-single-supplier-grace'}), (l2:SourceLocator {uid: 'hu:locator:nage-10k-fy2025-503b-authorized'})
@@ -213,8 +223,14 @@ MERGE (pw:Entity:RegulatoryPathway {uid: 'hu:reg-pathway:us-fda-food-facility-re
 SET pw.name = 'FDA food facility registration', pw.pathwayKind = 'FOOD_FACILITY_REGISTRATION', pw.jurisdiction = 'US', pw.legalBasisCitation = '21 CFR Part 1 Subpart H', pw.createdAt = datetime();
 
 // status: statically-checked
-MATCH (p:Product {uid: 'hu:product:tru-niagen-beauty'}), (v:ProductVariant {uid: 'hu:product-variant:tru-niagen-beauty-us-30ct'})
-MERGE (p)-[:HAS_VARIANT]->(v);
+MATCH (p:Product {uid: 'hu:product:tru-niagen-beauty'}), (v:ProductVariant {uid: 'hu:product-variant:tru-niagen-beauty-us-30ct'}), (l:SourceLocator {uid: 'hu:locator:amazon-b0fs82b35k-buybox'})
+MERGE (a:Assertion {uid: 'hu:assertion:tru-niagen-beauty-has-us-30ct-variant'})
+SET a.predicate = 'HAS_VARIANT', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-03T00:00:00Z')
+MERGE (a)-[:HAS_SUBJECT]->(p)
+MERGE (a)-[:HAS_OBJECT]->(v)
+MERGE (a)-[:SUPPORTED_BY]->(l)
+MERGE (p)-[hv:HAS_VARIANT]->(v)
+SET hv.assertionUid = a.uid, hv.recordedFrom = a.recordedAt, hv.relationshipUid = 'hu:rel:tru-niagen-beauty-has-us-30ct-variant';
 
 // ---------------------------------------------------------------------------
 // Section 3: filing disclosure versus promoted capability, and the BellLabs adjudication
@@ -224,13 +240,13 @@ MERGE (p)-[:HAS_VARIANT]->(v);
 // status: statically-checked
 MATCH (grace:Organization {uid: 'hu:org:w-r-grace-and-co-conn'}), (nrc:IngredientMaterial {uid: 'hu:material:niagen-nrc'}), (niagen:Organization {uid: 'hu:org:niagen-bioscience-inc'}), (l:SourceLocator {uid: 'hu:locator:nage-10k-fy2025-risk-single-supplier-grace'})
 MERGE (a:Assertion {uid: 'hu:assertion:nage-10k-grace-supplies-nrc'})
-SET a.predicate = 'SUPPLIES_INGREDIENT_MATERIAL', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.validFrom = datetime('2025-04-01T00:00:00Z'), a.valueString = null
+SET a.predicate = 'SUPPLIES_INGREDIENT_MATERIAL', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.validFrom = datetime('2025-04-01T00:00:00Z'), a.validFromBasis = 'STATED_BY_SOURCE', a.validFromPrecision = 'MONTH', a.valueString = null
 MERGE (a)-[:HAS_SUBJECT]->(grace)
 MERGE (a)-[:HAS_OBJECT]->(nrc)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (a)-[:ASSERTED_BY]->(niagen)
 MERGE (grace)-[r:SUPPLIES_INGREDIENT_MATERIAL]->(nrc)
-SET r.validFrom = datetime('2025-04-01T00:00:00Z'), r.validTo = null, r.recordedFrom = datetime('2026-10-03T00:00:00Z'), r.recordedTo = null, r.assertionUid = 'hu:assertion:nage-10k-grace-supplies-nrc';
+SET r.validFrom = datetime('2025-04-01T00:00:00Z'), r.validFromBasis = 'STATED_BY_SOURCE', r.validFromPrecision = 'MONTH', r.validTo = null, r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-03T00:00:00Z'), r.recordedTo = null, r.assertionUid = 'hu:assertion:nage-10k-grace-supplies-nrc';
 
 // Promoted capability (company statement on a marketing page). The capability node exists as the assertion's
 // object so the claim is preserved; it is NOT attached to the company by HAS_CAPABILITY_STATE.
@@ -255,15 +271,16 @@ MERGE (a)-[:ASSERTED_BY]->(niagen);
 // status: statically-checked
 MATCH (a:Assertion {uid: 'hu:assertion:niagen-home-promotes-ingredient-manufacturing'}), (l:SourceLocator {uid: 'hu:locator:nage-10k-fy2025-risk-single-supplier-grace'})
 MERGE (j:EvidenceAssessment:Adjudication {uid: 'hu:adjudication:niagen-nrc-operating-capability-2026-10-03'})
-SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'lane3-adjudication-v0', j.status = 'ACCEPTED', j.verdict = 'INSUFFICIENT', j.reviewerType = 'AGENT_PROPOSED_HUMAN_REVIEW_PENDING', j.reviewedAt = datetime('2026-10-03T00:00:00Z'), j.rationale = 'The FY2025 10-K discloses reliance on W.R. Grace as single supplier of NRC and on contract manufacturers; it discloses no company-operated NRC manufacturing. The 10-K limits Grace exclusivity to certain forms of NRCL, so the promotion is not contradicted outright; it is not established.', j.createdAt = datetime()
+SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'SUPPORT', j.recordedAt = datetime('2026-10-03T00:00:00Z'), j.methodVersion = 'lane3-adjudication-v0', j.status = 'ACCEPTED', j.verdict = 'INSUFFICIENT', j.reviewerType = 'AGENT', j.humanReviewPending = true, j.reviewedAt = datetime('2026-10-03T00:00:00Z'), j.rationale = 'The FY2025 10-K discloses reliance on W.R. Grace as single supplier of NRC and on contract manufacturers; it discloses no company-operated NRC manufacturing. The 10-K limits Grace exclusivity to certain forms of NRCL, so the promotion is not contradicted outright; it is not established.', j.createdAt = datetime()
 MERGE (j)-[:EVALUATES]->(a)
 MERGE (j)-[:SUPPORTED_BY]->(l);
 
-// 10-K characterization of agency position, adjudicated against the agency page.
+// 10-K characterization of agency position, adjudicated against the agency page. The capture is ACCEPTED (the company
+// did say this); whether it is right is the SUPPORT adjudication's PARTIALLY_SUPPORTED verdict (0.2.0 status semantics).
 // status: statically-checked
 MATCH (pg:IngredientMaterial {uid: 'hu:material:niagen-nrc-pharmaceutical-grade'}), (niagen:Organization {uid: 'hu:org:niagen-bioscience-inc'}), (l:SourceLocator {uid: 'hu:locator:nage-10k-fy2025-503b-authorized'})
 MERGE (a:Assertion {uid: 'hu:assertion:nage-10k-pharma-grade-niagen-authorized-503b'})
-SET a.predicate = 'CHARACTERIZES_REGULATORY_STATUS', a.status = 'DISPUTED', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.valueString = 'authorized by the FDA for compounding by 503B outsourcing facilities', a.jurisdiction = 'US'
+SET a.predicate = 'CHARACTERIZES_REGULATORY_STATUS', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.valueString = 'authorized by the FDA for compounding by 503B outsourcing facilities', a.jurisdiction = 'US'
 MERGE (a)-[:HAS_SUBJECT]->(pg)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (a)-[:ASSERTED_BY]->(niagen);
@@ -271,7 +288,7 @@ MERGE (a)-[:ASSERTED_BY]->(niagen);
 // status: statically-checked
 MATCH (a:Assertion {uid: 'hu:assertion:nage-10k-pharma-grade-niagen-authorized-503b'}), (l:SourceLocator {uid: 'hu:locator:fda-503b-category-1-policy'})
 MERGE (j:EvidenceAssessment:Adjudication {uid: 'hu:adjudication:nage-503b-authorized-characterization'})
-SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'lane3-adjudication-v0', j.status = 'ACCEPTED', j.verdict = 'PARTIALLY_SUPPORTED', j.reviewerType = 'AGENT_PROPOSED_HUMAN_REVIEW_PENDING', j.reviewedAt = datetime('2026-10-03T00:00:00Z'), j.rationale = 'FDA describes category 1 substances as within an interim enforcement policy pending a decision on the 503B bulks list; that is enforcement discretion, not an authorization. Whether NRC is in category 1 was not verified.', j.createdAt = datetime()
+SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'SUPPORT', j.recordedAt = datetime('2026-10-03T00:00:00Z'), j.methodVersion = 'lane3-adjudication-v0', j.status = 'ACCEPTED', j.verdict = 'PARTIALLY_SUPPORTED', j.reviewerType = 'AGENT', j.humanReviewPending = true, j.reviewedAt = datetime('2026-10-03T00:00:00Z'), j.rationale = 'FDA describes category 1 substances as within an interim enforcement policy pending a decision on the 503B bulks list; that is enforcement discretion, not an authorization. Whether NRC is in category 1 was not verified.', j.createdAt = datetime()
 MERGE (j)-[:EVALUATES]->(a)
 MERGE (j)-[:SUPPORTED_BY]->(l);
 
@@ -320,25 +337,25 @@ MERGE (a2)-[:HAS_SUBJECT]->(sub)
 MERGE (a2)-[:HAS_OBJECT]->(nrc)
 MERGE (a2)-[:SUPPORTED_BY]->(l)
 MERGE (sub)-[r2:SUBMISSION_ABOUT]->(nrc)
-SET r2.assertionUid = 'hu:assertion:grn-000635-about-nrc'
+SET r2.assertionUid = 'hu:assertion:grn-000635-about-nrc', r2.recordedFrom = datetime('2026-10-03T00:00:00Z'), r2.relationshipUid = 'hu:rel:grn-000635-about-nrc'
 MERGE (a3:Assertion {uid: 'hu:assertion:nrc-gras-notice-on-file-status'})
 SET a3.predicate = 'STATUS_OF', a3.status = 'ACCEPTED', a3.recordedAt = datetime('2026-10-03T00:00:00Z')
 MERGE (a3)-[:HAS_SUBJECT]->(st)
 MERGE (a3)-[:HAS_OBJECT]->(nrc)
 MERGE (a3)-[:SUPPORTED_BY]->(l)
 MERGE (st)-[r3:STATUS_OF]->(nrc)
-SET r3.assertionUid = 'hu:assertion:nrc-gras-notice-on-file-status';
+SET r3.assertionUid = 'hu:assertion:nrc-gras-notice-on-file-status', r3.recordedFrom = datetime('2026-10-03T00:00:00Z'), r3.relationshipUid = 'hu:rel:nrc-gras-notice-on-file-status';
 
 // Company restatement of the GRAS response, kept separate from the agency record.
 // status: statically-checked
 MATCH (resp:RegulatoryResponse {uid: 'hu:reg-response:us-fda-grn-000635'}), (niagen:Organization {uid: 'hu:org:niagen-bioscience-inc'}), (l:SourceLocator {uid: 'hu:locator:truniagen-regulatory-gras-line'}), (lf:SourceLocator {uid: 'hu:locator:fda-grn-000635-response-body'})
 MERGE (a:Assertion {uid: 'hu:assertion:truniagen-characterizes-grn-000635'})
-SET a.predicate = 'CHARACTERIZES_REGULATORY_RESPONSE', a.status = 'DISPUTED', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.valueString = 'FDA GRAS no objection for Niagen (nicotinamide riboside chloride) on August 05, 2016; Dose: 180 mg/day'
+SET a.predicate = 'CHARACTERIZES_REGULATORY_RESPONSE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.valueString = 'FDA GRAS no objection for Niagen (nicotinamide riboside chloride) on August 05, 2016; Dose: 180 mg/day'
 MERGE (a)-[:HAS_SUBJECT]->(resp)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (a)-[:ASSERTED_BY]->(niagen)
 MERGE (j:EvidenceAssessment:Adjudication {uid: 'hu:adjudication:truniagen-grn-000635-characterization'})
-SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'lane3-adjudication-v0', j.status = 'ACCEPTED', j.verdict = 'PARTIALLY_SUPPORTED', j.reviewerType = 'AGENT_PROPOSED_HUMAN_REVIEW_PENDING', j.reviewedAt = datetime('2026-10-03T00:00:00Z'), j.rationale = 'FDA response is "no questions" for listed food uses at 0.0057% by weight; it is not phrased as a dose in mg/day and FDA states it made no GRAS determination of its own. The 180 mg/day figure is not in the captured FDA text.', j.createdAt = datetime()
+SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'SUPPORT', j.recordedAt = datetime('2026-10-03T00:00:00Z'), j.methodVersion = 'lane3-adjudication-v0', j.status = 'ACCEPTED', j.verdict = 'PARTIALLY_SUPPORTED', j.reviewerType = 'AGENT', j.humanReviewPending = true, j.reviewedAt = datetime('2026-10-03T00:00:00Z'), j.rationale = 'FDA response is "no questions" for listed food uses at 0.0057% by weight; it is not phrased as a dose in mg/day and FDA states it made no GRAS determination of its own. The 180 mg/day figure is not in the captured FDA text.', j.createdAt = datetime()
 MERGE (j)-[:EVALUATES]->(a)
 MERGE (j)-[:SUPPORTED_BY]->(lf);
 
@@ -367,12 +384,13 @@ MATCH (st:RegulatoryStatus {uid: 'hu:reg-status:synthetic-plant-ffr-active'}), (
 MERGE (st)-[:UNDER_LEGAL_BASIS]->(pw)
 MERGE (st)-[:ISSUED_BY]->(fda)
 MERGE (a:Assertion {uid: 'hu:assertion:synthetic-plant-ffr-status'})
-SET a.predicate = 'STATUS_OF', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.validFrom = datetime('2024-11-01T00:00:00Z')
+SET a.predicate = 'STATUS_OF', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.validFrom = datetime('2024-11-01T00:00:00Z'), a.validFromBasis = 'STATED_BY_SOURCE', a.validFromPrecision = 'DAY'
 MERGE (a)-[:HAS_SUBJECT]->(st)
 MERGE (a)-[:HAS_OBJECT]->(f)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (st)-[r:STATUS_OF]->(f)
-SET r.assertionUid = 'hu:assertion:synthetic-plant-ffr-status';
+SET r.assertionUid = 'hu:assertion:synthetic-plant-ffr-status', r.recordedFrom = datetime('2026-10-03T00:00:00Z'), r.relationshipUid = 'hu:rel:synthetic-plant-ffr-status',
+    r.validFrom = datetime('2024-11-01T00:00:00Z'), r.validFromBasis = 'STATED_BY_SOURCE', r.validFromPrecision = 'DAY';
 
 // ---------------------------------------------------------------------------
 // Section 6: marketplace listing, offer roles, price observation
@@ -571,3 +589,42 @@ WHERE a.predicate IN ['CHARACTERIZES_REGULATORY_RESPONSE', 'CHARACTERIZES_REGULA
 RETURN a.uid AS unadjudicatedCharacterization;
 
 // Expected result of this fixture as written: zero rows from every query above.
+
+
+// ---------------------------------------------------------------------------
+// Assertions behind marketplace and submission edges
+// Asserted edges are projections of assertions (catalog 0.2.0 asserted_edge profile). The record-derived facts below were
+// created as bare edges by the lane; each now has its authorizing assertion, cited to the registry, publication or page
+// snapshot it was read from, and the edge carries assertionUid, recordedFrom and relationshipUid.
+// status: statically-checked, executed
+UNWIND [
+  {pred: 'HOSTS_LISTING', s: 'hu:org:amazon-marketplace-us', o: 'hu:listing:amazon-us-b0fs82b35k', loc: 'hu:locator:amazon-b0fs82b35k-buybox'},
+  {pred: 'IDENTIFIED_BY', s: 'hu:listing:amazon-us-b0fs82b35k', o: 'hu:trade-id:asin-b0fs82b35k', loc: 'hu:locator:amazon-b0fs82b35k-buybox'},
+  {pred: 'LISTING_FOR', s: 'hu:listing:amazon-us-b0fs82b35k', o: 'hu:product-variant:tru-niagen-beauty-us-30ct', loc: 'hu:locator:amazon-b0fs82b35k-buybox'},
+  {pred: 'SUBMITTED_BY', s: 'hu:reg-submission:us-fda-grn-000635', o: 'hu:org:niagen-bioscience-inc', loc: 'hu:locator:fda-grn-000635-response-body'}
+] AS row
+MATCH (s {uid: row.s}), (o {uid: row.o}), (l:SourceLocator {uid: row.loc})
+MERGE (a:Assertion {uid: 'hu:assertion:' + toLower(replace(row.pred, '_', '-')) + '-' + split(row.s, ':')[2] + '-' + split(row.o, ':')[2]})
+ON CREATE SET a.predicate = row.pred, a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.recordedAt = datetime('2026-10-03T00:00:00Z'), a.privacyClass = 'public'
+MERGE (a)-[:HAS_SUBJECT]->(s)
+MERGE (a)-[:HAS_OBJECT]->(o)
+MERGE (a)-[:SUPPORTED_BY]->(l)
+WITH row, s, o, a
+MATCH (s)-[r]->(o) WHERE type(r) = row.pred
+SET r.assertionUid = a.uid, r.recordedFrom = a.recordedAt, r.relationshipUid = 'hu:rel:' + split(a.uid, ':')[2];
+
+// ---------------------------------------------------------------------------
+// Capture-fidelity acceptance (catalog 0.2.0, INV-103). Every ACCEPTED, REJECTED or DISPUTED status is a projection of a
+// CAPTURE_FIDELITY adjudication. This fixture records one policy adjudication (reviewerType POLICY) covering the captured
+// assertions it created; it says nothing about whether any proposition is true (that is a SUPPORT adjudication).
+// status: statically-checked, executed
+MATCH (a:Assertion)
+WHERE a.status IN ['ACCEPTED', 'REJECTED', 'DISPUTED']
+  AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
+MERGE (j:EvidenceAssessment:Adjudication {uid: 'hu:adjudication:filing-vs-capability-capture-fidelity-policy-2026-10-04'})
+ON CREATE SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
+    j.reviewerType = 'POLICY', j.methodVersion = 'fixture-capture-policy-1', j.status = 'FINAL',
+    j.rationale = 'Fixture capture policy: the recorded propositions match the cited spans as read by the authoring lane.',
+    j.reviewedAt = datetime('2026-10-04T00:00:00Z'), j.recordedAt = datetime('2026-10-04T00:00:00Z'), j.createdAt = datetime('2026-10-04T00:00:00Z'),
+    j.privacyClass = 'internal'
+MERGE (j)-[:EVALUATES]->(a);
