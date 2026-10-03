@@ -1,0 +1,70 @@
+contract:
+  name: belllabs-schema-projection
+  version: 0.1.0
+  purpose: Bind an agent-visible schema slice to an intent, temporal viewpoint, source schema, and deterministic closure policy.
+
+request:
+  required:
+    - requestId
+    - intent
+    - competencyQuestionIds
+    - requestedModules
+    - temporalView
+    - sourceSchemaDigest
+  fields:
+    requestId: string
+    intent: string
+    competencyQuestionIds: [string]
+    requestedModules: [string]
+    requestedElements: [string]
+    excludedElements: [string]
+    temporalView:
+      validAt: datetime_or_null
+      recordedAt: datetime_or_null
+      intervalStart: datetime_or_null
+      intervalEnd: datetime_or_null
+      unknownTimePolicy: preserve_unknown
+    budgets:
+      maxNodes: integer
+      maxRelationships: integer
+      maxTraversalDepth: integer
+    sourceSchemaDigest: sha256
+
+result:
+  required:
+    - projectionId
+    - requestId
+    - sourceSchemaDigest
+    - selectedModules
+    - elements
+    - closureTrace
+    - validationStatus
+  fields:
+    projectionId: content_addressed_id
+    requestId: string
+    sourceSchemaDigest: sha256
+    selectedModules: [string]
+    elements:
+      nodes: [node_definition]
+      relationships: [relationship_definition]
+      relationshipPropertyTypes: [property_type_definition]
+      enums: [enum_definition]
+      invariants: [invariant_definition]
+      externalReferences: [external_reference]
+    closureTrace:
+      - element: string
+        reason: selected_or_dependency_or_endpoint_or_property_type_or_enum_or_invariant
+        introducedBy: string
+    exclusions:
+      - element: string
+        reason: string
+    validationStatus: valid_or_invalid
+    generatedAt: datetime
+
+invariants:
+  - The projection source digest equals the admitted canonical schema digest.
+  - Every relationship includes valid endpoint identity surfaces.
+  - Every relationship property type and referenced enum is included.
+  - Every write operation validates against the same projection used for extraction.
+  - Projection generation is deterministic for identical request and source inputs.
+  - Agents emit typed intents; compilers emit GraphQL or Cypher.

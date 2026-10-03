@@ -7,16 +7,16 @@
 
 ## Biotech Suite — 8 Repos
 
-| # | Repo | Path | Purpose |
-|---|------|------|---------|
-| 1 | `biotech-meta` | `C:\Users\Pinda\Proyectos\Biotech\biotech-meta` | **This repo.** Specs, docs, diagrams, system maps, demos |
-| 2 | `biotech-kg` | `C:\Users\Pinda\Proyectos\Biotech\biotech-kg` | Knowledge Graph — biological entities, ontologies, relationships |
-| 3 | `biotech-research-ingestion` | `C:\Users\Pinda\Proyectos\Biotech\biotech-research-ingestion` | Research data ingestion pipelines (papers, datasets, sources) |
-| 4 | `biotech-research-web` | `C:\Users\Pinda\Proyectos\Biotech\biotech-research-web` | Research exploration frontend |
-| 5 | `biotech-user-api` | `C:\Users\Pinda\Proyectos\Biotech\biotech-user-api` | User-facing backend API |
-| 6 | `biotech-user-web` | `C:\Users\Pinda\Proyectos\Biotech\biotech-user-web` | User-facing frontend application |
-| 7 | `biotech-mcp` | `C:\Users\Pinda\Proyectos\Biotech\biotech-mcp` | MCP servers and tool definitions for the suite |
-| 8 | `biotech-infra` | `C:\Users\Pinda\Proyectos\Biotech\biotech-infra` | Infrastructure as code (cloud, containers, CI/CD) |
+| #   | Repo                         | Path                                                          | Purpose                                                                                                                           |
+| --- | ---------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `biotech-meta`               | `C:\Users\Pinda\Proyectos\Biotech\biotech-meta`               | **This repo.** Specs, docs, diagrams, system maps, demos                                                                          |
+| 2   | `biotech-kg`                 | `C:\Users\Pinda\Proyectos\Biotech\biotech-kg`                 | Knowledge Graph — biotech entities (people, organizations products compounds ... ) biological entities, ontologies, relationships |
+| 3   | `biotech-research-ingestion` | `C:\Users\Pinda\Proyectos\Biotech\biotech-research-ingestion` | Research data ingestion pipelines (papers, datasets, sources)                                                                     |
+| 4   | `biotech-research-web`       | `C:\Users\Pinda\Proyectos\Biotech\biotech-research-web`       | Research exploration frontend                                                                                                     |
+| 5   | `biotech-user-api`           | `C:\Users\Pinda\Proyectos\Biotech\biotech-user-api`           | User-facing backend API                                                                                                           |
+| 6   | `biotech-user-web`           | `C:\Users\Pinda\Proyectos\Biotech\biotech-user-web`           | User-facing frontend application                                                                                                  |
+| 7   | `biotech-mcp`                | `C:\Users\Pinda\Proyectos\Biotech\biotech-mcp`                | MCP servers and tool definitions for the suite                                                                                    |
+| 8   | `biotech-infra`              | `C:\Users\Pinda\Proyectos\Biotech\biotech-infra`              | Infrastructure as code (cloud, containers, CI/CD)                                                                                 |
 
 **Build order:** `biotech-infra` → `biotech-kg` → `biotech-research-ingestion` → `biotech-mcp` → `biotech-user-api` → `biotech-research-web` → `biotech-user-web` → `biotech-meta` (iterate)
 
@@ -50,9 +50,13 @@ Reference for all agentic mechanisms available in Cursor. Each layer has a disti
 
 ```markdown
 # AGENTS.md minimal example
+
 ## Build
+
 - `npm run build` — production build
+
 ## Style
+
 - TypeScript only, strict mode
 ```
 
@@ -64,15 +68,15 @@ Reference for all agentic mechanisms available in Cursor. Each layer has a disti
 
 **What:** Structured rule files with YAML frontmatter. Four types:
 
-| Type | When applied | Config |
-|------|-------------|--------|
-| **Always** | Every context, every request | `alwaysApply: true` |
-| **Auto-Attached** | When matched files are in context | `globs: ["src/**/*.ts"]` |
+| Type              | When applied                                 | Config                          |
+| ----------------- | -------------------------------------------- | ------------------------------- |
+| **Always**        | Every context, every request                 | `alwaysApply: true`             |
+| **Auto-Attached** | When matched files are in context            | `globs: ["src/**/*.ts"]`        |
 | **Agent-Decided** | Agent reads description, decides if relevant | `description: "..."` (no globs) |
-| **Manual** | Only when explicitly called via `@ruleName` | No auto-trigger |
+| **Manual**        | Only when explicitly called via `@ruleName`  | No auto-trigger                 |
 
 **Location:** `.cursor/rules/` (project) · Cursor Settings → Rules (user-global) · Dashboard (team)  
-**Format:** `.mdc` files. Can reference other files with `@filename`.  
+**Format:** `.mdc` files. Can reference other files with `@filename`.
 
 ```yaml
 ---
@@ -107,6 +111,7 @@ alwaysApply: false
 ```
 
 **Capabilities MCP exposes:**
+
 - `tools` — callable functions (search KG, query DB, run pipeline)
 - `resources` — readable data (files, API responses)
 - `prompts` — reusable prompt templates
@@ -135,13 +140,13 @@ description: Ingest a research paper into biotech-research-ingestion pipeline
 
 **Skills vs Rules:**
 
-| | Skills | Rules |
-|-|--------|-------|
-| Best for | Procedural "how-to" workflows | Declarative style/architecture constraints |
-| Token cost | Low (loaded only when relevant) | Higher (always-on types always loaded) |
-| Format | `SKILL.md` with frontmatter | `.mdc` with frontmatter |
-| Invocation | Auto-discovered + `/skill-name` | Auto/manual per type |
-| Portable | Yes — works across any Agent Skills-compatible agent | Cursor-specific |
+|            | Skills                                               | Rules                                      |
+| ---------- | ---------------------------------------------------- | ------------------------------------------ |
+| Best for   | Procedural "how-to" workflows                        | Declarative style/architecture constraints |
+| Token cost | Low (loaded only when relevant)                      | Higher (always-on types always loaded)     |
+| Format     | `SKILL.md` with frontmatter                          | `.mdc` with frontmatter                    |
+| Invocation | Auto-discovered + `/skill-name`                      | Auto/manual per type                       |
+| Portable   | Yes — works across any Agent Skills-compatible agent | Cursor-specific                            |
 
 **Migrate old rules/commands:** Run `/migrate-to-skills` (built-in Cursor 2.4 skill).
 
@@ -165,11 +170,13 @@ Return structured JSON summaries. Never modify data.
 ```
 
 **Built-in subagents (auto-used, not manually invokable):**
+
 - `explore` — codebase research (faster/cheaper model)
 - `bash` — terminal command execution
 - `browser` — web browsing and scraping
 
 **Custom subagents enable:**
+
 - Parallel workstreams (e.g., 8 agents analyzing 8 repos simultaneously)
 - Context isolation — heavy token work stays out of main thread
 - Model flexibility — assign cheaper models to lighter tasks
@@ -177,12 +184,12 @@ Return structured JSON summaries. Never modify data.
 
 **When to use subagents vs skills:**
 
-| Use subagents when... | Use skills when... |
-|----------------------|-------------------|
-| Long research needing context isolation | Single-shot, quick repeatable task |
-| Multiple parallel workstreams | No separate context window needed |
-| Multi-step specialized expertise | Simple workflow (format, changelog) |
-| Independent verification of work | Task completes in one round-trip |
+| Use subagents when...                   | Use skills when...                  |
+| --------------------------------------- | ----------------------------------- |
+| Long research needing context isolation | Single-shot, quick repeatable task  |
+| Multiple parallel workstreams           | No separate context window needed   |
+| Multi-step specialized expertise        | Simple workflow (format, changelog) |
+| Independent verification of work        | Task completes in one round-trip    |
 
 > Source: [cursor.com/docs/context/subagents](https://cursor.com/docs/context/subagents)
 
@@ -197,7 +204,9 @@ Return structured JSON summaries. Never modify data.
 
 ```markdown
 # /spec-review
+
 Review the current specification against the codebase.
+
 1. Read `biotech-meta/specs/` for active specs
 2. Check each repo's implementation against spec
 3. Report gaps as a checklist
@@ -217,6 +226,7 @@ Review the current specification against the codebase.
 **Auth:** API key as HTTP basic auth username
 
 **Launch an agent (POST `/v0/agents`):**
+
 ```json
 {
   "prompt": { "text": "Update biotech-user-api to match the latest spec" },
@@ -242,6 +252,7 @@ Review the current specification against the codebase.
 **What:** Trigger Cursor agents directly from GitHub events (PRs, issues, comments).  
 **Mechanism:** Install the **Cursor GitHub App** on your repositories. Mention `@cursor` in a PR or issue to trigger an agent.  
 **Use cases:**
+
 - Auto-fix failing CI on PR
 - Implement issue descriptions as code changes
 - Spec compliance review on every PR
@@ -267,6 +278,7 @@ Review the current specification against the codebase.
 ```
 
 **Examples for biotech suite:**
+
 - `kg-explorer-plugin` — full KG traversal + visualization
 - `paper-ingestion-plugin` — end-to-end paper → KG pipeline
 - `spec-enforcer-plugin` — spec compliance across all 8 repos
@@ -290,18 +302,18 @@ As the `biotech-meta` agent, I:
 
 ## Quick Reference — Where Does It Go?
 
-| Artifact | Location | Purpose |
-|----------|----------|---------|
+| Artifact           | Location                           | Purpose                          |
+| ------------------ | ---------------------------------- | -------------------------------- |
 | Agent instructions | `AGENTS.md` or `.cursor/Agents.md` | Persistent context for this repo |
-| Scoped rules | `.cursor/rules/*.mdc` | Style, architecture, glob-scoped |
-| Skills | `.cursor/skills/<name>/SKILL.md` | Reusable domain workflows |
-| Subagents | `.cursor/agents/<name>.md` | Parallel / isolated task workers |
-| Commands | `.cursor/commands/<name>.md` | Slash-command workflows |
-| MCP config | `.cursor/mcp.json` | Tool server connections |
-| Specs | `specs/<domain>.md` | Source of truth for features |
-| Diagrams | `diagrams/` | System maps, architecture |
-| Demos | `demos/` | Prototypes, notebooks |
+| Scoped rules       | `.cursor/rules/*.mdc`              | Style, architecture, glob-scoped |
+| Skills             | `.cursor/skills/<name>/SKILL.md`   | Reusable domain workflows        |
+| Subagents          | `.cursor/agents/<name>.md`         | Parallel / isolated task workers |
+| Commands           | `.cursor/commands/<name>.md`       | Slash-command workflows          |
+| MCP config         | `.cursor/mcp.json`                 | Tool server connections          |
+| Specs              | `specs/<domain>.md`                | Source of truth for features     |
+| Diagrams           | `diagrams/`                        | System maps, architecture        |
+| Demos              | `demos/`                           | Prototypes, notebooks            |
 
 ---
 
-*Sources: [cursor.com/docs/context/rules](https://cursor.com/docs/context/rules) · [cursor.com/docs/context/skills](https://cursor.com/docs/context/skills) · [cursor.com/docs/context/subagents](https://cursor.com/docs/context/subagents) · [cursor.com/docs/context/commands](https://cursor.com/docs/context/commands) · [cursor.com/docs/cloud-agent/api/endpoints](https://cursor.com/docs/cloud-agent/api/endpoints) · [cursor.com/changelog/2-4](https://cursor.com/changelog/2-4)*
+_Sources: [cursor.com/docs/context/rules](https://cursor.com/docs/context/rules) · [cursor.com/docs/context/skills](https://cursor.com/docs/context/skills) · [cursor.com/docs/context/subagents](https://cursor.com/docs/context/subagents) · [cursor.com/docs/context/commands](https://cursor.com/docs/context/commands) · [cursor.com/docs/cloud-agent/api/endpoints](https://cursor.com/docs/cloud-agent/api/endpoints) · [cursor.com/changelog/2-4](https://cursor.com/changelog/2-4)_

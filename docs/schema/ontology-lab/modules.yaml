@@ -1,0 +1,102 @@
+manifest:
+  name: belllabs-biotech-ontology-modules
+  version: 0.1.0
+  status: candidate
+  canonicalCatalog: ../catalog/schema.yaml
+
+closurePolicies:
+  semantic_kernel:
+    include: [identity_keys, base_archetypes, shared_value_objects]
+  relationship_endpoints:
+    include: [relationship_property_type, endpoint_identity_surface, referenced_enums]
+  validation:
+    include: [invariants, forbidden_implications, module_shapes]
+  projection:
+    rule: dependencies_first_then_selected_elements_then_required_closure
+
+modules:
+  kernel:
+    maturity: accepted
+    dependencies: []
+    owns: [Entity, VersionedState, Occurrence, InformationArtifact, Assertion, EvidenceAssessment]
+    sharedBy: [all]
+
+  provenance:
+    maturity: accepted
+    dependencies: [kernel]
+    owns: [Source, SourceSnapshot, SourceLocator, Agent, Activity, Adjudication]
+    alignments: [W3C_PROV_O, Biolink_source_provenance]
+    sharedBy: [all]
+
+  temporal:
+    maturity: provisional
+    dependencies: [kernel, provenance]
+    owns: [TemporalExtent, TemporalExpression, TemporalPrecision, TemporalNormalization]
+    conventions:
+      interval: half_open
+      validTime: [validFrom, validTo]
+      systemTime: [recordedFrom, recordedTo]
+      unknownBound: null
+      rule: ingestion_time_never_substitutes_for_unknown_valid_time
+    sharedBy: [all]
+
+  identity_resolution:
+    maturity: provisional
+    dependencies: [kernel, provenance]
+    owns: [Mention, ResolutionHypothesis, Identifier, EquivalenceAssessment]
+    sharedBy: [all]
+
+  organizations:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, identity_resolution]
+    owns: [Organization, LegalEntity, ConsumerBrand, Person, Facility]
+
+  substances_and_materials:
+    maturity: provisional
+    dependencies: [kernel, provenance, identity_resolution]
+    owns: [IngredientMaterial, ChemicalSubstance, ChemicalForm, BotanicalPreparation, MicrobialPreparation, MaterialMixture]
+    externalAuthorities: [ChEBI, FDA_GSRS_UNII, PubChem, NCBI_Taxonomy]
+
+  products_and_formulations:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, identity_resolution, organizations, substances_and_materials]
+    owns: [Product, ProductVariant, FormulationVersion, IngredientComponent, PackageConfiguration, LabelSnapshot]
+
+  commerce:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, organizations, products_and_formulations]
+    owns: [MerchantListing, Offer, PriceObservation, SubscriptionPlan, Bundle]
+
+  studies_and_evidence:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, identity_resolution, substances_and_materials, products_and_formulations]
+    owns: [Study, TrialRegistration, RegistrationVersion, ProtocolVersion, StudyArm, StudyIntervention, StudyPopulation, OutcomeDefinition, StudyResult, Publication, EvidenceApplicability]
+    externalAuthorities: [ClinicalTrialsGov, PubMed, DOI]
+
+  safety_and_constraints:
+    maturity: candidate
+    dependencies: [kernel, provenance, temporal, substances_and_materials, products_and_formulations, studies_and_evidence]
+    owns: [SafetySignal, ContraindicationAssertion, InteractionAssertion, UseConstraint]
+
+  recommendation_decisions:
+    maturity: candidate
+    dependencies: [kernel, provenance, temporal, products_and_formulations, commerce, studies_and_evidence, safety_and_constraints]
+    owns: [DecisionContext, RecommendationRequest, RecommendationCandidate, RecommendationDecision, DecisionCriterion, DecisionExplanation, PolicyVersion]
+    rule: recommendations_are_occurrences_not_timeless_product_edges
+
+  diagnostics:
+    maturity: future
+    dependencies: [kernel, provenance, temporal, identity_resolution, organizations, studies_and_evidence, recommendation_decisions]
+    owns: [DiagnosticProduct, LabTest, PanelDefinition, Biomarker, Metric, ReferenceRange, Observation]
+
+  consumer_devices:
+    maturity: future
+    dependencies: [kernel, provenance, temporal, identity_resolution, organizations, studies_and_evidence, recommendation_decisions]
+    owns: [Device, DeviceModel, FirmwareVersion, Sensor, MeasurementMethod, DeviceObservation]
+
+projectionRules:
+  - A module may depend only on the kernel or on explicitly declared modules.
+  - Shared modules do not transfer ownership of their terms to consumers.
+  - Imported external identifiers retain their source namespace and version metadata.
+  - A projection may expose an external endpoint identity without importing the endpoint's full module.
+  - Recommendation projections must include provenance, temporal, evidence, safety, and policy-version surfaces.

@@ -1,0 +1,41 @@
+{
+  "name": "biotech-meta",
+  "version": "0.1.0",
+  "description": "Meta-orchestration, specs, and agentic tooling for the Biotech suite.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsx src/index.ts",
+    "seed:ecosystem-taxonomy": "tsx src/scripts/seed-ecosystem-taxonomy.ts",
+    "ecosystem:agent": "tsx src/scripts/run-ecosystem-mapping-agent.ts",
+    "research:workflow": "tsx src/scripts/run-research-workflow.ts",
+    "research:organizations": "tsx src/scripts/run-organization-ecosystem-research.ts",
+    "research:supplements": "tsx src/scripts/run-research-workflow.ts supplement-organizations",
+    "smoke:agent-tools": "tsx src/scripts/run-agent-tooling-smoke-test.ts",
+    "tools:web:check": "tsx src/scripts/check-web-research-tools.ts",
+    "firecrawl:status": "firecrawl --status",
+    "tavily:status": "tvly --status",
+    "skills:find:tavily": "npx skills find tavily",
+    "skills:find:firecrawl": "npx skills find firecrawl",
+    "skills:find:agent-browser": "npx skills find \"vercel agent browser\""
+  },
+  "dependencies": {
+    "@cursor/sdk": "^1.0.18",
+    "dotenv": "^17.4.2",
+    "mongoose": "^9.6.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sqlite3"
+    ]
+  }
+}

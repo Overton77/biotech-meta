@@ -1,0 +1,4 @@
+interface:
+  display_name: "Canonicalize Biotech Architecture"
+  short_description: "Turn architecture sources into specs and work plans"
+  default_prompt: "Use $canonicalize-biotech-architecture to extract current architecture decisions, run a focused interview, and produce traceable canonical specs and implementation work packages."

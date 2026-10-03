@@ -1,0 +1,90 @@
+registryVersion: 0.1.0
+updatedAt: 2026-07-13
+
+policy:
+  principle: Authority is claim-specific, not organization-global.
+  fields:
+    authorityFor: Questions for which the source is normally primary or highly relevant.
+    notAuthorityFor: Inferences the source cannot establish by itself.
+
+sources:
+  - id: SRC-ELYSIUM-ADVISORY
+    url: https://www.elysiumhealth.com/pages/advisory-board
+    publisher: Elysium Health
+    kind: official_organization_page
+    authorityFor: [declared_advisory_relationships, company_disclaimer_about_product_endorsement]
+    notAuthorityFor: [independent_product_efficacy, advisor_product_endorsement]
+    schemaConsequences: [ADVISES_ORGANIZATION_does_not_imply_ENDORSES_PRODUCT]
+
+  - id: SRC-ELYSIUM-BASIS-PRODUCT
+    url: https://www.elysiumhealth.com/products/basis
+    publisher: Elysium Health
+    kind: official_product_and_commerce_page
+    authorityFor: [current_marketing_identity, displayed_offer, subscription_terms, manufacturer_claims]
+    notAuthorityFor: [independent_efficacy, exact_historical_formulation, actual_lot_composition]
+    schemaConsequences: [separate_Product_PlatformIdentifier_SubscriptionPlan_Offer_PriceObservation]
+
+  - id: SRC-ELYSIUM-BASIS-LABEL
+    url: https://www.elysiumhealth.com/pages/basis-supplement-facts
+    publisher: Elysium Health
+    kind: official_label_page
+    authorityFor: [current_label_declaration_as_observed]
+    notAuthorityFor: [measured_composition, historical_formulation, study_intervention_identity]
+    schemaConsequences: [LabelSnapshot_is_not_FormulationVersion_or_MeasuredResult]
+
+  - id: SRC-ELYSIUM-MOSAIC-SCIENCE
+    url: https://www.elysiumhealth.com/pages/science-behind-mosaic
+    publisher: Elysium Health
+    kind: official_product_science_page
+    authorityFor: [company_description_of_mixture_and_constituents]
+    notAuthorityFor: [quantitative_constituent_amount_without_measurement, independent_efficacy]
+    schemaConsequences: [MaterialMixture_and_PROVIDES_CONSTITUENT_not_single_Compound]
+
+  - id: SRC-ELYSIUM-BASIS-LOT
+    url: https://www.elysiumhealth.com/pages/basis-lot-info
+    publisher: Elysium Health
+    kind: manufacturer_lot_summary
+    authorityFor: [company_lot_identifier_and_conformance_assertion]
+    notAuthorityFor: [full_COA_when_values_methods_lab_and_signed_certificate_absent]
+    schemaConsequences: [LotTestSummary_is_not_CertificateOfAnalysis]
+
+  - id: SRC-NSF-ELYSIUM
+    url: https://info.nsf.org/Certified/BannedSub/Listings.asp?Company=C0364723&Standard=306
+    publisher: NSF
+    kind: certification_listing
+    authorityFor: [NSF_program_listing_status_and_scope]
+    notAuthorityFor: [all_quality_dimensions, lots_or_products_outside_scope]
+    schemaConsequences: [CertificationProgram_Listing_Scope_and_CoveredIdentity_are_separate]
+
+  - id: SRC-FDA-ORPHAN-NR-PT
+    url: https://www.accessdata.fda.gov/scripts/opdlisting/oopd/detailedIndex.cfm?cfgridkey=628218
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_record
+    authorityFor: [orphan_designation_record_and_status]
+    notAuthorityFor: [drug_approval_for_orphan_indication, supplement_efficacy]
+    schemaConsequences: [OrphanDesignation_is_not_DrugApproval]
+
+  - id: SRC-FDA-NDI-PROCESS
+    url: https://www.fda.gov/food/dietary-supplements/new-dietary-ingredient-ndi-notification-process
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_guidance
+    authorityFor: [meaning_and_process_of_NDI_notification]
+    notAuthorityFor: [product_specific_safety_without_a_product_record]
+    schemaConsequences: [RegulatorySubmission_and_RegulatoryResponse_are_not_Approval]
+
+  - id: SRC-NATURE-BASIS-2017
+    url: https://www.nature.com/articles/s41514-017-0016-9
+    publisher: npj Aging and Mechanisms of Disease
+    kind: peer_reviewed_publication
+    authorityFor: [reported_study_design_intervention_results_funding_and_conflicts]
+    notAuthorityFor: [identity_of_later_formulations, longevity_outcome_not_measured]
+    schemaConsequences: [Publication_Study_Arm_Intervention_Result_and_CurrentProduct_are_separate]
+
+  - id: SRC-JUSTIA-ELYSIUM-CHROMADEX
+    url: https://law.justia.com/cases/federal/district-courts/new-york/nysdce/1%3A2017cv07394/481243/302/
+    publisher: Justia mirror of court record
+    kind: legal_record
+    authorityFor: [statements_and_findings_in_the_court_record_about_historical_supply]
+    notAuthorityFor: [chemical_equivalence, clinical_efficacy]
+    schemaConsequences: [historical_supplier_material_and_current_material_require_distinct_identity]
+

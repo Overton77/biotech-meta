@@ -1,0 +1,8 @@
+# Deep-module boundary settings.
+# The only things you should ever need to edit here are packages_root and root_package.
+
+# Where packages live. One immediate child dir per package (flat, no nesting).
+packages_root = "src/packages"
+
+# Dotted import prefix for that folder (must match how Python resolves imports).
+root_package = "packages"

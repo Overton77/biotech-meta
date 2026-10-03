@@ -1,0 +1,2883 @@
+interface Entity {
+  id: ID!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+}
+
+interface SearchIndexable {
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+}
+
+interface TemporalSnapshot {
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime
+  recordedTo: DateTime
+}
+
+interface ActorIdentity {
+  id: ID!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+}
+
+enum EvidenceStrength {
+  LOW
+  MODERATE
+  HIGH
+}
+
+enum AssociationPolarity {
+  POSITIVE
+  NEGATIVE
+  MIXED
+  NEUTRAL
+  UNKNOWN
+}
+
+enum RoleType {
+  FOUNDER
+  CO_FOUNDER
+  CEO
+  PRESIDENT
+  COO
+  CFO
+  CTO
+  CMO
+  CSO
+  BOARD_MEMBER
+  BOARD_OBSERVER
+  CHAIRPERSON
+  ADVISOR
+  SCIENTIFIC_ADVISOR
+  CLINICAL_ADVISOR
+  INVESTOR
+  LEAD_INVESTOR
+  EMPLOYEE
+  OPERATOR
+  SPONSOR
+  MANUFACTURER
+  DISTRIBUTOR
+  PARTNER
+  PRINCIPAL_INVESTIGATOR
+  AUTHOR
+  REVIEWER
+  SPEAKER
+  EXHIBITOR
+  UNKNOWN
+}
+
+enum CorporateRoleType {
+  DIRECTOR
+  INDEPENDENT_DIRECTOR
+  EXECUTIVE_DIRECTOR
+  NON_EXECUTIVE_DIRECTOR
+  CHAIR
+  LEAD_INDEPENDENT_DIRECTOR
+  CEO
+  PRESIDENT
+  CFO
+  COO
+  CTO
+  CMO
+  CSO
+  GENERAL_COUNSEL
+  CORPORATE_SECRETARY
+  TREASURER
+  FOUNDER
+  CO_FOUNDER
+  MANAGING_PARTNER
+  PARTNER
+  PRINCIPAL
+  ASSOCIATE
+  UNKNOWN
+}
+
+enum SeniorityLevel {
+  BOARD
+  C_SUITE
+  SVP
+  VP
+  DIRECTOR
+  HEAD
+  MANAGER
+  INDIVIDUAL_CONTRIBUTOR
+  ADVISOR
+  UNKNOWN
+}
+
+type TemporalMetadata @relationshipProperties {
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime
+  recordedTo: DateTime
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type OwnershipMetadata @relationshipProperties {
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime
+  recordedTo: DateTime
+  stakePercent: Float
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type RoleMetadata @relationshipProperties {
+  role: String
+  title: String
+  corporateRole: String
+  roleType: RoleType
+  corporateRoleType: CorporateRoleType
+  seniorityLevel: SeniorityLevel
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime
+  recordedTo: DateTime
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type RecommendationMetadata @relationshipProperties {
+  strength: Float
+  context: String
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type UsageMetadata @relationshipProperties {
+  usageContext: String
+  isPrimary: Boolean
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type ListingMetadata @relationshipProperties {
+  listRole: String
+  localPriceAmount: Float
+  localCurrency: String
+  appointmentRequiredOverride: Boolean
+  notes: String
+  mongoResearchRunId: String
+}
+
+type OrderingMetadata @relationshipProperties {
+  orderIndex: Int
+  sequenceIndex: Int
+  seasonNumber: Int
+  episodeNumber: Int
+  startTime: String
+  endTime: String
+  publishedAt: DateTime
+  rhetoricalRole: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+type ExtractionMetadata @relationshipProperties {
+  salience: Float
+  aboutness: Float
+  supportType: String
+  quoteSpan: String
+  extractionMethod: String
+  extractedAt: DateTime
+  extractorVersion: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+type MeasurementMetadata @relationshipProperties {
+  role: String
+  method: String
+  methodRole: String
+  unit: String
+  sampleType: String
+  signalType: String
+  samplingRateHz: Float
+  rangeMin: Float
+  rangeMax: Float
+  accuracy: Float
+  referenceRangeText: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+type DoseMetadata @relationshipProperties {
+  dose: Float
+  doseUnit: String
+  role: String
+  standardizedTo: String
+  quantity: Int
+  componentName: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+type InterventionArmMetadata @relationshipProperties {
+  armLabel: String
+  interventionRole: String
+  doseText: String
+  doseAmount: Float
+  doseUnit: String
+  route: String
+  frequency: String
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type TreatmentComponentMetadata @relationshipProperties {
+  role: String
+  doseText: String
+  route: String
+  frequency: String
+  durationText: String
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type TreatmentTargetMetadata @relationshipProperties {
+  targetRole: String
+  indicationType: String
+  patientSubset: String
+  evidenceStrength: EvidenceStrength
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type SafetyMetadata @relationshipProperties {
+  exposureContext: String
+  doseText: String
+  route: String
+  frequency: String
+  populationSubset: String
+  evidenceStrength: EvidenceStrength
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type AssociationMetadata @relationshipProperties {
+  direction: String
+  polarity: AssociationPolarity
+  associationShape: String
+  evidenceStrength: EvidenceStrength
+  specificity: String
+  latency: String
+  timeHorizon: String
+  citation: String
+  causalStatus: String
+  effectSummary: String
+  comparator: String
+  populationSubset: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+type MechanismLinkMetadata @relationshipProperties {
+  enzymeRole: String
+  regulatorySign: String
+  stoichiometryNote: String
+  upstreamDownstream: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+enum MediaRelationRole {
+  PRIMARY_IMAGE
+  THUMBNAIL
+  HERO_IMAGE
+  PRODUCT_PHOTO
+  PACKAGE_LABEL
+  SUPPLEMENT_FACTS_LABEL
+  DEVICE_PHOTO
+  CLINIC_PHOTO
+  PROCEDURE_DEMO
+  PROTOCOL_STEP_INSTRUCTION
+  MECHANISM_DIAGRAM
+  PATHWAY_DIAGRAM
+  MOLECULAR_RENDERING
+  ANATOMICAL_RENDERING
+  STUDY_FIGURE
+  RESULT_CHART
+  BEFORE_AFTER
+  SAFETY_WARNING
+  SCREENSHOT
+  LOGO
+  PORTRAIT
+  EVENT_PHOTO
+  PODCAST_COVER
+  SOCIAL_PREVIEW
+  GENERATED_EXPLAINER
+  UNKNOWN
+}
+
+type MediaLinkMetadata @relationshipProperties {
+  role: MediaRelationRole
+  confidence: Float
+  salience: Float
+  isPrimary: Boolean
+  isRepresentative: Boolean
+  isCanonical: Boolean
+  sourceText: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+type MediaSourceMetadata @relationshipProperties {
+  sourceRole: String
+  sourceConfidence: Float
+  extractionMethod: String
+  extractedAt: DateTime
+  sourceText: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+type AnnotationMetadata @relationshipProperties {
+  annotationRole: String
+  confidence: Float
+  salience: Float
+  label: String
+  sourceText: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+type RenderingMetadata @relationshipProperties {
+  renderingRole: String
+  renderer: String
+  renderingSoftware: String
+  renderingParametersJson: String
+  cameraPositionJson: String
+  lightingSpecJson: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+type BiologicalModelMetadata @relationshipProperties {
+  modelKind: String
+  coordinateSystem: String
+  scale: String
+  species: String
+  anatomicalContext: String
+  sourceDatabase: String
+  externalId: String
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+type MolecularRenderingMetadata @relationshipProperties {
+  representation: String
+  structureSource: String
+  pdbId: String
+  ligandId: String
+  conformationId: String
+  renderingSoftware: String
+  notes: String
+  mongoResearchRunId: String
+}
+
+enum OrganizationType {
+  COMPANY
+  PUBLIC_COMPANY
+  PRIVATE_COMPANY
+  STARTUP
+  SUBSIDIARY
+  HOLDING_COMPANY
+  OPERATING_COMPANY
+  CONTRACT_RESEARCH_ORGANIZATION
+  CONTRACT_DEVELOPMENT_AND_MANUFACTURING_ORGANIZATION
+  MANUFACTURER
+  BIOTECH_COMPANY
+  PHARMACEUTICAL_COMPANY
+  DIAGNOSTICS_COMPANY
+  MEDICAL_DEVICE_COMPANY
+  DIGITAL_HEALTH_COMPANY
+  CLINIC
+  HOSPITAL
+  HEALTH_SYSTEM
+  LABORATORY
+  RESEARCH_INSTITUTE
+  UNIVERSITY
+  NONPROFIT
+  FOUNDATION
+  GOVERNMENT_AGENCY
+  REGULATORY_AGENCY
+  INVESTOR
+  VENTURE_CAPITAL_FIRM
+  PRIVATE_EQUITY_FIRM
+  ACCELERATOR
+  INCUBATOR
+  DISTRIBUTOR
+  MARKETPLACE
+  RETAILER
+  INSURER
+  EMPLOYER
+  PROFESSIONAL_ASSOCIATION
+  STANDARDS_BODY
+  UNKNOWN
+}
+
+enum FundingStage {
+  BOOTSTRAPPED
+  GRANT_FUNDED
+  PRE_SEED
+  SEED
+  SEED_EXTENSION
+  SERIES_A
+  SERIES_B
+  SERIES_C
+  SERIES_D_PLUS
+  GROWTH_EQUITY
+  PRIVATE_EQUITY_BACKED
+  PRE_IPO
+  IPO
+  PUBLIC
+  ACQUIRED
+  POST_MERGER
+  BANKRUPTCY_RESTRUCTURING
+  UNKNOWN
+}
+
+enum EmployeeCountBand {
+  SOLO
+  MICRO_2_10
+  SMALL_11_50
+  SMALL_MID_51_200
+  MID_201_500
+  MID_LARGE_501_1000
+  LARGE_1001_5000
+  VERY_LARGE_5001_10000
+  ENTERPRISE_10001_PLUS
+  UNKNOWN
+}
+
+enum LocationType {
+  HEADQUARTERS
+  REGISTERED_OFFICE
+  CORPORATE_OFFICE
+  ADMINISTRATIVE_OFFICE
+  RESEARCH_SITE
+  LABORATORY
+  CLINIC
+  HOSPITAL
+  MANUFACTURING_SITE
+  GMP_FACILITY
+  PILOT_PLANT
+  WAREHOUSE
+  DISTRIBUTION_CENTER
+  RETAIL_SITE
+  TESTING_SITE
+  COLLECTION_SITE
+  DATA_CENTER
+  CAMPUS
+  REMOTE
+  VIRTUAL
+  OTHER
+  UNKNOWN
+}
+
+union Producible = Product | FoodProduct
+
+union Sponsorable = Conference | Channel | Episode
+
+union ContractManufacturingTarget = Product | CompoundForm | Organization
+
+type Organization implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "OrganizationName", fields: ["name", "searchText", "legalName", "displayName", "canonicalTicker"], queryName: "searchOrganizationsByName"}]) @vector(indexes: [{indexName: "OrganizationSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchOrganizationsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  canonicalTicker: String
+  legalName: String
+  displayName: String
+  organizationType: OrganizationType
+  active: Boolean
+  incorporatedOn: DateTime
+  dissolvedOn: DateTime
+  operatingFrom: DateTime
+  operatingTo: DateTime
+  foundedYear: Int
+  fundingStage: FundingStage
+  totalFundingUsd: Float
+  employeeCountMin: Int
+  employeeCountMax: Int
+  employeeCountEstimate: Int
+  employeeCountBand: EmployeeCountBand
+  employeeCountRaw: String
+  revenueModel: String
+  valueChainStages: [String!]
+  sector: String
+  websiteUrl: String
+  headquartersSummary: String
+  operatingSummary: String
+  marketCapUsd: Float
+  pipelineSummary: String
+  competitivePositionSummary: String
+  isPublicCompany: Boolean
+  isInvestor: Boolean
+  isProviderOrganization: Boolean
+  isResearchOrganization: Boolean
+  isManufacturer: Boolean
+  """Marks the timestamp of the current materialized state on this node."""
+  currentAsOf: DateTime
+  """
+  Canonical semantic search embedding for the organization identity/current record.
+  """
+  searchEmbedding: [Float!]
+  """
+  Optional historical milestone snapshots.
+  Non-temporal linkage only.
+  """
+  snapshots: [OrganizationSnapshot!]! @relationship(type: "HAS_SNAPSHOT", direction: OUT)
+  listings: [Listing!]! @relationship(type: "LISTS", direction: OUT, properties: "ListingMetadata")
+  locations: [PhysicalLocation!]! @relationship(type: "HAS_LOCATION", direction: OUT, properties: "TemporalMetadata")
+  developsPlatforms: [TechnologyPlatform!]! @relationship(type: "DEVELOPS_PLATFORM", direction: OUT, properties: "RoleMetadata")
+  usesPlatforms: [TechnologyPlatform!]! @relationship(type: "USES_PLATFORM", direction: OUT, properties: "UsageMetadata")
+  usesTools: [ToolOrInstrument!]! @relationship(type: "USES", direction: OUT, properties: "UsageMetadata")
+  offersProducts: [Producible!]! @relationship(type: "OFFERS", direction: OUT, properties: "RoleMetadata")
+  offersProcedures: [Procedure!]! @relationship(type: "OFFERS_PROCEDURE", direction: OUT, properties: "RoleMetadata")
+  developsTreatments: [Treatment!]! @relationship(type: "DEVELOPS_TREATMENT", direction: OUT, properties: "RoleMetadata")
+  offersTreatments: [Treatment!]! @relationship(type: "OFFERS_TREATMENT", direction: OUT, properties: "RoleMetadata")
+  worksOnConditions: [Condition!]! @relationship(type: "WORKS_ON_CONDITION", direction: OUT, properties: "RoleMetadata")
+  manufactures: [Producible!]! @relationship(type: "MANUFACTURES", direction: OUT, properties: "RoleMetadata")
+  performsProcesses: [ManufacturingProcess!]! @relationship(type: "PERFORMS_PROCESS", direction: OUT, properties: "RoleMetadata")
+  controls: [Organization!]! @relationship(type: "CONTROLS", direction: OUT, properties: "OwnershipMetadata")
+  contractsManufacturing: [ContractManufacturingTarget!]! @relationship(type: "CONTRACTS_MANUFACTURING", direction: OUT, properties: "RoleMetadata")
+  sponsors: [Sponsorable!]! @relationship(type: "SPONSORS", direction: OUT, properties: "RoleMetadata")
+  exhibitsAt: [Conference!]! @relationship(type: "EXHIBITS_AT", direction: OUT, properties: "RoleMetadata")
+  operatesChannels: [Channel!]! @relationship(type: "OPERATES_CHANNEL", direction: OUT, properties: "RoleMetadata")
+  employs: [Person!]! @relationship(type: "EMPLOYS", direction: OUT, properties: "RoleMetadata")
+  hasBoardMembers: [Person!]! @relationship(type: "HAS_BOARD_MEMBER", direction: OUT, properties: "RoleMetadata")
+  foundedBy: [Person!]! @relationship(type: "FOUNDED_BY", direction: OUT, properties: "RoleMetadata")
+  hasCeos: [Person!]! @relationship(type: "HAS_CEO", direction: OUT, properties: "TemporalMetadata")
+}
+
+type OrganizationSnapshot implements Entity & SearchIndexable & TemporalSnapshot @node @fulltext(indexes: [{indexName: "OrganizationSnapshotSearch", fields: ["name", "description", "sector", "searchText"], queryName: "searchOrganizationSnapshots"}]) @vector(indexes: [{indexName: "OrganizationSnapshotSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchOrganizationSnapshotsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """When this snapshot was true in the world."""
+  validFrom: DateTime
+  validTo: DateTime
+  """When this snapshot was known/recorded in the graph."""
+  recordedFrom: DateTime
+  recordedTo: DateTime
+  snapshotType: String
+  legalName: String
+  displayName: String
+  organizationType: OrganizationType
+  active: Boolean
+  foundedYear: Int
+  fundingStage: FundingStage
+  totalFundingUsd: Float
+  employeeCountMin: Int
+  employeeCountMax: Int
+  employeeCountEstimate: Int
+  employeeCountBand: EmployeeCountBand
+  employeeCountRaw: String
+  revenueModel: String
+  valueChainStages: [String!]
+  sector: String
+  websiteUrl: String
+  headquarters: String
+  headquartersSummary: String
+  operatingSummary: String
+  marketCapUsd: Float
+  pipelineSummary: String
+  competitivePositionSummary: String
+  isPublicCompany: Boolean
+  isInvestor: Boolean
+  isProviderOrganization: Boolean
+  isResearchOrganization: Boolean
+  isManufacturer: Boolean
+  searchEmbedding: [Float!]
+  organization: [Organization!]! @relationship(type: "HAS_SNAPSHOT", direction: IN)
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type PhysicalLocation implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  locationType: LocationType
+  latitude: Float
+  longitude: Float
+  country: String
+  region: String
+  city: String
+  addressText: String
+  postalCode: String
+  establishmentIdentifier: String
+  isHeadquarters: Boolean
+  isManufacturingSite: Boolean
+  isClinicalSite: Boolean
+  isResearchSite: Boolean
+  hostsProcesses: [ManufacturingProcess!]! @relationship(type: "HOSTS_PROCESS", direction: OUT, properties: "TemporalMetadata")
+  hostsProducts: [Product!]! @relationship(type: "HOSTS_PRODUCT", direction: OUT, properties: "RoleMetadata")
+}
+
+type Compound implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "CompoundSearch", fields: ["name", "description", "commonName", "casNumber", "searchText"], queryName: "searchCompounds"}]) @vector(indexes: [{indexName: "CompoundSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchCompoundsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  commonName: String
+  casNumber: String
+  molecularFormula: String
+  molecularWeight: Float
+  compoundClass: String
+  searchEmbedding: [Float!]
+  forms: [CompoundForm!]! @relationship(type: "IS_FORM_OF", direction: IN, properties: "RoleMetadata")
+  modulates: [MolecularEntity!]! @relationship(type: "MODULATES", direction: OUT, properties: "AssociationMetadata")
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyMetadata")
+}
+
+type CompoundForm implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  dosageForm: String
+  concentrationText: String
+  formOf: [Compound!]! @relationship(type: "IS_FORM_OF", direction: OUT, properties: "RoleMetadata")
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "AssociationMetadata")
+}
+
+union ProductClassification = ToolOrInstrument | Device
+
+union ExposureAgent = FoodItem | FoodProduct | Ingredient | Compound | Lifestyle
+
+union TreatmentComponent = Compound | CompoundForm | Product | Device | Procedure | Protocol | Lifestyle | FoodProduct
+
+union SafetySubject = Compound | Product | FoodItem | FoodProduct | Ingredient | Lifestyle | Treatment | Procedure
+
+enum ProductStatus {
+  DISCOVERY
+  RESEARCH
+  PRECLINICAL
+  CLINICAL
+  APPROVED
+  DISCONTINUED
+}
+
+enum TreatmentModality {
+  SMALL_MOLECULE
+  BIOLOGIC
+  GENE_THERAPY
+  CELL_THERAPY
+  RNA_THERAPY
+  PROCEDURE
+  DEVICE_BASED
+  NUTRITIONAL
+  LIFESTYLE
+  COMBINATION
+  OTHER
+  UNKNOWN
+}
+
+enum SafetySeverity {
+  MILD
+  MODERATE
+  SEVERE
+  SERIOUS
+  LIFE_THREATENING
+  UNKNOWN
+}
+
+enum OutcomeDirection {
+  IMPROVED
+  WORSENED
+  NO_CHANGE
+  MIXED
+  INCONCLUSIVE
+  UNKNOWN
+}
+
+type Product implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "ProductSearch", fields: ["name", "description", "searchText", "productType", "productClass", "primaryRegulatoryIdentifier", "regulatoryAuthorizationId"], queryName: "searchProducts"}]) @vector(indexes: [{indexName: "ProductSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchProductsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """
+  Stable identity-level or canonical product identifier.
+  Keep only if truly stable.
+  """
+  primaryRegulatoryIdentifier: String
+  """Current materialized product facts."""
+  productType: String
+  applicationContext: String
+  categories: [String!]
+  launchYear: Int
+  targetCustomer: String
+  deliveryModel: String
+  status: ProductStatus
+  approvedYear: Int
+  productClass: String
+  formulationSummary: String
+  indicationSummary: String
+  modalitySummary: String
+  regulatoryAuthorizationId: String
+  """Timestamp for the current materialized product record."""
+  currentAsOf: DateTime
+  """Canonical semantic search embedding for the product current record."""
+  searchEmbedding: [Float!]
+  """Optional historical product snapshots."""
+  snapshots: [ProductSnapshot!]! @relationship(type: "HAS_SNAPSHOT", direction: OUT)
+  offeredBy: [Organization!]! @relationship(type: "OFFERS", direction: IN, properties: "RoleMetadata")
+  manufacturedBy: [Organization!]! @relationship(type: "MANUFACTURES", direction: IN, properties: "RoleMetadata")
+  contractManufacturedBy: [Organization!]! @relationship(type: "CONTRACTS_MANUFACTURING", direction: IN, properties: "RoleMetadata")
+  listedIn: [Listing!]! @relationship(type: "LISTS_PRODUCT", direction: IN, properties: "RoleMetadata")
+  containsCompoundForms: [CompoundForm!]! @relationship(type: "CONTAINS_COMPOUND_FORM", direction: OUT, properties: "DoseMetadata")
+  implementsPlatforms: [TechnologyPlatform!]! @relationship(type: "IMPLEMENTS", direction: OUT, properties: "UsageMetadata")
+  classifiedAs: [ProductClassification!]! @relationship(type: "CLASSIFIED_AS", direction: OUT, properties: "RoleMetadata")
+  implementsPanels: [PanelDefinition!]! @relationship(type: "IMPLEMENTS_PANEL", direction: OUT, properties: "RoleMetadata")
+  deliversLabTests: [LabTest!]! @relationship(type: "DELIVERS_LABTEST", direction: OUT, properties: "RoleMetadata")
+  followsRegulatoryPathways: [RegulatoryPathway!]! @relationship(type: "FOLLOWS_PATHWAY", direction: OUT, properties: "RoleMetadata")
+  hasRegulatoryStatuses: [RegulatoryStatus!]! @relationship(type: "HAS_REGULATORY_STATUS", direction: OUT, properties: "RoleMetadata")
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyMetadata")
+}
+
+type ProductSnapshot implements Entity & SearchIndexable & TemporalSnapshot @node @fulltext(indexes: [{indexName: "ProductSnapshotSearch", fields: ["name", "description", "searchText"], queryName: "searchProductSnapshots"}]) @vector(indexes: [{indexName: "ProductSnapshotSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchProductSnapshotsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime
+  recordedTo: DateTime
+  snapshotType: String
+  productType: String
+  applicationContext: String
+  categories: [String!]
+  launchYear: Int
+  targetCustomer: String
+  deliveryModel: String
+  status: ProductStatus
+  approvedYear: Int
+  productClass: String
+  formulationSummary: String
+  indicationSummary: String
+  modalitySummary: String
+  regulatoryAuthorizationId: String
+  searchEmbedding: [Float!]
+  product: [Product!]! @relationship(type: "HAS_SNAPSHOT", direction: IN)
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+
+type Procedure implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "ProcedureSearch", fields: ["name", "description", "searchText", "procedureType", "setting"], queryName: "searchProcedures"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  procedureType: String
+  setting: String
+  deliveryRoute: String
+  invasiveness: String
+  durationSummary: String
+  preparationSummary: String
+  recoverySummary: String
+  listedIn: [Listing!]! @relationship(type: "LISTS_PROCEDURE", direction: IN, properties: "TemporalMetadata")
+  offeredBy: [Organization!]! @relationship(type: "OFFERS_PROCEDURE", direction: IN, properties: "RoleMetadata")
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyMetadata")
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Treatment implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "TreatmentSearch", fields: ["name", "description", "searchText", "treatmentClass", "orphanDrugDesignation"], queryName: "searchTreatments"}]) @vector(indexes: [{indexName: "TreatmentSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchTreatmentsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  modality: TreatmentModality
+  treatmentClass: String
+  developmentStage: String
+  orphanDrugDesignation: String
+  routeCategory: String
+  regimenSummary: String
+  targetedPopulation: String
+  searchEmbedding: [Float!]
+  targetsConditions: [Condition!]! @relationship(type: "TARGETS_CONDITION", direction: OUT, properties: "TreatmentTargetMetadata")
+  usesComponents: [TreatmentComponent!]! @relationship(type: "USES_COMPONENT", direction: OUT, properties: "TreatmentComponentMetadata")
+  developedBy: [Organization!]! @relationship(type: "DEVELOPS_TREATMENT", direction: IN, properties: "RoleMetadata")
+  offeredBy: [Organization!]! @relationship(type: "OFFERS_TREATMENT", direction: IN, properties: "RoleMetadata")
+  evaluatedInStudies: [Study!]! @relationship(type: "EVALUATES", direction: IN, properties: "InterventionArmMetadata")
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyMetadata")
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Listing implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "ListingSearch", fields: ["name", "description", "searchText", "listingType", "status", "url", "availabilityStatus", "commercialTermsSummary"], queryName: "searchListings"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  listingType: String
+  status: String
+  url: String
+  priceAmount: Float
+  currency: String
+  availabilityStatus: String
+  capturedAt: DateTime
+  commercialTermsSummary: String
+  """Timestamp for the current materialized listing record."""
+  currentAsOf: DateTime
+  offeredBy: [Organization!]! @relationship(type: "LISTS", direction: IN, properties: "ListingMetadata")
+  availableIn: [PhysicalLocation!]! @relationship(type: "AVAILABLE_IN", direction: OUT, properties: "ListingMetadata")
+  listsProducts: [Product!]! @relationship(type: "LISTS_PRODUCT", direction: OUT, properties: "TemporalMetadata")
+  listsProcedures: [Procedure!]! @relationship(type: "LISTS_PROCEDURE", direction: OUT, properties: "TemporalMetadata")
+  implementsPanels: [PanelDefinition!]! @relationship(type: "IMPLEMENTS_PANEL", direction: OUT, properties: "RoleMetadata")
+  snapshots: [ListingSnapshot!]! @relationship(type: "HAS_SNAPSHOT", direction: OUT)
+}
+
+type ListingSnapshot implements Entity & TemporalSnapshot @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime
+  recordedTo: DateTime
+  snapshotType: String
+  listingType: String
+  status: String
+  url: String
+  priceAmount: Float
+  currency: String
+  availabilityStatus: String
+  capturedAt: DateTime
+  commercialTermsSummary: String
+  listing: [Listing!]! @relationship(type: "HAS_SNAPSHOT", direction: IN)
+}
+
+type FoodItem implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "FoodItemSearch", fields: ["name", "description", "searchText", "foodGroup"], queryName: "searchFoodItems"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  foodGroup: String
+  variantKind: String
+  productionType: String
+  processingMethods: [String!]
+  preparationNotes: String
+  hasVariants: [FoodItem!]! @relationship(type: "VARIANT_OF", direction: IN, properties: "RoleMetadata")
+  containsCompounds: [Compound!]! @relationship(type: "CONTAINS_COMPOUND", direction: OUT, properties: "DoseMetadata")
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyMetadata")
+}
+
+type Ingredient implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "IngredientSearch", fields: ["name", "description", "searchText", "ingredientRole"], queryName: "searchIngredients"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  ingredientRole: String
+  containsCompounds: [Compound!]! @relationship(type: "CONTAINS_COMPOUND", direction: OUT, properties: "DoseMetadata")
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyMetadata")
+}
+
+type FoodProduct implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "FoodProductSearch", fields: ["name", "description", "searchText", "brandName"], queryName: "searchFoodProducts"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  brandName: String
+  processingMethods: [String!]
+  preparationNotes: String
+  hasIngredients: [Ingredient!]! @relationship(type: "HAS_INGREDIENT", direction: OUT, properties: "DoseMetadata")
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyMetadata")
+}
+
+type Exposure implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  exposureType: String
+  exposureContext: String
+  involves: [ExposureAgent!]! @relationship(type: "INVOLVES", direction: OUT, properties: "RoleMetadata")
+}
+
+
+type Lifestyle implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "LifestyleSearch", fields: ["name", "description", "searchText", "lifestyleClass"], queryName: "searchLifestyles"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  lifestyleClass: String
+  lifestyleDomain: String
+  intensitySummary: String
+  exposurePattern: String
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "AssociationMetadata")
+  associatedWithConditions: [Condition!]! @relationship(type: "ASSOCIATED_WITH_CONDITION", direction: OUT, properties: "AssociationMetadata")
+  associatedWithOutcomes: [Outcome!]! @relationship(type: "ASSOCIATED_WITH_OUTCOME", direction: OUT, properties: "AssociationMetadata")
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyMetadata")
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type AdverseEffect implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "AdverseEffectSearch", fields: ["name", "description", "searchText", "effectCategory"], queryName: "searchAdverseEffects"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  effectCategory: String
+  organSystem: String
+  severitySummary: String
+  affectsOrgans: [Organ!]! @relationship(type: "AFFECTS_ORGAN", direction: OUT, properties: "AssociationMetadata")
+  associatedWithConditions: [Condition!]! @relationship(type: "ASSOCIATED_WITH_CONDITION", direction: OUT, properties: "AssociationMetadata")
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type SafetySignal implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "SafetySignalSearch", fields: ["name", "description", "searchText", "signalType", "interactionSummary"], queryName: "searchSafetySignals"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  signalType: String
+  severity: SafetySeverity
+  evidenceStrength: EvidenceStrength
+  frequencyText: String
+  latencyText: String
+  reversibility: String
+  mechanismSummary: String
+  populationSummary: String
+  interactionSummary: String
+  subjects: [SafetySubject!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: IN, properties: "SafetyMetadata")
+  relatesToEffects: [AdverseEffect!]! @relationship(type: "RELATES_TO_EFFECT", direction: OUT, properties: "AssociationMetadata")
+  relatesToConditions: [Condition!]! @relationship(type: "RELATES_TO_CONDITION", direction: OUT, properties: "AssociationMetadata")
+  affectsOrgans: [Organ!]! @relationship(type: "AFFECTS_ORGAN", direction: OUT, properties: "AssociationMetadata")
+  reportedInStudies: [Study!]! @relationship(type: "REPORTS_SAFETY_SIGNAL", direction: IN, properties: "AssociationMetadata")
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+union Recommendable = Protocol | Compound | FoodItem | FoodProduct | Organization | Product | Treatment | Lifestyle | Procedure
+
+type Person implements Entity & SearchIndexable & ActorIdentity @node @fulltext(indexes: [{indexName: "PersonSearch", fields: ["name", "description", "bio", "title", "searchText"], queryName: "searchPeople"}]) @vector(indexes: [{indexName: "PersonSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchPeopleBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  title: String
+  bio: String
+  birthDate: DateTime
+  birthCity: String
+  birthState: String
+  birthCountry: String
+  deathDate: DateTime
+  linkedInUrl: String
+  twitterUrl: String
+  facebookUrl: String
+  instagramUrl: String
+  youtubeChannelUrl: String
+  personalWebsiteUrl: String
+  searchEmbedding: [Float!]
+  holdsRoleAt: [Organization!]! @relationship(type: "HOLDS_ROLE_AT", direction: OUT, properties: "RoleMetadata")
+  affiliatedWith: [Organization!]! @relationship(type: "AFFILIATED_WITH", direction: OUT, properties: "RoleMetadata")
+  advises: [Organization!]! @relationship(type: "ADVISES", direction: OUT, properties: "RoleMetadata")
+  servesOnChannels: [Channel!]! @relationship(type: "SERVES_ON_CHANNEL", direction: OUT, properties: "RoleMetadata")
+  appearsIn: [Episode!]! @relationship(type: "APPEARS_IN", direction: OUT, properties: "RoleMetadata")
+  recommends: [Recommendable!]! @relationship(type: "RECOMMENDS", direction: OUT, properties: "RecommendationMetadata")
+  speaksAt: [Event!]! @relationship(type: "SPEAKS_AT", direction: OUT, properties: "RoleMetadata")
+  attends: [Conference!]! @relationship(type: "ATTENDS", direction: OUT, properties: "RoleMetadata")
+  linksTo: [PseudonymousActor!]! @relationship(type: "LINKS_TO", direction: OUT, properties: "RoleMetadata")
+  hasParticipantTokens: [CohortParticipant!]! @relationship(type: "HAS_PARTICIPANT_TOKEN", direction: OUT, properties: "RoleMetadata")
+  recordsObservations: [Observation!]! @relationship(type: "RECORDS", direction: OUT, properties: "RoleMetadata")
+  postsResults: [ProtocolResult!]! @relationship(type: "POSTS_RESULT", direction: OUT, properties: "RoleMetadata")
+  authorsReports: [ExperienceReport!]! @relationship(type: "AUTHORS", direction: OUT, properties: "RoleMetadata")
+}
+
+type PseudonymousActor implements Entity & ActorIdentity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  handle: String
+  onPlatforms: [Platform!]! @relationship(type: "ON_PLATFORM", direction: OUT, properties: "RoleMetadata")
+  authorsReports: [ExperienceReport!]! @relationship(type: "AUTHORS", direction: OUT, properties: "RoleMetadata")
+  linkedFrom: [Person!]! @relationship(type: "LINKS_TO", direction: IN, properties: "RoleMetadata")
+}
+
+type AnonymousActor implements Entity & ActorIdentity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  anonymityClass: String
+  authorsReports: [ExperienceReport!]! @relationship(type: "AUTHORS", direction: OUT, properties: "RoleMetadata")
+}
+
+type CohortParticipant implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  participantToken: String
+  reportsExperiences: [ExperienceReport!]! @relationship(type: "REPORTS", direction: OUT, properties: "RoleMetadata")
+}
+
+type Mechanism implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "MechanismSearch", fields: ["name", "description", "searchText"], queryName: "searchMechanisms"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  mechanismClass: String
+  regulatoryMode: String
+  biologicalLayer: String
+  keyEntitiesSummary: String
+  searchEmbedding: [Float!]
+  involvesPathways: [Pathway!]! @relationship(type: "INVOLVES_PATHWAY", direction: OUT, properties: "MechanismLinkMetadata")
+  actsInOrgans: [Organ!]! @relationship(type: "ACTS_IN", direction: OUT, properties: "AssociationMetadata")
+  actsInContexts: [AnatomicalContext!]! @relationship(type: "ACTS_IN_CONTEXT", direction: OUT, properties: "AssociationMetadata")
+  appliesToSpecies: [Species!]! @relationship(type: "APPLIES_TO_SPECIES", direction: OUT, properties: "AssociationMetadata")
+  influencesOutcomes: [Outcome!]! @relationship(type: "INFLUENCES_OUTCOME", direction: OUT, properties: "AssociationMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Pathway implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  pathwayClass: String
+  sourceDatabase: String
+  externalId: String
+  pathwayRevision: String
+  actsInOrgans: [Organ!]! @relationship(type: "ACTS_IN", direction: OUT, properties: "AssociationMetadata")
+  hasMechanisms: [Mechanism!]! @relationship(type: "HAS_MECHANISM", direction: OUT, properties: "MechanismLinkMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Organ implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  organSystem: String
+  measuredByMetrics: [Metric!]! @relationship(type: "MEASURED_BY_METRIC", direction: OUT, properties: "AssociationMetadata")
+  hasMechanisms: [Mechanism!]! @relationship(type: "HAS_MECHANISM", direction: OUT, properties: "MechanismLinkMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Condition implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "ConditionSearch", fields: ["name", "description", "searchText", "mondoId", "icd11Code", "orphaCode", "omimId"], queryName: "searchConditions"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  conditionClass: String
+  mondoId: String
+  icd11Code: String
+  orphaCode: String
+  omimId: String
+  isRare: Boolean
+  searchEmbedding: [Float!]
+  affectsOrgans: [Organ!]! @relationship(type: "AFFECTS_ORGAN", direction: OUT, properties: "AssociationMetadata")
+  hasMechanisms: [Mechanism!]! @relationship(type: "HAS_MECHANISM", direction: OUT, properties: "MechanismLinkMetadata")
+  involvesPathways: [Pathway!]! @relationship(type: "INVOLVES_PATHWAY", direction: OUT, properties: "MechanismLinkMetadata")
+  appliesToSpecies: [Species!]! @relationship(type: "APPLIES_TO_SPECIES", direction: OUT, properties: "AssociationMetadata")
+  indicatedByBiomarkers: [Biomarker!]! @relationship(type: "INDICATES", direction: IN, properties: "AssociationMetadata")
+  investigatedByStudies: [Study!]! @relationship(type: "INVESTIGATES", direction: IN, properties: "RoleMetadata")
+  treatedBy: [Treatment!]! @relationship(type: "TARGETS_CONDITION", direction: IN, properties: "TreatmentTargetMetadata")
+  workedOnBy: [Organization!]! @relationship(type: "WORKS_ON_CONDITION", direction: IN, properties: "RoleMetadata")
+  relatedSafetySignals: [SafetySignal!]! @relationship(type: "RELATES_TO_CONDITION", direction: IN, properties: "AssociationMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Outcome implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  outcomeClass: String
+  outcomeDomain: String
+  timeframeText: String
+  operationalizedBy: [Metric!]! @relationship(type: "OPERATIONALIZED_BY", direction: OUT, properties: "AssociationMetadata")
+  reflectsMechanisms: [Mechanism!]! @relationship(type: "REFLECTS_MECHANISM", direction: OUT, properties: "MechanismLinkMetadata")
+  associatedWithConditions: [Condition!]! @relationship(type: "ASSOCIATED_WITH_CONDITION", direction: OUT, properties: "AssociationMetadata")
+}
+
+type Biomarker implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "BiomarkerSearch", fields: ["name", "description", "searchText"], queryName: "searchBiomarkers"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  biomarkerType: String
+  specimenMatrix: String
+  moleculeClass: String
+  measurementDirectness: String
+  clinicalSignificance: String
+  commonUnits: [String!]
+  agingHallmark: String
+  searchEmbedding: [Float!]
+  indicatesConditions: [Condition!]! @relationship(type: "INDICATES", direction: OUT, properties: "AssociationMetadata")
+  reflectsMechanisms: [Mechanism!]! @relationship(type: "REFLECTS_MECHANISM", direction: OUT, properties: "MechanismLinkMetadata")
+  inPathways: [Pathway!]! @relationship(type: "IN_PATHWAY", direction: OUT, properties: "AssociationMetadata")
+  expressedInOrgans: [Organ!]! @relationship(type: "EXPRESSED_IN", direction: OUT, properties: "AssociationMetadata")
+  expressedInContexts: [AnatomicalContext!]! @relationship(type: "EXPRESSED_IN_CONTEXT", direction: OUT, properties: "AssociationMetadata")
+  encodedByGenes: [MolecularEntity!]! @relationship(type: "ENCODES", direction: IN, properties: "AssociationMetadata")
+  hasReferenceRanges: [ReferenceRange!]! @relationship(type: "HAS_REFERENCE_RANGE", direction: OUT, properties: "AssociationMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Metric implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "MetricSearch", fields: ["name", "description", "searchText"], queryName: "searchMetrics"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  metricType: String
+  canonicalUnit: String
+  loincCode: String
+  ucumUnit: String
+  formulaExpression: String
+  formulaVariables: String
+  mediaUrl: String
+  mediaType: String
+  searchEmbedding: [Float!]
+  quantifiesBiomarkers: [Biomarker!]! @relationship(type: "QUANTIFIES", direction: OUT, properties: "AssociationMetadata")
+  reflectsMechanisms: [Mechanism!]! @relationship(type: "REFLECTS_MECHANISM", direction: OUT, properties: "AssociationMetadata")
+  measuredInOrgans: [Organ!]! @relationship(type: "MEASURED_IN", direction: OUT, properties: "AssociationMetadata")
+  hasReferenceRanges: [ReferenceRange!]! @relationship(type: "HAS_REFERENCE_RANGE", direction: OUT, properties: "AssociationMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type ReferenceRange implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  lowerBound: Float
+  upperBound: Float
+  unit: String
+  populationNotes: String
+  stratifiersText: String
+  sex: String
+  ageMinYears: Float
+  ageMaxYears: Float
+  fastingStatus: String
+  pregnancyStatus: String
+}
+
+type MolecularEntity implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  entityKind: String
+  geneSymbol: String
+  hgncId: String
+  uniprotId: String
+  ensemblId: String
+  encodesBiomarkers: [Biomarker!]! @relationship(type: "ENCODES", direction: OUT, properties: "AssociationMetadata")
+  participatesInPathways: [Pathway!]! @relationship(type: "PARTICIPATES_IN", direction: OUT, properties: "MechanismLinkMetadata")
+  contributesToMechanisms: [Mechanism!]! @relationship(type: "CONTRIBUTES_TO", direction: OUT, properties: "MechanismLinkMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type AnatomicalContext implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  contextKind: String
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Species implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  ncbiTaxonomyId: String
+  scientificName: String
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type RiskFactor implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  riskClass: String
+  modifiable: Boolean
+  exposureCategory: String
+  increasesRiskFor: [Condition!]! @relationship(type: "INCREASES_RISK_FOR", direction: OUT, properties: "AssociationMetadata")
+  mediatesRiskThrough: [Mechanism!]! @relationship(type: "MEDIATES_RISK_THROUGH", direction: OUT, properties: "AssociationMetadata")
+  appliesToSpecies: [Species!]! @relationship(type: "APPLIES_TO_SPECIES", direction: OUT, properties: "AssociationMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type TechnologyPlatform implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "TechnologyPlatformSearch", fields: ["name", "description", "searchText"], queryName: "searchTechnologyPlatforms"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  platformClass: String
+  searchEmbedding: [Float!]
+}
+
+type ToolOrInstrument implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  toolClass: String
+}
+
+type PanelDefinition implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  panelType: String
+  versionLabel: String
+  includesLabTests: [LabTest!]! @relationship(type: "INCLUDES_LABTEST", direction: OUT, properties: "RoleMetadata")
+  includesBiomarkers: [Biomarker!]! @relationship(type: "INCLUDES_BIOMARKER", direction: OUT, properties: "RoleMetadata")
+}
+
+type LabTest implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "LabTestSearch", fields: ["name", "description", "searchText"], queryName: "searchLabTests"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  testType: String
+  searchEmbedding: [Float!]
+  measuresBiomarkers: [Biomarker!]! @relationship(type: "MEASURES", direction: OUT, properties: "MeasurementMetadata")
+  measuresMetrics: [Metric!]! @relationship(type: "MEASURES_METRIC", direction: OUT, properties: "MeasurementMetadata")
+  usesMethods: [MeasurementMethod!]! @relationship(type: "USES_METHOD", direction: OUT, properties: "MeasurementMetadata")
+  requiresSpecimens: [Specimen!]! @relationship(type: "REQUIRES_SPECIMEN", direction: OUT, properties: "MeasurementMetadata")
+  usesPlatforms: [TechnologyPlatform!]! @relationship(type: "USES_PLATFORM", direction: OUT, properties: "MeasurementMetadata")
+}
+
+type MeasurementMethod implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  methodClass: String
+  runsOnPlatforms: [TechnologyPlatform!]! @relationship(type: "RUNS_ON_PLATFORM", direction: OUT, properties: "MeasurementMetadata")
+}
+
+type Specimen implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  specimenType: String
+  collectionSetting: String
+}
+
+type Device implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  deviceClass: String
+  deviceFamily: String
+  usesModalities: [Modality!]! @relationship(type: "USES_MODALITY", direction: OUT, properties: "UsageMetadata")
+  hasSensors: [Sensor!]! @relationship(type: "HAS_SENSOR", direction: OUT, properties: "RoleMetadata")
+  implementsPlatforms: [TechnologyPlatform!]! @relationship(type: "IMPLEMENTS_PLATFORM", direction: OUT, properties: "UsageMetadata")
+  measuresMetrics: [Metric!]! @relationship(type: "MEASURES_METRIC", direction: OUT, properties: "MeasurementMetadata")
+}
+
+type Modality implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  modalityClass: String
+  modalityFamily: String
+  parameterNames: [String!]
+  parameterUnits: [String!]
+}
+
+type Sensor implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  sensorType: String
+  measuresMetrics: [Metric!]! @relationship(type: "MEASURES_METRIC", direction: OUT, properties: "MeasurementMetadata")
+}
+
+type ManufacturingProcess implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  processClass: String
+  qualitySystemKind: String
+  productionScale: String
+  processTechnologySummary: String
+  hasSteps: [ManufacturingStep!]! @relationship(type: "HAS_STEP", direction: OUT, properties: "OrderingMetadata")
+  inputsMaterials: [Material!]! @relationship(type: "INPUTS", direction: OUT, properties: "DoseMetadata")
+  outputsMaterials: [Material!]! @relationship(type: "OUTPUTS", direction: OUT, properties: "DoseMetadata")
+  producesMaterials: [Material!]! @relationship(type: "PRODUCES", direction: OUT, properties: "DoseMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type ManufacturingStep implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  stepClass: String
+  environmentGrade: String
+  operationKind: String
+  usesPlatforms: [TechnologyPlatform!]! @relationship(type: "USES_PLATFORM", direction: OUT, properties: "UsageMetadata")
+  usesEquipment: [ToolOrInstrument!]! @relationship(type: "USES_EQUIPMENT", direction: OUT, properties: "UsageMetadata")
+  hasInputMaterials: [Material!]! @relationship(type: "HAS_INPUT", direction: OUT, properties: "DoseMetadata")
+  hasOutputMaterials: [Material!]! @relationship(type: "HAS_OUTPUT", direction: OUT, properties: "DoseMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Material implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  materialType: String
+  materialGrade: String
+  regulatoryCategoryHint: String
+  traceabilityCode: String
+  partOfProducts: [Product!]! @relationship(type: "PART_OF", direction: OUT, properties: "DoseMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type RegulatoryPathway implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  pathwayKind: String
+  submissionCategory: String
+  jurisdictionCode: String
+  hasSteps: [RegulatoryStep!]! @relationship(type: "HAS_REGULATORY_STEP", direction: OUT, properties: "OrderingMetadata")
+}
+
+type RegulatoryStep implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  stepKind: String
+  milestoneCode: String
+}
+
+type RegulatoryStatus implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  statusCode: String
+  effectiveDate: DateTime
+  applicationNumber: String
+  decisionDate: DateTime
+  expirationOrRenewalDate: DateTime
+  jurisdictionCode: String
+  issuedBy: [RegulatoryAgency!]! @relationship(type: "ISSUED_BY", direction: OUT, properties: "RoleMetadata")
+}
+
+type RegulatoryAgency implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  agencyCode: String
+  overseesPathways: [RegulatoryPathway!]! @relationship(type: "OVERSEES", direction: OUT, properties: "RoleMetadata")
+}
+
+union StudyIntervention = Product | Compound | CompoundForm | FoodItem | FoodProduct | Protocol | Treatment | Device | Procedure | Lifestyle
+
+type Study implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "StudySearch", fields: ["name", "description", "searchText"], queryName: "searchStudies"}]) @vector(indexes: [{indexName: "StudySearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchStudiesBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  registryNamespace: String
+  registryId: String
+  canonicalUrl: String
+  pmid: String
+  doi: String
+  overallStatus: String
+  registrySyncedAt: DateTime
+  startDate: DateTime
+  primaryCompletionDate: DateTime
+  completionDate: DateTime
+  enrollmentCount: Int
+  studyType: String
+  allocation: String
+  interventionModel: String
+  masking: String
+  primaryPurpose: String
+  countries: [String!]
+  fdaRegulatedDrug: Boolean
+  fdaRegulatedDevice: Boolean
+  hasResults: Boolean
+  studyPhase: String
+  sampleSizeText: String
+  evidenceLevel: String
+  searchEmbedding: [Float!]
+  hasPrimarySources: [Document!]! @relationship(type: "HAS_PRIMARY_SOURCE", direction: OUT, properties: "RoleMetadata")
+  evaluates: [StudyIntervention!]! @relationship(type: "EVALUATES", direction: OUT, properties: "InterventionArmMetadata")
+  sponsoredBy: [Organization!]! @relationship(type: "SPONSORED_BY", direction: OUT, properties: "RoleMetadata")
+  operatedBy: [Organization!]! @relationship(type: "OPERATED_BY", direction: OUT, properties: "RoleMetadata")
+  investigatedBy: [Person!]! @relationship(type: "INVESTIGATED_BY", direction: OUT, properties: "RoleMetadata")
+  studiesPopulations: [Population!]! @relationship(type: "STUDIES", direction: OUT, properties: "RoleMetadata")
+  hasDatasets: [Dataset!]! @relationship(type: "HAS_DATASET", direction: OUT, properties: "RoleMetadata")
+  investigatesConditions: [Condition!]! @relationship(type: "INVESTIGATES", direction: OUT, properties: "RoleMetadata")
+  studiedInSpecies: [Species!]! @relationship(type: "STUDIED_IN", direction: OUT, properties: "RoleMetadata")
+  evaluatesRiskFactors: [RiskFactor!]! @relationship(type: "EVALUATES_RISK_FACTOR", direction: OUT, properties: "RoleMetadata")
+  hasArms: [StudyArm!]! @relationship(type: "HAS_ARM", direction: OUT, properties: "RoleMetadata")
+  hasOutcomeMeasures: [OutcomeMeasure!]! @relationship(type: "HAS_OUTCOME_MEASURE", direction: OUT, properties: "RoleMetadata")
+  hasOutcomeResults: [OutcomeResult!]! @relationship(type: "HAS_OUTCOME_RESULT", direction: OUT, properties: "RoleMetadata")
+  hasOutcomes: [StudyOutcome!]! @relationship(type: "HAS_OUTCOME", direction: OUT, properties: "AssociationMetadata")
+  reportsSafetySignals: [SafetySignal!]! @relationship(type: "REPORTS_SAFETY_SIGNAL", direction: OUT, properties: "AssociationMetadata")
+}
+
+type StudyOutcome implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  outcomeSummary: String
+  sourceUrl: String
+  refersToOutcomes: [Outcome!]! @relationship(type: "REFERS_TO_OUTCOME", direction: OUT, properties: "AssociationMetadata")
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+
+type StudyArm implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  armType: String
+  comparatorType: String
+  armDescription: String
+  plannedEnrollment: Int
+  receivesInterventions: [StudyIntervention!]! @relationship(type: "RECEIVES", direction: OUT, properties: "InterventionArmMetadata")
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type OutcomeMeasure implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  outcomeKind: String
+  isPrimary: Boolean
+  timepointLabel: String
+  measureType: String
+  measuredByMetrics: [Metric!]! @relationship(type: "MEASURED_BY_METRIC", direction: OUT, properties: "MeasurementMetadata")
+  refersToOutcomes: [Outcome!]! @relationship(type: "REFERS_TO_OUTCOME", direction: OUT, properties: "AssociationMetadata")
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type OutcomeResult implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  resultText: String
+  direction: OutcomeDirection
+  effectSizeValue: Float
+  effectSizeUnit: String
+  pValue: Float
+  confidenceIntervalText: String
+  baselineValue: Float
+  followupValue: Float
+  absoluteChange: Float
+  relativeChangePercent: Float
+  sampleSize: Int
+  isStatisticallySignificant: Boolean
+  isClinicallyMeaningful: Boolean
+  timepointLabel: String
+  forMeasures: [OutcomeMeasure!]! @relationship(type: "FOR_MEASURE", direction: OUT, properties: "RoleMetadata")
+  fromArms: [StudyArm!]! @relationship(type: "FROM_ARM", direction: OUT, properties: "RoleMetadata")
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "ExtractionMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type Dataset implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  datasetKind: String
+  sourceUrl: String
+  registrationId: String
+  accessLevel: String
+  dataFormat: String
+  isPrimaryResults: Boolean
+}
+
+type Population implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  populationType: String
+  sampleSize: Int
+  sexEligibility: String
+  minAge: String
+  maxAge: String
+  healthyVolunteers: Boolean
+}
+
+union StepSubstance = Compound | CompoundForm | Product | FoodItem | FoodProduct
+
+union StepInstrument = Device | LabTest | Exposure
+
+union TherapeuticTarget = Condition | Outcome | Mechanism
+
+union ConstraintBasis = Condition | Biomarker | LabTest | Metric
+
+union ProtocolResultMention = Compound | Product | Device | Condition | Treatment | Procedure | Lifestyle | SafetySignal | AdverseEffect
+
+union ProvenanceSource = Chunk | Document | Organization | Study
+
+enum ProtocolType {
+  TREATMENT_PROTOCOL
+  SUPPLEMENT_PROTOCOL
+  DIAGNOSTIC_PROTOCOL
+  MONITORING_PROTOCOL
+  TESTING_PROTOCOL
+  SCREENING_PROTOCOL
+  EXERCISE_PROTOCOL
+  NUTRITION_PROTOCOL
+  FASTING_PROTOCOL
+  SLEEP_PROTOCOL
+  RECOVERY_PROTOCOL
+  DRUG_ADMINISTRATION_PROTOCOL
+  DOSING_PROTOCOL
+  TITRATION_PROTOCOL
+  LAB_PANEL_PROTOCOL
+  IMAGING_PROTOCOL
+  BIOPSY_PROTOCOL
+  SAMPLE_COLLECTION_PROTOCOL
+  CLINICAL_TRIAL_PROTOCOL
+  RESEARCH_PROTOCOL
+  EXPERIMENTAL_PROTOCOL
+  SOP
+  WORKFLOW
+  UNKNOWN
+}
+
+enum SchedulePattern {
+  ONE_TIME
+  RECURRING
+  DAILY
+  WEEKLY
+  MONTHLY
+  CYCLIC
+  INTERMITTENT
+  AS_NEEDED
+  EVENT_DRIVEN
+  PHASE_BASED
+  UNKNOWN
+}
+
+enum CadenceUnit {
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  CYCLE
+  AS_NEEDED
+  UNKNOWN
+}
+
+enum TimeOfDay {
+  MORNING
+  AFTERNOON
+  EVENING
+  NIGHT
+  BEDTIME
+  UPON_WAKING
+  PRE_MEAL
+  WITH_MEAL
+  POST_MEAL
+  FASTED
+  ANYTIME
+  UNKNOWN
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum ProtocolStepType {
+  ADMINISTER
+  INGEST
+  INJECT
+  INFUSE
+  APPLY
+  MEASURE
+  TEST
+  SAMPLE
+  OBSERVE
+  RECORD
+  MONITOR
+  EXERCISE
+  SLEEP
+  FAST
+  EAT
+  AVOID
+  ADJUST
+  TITRATE
+  RECOVER
+  REVIEW
+  DECISION
+  OTHER
+  UNKNOWN
+}
+
+type Protocol implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "ProtocolSearch", fields: ["name", "description", "searchText"], queryName: "searchProtocols"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  protocolType: ProtocolType
+  versionLabel: String
+  lastUpdatedAt: DateTime
+  authorName: String
+  publicUrl: String
+  scheduleText: String
+  cadence: String
+  schedulePattern: SchedulePattern
+  cadenceUnit: CadenceUnit
+  cadenceInterval: Int
+  occurrencesPerDay: Int
+  occurrencesPerWeek: Int
+  occurrencesPerMonth: Int
+  durationDaysMin: Int
+  durationDaysMax: Int
+  cycleLengthDays: Int
+  timeOfDay: TimeOfDay
+  daysOfWeek: [DayOfWeek!]
+  isContinuous: Boolean
+  isAsNeeded: Boolean
+  isCyclic: Boolean
+  requiresFasting: Boolean
+  requiresMonitoring: Boolean
+  searchEmbedding: [Float!]
+  hasSteps: [ProtocolStep!]! @relationship(type: "HAS_STEP", direction: OUT, properties: "OrderingMetadata")
+  hasConstraints: [Constraint!]! @relationship(type: "HAS_CONSTRAINT", direction: OUT, properties: "RoleMetadata")
+  hasMeasurementPlans: [MeasurementPlan!]! @relationship(type: "HAS_MEASUREMENT_PLAN", direction: OUT, properties: "RoleMetadata")
+  hasTargets: [Target!]! @relationship(type: "HAS_TARGET", direction: OUT, properties: "RoleMetadata")
+  hasFunctionalGoals: [FunctionalGoal!]! @relationship(type: "HAS_FUNCTIONAL_GOAL", direction: OUT, properties: "RoleMetadata")
+  hasAdjustmentRules: [ProtocolAdjustmentRule!]! @relationship(type: "HAS_ADJUSTMENT_RULE", direction: OUT, properties: "RoleMetadata")
+  targets: [TherapeuticTarget!]! @relationship(type: "TARGETS", direction: OUT, properties: "RoleMetadata")
+  includesProtocols: [Protocol!]! @relationship(type: "INCLUDES_PROTOCOL", direction: OUT, properties: "OrderingMetadata")
+  hasSubprotocols: [Protocol!]! @relationship(type: "HAS_SUBPROTOCOL", direction: OUT, properties: "OrderingMetadata")
+  results: [ProtocolResult!]! @relationship(type: "FOR_PROTOCOL", direction: IN, properties: "RoleMetadata")
+}
+
+type ProtocolStep implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  stepKind: ProtocolStepType
+  stepKindRaw: String
+  stepDescription: String
+  frequencyText: String
+  timingText: String
+  durationText: String
+  scheduleText: String
+  schedulePattern: SchedulePattern
+  cadenceUnit: CadenceUnit
+  cadenceInterval: Int
+  timeOfDay: TimeOfDay
+  daysOfWeek: [DayOfWeek!]
+  durationMinutesMin: Int
+  durationMinutesMax: Int
+  durationDaysMin: Int
+  durationDaysMax: Int
+  isOptional: Boolean
+  isRepeatable: Boolean
+  dependsOn: [ProtocolStep!]! @relationship(type: "DEPENDS_ON", direction: OUT, properties: "OrderingMetadata")
+  hasConstraints: [Constraint!]! @relationship(type: "HAS_CONSTRAINT", direction: OUT, properties: "RoleMetadata")
+  uses: [StepSubstance!]! @relationship(type: "USES", direction: OUT, properties: "DoseMetadata")
+  employs: [StepInstrument!]! @relationship(type: "EMPLOYS", direction: OUT, properties: "RoleMetadata")
+  targets: [TherapeuticTarget!]! @relationship(type: "TARGETS", direction: OUT, properties: "RoleMetadata")
+}
+
+type Constraint implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  constraintType: String
+  basedOn: [ConstraintBasis!]! @relationship(type: "BASED_ON", direction: OUT, properties: "RoleMetadata")
+}
+
+type MeasurementPlan implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  planType: String
+  tracksMetrics: [Metric!]! @relationship(type: "TRACKS_METRIC", direction: OUT, properties: "RoleMetadata")
+}
+
+type Target implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  targetType: String
+  forMetrics: [Metric!]! @relationship(type: "FOR_METRIC", direction: OUT, properties: "RoleMetadata")
+  comparedToRanges: [ReferenceRange!]! @relationship(type: "COMPARED_TO_REFERENCE", direction: OUT, properties: "AssociationMetadata")
+}
+
+type FunctionalGoal implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  goalType: String
+  operationalizedByTargets: [Target!]! @relationship(type: "OPERATIONALIZED_BY", direction: OUT, properties: "AssociationMetadata")
+}
+
+type Observation implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  observedAt: DateTime
+  observationType: String
+  observedPopulation: String
+  measuresMetrics: [Metric!]! @relationship(type: "MEASURES_METRIC", direction: OUT, properties: "MeasurementMetadata")
+  partOfPlans: [MeasurementPlan!]! @relationship(type: "PART_OF_PLAN", direction: OUT, properties: "RoleMetadata")
+  fromLabTests: [LabTest!]! @relationship(type: "FROM_LAB_TEST", direction: OUT, properties: "MeasurementMetadata")
+  fromDevices: [Device!]! @relationship(type: "FROM_DEVICE", direction: OUT, properties: "MeasurementMetadata")
+  aboutConditions: [Condition!]! @relationship(type: "ABOUT_CONDITION", direction: OUT, properties: "RoleMetadata")
+  aboutProtocols: [Protocol!]! @relationship(type: "ABOUT_PROTOCOL", direction: OUT, properties: "RoleMetadata")
+}
+
+type ProtocolAdjustmentRule implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  ruleType: String
+  triggeredByMetrics: [Metric!]! @relationship(type: "TRIGGERED_BY", direction: OUT, properties: "RoleMetadata")
+  modifiesSteps: [ProtocolStep!]! @relationship(type: "MODIFIES_STEP", direction: OUT, properties: "RoleMetadata")
+  modifiesTargets: [Target!]! @relationship(type: "MODIFIES_TARGET", direction: OUT, properties: "RoleMetadata")
+  requiresConditions: [Condition!]! @relationship(type: "REQUIRES_CONDITION", direction: OUT, properties: "RoleMetadata")
+}
+
+type ProtocolResult implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  resultSummary: String
+  forProtocols: [Protocol!]! @relationship(type: "FOR_PROTOCOL", direction: OUT, properties: "RoleMetadata")
+  includesObservations: [Observation!]! @relationship(type: "INCLUDES_OBSERVATION", direction: OUT, properties: "RoleMetadata")
+  claimsOutcomes: [Outcome!]! @relationship(type: "CLAIMS_OUTCOME", direction: OUT, properties: "AssociationMetadata")
+  mentions: [ProtocolResultMention!]! @relationship(type: "MENTIONS", direction: OUT, properties: "ExtractionMetadata")
+  supportedBy: [ProvenanceSource!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+  postedBy: [Person!]! @relationship(type: "POSTS_RESULT", direction: IN, properties: "RoleMetadata")
+}
+
+union EventParticipant = Organization | Person | Product | Compound | Study | TechnologyPlatform | Treatment | Procedure
+
+union EventSubject = Organization | Product | Person | Compound | Study | Condition | TechnologyPlatform | Protocol | Treatment | Procedure | SafetySignal | AdverseEffect | Lifestyle
+
+enum EventCategory {
+  CORPORATE_EVENT
+  FINANCING_EVENT
+  MNA_EVENT
+  PARTNERSHIP_EVENT
+  LICENSING_EVENT
+  REGULATORY_EVENT
+  CLINICAL_EVENT
+  RESEARCH_EVENT
+  PRODUCT_EVENT
+  MANUFACTURING_EVENT
+  FACILITY_EVENT
+  HIRING_EVENT
+  LEADERSHIP_EVENT
+  BOARD_EVENT
+  LEGAL_EVENT
+  LITIGATION_EVENT
+  POLICY_EVENT
+  MARKET_EVENT
+  COMMERCIAL_EVENT
+  CONFERENCE_EVENT
+  MEDIA_EVENT
+  SAFETY_EVENT
+  RECALL_EVENT
+  DATA_READOUT_EVENT
+  OTHER
+  UNKNOWN
+}
+
+enum ImpactLevel {
+  LOW
+  MODERATE
+  HIGH
+  CRITICAL
+  UNKNOWN
+}
+
+enum EventStatus {
+  PLANNED
+  ANNOUNCED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DELAYED
+  UNKNOWN
+}
+
+enum EventPhase {
+  PRE_EVENT
+  ACTIVE
+  POST_EVENT
+  FOLLOW_UP
+  UNKNOWN
+}
+
+type Community implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  communityType: String
+  hostsEvents: [Event!]! @relationship(type: "HOSTS_EVENT", direction: OUT, properties: "RoleMetadata")
+}
+
+type Conference implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  conferenceType: String
+  location: String
+  startDate: DateTime
+  endDate: DateTime
+  websiteUrl: String
+  hasEvents: [Event!]! @relationship(type: "HAS_EVENT", direction: OUT, properties: "OrderingMetadata")
+}
+
+type Event implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "EventSearch", fields: ["name", "description", "summaryText"], queryName: "searchEvents"}]) @vector(indexes: [{indexName: "EventSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchEventsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  eventCategory: EventCategory
+  impactLevel: ImpactLevel
+  eventStatus: EventStatus
+  eventPhase: EventPhase
+  happenedAt: DateTime
+  happenedAtEnd: DateTime
+  announcedAt: DateTime
+  effectiveAt: DateTime
+  sourceUrl: String
+  summaryText: String
+  searchEmbedding: [Float!]
+  involves: [EventParticipant!]! @relationship(type: "INVOLVES", direction: OUT, properties: "RoleMetadata")
+  about: [EventSubject!]! @relationship(type: "ABOUT", direction: OUT, properties: "ExtractionMetadata")
+  reportedIn: [Document!]! @relationship(type: "REPORTED_IN", direction: OUT, properties: "ExtractionMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+  causedBy: [Event!]! @relationship(type: "CAUSED_BY", direction: OUT, properties: "RoleMetadata")
+  followedBy: [Event!]! @relationship(type: "FOLLOWED_BY", direction: OUT, properties: "OrderingMetadata")
+}
+
+type NarrativeArc implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "NarrativeArcSearch", fields: ["name", "description", "themeSummary", "searchText"], queryName: "searchNarrativeArcs"}]) @vector(indexes: [{indexName: "NarrativeArcSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchNarrativeArcsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  arcType: String
+  arcStatus: String
+  startedAt: DateTime
+  endedAt: DateTime
+  impactDomain: String
+  themeSummary: String
+  searchEmbedding: [Float!]
+  hasEvents: [Event!]! @relationship(type: "HAS_EVENT", direction: OUT, properties: "OrderingMetadata")
+  about: [EventSubject!]! @relationship(type: "ABOUT", direction: OUT, properties: "ExtractionMetadata")
+  reportedIn: [Document!]! @relationship(type: "REPORTED_IN", direction: OUT, properties: "ExtractionMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+union EvidenceSubject = Organization | OrganizationSnapshot | Product | ProductSnapshot | Procedure | Treatment | Compound | CompoundForm | FoodItem | FoodProduct | Ingredient | Exposure | Lifestyle | AdverseEffect | SafetySignal | Person | PseudonymousActor | AnonymousActor | CohortParticipant | Study | StudyArm | OutcomeMeasure | OutcomeResult | StudyOutcome | Population | Protocol | ProtocolStep | Condition | Outcome | Mechanism | Pathway | Organ | Biomarker | Metric | Device | LabTest | TechnologyPlatform | ToolOrInstrument | ManufacturingProcess | ManufacturingStep | Material | RegulatoryPathway | RegulatoryStatus | PanelDefinition | Listing | ListingSnapshot | Event | NarrativeArc | RiskFactor | Community | Conference
+
+union ClaimSubject = Association | Organization | OrganizationSnapshot | Product | ProductSnapshot | Procedure | Treatment | Compound | CompoundForm | FoodItem | FoodProduct | Ingredient | Exposure | Lifestyle | AdverseEffect | SafetySignal | Person | PseudonymousActor | AnonymousActor | CohortParticipant | Study | StudyArm | OutcomeMeasure | OutcomeResult | StudyOutcome | Population | Protocol | ProtocolStep | Condition | Outcome | Mechanism | Pathway | Organ | Biomarker | Metric | Device | LabTest | TechnologyPlatform | ToolOrInstrument | ManufacturingProcess | ManufacturingStep | Material | RegulatoryPathway | RegulatoryStatus | PanelDefinition | Listing | ListingSnapshot | Event | NarrativeArc | RiskFactor | Community | Conference
+
+union AssociationParticipant = Organization | Product | Procedure | Treatment | Compound | CompoundForm | FoodItem | FoodProduct | Ingredient | Exposure | Lifestyle | AdverseEffect | SafetySignal | Person | PseudonymousActor | AnonymousActor | CohortParticipant | Study | Protocol | ProtocolStep | Condition | Outcome | Mechanism | Pathway | Organ | Biomarker | Metric | Device | LabTest | TechnologyPlatform | ToolOrInstrument | Event | NarrativeArc | RiskFactor
+
+union ClaimSpeaker = Person | PseudonymousActor | AnonymousActor
+
+union ExperienceAuthor = Person | PseudonymousActor | AnonymousActor
+
+union DocumentAuthor = Person | Organization
+
+union OccurrenceContainer = Episode | Document
+
+union ExtractionSource = Document | Episode | Chunk
+
+union EpisodeMentionable = Event | TechnologyPlatform | ToolOrInstrument | ManufacturingProcess | ManufacturingStep | Material | Treatment | Procedure | SafetySignal
+
+enum MediaAssetType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT_FIGURE
+  DIAGRAM
+  CHART
+  TABLE_IMAGE
+  SCREENSHOT
+  MICROSCOPY_IMAGE
+  MEDICAL_IMAGE
+  MOLECULAR_STRUCTURE
+  THREE_D_MODEL
+  ANIMATION
+  INTERACTIVE_MODEL
+  POINT_CLOUD
+  MESH
+  TEXTURE
+  THUMBNAIL
+  UNKNOWN
+}
+
+enum MediaFormat {
+  PNG
+  JPEG
+  WEBP
+  SVG
+  GIF
+  MP4
+  MOV
+  WEBM
+  MP3
+  WAV
+  PDF
+  GLB
+  GLTF
+  OBJ
+  STL
+  PLY
+  USDZ
+  DICOM
+  NIFTI
+  CSV
+  HTML
+  UNKNOWN
+}
+
+enum MediaPurpose {
+  DEPICTION
+  EXPLANATION
+  EVIDENCE
+  PRODUCT_PHOTO
+  LABEL_IMAGE
+  INSTRUCTIONAL
+  SCIENTIFIC_FIGURE
+  PATHWAY_DIAGRAM
+  ANATOMICAL_MODEL
+  MOLECULAR_RENDERING
+  PROTOCOL_GUIDE
+  COMPARISON
+  BEFORE_AFTER
+  RESULT_VISUALIZATION
+  MARKETING
+  EDUCATIONAL
+  COMMUNITY_POST
+  GENERATED_SUMMARY
+  UNKNOWN
+}
+
+enum MediaGenerationMode {
+  CAPTURED
+  EXTRACTED
+  UPLOADED
+  GENERATED
+  RENDERED
+  DERIVED
+  TRANSCODED
+  ANNOTATED
+  UNKNOWN
+}
+
+enum MediaVariantKind {
+  ORIGINAL
+  THUMBNAIL
+  PREVIEW
+  CROPPED
+  RESIZED
+  COMPRESSED
+  TRANSCODED
+  OCR_ENHANCED
+  ANNOTATED
+  MASKED
+  DEPTH_MAP
+  NORMAL_MAP
+  TEXTURE
+  LOW_POLY
+  HIGH_POLY
+  LOD
+  MOBILE_OPTIMIZED
+  PRINT_READY
+  UNKNOWN
+}
+
+enum AnnotationType {
+  BOUNDING_BOX
+  POLYGON
+  POINT
+  MASK
+  SEGMENT
+  FRAME_RANGE
+  TIME_RANGE
+  VOLUME_REGION
+  MESH_REGION
+  LABEL
+  CALLOUT
+  OCR_SPAN
+  TRANSCRIPT_SPAN
+  FIGURE_PANEL
+  CHART_AXIS
+  CHART_SERIES
+  UNKNOWN
+}
+
+enum MediaSourceType {
+  DOCUMENT
+  DOCUMENT_FIGURE
+  PRODUCT_PAGE
+  MARKETPLACE_LISTING
+  REGULATORY_LABEL
+  PATENT_FIGURE
+  STUDY_FIGURE
+  VIDEO_FRAME
+  EPISODE_THUMBNAIL
+  SOCIAL_MEDIA_POST
+  USER_UPLOAD
+  GENERATED_OUTPUT
+  RENDER_PIPELINE
+  INSTRUMENT_CAPTURE
+  DEVICE_EXPORT
+  MICROSCOPE_CAPTURE
+  MEDICAL_SCAN
+  UNKNOWN
+}
+
+enum GraphViewType {
+  MECHANISM_MAP
+  PATHWAY_MAP
+  PRODUCT_SUPPLY_CHAIN
+  COMPANY_ECOSYSTEM_MAP
+  PROTOCOL_FLOWCHART
+  STUDY_EVIDENCE_MAP
+  CLAIM_PROVENANCE_MAP
+  SAFETY_INTERACTION_MAP
+  BIOMARKER_PANEL_MAP
+  REGULATORY_TIMELINE
+  EVENT_TIMELINE
+  NARRATIVE_ARC_MAP
+  UNKNOWN
+}
+
+enum LabelRegionType {
+  SUPPLEMENT_FACTS
+  NUTRITION_FACTS
+  INGREDIENT_LIST
+  DIRECTIONS
+  WARNING
+  MANUFACTURER_INFO
+  CERTIFICATION
+  LOT_NUMBER
+  EXPIRATION_DATE
+  CLAIM_TEXT
+  QR_CODE
+  BARCODE
+  UNKNOWN
+}
+
+union MediaSubject = Organization | OrganizationSnapshot | PhysicalLocation | Product | ProductSnapshot | Procedure | Treatment | Listing | ListingSnapshot | Compound | CompoundForm | FoodItem | FoodProduct | Ingredient | Exposure | Lifestyle | AdverseEffect | SafetySignal | Person | PseudonymousActor | AnonymousActor | CohortParticipant | Mechanism | Pathway | Organ | Condition | Outcome | Biomarker | Metric | ReferenceRange | MolecularEntity | AnatomicalContext | Species | RiskFactor | TechnologyPlatform | ToolOrInstrument | PanelDefinition | LabTest | MeasurementMethod | Specimen | Device | Modality | Sensor | ManufacturingProcess | ManufacturingStep | Material | RegulatoryPathway | RegulatoryStep | RegulatoryStatus | RegulatoryAgency | Study | StudyOutcome | StudyArm | OutcomeMeasure | OutcomeResult | Dataset | Population | Protocol | ProtocolStep | Constraint | MeasurementPlan | Target | FunctionalGoal | Observation | ProtocolAdjustmentRule | ProtocolResult | Community | Conference | Event | NarrativeArc | Document | DocumentTextVersion | Segmentation | Chunk | Association | Claim | ClaimOccurrence | ExperienceReport | Episode | EpisodeSegment | Platform | Channel | Series | MediaAsset | MediaVariant | MediaAnnotation | MediaSource | GraphView | FigurePanel | ProductLabelRegion | RelationshipAssertion
+
+union MediaVisualizableRelationship = Association | RelationshipAssertion
+
+union ProductLabelMention = Compound | Ingredient
+
+type MediaAsset implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "MediaAssetSearch", fields: ["name", "description", "title", "altText", "caption", "transcriptText", "ocrText", "searchText"], queryName: "searchMediaAssets"}]) @vector(indexes: [{indexName: "MediaAssetSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchMediaAssetsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  assetType: MediaAssetType!
+  mediaFormat: MediaFormat
+  mediaPurpose: MediaPurpose
+  generationMode: MediaGenerationMode
+  canonicalUrl: String
+  storageUri: String
+  sourceUrl: String
+  thumbnailUrl: String
+  previewUrl: String
+  mimeType: String
+  fileSizeBytes: Int
+  widthPx: Int
+  heightPx: Int
+  durationSeconds: Float
+  frameRate: Float
+  colorSpace: String
+  resolutionText: String
+  checksumSha256: String
+  perceptualHash: String
+  title: String
+  altText: String
+  caption: String
+  transcriptText: String
+  ocrText: String
+  license: String
+  attributionText: String
+  copyrightHolder: String
+  usageRestrictions: String
+  capturedAt: DateTime
+  extractedAt: DateTime
+  generatedAt: DateTime
+  sourcePublishedAt: DateTime
+  qualityScore: Float
+  authenticityScore: Float
+  isSynthetic: Boolean
+  isEdited: Boolean
+  isPrimarySource: Boolean
+  variants: [MediaVariant!]! @relationship(type: "HAS_VARIANT", direction: OUT)
+  annotations: [MediaAnnotation!]! @relationship(type: "HAS_ANNOTATION", direction: OUT)
+  sources: [MediaSource!]! @relationship(type: "DERIVED_FROM_SOURCE", direction: OUT, properties: "MediaSourceMetadata")
+  figurePanels: [FigurePanel!]! @relationship(type: "PART_OF_MEDIA", direction: IN, properties: "OrderingMetadata")
+  depicts: [MediaSubject!]! @relationship(type: "DEPICTS", direction: OUT, properties: "MediaLinkMetadata")
+  explains: [MediaSubject!]! @relationship(type: "EXPLAINS", direction: OUT, properties: "MediaLinkMetadata")
+  evidences: [MediaSubject!]! @relationship(type: "EVIDENCES", direction: OUT, properties: "MediaLinkMetadata")
+  supportsClaims: [Claim!]! @relationship(type: "SUPPORTS_CLAIM", direction: OUT, properties: "ExtractionMetadata")
+  supportsClaimOccurrences: [ClaimOccurrence!]! @relationship(type: "SUPPORTS_CLAIM_OCCURRENCE", direction: OUT, properties: "ExtractionMetadata")
+  visualizesRelationships: [MediaVisualizableRelationship!]! @relationship(type: "VISUALIZES", direction: OUT, properties: "MediaLinkMetadata")
+  visualizesTraversal: [GraphView!]! @relationship(type: "VISUALIZES_TRAVERSAL", direction: OUT, properties: "MediaLinkMetadata")
+}
+
+type MediaVariant implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  variantKind: MediaVariantKind!
+  mediaFormat: MediaFormat
+  storageUri: String
+  url: String
+  mimeType: String
+  fileSizeBytes: Int
+  widthPx: Int
+  heightPx: Int
+  durationSeconds: Float
+  checksumSha256: String
+  derivedFrom: [MediaAsset!]! @relationship(type: "HAS_VARIANT", direction: IN)
+}
+
+type MediaAnnotation implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  annotationType: AnnotationType!
+  label: String
+  text: String
+  confidence: Float
+  x: Float
+  y: Float
+  width: Float
+  height: Float
+  polygonJson: String
+  maskUri: String
+  startTimeSeconds: Float
+  endTimeSeconds: Float
+  frameStart: Int
+  frameEnd: Int
+  meshObjectName: String
+  vertexGroupName: String
+  volumeRegionJson: String
+  annotatesMedia: [MediaAsset!]! @relationship(type: "HAS_ANNOTATION", direction: IN)
+  annotatesSubjects: [MediaSubject!]! @relationship(type: "ANNOTATES_SUBJECT", direction: OUT, properties: "MediaLinkMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type MediaSource implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  sourceType: MediaSourceType
+  sourceUrl: String
+  sourceIdentifier: String
+  sourcePageNumber: Int
+  sourceFigureLabel: String
+  sourceTimestampSeconds: Float
+  sourceAccessedAt: DateTime
+  derivedAssets: [MediaAsset!]! @relationship(type: "DERIVED_FROM_SOURCE", direction: IN, properties: "MediaSourceMetadata")
+  sourceDocument: [Document!]! @relationship(type: "SOURCE_DOCUMENT", direction: OUT, properties: "RoleMetadata")
+  sourceChunk: [Chunk!]! @relationship(type: "SOURCE_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+  sourceEpisode: [Episode!]! @relationship(type: "SOURCE_EPISODE", direction: OUT, properties: "RoleMetadata")
+  sourceListing: [Listing!]! @relationship(type: "SOURCE_LISTING", direction: OUT, properties: "RoleMetadata")
+}
+
+type GraphView implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "GraphViewSearch", fields: ["name", "description", "searchText", "queryText"], queryName: "searchGraphViews"}]) @vector(indexes: [{indexName: "GraphViewSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchGraphViewsBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  graphViewType: GraphViewType
+  queryText: String
+  cypherQuery: String
+  graphqlQuery: String
+  traversalSpecJson: String
+  layoutSpecJson: String
+  renderedSvgUri: String
+  renderedImageUri: String
+  interactiveViewUri: String
+  includesSubjects: [MediaSubject!]! @relationship(type: "INCLUDES_SUBJECT", direction: OUT, properties: "MediaLinkMetadata")
+  hasMediaAssets: [MediaAsset!]! @relationship(type: "VISUALIZES_TRAVERSAL", direction: IN, properties: "MediaLinkMetadata")
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type FigurePanel implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  panelLabel: String
+  figureNumber: String
+  captionText: String
+  partOfMedia: [MediaAsset!]! @relationship(type: "PART_OF_MEDIA", direction: OUT, properties: "OrderingMetadata")
+  fromAnnotations: [MediaAnnotation!]! @relationship(type: "FROM_ANNOTATION", direction: OUT, properties: "AnnotationMetadata")
+  depictsSubjects: [MediaSubject!]! @relationship(type: "DEPICTS", direction: OUT, properties: "MediaLinkMetadata")
+  supportsClaims: [Claim!]! @relationship(type: "SUPPORTS_CLAIM", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type ProductLabelRegion implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  labelRegionType: LabelRegionType
+  extractedText: String
+  confidence: Float
+  fromAnnotation: [MediaAnnotation!]! @relationship(type: "FROM_ANNOTATION", direction: OUT, properties: "AnnotationMetadata")
+  aboutProduct: [Product!]! @relationship(type: "ABOUT_PRODUCT", direction: OUT, properties: "ExtractionMetadata")
+  mentions: [ProductLabelMention!]! @relationship(type: "MENTIONS", direction: OUT, properties: "ExtractionMetadata")
+  assertsClaims: [Claim!]! @relationship(type: "ASSERTS", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type RelationshipAssertion implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  relationshipType: String
+  subjectLabel: String
+  objectLabel: String
+  predicateText: String
+  confidence: Float
+  subject: [MediaSubject!]! @relationship(type: "SUBJECT", direction: OUT, properties: "RoleMetadata")
+  object: [MediaSubject!]! @relationship(type: "OBJECT", direction: OUT, properties: "RoleMetadata")
+  supportedByClaims: [Claim!]! @relationship(type: "SUPPORTED_BY_CLAIM", direction: OUT, properties: "ExtractionMetadata")
+  visualizedBy: [MediaAsset!]! @relationship(type: "VISUALIZES", direction: IN, properties: "MediaLinkMetadata")
+}
+
+enum DocumentType {
+  SCIENTIFIC_ARTICLE
+  REVIEW_ARTICLE
+  PREPRINT
+  CLINICAL_TRIAL_RECORD
+  CLINICAL_TRIAL_PROTOCOL
+  TRIAL_RESULT
+  CASE_REPORT
+  META_ANALYSIS
+  SYSTEMATIC_REVIEW
+  WHITE_PAPER
+  TECHNICAL_REPORT
+  REGULATORY_FILING
+  SEC_FILING
+  ANNUAL_REPORT
+  QUARTERLY_REPORT
+  INVESTOR_PRESENTATION
+  EARNINGS_TRANSCRIPT
+  PRESS_RELEASE
+  PATENT
+  PATENT_APPLICATION
+  PRODUCT_LABEL
+  PACKAGE_INSERT
+  SAFETY_COMMUNICATION
+  SAFETY_DATA_SHEET
+  SOP
+  POLICY
+  GUIDELINE
+  WEBPAGE
+  BLOG_POST
+  NEWS_ARTICLE
+  CONFERENCE_ABSTRACT
+  CONFERENCE_POSTER
+  CONFERENCE_PRESENTATION
+  DATASET
+  DATABASE_RECORD
+  MANUAL
+  UNKNOWN
+}
+
+enum DocumentDomain {
+  BIOMEDICAL_RESEARCH
+  CLINICAL
+  REGULATORY
+  COMMERCIAL
+  PATENT_IP
+  NEWS_MEDIA
+  EDUCATION
+  TECHNICAL
+  LEGAL
+  OTHER
+  UNKNOWN
+}
+
+enum ClaimType {
+  MECHANISTIC_CLAIM
+  CAUSAL_CLAIM
+  ASSOCIATION_CLAIM
+  EFFICACY_CLAIM
+  SAFETY_CLAIM
+  DOSING_CLAIM
+  BIOMARKER_CLAIM
+  DIAGNOSTIC_CLAIM
+  PROGNOSTIC_CLAIM
+  PREDICTIVE_CLAIM
+  REGULATORY_CLAIM
+  COMMERCIAL_CLAIM
+  LEGAL_CLAIM
+  HISTORICAL_CLAIM
+  COMPARATIVE_CLAIM
+  PREVALENCE_CLAIM
+  INCIDENCE_CLAIM
+  METHOD_CLAIM
+  UNKNOWN
+}
+
+type Document implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "DocumentSearch", fields: ["name", "sourceUrl", "searchText"], queryName: "searchDocuments"}]) @vector(indexes: [{indexName: "DocumentSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchDocumentsBySemanticText"}]) {
+  id: ID! @id @alias(property: "documentId")
+  name: String! @alias(property: "title")
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  documentKey: String!
+  documentType: DocumentType! @alias(property: "type")
+  sourceUrl: String @alias(property: "url")
+  documentDomain: DocumentDomain
+  publisher: String
+  publicationVenue: String
+  publishedAt: DateTime
+  fileFormat: String
+  languageCode: String
+  isPeerReviewed: Boolean
+  isPrimarySource: Boolean
+  isRegulatorySource: Boolean
+  isFinancialDisclosure: Boolean
+  searchEmbedding: [Float!]
+  hasTextVersions: [DocumentTextVersion!]! @relationship(type: "HAS_TEXT_VERSION", direction: OUT)
+  hasChunks: [Chunk!]! @relationship(type: "HAS_CHUNK", direction: OUT, properties: "OrderingMetadata")
+  about: [ClaimSubject!]! @relationship(type: "ABOUT", direction: OUT, properties: "ExtractionMetadata")
+  authoredBy: [DocumentAuthor!]! @relationship(type: "AUTHORED_BY", direction: OUT, properties: "RoleMetadata")
+  sourceForEpisodes: [Episode!]! @relationship(type: "SOURCE_OF", direction: OUT, properties: "RoleMetadata")
+}
+
+type DocumentTextVersion implements Entity @node {
+  id: ID! @id @alias(property: "documentTextVersionId")
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  versionLabel: String
+  textVersionHash: String!
+  source: String!
+  text: String!
+  hasSegmentations: [Segmentation!]! @relationship(type: "HAS_SEGMENTATION", direction: OUT, properties: "OrderingMetadata")
+}
+
+type Segmentation implements Entity @node {
+  id: ID! @id @alias(property: "segmentationId")
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  segmentationHash: String!
+  chunkSize: Int!
+  overlap: Int!
+  segmentationStrategy: String! @alias(property: "strategy")
+}
+
+type Chunk implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "ChunkSearch", fields: ["text", "searchText"], queryName: "searchChunks"}]) @vector(indexes: [{indexName: "ChunkSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchChunksBySemanticText"}]) {
+  id: ID! @id @alias(property: "chunkId")
+  name: String! @alias(property: "chunkKey")
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  chunkIndex: Int! @alias(property: "index")
+  text: String!
+  searchEmbedding: [Float!]
+  segmentationHash: String
+  nextChunks: [Chunk!]! @relationship(type: "NEXT_CHUNK", direction: OUT, properties: "OrderingMetadata")
+  previousChunks: [Chunk!]! @relationship(type: "PREV_CHUNK", direction: OUT, properties: "OrderingMetadata")
+  mentions: [ClaimSubject!]! @relationship(type: "MENTIONS", direction: OUT, properties: "ExtractionMetadata")
+  about: [ClaimSubject!]! @relationship(type: "ABOUT", direction: OUT, properties: "ExtractionMetadata")
+  assertsClaims: [Claim!]! @relationship(type: "ASSERTS", direction: OUT, properties: "ExtractionMetadata")
+  fromTextVersions: [DocumentTextVersion!]! @relationship(type: "FROM_TEXT_VERSION", direction: OUT, properties: "RoleMetadata")
+  inEpisodeSegments: [EpisodeSegment!]! @relationship(type: "OCCURS_IN_SEGMENT", direction: OUT, properties: "OrderingMetadata")
+}
+
+type Association implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  associationSummary: String
+  associationType: String
+  associationCategory: String
+  left: [AssociationParticipant!]! @relationship(type: "LEFT", direction: OUT, properties: "RoleMetadata")
+  right: [AssociationParticipant!]! @relationship(type: "RIGHT", direction: OUT, properties: "RoleMetadata")
+}
+
+type Claim implements Entity & SearchIndexable @node @fulltext(indexes: [{indexName: "ClaimSearch", fields: ["name", "description", "searchText"], queryName: "searchClaims"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  claimText: String
+  searchEmbedding: [Float!]
+  claimPolarity: AssociationPolarity
+  evidenceStrength: EvidenceStrength
+  claimType: ClaimType
+  isQuantitative: Boolean
+  isCausal: Boolean
+  isMechanistic: Boolean
+  isClinical: Boolean
+  isPreclinical: Boolean
+  about: [ClaimSubject!]! @relationship(type: "ABOUT", direction: OUT, properties: "ExtractionMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+  occurrences: [ClaimOccurrence!]! @relationship(type: "INSTANCE_OF", direction: IN, properties: "RoleMetadata")
+}
+
+type ClaimOccurrence implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  utteranceText: String
+  occursIn: [OccurrenceContainer!]! @relationship(type: "OCCURS_IN", direction: OUT, properties: "RoleMetadata")
+  occursInSegments: [EpisodeSegment!]! @relationship(type: "OCCURS_IN_SEGMENT", direction: OUT, properties: "OrderingMetadata")
+  utteredBy: [ClaimSpeaker!]! @relationship(type: "UTTERED_BY", direction: OUT, properties: "RoleMetadata")
+  instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "RoleMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type ExperienceReport implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  reportText: String
+  about: [EvidenceSubject!]! @relationship(type: "ABOUT", direction: OUT, properties: "ExtractionMetadata")
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "ExtractionMetadata")
+  extractedFrom: [ExtractionSource!]! @relationship(type: "EXTRACTED_FROM", direction: OUT, properties: "ExtractionMetadata")
+  extractedFromSegments: [EpisodeSegment!]! @relationship(type: "EXTRACTED_FROM_SEGMENT", direction: OUT, properties: "ExtractionMetadata")
+  authors: [ExperienceAuthor!]! @relationship(type: "AUTHORS", direction: IN, properties: "RoleMetadata")
+  reportedBy: [CohortParticipant!]! @relationship(type: "REPORTS", direction: IN, properties: "RoleMetadata")
+}
+
+type Episode implements Entity @node @fulltext(indexes: [{indexName: "EpisodeSearch", fields: ["name", "title", "summaryText"], queryName: "searchEpisodes"}]) @vector(indexes: [{indexName: "EpisodeSearchEmbedding", provider: OPEN_AI, embeddingProperty: "searchEmbedding", queryName: "searchEpisodesBySemanticText"}]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  episodeType: String
+  title: String
+  durationSeconds: Int
+  publishedAt: DateTime
+  summaryText: String
+  searchEmbedding: [Float!]
+  personsInEpisode: [Person!]! @relationship(type: "APPEARS_IN", direction: IN, properties: "RoleMetadata")
+  hasSegments: [EpisodeSegment!]! @relationship(type: "HAS_SEGMENT", direction: OUT, properties: "OrderingMetadata")
+  onPlatforms: [Platform!]! @relationship(type: "ON_PLATFORM", direction: OUT, properties: "RoleMetadata")
+  sponsorsProducts: [Product!]! @relationship(type: "SPONSORS_PRODUCT", direction: OUT, properties: "RoleMetadata")
+  mentions: [EpisodeMentionable!]! @relationship(type: "MENTIONS", direction: OUT, properties: "RoleMetadata")
+  hasTranscriptVersions: [DocumentTextVersion!]! @relationship(type: "HAS_TRANSCRIPT", direction: OUT, properties: "ExtractionMetadata")
+}
+
+type EpisodeSegment implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  segmentType: String
+}
+
+type Platform implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  platformType: String
+  url: String
+  hostsChannels: [Channel!]! @relationship(type: "HOSTS_CHANNEL", direction: OUT, properties: "RoleMetadata")
+}
+
+type Channel implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  channelType: String
+  hasSeries: [Series!]! @relationship(type: "HAS_SERIES", direction: OUT, properties: "OrderingMetadata")
+  hasEpisodes: [Episode!]! @relationship(type: "HAS_EPISODE", direction: OUT, properties: "OrderingMetadata")
+}
+
+type Series implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  seriesType: String
+  includesEpisodes: [Episode!]! @relationship(type: "INCLUDES_EPISODE", direction: OUT, properties: "OrderingMetadata")
+}

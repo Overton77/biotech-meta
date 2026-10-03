@@ -1,0 +1,317 @@
+schema:
+  name: human-upgrade-knowledge-graph
+  version: 0.1.0
+  status: provisional
+  targetProjection: neo4j-5
+  updatedAt: 2026-07-13
+
+conventions:
+  identityProperty: uid
+  uidFormat: "hu:<type>:<opaque-stable-id>"
+  enumStyle: SCREAMING_SNAKE_CASE
+  relationshipStyle: SCREAMING_SNAKE_CASE
+  nullMeans: unknown_or_not_applicable
+  timeIntervals: half_open
+  quantityModel: value_plus_ucum_unit
+  nodeMaturity: [CANDIDATE, PROVISIONAL, ACCEPTED, DEPRECATED]
+  assertionStatus: [EXTRACTED, PROPOSED, ACCEPTED, REJECTED, DISPUTED, SUPERSEDED, UNRESOLVED]
+  adjudicationVerdict: [SUPPORTED, PARTIALLY_SUPPORTED, CONTRADICTED, INSUFFICIENT, NOT_APPLICABLE]
+
+baseArchetypes:
+  Entity:
+    required: [uid, entityType, createdAt]
+  VersionedState:
+    required: [uid, stateType, createdAt]
+    optional: [effectiveFrom, effectiveTo]
+  Occurrence:
+    required: [uid, occurrenceType, createdAt]
+    optional: [startedAt, endedAt]
+  InformationArtifact:
+    required: [uid, artifactType, createdAt]
+    optional: [publishedAt, observedAt, contentHash]
+  Assertion:
+    required: [uid, predicate, status, recordedAt]
+    optional: [valueString, valueNumber, valueBoolean, unitCode, validFrom, validTo, jurisdiction, confidence, extractionMethod, agentRunUid]
+  EvidenceAssessment:
+    required: [uid, assessmentType, methodVersion, status, createdAt]
+    optional: [summary, overallScore, confidence]
+
+modules:
+  provenance:
+    maturity: accepted
+    nodes:
+      Source:
+        archetype: Entity
+        description: Stable identity of a publisher, registry, database, website, or supplied document source.
+        properties: [canonicalUri, title, sourceKind, publisherUid]
+      SourceSnapshot:
+        archetype: InformationArtifact
+        description: Captured content from a Source at a known observation time and content version.
+        properties: [canonicalUri, retrievedAt, contentHash, mimeType, language]
+      SourceLocator:
+        archetype: InformationArtifact
+        description: Stable locator for the exact page, section, table, figure, label panel, or excerpt supporting an assertion.
+        properties: [uri, selector, page, section, quoteHash]
+      Adjudication:
+        archetype: EvidenceAssessment
+        description: Human Upgrade evaluation of one or more assertions.
+        properties: [verdict, rationale, reviewerType, reviewedAt]
+      ResolutionHypothesis:
+        archetype: EvidenceAssessment
+        description: Scored candidate identity or equivalence resolution that may compete with alternatives.
+        properties: [resolutionType, score, rationale, resolutionStatus]
+    relationships:
+      HAS_SNAPSHOT: {from: Source, to: SourceSnapshot, class: structural}
+      HAS_LOCATOR: {from: SourceSnapshot, to: SourceLocator, class: structural}
+      HAS_SUBJECT: {from: Assertion, to: "Entity|VersionedState|Occurrence|InformationArtifact", class: structural, cardinality: exactly_one}
+      HAS_OBJECT: {from: Assertion, to: "Entity|VersionedState|Occurrence|InformationArtifact", class: structural, cardinality: zero_or_one}
+      SUPPORTED_BY: {from: "Assertion|Adjudication|EvidenceAssessment", to: SourceLocator, class: asserted}
+      CONTRADICTED_BY: {from: "Assertion|Adjudication", to: SourceLocator, class: asserted}
+      ASSERTED_BY: {from: Assertion, to: "Person|Organization|Agent", class: structural}
+      EVALUATES: {from: Adjudication, to: Assertion, class: structural}
+      PROPOSES_MATCH: {from: ResolutionHypothesis, to: "Entity|VersionedState|InformationArtifact", class: structural}
+      COMPETES_WITH: {from: ResolutionHypothesis, to: ResolutionHypothesis, class: structural}
+
+  organizations:
+    maturity: provisional
+    nodes:
+      Organization: {archetype: Entity, properties: [name, organizationKind, jurisdiction]}
+      LegalEntity: {archetype: Entity, parentLabel: Organization, properties: [legalName, registrationId, jurisdiction]}
+      ConsumerBrand: {archetype: Entity, properties: [name]}
+      Facility: {archetype: Entity, properties: [name, facilityKind, address]}
+      Person: {archetype: Entity, properties: [name, orcid]}
+      Agent: {archetype: Entity, properties: [name, model, promptVersion, runUid]}
+    assertedPredicates:
+      - PARENT_OF
+      - SUBSIDIARY_OF
+      - OWNS_BRAND
+      - OWNS_PRODUCT
+      - MARKETS_PRODUCT
+      - DISTRIBUTES_PRODUCT
+      - LABELS_PRODUCT
+      - MANUFACTURES_PRODUCT
+      - CONTRACT_MANUFACTURES_FOR
+      - OPERATES_FACILITY
+      - SUPPLIES_INGREDIENT_MATERIAL
+      - OWNS_SPECIFICATION
+      - OWNS_TRADEMARK
+      - ASSIGNED_PATENT
+      - LICENSES_PATENT
+      - SPONSORS_STUDY
+      - FUNDS_STUDY
+      - SERVES_AS_CRO_FOR
+      - HOSTS_STUDY_SITE
+      - AFFILIATED_WITH
+      - EMPLOYED_BY
+      - ADVISES_ORGANIZATION
+      - ENDORSES_PRODUCT
+      - OPERATES_LABORATORY
+      - OPERATES_CERTIFICATION_PROGRAM
+      - SELLS_PRODUCT
+      - LISTS_OFFER
+      - FULFILLS_OFFER
+      - RECOMMENDS_PRODUCT
+      - AFFILIATE_FOR_OFFER
+    forbiddenImplications:
+      - [ADVISES_ORGANIZATION, ENDORSES_PRODUCT]
+      - [DISTRIBUTES_PRODUCT, MANUFACTURES_PRODUCT]
+      - [SPONSORS_STUDY, EXECUTES_STUDY]
+      - [LICENSES_PATENT, OWNS_STUDY]
+      - [LISTS_OFFER, SELLS_PRODUCT]
+
+  products_and_commerce:
+    maturity: provisional
+    nodes:
+      Product: {archetype: Entity, properties: [name, productKind]}
+      ProductVariant: {archetype: Entity, properties: [name, strengthDescriptor, dosageForm, flavor, jurisdiction]}
+      PackageConfiguration: {archetype: VersionedState, properties: [packageForm, unitCount, netQuantity, netQuantityUnit]}
+      TradeItemIdentifier: {archetype: Entity, properties: [scheme, value, issuer, jurisdiction]}
+      MerchantListing: {archetype: Entity, properties: [merchantListingId, title, canonicalUrl]}
+      Offer: {archetype: VersionedState, properties: [offerKind, currency, availability, terms, observedAt]}
+      PriceObservation: {archetype: Occurrence, properties: [amount, currency, observedAt]}
+      SubscriptionPlan: {archetype: VersionedState, properties: [sellingPlanId, interval, intervalCount, terms]}
+      Bundle: {archetype: Entity, properties: [name, bundleKind]}
+      BundleComponent: {archetype: VersionedState, properties: [quantity, componentRole]}
+      InventoryItem: {archetype: Entity, properties: [merchantInventoryId]}
+      IndividualUnit: {archetype: Entity, properties: [serialNumber]}
+      CommerceMatch: {archetype: EvidenceAssessment, properties: [matchKind, score, rationale]}
+    relationships:
+      HAS_VARIANT: {from: Product, to: ProductVariant, class: asserted}
+      HAS_PACKAGE_CONFIGURATION: {from: ProductVariant, to: PackageConfiguration, class: asserted}
+      IDENTIFIED_BY: {from: "ProductVariant|PackageConfiguration|MerchantListing", to: TradeItemIdentifier, class: asserted}
+      LISTING_FOR: {from: MerchantListing, to: "ProductVariant|PackageConfiguration", class: asserted}
+      HAS_OFFER: {from: MerchantListing, to: Offer, class: structural}
+      HAS_PRICE_OBSERVATION: {from: Offer, to: PriceObservation, class: structural}
+      USES_SUBSCRIPTION_PLAN: {from: Offer, to: SubscriptionPlan, class: asserted}
+      HAS_BUNDLE_COMPONENT: {from: Bundle, to: BundleComponent, class: structural}
+      COMPONENT_PRODUCT: {from: BundleComponent, to: "Product|ProductVariant", class: asserted}
+      INVENTORY_INSTANCE_OF: {from: InventoryItem, to: "ProductVariant|PackageConfiguration", class: asserted}
+      UNIT_FROM_LOT: {from: IndividualUnit, to: ProductLot, class: asserted}
+      MATCHES_COMMERCE_ITEM: {from: CommerceMatch, to: "ProductVariant|MerchantListing|InventoryItem", class: structural}
+
+  formulation_and_ingredients:
+    maturity: provisional
+    nodes:
+      FormulationVersion: {archetype: VersionedState, properties: [versionName, jurisdiction, effectiveFrom, effectiveTo]}
+      IngredientComponent: {archetype: VersionedState, properties: [role, labelOrder, quantity, unitCode, quantityBasis, declaredAs, isDietaryIngredient]}
+      IngredientMaterial: {archetype: Entity, properties: [name, materialKind]}
+      BrandedIngredientMaterial: {archetype: Entity, parentLabel: IngredientMaterial, properties: [brandName, specificationOwnerUid]}
+      ChemicalSubstance: {archetype: Entity, properties: [preferredName, molecularFormula, pubchemCid, inchikey]}
+      ChemicalForm: {archetype: Entity, properties: [formKind, hydrationState, polymorph, grade]}
+      BotanicalTaxon: {archetype: Entity, properties: [scientificName, taxonRank, taxonomyId]}
+      BotanicalPreparation: {archetype: Entity, parentLabel: IngredientMaterial, properties: [plantPart, preparationType, extractRatio, solvent]}
+      MicrobialTaxon: {archetype: Entity, properties: [scientificName, taxonomyId]}
+      MicrobialStrain: {archetype: Entity, properties: [strainDesignation, depositIdentifier]}
+      MicrobialPreparation: {archetype: Entity, parentLabel: IngredientMaterial, properties: [preparationType, viabilityState]}
+      MaterialMixture: {archetype: Entity, parentLabel: IngredientMaterial, properties: [name, mixtureKind]}
+      Constituent: {archetype: Entity, properties: [name, constituentKind]}
+      Nutrient: {archetype: Entity, properties: [name, nutrientKind]}
+      ManufacturingSpecification: {archetype: Entity, properties: [name, specificationKind]}
+      SpecificationVersion: {archetype: VersionedState, properties: [versionName, effectiveFrom, effectiveTo]}
+      ManufacturingProcess: {archetype: Entity, properties: [name, processKind]}
+      Trademark: {archetype: Entity, properties: [markText, registrationNumber, jurisdiction, status]}
+    relationships:
+      HAS_FORMULATION_VERSION: {from: ProductVariant, to: FormulationVersion, class: asserted}
+      HAS_INGREDIENT_COMPONENT: {from: FormulationVersion, to: IngredientComponent, class: structural}
+      NESTED_COMPONENT: {from: IngredientComponent, to: IngredientComponent, class: structural}
+      USES_MATERIAL: {from: IngredientComponent, to: IngredientMaterial, class: asserted}
+      REALIZES_SUBSTANCE: {from: IngredientMaterial, to: ChemicalSubstance, class: asserted}
+      HAS_CHEMICAL_FORM: {from: IngredientMaterial, to: ChemicalForm, class: asserted}
+      DERIVED_FROM_TAXON: {from: BotanicalPreparation, to: BotanicalTaxon, class: asserted}
+      HAS_STRAIN: {from: MicrobialPreparation, to: MicrobialStrain, class: asserted}
+      STRAIN_OF: {from: MicrobialStrain, to: MicrobialTaxon, class: asserted}
+      HAS_MIXTURE_COMPONENT: {from: MaterialMixture, to: IngredientMaterial, class: asserted}
+      PROVIDES_CONSTITUENT: {from: IngredientMaterial, to: "Constituent|Nutrient", class: asserted, quantitative: false}
+      QUANTITATIVELY_CONTAINS: {from: IngredientMaterial, to: "Constituent|Nutrient|ChemicalSubstance", class: asserted, requiredQualifiers: [quantity, unitCode, basis]}
+      GOVERNED_BY_SPECIFICATION: {from: IngredientMaterial, to: SpecificationVersion, class: asserted}
+      VERSION_OF_SPECIFICATION: {from: SpecificationVersion, to: ManufacturingSpecification, class: structural}
+      PRODUCED_BY_PROCESS: {from: IngredientMaterial, to: ManufacturingProcess, class: asserted}
+      MARKETED_UNDER_MARK: {from: BrandedIngredientMaterial, to: Trademark, class: asserted}
+      CONTAINS: {from: "Product|ProductVariant", to: IngredientMaterial, class: derived, mustBeRegenerable: true}
+
+  labels:
+    maturity: provisional
+    nodes:
+      LabelSnapshot: {archetype: InformationArtifact, properties: [jurisdiction, language, observedAt, labelVersionText]}
+      LabelDeclaration: {archetype: InformationArtifact, properties: [verbatimText, declarationKind, panelOrder]}
+      ServingDefinition: {archetype: VersionedState, properties: [servingCount, unitDescription, servingsPerContainer]}
+      QuantityDeclaration: {archetype: InformationArtifact, properties: [value, unitCode, basis, dailyValuePercent]}
+    relationships:
+      LABEL_FOR: {from: LabelSnapshot, to: "ProductVariant|PackageConfiguration", class: asserted}
+      DECLARES_FORMULATION: {from: LabelSnapshot, to: FormulationVersion, class: asserted}
+      HAS_DECLARATION: {from: LabelSnapshot, to: LabelDeclaration, class: structural}
+      DECLARATION_IDENTIFIES_MATERIAL: {from: LabelDeclaration, to: IngredientMaterial, class: asserted}
+      HAS_QUANTITY_DECLARATION: {from: LabelDeclaration, to: QuantityDeclaration, class: structural}
+      USES_SERVING_DEFINITION: {from: LabelSnapshot, to: ServingDefinition, class: structural}
+
+  studies_and_evidence:
+    maturity: provisional
+    nodes:
+      Study: {archetype: Entity, properties: [title, studyKind, phase, status]}
+      TrialRegistration: {archetype: Entity, properties: [registry, registrationId]}
+      RegistrationVersion: {archetype: InformationArtifact, properties: [versionDate, recruitmentStatus]}
+      ProtocolVersion: {archetype: InformationArtifact, properties: [versionName, versionDate]}
+      StudyArm: {archetype: VersionedState, properties: [name, armType]}
+      StudyIntervention: {archetype: VersionedState, properties: [name, route, schedule, duration]}
+      InterventionComponent: {archetype: VersionedState, properties: [quantity, unitCode, quantityBasis]}
+      StudyPopulation: {archetype: VersionedState, properties: [populationKind, description, size]}
+      OutcomeDefinition: {archetype: VersionedState, properties: [name, outcomeKind, timepoint, priority]}
+      StudyResult: {archetype: InformationArtifact, properties: [resultKind, estimate, unitCode, pValue, confidenceInterval, analysisPopulation, isStatisticallySignificant]}
+      Publication: {archetype: InformationArtifact, properties: [title, doi, pmid, publishedAt]}
+      EvidenceApplicability: {archetype: EvidenceAssessment, properties: [identityMatch, doseMatch, routeMatch, scheduleMatch, durationMatch, populationMatch, outcomeMatch, summary]}
+    relationships:
+      REGISTERED_AS: {from: Study, to: TrialRegistration, class: asserted}
+      HAS_REGISTRATION_VERSION: {from: TrialRegistration, to: RegistrationVersion, class: structural}
+      HAS_PROTOCOL_VERSION: {from: Study, to: ProtocolVersion, class: structural}
+      HAS_ARM: {from: Study, to: StudyArm, class: structural}
+      ASSIGNS_INTERVENTION: {from: StudyArm, to: StudyIntervention, class: asserted}
+      HAS_INTERVENTION_COMPONENT: {from: StudyIntervention, to: InterventionComponent, class: structural}
+      USES_INTERVENTION_MATERIAL: {from: InterventionComponent, to: "IngredientMaterial|ProductVariant|ProductLot", class: asserted}
+      HAS_ELIGIBLE_POPULATION: {from: Study, to: StudyPopulation, class: structural}
+      HAS_ENROLLED_COHORT: {from: Study, to: StudyPopulation, class: structural}
+      HAS_ANALYZED_COHORT: {from: StudyResult, to: StudyPopulation, class: structural}
+      DEFINES_OUTCOME: {from: Study, to: OutcomeDefinition, class: structural}
+      RESULT_FOR: {from: StudyResult, to: OutcomeDefinition, class: structural}
+      REPORTS_ON: {from: Publication, to: Study, class: asserted}
+      ASSESSES_APPLICABILITY_TO: {from: EvidenceApplicability, to: "Product|ProductVariant|FormulationVersion|IngredientMaterial|UserContext", class: structural}
+      BASED_ON_EVIDENCE: {from: EvidenceApplicability, to: "Study|StudyResult|Publication", class: structural}
+
+  quality:
+    maturity: provisional
+    nodes:
+      ProductLot: {archetype: Entity, properties: [lotCode, manufactureDate, expiryDate]}
+      TestSample: {archetype: Entity, properties: [sampleCode, sampledAt, samplingMethod]}
+      TestExecution: {archetype: Occurrence, properties: [executedAt, status]}
+      TestMethod: {archetype: Entity, properties: [name, methodIdentifier, methodVersion]}
+      TestingLaboratory: {archetype: Entity, parentLabel: Organization, properties: [name, accreditation]}
+      MeasuredResult: {archetype: InformationArtifact, properties: [analyte, value, unitCode, uncertainty, limitOfDetection, qualifier]}
+      SpecificationCriterion: {archetype: VersionedState, properties: [analyte, comparator, threshold, unitCode]}
+      PassFailInterpretation: {archetype: EvidenceAssessment, properties: [verdict, rationale]}
+      LotTestSummary: {archetype: InformationArtifact, properties: [title, observedAt]}
+      CertificateOfAnalysis: {archetype: InformationArtifact, properties: [certificateNumber, signedAt, signer]}
+      CertificationProgram: {archetype: Entity, properties: [name, standard]}
+      CertificationListing: {archetype: VersionedState, properties: [listingId, status, effectiveFrom, effectiveTo]}
+      CertificationScope: {archetype: VersionedState, properties: [scopeText]}
+    relationships:
+      LOT_OF: {from: ProductLot, to: ProductVariant, class: asserted}
+      MANUFACTURED_UNDER: {from: ProductLot, to: "FormulationVersion|SpecificationVersion", class: asserted}
+      SAMPLE_FROM: {from: TestSample, to: "ProductLot|IndividualUnit|IngredientMaterial", class: asserted}
+      TESTED_SAMPLE: {from: TestExecution, to: TestSample, class: structural}
+      USED_METHOD: {from: TestExecution, to: TestMethod, class: asserted}
+      PERFORMED_BY_LAB: {from: TestExecution, to: TestingLaboratory, class: asserted}
+      PRODUCED_RESULT: {from: TestExecution, to: MeasuredResult, class: structural}
+      EVALUATED_AGAINST: {from: MeasuredResult, to: SpecificationCriterion, class: asserted}
+      INTERPRETS_RESULT: {from: PassFailInterpretation, to: MeasuredResult, class: structural}
+      SUMMARIZES_TESTING: {from: LotTestSummary, to: "ProductLot|TestExecution", class: asserted}
+      CERTIFIES_RESULTS_FOR: {from: CertificateOfAnalysis, to: "ProductLot|TestExecution", class: asserted}
+      PROGRAM_HAS_LISTING: {from: CertificationProgram, to: CertificationListing, class: structural}
+      HAS_CERTIFICATION_SCOPE: {from: CertificationListing, to: CertificationScope, class: structural}
+      COVERS: {from: CertificationScope, to: "Product|ProductVariant|ProductLot", class: asserted}
+
+  regulatory_and_ip:
+    maturity: provisional
+    nodes:
+      PatentFamily: {archetype: Entity, properties: [familyIdentifier, title]}
+      PatentApplication: {archetype: InformationArtifact, properties: [applicationNumber, jurisdiction, filingDate, status]}
+      GrantedPatent: {archetype: InformationArtifact, properties: [patentNumber, jurisdiction, grantDate, status]}
+      PatentClaim: {archetype: InformationArtifact, properties: [claimNumber, claimTextHash, claimKind]}
+      PatentLicense: {archetype: VersionedState, properties: [exclusive, fieldOfUse, territory, effectiveFrom, effectiveTo]}
+      RegulatorySubmission: {archetype: InformationArtifact, properties: [submissionKind, identifier, jurisdiction, submittedAt]}
+      RegulatoryResponse: {archetype: InformationArtifact, properties: [responseKind, status, issuedAt, jurisdiction]}
+      OrphanDesignation: {archetype: VersionedState, properties: [designationId, indication, jurisdiction, status]}
+      DrugApproval: {archetype: VersionedState, properties: [applicationNumber, indication, jurisdiction, status]}
+    relationships:
+      FAMILY_HAS_APPLICATION: {from: PatentFamily, to: PatentApplication, class: structural}
+      APPLICATION_GRANTED_AS: {from: PatentApplication, to: GrantedPatent, class: asserted}
+      HAS_PATENT_CLAIM: {from: "PatentApplication|GrantedPatent", to: PatentClaim, class: structural}
+      LICENSE_COVERS: {from: PatentLicense, to: "PatentFamily|PatentApplication|GrantedPatent|PatentClaim", class: asserted}
+      SUBMISSION_HAS_RESPONSE: {from: RegulatorySubmission, to: RegulatoryResponse, class: structural}
+      DESIGNATION_FOR: {from: OrphanDesignation, to: "IngredientMaterial|StudyIntervention|Product", class: asserted}
+      APPROVAL_FOR: {from: DrugApproval, to: "IngredientMaterial|StudyIntervention|Product", class: asserted}
+    forbiddenImplications:
+      - [HAS_ORPHAN_DESIGNATION, IS_APPROVED]
+      - [NDI_NOTIFICATION_RECEIVED, FDA_APPROVED]
+      - [PATENT_CLAIMS, PROVES_EFFICACY]
+
+globalInvariants:
+  - id: INV-001
+    rule: Every committed node has exactly one globally stable uid and at least one base archetype label.
+  - id: INV-002
+    rule: Every ACCEPTED source-derived assertion has at least one SourceLocator.
+  - id: INV-003
+    rule: An Assertion has exactly one subject and either one object or one typed literal value.
+  - id: INV-004
+    rule: Derived relationships are regenerable and identify their assertion or derivation rule.
+  - id: INV-005
+    rule: Formulation composition is authoritative only through FormulationVersion and IngredientComponent.
+  - id: INV-006
+    rule: A label declaration is not measured composition.
+  - id: INV-007
+    rule: Unknown, unmeasured, not reported, below detection, absent, and false are never normalized to one state.
+  - id: INV-008
+    rule: Evidence applicability cannot be inferred solely from a shared ingredient or marketing name.
+  - id: INV-009
+    rule: Organization roles never imply other organization roles without an assertion.
+  - id: INV-010
+    rule: Regulatory notification, designation, certification, patent status, and approval remain distinct.
+
