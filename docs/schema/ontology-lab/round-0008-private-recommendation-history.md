@@ -1,5 +1,8 @@
 # Round 0008: Private User Context and Recommendation History
 
+> **Integration decision (2026-10-03):** `ACCEPTED`. Placement: transactional private context store (PostgreSQL recommended) as system of record, zero private nodes in the shared graph. Observation stays public in protocols; PersonalMeasurement is private. ASSESSES_APPLICABILITY_TO loses UserContext in favour of UseContextProfile. RecommendationSnapshot and RecommendationOption replace the 0.1.0 names. Catalog 0.2.0; see [proposal-index.md](./proposal-index.md).
+
+
 Status recommended by Lane 5: `ACCEPTED` for the placement decision (private context store as system of record, zero private nodes in the shared graph), the `RecommendationSnapshot` contract, the `Observation` ownership decision, and the `ProtocolEdition` / `ProtocolInUse` split. `OPEN` for the cross-lane items listed under "Residual uncertainty". The coordinator sets the final status.
 
 ## Header
@@ -11,7 +14,7 @@ Status recommended by Lane 5: `ACCEPTED` for the placement decision (private con
 - Owning modules: `recommendation_decisions` (changed), `private_context` (new), `protocols` (new, public)
 - Candidate schema version: 0.2.0
 - Source schema digest: `current_biotech_schema.graphql` sha256 `86b5e0b5d11d203bd75b69b4507b0aad97d5df2495d3897ca64272068ea5f112`; `catalog/schema.yaml` 0.1.0 sha256 `4c3203f57706c43fe508549211ed6f11910e2150947814c047122eb34f29825f`
-- Decision status: `OPEN` (recommendation above)
+- Decision status: `ACCEPTED` (set by the integration owner on 2026-10-03; the lane recommendation is preserved below)
 
 ## Intent and competency questions
 

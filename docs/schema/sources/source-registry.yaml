@@ -1,8 +1,9 @@
-registryVersion: 0.1.0
-updatedAt: 2026-07-13
+registryVersion: 0.2.0
+updatedAt: 2026-10-03
 
 policy:
   principle: Authority is claim-specific, not organization-global.
+  provenance: Entries added in 0.2.0 carry addedBy naming the ontology-lab round that relies on them. Locators and modeling consequences are stored, never page dumps. Entries whose URL could not be fetched directly in the authoring session say so in notes or verification fields; they are still claim-scoped, not endorsements.
   fields:
     authorityFor: Questions for which the source is normally primary or highly relevant.
     notAuthorityFor: Inferences the source cannot establish by itself.
@@ -54,7 +55,9 @@ sources:
     kind: certification_listing
     authorityFor: [NSF_program_listing_status_and_scope]
     notAuthorityFor: [all_quality_dimensions, lots_or_products_outside_scope]
-    schemaConsequences: [CertificationProgram_Listing_Scope_and_CoveredIdentity_are_separate]
+    schemaConsequences: [CertificationProgram_Listing_Scope_and_CoveredIdentity_are_separate, CertificationScope_COVERS_TradeItemIdentifier_or_ProductLot]
+    observedAt: 2026-10-03
+    note: Listing current as of 2026-10-03 enumerates Product IDs per trade designation (for example Basis 231202; 24150 24150A; R212-01 M070-01 P043-01); observation added by rounds-0004-0005.
 
   - id: SRC-FDA-ORPHAN-NR-PT
     url: https://www.accessdata.fda.gov/scripts/opdlisting/oopd/detailedIndex.cfm?cfgridkey=628218
@@ -87,4 +90,1205 @@ sources:
     authorityFor: [statements_and_findings_in_the_court_record_about_historical_supply]
     notAuthorityFor: [chemical_equivalence, clinical_efficacy]
     schemaConsequences: [historical_supplier_material_and_current_material_require_distinct_identity]
+
+
+  # ---- Added for round-0009 (lane1) ----
+
+  - id: SRC-GRUNINGER-FOX-1995
+    url: http://www.eil.utoronto.ca/wp-content/uploads/enterprise-modelling/papers/gruninger-ijcai95.pdf
+    publisher: "Enterprise Integration Laboratory, University of Toronto (Gruninger and Fox, IJCAI-95 workshop paper)"
+    kind: methodology_paper
+    # verification: citation and secondary quotes seen (snippet); the PDF body was not read
+    authorityFor: [competency_questions_as_requirements_stated_informally_then_restated_in_the_model_language, competency_questions_evaluate_commitments_rather_than_generate_them]
+    notAuthorityFor: [how_to_classify_questions_by_priority, bitemporal_or_provenance_modeling, graph_query_syntax]
+    schemaConsequences: [every_Essential_or_Foundational_question_has_a_query_shape_in_query-shapes_md, a_question_does_not_create_a_node_by_itself_only_its_trace_does]
+    addedBy: round-0009
+
+  - id: SRC-USCHOLD-GRUNINGER-1996
+    url: https://www.redalyc.org/journal/395/39571719015/html
+    publisher: "Redalyc, summarizing Uschold and Gruninger, 'Ontologies: principles, methods and applications', Knowledge Engineering Review 11(2), 1996"
+    kind: secondary_summary_of_methodology
+    # verification: secondary summary read at snippet level; the original article was not read
+    authorityFor: [staging_of_ontology_building_purpose_scope_competency_questions_and_evaluation, informal_versus_formal_competency_questions]
+    notAuthorityFor: [priority_classes_used_by_this_project, current_tooling]
+    schemaConsequences: [requirements_header_states_purpose_scope_users_uses_before_questions]
+    addedBy: round-0009
+
+  - id: SRC-NEON-ORSD-2012
+    url: https://link.springer.com/content/pdf/10.1007/978-3-642-24794-1.pdf
+    publisher: "Springer (Suarez-Figueroa, Gomez-Perez, Fernandez-Lopez, 'The NeOn Methodology for Ontology Engineering', 2012)"
+    kind: methodology_book_chapter
+    # verification: snippet only; a thesis and a project deliverable that describe the ORSD fields were also seen at snippet level
+    authorityFor: [ontology_requirements_specification_document_with_purpose_scope_users_uses_and_functional_requirements_as_competency_questions]
+    notAuthorityFor: [question_priority_scheme, schema_design_for_property_graphs]
+    schemaConsequences: [competency_questions_md_opens_with_an_ORSD_style_header]
+    addedBy: round-0009
+
+  - id: SRC-SNODGRASS-TDB-BOOK
+    url: https://cs.arizona.edu/~rts/tdbbook.pdf
+    publisher: "Richard T. Snodgrass, 'Developing Time-Oriented Database Applications in SQL'"
+    kind: textbook
+    # verification: chapter 10 summary and bitemporal time-slice query (figure 10.18) read at snippet level
+    authorityFor: [bitemporal_table_has_valid_time_and_transaction_time_periods, bitemporal_time_slice_constrains_both_periods, transaction_time_current_primary_keys]
+    notAuthorityFor: [property_graph_representation, unknown_bound_semantics_in_Neo4j]
+    schemaConsequences: [as_of_shape_constrains_recordedFrom_recordedTo_and_validFrom_validTo_together, valid_and_recorded_time_are_separate_properties]
+    addedBy: round-0009
+
+  - id: SRC-POSTGRES-SQL2011-WIKI
+    url: https://wiki.postgresql.org/wiki/SQL2011Temporal
+    publisher: "PostgreSQL community wiki"
+    kind: community_documentation
+    # verification: read at snippet level; it describes SQL:2011 vocabulary, not the standard text
+    authorityFor: [SQL_2011_vocabulary_application_time_and_system_time, a_bitemporal_row_asserts_that_the_database_claimed_from_a_time_that_a_statement_was_true_for_a_time, period_start_must_be_before_end]
+    notAuthorityFor: [the_text_of_the_SQL_standard, Neo4j_behavior]
+    schemaConsequences: [half_open_non_empty_intervals_V-102, system_time_is_assigned_by_the_system_not_by_sources]
+    addedBy: round-0009
+
+  - id: SRC-SQL2011-KULKARNI-MICHELS
+    url: https://sigmodrecord.org/2012/09/30/temporal-features-in-sql2011
+    publisher: "ACM SIGMOD Record 41(3), 2012"
+    kind: journal_article
+    # verification: not read; located by citation metadata. Listed so the SQL:2011 claim in SRC-POSTGRES-SQL2011-WIKI can be checked against a primary description.
+    authorityFor: [description_of_SQL_2011_temporal_features_by_standard_contributors]
+    notAuthorityFor: [anything_not_read]
+    schemaConsequences: [none_until_read]
+    addedBy: round-0009
+
+  - id: SRC-XTDB-TIME
+    url: https://docs.xtdb.com/about/time-in-xtdb.html
+    publisher: "XTDB documentation"
+    kind: product_documentation
+    # verification: read at snippet level
+    authorityFor: [as_of_and_with_effect_from_requirements_usually_mean_valid_time, valid_time_is_when_a_version_is_considered_valid_in_the_world, system_time_is_when_the_database_held_it, query_forms_FOR_VALID_TIME_AS_OF_and_FOR_SYSTEM_TIME]
+    notAuthorityFor: [BellLabs_assertion_status_semantics, unknown_versus_open_valid_end]
+    schemaConsequences: [two_independent_as_of_parameters_R_and_V, valid_time_may_be_supplied_by_the_application_and_corrected_later]
+    addedBy: round-0009
+
+  - id: SRC-XTDB-BITEMP-INDEX
+    url: https://xtdb.com/blog/building-a-bitemp-index-2-resolution
+    publisher: "XTDB blog"
+    kind: engineering_blog
+    # verification: read at snippet level; shows rows whose system-time is closed when valid-time is corrected
+    authorityFor: [correction_of_past_valid_time_closes_system_time_on_the_old_row_and_adds_a_new_row]
+    notAuthorityFor: [requirements_of_BellLabs, graph_storage]
+    schemaConsequences: [a_correction_is_a_new_recorded_episode_not_an_edit_of_valid_time_on_the_old_edge]
+    addedBy: round-0009
+
+  - id: SRC-DATOMIC-FILTERS
+    url: https://docs.datomic.com/reference/filters.html
+    publisher: "Datomic documentation"
+    kind: product_documentation
+    # verification: read at snippet level
+    authorityFor: [as_of_filters_the_database_by_transaction_time_inclusive, since_filters_to_later_transactions, history_exposes_assertions_and_retractions]
+    notAuthorityFor: [valid_time_semantics, bitemporal_queries]
+    schemaConsequences: [valid_time_needs_explicit_attributes_because_transaction_time_alone_cannot_express_a_retroactive_fact]
+    addedBy: round-0009
+
+  - id: SRC-NEO4J-GQL-AUTOGEN
+    url: https://neo4j.com/docs/graphql/current/directives/autogeneration/
+    publisher: "Neo4j GraphQL Library documentation (version 7 pages)"
+    kind: product_documentation
+    # verification: read
+    authorityFor: [id_directive_generates_a_random_UUID_and_is_absent_from_mutation_inputs, timestamp_values_are_generated_at_the_GraphQL_API_layer_only]
+    notAuthorityFor: [behavior_of_the_library_version_this_repo_uses, whether_a_unique_constraint_is_created_for_id]
+    schemaConsequences: [catalog_created_nodes_must_set_id_createdAt_updatedAt_themselves, uid_is_a_separate_stored_property_not_an_id_directive_field]
+    addedBy: round-0009
+
+  - id: SRC-NEO4J-GQL-DBMAPPING
+    url: https://neo4j.com/docs/graphql/current/directives/database-mapping/
+    publisher: "Neo4j GraphQL Library documentation (version 7 pages)"
+    kind: product_documentation
+    # verification: read (alias definition and usage); the default-label behavior of @node is not confirmed by the retrieved text
+    authorityFor: [alias_maps_a_GraphQL_field_to_a_different_stored_property, node_labels_argument_sets_the_labels_of_a_type]
+    notAuthorityFor: [default_label_when_labels_is_omitted_verify, behavior_with_extra_archetype_labels]
+    schemaConsequences: [cypher_and_indexes_use_stored_property_names_documentId_title_url_chunkId_index, coalesce_over_id_aliases_in_uid_checks]
+    addedBy: round-0009
+
+  - id: SRC-NEO4J-GQL-INDEXES
+    url: https://neo4j.com/docs/graphql/current/directives/indexes-and-constraints/
+    publisher: "Neo4j GraphQL Library documentation (version 7 pages)"
+    kind: product_documentation
+    # verification: read
+    authorityFor: [fulltext_directive_does_not_create_the_index_it_must_be_created_manually, vector_directive_queries_an_existing_vector_index, phrase_queries_are_embedded_through_the_Neo4j_GenAI_plugin]
+    notAuthorityFor: [who_computes_stored_node_embeddings, index_state_in_the_live_database]
+    schemaConsequences: [V-120_checks_index_existence_and_property_names, search_hits_are_candidates_QS-8, embeddingModel_and_dimensions_recorded_per_node_V-119]
+    addedBy: round-0009
+
+  - id: SRC-NEO4J-GQL-MIGRATION-7
+    url: https://neo4j.com/docs/graphql/current/migration
+    publisher: "Neo4j GraphQL Library documentation"
+    kind: product_documentation
+    # verification: read at snippet level
+    authorityFor: [types_without_@node_are_not_nodes_in_version_7, relationship_fields_require_@node_types, connect_always_creates_a_new_relationship]
+    notAuthorityFor: [the_library_version_in_use_by_BellLabs]
+    schemaConsequences: [repeated_attachments_between_the_same_two_nodes_are_possible_for_multiple_recorded_episodes]
+    addedBy: round-0009
+
+  - id: SRC-NEO4J-CYPHER-QPP
+    url: https://neo4j.com/docs/cypher-manual/current/patterns/variable-length-patterns/
+    publisher: "Neo4j Cypher Manual"
+    kind: product_documentation
+    # verification: read at snippet level
+    authorityFor: [quantified_path_patterns_and_quantified_relationships_syntax, variable_length_relationship_syntax_does_not_allow_WHERE]
+    notAuthorityFor: [whether_a_parameter_may_be_a_quantifier_bound]
+    schemaConsequences: [per_hop_label_and_time_predicates_in_QS-5b_and_QS-6a_use_quantified_path_patterns, compiler_substitutes_literal_depth]
+    addedBy: round-0009
+
+  - id: SRC-NEO4J-CYPHER-VECTOR
+    url: https://neo4j.com/docs/cypher-manual/current/indexes/semantic-indexes/vector-indexes/
+    publisher: "Neo4j Cypher Manual"
+    kind: product_documentation
+    # verification: read at snippet level (dimension recommendation, 5.13 general availability, queryNodes procedure)
+    authorityFor: [vector_index_dimensions_and_similarity_function_set_at_creation, vector_properties_stored_as_lists_in_5_13, db_index_vector_queryNodes_signature]
+    notAuthorityFor: [embedding_quality, provider_choice]
+    schemaConsequences: [embeddingDimensions_is_a_mirror_of_an_index_setting_and_is_checked_V-119]
+    addedBy: round-0009
+
+  - id: SRC-NEO4J-CYPHER-FULLTEXT
+    url: https://neo4j.com/docs/cypher-manual/current/indexes/semantic-indexes/full-text-indexes/
+    publisher: "Neo4j Cypher Manual"
+    kind: product_documentation
+    # verification: read at snippet level
+    authorityFor: [fulltext_indexes_can_cover_several_labels_and_properties, eventually_consistent_mode_exists, queryNodes_returns_Lucene_score]
+    notAuthorityFor: [relevance_across_indexes]
+    schemaConsequences: [lexical_score_is_not_resolutionConfidence, search_is_not_a_read_your_write_check]
+    addedBy: round-0009
+
+  - id: SRC-FDA-807-39
+    url: https://www.law.cornell.edu/cfr/text/21/807.39
+    publisher: "Legal Information Institute (21 CFR 807.39); FDA Establishment Registration and Device Listing database notice; FDA FAQ on registration and listing"
+    kind: regulation_and_agency_page
+    # verification: read at snippet level for all three (eCFR text; database note; COVID-19 registration FAQ)
+    authorityFor: [registration_of_a_device_establishment_or_assignment_of_a_registration_number_does_not_denote_approval, listing_does_not_denote_approval_clearance_or_authorization_by_FDA, representing_registration_as_approval_is_misbranding]
+    notAuthorityFor: [whether_a_specific_device_is_cleared_or_approved, non_US_jurisdictions]
+    schemaConsequences: [registration_and_listing_records_are_not_clearance_or_approval, forbidden_implication_candidate_DEVICE_ESTABLISHMENT_REGISTERED_to_FDA_CLEARED_OR_APPROVED, adversarial_pair_12]
+    addedBy: round-0009
+
+  - id: SRC-NEO4J-LANGUAGE-SUPPORT
+    url: https://www.npmjs.com/package/@neo4j-cypher/language-support
+    publisher: "Neo4j (npm package @neo4j-cypher/language-support 2.0.0-next.6)"
+    kind: tool
+    # verification: installed and run in this session on every statement in query-shapes.md and validation.cypher
+    authorityFor: [Cypher_syntax_and_schema_free_semantic_diagnostics_as_implemented_by_the_package, importing_WITH_scoping_errors]
+    notAuthorityFor: [label_or_property_existence_in_the_catalog, query_plans, runtime_results, equivalence_with_the_Neo4j_server_parser_version]
+    schemaConsequences: [status_statically_checked_means_lint_clean_plus_author_reading, no_query_is_marked_executed]
+    addedBy: round-0009
+
+
+  # ---- Added for rounds-0002-0003 (lane2) ----
+
+  # CHANGE to existing SRC-NATURE-BASIS-2017: add PMID/locators and consequences below (same article).
+  - id: SRC-PUBMED-30155270
+    url: https://doi.org/10.1038/s41514-018-0027-1
+    publisher: npj Aging and Mechanisms of Disease
+    kind: published_correction
+    # PMID 30155270; PMC6102308. Author Correction to PMID 29184669.
+    authorityFor: [corrected_text_of_the_original_article, statement_that_Elysium_provided_the_investigational_product_and_placebo]
+    notAuthorityFor: [who_manufactured_or_supplied_the_NR_raw_material, change_in_results]
+    schemaConsequences: [CORRECTS_edge_between_Publications, PROVIDES_INVESTIGATIONAL_PRODUCT_is_not_SUPPLIES_INGREDIENT_MATERIAL, correction_is_new_recorded_episode_not_deletion]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-CTGOV-NCT02678611
+    url: https://clinicaltrials.gov/study/NCT02678611
+    publisher: U.S. National Library of Medicine (ClinicalTrials.gov)
+    kind: trial_registry_record
+    # Current version only (MCP tool). Version history not retrievable: direct API refused by egress proxy.
+    authorityFor: [registered_primary_and_secondary_outcomes_as_currently_shown, registered_arms_and_intervention_labels, sponsor_and_collaborator_as_registered, overall_status, enrollment_count_as_shown, registered_sites, results_section_posted_or_not]
+    notAuthorityFor: [whether_results_were_published, outcome_registration_history_without_version_records, material_identity_of_Basis_250_or_500, current_product_formulation]
+    schemaConsequences: [RegistrationVersion_with_observedAt, resultsPosted_false_is_not_unpublished, registry_vs_publication_site_disagreement_preserved, registered_priority_derived_from_earliest_RegistrationVersion]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-CEN-2018-NIAGEN-FEUD
+    url: https://cen.acs.org/business/consumer-products/Firms-feud-over-Niagen-purported/96/i33
+    publisher: Chemical & Engineering News (American Chemical Society)
+    kind: trade_press
+    # Locator: paragraph "Until mid-2016, ChromaDex sold Elysium all the NR and pterostilbene it needed to make Basis, according to ChromaDex."
+    authorityFor: [that_ChromaDex_made_the_reported_statement, that_Elysium_declined_comment]
+    notAuthorityFor: [lot_level_supply_to_NCT02678611, chemical_equivalence_of_NIAGEN_and_NR_E, truth_of_ChromaDex_statement]
+    schemaConsequences: [attributed_Assertion_ASSERTED_BY_ChromaDex_status_DISPUTED, competing_ResolutionHypothesis_for_trial_material]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-CTGOV-NCT02712593
+    url: https://clinicaltrials.gov/study/NCT02712593
+    publisher: U.S. National Library of Medicine (ClinicalTrials.gov)
+    kind: trial_registry_record
+    authorityFor: [registered_arms_Niagen_100_300_1000, registered_primary_outcome_urinary_methylnicotinamide, eligibility_age_40_to_60_BMI_25_to_30, sponsor_KGK_collaborator_ChromaDex, results_section_posted_or_not]
+    notAuthorityFor: [NIAGEN_specification_version_used, reported_results]
+    schemaConsequences: [same_CRO_site_and_period_as_NCT02678611_yet_distinct_material, StudyArm_per_dose]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-PUBMED-31278280
+    url: https://doi.org/10.1038/s41598-019-46120-z
+    publisher: Scientific Reports
+    kind: peer_reviewed_publication
+    # PMID 31278280; PMC6611812. Abstract locator.
+    authorityFor: [reported_whole_blood_NAD_changes_at_100_300_1000_mg, reported_LDL_finding, description_of_NIAGEN_as_crystal_form_of_NR_chloride]
+    notAuthorityFor: [mass_basis_of_dose_salt_vs_cation, current_Tru_Niagen_formulation, Elysium_material_equivalence]
+    schemaConsequences: [ChemicalForm_distinct_from_BrandedIngredientMaterial, DOSE_dimension_ratio_withheld_on_basis_mismatch, cross_study_LDL_disagreement_is_not_contradiction_without_applicability]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-TRUNIAGEN-300MG-PAGE
+    url: https://www.truniagen.com/products/tru-niagen-300mg
+    publisher: ChromaDex (Niagen Bioscience)
+    kind: official_product_and_label_page
+    # Supplement Facts: 1 vegetarian capsule; NIAGEN (nicotinamide riboside chloride) 300 mg; MCC, hypromellose, vegetable magnesium stearate.
+    authorityFor: [current_label_declaration_as_observed, displayed_marketing_claims]
+    notAuthorityFor: [historical_formulation, trial_material_identity, independent_efficacy]
+    schemaConsequences: [IngredientComponent_massBasis_SALT_FORM, LabelSnapshot_is_not_StudyIntervention]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-CTGOV-NCT03464500
+    url: https://clinicaltrials.gov/study/NCT03464500
+    publisher: U.S. National Library of Medicine (ClinicalTrials.gov)
+    kind: trial_registry_record
+    # ATLAS. Title uses code "AMAZ-02"; interventions "Mitopure 500mg", "Mitopure 1000mg".
+    authorityFor: [registered_primary_outcome_cycle_ergometer_power_output, registered_secondary_outcomes, intervention_labels]
+    notAuthorityFor: [results, equivalence_of_trial_softgel_and_current_vegan_softgel]
+    schemaConsequences: [code_name_alias_needs_ResolutionHypothesis, analysisKind_PRIMARY_vs_SECONDARY]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-PUBMED-35584623
+    url: https://doi.org/10.1016/j.xcrm.2022.100633
+    publisher: Cell Reports Medicine
+    kind: peer_reviewed_publication
+    # PMID 35584623; PMC9133463. Abstract (primary endpoint peak power output not significant; strength ~12%); Methods (4 softgels/day; 500 mg = 2 UA + 2 placebo softgels).
+    authorityFor: [reported_primary_and_secondary_results, softgel_delivery_and_per_softgel_amount, author_claim_of_clinically_meaningful_improvement, mitophagy_linked_protein_expression_in_muscle]
+    notAuthorityFor: [mitophagy_flux_in_humans, current_product_formulation]
+    schemaConsequences: [null_primary_with_favorable_secondary, RESULT_CLINICALLY_MEANINGFUL_is_author_Assertion, proxy_marker_is_not_process_flux]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-CTGOV-NCT03283462
+    url: https://clinicaltrials.gov/study/NCT03283462
+    publisher: U.S. National Library of Medicine (ClinicalTrials.gov)
+    kind: trial_registry_record
+    # ENERGIZE. Primary: 6MWD change; ATPmax hand muscle.
+    authorityFor: [registered_primary_outcomes, eligibility_age_65_to_90]
+    notAuthorityFor: [results]
+    schemaConsequences: [registered_priority_for_null_primary_check]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-PUBMED-35050355
+    url: https://doi.org/10.1001/jamanetworkopen.2021.44279
+    publisher: JAMA Network Open
+    kind: peer_reviewed_publication
+    # PMID 35050355; PMC8777576. 1000 mg/day UA, 4 months, 66 adults 65 to 90.
+    authorityFor: [reported_null_primary_6MWD_and_ATPmax, reported_favorable_secondary_endurance, adverse_event_comparison]
+    notAuthorityFor: [evidence_of_no_effect, applicability_to_500_mg_products]
+    schemaConsequences: [NOT_SIGNIFICANT_is_not_NO_EFFECT, DOSE_dimension_1000_vs_500]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-TIMELINE-MITOPURE-SOFTGELS
+    url: https://www.timeline.com/products/mitopure-softgels-vegan
+    publisher: Timeline (Amazentis SA)
+    kind: official_product_page
+    # "two vegan softgels daily for the recommended dose of Urolithin A (500mg of Mitopure)"; "Muscle strength increases by up to 12% after 16 weeks".
+    authorityFor: [current_dose_and_dosage_form_as_displayed, company_marketing_claims]
+    notAuthorityFor: [primary_endpoint_results, equivalence_to_trial_softgels, mitophagy_flux]
+    schemaConsequences: [secondary_result_marketed_as_headline_detectable_via_analysisKind, EXPOSURE_dimension_PARTIAL_without_trial_to_product_softgel_bridge]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-PUBMED-32694802
+    url: https://doi.org/10.1038/s42255-019-0073-4
+    publisher: Nature Metabolism
+    kind: peer_reviewed_publication
+    # PMID 32694802. First-in-human UA trial (Andreux et al. 2019).
+    authorityFor: [plasma_bioavailability_of_trial_UA_material, muscle_mitochondrial_gene_expression_changes, safety_as_primary_outcome]
+    notAuthorityFor: [mitophagy_flux, current_product_exposure]
+    schemaConsequences: [human_exposure_evidence_for_EXPOSURE_dimension, plasma_and_muscle_measurands_distinct]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-PUBMED-27400265
+    url: https://doi.org/10.1038/nm.4132
+    publisher: Nature Medicine
+    kind: peer_reviewed_publication
+    # PMID 27400265 (Ryu et al. 2016). Doses not extracted in session.
+    authorityFor: [mitophagy_induction_in_reported_cell_worm_and_rodent_contexts, C_elegans_lifespan_result]
+    notAuthorityFor: [human_mitophagy, product_dose_adequacy]
+    schemaConsequences: [MechanismEvidenceContext_per_species, FI_303_ingredient_mechanism_not_formulation_exposure]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-PUBMED-31412242
+    url: https://doi.org/10.1016/j.celrep.2019.07.043
+    publisher: Cell Reports
+    kind: peer_reviewed_publication
+    # PMID 31412242; PMC6702140. Abstract; Results and Figure 3 (respiration, citrate synthase, mtDNA, pan-acetylation unchanged).
+    authorityFor: [human_skeletal_muscle_NAD_metabolome_changes_at_1g_per_day_21_days, measured_null_for_mitochondrial_bioenergetics_and_acetylation_proxy]
+    notAuthorityFor: [effects_at_lower_doses, effects_in_women, longer_durations]
+    schemaConsequences: [basisKind_DIRECT_MEASUREMENT_with_NEGATIVE_polarity, compartment_specific_measurands, synthesis_TRIGGERED_BY_human_null]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-PUBMED-29992272
+    url: https://doi.org/10.1093/ajcn/nqy132
+    publisher: American Journal of Clinical Nutrition
+    kind: peer_reviewed_publication
+    # PMID 29992272. Registry NCT02303483 named in abstract; registry record not opened in session.
+    authorityFor: [measured_null_insulin_sensitivity_at_2g_per_day_12_weeks_in_obese_men]
+    notAuthorityFor: [effects_in_other_populations]
+    schemaConsequences: [species_and_population_bound_mechanism_contradiction]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-PUBMED-27127236
+    url: https://doi.org/10.1126/science.aaf2693
+    publisher: Science
+    kind: peer_reviewed_publication
+    # PMID 27127236 (Zhang et al. 2016). Dose and route not extracted in session (unverified).
+    authorityFor: [mouse_muscle_stem_cell_and_mitochondrial_results, mouse_lifespan_result]
+    notAuthorityFor: [human_effects, human_equivalent_dose]
+    schemaConsequences: [exposureStatus_NOT_EXTRACTED_not_zero, APPLIES_TO_SPECIES_derived_per_context]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-PUBMED-18789672
+    url: https://doi.org/10.1016/j.jnutbio.2008.05.003
+    publisher: Journal of Nutritional Biochemistry
+    kind: peer_reviewed_publication_retracted
+    # PMID 18789672; PubMed publication type "Retracted Publication". Retraction notice id not retrieved (unverified).
+    authorityFor: [what_the_retracted_paper_reported, retracted_status_per_PubMed_publication_type]
+    notAuthorityFor: [any_accepted_mechanism_fact]
+    schemaConsequences: [RETRACTS_edge_and_review_propagation, dose_in_context_needed_for_biphasic_sign]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-FDA-SURROGATE-RESOURCES
+    url: https://www.fda.gov/drugs/development-resources/surrogate-endpoint-resources-drug-and-biologic-development
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_guidance_page
+    authorityFor: [definitions_of_surrogate_endpoint_validated_reasonably_likely_candidate]
+    notAuthorityFor: [surrogate_status_outside_drug_approval_contexts, dietary_supplement_claims]
+    schemaConsequences: [surrogateValidationLevel_enum, EndpointClassification_is_an_assessment]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-FDA-SURROGATE-TABLE
+    url: https://www.fda.gov/drugs/development-resources/table-surrogate-endpoints-were-basis-drug-approval-or-licensure
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_reference_table
+    # Row: Hypercholesterolemia / patients with heterozygous familial and nonfamilial hypercholesterolemia / Serum LDL cholesterol / Traditional / Lipid-lowering.
+    authorityFor: [surrogate_endpoints_used_as_basis_of_approval_with_disease_population_approval_type_and_mechanism]
+    notAuthorityFor: [surrogate_status_for_other_mechanisms_or_populations]
+    schemaConsequences: [context_of_use_fields_disease_population_mechanism_approvalType, FI_204]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-FDA-HED-GUIDANCE-2005
+    url: https://www.fda.gov/media/72309/download
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_guidance
+    # "Estimating the Maximum Safe Starting Dose in Initial Clinical Trials for Therapeutics in Adult Healthy Volunteers" (July 2005), Section V.
+    authorityFor: [body_surface_area_human_equivalent_dose_method_for_starting_dose_estimation]
+    notAuthorityFor: [bioavailability_or_formulation_equivalence, efficacy_dose_translation_for_supplements]
+    schemaConsequences: [hedValue_is_derived_with_hedMethod]
+    addedBy: rounds-0002-0003
+
+  - id: SRC-FLEMING-POWERS-2012
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3551627
+    publisher: PubMed Central (Statistics in Medicine; journal and authors not re-verified in session)
+    kind: peer_reviewed_publication
+    authorityFor: [risks_of_relying_on_biomarkers_and_short_term_intermediate_endpoints]
+    notAuthorityFor: [specific_surrogate_validation_for_supplement_outcomes]
+    schemaConsequences: [INTERMEDIATE_CLINICAL_ENDPOINT_distinct_from_CLINICAL_OUTCOME]
+    addedBy: rounds-0002-0003
+
+
+  # ---- Added for rounds-0004-0005 (lane3) ----
+
+  - id: SRC-LOINC-4548-4
+    url: https://loinc.org/4548-4
+    publisher: Regenstrief Institute (LOINC)
+    kind: terminology_record
+    observedAt: 2026-10-03
+    verification: tavily_extract
+    authorityFor: [measurand_concept_definition, loinc_part_model, example_units]
+    notAuthorityFor: [assay_identity, method_used_by_a_lab, reference_interval, result_comparability]
+    schemaConsequences: [LOINC_identifies_Metric_not_AssayVersion, method_absent_from_code_is_not_evidence_about_method]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-LOINC-17856-6
+    url: https://loinc.org/17856-6
+    publisher: Regenstrief Institute (LOINC)
+    kind: terminology_record
+    observedAt: 2026-10-03
+    verification: tavily_extract
+    authorityFor: [method_specific_concept_definition, loinc_mapping_guidance]
+    notAuthorityFor: [which_method_a_lab_reporting_4548_4_used]
+    schemaConsequences: [method_recorded_on_AssayVersion_independently_of_LOINC]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-LOINC-59261-8
+    url: https://loinc.org/59261-8
+    publisher: Regenstrief Institute (LOINC)
+    kind: terminology_record
+    observedAt: 2026-10-03
+    verification: tavily_extract
+    note: Displayed title read "standardized per IFCC-RMP for CDT"; language variants render the method as IFCC protocol. Recorded as displayed; not cross-checked against a LOINC release file.
+    authorityFor: [distinct_measurand_concept_for_IFCC_units]
+    notAuthorityFor: [numeric_equivalence_with_4548_4]
+    schemaConsequences: [separate_Metric_per_LOINC_concept, cross_metric_comparison_requires_ComparabilityAssessment]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-NGSP-IFCC
+    url: https://ngsp.org/ifccngsp.asp
+    publisher: NGSP
+    kind: standardization_program_page
+    observedAt: 2026-10-03
+    verification: tavily_extract
+    authorityFor: [IFCC_NGSP_master_equation, unit_convention_mmol_per_mol]
+    notAuthorityFor: [traceability_of_a_specific_result, certification_status_of_a_lab]
+    schemaConsequences: [unitConversionRule_on_ComparabilityAssessment, conversion_is_not_identity]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-NGSP-CERTIFIED
+    url: https://ngsp.org/certified.asp
+    publisher: NGSP
+    kind: certification_listing
+    observedAt: 2026-10-03
+    verification: tavily_extract (PDF lists not opened)
+    authorityFor: [current_listing_of_certified_methods_and_labs_as_of_page_update]
+    notAuthorityFor: [certification_at_time_of_historical_result]
+    schemaConsequences: [NGSP_certification_as_time_bounded_CertificationListing_on_AssayVersion_or_lab]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-NGSP-INTERF
+    url: https://ngsp.org/interf.asp
+    publisher: NGSP
+    kind: method_interference_table
+    observedAt: 2026-10-03
+    verification: tavily_extract
+    authorityFor: [hemoglobin_variant_and_HbF_interference_by_instrument_and_software_version]
+    notAuthorityFor: [individual_variant_status, unlisted_versions]
+    schemaConsequences: [softwareVersion_is_part_of_AssayVersion_identity, same_LOINC_not_same_assay]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-CLSI-EP28
+    url: https://clsi.org/shop/standards/ep28
+    publisher: Clinical and Laboratory Standards Institute
+    kind: standards_body_product_page
+    observedAt: 2026-10-03
+    verification: tavily_search (full guideline paywalled, not read)
+    authorityFor: [existence_and_scope_of_reference_interval_establishment_transfer_verification_guideline]
+    notAuthorityFor: [specific_reference_interval_values, guideline_details_not_in_summary]
+    schemaConsequences: [ReferenceIntervalVersion_derivationKind, interval_bound_to_AssayVersion]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-OZARDA-RI-2016
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4783089
+    publisher: Biochemia Medica (via PMC)
+    kind: peer_reviewed_review
+    observedAt: 2026-10-03
+    verification: tavily_search_snippet
+    authorityFor: [conditions_for_reference_interval_transference_between_methods]
+    notAuthorityFor: [any_laboratory_interval]
+    schemaConsequences: [TRANSFERRED_interval_requires_method_comparability_basis]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-PMID-30669119
+    url: https://doi.org/10.18632/aging.101684
+    publisher: Aging (Albany NY)
+    kind: peer_reviewed_publication
+    pmid: "30669119"
+    authorityFor: [GrimAge_v1_definition_inputs_output_unit, reported_validation]
+    notAuthorityFor: [vendor_implementation_identity, individual_score_meaning]
+    schemaConsequences: [AlgorithmVersion_with_PUBLICATION_VERSION_basis, outputKind_AGE_ESTIMATE]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-PMID-36516495
+    url: https://doi.org/10.18632/aging.204434
+    publisher: Aging (Albany NY)
+    kind: peer_reviewed_publication
+    pmid: "36516495"
+    authorityFor: [GrimAge2_definition, added_logCRP_logA1C_surrogates, training_age_range_40_to_92]
+    notAuthorityFor: [equivalence_with_GrimAge_v1_scores]
+    schemaConsequences: [distinct_AlgorithmVersion, DERIVED_FROM_ALGORITHM_VERSION, forbidden_SAME_ALGORITHM_FAMILY_implies_SAME_VERSION]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-PMID-29676998
+    url: https://doi.org/10.18632/aging.101414
+    publisher: Aging (Albany NY)
+    kind: peer_reviewed_publication
+    pmid: "29676998"
+    authorityFor: [PhenoAge_definition_trained_on_whole_blood]
+    notAuthorityFor: [vendor_pipeline_identity]
+    schemaConsequences: [AlgorithmVersion_per_clock]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-PMID-35029144
+    url: https://doi.org/10.7554/eLife.73420
+    publisher: eLife
+    kind: peer_reviewed_publication
+    pmid: "35029144"
+    authorityFor: [DunedinPACE_definition_pace_output, probe_selection_by_test_retest_reliability]
+    notAuthorityFor: [comparability_with_age_type_clocks]
+    schemaConsequences: [outputKind_PACE_distinct_from_AGE_ESTIMATE]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-PMID-36277076
+    url: https://doi.org/10.1038/s43587-022-00248-2
+    publisher: Nature Aging
+    kind: peer_reviewed_publication
+    pmid: "36277076"
+    note: Author list includes an Elysium Health affiliation (financial-relationship relevance is Lane 4's concern).
+    authorityFor: [replicate_deviation_up_to_9_years_for_six_clocks, principal_component_clock_versions]
+    notAuthorityFor: [noise_of_any_specific_commercial_pipeline]
+    schemaConsequences: [replicateNoiseBasis_on_ComparabilityAssessment, PC_variants_are_distinct_AlgorithmVersions]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-OWKIN-PATHEXPLORER
+    url: mcp://owkin/pathology_explorer (tools pathology_explorer_help, list_cohorts, list_cell_types, features_description, cohort_description)
+    publisher: Owkin
+    kind: model_derived_feature_service
+    observedAt: 2026-10-03
+    verification: mcp_tool_calls
+    authorityFor: [cohort_list, cell_type_list, feature_names_and_text_definitions, cohort_summary_statistics_as_served]
+    notAuthorityFor: [model_version, preprint_version_correspondence, area_unit_for_density_features, tumor_region_method, patient_level_clinical_meaning]
+    schemaConsequences: [versionBasis_SERVICE_ENDPOINT_UNVERSIONED, unitStatus_NOT_REPORTED, unversioned_outputs_not_trendable]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-ARXIV-2508-09926
+    url: https://arxiv.org/abs/2508.09926
+    publisher: arXiv
+    kind: preprint
+    observedAt: 2026-10-03
+    verification: tavily_extract (listing page only; v3 current)
+    authorityFor: [described_cell_detection_method_in_each_preprint_version]
+    notAuthorityFor: [deployed_model_identity]
+    schemaConsequences: [publication_version_is_not_deployment_version]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-DEN200080
+    url: https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/denovo.cfm?id=DEN200080
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_record
+    observedAt: 2026-10-03
+    authorityFor: [De_Novo_grant_DEN200080_Paige_Prostate, product_code_QPN, regulation_864_3750, decision_date_2021_09_21, PCCP_not_authorized]
+    notAuthorityFor: [currently_deployed_model_build, clinical_performance_outside_decision_summary]
+    schemaConsequences: [RegulatoryStatus_DE_NOVO_AUTHORIZATION_scoped_to_device_or_AlgorithmVersion, pcccAuthorized_property]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-NDIN-PROCEDURES
+    url: https://www.fda.gov/media/176512/download
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_guidance
+    observedAt: 2026-10-03
+    verification: tavily_search_snippet (sentence truncated in capture)
+    authorityFor: [NDI_response_letter_types, 75_day_wait_after_filing_date, filing_date_reset_on_substantive_supplement]
+    notAuthorityFor: [any_specific_notification_outcome]
+    schemaConsequences: [closed_responseKind_enum_for_NDI, filingDate_versioned_by_recorded_time]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-GRAS-OVERVIEW
+    url: https://www.fda.gov/food/food-ingredients-packaging/generally-recognized-safe-gras
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_page
+    observedAt: 2026-10-03
+    authorityFor: [GRAS_definition, proposed_rule_2026_08_10_docket_FDA_2025_N_3262]
+    notAuthorityFor: [final_rule_content]
+    schemaConsequences: [RegulatoryPathway_effectiveFrom_effectiveTo_and_legalBasisCitation]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-GRAS-INVENTORY
+    url: https://www.hfpappexternal.fda.gov/scripts/fdcc/index.cfm?set=GRASNotices
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_database
+    observedAt: 2026-10-03
+    authorityFor: [GRAS_notice_response_type_and_closure_date, resubmission_links]
+    notAuthorityFor: [FDA_safety_determination]
+    schemaConsequences: [GRAS_responseKind_enum, SUPERSEDES_SUBMISSION]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-GRN-000635
+    url: https://www.fda.gov/food/gras-notice-inventory/agency-response-letter-gras-notice-no-grn-000635
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_record
+    observedAt: 2026-10-03
+    authorityFor: [FDA_no_questions_response_for_NR_GRAS_notice, intended_conditions_of_use_food_categories_0_0057_percent, agency_disclaimer_no_own_determination]
+    notAuthorityFor: [approval, dietary_supplement_dose_safety, uses_outside_notice]
+    schemaConsequences: [RegulatoryResponse_GRAS_NO_QUESTIONS_with_verbatim_conditions, forbidden_GRAS_NO_QUESTIONS_implies_FDA_APPROVED]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-TRUNIAGEN-REGULATORY
+    url: https://pages.truniagen.com/regulatory
+    publisher: Niagen Bioscience (Tru Niagen)
+    kind: official_company_page
+    observedAt: 2026-10-03
+    verification: tavily_search_snippet
+    authorityFor: [company_characterization_of_its_regulatory_responses]
+    notAuthorityFor: [agency_wording, agency_conditions_of_use, NDI_letter_content]
+    schemaConsequences: [CHARACTERIZES_REGULATORY_RESPONSE_assertion_attributed_to_company, adjudicated_against_agency_record]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-SEC-NAGE-10K-FY2025
+    url: https://www.sec.gov/Archives/edgar/data/1386570/000138657026000013/cdxc-20251231.htm
+    publisher: Niagen Bioscience, Inc. (SEC EDGAR, CIK 1386570)
+    kind: securities_filing
+    observedAt: 2026-10-03
+    authorityFor: [disclosed_supplier_dependence_on_W_R_Grace, disclosed_contract_manufacturing_and_503B_reliance, company_characterization_of_FDA_position]
+    notAuthorityFor: [agency_position, actual_facility_operations, capacity]
+    schemaConsequences: [filing_statements_are_Assertions_ASSERTED_BY_issuer, SUPPLIES_INGREDIENT_MATERIAL_not_MANUFACTURES_PRODUCT]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-NIAGEN-HOME
+    url: https://www.niagenbioscience.com
+    publisher: Niagen Bioscience
+    kind: marketing_page
+    observedAt: 2026-10-03
+    verification: tavily_search_snippet
+    authorityFor: [what_the_company_promotes]
+    notAuthorityFor: [manufacturing_capability_stage, facility_identity]
+    schemaConsequences: [promoted_capability_cannot_attach_OPERATING_state_alone]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-ASN-NIAGEN-DIRECTORY
+    url: https://nutrition.org/business-directory/chromadex-corp
+    publisher: American Society for Nutrition (company-supplied directory text)
+    kind: third_party_directory
+    observedAt: 2026-10-03
+    verification: tavily_search_snippet
+    authorityFor: [company_statements_placed_in_directory]
+    notAuthorityFor: [ASN_endorsement, inspection_outcomes, accreditation_scope]
+    schemaConsequences: [directory_text_ASSERTED_BY_company_not_host_site]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-503B-BULKS
+    url: https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding-under-section-503b-fdc-act
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_page
+    observedAt: 2026-10-03
+    authorityFor: [meaning_of_503B_category_1_interim_enforcement_policy]
+    notAuthorityFor: [whether_a_given_substance_is_in_category_1_unless_listed_on_the_page]
+    schemaConsequences: [statusKind_ENFORCEMENT_DISCRETION, forbidden_ENFORCEMENT_DISCRETION_implies_AUTHORIZATION]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-ECFR-21-807
+    url: https://www.ecfr.gov/current/title-21/chapter-I/subchapter-H/part-807
+    publisher: Office of the Federal Register (eCFR)
+    kind: regulation
+    observedAt: 2026-10-03
+    authorityFor: [807_39_registration_does_not_denote_approval, 807_97_premarket_notification_does_not_denote_approval]
+    notAuthorityFor: [product_specific_status]
+    schemaConsequences: [ESTABLISHMENT_REGISTRATION_status_of_Facility_only, forbidden_CLEARED_510K_implies_FDA_APPROVED]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-IS-IT-APPROVED
+    url: https://www.fda.gov/consumers/consumer-updates/it-really-fda-approved
+    publisher: U.S. Food and Drug Administration
+    kind: consumer_guidance
+    observedAt: 2026-10-03
+    authorityFor: [vocabulary_approval_clearance_registration_notification, FDA_does_not_approve_supplement_labels]
+    notAuthorityFor: [product_specific_status]
+    schemaConsequences: [regulatoryStatusKind_enum]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-WL-ZONA-2019
+    url: https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/zona-health-inc-584676-12062019
+    publisher: U.S. Food and Drug Administration
+    kind: warning_letter
+    observedAt: 2026-10-03
+    authorityFor: [agency_finding_that_registration_and_510k_representations_were_misbranding_in_that_case]
+    notAuthorityFor: [other_companies]
+    schemaConsequences: [real_failing_case_for_registration_as_approval]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-DS-QA
+    url: https://www.fda.gov/food/information-consumers-using-dietary-supplements/questions-and-answers-dietary-supplements
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_qa
+    observedAt: 2026-10-03
+    authorityFor: [facility_registration_duty, CGMP_duty, FDA_does_not_approve_supplement_claims]
+    notAuthorityFor: [compliance_of_any_facility]
+    schemaConsequences: [forbidden_ESTABLISHMENT_REGISTERED_implies_CGMP_COMPLIANT]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-DENOVO
+    url: https://www.fda.gov/medical-devices/premarket-submissions-selecting-and-preparing-correct-submission/de-novo-classification-request
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_page
+    observedAt: 2026-10-03
+    authorityFor: [De_Novo_grant_and_decline_semantics]
+    notAuthorityFor: [specific_device_status]
+    schemaConsequences: [DE_NOVO_AUTHORIZATION_distinct_from_APPROVAL]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FDA-LDT
+    url: https://www.fda.gov/medical-devices/in-vitro-diagnostics/laboratory-developed-tests
+    publisher: U.S. Food and Drug Administration
+    kind: regulatory_page
+    observedAt: 2026-10-03
+    authorityFor: [LDT_rule_history_2024_rule_2025_vacatur_2025_reversion]
+    notAuthorityFor: [status_of_any_specific_LDT]
+    schemaConsequences: [RegulatoryPathway_effective_interval, status_ends_at_vacatur_not_deleted]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FR-2025-18239
+    url: https://www.federalregister.gov/documents/2025/09/19/2025-18239/regulation-identification-number-0910-aj05-medical-devices-laboratory-developed-tests-implementation
+    publisher: Federal Register
+    kind: final_rule
+    observedAt: 2026-10-03
+    authorityFor: [reversion_of_21_CFR_809_3_effective_2025_09_19, citation_of_vacatur_Am_Clinical_Lab_Assn_v_FDA]
+    notAuthorityFor: [future_LDT_policy]
+    schemaConsequences: [legalBasisCitation_on_RegulatoryStatus]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-FTC-HEALTH-PRODUCTS-2022
+    url: https://www.ftc.gov/business-guidance/resources/health-products-compliance-guidance
+    publisher: U.S. Federal Trade Commission
+    kind: enforcement_guidance
+    observedAt: 2026-10-03
+    authorityFor: [competent_and_reliable_scientific_evidence_standard, testimonials_not_substantiation]
+    notAuthorityFor: [whether_a_specific_claim_is_substantiated]
+    schemaConsequences: [substantiation_is_EvidenceAssessment_not_attribute, promoted_claims_are_Assertions]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-NSF-173DI
+    url: https://www.nsf.org/knowledge-library/dietary-supplement-ingredient-certification
+    publisher: NSF
+    kind: certifier_explainer
+    observedAt: 2026-10-03
+    authorityFor: [distinction_between_facility_GMP_455_product_173_sport_306_ingredient_173DI_programs]
+    notAuthorityFor: [any_listing_status]
+    schemaConsequences: [CertificationScope_COVERS_Facility_or_product_or_ingredient_distinctly]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-NSF-455-2
+    url: https://www.nsf.org/knowledge-library/nsf-ansi-455-2-dietary-supplement-gmp-certification
+    publisher: NSF
+    kind: certifier_explainer
+    observedAt: 2026-10-03
+    authorityFor: [NSF_ANSI_455_2_is_facility_GMP_certification]
+    notAuthorityFor: [product_contents]
+    schemaConsequences: [forbidden_facility_GMP_certification_implies_product_certification]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-AMAZON-B0FS82B35K
+    url: https://www.amazon.com/TRU-NIAGEN-Astaxanthin-Hyaluronic-Supplements/dp/B0FS82B35K
+    publisher: Amazon
+    kind: marketplace_listing
+    observedAt: 2026-10-03
+    verification: tavily_search_snippet (not an archived snapshot)
+    authorityFor: [displayed_seller_of_record, displayed_fulfiller, displayed_price_at_observation]
+    notAuthorityFor: [legal_entity_of_seller, label_declaration, persistence_of_offer]
+    schemaConsequences: [HOSTS_LISTING_FULFILLS_OFFER_SELLER_OF_RECORD_FOR_are_distinct, PriceObservation_priceKind]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-AMAZON-TRUNIAGEN-STORE
+    url: https://www.amazon.com/stores/TruNiagen/page/32AC1A83-7E42-4575-9911-6BF694DD03C7
+    publisher: Amazon (brand store content)
+    kind: marketplace_brand_page
+    observedAt: 2026-10-03
+    verification: tavily_search_snippet
+    authorityFor: [displayed_coupon_adjusted_price]
+    notAuthorityFor: [list_price, label_amount]
+    schemaConsequences: [priceKind_COUPON_ADJUSTED, listing_title_amount_is_not_label_amount]
+    addedBy: rounds-0004-0005
+
+  - id: SRC-ECFR-21-101-36
+    url: https://www.ecfr.gov/current/title-21/chapter-I/subchapter-B/part-101/subpart-C/section-101.36
+    publisher: Office of the Federal Register (eCFR)
+    kind: regulation
+    observedAt: 2026-10-03
+    authorityFor: [US_supplement_facts_amount_referent_nutrient_vs_source, other_dietary_ingredient_amount_as_listed, proprietary_blend_total]
+    notAuthorityFor: [non_US_labels, botanical_extract_detail_beyond_quoted_paragraphs]
+    schemaConsequences: [QuantityDeclaration_amountReferent_enum, active_moiety_amount_is_calculated]
+    addedBy: rounds-0004-0005
+
+
+  # ---- Added for round-0006 (lane4) ----
+
+  - id: SRC-W3C-PROV-O
+    url: https://www.w3.org/TR/prov-o/
+    publisher: World Wide Web Consortium
+    kind: standard_specification
+    verification: 'extracted 2026-10-03 (definitions of wasDerivedFrom, wasQuotedFrom, wasRevisionOf, hadPrimarySource, wasAttributedTo; qualified-influence table)'
+    authorityFor: [provenance_vocabulary_entity_activity_agent, derivation_subtypes_quotation_revision_primary_source, attribution_semantics]
+    notAuthorityFor: [use_permissions_or_policy, truth_of_any_proposition, evidence_strength]
+    schemaConsequences: [Assertion_Source_Snapshot_Locator_are_prov_Entity, Activity_node_with_USED_WAS_GENERATED_BY_WAS_ASSOCIATED_WITH, RETELLS_maps_to_wasDerivedFrom_and_VERBATIM_QUOTE_to_wasQuotedFrom, snapshot_succession_maps_to_wasRevisionOf, ASSERTED_BY_maps_to_wasAttributedTo]
+    addedBy: round-0006
+
+  - id: SRC-W3C-WEB-ANNOTATION-MODEL
+    url: https://www.w3.org/TR/annotation-model/
+    publisher: World Wide Web Consortium
+    kind: standard_specification
+    verification: 'extracted 2026-10-03 (section 4.2.5 Text Position Selector; key table listing exact, prefix, suffix, start, end, conformsTo, refinedBy, sourceDate, cached)'
+    authorityFor: [selector_field_names_and_semantics, text_position_counting_rule_start_inclusive_end_exclusive, brittleness_of_position_selectors_and_use_of_state]
+    notAuthorityFor: [which_span_supports_a_claim, quote_normalization_choice_for_BellLabs]
+    schemaConsequences: [SourceLocator_typed_selector_fields_exact_prefix_suffix_startOffset_endOffset, position_selector_requires_text_version_and_quote, locator_bound_to_snapshot_as_state, REANCHORS_for_refound_spans]
+    addedBy: round-0006
+
+  - id: SRC-W3C-MEDIA-FRAGMENTS
+    url: https://www.w3.org/TR/media-frags/
+    publisher: World Wide Web Consortium
+    kind: standard_specification
+    verification: 'unverified (not fetched; cited as the conformsTo target of Web Annotation FragmentSelector)'
+    authorityFor: [time_fragment_syntax_t_equals]
+    notAuthorityFor: [rendition_identity, ad_insertion_offsets]
+    schemaConsequences: [MEDIA_TIME_locator_carries_numeric_seconds_and_rendition_snapshot]
+    addedBy: round-0006
+
+  - id: SRC-NANOPUB-GUIDELINES
+    url: https://nanopub.net/guidelines/working_draft
+    publisher: Nanopublication community
+    kind: community_guideline
+    verification: 'search snippet 2026-10-03 (assertion, provenance and publication-info graphs; provenance graph MUST link to the assertion)'
+    authorityFor: [separation_of_assertion_from_its_provenance_and_from_record_metadata]
+    notAuthorityFor: [property_graph_layout, adjudication_semantics]
+    schemaConsequences: [Assertion_node_separate_from_SUPPORTED_BY_and_WAS_GENERATED_BY_lineage, recordedAt_and_commit_Activity_as_publication_info]
+    addedBy: round-0006
+
+  - id: SRC-BIOLINK-KL-AT
+    url: https://biolink.github.io/biolink-model/KnowledgeLevelEnum/
+    publisher: Biolink Model (NCATS Translator)
+    kind: data_model_documentation
+    verification: 'extracted 2026-10-03 (KnowledgeLevelEnum, AgentTypeEnum pages; primary_knowledge_source and aggregator_knowledge_source on https://biolink.github.io/biolink-model/FunctionalAssociation)'
+    authorityFor: [knowledge_level_and_agent_type_vocabulary, primary_versus_aggregator_knowledge_source]
+    notAuthorityFor: [speech_act_or_personal_experience_distinctions, BellLabs_adjudication]
+    schemaConsequences: [Agent_agentKind_aligned_to_AgentTypeEnum, primary_source_derived_from_absence_of_RETELLS, aggregator_role_for_retelling_sources]
+    addedBy: round-0006
+
+  - id: SRC-FTC-16CFR255-0
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255/section-255.0
+    publisher: U.S. Federal Trade Commission (eCFR)
+    kind: regulation_guide
+    verification: 'extracted 2026-10-03 (definition of endorsement and endorser, 255.0(b); Example 1 on excerpts that distort the endorser''s opinion)'
+    authorityFor: [legal_definition_of_endorsement_in_advertising, excerpt_distortion_as_deception_example]
+    notAuthorityFor: [whether_an_editorial_podcast_statement_is_an_endorsement_without_facts, truth_of_endorsed_claim]
+    schemaConsequences: [ENDORSES_PRODUCT_only_from_explicit_assertion, mention_or_use_is_not_endorsement, retelling_that_changes_substance_is_a_distinct_assertion]
+    addedBy: round-0006
+
+  - id: SRC-FTC-16CFR255-1
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255/section-255.1
+    publisher: U.S. Federal Trade Commission (eCFR)
+    kind: regulation_guide
+    verification: 'extracted 2026-10-03 (255.1(a) honest opinion and no representation deceptive if made by advertiser; 255.1(c) bona fide user; 255.1(d)-(e) liability)'
+    authorityFor: [endorsement_does_not_relieve_substantiation, bona_fide_use_requirement]
+    notAuthorityFor: [efficacy_of_any_product]
+    schemaConsequences: [disclosure_does_not_substitute_for_evidence, forbidden_implication_FINANCIAL_INTEREST_to_truth_verdict]
+    addedBy: round-0006
+
+  - id: SRC-FTC-16CFR255-5
+    url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255/section-255.5
+    publisher: U.S. Federal Trade Commission (eCFR; source 88 FR 48102, July 26, 2023)
+    kind: regulation_guide
+    verification: 'extracted 2026-10-03 (255.5(a) text on material connections and disclosure)'
+    authorityFor: [kinds_of_material_connection_payment_free_product_business_family_personal, disclosure_need_not_give_complete_details]
+    notAuthorityFor: [existence_of_a_specific_undisclosed_connection, truth_or_falsity_of_the_claim]
+    schemaConsequences: [financial_interest_predicate_family_time_bounded, disclosure_is_an_occurrence_fact_not_a_role_property, coarse_disclosures_allowed_with_roleTitleVerbatim, DisclosureFinding_distinguishes_not_found_from_not_disclosed]
+    addedBy: round-0006
+
+  - id: SRC-PUBMED-RETRACTED-PUBTYPE-EXAMPLE
+    url: https://pubmed.ncbi.nlm.nih.gov/39524725/
+    publisher: National Library of Medicine (PubMed)
+    kind: bibliographic_database_record
+    verification: 'PubMed API 2026-10-03, PMID 39524725, DOI 10.1016/j.heliyon.2024.e38631, publication types [Journal Article, Retracted Publication]'
+    authorityFor: [publication_type_status_flags_in_PubMed]
+    notAuthorityFor: [reason_for_retraction, which_findings_were_wrong]
+    schemaConsequences: [retracted_status_is_a_state_of_the_article_not_a_DocumentType, notice_documents_are_separate_Sources]
+    addedBy: round-0006
+
+  - id: SRC-PUBMED-NICE-TRIAL-2024
+    url: https://pubmed.ncbi.nlm.nih.gov/38871717/
+    publisher: Nature Communications via PubMed
+    kind: peer_reviewed_publication
+    verification: 'PubMed API 2026-10-03, PMID 38871717, DOI 10.1038/s41467-024-49092-5, publication types [Journal Article, Randomized Controlled Trial]'
+    authorityFor: [reported_design_population_effect_estimate_and_authors_call_for_confirmation]
+    notAuthorityFor: [effect_in_populations_other_than_PAD, NMN_effects]
+    schemaConsequences: [qualification_kinds_POPULATION_SCOPE_UNCERTAINTY_INTERVAL_NEEDS_CONFIRMATION]
+    addedBy: round-0006
+
+  - id: SRC-PUBMED-NICE-CORRECTION-2024
+    url: https://pubmed.ncbi.nlm.nih.gov/39134546/
+    publisher: Nature Communications via PubMed
+    kind: correction_notice
+    verification: 'PubMed API 2026-10-03, PMID 39134546, DOI 10.1038/s41467-024-51289-7, publication type [Published Erratum], title "Publisher Correction"'
+    authorityFor: [existence_and_date_of_a_correction_notice]
+    notAuthorityFor: [that_the_trial_result_changed, content_of_the_correction_without_reading_it]
+    schemaConsequences: [CORRECTS_SOURCE_notice_link_is_not_a_result_change, corrected_is_not_ceased]
+    addedBy: round-0006
+
+  - id: SRC-PUBMED-ALS-NR-PT-2023
+    url: https://pubmed.ncbi.nlm.nih.gov/38241160/
+    publisher: Neurotherapeutics via PubMed
+    kind: peer_reviewed_publication
+    verification: 'PubMed API 2026-10-03, PMID 38241160, DOI 10.1016/j.neurot.2023.10.011; corrigendum PMID 42697153, DOI 10.1016/j.neurot.2026.e01070 [Published Erratum]'
+    authorityFor: [author_affiliations_as_printed_including_Elysium_Health_Inc, reported_mouse_model_results]
+    notAuthorityFor: [study_funding_by_Elysium, human_efficacy, endorsement_by_affiliated_author]
+    schemaConsequences: [author_affiliation_is_not_FUNDS_STUDY_or_SPONSORS_STUDY, ecosystem_neighbourhood_edge_needs_its_own_assertion, SPECIES_OR_MODEL_qualification_kind]
+    addedBy: round-0006
+
+  - id: SRC-CROSSREF-RETRACTION-WATCH
+    url: https://www.crossref.org/documentation/retrieve-metadata/retraction-watch
+    publisher: Crossref
+    kind: data_service_documentation
+    verification: 'search snippet 2026-10-03 (RetractionNature values Retraction, Correction, Expression of concern, Reinstatement; acquired September 2023; corrections and EoCs less comprehensive)'
+    authorityFor: [update_notice_kinds_and_coverage_caveat]
+    notAuthorityFor: [completeness_for_corrections, truth_of_retracted_findings]
+    schemaConsequences: [notice_kinds_CORRECTION_RETRACTION_EXPRESSION_OF_CONCERN_REINSTATEMENT, absence_from_Retraction_Watch_is_not_absence_of_correction]
+    addedBy: round-0006
+
+  - id: SRC-HUBERMANLAB-52-TRANSCRIPT
+    url: https://www.hubermanlab.com/episode/dr-david-sinclair-the-biology-of-slowing-and-reversing-aging
+    publisher: Huberman Lab (Scicomm Media)
+    kind: publisher_transcript_page
+    verification: 'extracted 2026-10-03 (partial excerpts; page states "This transcript is currently under human review and may contain errors"); excerpt stored as fixture snapshot sha256:9cadaee8...'
+    authorityFor: [publisher_rendered_text_of_what_speakers_said, chapter_titles_as_published, speaker_labels_as_published]
+    notAuthorityFor: [truth_of_statements, audio_exactness_while_under_review, sponsor_terms]
+    schemaConsequences: [Episode_is_work_and_page_is_rendition_Source, TEXT_QUOTE_locator_with_prefix_suffix, mutable_transcript_requires_snapshot_hash_and_REANCHORS, qualification_can_be_a_separate_utterance_QUALIFIED_BY]
+    addedBy: round-0006
+
+  - id: SRC-YOUTUBE-HL52
+    url: https://www.youtube.com/watch?v=n9IxomBusuw
+    publisher: Huberman Lab channel on YouTube
+    kind: video_rendition
+    verification: 'extracted 2026-10-03 (description timestamps "00:03:30 ROKA, InsideTracker, Magic Spoon"; transcript cue [4:47] "Today''s episode is also brought to us by InsideTracker.")'
+    authorityFor: [host_read_sponsor_statement_in_this_rendition, rendition_specific_timestamps]
+    notAuthorityFor: [sponsorship_contract_terms_or_payment, sponsor_reads_in_other_renditions]
+    schemaConsequences: [SPONSORS_CONTENT_assertion_asserted_by_host, MEDIA_TIME_locator_scoped_to_rendition, sponsor_read_segment_distinct_from_editorial]
+    addedBy: round-0006
+
+  - id: SRC-APPLE-PODCASTS-HL52
+    url: https://podcasts.apple.com/cm/podcast/the-biology-of-slowing-reversing-aging-dr-david-sinclair/id1545953110?i=1000546195888
+    publisher: Apple Podcasts
+    kind: podcast_directory_record
+    verification: 'extracted 2026-10-03 (Publiée 27 décembre 2021 à 09:00 UTC; épisode 52; chaîne Scicomm Media; host and guest roles; "megaphone.fm/adchoices" notice)'
+    authorityFor: [episode_publication_time_in_directory, host_and_guest_roles_as_listed, presence_of_dynamic_ad_notice]
+    notAuthorityFor: [which_ads_a_listener_heard, transcript_content]
+    schemaConsequences: [Episode_publishedAt_with_source, HOST_GUEST_role_values, audio_offsets_not_portable_across_renditions]
+    addedBy: round-0006
+
+  - id: SRC-YOUTUBE-LIFESPAN-4
+    url: https://www.youtube.com/watch?v=bRWT7hVgwuM
+    publisher: Lifespan with Dr. David Sinclair (YouTube)
+    kind: video_rendition_with_correction_notice
+    verification: 'extracted 2026-10-03 (description "Correction and clarification: At time point 1:07:37, Dr. Sinclair says he takes 1 gram of Spermidine, but the active ingredient in the capsules is 1-2 milligrams."; transcript cue [1:08:12] spermidine "about a gram"; [1:08:28] "Now, you''re not most people."; extract has gaps so not every cue near 1:07:37 was seen)'
+    authorityFor: [publisher_correction_of_a_quantity_statement, the_statement_as_spoken_in_this_rendition]
+    notAuthorityFor: [actual_capsule_content, which_of_several_utterances_the_time_point_targets_without_review]
+    schemaConsequences: [correction_is_new_assertion_linked_to_original_not_overwrite, quantityBasis_UNSPECIFIED_vs_ACTIVE_INGREDIENT, time_only_locator_is_ambiguous, CQ-PV-04_conversion_error_case]
+    addedBy: round-0006
+
+  - id: SRC-SINCLAIR-AFFILIATIONS
+    url: https://sinclair.hms.harvard.edu/david-sinclairs-affiliations
+    publisher: The Sinclair Lab (Harvard Medical School site)
+    kind: self_disclosure_page
+    verification: 'extracted 2026-10-03 (legend F, I, E, A, B, IP, L; "InsideTracker (Segterra), Cambridge, MA B (2011-2017) I,A,IP (2011-present)"; "EdenRoc Sciences companies F,I,E,A,B, IP"; "MetroBiotech International, an EdenRoc Sciences company, NAD boosters (2015-present)"; "Elysium Health New York, NY (2018) IP"); excerpt stored as fixture snapshot sha256:7f5c60d1...'
+    authorityFor: [self_declared_role_kinds_and_year_bounds_as_displayed_on_observation_date]
+    notAuthorityFor: [roles_after_observation_date, per_company_application_of_group_level_codes, amounts_or_terms, disclosure_inside_any_episode]
+    schemaConsequences: [INVESTED_IN_distinct_from_HOLDS_EQUITY_IN, year_precision_bounds, present_means_open_as_of_observation, group_line_scope_ambiguity, brand_and_legal_entity_names_not_merged]
+    addedBy: round-0006
+
+  - id: SRC-INSIDETRACKER-TEAM
+    url: https://www.insidetracker.com/team
+    publisher: InsideTracker
+    kind: official_organization_page
+    verification: 'search snippet 2026-10-03 (lists David Sinclair, PhD under Scientific Advisory Board with a quoted testimonial)'
+    authorityFor: [company_declared_advisory_listing_as_observed]
+    notAuthorityFor: [equity_or_compensation, role_dates]
+    schemaConsequences: [same_role_asserted_by_two_parties_is_two_assertions, company_page_testimonial_is_an_endorsement_candidate_needing_its_own_assertion]
+    addedBy: round-0006
+
+  - id: SRC-CATALIO-SINCLAIR
+    url: https://www.cataliocapital.com/team/david-sinclair
+    publisher: Catalio Capital Management
+    kind: third_party_profile_page
+    verification: 'search snippet 2026-10-03 ("Scientific Advisory Board: Jupiter Orphan Therapeutics, Zymo Research, Elysium Health, InsideTracker")'
+    authorityFor: [what_this_profile_displays]
+    notAuthorityFor: [current_roles, role_dates, resolution_of_conflict_with_self_disclosure_page]
+    schemaConsequences: [conflicting_role_kind_for_Elysium_preserved_as_separate_assertions_IP_2018_vs_advisory_board]
+    addedBy: round-0006
+
+  - id: SRC-NMNCOM-SINCLAIR-2026
+    url: https://www.nmn.com/news/longevity-protocol-for-harvards-david-sinclair-in-2026
+    publisher: NMN.com
+    kind: secondary_retelling_article
+    verification: 'extracted 2026-10-03, partial (byline Brett J. Weiss; "As core supplements, Dr. Sinclair takes 1 gram of nicotinamide mononucleotide (NMN)..."; "Dr. Sinclair takes spermidine daily at an unspecified dosage"); the article''s own source span and whether it omits a qualification were NOT verified'
+    authorityFor: [what_this_article_states]
+    notAuthorityFor: [what_Sinclair_said_in_any_specific_episode, recommendation_by_Sinclair]
+    schemaConsequences: [real_retellings_exist_without_citations_so_RETELLS_needs_BELLLABS_MATCH_basis, retelling_source_is_aggregator_not_primary]
+    addedBy: round-0006
+
+
+  # ---- Added for rounds-0007-0008 (lane5) ----
+
+  - id: SRC-SNODGRASS-TDB-2000
+    url: https://cs.arizona.edu/~rts/tdbbook.pdf
+    publisher: Morgan Kaufmann (author-hosted PDF), Richard T. Snodgrass, ISBN 1558604367
+    kind: textbook
+    locator: "Chapter 10, Bitemporal Tables (VT_Begin/VT_End and TT_Start/TT_Stop columns; modifications sequenced on valid time are current on transaction time)"
+    authorityFor: [bitemporal_table_semantics, sequenced_modification_rule, timestamp_granularity]
+    notAuthorityFor: [graph_database_implementation, domain_specific_validity_rules]
+    schemaConsequences: [valid_time_immutable_change_is_new_recorded_episode, recorded_time_never_backdated, per_bound_precision]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-SQL2011-TEMPORAL
+    url: https://sigmodrecord.org/2012/09/30/temporal-features-in-sql2011
+    publisher: ACM SIGMOD Record 41(3):34-43 (Kulkarni and Michels, 2012)
+    kind: standards_explainer
+    locator: "sections on system-versioned tables, application-time period tables, WITHOUT OVERLAPS"
+    authorityFor: [SQL2011_system_time_set_by_DBMS, application_time_periods, temporal_primary_keys_without_overlaps]
+    notAuthorityFor: [Neo4j_behavior, which_states_are_exclusive_in_a_domain]
+    schemaConsequences: [recordedFrom_service_assigned, exclusivity_declared_per_relationship_type, private_store_can_enforce_non_overlap_natively]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-PG-WIKI-SQL2011-TEMPORAL
+    url: https://wiki.postgresql.org/wiki/SQL2011Temporal
+    publisher: PostgreSQL community wiki
+    kind: implementation_notes
+    locator: "PRIMARY KEY (id, valid_at WITHOUT OVERLAPS); 'In general Application Time and System Time do not interact'"
+    authorityFor: [temporal_key_syntax_in_a_transactional_store]
+    notAuthorityFor: [release_status_of_features_in_a_specific_PostgreSQL_version]
+    schemaConsequences: [HAS_CONTEXT_VERSION_non_overlap_enforceable_in_private_store]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-NEO4J-VERSIONED-GRAPH-PATTERN
+    url: https://medium.com/neo4j/keeping-track-of-graph-changes-using-temporal-versioning-3b0f854536fa
+    publisher: Neo4j Developer Blog on Medium (NODES 2019 talk write-up); related case study at https://neo4j.com/blog/cypher-and-gql/neo4j-real-world-performance
+    kind: community_engineering_writeup
+    locator: "identity node plus state nodes; from/to on the state relationship; 'WHERE NOT EXISTS(r.to)' for current state; case study uses max long sentinel for open 'to'"
+    authorityFor: [common_Neo4j_modeling_pattern_for_versioned_state]
+    notAuthorityFor: [official_Neo4j_feature, bitemporal_correctness]
+    schemaConsequences: [HAS_STATE_episode_edges, sentinel_maximum_dates_forbidden, Neo4j_needs_explicit_time_modeling]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-NLM-ERRATA-RETRACTION-POLICY
+    url: https://www.nlm.nih.gov/bsd/policy/errata.html
+    publisher: U.S. National Library of Medicine
+    kind: database_policy_page
+    locator: "Retraction Notice [PT] assigned to the notice; Retracted Publication [PT] assigned to the article; 'Retraction in:' / 'Retraction of:' linking; errata, corrected and republished articles, expressions of concern"
+    authorityFor: [PubMed_publication_types_for_revisions, notice_to_article_linking]
+    notAuthorityFor: [reasons_for_a_specific_retraction, validity_of_findings]
+    schemaConsequences: [SourceRevisionEvent_revisionKind_values, notice_is_its_own_Source, ANNOUNCED_IN]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-PUBMED-9500320
+    url: https://pubmed.ncbi.nlm.nih.gov/9500320/
+    publisher: PubMed (NLM); article in Lancet 1998;351(9103):637-41, DOI 10.1016/s0140-6736(97)11096-0
+    kind: bibliographic_database_record
+    locator: "PublicationTypeList includes 'Retracted Publication' (observed 2026-10-03); publication date 1998-02-28"
+    authorityFor: [current_record_metadata_and_retraction_tagging]
+    notAuthorityFor: [record_state_before_the_retraction_was_linked, scientific_validity]
+    schemaConsequences: [database_records_mutate_so_each_observed_state_is_a_new_SourceSnapshot, retraction_does_not_rewrite_what_the_article_reported]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-PUBMED-20137807
+    url: https://pubmed.ncbi.nlm.nih.gov/20137807/
+    publisher: PubMed (NLM); notice in Lancet 2010;375(9713):445, DOI 10.1016/S0140-6736(10)60175-4
+    kind: retraction_notice_record
+    locator: "publication type 'Retraction Notice'; publication date 2010-02-06"
+    authorityFor: [that_a_retraction_notice_was_published_and_when]
+    notAuthorityFor: [full_reasons, findings_of_other_publications]
+    schemaConsequences: [SourceRevisionEvent_occurredAt_from_notice_publishedAt, recordedAt_from_when_BellLabs_learned]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-FHIR-R5-PROVENANCE
+    url: https://hl7.org/fhir/R5/provenance.html
+    publisher: HL7 International (FHIR v5.0.0)
+    kind: interoperability_standard
+    locator: "Provenance.occurred[x], Provenance.recorded, Provenance.policy, Provenance.authorization, Provenance.entity.role (revision | quotation | source | instantiates | removal)"
+    authorityFor: [separation_of_activity_time_and_record_time, revision_and_removal_roles]
+    notAuthorityFor: [graph_storage_design]
+    schemaConsequences: [SourceRevisionEvent_occurredAt_vs_recordedAt, revision_kinds_map_to_revision_and_removal]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-FHIR-R5-CONSENT
+    url: https://hl7.org/fhir/R5/consent.html
+    publisher: HL7 International (FHIR v5.0.0)
+    kind: interoperability_standard
+    locator: "Consent definition ('permit or deny recipients or roles to perform actions for specific purposes and periods of time'); Consent.status codes; decision, provision actor/action/purpose/period/data"
+    authorityFor: [shape_of_computable_consent]
+    notAuthorityFor: [legal_sufficiency_of_a_consent, BellLabs_policy]
+    schemaConsequences: [SharingGrant_fields_decision_grantee_actions_purpose_period_data, grant_period_as_bitemporal_episode]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-FHIR-R5-CAREPLAN
+    url: https://hl7.org/fhir/R5/careplan.html
+    publisher: HL7 International (FHIR v5.0.0)
+    kind: interoperability_standard
+    locator: "CarePlan.instantiatesCanonical (PlanDefinition | Questionnaire | Measure | ActivityDefinition | OperationDefinition), instantiatesUri, replaces, status"
+    authorityFor: [person_plan_instantiates_a_versioned_public_definition]
+    notAuthorityFor: [adherence, clinical_appropriateness]
+    schemaConsequences: [ProtocolAdoptionVersion_adoptedEditionUid, adoption_does_not_imply_adherence]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-NEO4J-PBAC
+    url: https://neo4j.com/docs/operations-manual/current/authentication-authorization/property-based-access-control/
+    publisher: Neo4j, Inc.
+    kind: vendor_documentation
+    locator: "edition badges (AuraDB Business Critical, AuraDB Virtual Dedicated Cloud, Enterprise Edition); 'Each property-based privilege can only be restricted by a single property'; 'ensure the property used for the rule cannot be modified'; 'A DENY rule fails open when its criteria cannot be evaluated'; 'Sharded property databases do not support property-based access control'"
+    authorityFor: [capabilities_and_limits_of_Neo4j_property_based_access_control]
+    notAuthorityFor: [Neo4j_GraphQL_library_authorization, deployment_edition_in_use_at_BellLabs]
+    schemaConsequences: [shared_graph_isolation_by_RBAC_rejected_as_primary_control, private_data_placed_outside_shared_graph]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-NEO4J-RBAC-LIMITATIONS
+    url: https://neo4j.com/docs/operations-manual/current/authentication-authorization/limitations/
+    publisher: Neo4j, Inc.
+    kind: vendor_documentation
+    locator: "Fail-open DENY behavior (null or misspelled criteria); full-text and vector index results under security rules"
+    authorityFor: [documented_leak_modes_of_Neo4j_access_rules]
+    notAuthorityFor: [application_layer_controls]
+    schemaConsequences: [leak_checks_F-V6_F-V7_V-520_to_V-522, privacyClass_null_must_not_mean_public]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-NEO4J-RBAC
+    url: https://neo4j.com/docs/operations-manual/current/authentication-authorization/manage-privileges/
+    publisher: Neo4j, Inc.
+    kind: vendor_documentation
+    locator: "edition badges; privilege qualifiers READ {property}, SET LABEL"
+    authorityFor: [RBAC_availability_by_edition]
+    notAuthorityFor: [Community_Edition_isolation]
+    schemaConsequences: [RBAC_is_defense_in_depth_only]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-GDPR-ART17
+    url: https://gdpr-info.eu/art-17-gdpr/
+    publisher: gdpr-info.eu (consolidated text of Regulation (EU) 2016/679)
+    kind: regulation_text
+    locator: "Art. 17(1) grounds; 17(2) 'take reasonable steps ... to inform controllers which are processing the personal data'; 17(3)(c) public health, 17(3)(d) research per Art. 89(1)"
+    authorityFor: [erasure_obligations_and_exceptions_text]
+    notAuthorityFor: [whether_GDPR_applies_to_BellLabs, legal_advice]
+    schemaConsequences: [ErasureTombstone_and_propagation, contributionToken_for_withdrawal, immutability_means_no_edits_not_no_deletion]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-HHS-HIPAA-DEID
+    url: https://www.hhs.gov/hipaa/for-professionals/privacy/special-topics/de-identification/index.html
+    publisher: U.S. Department of Health and Human Services
+    kind: regulator_guidance
+    locator: "Safe Harbor: dates more specific than the year are not permitted; identifiers in free text must be removed; actual knowledge provision"
+    authorityFor: [Safe_Harbor_de_identification_benchmark]
+    notAuthorityFor: [whether_HIPAA_applies_to_BellLabs, expert_determination_method_outcomes]
+    schemaConsequences: [shared_graph_contributions_year_only_dates, no_personal_dates_in_shared_graph]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-PROTOCOLS-IO-VERSIONING
+    url: https://pubmed.ncbi.nlm.nih.gov/27547938/
+    publisher: "PLoS Biology 2016 (Teytelman et al.), Protocols.io - Virtual Communities for Protocol Development and Discussion, PMID 27547938, full text PMC4993360"
+    kind: peer_reviewed_platform_description
+    locator: "'Once published, a protocol cannot be edited or removed, but authors can easily create new versions'; forks link to the original"
+    authorityFor: [explicit_immutable_protocol_versions_on_that_platform]
+    notAuthorityFor: [versioning_practice_of_other_protocol_publishers]
+    schemaConsequences: [ProtocolEdition_maps_one_to_one_to_source_versions_when_available, editionLabel_from_source]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-BLUEPRINT-PROTOCOL-PAGE
+    url: https://blueprint.bryanjohnson.com/blogs/news/bryan-johnsons-protocol
+    publisher: Blueprint (Bryan Johnson)
+    kind: individual_public_protocol_page
+    locator: "section list (Protocols: Sleep, Exercise, Nutrition, Skin, Oral care, Hair, Clean water, Female protocol, Pregnancy, Measurement; Other Advanced Therapies incl. Rx / Prescriptions); Routine Measurement ('Blood draw, every 3 to 6 months'; 'Full body MRI annually (if over 40 or a family history of high risk)'); observed via extraction tool 2026-10-03; no version label or changelog seen in the extracted text"
+    authorityFor: [what_the_page_displays_at_observation_time, author_stated_conditions_on_steps]
+    notAuthorityFor: [prior_page_states, efficacy, safety, that_readers_should_follow_listed_prescriptions]
+    schemaConsequences: [ProtocolEdition_per_observed_payloadHash, CONDITIONAL_steps_with_constraints, MeasurementPlan_PERIODIC_with_min_max_cadence]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-NADCOM-JOHNSON-2026
+    url: https://www.nad.com/news/aging-guru-bryan-johnsons-supplement-list-for-2026
+    publisher: NAD.com
+    kind: third_party_news_report
+    locator: "Key points: NMN or NR six days a week rather than seven; rapamycin stopped in 2024; low-dose lithium and NDGA added"
+    authorityFor: [that_a_third_party_reported_these_protocol_changes]
+    notAuthorityFor: [the_protocol_owner_s_own_version_history, exact_change_dates_beyond_stated_year]
+    schemaConsequences: [third_party_change_is_an_Assertion_not_a_ProtocolEdition, protocolChangeProvenance_THIRD_PARTY_REPORTED]
+    addedBy: rounds-0007-0008
+
+  - id: SRC-LOINC-19123-9
+    url: https://www.findacode.com/loinc/19123-9--magnesium-massvolume-in-serum-or-plasma.html
+    publisher: findacode.com mirror of LOINC (Regenstrief); cross-checked against HL7 PDDI-CDS value set expansion (LOINC 2.82)
+    kind: terminology_record_mirror
+    locator: "19123-9 Magnesium [Mass/volume] in Serum or Plasma; property MCnc; system Ser/Plas; status ACTIVE"
+    authorityFor: [identifier_and_name_of_the_LOINC_code]
+    notAuthorityFor: [assay_comparability_across_laboratories, reference_intervals]
+    schemaConsequences: [PersonalMeasurement_references_Metric_by_uid_and_Metric_carries_loincCode]
+    addedBy: rounds-0007-0008
 

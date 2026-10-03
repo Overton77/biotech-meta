@@ -1,8 +1,14 @@
 manifest:
   name: belllabs-biotech-ontology-modules
-  version: 0.1.0
-  status: candidate
+  version: 0.2.0
+  status: provisional
   canonicalCatalog: ../catalog/schema.yaml
+  updatedAt: 2026-10-03
+  ownershipRule: >
+    Every shared concept has exactly one owning module. Other modules reference it by label and never
+    redefine its properties. Kernel-owned concepts (Assertion, Source, SourceSnapshot, SourceLocator,
+    Adjudication, ResolutionHypothesis, the temporal profiles, the confidence vector) change only through a
+    kernel-change decision recorded in the catalog's kernelChangeDecisions block.
 
 closurePolicies:
   semantic_kernel:
@@ -13,6 +19,8 @@ closurePolicies:
     include: [invariants, forbidden_implications, module_shapes]
   projection:
     rule: dependencies_first_then_selected_elements_then_required_closure
+  access:
+    rule: accessTier other than OWNER_PRIVATE excludes every private-personal module and requires privateContext EXCLUDED
 
 modules:
   kernel:
@@ -20,83 +28,179 @@ modules:
     dependencies: []
     owns: [Entity, VersionedState, Occurrence, InformationArtifact, Assertion, EvidenceAssessment]
     sharedBy: [all]
+    rounds: [0007, 0009]
 
   provenance:
     maturity: accepted
     dependencies: [kernel]
-    owns: [Source, SourceSnapshot, SourceLocator, Agent, Activity, Adjudication]
-    alignments: [W3C_PROV_O, Biolink_source_provenance]
+    owns: [Source, SourceSnapshot, SourceLocator, SourceRevisionEvent, DocumentTextVersion, Agent, Activity, Adjudication, ResolutionHypothesis, SUPERSEDES, DERIVED_FROM_ASSERTION, CORRECTS_SOURCE, RETRACTS_SOURCE, EXPRESSES_CONCERN_ABOUT, REINSTATES_SOURCE]
+    alignments: [W3C_PROV_O, W3C_Web_Annotation_selectors, Biolink_source_provenance, NLM_publication_types]
     sharedBy: [all]
+    rounds: [0006, 0007, 0009]
 
   temporal:
     maturity: provisional
     dependencies: [kernel, provenance]
-    owns: [TemporalExtent, TemporalExpression, TemporalPrecision, TemporalNormalization]
+    owns: [bitemporal_attachment_profile, asserted_edge_profile, timePrecision, validTimeBasis, supersessionKind, predicateExclusivity, HAS_STATE, as_of_query_contract]
     conventions:
       interval: half_open
       validTime: [validFrom, validTo]
+      validTimeQualifiers: [validFromPrecision, validToPrecision, validFromBasis, validToBasis]
       systemTime: [recordedFrom, recordedTo]
+      assertionSystemTime: [recordedAt, recordedTo]
       unknownBound: null
-      rule: ingestion_time_never_substitutes_for_unknown_valid_time
+      rules:
+        - ingestion_time_never_substitutes_for_unknown_valid_time
+        - valid_time_is_immutable_after_commit
+        - a_correction_is_a_new_recorded_time_episode_not_a_change_of_valid_time
+        - recorded_time_is_service_assigned_and_never_backdated
     sharedBy: [all]
+    rounds: [0007]
 
   identity_resolution:
     maturity: provisional
     dependencies: [kernel, provenance]
-    owns: [Mention, ResolutionHypothesis, Identifier, EquivalenceAssessment]
+    owns: [Identifier, TradeItemIdentifier, Mention, EquivalenceAssessment, HAS_IDENTIFIER, uid_redirect_contract]
     sharedBy: [all]
+    rounds: [0006, 0009]
+    open: [redirect contract for merged uids]
 
   organizations:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, identity_resolution]
-    owns: [Organization, LegalEntity, ConsumerBrand, Person, Facility]
+    owns: [Organization, LegalEntity, ConsumerBrand, Person, PseudonymousActor, AnonymousActor, Facility, FINANCIAL_INTEREST_predicate_family]
+    rounds: [0006]
 
   substances_and_materials:
     maturity: provisional
     dependencies: [kernel, provenance, identity_resolution]
-    owns: [IngredientMaterial, ChemicalSubstance, ChemicalForm, BotanicalPreparation, MicrobialPreparation, MaterialMixture]
+    owns: [IngredientMaterial, BrandedIngredientMaterial, ChemicalSubstance, ChemicalForm, BotanicalTaxon, BotanicalPreparation, MicrobialTaxon, MicrobialStrain, MicrobialPreparation, MaterialMixture, Constituent, Nutrient, FORM_OF_SUBSTANCE, HAS_ACTIVE_MOIETY]
     externalAuthorities: [ChEBI, FDA_GSRS_UNII, PubChem, NCBI_Taxonomy]
+    liveSeams: [Compound -> ChemicalSubstance (catalog name wins), CompoundForm -> ChemicalForm + IngredientMaterial + dosageForm]
+    rounds: [0002]
 
   products_and_formulations:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, identity_resolution, organizations, substances_and_materials]
-    owns: [Product, ProductVariant, FormulationVersion, IngredientComponent, PackageConfiguration, LabelSnapshot]
+    owns: [Product, ProductVariant, FormulationVersion, IngredientComponent, PackageConfiguration, ManufacturingSpecification, SpecificationVersion, ManufacturingProcess, ManufacturingStep, Trademark, CONTAINS, CONTAINS_COMPOUND_FORM]
+    rounds: [0001, 0002, 0005]
+
+  labels:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, products_and_formulations, substances_and_materials]
+    owns: [LabelSnapshot, LabelDeclaration, ServingDefinition, QuantityDeclaration, amountReferent]
+    rounds: [0005]
 
   commerce:
     maturity: provisional
     dependencies: [kernel, provenance, temporal, organizations, products_and_formulations]
-    owns: [MerchantListing, Offer, PriceObservation, SubscriptionPlan, Bundle]
+    owns: [MerchantListing, Offer, PriceObservation, SubscriptionPlan, Bundle, BundleComponent, InventoryItem, IndividualUnit, AffiliateLink, CommerceMatch, HOSTS_LISTING, LISTS_OFFER, SELLER_OF_RECORD_FOR, FULFILLS_OFFER, SELLS_PRODUCT]
+    rounds: [0005]
 
   studies_and_evidence:
     maturity: provisional
-    dependencies: [kernel, provenance, temporal, identity_resolution, substances_and_materials, products_and_formulations]
-    owns: [Study, TrialRegistration, RegistrationVersion, ProtocolVersion, StudyArm, StudyIntervention, StudyPopulation, OutcomeDefinition, StudyResult, Publication, EvidenceApplicability]
-    externalAuthorities: [ClinicalTrialsGov, PubMed, DOI]
+    dependencies: [kernel, provenance, temporal, identity_resolution, substances_and_materials, products_and_formulations, diagnostics]
+    owns: [Study, TrialRegistration, RegistrationVersion, ProtocolVersion, StudyArm, StudyIntervention, InterventionComponent, StudyPopulation, OutcomeDefinition, StudyResult, AdverseEventResult, Publication, Dataset, EvidenceApplicability, ApplicabilityDimension, UseContextProfile, EndpointClassification, ResultInterpretation, EvidenceSynthesis, EvidenceStrengthAssessment]
+    externalAuthorities: [ClinicalTrialsGov, PubMed, DOI, FDA_NIH_BEST_glossary, FDA_surrogate_endpoint_table]
+    rounds: [0002]
+
+  mechanisms:
+    maturity: candidate
+    dependencies: [kernel, provenance, substances_and_materials, studies_and_evidence, diagnostics]
+    owns: [MechanismEvidenceContext, Mechanism, Pathway, MolecularEntity, Species, AnatomicalContext, Organ, Outcome, Condition, MEASURED_IN_MATRIX, mechanism_predicates]
+    rounds: [0003]
+
+  diagnostics:
+    maturity: candidate   # promoted from future in round 0004
+    dependencies: [kernel, provenance, temporal, identity_resolution, organizations]
+    owns: [Biomarker, Metric, LabTest, PanelDefinition, MeasurementMethod, Specimen, ReferenceSystem, AssayVersion, Algorithm, AlgorithmVersion, ReferenceIntervalVersion, ComparabilityAssessment, DiagnosticResult_contract]
+    externalAuthorities: [LOINC, NGSP, IFCC, CLSI_EP28]
+    liveSeams: [ReferenceRange -> projection of ReferenceIntervalVersion, Observation -> owned by protocols]
+    rounds: [0004]
+
+  consumer_devices:
+    maturity: future
+    dependencies: [kernel, provenance, temporal, identity_resolution, organizations, diagnostics]
+    owns: [Device, DeviceModel, FirmwareVersion, Sensor, Modality, DeviceObservation]
+    note: firmware version is treated as AssayVersion.softwareVersion until a round opens this module
+
+  quality:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, products_and_formulations, substances_and_materials, organizations]
+    owns: [ProductLot, TestSample, TestExecution, TestMethod, TestingLaboratory, MeasuredResult, SpecificationCriterion, PassFailInterpretation, LotTestSummary, CertificateOfAnalysis, CertificationProgram, CertificationListing, CertificationScope]
+    rounds: [0005]
+
+  regulatory_and_ip:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, identity_resolution, organizations, products_and_formulations, diagnostics]
+    owns: [PatentFamily, PatentApplication, GrantedPatent, PatentClaim, PatentLicense, RegulatoryAgency, RegulatoryPathway, RegulatoryStep, RegulatorySubmission, RegulatoryResponse, RegulatoryStatus, OrphanDesignation, DrugApproval]
+    externalAuthorities: [FDA_eCFR_21, FDA_GRAS_notice_inventory, FDA_NDI_notifications, FDA_510k_DeNovo_PMA_databases]
+    rounds: [0005]
+
+  manufacturing_readiness:
+    maturity: candidate
+    dependencies: [kernel, provenance, temporal, organizations, products_and_formulations]
+    owns: [ManufacturingCapability, HAS_CAPABILITY_STATE]
+    rounds: [0005]
+
+  claims_and_documents:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, identity_resolution, organizations]
+    owns: [Document, Episode, EpisodeSegment, Channel, Series, Platform, Segmentation, Chunk, Claim, ClaimOccurrence, RelationshipAssertion, ClaimEvidenceAssessment, RetellingFidelityAssessment, ConflictRelevanceAssessment, RETELLS, QUALIFIED_BY, ATTRIBUTES_TO, INSTANCE_OF, RESOLVES_TO_CHUNK, assertionBasis, speechAct]
+    liveSeams: [Document -> Source, ClaimOccurrence -> (:Assertion:ClaimOccurrence), UTTERED_BY -> ASSERTED_BY, SUPPORTED_BY->Chunk -> derived with locatorUid, mongoResearchRunId -> Activity.externalRunId]
+    rounds: [0006]
+
+  media:
+    maturity: future
+    dependencies: [kernel, provenance, claims_and_documents]
+    owns: [MediaAsset, MediaVariant, MediaAnnotation, MediaSource, GraphView, FigurePanel, ProductLabelRegion]
+    note: live media types kept as seams; MediaAnnotation may act as an IMAGE_REGION locator (round 0006); no round has opened media semantics
+
+  events_and_narrative:
+    maturity: future
+    dependencies: [kernel, provenance, organizations, claims_and_documents]
+    owns: [Community, Conference, Event, NarrativeArc]
+    note: live types kept as seams; SPONSORS_CONTENT may target Conference
+
+  protocols:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, identity_resolution, substances_and_materials, products_and_formulations, diagnostics]
+    owns: [Protocol, ProtocolEdition, ProtocolStep, Constraint, MeasurementPlan, ProtocolAdjustmentRule, Target, FunctionalGoal, Observation, ProtocolResult]
+    note: Observation ownership decided in round 0008 (public, protocol-linked, source-attributed); private measurements are PersonalMeasurement
+    rounds: [0008]
 
   safety_and_constraints:
     maturity: candidate
     dependencies: [kernel, provenance, temporal, substances_and_materials, products_and_formulations, studies_and_evidence]
     owns: [SafetySignal, ContraindicationAssertion, InteractionAssertion, UseConstraint]
+    open: [SafetySignal as EvidenceAssessment over AdverseEventResult (round 0002 OQ-L2-10)]
 
   recommendation_decisions:
+    maturity: provisional
+    dependencies: [kernel, provenance, temporal, products_and_formulations, commerce, studies_and_evidence, safety_and_constraints, private_context]
+    owns: [RecommendationRequest, RecommendationSnapshot, RecommendationOption, DecisionCriterionValue, UserDecision, PolicyVersion, DecisionCriterion]
+    placement: private_context_store_except_PolicyVersion_and_DecisionCriterion
+    rule: recommendations_are_private_decision_occurrences_not_timeless_product_edges
+    rounds: [0008]
+
+  private_context:
+    maturity: provisional
+    dependencies: [kernel, temporal, recommendation_decisions, protocols, diagnostics]
+    owns: [UserContext, UserContextVersion, UserGoal, UserGoalVersion, PersonalMeasurement, PersonalLabReport, ProtocolInUse, ProtocolAdoptionVersion, ProtocolDeviation, SharingGrant, DisclosureEvent, PendingItem, PurchaseEvent, PersonalApplicabilityAssessment, ErasureTombstone]
+    placement: private_context_store
+    rounds: [0008]
+
+  access_and_answers:
     maturity: candidate
-    dependencies: [kernel, provenance, temporal, products_and_formulations, commerce, studies_and_evidence, safety_and_constraints]
-    owns: [DecisionContext, RecommendationRequest, RecommendationCandidate, RecommendationDecision, DecisionCriterion, DecisionExplanation, PolicyVersion]
-    rule: recommendations_are_occurrences_not_timeless_product_edges
-
-  diagnostics:
-    maturity: future
-    dependencies: [kernel, provenance, temporal, identity_resolution, organizations, studies_and_evidence, recommendation_decisions]
-    owns: [DiagnosticProduct, LabTest, PanelDefinition, Biomarker, Metric, ReferenceRange, Observation]
-
-  consumer_devices:
-    maturity: future
-    dependencies: [kernel, provenance, temporal, identity_resolution, organizations, studies_and_evidence, recommendation_decisions]
-    owns: [Device, DeviceModel, FirmwareVersion, Sensor, MeasurementMethod, DeviceObservation]
+    dependencies: [kernel, provenance, temporal]
+    owns: [AnswerRecord, accessTier, traceDepth]
+    rounds: [0009]
 
 projectionRules:
   - A module may depend only on the kernel or on explicitly declared modules.
   - Shared modules do not transfer ownership of their terms to consumers.
-  - Imported external identifiers retain their source namespace and version metadata.
+  - Imported external identifiers retain their source namespace and version metadata (Identifier records).
   - A projection may expose an external endpoint identity without importing the endpoint's full module.
   - Recommendation projections must include provenance, temporal, evidence, safety, and policy-version surfaces.
+  - A projection with accessTier PUBLIC_ANSWER, OPERATOR_AUDIT or AGENT_PROJECTION never includes a private-personal module; private records are reached only by uid from the private context store.
+  - Live GraphQL types that no module owns yet (media, events_and_narrative, consumer_devices) are seams: they keep their live meaning and are projected unchanged.

@@ -1,6 +1,9 @@
 # Round 0002: Study Intervention versus Commercial Product
 
-Status: `OPEN` (Lane 2 recommendation: `ACCEPTED` for rules R1 to R12; `DEFERRED` for applicability threshold calibration)
+> **Integration decision (2026-10-03):** `ACCEPTED`. Rules R1 to R12 accepted into catalog 0.2.0; dose, duration and exposure ratio-band calibration and composite scoring DEFERRED (OPEN-QUESTIONS, evidence applicability 2). Catalog 0.2.0; see [proposal-index.md](./proposal-index.md).
+
+
+Status: `ACCEPTED` (integration owner, 2026-10-03). Lane recommendation was: OPEN (Lane 2 recommendation: `ACCEPTED` for rules R1 to R12; `DEFERRED` for applicability threshold calibration)
 
 ## Header
 
@@ -11,7 +14,7 @@ Status: `OPEN` (Lane 2 recommendation: `ACCEPTED` for rules R1 to R12; `DEFERRED
 - Owning module: `studies_and_evidence` (with seams into `substances_and_materials`, `products_and_formulations`)
 - Candidate schema version: 0.2.0-candidate
 - Source schema digest: `current_biotech_schema.graphql` sha256 `86b5e0b5d11d203bd75b69b4507b0aad97d5df2495d3897ca64272068ea5f112`; `catalog/schema.yaml` sha256 `4c3203f57706c43fe508549211ed6f11910e2150947814c047122eb34f29825f`
-- Decision status: `OPEN`
+- Decision status: `ACCEPTED` (set by the integration owner on 2026-10-03; the lane recommendation is preserved below)
 
 ## Intent and competency questions
 

@@ -1,0 +1,1459 @@
+# Proposed GraphQL delta against docs/schema/current_biotech_schema.graphql
+#
+# Status: PROPOSAL (catalog 0.2.0 candidate). This file does not replace the live schema.
+# It is additive: new types, enums and `extend type` blocks that give the accepted ontology-lab rounds a
+# parsable projection on the live Neo4j GraphQL surface. Field-level `@relationship(properties:)` changes on
+# existing fields and `@node(labels:)` additions are described in the round files and proposal-index.md
+# because `extend type` cannot change an existing field's directive.
+#
+# Static check (2026-10-03): the delta parses with graphql-js, every lane's definitions were de-duplicated
+# (Lane 5's per-bound `ValidTimeBasis` and `TimePrecision` enums win over Lane 1's single-basis versions), and
+# the live schema extended with this delta (directives stripped) builds without name or field collisions.
+# Whether the deployed @neo4j/graphql version accepts `extend type` on `@node` and `@relationshipProperties`
+# types is unverified (OPEN-QUESTIONS, live-stack items). Nothing here was deployed.
+#
+# Sections follow lane order; each section names its rounds.
+
+# ---------------------------------------------------------------------------
+# Lane 1 (round 0009): query shapes and access
+# ---------------------------------------------------------------------------
+
+"""
+Bitemporal attachment of a state (for example a snapshot) to its entity; replaces node-level time as the authority.
+"""
+type StateAttachmentMetadata @relationshipProperties {
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  validTimeBasis: ValidTimeBasis
+  validTimePrecision: TimePrecision
+  assertionUid: String
+  mongoResearchRunId: String
+}
+
+extend type Product {
+  uid: String
+}
+
+extend type Organization {
+  uid: String
+}
+
+extend type Person {
+  uid: String
+}
+
+extend type Document {
+  uid: String
+}
+
+extend type DocumentTextVersion {
+  uid: String
+}
+
+extend type Chunk {
+  uid: String
+}
+
+extend type Claim {
+  uid: String
+}
+
+extend type ClaimOccurrence {
+  uid: String
+}
+
+type AnswerRecord implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  uid: String
+  recordedAsOf: DateTime!
+  validAt: DateTime
+  intervalStart: DateTime
+  intervalEnd: DateTime
+  schemaDigest: String!
+  queryShapeId: String!
+  queryShapeVersion: String
+  accessTier: String!
+  traceDepth: String
+  publishedAt: DateTime
+}
+
+# ---------------------------------------------------------------------------
+# Lane 2 (rounds 0002, 0003): studies, evidence, mechanisms
+# ---------------------------------------------------------------------------
+
+enum ApplicabilityVerdict {
+  MATCH
+  PARTIAL
+  MISMATCH
+  UNKNOWN
+  NOT_ASSESSED
+  NOT_APPLICABLE
+  NOT_SCORED
+}
+
+enum ApplicabilityDimensionKind {
+  MATERIAL_IDENTITY
+  ACTIVE_COMPOSITION
+  DOSE
+  DOSAGE_FORM
+  ROUTE
+  SCHEDULE
+  DURATION
+  POPULATION
+  COMPARATOR
+  OUTCOME_RELEVANCE
+  STUDY_DESIGN_AND_QUALITY
+  EXPOSURE
+  BACKGROUND_CONTEXT
+  RECENCY_AND_CORRECTIONS
+}
+
+enum DimensionClass {
+  CATEGORICAL
+  CONTINUOUS
+  EXPLANATION_ONLY
+}
+
+enum MaterialIdentityLevel {
+  SAME_LOT
+  SAME_FORMULATION_VERSION
+  SAME_VARIANT_FORMULATION_UNRESOLVED
+  SAME_BRANDED_MATERIAL_SAME_SPEC
+  SAME_BRANDED_MATERIAL_SPEC_UNRESOLVED
+  SAME_SUBSTANCE_SAME_FORM_DIFFERENT_MATERIAL
+  SAME_SUBSTANCE_MATERIAL_UNRESOLVED
+  SAME_SUBSTANCE_DIFFERENT_FORM
+  RELATED_SUBSTANCE
+  DIFFERENT
+}
+
+enum QuantityBasis {
+  PER_DAY
+  PER_DOSE
+  PER_SERVING
+  PER_KG_BODY_WEIGHT_PER_DAY
+  SINGLE_DOSE
+}
+
+enum MassBasis {
+  SALT_FORM
+  ACTIVE_MOIETY
+  MATERIAL_AS_IS
+  UNSPECIFIED
+}
+
+enum MeasureKind {
+  BIOMARKER
+  PERFORMANCE_OUTCOME
+  PATIENT_REPORTED_OUTCOME
+  CLINICIAN_REPORTED_OUTCOME
+  OBSERVER_REPORTED_OUTCOME
+  CLINICAL_EVENT
+}
+
+enum EndpointClass {
+  BIOMARKER_NOT_SURROGATE
+  SURROGATE_ENDPOINT
+  INTERMEDIATE_CLINICAL_ENDPOINT
+  CLINICAL_OUTCOME
+}
+
+enum SurrogateValidationLevel {
+  VALIDATED
+  REASONABLY_LIKELY
+  CANDIDATE
+  NOT_ESTABLISHED
+}
+
+enum AnalysisKind {
+  PRIMARY_PRESPECIFIED
+  SECONDARY_PRESPECIFIED
+  SUBGROUP_PRESPECIFIED
+  SUBGROUP_POST_HOC
+  EXPLORATORY
+  SAFETY
+}
+
+enum ComparisonKind {
+  BETWEEN_ARM
+  WITHIN_ARM_CHANGE
+  ARM_DESCRIPTIVE
+}
+
+enum StatisticalConclusion {
+  SIGNIFICANT_FAVORABLE
+  SIGNIFICANT_UNFAVORABLE
+  NOT_SIGNIFICANT
+  NOT_TESTED
+  NOT_REPORTED
+}
+
+enum AeCollectionMethod {
+  SYSTEMATIC
+  SPONTANEOUS
+  NOT_DESCRIBED
+}
+
+enum BasisKind {
+  DIRECT_MEASUREMENT
+  INFERRED_FROM_MEASUREMENT
+  CITED_FROM_PRIOR_WORK
+  HYPOTHESIS
+}
+
+enum MechanismSetting {
+  IN_VITRO_CELL_FREE
+  IN_VITRO_CELL
+  EX_VIVO
+  IN_VIVO_NONMAMMAL
+  IN_VIVO_MAMMAL
+  HUMAN_INTERVENTIONAL
+  HUMAN_OBSERVATIONAL
+  IN_SILICO
+}
+
+enum ExposureBasis {
+  PER_KG_BODY_WEIGHT_PER_DAY
+  ABSOLUTE_PER_DAY
+  SINGLE_DOSE
+  MEDIUM_CONCENTRATION
+  DIET_CONCENTRATION
+}
+
+type TrialRegistration implements Entity @node(labels: ["TrialRegistration", "Entity"]) {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  registry: String!
+  registrationId: String!
+  study: [Study!]! @relationship(type: "REGISTERED_AS", direction: IN)
+  versions: [RegistrationVersion!]! @relationship(type: "HAS_REGISTRATION_VERSION", direction: OUT)
+}
+
+type RegistrationVersion @node(labels: ["RegistrationVersion", "InformationArtifact"]) {
+  id: ID! @id
+  observedAt: DateTime!
+  versionDate: Date
+  overallStatus: String
+  enrollmentCount: Int
+  enrollmentCountType: String
+  resultsPosted: Boolean
+  resultsFirstPostedAt: DateTime
+  startDate: String
+  startDateType: String
+  primaryCompletionDate: String
+  primaryCompletionDateType: String
+  studyType: String
+  allocation: String
+  interventionModel: String
+  masking: String
+  primaryPurpose: String
+  phase: String
+  siteCountries: [String!]
+  registration: [TrialRegistration!]! @relationship(type: "HAS_REGISTRATION_VERSION", direction: IN)
+}
+
+type ArmIntervention @node(labels: ["StudyIntervention", "VersionedState"]) {
+  id: ID! @id
+  name: String
+  route: String
+  dosageForm: String
+  schedule: String
+  dosesPerDay: Int
+  durationIso: String
+  arm: [StudyArm!]! @relationship(type: "ASSIGNS_INTERVENTION", direction: IN)
+  components: [InterventionComponent!]! @relationship(type: "HAS_INTERVENTION_COMPONENT", direction: OUT)
+}
+
+type InterventionComponent @node(labels: ["InterventionComponent", "VersionedState"]) {
+  id: ID! @id
+  quantity: Float
+  unitCode: String
+  quantityBasis: QuantityBasis
+  massBasis: MassBasis!
+  verbatimDoseText: String
+  usesCompoundForm: [CompoundForm!]! @relationship(type: "USES_INTERVENTION_MATERIAL", direction: OUT, properties: "InterventionMaterialMetadata")
+}
+
+type InterventionMaterialMetadata @relationshipProperties {
+  asReportedName: String
+  projectionOfAssertionUid: String
+}
+
+extend type StudyArm {
+  assignsInterventions: [ArmIntervention!]! @relationship(type: "ASSIGNS_INTERVENTION", direction: OUT)
+}
+
+extend type Study {
+  registrations: [TrialRegistration!]! @relationship(type: "REGISTERED_AS", direction: OUT)
+}
+
+extend type OutcomeMeasure {
+  measureKind: MeasureKind
+  classifications: [EndpointClassification!]! @relationship(type: "CLASSIFIES_OUTCOME", direction: IN)
+}
+
+extend type OutcomeResult {
+  analysisKind: AnalysisKind
+  comparisonKind: ComparisonKind
+  statisticalConclusion: StatisticalConclusion
+  multiplicityAdjusted: Boolean
+}
+
+type AdverseEventResult @node(labels: ["AdverseEventResult", "StudyResult", "InformationArtifact"]) {
+  id: ID! @id
+  eventTerm: String!
+  eventTermCode: String
+  seriousness: String!
+  participantsAffected: Int
+  participantsAtRisk: Int
+  eventCount: Int
+  collectionMethod: AeCollectionMethod!
+  relatednessAssessor: String
+  arms: [StudyArm!]! @relationship(type: "RESULT_FOR_ARM", direction: OUT)
+}
+
+type EndpointClassification @node(labels: ["EndpointClassification", "EvidenceAssessment"]) {
+  id: ID! @id
+  endpointClass: EndpointClass!
+  biomarkerCategory: String
+  surrogateValidationLevel: SurrogateValidationLevel!
+  contextDiseaseOrUse: String
+  contextPopulation: String
+  contextInterventionMechanism: String
+  contextApprovalType: String
+  contextMatch: String
+  rationale: String
+  methodVersion: String!
+  recordedAt: DateTime!
+  outcomes: [OutcomeMeasure!]! @relationship(type: "CLASSIFIES_OUTCOME", direction: OUT)
+  biomarkers: [Biomarker!]! @relationship(type: "CLASSIFIES_BIOMARKER", direction: OUT)
+  comparedWith: [EndpointClassification!]! @relationship(type: "COMPARED_WITH_CONTEXT", direction: OUT)
+}
+
+type EvidenceApplicability @node(labels: ["EvidenceApplicability", "EvidenceAssessment"]) {
+  id: ID! @id
+  methodVersion: String!
+  status: String!
+  summary: String
+  overallScore: Float
+  recordedAt: DateTime!
+  evidenceTarget: [ArmIntervention!]! @relationship(type: "HAS_EVIDENCE_TARGET", direction: OUT)
+  useTargetProduct: [Product!]! @relationship(type: "ASSESSES_APPLICABILITY_TO", direction: OUT)
+  dimensions: [ApplicabilityDimension!]! @relationship(type: "HAS_DIMENSION", direction: OUT)
+}
+
+type ApplicabilityDimension @node(labels: ["ApplicabilityDimension", "EvidenceAssessment"]) {
+  id: ID! @id
+  dimension: ApplicabilityDimensionKind!
+  dimensionClass: DimensionClass!
+  verdict: ApplicabilityVerdict!
+  identityLevel: MaterialIdentityLevel
+  evidenceCategory: String
+  targetCategory: String
+  evidenceValue: Float
+  targetValue: Float
+  unitCode: String
+  evidenceQuantityBasis: QuantityBasis
+  targetQuantityBasis: QuantityBasis
+  evidenceMassBasis: MassBasis
+  targetMassBasis: MassBasis
+  ratio: Float
+  missingFacts: [String!]
+  rationale: String
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+}
+
+type EvidenceSynthesis @node(labels: ["EvidenceSynthesis", "EvidenceAssessment"]) {
+  id: ID! @id
+  claimText: String
+  verdict: String!
+  evidenceCutoff: Date
+  recordedAt: DateTime!
+  methodVersion: String!
+  rationale: String
+  supersedes: [EvidenceSynthesis!]! @relationship(type: "SUPERSEDES", direction: OUT)
+  triggeredByResults: [OutcomeResult!]! @relationship(type: "TRIGGERED_BY", direction: OUT, properties: "EvidenceChangeMetadata")
+  includesResults: [OutcomeResult!]! @relationship(type: "INCLUDES_RESULT", direction: OUT, properties: "SynthesisInputMetadata")
+}
+
+type EvidenceChangeMetadata @relationshipProperties {
+  criterionCode: String!
+  effectOnVerdict: String!
+  evidencePublishedAt: Date
+}
+
+type SynthesisInputMetadata @relationshipProperties {
+  inputRole: String!
+}
+
+type MechanismEvidenceContext @node(labels: ["MechanismEvidenceContext", "Occurrence"]) {
+  id: ID! @id
+  setting: MechanismSetting!
+  modelDescriptor: String
+  sexScope: String
+  ageDescriptor: String
+  sampleSize: Int
+  exposureAmount: Float
+  exposureUnit: String
+  exposureBasis: ExposureBasis
+  route: String
+  exposureDurationIso: String
+  exposureStatus: String
+  species: [Species!]! @relationship(type: "IN_SPECIES", direction: OUT)
+  measuredIn: [AnatomicalContext!]! @relationship(type: "MEASURED_IN", direction: OUT)
+  exposedToCompoundForms: [CompoundForm!]! @relationship(type: "EXPOSED_TO", direction: OUT)
+  studyArm: [StudyArm!]! @relationship(type: "IN_STUDY_ARM", direction: OUT)
+}
+
+extend type Biomarker {
+  measuredInMatrix: [AnatomicalContext!]! @relationship(type: "MEASURED_IN_MATRIX", direction: OUT)
+}
+
+# ---------------------------------------------------------------------------
+# Lane 3 (rounds 0004, 0005): diagnostics, regulatory, manufacturing, commerce
+# ---------------------------------------------------------------------------
+
+type AssertedTemporalMetadata @relationshipProperties {
+  relationshipUid: String
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  assertionUid: String
+  projectionOfAssertionUid: String
+  derivationRule: String
+}
+
+enum DiagnosticResultKind {
+  MEASURED
+  CALCULATED
+  INFERRED
+}
+
+enum AlgorithmOutputKind {
+  AGE_ESTIMATE
+  PACE
+  RISK_SCORE
+  FEATURE_MEASURE
+  CLASSIFICATION
+  CALCULATED_QUANTITY
+}
+
+enum AlgorithmVersionBasis {
+  VENDOR_VERSION_STRING
+  PUBLICATION_VERSION
+  SERVICE_ENDPOINT_UNVERSIONED
+  UNKNOWN
+}
+
+enum ReportedStatus {
+  REPORTED
+  NOT_REPORTED
+  NOT_APPLICABLE
+}
+
+enum ReferenceIntervalKind {
+  REFERENCE_INTERVAL
+  DECISION_LIMIT
+  GUIDELINE_TARGET
+}
+
+enum ReferenceIntervalDerivation {
+  ESTABLISHED
+  TRANSFERRED
+  VERIFIED
+  ADOPTED_FROM_MANUFACTURER
+  NOT_REPORTED
+}
+
+enum ComparabilityVerdict {
+  COMPARABLE
+  COMPARABLE_WITH_CONVERSION
+  NOT_COMPARABLE
+  UNKNOWN
+}
+
+enum RegulatoryStatusKind {
+  APPROVAL
+  CLEARANCE
+  DE_NOVO_AUTHORIZATION
+  DESIGNATION
+  ESTABLISHMENT_REGISTRATION
+  NOTIFICATION_ON_FILE
+  ENFORCEMENT_DISCRETION
+  WITHDRAWN
+  REVOKED
+}
+
+enum RegulatoryResponseKind {
+  NDI_ACKNOWLEDGED_WITHOUT_OBJECTION
+  NDI_INCOMPLETE
+  NDI_OBJECTION
+  NDI_OTHER_REGULATORY_ISSUE
+  GRAS_NO_QUESTIONS
+  GRAS_NO_BASIS
+  GRAS_CEASED_AT_NOTIFIER_REQUEST
+  SUBSTANTIALLY_EQUIVALENT
+  NOT_SUBSTANTIALLY_EQUIVALENT
+  DE_NOVO_GRANTED
+  DE_NOVO_DECLINED
+  PMA_APPROVED
+  PMA_DENIED
+  PMA_APPROVABLE
+  PMA_NOT_APPROVABLE
+  APPROVED
+  COMPLETE_RESPONSE
+  ORPHAN_DESIGNATION_GRANTED
+  ORPHAN_DESIGNATION_DENIED
+  ORPHAN_DESIGNATION_REVOKED
+  REGISTRATION_ACTIVE
+  REGISTRATION_CANCELLED
+}
+
+enum CapabilityStage {
+  OPERATING
+  PILOTING
+  PLANNED
+  SUSPENDED
+  DISCONTINUED
+}
+
+enum CapacityBasis {
+  NAMEPLATE
+  UTILIZED
+  NOT_REPORTED
+}
+
+enum PriceKind {
+  LIST
+  ONE_TIME
+  SUBSCRIPTION
+  COUPON_ADJUSTED
+  PER_UNIT
+}
+
+enum AmountReferent {
+  NUTRIENT_AS_NUTRIENT
+  LISTED_INGREDIENT_AS_LISTED
+  PROPRIETARY_BLEND_TOTAL
+  EXTRACT_TOTAL
+  MARKER_CONSTITUENT
+  NOT_STATED
+}
+
+type AssayVersion implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  assayKitIdentifier: String
+  softwareVersion: String
+  softwareVersionStatus: ReportedStatus
+  reportedUnitCode: String
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  operatedBy: [Organization!]! @relationship(type: "ASSAY_OPERATED_BY", direction: OUT, properties: "AssertedTemporalMetadata")
+  usesMethods: [MeasurementMethod!]! @relationship(type: "USES_METHOD", direction: OUT, properties: "AssertedTemporalMetadata")
+  runsOnInstruments: [ToolOrInstrument!]! @relationship(type: "RUNS_ON_INSTRUMENT", direction: OUT, properties: "AssertedTemporalMetadata")
+  forMetrics: [Metric!]! @relationship(type: "ASSAY_FOR_METRIC", direction: OUT, properties: "AssertedTemporalMetadata")
+  acceptsSpecimenTypes: [Specimen!]! @relationship(type: "ACCEPTS_SPECIMEN_TYPE", direction: OUT, properties: "AssertedTemporalMetadata")
+  traceableTo: [ReferenceSystem!]! @relationship(type: "CALIBRATION_TRACEABLE_TO", direction: OUT, properties: "AssertedTemporalMetadata")
+  usedByLabTests: [LabTest!]! @relationship(type: "PERFORMED_WITH_ASSAY_VERSION", direction: IN, properties: "AssertedTemporalMetadata")
+}
+
+type ReferenceSystem implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  referenceSystemKind: String
+}
+
+type Algorithm implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  versions: [AlgorithmVersion!]! @relationship(type: "VERSION_OF_ALGORITHM", direction: IN)
+}
+
+type AlgorithmVersion implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  versionLabel: String
+  versionBasis: AlgorithmVersionBasis!
+  outputKind: AlgorithmOutputKind!
+  outputUnitCode: String
+  trainingPopulationText: String
+  retrievedAt: DateTime
+  versionOf: [Algorithm!]! @relationship(type: "VERSION_OF_ALGORITHM", direction: OUT)
+  derivedFrom: [AlgorithmVersion!]! @relationship(type: "DERIVED_FROM_ALGORITHM_VERSION", direction: OUT, properties: "AssertedTemporalMetadata")
+  requiresInputMetrics: [Metric!]! @relationship(type: "REQUIRES_INPUT_METRIC", direction: OUT, properties: "AssertedTemporalMetadata")
+  compatibleWithAssayVersions: [AssayVersion!]! @relationship(type: "COMPATIBLE_WITH_ASSAY_VERSION", direction: OUT, properties: "AssertedTemporalMetadata")
+  outputsMetrics: [Metric!]! @relationship(type: "OUTPUTS_METRIC", direction: OUT, properties: "AssertedTemporalMetadata")
+}
+
+type ReferenceIntervalVersion implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  lowerBound: Float
+  upperBound: Float
+  unitCode: String
+  intervalKind: ReferenceIntervalKind!
+  derivationKind: ReferenceIntervalDerivation!
+  sexPartition: String
+  ageMinYears: Float
+  ageMaxYears: Float
+  fastingStatus: String
+  pregnancyStatus: String
+  partitionText: String
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  forAssayVersion: [AssayVersion!]! @relationship(type: "FOR_ASSAY_VERSION", direction: OUT)
+  forMetric: [Metric!]! @relationship(type: "FOR_METRIC", direction: OUT)
+}
+
+union ComparableVersion = AssayVersion | AlgorithmVersion | ReferenceIntervalVersion
+
+type ComparabilityAssessment implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  methodVersion: String!
+  verdict: ComparabilityVerdict!
+  measurandMatch: String
+  unitConversionRule: String
+  traceabilityMatch: String
+  interferenceProfileMatch: String
+  referenceIntervalMatch: String
+  replicateNoiseBasis: String
+  rationale: String
+  compares: [ComparableVersion!]! @relationship(type: "COMPARES", direction: OUT)
+}
+
+extend type LabTest {
+  localTestCode: String
+  issuerUid: String
+  assayVersions: [AssayVersion!]! @relationship(type: "PERFORMED_WITH_ASSAY_VERSION", direction: OUT, properties: "AssertedTemporalMetadata")
+}
+
+extend type Metric {
+  propertyKind: String
+  systemKind: String
+  scaleKind: String
+  unitStatus: ReportedStatus
+  definitionText: String
+}
+
+extend type PanelDefinition {
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+}
+
+type RegulatorySubmission implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  submissionKind: String!
+  identifier: String
+  jurisdiction: String!
+  submittedAt: DateTime
+  filingDate: DateTime
+  conditionsOfUseText: String
+  underPathway: [RegulatoryPathway!]! @relationship(type: "UNDER_PATHWAY", direction: OUT)
+  submittedBy: [Organization!]! @relationship(type: "SUBMITTED_BY", direction: OUT, properties: "AssertedTemporalMetadata")
+  responses: [RegulatoryResponse!]! @relationship(type: "SUBMISSION_HAS_RESPONSE", direction: OUT)
+  supersedes: [RegulatorySubmission!]! @relationship(type: "SUPERSEDES_SUBMISSION", direction: OUT, properties: "AssertedTemporalMetadata")
+}
+
+type RegulatoryResponse implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  responseKind: RegulatoryResponseKind!
+  issuedAt: DateTime
+  jurisdiction: String!
+  conditionsOfUseText: String
+  agencyDisclaimerText: String
+  issuedBy: [RegulatoryAgency!]! @relationship(type: "ISSUED_BY", direction: OUT)
+}
+
+extend type RegulatoryStatus {
+  statusKind: RegulatoryStatusKind
+  scopeText: String
+  productCode: String
+  pcccAuthorized: Boolean
+  legalBasisCitation: String
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  resultsFromResponse: [RegulatoryResponse!]! @relationship(type: "RESULTS_FROM_RESPONSE", direction: OUT)
+  underLegalBasis: [RegulatoryPathway!]! @relationship(type: "UNDER_LEGAL_BASIS", direction: OUT)
+}
+
+extend type RegulatoryPathway {
+  legalBasisCitation: String
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+}
+
+type ManufacturingCapability implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  stage: CapabilityStage!
+  capacityValue: Float
+  capacityUnitCode: String
+  capacityBasis: CapacityBasis
+  targetOperationalDate: DateTime
+  forProcess: [ManufacturingProcess!]! @relationship(type: "CAPABILITY_FOR_PROCESS", direction: OUT)
+  heldByOrganizations: [Organization!]! @relationship(type: "HAS_CAPABILITY_STATE", direction: IN, properties: "AssertedTemporalMetadata")
+  heldByLocations: [PhysicalLocation!]! @relationship(type: "HAS_CAPABILITY_STATE", direction: IN, properties: "AssertedTemporalMetadata")
+}
+
+type Offer implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  offerKind: String
+  currency: String
+  availability: String
+  termsText: String
+  observedAt: DateTime
+  onListing: [Listing!]! @relationship(type: "HAS_OFFER", direction: IN)
+  sellerOfRecord: [Organization!]! @relationship(type: "SELLER_OF_RECORD_FOR", direction: IN, properties: "AssertedTemporalMetadata")
+  fulfilledBy: [Organization!]! @relationship(type: "FULFILLS_OFFER", direction: IN, properties: "AssertedTemporalMetadata")
+  listedBy: [Organization!]! @relationship(type: "LISTS_OFFER", direction: IN, properties: "AssertedTemporalMetadata")
+  priceObservations: [PriceObservation!]! @relationship(type: "HAS_PRICE_OBSERVATION", direction: OUT)
+}
+
+type PriceObservation implements Entity @node {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  amount: Float!
+  currency: String!
+  observedAt: DateTime!
+  priceKind: PriceKind!
+  availabilityObserved: String
+}
+
+extend type Listing {
+  hostedBy: [Organization!]! @relationship(type: "HOSTS_LISTING", direction: IN, properties: "AssertedTemporalMetadata")
+  offers: [Offer!]! @relationship(type: "HAS_OFFER", direction: OUT)
+}
+
+# ---------------------------------------------------------------------------
+# Lane 4 (round 0006): claims, documents, provenance
+# ---------------------------------------------------------------------------
+
+enum AssertionStatus {
+  EXTRACTED
+  PROPOSED
+  ACCEPTED
+  REJECTED
+  DISPUTED
+  SUPERSEDED
+  UNRESOLVED
+}
+
+enum SelectorKind {
+  TEXT_QUOTE
+  TEXT_POSITION
+  MEDIA_TIME
+  PDF_PAGE
+  IMAGE_REGION
+}
+
+enum ContentHashBasis {
+  RAW_BYTES
+  NORMALIZED_TEXT
+  STORED_EXCERPT_TEXT
+}
+
+enum CaptureCompleteness {
+  COMPLETE
+  PARTIAL_EXCERPT
+  UNKNOWN
+}
+
+enum AnchorMatch {
+  EXACT
+  FUZZY
+}
+
+enum AssertionBasis {
+  PERSONAL_EXPERIENCE
+  THIRD_PARTY_ANECDOTE
+  MANUFACTURER_CLAIM
+  STUDY_RESULT
+  MECHANISM_REASONING
+  EXPERT_OPINION
+  UNSTATED
+}
+
+enum SpeechAct {
+  STATES
+  REPORTS_PRACTICE
+  RECOMMENDS
+  CAUTIONS
+  SPECULATES
+  QUESTIONS
+  DENIES
+}
+
+enum QualificationKind {
+  INDIVIDUAL_VARIATION
+  POPULATION_SCOPE
+  SPECIES_OR_MODEL
+  QUANTITY_BASIS
+  UNCERTAINTY_INTERVAL
+  NEEDS_CONFIRMATION
+  HEDGE
+  TIME_SCOPE
+  CONDITIONAL_USE
+  CONSULT_PROFESSIONAL
+}
+
+enum RetellingMode {
+  VERBATIM_QUOTE
+  PARAPHRASE
+  SUMMARY
+  TRANSLATION
+}
+
+enum RetellingLinkBasis {
+  EXPLICIT_CITATION
+  BELLLABS_MATCH
+}
+
+enum RelevanceLevel {
+  DIRECT
+  INDIRECT
+  NOT_RELEVANT
+  UNKNOWN
+}
+
+enum RelevanceBasis {
+  SAME_PRODUCT
+  SAME_ORGANIZATION
+  COMPETING_PRODUCT
+  SAME_SUBSTANCE
+  SAME_SUBSTANCE_CLASS_VIA_GROUP
+  SPONSOR_OF_CONTAINER
+  NO_PATH_FOUND
+}
+
+enum DisclosureFinding {
+  DISCLOSED_IN_CONTAINER
+  DISCLOSED_ELSEWHERE
+  NOT_FOUND_IN_PARTIAL_CAPTURE
+  NOT_DISCLOSED
+  UNKNOWN
+}
+
+enum TemporalOverlap {
+  OVERLAPS
+  DISJOINT
+  UNKNOWN
+}
+
+enum ActivityKind {
+  CAPTURE
+  TRANSCRIPTION
+  TEXT_EXTRACTION
+  SEGMENTATION
+  EXTRACTION
+  RESOLUTION
+  REANCHORING
+  ADJUDICATION
+  ANSWER_COMPOSITION
+}
+
+enum AgentKind {
+  MANUAL_AGENT
+  AUTOMATED_AGENT
+  TEXT_MINING_AGENT
+  DATA_ANALYSIS_PIPELINE
+  COMPUTATIONAL_MODEL
+  MANUAL_VALIDATION_OF_AUTOMATED_AGENT
+}
+
+enum UseKind {
+  QUOTE_IN_ANSWER
+  SUMMARIZE_IN_ANSWER
+  USE_AS_RECOMMENDATION_EVIDENCE
+  SHARE_EXTERNALLY
+}
+
+enum EquivalenceKind {
+  SAME_WORK_DIFFERENT_NAME
+  OVERLAPPING_SCOPE
+  RELATED_NOT_EQUIVALENT
+  NOT_EQUIVALENT
+}
+
+extend enum RoleType {
+  HOST
+  CO_HOST
+  GUEST
+}
+
+extend enum DocumentType {
+  CORRECTION_NOTICE
+  RETRACTION_NOTICE
+  EXPRESSION_OF_CONCERN
+  REINSTATEMENT_NOTICE
+  TRANSCRIPT_PAGE
+  VIDEO_PAGE
+  AUDIO_FEED_ITEM
+  NEWSLETTER_ISSUE
+}
+
+type ChunkResolutionMetadata @relationshipProperties {
+  derivationRule: String!
+  segmentationHash: String!
+}
+
+type ReanchorMetadata @relationshipProperties {
+  anchorMatch: AnchorMatch!
+  activityUid: String
+}
+
+type QualificationMetadata @relationshipProperties {
+  qualificationKind: QualificationKind!
+  relationshipUid: String
+}
+
+type RetellingMetadata @relationshipProperties {
+  retellingMode: RetellingMode!
+  linkBasis: RetellingLinkBasis!
+  hypothesisUid: String
+  citationLocatorUid: String
+  relationshipUid: String
+}
+
+type DerivedSupportMetadata @relationshipProperties {
+  locatorUid: String!
+  derivationRule: String
+}
+
+type AuthorizationMetadata @relationshipProperties {
+  useKind: UseKind!
+}
+
+extend type RoleMetadata {
+  assertionUid: String
+  relationshipUid: String
+  validTimePrecision: String
+  validTimeBasis: String
+  roleTitleVerbatim: String
+}
+
+extend type ExtractionMetadata {
+  locatorUid: String
+  activityUid: String
+}
+
+type SourceSnapshot implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  uid: String!
+  canonicalUri: String!
+  retrievedAt: DateTime!
+  observedAt: DateTime
+  contentHash: String!
+  contentHashBasis: ContentHashBasis!
+  captureCompleteness: CaptureCompleteness!
+  storageUri: String
+  archiveUri: String
+  mimeType: String
+  languageCode: String
+  publisherRevisionNotice: String
+  ofDocument: [Document!]! @relationship(type: "HAS_SNAPSHOT", direction: IN)
+  locators: [SourceLocator!]! @relationship(type: "HAS_LOCATOR", direction: OUT)
+  textVersions: [DocumentTextVersion!]! @relationship(type: "TEXT_OF_SNAPSHOT", direction: IN)
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+}
+
+type SourceLocator implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  uid: String!
+  uri: String
+  selectorKind: SelectorKind!
+  exact: String
+  prefix: String
+  suffix: String
+  quoteHash: String
+  normalizationVersion: String!
+  startOffset: Int
+  endOffset: Int
+  mediaStartSeconds: Float
+  mediaEndSeconds: Float
+  mediaTimeBasis: String
+  page: Int
+  section: String
+  mediaAnnotationUid: String
+  speakerLabelInSource: String
+  snapshot: [SourceSnapshot!]! @relationship(type: "HAS_LOCATOR", direction: IN)
+  textVersion: [DocumentTextVersion!]! @relationship(type: "LOCATOR_IN_TEXT_VERSION", direction: OUT)
+  reanchors: [SourceLocator!]! @relationship(type: "REANCHORS", direction: OUT, properties: "ReanchorMetadata")
+  resolvesToChunks: [Chunk!]! @relationship(type: "RESOLVES_TO_CHUNK", direction: OUT, properties: "ChunkResolutionMetadata")
+}
+
+type Activity implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  uid: String!
+  activityKind: ActivityKind!
+  startedAt: DateTime
+  endedAt: DateTime
+  methodVersion: String
+  externalRunSystem: String
+  externalRunId: String
+  associatedWith: [Agent!]! @relationship(type: "WAS_ASSOCIATED_WITH", direction: OUT)
+  usedSnapshots: [SourceSnapshot!]! @relationship(type: "USED", direction: OUT)
+  usedLocators: [SourceLocator!]! @relationship(type: "USED", direction: OUT)
+}
+
+type Agent implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  uid: String!
+  agentKind: AgentKind!
+  model: String
+  promptVersion: String
+  toolVersion: String
+}
+
+type ClaimEvidenceAssessment implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  uid: String!
+  evidenceStrength: EvidenceStrength
+  criteriaVersion: String
+  methodVersion: String!
+  status: String!
+  assessedAt: DateTime
+  assessesClaim: [Claim!]! @relationship(type: "ASSESSES_CLAIM", direction: OUT)
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+}
+
+type RetellingFidelityAssessment implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  uid: String!
+  methodVersion: String!
+  status: String!
+  qualificationLost: Boolean
+  lostQualificationKinds: [QualificationKind!]
+  speechActChanged: Boolean
+  speechActFrom: SpeechAct
+  speechActTo: SpeechAct
+  assertionBasisChanged: Boolean
+  scopeBroadened: Boolean
+  addedPurposeText: String
+  quantityChanged: Boolean
+  attributionChanged: Boolean
+  correctionIgnored: Boolean
+  assessedAt: DateTime
+  retelling: [ClaimOccurrence!]! @relationship(type: "ASSESSES_RETELLING", direction: OUT)
+  original: [ClaimOccurrence!]! @relationship(type: "AGAINST_ORIGINAL", direction: OUT)
+  lostQualifications: [ClaimOccurrence!]! @relationship(type: "IDENTIFIES_LOST_QUALIFICATION", direction: OUT)
+}
+
+type ConflictRelevanceAssessment implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  uid: String!
+  methodVersion: String!
+  status: String!
+  relevanceLevel: RelevanceLevel!
+  relevanceBasis: RelevanceBasis
+  temporalOverlap: TemporalOverlap
+  disclosureFinding: DisclosureFinding!
+  scopeAmbiguity: String
+  forOccurrence: [ClaimOccurrence!]! @relationship(type: "FOR_OCCURRENCE", direction: OUT)
+}
+
+type EquivalenceAssessment implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  uid: String!
+  equivalenceKind: EquivalenceKind!
+  methodVersion: String!
+  status: String!
+  rationale: String
+  compares: [MediaSubject!]! @relationship(type: "COMPARES", direction: OUT)
+}
+
+extend type Document {
+  sourceKind: String
+  snapshots: [SourceSnapshot!]! @relationship(type: "HAS_SNAPSHOT", direction: OUT)
+  renditionOf: [Episode!]! @relationship(type: "RENDITION_OF", direction: OUT)
+}
+
+extend type DocumentTextVersion {
+  normalizationVersion: String
+  ofSnapshot: [SourceSnapshot!]! @relationship(type: "TEXT_OF_SNAPSHOT", direction: OUT)
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+}
+
+extend type Chunk {
+  charStart: Int
+  charEnd: Int
+  resolvedFromLocators: [SourceLocator!]! @relationship(type: "RESOLVES_TO_CHUNK", direction: IN, properties: "ChunkResolutionMetadata")
+}
+
+extend type Episode {
+  episodeNumber: Int
+  renditions: [Document!]! @relationship(type: "RENDITION_OF", direction: IN)
+}
+
+extend type Claim {
+  evidenceAssessments: [ClaimEvidenceAssessment!]! @relationship(type: "ASSESSES_CLAIM", direction: IN)
+}
+
+extend type ClaimOccurrence {
+  predicate: String
+  status: AssertionStatus
+  polarity: AssociationPolarity
+  assertionBasis: AssertionBasis
+  speechAct: SpeechAct
+  reportedSpeechAct: SpeechAct
+  valueString: String
+  valueNumber: Float
+  valueBoolean: Boolean
+  unitCode: String
+  quantityBasis: String
+  validFrom: DateTime
+  validTo: DateTime
+  validTimePrecision: String
+  validTimeBasis: String
+  recordedAt: DateTime
+  extractionConfidence: Float
+  roleTitleVerbatim: String
+  supportedByLocators: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  assertedBy: [ClaimSpeaker!]! @relationship(type: "ASSERTED_BY", direction: OUT)
+  attributesTo: [ClaimSpeaker!]! @relationship(type: "ATTRIBUTES_TO", direction: OUT)
+  hasSubject: [ClaimSubject!]! @relationship(type: "HAS_SUBJECT", direction: OUT)
+  hasObject: [ClaimSubject!]! @relationship(type: "HAS_OBJECT", direction: OUT)
+  qualifiedBy: [ClaimOccurrence!]! @relationship(type: "QUALIFIED_BY", direction: OUT, properties: "QualificationMetadata")
+  retells: [ClaimOccurrence!]! @relationship(type: "RETELLS", direction: OUT, properties: "RetellingMetadata")
+  retoldBy: [ClaimOccurrence!]! @relationship(type: "RETELLS", direction: IN, properties: "RetellingMetadata")
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  relevanceAssessments: [ConflictRelevanceAssessment!]! @relationship(type: "FOR_OCCURRENCE", direction: IN)
+}
+
+extend type RelationshipAssertion {
+  predicate: String
+  status: AssertionStatus
+  recordedAt: DateTime
+  extractionConfidence: Float
+  supportedByLocators: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "RoleMetadata")
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+}
+
+extend type Organization {
+  sponsorsContent: [Sponsorable!]! @relationship(type: "SPONSORS_CONTENT", direction: OUT, properties: "RoleMetadata")
+}
+
+# ---------------------------------------------------------------------------
+# Lane 5 (rounds 0007, 0008): time, private context, protocols, recommendations
+# ---------------------------------------------------------------------------
+
+enum TimePrecision {
+  INSTANT
+  DAY
+  MONTH
+  QUARTER
+  YEAR
+  DECADE
+}
+
+enum ValidTimeBasis {
+  STATED_BY_SOURCE
+  PUBLICATION_PROXY
+  OBSERVATION_ONLY
+  INFERRED
+  UNKNOWN
+}
+
+enum SupersessionKind {
+  SOURCE_CORRECTION
+  VALIDITY_BOUNDED
+  EXTRACTION_FIX
+  RESOLUTION_FIX
+  DUPLICATE_MERGE
+  RE_REVIEW
+  SOURCE_REVISION
+}
+
+enum SourceRevisionKind {
+  ERRATUM
+  RETRACTION
+  EXPRESSION_OF_CONCERN
+  CORRECTED_AND_REPUBLISHED
+  NEW_VERSION
+  SILENT_CONTENT_CHANGE
+  WITHDRAWAL
+  REINSTATEMENT
+}
+
+"""
+Bitemporal episode properties for new attachment relationships (round 0007).
+"""
+type StateEpisodeMetadata @relationshipProperties {
+  relationshipUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  assertionUid: String
+}
+
+extend type TemporalMetadata {
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis
+  validToBasis: ValidTimeBasis
+  assertionUid: String
+  relationshipUid: String
+}
+
+extend type RecommendationMetadata {
+  assertionUid: String
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis
+  validToBasis: ValidTimeBasis
+  recordedFrom: DateTime
+  recordedTo: DateTime
+}
+
+extend type ProductSnapshot {
+  catalogUid: String
+  payloadHash: String
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis
+  validToBasis: ValidTimeBasis
+  assertionUids: [String!]
+}
+
+extend type OrganizationSnapshot {
+  catalogUid: String
+  payloadHash: String
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis
+  validToBasis: ValidTimeBasis
+  assertionUids: [String!]
+}
+
+extend type ListingSnapshot {
+  catalogUid: String
+  payloadHash: String
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis
+  validToBasis: ValidTimeBasis
+  assertionUids: [String!]
+}
+
+enum RequirementLevel {
+  ESSENTIAL
+  RECOMMENDED
+  OPTIONAL
+  CONDITIONAL
+  NOT_STATED
+}
+
+enum RequirementBasis {
+  STATED_BY_SOURCE
+  EDITORIAL_INFERENCE
+  NOT_STATED
+}
+
+enum StepDependencyKind {
+  REQUIRES_PRIOR_COMPLETION
+  REQUIRES_RESULT_OF
+  CONCURRENT_WITH
+  MUTUALLY_EXCLUSIVE_WITH
+}
+
+enum ConstraintKind {
+  POPULATION
+  CONDITION_PRESENT
+  CONDITION_ABSENT
+  MEASUREMENT_THRESHOLD
+  PHASE
+  TIME_WINDOW
+  CO_INTERVENTION
+}
+
+enum MeasurementPlanTiming {
+  BASELINE
+  DURING
+  FOLLOW_UP
+  PERIODIC
+}
+
+enum ReviewTriggerKind {
+  THRESHOLD_CROSSED
+  TREND
+  ADVERSE_EVENT_REPORTED
+  SCHEDULED_REVIEW
+}
+
+enum ThresholdComparator {
+  GT
+  GTE
+  LT
+  LTE
+  OUTSIDE_REFERENCE_RANGE
+}
+
+enum ReviewTriggerAction {
+  REVIEW
+  PAUSE_STEP
+  STOP_PROTOCOL
+  ADJUST_DOSE
+  CONTACT_CLINICIAN
+}
+
+enum ReviewRuleBasis {
+  STATED_BY_SOURCE
+  BELLLABS_SAFETY_POLICY
+}
+
+"""
+Immutable structured content of one observed or published state of a public Protocol (round 0008).
+"""
+type ProtocolEdition implements Entity @node {
+  id: ID! @id
+  name: String!
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  catalogUid: String!
+  editionLabel: String
+  payloadHash: String!
+  protocol: [Protocol!]! @relationship(type: "HAS_PROTOCOL_EDITION", direction: IN, properties: "StateEpisodeMetadata")
+  steps: [ProtocolStep!]! @relationship(type: "HAS_STEP", direction: OUT, properties: "OrderingMetadata")
+  constraints: [Constraint!]! @relationship(type: "HAS_CONSTRAINT", direction: OUT, properties: "RoleMetadata")
+  measurementPlans: [MeasurementPlan!]! @relationship(type: "HAS_MEASUREMENT_PLAN", direction: OUT, properties: "RoleMetadata")
+  adjustmentRules: [ProtocolAdjustmentRule!]! @relationship(type: "HAS_ADJUSTMENT_RULE", direction: OUT, properties: "RoleMetadata")
+  functionalGoals: [FunctionalGoal!]! @relationship(type: "HAS_FUNCTIONAL_GOAL", direction: OUT, properties: "RoleMetadata")
+}
+
+extend type Protocol {
+  catalogUid: String
+  editions: [ProtocolEdition!]! @relationship(type: "HAS_PROTOCOL_EDITION", direction: OUT, properties: "StateEpisodeMetadata")
+}
+
+extend type ProtocolStep {
+  catalogUid: String
+  stepKey: String
+  requirementLevel: RequirementLevel
+  requirementBasis: RequirementBasis
+  notReportedFields: [String!]
+  payloadHash: String
+}
+
+extend type OrderingMetadata {
+  dependencyKind: StepDependencyKind
+}
+
+extend type Constraint {
+  constraintKind: ConstraintKind
+}
+
+extend type MeasurementPlan {
+  planTiming: MeasurementPlanTiming
+  requiredForEvaluation: Boolean
+  maxBaselineAgeDays: Int
+  cadenceMinDays: Int
+  cadenceMaxDays: Int
+}
+
+extend type ProtocolAdjustmentRule {
+  triggerKind: ReviewTriggerKind
+  comparator: ThresholdComparator
+  thresholdValue: Float
+  thresholdUnitCode: String
+  triggerAction: ReviewTriggerAction
+  ruleBasis: ReviewRuleBasis
+}

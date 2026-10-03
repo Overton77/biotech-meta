@@ -1,86 +1,398 @@
 schema:
   name: human-upgrade-knowledge-graph
-  version: 0.1.0
+  version: 0.2.0
   status: provisional
   targetProjection: neo4j-5
-  updatedAt: 2026-07-13
+  updatedAt: 2026-10-03
+  previousVersion: 0.1.0
+  integrationNote: >
+    0.2.0 integrates ontology-lab rounds 0002 to 0009 (see ../ontology-lab/proposal-index.md). Meaning changes
+    relative to 0.1.0 are listed under migration. The live Neo4j GraphQL schema (../current_biotech_schema.graphql)
+    is read-only; its concepts are kept, refined, merged, split, or left as seams as recorded per module in
+    `liveSchemaAlignment` and in ../neo4j/proposed-delta.graphql.
 
 conventions:
   identityProperty: uid
   uidFormat: "hu:<type>:<opaque-stable-id>"
+  privateUidFormat: "hu:private-<type>:<opaque-stable-id>"   # round 0008: leak checks detect private uids anywhere in the shared graph
+  uidTypeTokens:
+    # one token per primary label; the <type> segment of a uid. Round 0009 (K-1 seam) and round 0006.
+    Organization: org
+    LegalEntity: org
+    ConsumerBrand: brand
+    Facility: facility
+    Person: person
+    PseudonymousActor: pseudonymous-actor
+    AnonymousActor: anonymous-actor
+    Agent: agent
+    Activity: activity            # round 0006 ruling: captures and manual reviews are activities, not agent runs
+    Product: product
+    ProductVariant: product-variant
+    FormulationVersion: formulation
+    IngredientComponent: component
+    IngredientMaterial: material
+    ChemicalSubstance: substance
+    ChemicalForm: form
+    Source: source
+    SourceSnapshot: snapshot
+    SourceLocator: locator
+    SourceRevisionEvent: source-revision
+    Document: document            # live Document (stored id property documentId)
+    DocumentTextVersion: text-version
+    Chunk: chunk                  # live Chunk (stored id property chunkId)
+    Claim: claim
+    ClaimOccurrence: claim-occurrence
+    RelationshipAssertion: assertion
+    Assertion: assertion
+    Adjudication: adjudication
+    EvidenceApplicability: applicability
+    ApplicabilityDimension: applicability-dimension
+    EvidenceAssessment: assessment
+    ResolutionHypothesis: resolution
+    Identifier: identifier
+    Study: study
+    StudyArm: arm
+    StudyIntervention: intervention
+    Publication: publication
+    AssayVersion: assay-version
+    AlgorithmVersion: algorithm-version
+    RegulatoryStatus: regulatory-status
+    Protocol: protocol
+    ProtocolEdition: protocol-edition
+    AnswerRecord: answer-record
+    Episode: episode
+    EpisodeSegment: episode-segment
+    Channel: channel
+    Series: series
+  liveSeamTypes:
+    # Live GraphQL types referenced by relationships here but owned by no module yet (kept unchanged as seams).
+    [ToolOrInstrument, ReferenceRange, Device, Sensor, Modality, Conference, Event, Community, NarrativeArc, MediaAsset, MediaVariant, MediaAnnotation, MediaSource, GraphView, FigurePanel, ProductLabelRegion, Procedure, Treatment, FoodItem, Ingredient, FoodProduct, Exposure, Lifestyle, AdverseEffect, SafetySignal, RiskFactor, TechnologyPlatform, Material, CohortParticipant, ExperienceReport, Association]
+  liveIdProjection:
+    # round 0009 seam: the live GraphQL `id: ID! @id` is the opaque segment of uid; uid is stored as its own property.
+    rule: "live id = opaque segment of uid (text after the second colon); uid is stored beside id"
+    storedLiveIdProperty: {default: id, Document: documentId, DocumentTextVersion: documentTextVersionId, Segmentation: segmentationId, Chunk: chunkId}
+    opaqueIdMustBe: "globally unique and unrelated to any name (UUID or ULID) in production ingestion; the readable ids in ../examples/*.cypher are illustrative only"
   enumStyle: SCREAMING_SNAKE_CASE
   relationshipStyle: SCREAMING_SNAKE_CASE
   nullMeans: unknown_or_not_applicable
+  nullBoundMeans: unknown          # round 0007: a null validTo is an unknown end, never "ongoing"
   timeIntervals: half_open
   quantityModel: value_plus_ucum_unit
   nodeMaturity: [CANDIDATE, PROVISIONAL, ACCEPTED, DEPRECATED]
   assertionStatus: [EXTRACTED, PROPOSED, ACCEPTED, REJECTED, DISPUTED, SUPERSEDED, UNRESOLVED]
+  assertionStatusMeaning: >
+    Workflow status of the record of what a source asserted (capture and attribution fidelity). ACCEPTED means
+    "accepted as an accurate record of what this asserter said in this source". It is never a truth verdict:
+    truth and support live on Adjudication.verdict (adjudicationKind SUPPORT) and on EvidenceAssessments. The
+    stored status is a current projection of CAPTURE_FIDELITY adjudications and SUPERSEDES records; the
+    historical status as of a recorded date is derived from those records, not from the stored field
+    (rounds 0006 and 0007).
+  adjudicationKind: [CAPTURE_FIDELITY, SUPPORT]      # round 0006 and 0007 reconciliation (integration ruling)
   adjudicationVerdict: [SUPPORTED, PARTIALLY_SUPPORTED, CONTRADICTED, INSUFFICIENT, NOT_APPLICABLE]
+  reviewerType: [HUMAN, AGENT, POLICY, MIGRATION]      # round 0007
+  privacyClass: [public, internal, private-personal]  # round 0008; "synthetic" is fixtureProvenance, not a privacy class
+  privacyRule: >
+    private-personal elements exist only in the private context store; internal elements live in the shared
+    graph but are excluded from public projections; every node type and property declares a class
+    (default public).
+  basisKind: [DIRECT_MEASUREMENT, INFERRED_FROM_MEASUREMENT, CITED_FROM_PRIOR_WORK, HYPOTHESIS, CALCULATED]
+  # basisKind: epistemic basis of the proposition in the source or in BellLabs (rounds 0003 and 0005).
+  # CALCULATED marks a BellLabs-derived assertion that carries derivationRule and DERIVED_FROM_ASSERTION inputs.
+  assertionBasis: [PERSONAL_EXPERIENCE, THIRD_PARTY_ANECDOTE, MANUFACTURER_CLAIM, STUDY_RESULT, MECHANISM_REASONING, EXPERT_OPINION, UNSTATED]
+  # assertionBasis: on what basis the asserter presents the proposition (round 0006). Distinct from basisKind
+  # and from live ClaimType (what the proposition is about).
+  speechAct: [STATES, REPORTS_PRACTICE, RECOMMENDS, CAUTIONS, SPECULATES, QUESTIONS, DENIES]
+  polarity: [POSITIVE, NEGATIVE, MIXED, UNKNOWN]
+  timePrecision: [INSTANT, DAY, MONTH, QUARTER, YEAR, DECADE]
+  timeBoundRule: a non-null bound is stored as the first UTC instant of its precision period
+  validTimeBasis: [STATED_BY_SOURCE, PUBLICATION_PROXY, OBSERVATION_ONLY, INFERRED, UNKNOWN]
+  supersessionKind: [SOURCE_CORRECTION, VALIDITY_BOUNDED, EXTRACTION_FIX, RESOLUTION_FIX, DUPLICATE_MERGE, RE_REVIEW, SOURCE_REVISION]
+  sourceRevisionKind: [ERRATUM, RETRACTION, EXPRESSION_OF_CONCERN, CORRECTED_AND_REPUBLISHED, NEW_VERSION, SILENT_CONTENT_CHANGE, WITHDRAWAL, REINSTATEMENT]
+  temporalCardinality: [EXCLUSIVE, NONEXCLUSIVE]
+  temporalProfiles:
+    bitemporal_attachment:   # round 0007: one contract for HAS_STATE and every domain attachment type
+      required: [relationshipUid, recordedFrom, validFromBasis, validToBasis]
+      optional: [validFrom, validTo, validFromPrecision, validToPrecision, recordedTo, assertionUid]
+      rules:
+        - one relationship per recorded-time episode
+        - all properties immutable after commit except one write of recordedTo from null
+        - recordedFrom is the commit transaction time assigned by the ingestion service and is never backdated
+        - precision is required when its bound is non-null
+        - OBSERVATION_ONLY or UNKNOWN basis requires the corresponding bound to be null
+    asserted_edge:           # rounds 0007 and 0009: an asserted edge is a projection of exactly one Assertion
+      extends: bitemporal_attachment
+      required: [assertionUid]
+      rules:
+        - valid bounds, precisions, and bases equal those of the authorizing assertion
+        - recordedFrom >= assertion.recordedAt; recordedTo equals assertion.recordedTo once closed
+  relationshipClasses:
+    structural: {meaning: defines the internal shape of a captured record}
+    asserted: {meaning: authoritative only through an Assertion, profile: asserted_edge}
+    derived:
+      meaning: regenerable traversal shortcut; never the only history
+      oneOf:
+        - [projectionOfAssertionUid]                   # 1:1 projection of one asserted edge; cited predicate equals the edge type
+        - [derivationRule, derivedFromAssertionUids]   # multi-hop derivation such as CONTAINS (round 0009 K-2)
+      rule: the cited predicate is never the premise of a forbidden implication for the edge type
+  predicateExclusivity:      # round 0009 K-6 and round 0007 TM-R5 (CQ-TM-05)
+    HAS_FORMULATION_VERSION: {mode: EXCLUSIVE, scope: subject, partitionBy: [jurisdiction]}
+    HAS_REGISTRATION_VERSION: {mode: EXCLUSIVE, scope: subject}
+    HAS_PROTOCOL_EDITION: {mode: EXCLUSIVE, scope: subject}
+    HAS_CONTEXT_VERSION: {mode: EXCLUSIVE, scope: subject}
+    HAS_ADOPTION_VERSION: {mode: EXCLUSIVE, scope: subject}
+    HAS_PACKAGE_CONFIGURATION: {mode: NONEXCLUSIVE}
+    HAS_SHARING_GRANT: {mode: NONEXCLUSIVE}
+    MARKETS_PRODUCT: {mode: NONEXCLUSIVE}
+    MANUFACTURES_PRODUCT: {mode: NONEXCLUSIVE}
+    SPONSORS_STUDY: {mode: NONEXCLUSIVE}
+    ADVISES_ORGANIZATION: {mode: NONEXCLUSIVE}
+    LISTS_OFFER: {mode: NONEXCLUSIVE}
+    default: NONEXCLUSIVE
+  sourceKind: [PEER_REVIEWED_PUBLICATION, PREPRINT, CORRECTION_NOTICE, RETRACTION_NOTICE, EXPRESSION_OF_CONCERN, REGULATORY_RECORD, REGULATORY_GUIDANCE, SECURITIES_FILING, PRESS_RELEASE, MARKETING_PAGE, MANUFACTURER_LABEL_PAGE, ORGANIZATION_WEBPAGE, SELF_DISCLOSURE_PAGE, THIRD_PARTY_PROFILE_PAGE, THIRD_PARTY_DIRECTORY, CERTIFICATION_LISTING, AUDIT_REPORT, MARKETPLACE_LISTING, TERMINOLOGY_RECORD, STANDARDS_DOCUMENT, PODCAST_TRANSCRIPT_PAGE, VIDEO_RENDITION, AUDIO_FEED_ITEM, PODCAST_DIRECTORY_RECORD, NEWSLETTER, MODEL_SERVICE, LEGAL_RECORD]
+  selectorKind: [TEXT_QUOTE, TEXT_POSITION, MEDIA_TIME, PDF_PAGE, IMAGE_REGION]
+  contentHashBasis: [RAW_BYTES, NORMALIZED_TEXT, STORED_EXCERPT_TEXT]
+  captureCompleteness: [COMPLETE, PARTIAL_EXCERPT, UNKNOWN]
+  normalizationVersions:
+    NFC-WS1: "Unicode NFC, every run of whitespace replaced by one U+0020, leading and trailing whitespace removed; sha256 over UTF-8; written 'sha256:<hex>'"
+  qualificationKind: [INDIVIDUAL_VARIATION, POPULATION_SCOPE, SPECIES_OR_MODEL, QUANTITY_BASIS, UNCERTAINTY_INTERVAL, NEEDS_CONFIRMATION, HEDGE, TIME_SCOPE, CONDITIONAL_USE, CONSULT_PROFESSIONAL]
+  retellingMode: [VERBATIM_QUOTE, PARAPHRASE, SUMMARY, TRANSLATION]
+  retellingLinkBasis: [EXPLICIT_CITATION, BELLLABS_MATCH]
+  relevanceLevel: [DIRECT, INDIRECT, NOT_RELEVANT, UNKNOWN]
+  relevanceBasis: [SAME_PRODUCT, SAME_ORGANIZATION, COMPETING_PRODUCT, SAME_SUBSTANCE, SAME_SUBSTANCE_CLASS_VIA_GROUP, SPONSOR_OF_CONTAINER, NO_PATH_FOUND]
+  disclosureFinding: [DISCLOSED_IN_CONTAINER, DISCLOSED_ELSEWHERE, NOT_FOUND_IN_PARTIAL_CAPTURE, NOT_DISCLOSED, UNKNOWN]
+  temporalOverlap: [OVERLAPS, DISJOINT, UNKNOWN]
+  activityKind: [CAPTURE, TRANSCRIPTION, TEXT_EXTRACTION, SEGMENTATION, EXTRACTION, RESOLUTION, REANCHORING, ADJUDICATION, ANSWER_COMPOSITION]
+  agentKind: [MANUAL_AGENT, AUTOMATED_AGENT, TEXT_MINING_AGENT, DATA_ANALYSIS_PIPELINE, COMPUTATIONAL_MODEL, MANUAL_VALIDATION_OF_AUTOMATED_AGENT]
+  useKind: [QUOTE_IN_ANSWER, SUMMARIZE_IN_ANSWER, USE_AS_RECOMMENDATION_EVIDENCE, SHARE_EXTERNALLY]
+  equivalenceKind: [SAME_WORK_DIFFERENT_NAME, OVERLAPPING_SCOPE, RELATED_NOT_EQUIVALENT, NOT_EQUIVALENT]
+  applicabilityVerdict: [MATCH, PARTIAL, MISMATCH, UNKNOWN, NOT_ASSESSED, NOT_APPLICABLE, NOT_SCORED]
+  applicabilityDimension: [MATERIAL_IDENTITY, ACTIVE_COMPOSITION, DOSE, DOSAGE_FORM, ROUTE, SCHEDULE, DURATION, POPULATION, COMPARATOR, OUTCOME_RELEVANCE, STUDY_DESIGN_AND_QUALITY, EXPOSURE, BACKGROUND_CONTEXT, RECENCY_AND_CORRECTIONS]
+  dimensionClass: [CATEGORICAL, CONTINUOUS, EXPLANATION_ONLY]
+  materialIdentityLevel: [SAME_LOT, SAME_FORMULATION_VERSION, SAME_VARIANT_FORMULATION_UNRESOLVED, SAME_BRANDED_MATERIAL_SAME_SPEC, SAME_BRANDED_MATERIAL_SPEC_UNRESOLVED, SAME_SUBSTANCE_SAME_FORM_DIFFERENT_MATERIAL, SAME_SUBSTANCE_MATERIAL_UNRESOLVED, SAME_SUBSTANCE_DIFFERENT_FORM, RELATED_SUBSTANCE, DIFFERENT]
+  quantityBasis: [PER_DAY, PER_DOSE, PER_SERVING, PER_KG_BODY_WEIGHT_PER_DAY, SINGLE_DOSE]
+  massBasis: [SALT_FORM, ACTIVE_MOIETY, MATERIAL_AS_IS, UNSPECIFIED]
+  amountReferent: [NUTRIENT_AS_NUTRIENT, LISTED_INGREDIENT_AS_LISTED, PROPRIETARY_BLEND_TOTAL, EXTRACT_TOTAL, MARKER_CONSTITUENT, NOT_STATED]
+  measureKind: [BIOMARKER, PERFORMANCE_OUTCOME, PATIENT_REPORTED_OUTCOME, CLINICIAN_REPORTED_OUTCOME, OBSERVER_REPORTED_OUTCOME, CLINICAL_EVENT]
+  endpointClass: [BIOMARKER_NOT_SURROGATE, SURROGATE_ENDPOINT, INTERMEDIATE_CLINICAL_ENDPOINT, CLINICAL_OUTCOME]
+  biomarkerCategory: [SUSCEPTIBILITY_RISK, DIAGNOSTIC, MONITORING, PROGNOSTIC, PREDICTIVE, PHARMACODYNAMIC_RESPONSE, SAFETY]
+  surrogateValidationLevel: [VALIDATED, REASONABLY_LIKELY, CANDIDATE, NOT_ESTABLISHED]
+  outcomePriority: [PRIMARY, SECONDARY, OTHER_PRESPECIFIED, POST_HOC, SAFETY]
+  analysisKind: [PRIMARY_PRESPECIFIED, SECONDARY_PRESPECIFIED, SUBGROUP_PRESPECIFIED, SUBGROUP_POST_HOC, EXPLORATORY, SAFETY]
+  comparisonKind: [BETWEEN_ARM, WITHIN_ARM_CHANGE, ARM_DESCRIPTIVE]
+  statisticalConclusion: [SIGNIFICANT_FAVORABLE, SIGNIFICANT_UNFAVORABLE, NOT_SIGNIFICANT, NOT_TESTED, NOT_REPORTED]
+  resultInterpretation: [EFFECT_DETECTED, INCONCLUSIVE, EVIDENCE_OF_NO_MEANINGFUL_EFFECT]
+  synthesisInputRole: [CONFIRMATORY, SUPPORTIVE, HYPOTHESIS_GENERATING, CONTRADICTING, SAFETY, INDEPENDENT_REPLICATION]
+  evidenceChangeEffect: [STRENGTHENED, WEAKENED, REVERSED, NO_CHANGE]
+  aeCollectionMethod: [SYSTEMATIC, SPONTANEOUS, NOT_DESCRIBED]
+  datasetAnalysisRole: [PRIMARY_REPORT, SECONDARY_ANALYSIS, POOLED_ANALYSIS, REANALYSIS]
+  publicationKind: [ARTICLE, AUTHOR_CORRECTION, ERRATUM, RETRACTION_NOTICE, EXPRESSION_OF_CONCERN, PREPRINT, CONFERENCE_ABSTRACT]
+  registryDateType: [ACTUAL, ANTICIPATED]
+  enrollmentCountType: [ACTUAL, ESTIMATED]
+  mechanismSetting: [IN_VITRO_CELL_FREE, IN_VITRO_CELL, EX_VIVO, IN_VIVO_NONMAMMAL, IN_VIVO_MAMMAL, HUMAN_INTERVENTIONAL, HUMAN_OBSERVATIONAL, IN_SILICO]
+  exposureBasis: [PER_KG_BODY_WEIGHT_PER_DAY, ABSOLUTE_PER_DAY, SINGLE_DOSE, MEDIUM_CONCENTRATION, DIET_CONCENTRATION]
+  resultKind: [MEASURED, CALCULATED, INFERRED]
+  algorithmOutputKind: [AGE_ESTIMATE, PACE, RISK_SCORE, FEATURE_MEASURE, CLASSIFICATION, CALCULATED_QUANTITY]
+  algorithmVersionBasis: [VENDOR_VERSION_STRING, PUBLICATION_VERSION, SERVICE_ENDPOINT_UNVERSIONED, UNKNOWN]
+  referenceIntervalKind: [REFERENCE_INTERVAL, DECISION_LIMIT, GUIDELINE_TARGET]
+  referenceIntervalDerivation: [ESTABLISHED, TRANSFERRED, VERIFIED, ADOPTED_FROM_MANUFACTURER, NOT_REPORTED]
+  comparabilityVerdict: [COMPARABLE, COMPARABLE_WITH_CONVERSION, NOT_COMPARABLE, UNKNOWN]
+  reportedStatus: [REPORTED, NOT_REPORTED, NOT_APPLICABLE]
+  regulatoryStatusKind: [APPROVAL, CLEARANCE, DE_NOVO_AUTHORIZATION, DESIGNATION, ESTABLISHMENT_REGISTRATION, NOTIFICATION_ON_FILE, ENFORCEMENT_DISCRETION, WITHDRAWN, REVOKED]
+  regulatoryResponseKind:
+    NDI_NOTIFICATION: [NDI_ACKNOWLEDGED_WITHOUT_OBJECTION, NDI_INCOMPLETE, NDI_OBJECTION, NDI_OTHER_REGULATORY_ISSUE]
+    GRAS_NOTICE: [GRAS_NO_QUESTIONS, GRAS_NO_BASIS, GRAS_CEASED_AT_NOTIFIER_REQUEST]
+    PREMARKET_NOTIFICATION_510K: [SUBSTANTIALLY_EQUIVALENT, NOT_SUBSTANTIALLY_EQUIVALENT]
+    DE_NOVO: [DE_NOVO_GRANTED, DE_NOVO_DECLINED]
+    PMA: [PMA_APPROVED, PMA_DENIED, PMA_APPROVABLE, PMA_NOT_APPROVABLE]
+    NDA_BLA: [APPROVED, COMPLETE_RESPONSE]
+    ORPHAN_DESIGNATION: [ORPHAN_DESIGNATION_GRANTED, ORPHAN_DESIGNATION_DENIED, ORPHAN_DESIGNATION_REVOKED]
+    ESTABLISHMENT_REGISTRATION: [REGISTRATION_ACTIVE, REGISTRATION_CANCELLED]
+  capabilityStage: [OPERATING, PILOTING, PLANNED, SUSPENDED, DISCONTINUED]
+  capacityBasis: [NAMEPLATE, UTILIZED, NOT_REPORTED]
+  priceKind: [LIST, ONE_TIME, SUBSCRIPTION, COUPON_ADJUSTED, PER_UNIT]
 
 baseArchetypes:
   Entity:
     required: [uid, entityType, createdAt]
+    optional: [privacyClass, schemaVersion, maturity]
   VersionedState:
-    required: [uid, stateType, createdAt]
-    optional: [effectiveFrom, effectiveTo]
+    required: [uid, stateType, createdAt, payloadHash]      # round 0007: replay compares state identity by hash
+    optional: [effectiveFrom, effectiveTo, privacyClass]    # effective bounds are source-stated payload; query validity comes from the attachment episode
   Occurrence:
     required: [uid, occurrenceType, createdAt]
-    optional: [startedAt, endedAt]
+    optional: [startedAt, endedAt, privacyClass]
   InformationArtifact:
     required: [uid, artifactType, createdAt]
-    optional: [publishedAt, observedAt, contentHash]
+    optional: [publishedAt, observedAt, contentHash, privacyClass]
   Assertion:
-    required: [uid, predicate, status, recordedAt]
-    optional: [valueString, valueNumber, valueBoolean, unitCode, validFrom, validTo, jurisdiction, confidence, extractionMethod, agentRunUid]
+    # Kernel changes accepted in 0.2.0: polarity (K-4), basisKind (KCR-3a, KCR-L3-001), recordedTo and contentHash
+    # (KCR-0007-1), per-bound precision and basis (round 0007), assertionBasis and speechAct (KCR-4.2),
+    # derivationRule for CALCULATED assertions. `confidence` is deprecated for new writes (INV-407).
+    required: [uid, predicate, status, recordedAt, contentHash, validFromBasis, validToBasis]
+    optional: [valueString, valueNumber, valueBoolean, unitCode, validFrom, validTo, validFromPrecision, validToPrecision, recordedTo, polarity, basisKind, predicateClass, assertionBasis, speechAct, reportedSpeechAct, quantityBasis, derivationRule, jurisdiction, extractionMethod, extractionConfidence, agentRunUid, roleTitleVerbatim, statedTense]
+    deprecated:
+      confidence: "replaced by extractionConfidence, which requires WAS_GENERATED_BY an Activity with methodVersion; existing 0.1.0 values are read as extractionConfidence with unknown method"
+      agentRunUid: "retained for 0.1.0 compatibility; new writes link WAS_GENERATED_BY an Activity"
+    statusSemantics: current_projection_of_capture_fidelity_adjudications_and_supersession
+    rules:
+      - valid time, literal value, subject and object are immutable after commit; a change in belief is a new Assertion linked by SUPERSEDES
+      - recordedTo is written once, from null, when the assertion is superseded or withdrawn
+      - exactly one subject; exactly one object or one typed literal
+      - at most one asserter (ASSERTED_BY); corroboration is several Assertions INSTANCE_OF one Claim (round 0006 KCR-4.3)
+      - basisKind is required when predicateClass is MECHANISM; CALCULATED requires derivationRule and at least one DERIVED_FROM_ASSERTION
   EvidenceAssessment:
-    required: [uid, assessmentType, methodVersion, status, createdAt]
-    optional: [summary, overallScore, confidence]
+    required: [uid, assessmentType, methodVersion, status, createdAt, recordedAt]   # round 0007 KCR-0007-2 and round 0002 KCR-2a
+    optional: [summary, overallScore, confidence, privacyClass]
+    rules:
+      - assessments are immutable; a re-assessment is a new node linked by SUPERSEDES
+      - a composite score requires methodVersion and all required dimensions; missing dimensions are never averaged away
 
 modules:
   provenance:
     maturity: accepted
+    privacyClass: public
     nodes:
       Source:
         archetype: Entity
-        description: Stable identity of a publisher, registry, database, website, or supplied document source.
+        description: Stable identity of a retrieval endpoint (one canonicalUri) for a publisher page, registry record, database record, document, or media rendition. Live Document is carried as a Source (round 0006).
         properties: [canonicalUri, title, sourceKind, publisherUid]
       SourceSnapshot:
         archetype: InformationArtifact
-        description: Captured content from a Source at a known observation time and content version.
-        properties: [canonicalUri, retrievedAt, contentHash, mimeType, language]
+        description: Captured content from a Source at a known retrieval time, with a hash whose basis is named. Immutable; a change at the source is a new snapshot and a SourceRevisionEvent.
+        properties: [canonicalUri, publishedAt, publishedAtPrecision, observedAt, retrievedAt, contentHash, contentHashBasis, captureCompleteness, storageUri, archiveUri, publisherRevisionNotice, mimeType, language]
+        requiredWhenCited: [contentHash, contentHashBasis, retrievedAt]   # round 0009 and 0006: reproducibility of an ACCEPTED assertion's support
+        timeFields: {retrievedAt: when BellLabs fetched the bytes, observedAt: the instant the content is known to have been displayed (archive capture date for late sources), publishedAt: issue time stated by the source}
       SourceLocator:
         archetype: InformationArtifact
-        description: Stable locator for the exact page, section, table, figure, label panel, or excerpt supporting an assertion.
-        properties: [uri, selector, page, section, quoteHash]
+        description: Stable locator for the exact span, time range, page, or region supporting an assertion, bound to one SourceSnapshot. Round 0006 (KCR-4.1) replaces the untyped selector with typed selector fields; closes OPEN-QUESTIONS P0-5.
+        properties: [uri, selectorKind, exact, prefix, suffix, quoteHash, normalizationVersion, startOffset, endOffset, mediaStartSeconds, mediaEndSeconds, mediaTimeBasis, page, section, mediaAnnotationUid, speakerLabelInSource]
+        requiredBySelectorKind:
+          TEXT_QUOTE: [exact, quoteHash, normalizationVersion]
+          TEXT_POSITION: [exact, quoteHash, normalizationVersion, startOffset, endOffset, LOCATOR_IN_TEXT_VERSION]
+          MEDIA_TIME: [exact, quoteHash, normalizationVersion, mediaStartSeconds, mediaEndSeconds]
+          PDF_PAGE: [page, exact, quoteHash, normalizationVersion]
+          IMAGE_REGION: [mediaAnnotationUid, normalizationVersion]
+        deprecated: {selector: "untyped; split into the fields above"}
+      DocumentTextVersion:
+        archetype: InformationArtifact
+        description: Live type kept. A text rendition derived from exactly one SourceSnapshot by a named Activity (publisher text, PDF extraction, transcription). Character offsets are defined only relative to a text version.
+        properties: [textVersionHash, source, versionLabel, normalizationVersion]
+      SourceRevisionEvent:
+        archetype: Occurrence
+        description: A correction, retraction, expression of concern, new version, silent change, withdrawal, or reinstatement of a Source, as issued by its publisher and as learned by BellLabs (round 0007 KCR-0007-3; closes OPEN-QUESTIONS P0-4).
+        properties: [revisionKind, occurredAt, occurredAtPrecision, recordedAt]
       Adjudication:
         archetype: EvidenceAssessment
-        description: Human Upgrade evaluation of one or more assertions.
-        properties: [verdict, rationale, reviewerType, reviewedAt]
+        description: Immutable BellLabs evaluation of one or more assertions. adjudicationKind CAPTURE_FIDELITY judges whether the record is an accurate capture (feeds Assertion.status); SUPPORT judges whether evidence supports the proposition (verdict). A re-review is a new Adjudication linked by SUPERSEDES.
+        properties: [adjudicationKind, verdict, rationale, reviewerType, reviewedAt, recordedAt]
       ResolutionHypothesis:
         archetype: EvidenceAssessment
-        description: Scored candidate identity or equivalence resolution that may compete with alternatives.
+        description: Scored candidate identity, equivalence, or retelling-source resolution that may compete with alternatives.
         properties: [resolutionType, score, rationale, resolutionStatus]
+      Agent:
+        archetype: Entity
+        description: A software or human agent identity (model, prompt, tool version). Runs are Activities, not Agent properties (round 0006 KCR-4.4).
+        properties: [name, agentKind, model, promptVersion, toolVersion]
+      Activity:
+        archetype: Occurrence
+        description: A bounded process that used and generated records (capture, transcription, segmentation, extraction, resolution, re-anchoring, adjudication, answer composition). Maps to prov:Activity. Live mongoResearchRunId maps to externalRunSystem and externalRunId.
+        properties: [activityKind, startedAt, endedAt, methodVersion, externalRunSystem, externalRunId]
     relationships:
       HAS_SNAPSHOT: {from: Source, to: SourceSnapshot, class: structural}
-      HAS_LOCATOR: {from: SourceSnapshot, to: SourceLocator, class: structural}
+      HAS_LOCATOR: {from: SourceSnapshot, to: SourceLocator, class: structural, cardinality: exactly_one_snapshot_per_locator}
+      HAS_TEXT_VERSION: {from: Source, to: DocumentTextVersion, class: structural}
+      TEXT_OF_SNAPSHOT: {from: DocumentTextVersion, to: SourceSnapshot, class: structural, cardinality: exactly_one}
+      LOCATOR_IN_TEXT_VERSION: {from: SourceLocator, to: DocumentTextVersion, class: structural, cardinality: zero_or_one}
+      REANCHORS: {from: SourceLocator, to: SourceLocator, class: structural, requiredProperties: [anchorMatch], note: newer snapshot locator to older snapshot locator of the same Source}
+      RENDITION_OF: {from: Source, to: "Episode|Publication", class: structural}
       HAS_SUBJECT: {from: Assertion, to: "Entity|VersionedState|Occurrence|InformationArtifact", class: structural, cardinality: exactly_one}
       HAS_OBJECT: {from: Assertion, to: "Entity|VersionedState|Occurrence|InformationArtifact", class: structural, cardinality: zero_or_one}
       SUPPORTED_BY: {from: "Assertion|Adjudication|EvidenceAssessment", to: SourceLocator, class: asserted}
       CONTRADICTED_BY: {from: "Assertion|Adjudication", to: SourceLocator, class: asserted}
-      ASSERTED_BY: {from: Assertion, to: "Person|Organization|Agent", class: structural}
+      ASSERTED_BY: {from: Assertion, to: "Person|Organization|Agent|PseudonymousActor|AnonymousActor", class: structural, cardinality: at_most_one, note: exactly_one for ClaimOccurrence}
       EVALUATES: {from: Adjudication, to: Assertion, class: structural}
-      PROPOSES_MATCH: {from: ResolutionHypothesis, to: "Entity|VersionedState|InformationArtifact", class: structural}
+      CONSIDERS_ASSESSMENT: {from: Adjudication, to: EvidenceAssessment, class: structural}
+      SUPERSEDES: {from: "Assertion|Adjudication|EvidenceAssessment", to: "Assertion|Adjudication|EvidenceAssessment", class: structural, sameLabelRequired: true, properties: [supersessionKind, recordedAt, sourceRevisionEventUid], rule: newer.recordedAt >= older.recordedAt; a SUPERSEDED status requires an incoming SUPERSEDES}
+      DERIVED_FROM_ASSERTION: {from: Assertion, to: Assertion, class: structural, note: inputs of a CALCULATED assertion (round 0005 KCR-L3-001)}
+      REVISES_SOURCE: {from: SourceRevisionEvent, to: Source, class: structural, cardinality: exactly_one}
+      PRIOR_SNAPSHOT: {from: SourceRevisionEvent, to: SourceSnapshot, class: structural, cardinality: zero_or_one}
+      RESULTING_SNAPSHOT: {from: SourceRevisionEvent, to: SourceSnapshot, class: structural, cardinality: zero_or_one}
+      ANNOUNCED_IN: {from: SourceRevisionEvent, to: SourceSnapshot, class: structural, cardinality: zero_or_one}
+      PROPOSES_MATCH: {from: ResolutionHypothesis, to: "Entity|VersionedState|InformationArtifact|Assertion", class: structural}
       COMPETES_WITH: {from: ResolutionHypothesis, to: ResolutionHypothesis, class: structural}
+      WAS_GENERATED_BY: {from: "Assertion|SourceSnapshot|DocumentTextVersion|SourceLocator|EvidenceAssessment", to: Activity, class: structural}
+      USED: {from: Activity, to: "SourceSnapshot|SourceLocator|Assertion|DocumentTextVersion", class: structural}
+      WAS_ASSOCIATED_WITH: {from: Activity, to: "Agent|Person", class: structural}
+      ACTED_ON_BEHALF_OF: {from: Agent, to: Organization, class: structural}
+      AUTHORIZED_BY: {from: Activity, to: PolicyVersion, class: structural, requiredProperties: [useKind]}
+      ASSESSED_BY: {from: EvidenceAssessment, to: "Agent|Person", class: structural}
+    assertedPredicates:
+      - CORRECTS_SOURCE          # notice Source -> corrected Source or Publication
+      - RETRACTS_SOURCE
+      - EXPRESSES_CONCERN_ABOUT
+      - REINSTATES_SOURCE
+    provenanceStates:   # round 0006 (CQ-PV-01), PROV-O alignment
+      someone_said_it: Assertion + ASSERTED_BY
+      a_source_supports_it: SUPPORTED_BY -> SourceLocator in a SourceSnapshot
+      evidence_warrants_a_broader_conclusion: EvidenceAssessment or Adjudication (SUPPORT)
+      an_agent_used_the_source: Activity with USED, WAS_GENERATED_BY, WAS_ASSOCIATED_WITH
+      a_policy_allows_a_downstream_use: AUTHORIZED_BY {useKind} -> PolicyVersion
+    forbiddenImplications:
+      - [ASSERTION_STATUS_ACCEPTED, PROPOSITION_TRUE]
+      - [CORRECTS_SOURCE, FACT_CEASED]
+      - [NOT_FOUND_IN_PARTIAL_CAPTURE, NOT_DISCLOSED]
+
+  temporal:
+    maturity: provisional
+    privacyClass: public
+    description: Executable time model (round 0007). Owns the bitemporal_attachment and asserted_edge profiles, timePrecision, validTimeBasis, supersessionKind, predicateExclusivity declarations, and the as-of query contract (../ontology-lab/query-shapes.md QS-2).
+    relationships:
+      HAS_STATE: {from: Entity, to: VersionedState, class: asserted, temporalProfile: bitemporal_attachment, temporalCardinality: NONEXCLUSIVE, note: generic attachment when no domain type exists}
+    rules:
+      - {id: TM-R1, rule: Valid time on an Assertion or attachment episode is never edited; a change in belief is a new recorded-time episode.}
+      - {id: TM-R2, rule: A correction supersedes with SOURCE_CORRECTION and leaves the corrected state without a current attachment for the corrected interval.}
+      - {id: TM-R3, rule: A fact ending supersedes with VALIDITY_BOUNDED; the old state stays attached for its bounded interval in current recorded time.}
+      - {id: TM-R4, rule: Recorded time is service-assigned and never earlier than the supporting snapshot's retrievedAt.}
+      - {id: TM-R5, rule: Mutually exclusive attachments may not definitely overlap in both valid and recorded time; possible overlaps (unknown or imprecise bounds) are queued for review.}
+      - {id: TM-R6, rule: A late-arriving historical fact keeps its past validFrom; recordedFrom is the commit time; the archive capture time goes in SourceSnapshot.observedAt.}
+
+  identity_resolution:
+    maturity: provisional
+    privacyClass: public
+    nodes:
+      Identifier:
+        archetype: Entity
+        description: An external identifier with its scheme and issuer (NCT, PMID, DOI, UNII, CAS, LOINC, GTIN, patent and FDA submission numbers). Names never establish identity; identifiers do so only within a scheme and a validity interval.
+        properties: [scheme, value, issuer, jurisdiction, validFrom, validTo, normalizationRule]
+        uniqueness: [scheme, issuer, value]
+      TradeItemIdentifier: {archetype: Entity, parentLabel: Identifier, properties: [scheme, value, issuer, jurisdiction]}
+      Mention: {archetype: InformationArtifact, properties: [surfaceForm, mentionKind], note: extracted before any entity is created; linked to a locator}
+      EquivalenceAssessment:
+        archetype: EvidenceAssessment
+        description: Assessment that two distinct identities are the same work under different names, overlap, or are related. It never merges them (round 0006, CQ-EC-02).
+        properties: [equivalenceKind, methodVersion, status, rationale]
+    relationships:
+      HAS_IDENTIFIER: {from: "Entity|VersionedState|InformationArtifact", to: Identifier, class: asserted}
+      MENTIONS: {from: SourceLocator, to: Mention, class: structural}
+      RESOLVES_MENTION: {from: ResolutionHypothesis, to: Mention, class: structural}
+      COMPARES_IDENTITIES: {from: EquivalenceAssessment, to: "Entity|VersionedState", class: structural, cardinality: exactly_two_distinct}
+    rules:
+      - a merged uid keeps a redirect record so private snapshots that hold the old uid keep resolving (open: redirect contract, OPEN-QUESTIONS)
+    forbiddenImplications:
+      - [SIMILAR_NAME, SAME_IDENTITY]
+      - [SHARED_IDENTIFIER_SCHEME_VALUE_ACROSS_ISSUERS, SAME_IDENTITY]
 
   organizations:
     maturity: provisional
+    privacyClass: public
     nodes:
       Organization: {archetype: Entity, properties: [name, organizationKind, jurisdiction]}
       LegalEntity: {archetype: Entity, parentLabel: Organization, properties: [legalName, registrationId, jurisdiction]}
       ConsumerBrand: {archetype: Entity, properties: [name]}
       Facility: {archetype: Entity, properties: [name, facilityKind, address]}
       Person: {archetype: Entity, properties: [name, orcid]}
-      Agent: {archetype: Entity, properties: [name, model, promptVersion, runUid]}
+      PseudonymousActor: {archetype: Entity, properties: [handle], note: a speaker identity known only by a handle; a link to a Person is a ResolutionHypothesis}
+      AnonymousActor: {archetype: Entity, properties: [anonymityClass]}
     assertedPredicates:
       - PARENT_OF
       - SUBSIDIARY_OF
@@ -101,62 +413,100 @@ modules:
       - FUNDS_STUDY
       - SERVES_AS_CRO_FOR
       - HOSTS_STUDY_SITE
+      - PROVIDES_INVESTIGATIONAL_PRODUCT   # round 0002: Organization -> StudyIntervention
       - AFFILIATED_WITH
       - EMPLOYED_BY
       - ADVISES_ORGANIZATION
-      - ENDORSES_PRODUCT
+      - ENDORSES_PRODUCT                   # only from an explicit endorsement assertion
       - OPERATES_LABORATORY
       - OPERATES_CERTIFICATION_PROGRAM
-      - SELLS_PRODUCT
+      - SELLS_PRODUCT                      # derived only in 0.2.0; see commerce
       - LISTS_OFFER
       - FULFILLS_OFFER
-      - RECOMMENDS_PRODUCT
+      - HOSTS_LISTING
+      - SELLER_OF_RECORD_FOR
+      - RECOMMENDS_PRODUCT                 # a source's recommendation; never a BellLabs recommendation
       - AFFILIATE_FOR_OFFER
+      - SPONSORS_CONTENT                   # round 0006: Organization|ConsumerBrand -> Episode|Series|Channel|Document|Conference
+      - INVESTED_IN
+      - HOLDS_EQUITY_IN
+      - BOARD_MEMBER_OF
+      - FOUNDED_ORGANIZATION
+      - HAS_IP_INTEREST_IN
+      - RECEIVES_COMPENSATION_FROM         # qualifier compensationKind [PAYMENT, FREE_PRODUCT, COMMISSION, OTHER]
+      - DEVELOPS_PRODUCT_CLASS             # literal valueString, source-stated focus such as "NAD boosters"
+      - CLAIMS_CGMP_COMPLIANCE             # round 0005: a claim; not certification, not inspection
+      - CHARACTERIZES_REGULATORY_RESPONSE  # round 0005: company restatement of an agency response
+      - CHARACTERIZES_REGULATORY_STATUS
+    predicateFamilies:
+      FINANCIAL_INTEREST:
+        members: [SPONSORS_CONTENT, AFFILIATE_FOR_OFFER, INVESTED_IN, HOLDS_EQUITY_IN, BOARD_MEMBER_OF, ADVISES_ORGANIZATION, EMPLOYED_BY, FOUNDED_ORGANIZATION, HAS_IP_INTEREST_IN, RECEIVES_COMPENSATION_FROM]
+        rule: every member is an asserted, time-bounded relationship under the asserted_edge profile; membership never changes a truth verdict (round 0006; FTC 16 CFR 255)
     forbiddenImplications:
       - [ADVISES_ORGANIZATION, ENDORSES_PRODUCT]
       - [DISTRIBUTES_PRODUCT, MANUFACTURES_PRODUCT]
       - [SPONSORS_STUDY, EXECUTES_STUDY]
       - [LICENSES_PATENT, OWNS_STUDY]
       - [LISTS_OFFER, SELLS_PRODUCT]
+      - [SPONSORS_CONTENT, ENDORSES_PRODUCT]
+      - [HAS_FINANCIAL_INTEREST, ENDORSES_PRODUCT]
+      - [INVESTED_IN, HOLDS_EQUITY_IN]
+      - [GROUP_LEVEL_ROLE, MEMBER_COMPANY_ROLE]
+      - [AUTHOR_AFFILIATED_WITH, FUNDS_STUDY]
+      - [PROVIDES_INVESTIGATIONAL_PRODUCT, SUPPLIES_INGREDIENT_MATERIAL]
+      - [SUPPLIES_INGREDIENT_MATERIAL, MANUFACTURES_PRODUCT]
+      - [RECOMMENDS_PRODUCT, BELLLABS_RECOMMENDS]
 
   products_and_commerce:
     maturity: provisional
+    privacyClass: public
     nodes:
       Product: {archetype: Entity, properties: [name, productKind]}
       ProductVariant: {archetype: Entity, properties: [name, strengthDescriptor, dosageForm, flavor, jurisdiction]}
       PackageConfiguration: {archetype: VersionedState, properties: [packageForm, unitCount, netQuantity, netQuantityUnit]}
-      TradeItemIdentifier: {archetype: Entity, properties: [scheme, value, issuer, jurisdiction]}
-      MerchantListing: {archetype: Entity, properties: [merchantListingId, title, canonicalUrl]}
-      Offer: {archetype: VersionedState, properties: [offerKind, currency, availability, terms, observedAt]}
-      PriceObservation: {archetype: Occurrence, properties: [amount, currency, observedAt]}
+      MerchantListing: {archetype: Entity, properties: [merchantListingId, title, canonicalUrl], note: a marketplace detail page that merges sellers is one listing with several Offers; a listing is never product identity}
+      Offer: {archetype: VersionedState, properties: [offerKind, currency, availability, termsText, observedAt]}
+      PriceObservation: {archetype: Occurrence, properties: [amount, currency, observedAt, priceKind, availabilityObserved]}
       SubscriptionPlan: {archetype: VersionedState, properties: [sellingPlanId, interval, intervalCount, terms]}
       Bundle: {archetype: Entity, properties: [name, bundleKind]}
       BundleComponent: {archetype: VersionedState, properties: [quantity, componentRole]}
       InventoryItem: {archetype: Entity, properties: [merchantInventoryId]}
       IndividualUnit: {archetype: Entity, properties: [serialNumber]}
+      AffiliateLink: {archetype: InformationArtifact, properties: [url, trackingParameter, observedAt]}
       CommerceMatch: {archetype: EvidenceAssessment, properties: [matchKind, score, rationale]}
     relationships:
       HAS_VARIANT: {from: Product, to: ProductVariant, class: asserted}
-      HAS_PACKAGE_CONFIGURATION: {from: ProductVariant, to: PackageConfiguration, class: asserted}
+      HAS_PACKAGE_CONFIGURATION: {from: ProductVariant, to: PackageConfiguration, class: asserted, temporalProfile: asserted_edge}
       IDENTIFIED_BY: {from: "ProductVariant|PackageConfiguration|MerchantListing", to: TradeItemIdentifier, class: asserted}
-      LISTING_FOR: {from: MerchantListing, to: "ProductVariant|PackageConfiguration", class: asserted}
+      LISTING_FOR: {from: MerchantListing, to: "ProductVariant|PackageConfiguration", class: asserted, note: replaces live LISTS_PRODUCT whose two sides declare different property types}
       HAS_OFFER: {from: MerchantListing, to: Offer, class: structural}
       HAS_PRICE_OBSERVATION: {from: Offer, to: PriceObservation, class: structural}
       USES_SUBSCRIPTION_PLAN: {from: Offer, to: SubscriptionPlan, class: asserted}
+      HOSTS_LISTING: {from: Organization, to: MerchantListing, class: asserted}
+      LISTS_OFFER: {from: Organization, to: Offer, class: asserted}
+      SELLER_OF_RECORD_FOR: {from: Organization, to: Offer, class: asserted, temporalProfile: asserted_edge}
+      FULFILLS_OFFER: {from: Organization, to: Offer, class: asserted, temporalProfile: asserted_edge}
+      AFFILIATE_FOR_OFFER: {from: "Person|Organization", to: Offer, class: asserted}
+      LINKS_TO: {from: AffiliateLink, to: "MerchantListing|Offer", class: structural}
       HAS_BUNDLE_COMPONENT: {from: Bundle, to: BundleComponent, class: structural}
       COMPONENT_PRODUCT: {from: BundleComponent, to: "Product|ProductVariant", class: asserted}
       INVENTORY_INSTANCE_OF: {from: InventoryItem, to: "ProductVariant|PackageConfiguration", class: asserted}
       UNIT_FROM_LOT: {from: IndividualUnit, to: ProductLot, class: asserted}
       MATCHES_COMMERCE_ITEM: {from: CommerceMatch, to: "ProductVariant|MerchantListing|InventoryItem", class: structural}
+      SELLS_PRODUCT: {from: Organization, to: "Product|ProductVariant", class: derived, mustBeRegenerable: true, note: projection of SELLER_OF_RECORD_FOR assertions only (round 0005)}
+    forbiddenImplications:
+      - [HOSTS_LISTING, SELLS_PRODUCT]
+      - [FULFILLS_OFFER, SELLS_PRODUCT]
+      - [AFFILIATE_FOR_OFFER, SELLS_PRODUCT]
+      - [LISTING_TITLE_AMOUNT, LABEL_DECLARED_AMOUNT]
 
-  formulation_and_ingredients:
+  substances_and_materials:
     maturity: provisional
+    privacyClass: public
     nodes:
-      FormulationVersion: {archetype: VersionedState, properties: [versionName, jurisdiction, effectiveFrom, effectiveTo]}
-      IngredientComponent: {archetype: VersionedState, properties: [role, labelOrder, quantity, unitCode, quantityBasis, declaredAs, isDietaryIngredient]}
       IngredientMaterial: {archetype: Entity, properties: [name, materialKind]}
       BrandedIngredientMaterial: {archetype: Entity, parentLabel: IngredientMaterial, properties: [brandName, specificationOwnerUid]}
-      ChemicalSubstance: {archetype: Entity, properties: [preferredName, molecularFormula, pubchemCid, inchikey]}
+      ChemicalSubstance: {archetype: Entity, properties: [preferredName, molecularFormula, pubchemCid, inchikey], note: live Compound merges into this label; the catalog name wins (round 0002 R11). Identifiers beyond the materialized keys are Identifier records.}
       ChemicalForm: {archetype: Entity, properties: [formKind, hydrationState, polymorph, grade]}
       BotanicalTaxon: {archetype: Entity, properties: [scientificName, taxonRank, taxonomyId]}
       BotanicalPreparation: {archetype: Entity, parentLabel: IngredientMaterial, properties: [plantPart, preparationType, extractRatio, solvent]}
@@ -166,36 +516,55 @@ modules:
       MaterialMixture: {archetype: Entity, parentLabel: IngredientMaterial, properties: [name, mixtureKind]}
       Constituent: {archetype: Entity, properties: [name, constituentKind]}
       Nutrient: {archetype: Entity, properties: [name, nutrientKind]}
-      ManufacturingSpecification: {archetype: Entity, properties: [name, specificationKind]}
-      SpecificationVersion: {archetype: VersionedState, properties: [versionName, effectiveFrom, effectiveTo]}
-      ManufacturingProcess: {archetype: Entity, properties: [name, processKind]}
-      Trademark: {archetype: Entity, properties: [markText, registrationNumber, jurisdiction, status]}
     relationships:
-      HAS_FORMULATION_VERSION: {from: ProductVariant, to: FormulationVersion, class: asserted}
-      HAS_INGREDIENT_COMPONENT: {from: FormulationVersion, to: IngredientComponent, class: structural}
-      NESTED_COMPONENT: {from: IngredientComponent, to: IngredientComponent, class: structural}
-      USES_MATERIAL: {from: IngredientComponent, to: IngredientMaterial, class: asserted}
       REALIZES_SUBSTANCE: {from: IngredientMaterial, to: ChemicalSubstance, class: asserted}
       HAS_CHEMICAL_FORM: {from: IngredientMaterial, to: ChemicalForm, class: asserted}
+      FORM_OF_SUBSTANCE: {from: ChemicalForm, to: ChemicalSubstance, class: asserted, cardinality: exactly_one}
+      HAS_ACTIVE_MOIETY: {from: ChemicalSubstance, to: ChemicalSubstance, class: asserted, note: enables the SALT_FORM to ACTIVE_MOIETY calculation as a CALCULATED assertion}
       DERIVED_FROM_TAXON: {from: BotanicalPreparation, to: BotanicalTaxon, class: asserted}
       HAS_STRAIN: {from: MicrobialPreparation, to: MicrobialStrain, class: asserted}
       STRAIN_OF: {from: MicrobialStrain, to: MicrobialTaxon, class: asserted}
       HAS_MIXTURE_COMPONENT: {from: MaterialMixture, to: IngredientMaterial, class: asserted}
       PROVIDES_CONSTITUENT: {from: IngredientMaterial, to: "Constituent|Nutrient", class: asserted, quantitative: false}
       QUANTITATIVELY_CONTAINS: {from: IngredientMaterial, to: "Constituent|Nutrient|ChemicalSubstance", class: asserted, requiredQualifiers: [quantity, unitCode, basis]}
+    forbiddenImplications:
+      - [PROVIDES_CONSTITUENT, QUANTITATIVELY_CONTAINS]
+
+  products_and_formulations:
+    maturity: provisional
+    privacyClass: public
+    nodes:
+      FormulationVersion: {archetype: VersionedState, properties: [versionName, jurisdiction, effectiveFrom, effectiveTo]}
+      IngredientComponent: {archetype: VersionedState, properties: [role, labelOrder, quantity, unitCode, quantityBasis, massBasis, amountReferent, declaredAs, isDietaryIngredient]}
+      ManufacturingSpecification: {archetype: Entity, properties: [name, specificationKind]}
+      SpecificationVersion: {archetype: VersionedState, properties: [versionName, effectiveFrom, effectiveTo]}
+      ManufacturingProcess: {archetype: Entity, properties: [name, processKind], note: merge target of live ManufacturingProcess (processKind <- live processClass)}
+      ManufacturingStep: {archetype: Entity, properties: [name, stepKind, environmentGrade]}
+      Trademark: {archetype: Entity, properties: [markText, registrationNumber, jurisdiction, status]}
+    relationships:
+      HAS_FORMULATION_VERSION: {from: ProductVariant, to: FormulationVersion, class: asserted, temporalProfile: asserted_edge}
+      HAS_INGREDIENT_COMPONENT: {from: FormulationVersion, to: IngredientComponent, class: structural}
+      NESTED_COMPONENT: {from: IngredientComponent, to: IngredientComponent, class: structural}
+      USES_MATERIAL: {from: IngredientComponent, to: IngredientMaterial, class: asserted}
       GOVERNED_BY_SPECIFICATION: {from: IngredientMaterial, to: SpecificationVersion, class: asserted}
       VERSION_OF_SPECIFICATION: {from: SpecificationVersion, to: ManufacturingSpecification, class: structural}
       PRODUCED_BY_PROCESS: {from: IngredientMaterial, to: ManufacturingProcess, class: asserted}
+      HAS_STEP: {from: ManufacturingProcess, to: ManufacturingStep, class: structural}
       MARKETED_UNDER_MARK: {from: BrandedIngredientMaterial, to: Trademark, class: asserted}
-      CONTAINS: {from: "Product|ProductVariant", to: IngredientMaterial, class: derived, mustBeRegenerable: true}
+      CONTAINS: {from: "Product|ProductVariant", to: IngredientMaterial, class: derived, mustBeRegenerable: true, requiredQualifiers: [derivationRule, derivedFromAssertionUids]}
+      CONTAINS_COMPOUND_FORM: {from: Product, to: ChemicalForm, class: derived, mustBeRegenerable: true, note: live edge with DoseMetadata reclassified as a projection of IngredientComponent facts (round 0002 R11)}
+    forbiddenImplications:
+      - [LISTED_INGREDIENT_AMOUNT, ACTIVE_MOIETY_AMOUNT]
+      - [MARKER_CONSTITUENT_AMOUNT, TOTAL_CONSTITUENT_AMOUNT]
 
   labels:
     maturity: provisional
+    privacyClass: public
     nodes:
       LabelSnapshot: {archetype: InformationArtifact, properties: [jurisdiction, language, observedAt, labelVersionText]}
       LabelDeclaration: {archetype: InformationArtifact, properties: [verbatimText, declarationKind, panelOrder]}
       ServingDefinition: {archetype: VersionedState, properties: [servingCount, unitDescription, servingsPerContainer]}
-      QuantityDeclaration: {archetype: InformationArtifact, properties: [value, unitCode, basis, dailyValuePercent]}
+      QuantityDeclaration: {archetype: InformationArtifact, properties: [value, unitCode, basis, dailyValuePercent, amountReferent, amountReferentUid], note: amountReferent closes OPEN-QUESTIONS P1 ingredient item 3 for US Supplement Facts labels (21 CFR 101.36)}
     relationships:
       LABEL_FOR: {from: LabelSnapshot, to: "ProductVariant|PackageConfiguration", class: asserted}
       DECLARES_FORMULATION: {from: LabelSnapshot, to: FormulationVersion, class: asserted}
@@ -206,38 +575,181 @@ modules:
 
   studies_and_evidence:
     maturity: provisional
+    privacyClass: public
     nodes:
-      Study: {archetype: Entity, properties: [title, studyKind, phase, status]}
+      Study: {archetype: Entity, properties: [title, studyKind], note: identity only; registry status, design, enrollment, results-posted, and identifiers move to RegistrationVersion and Identifier (round 0002 R10)}
       TrialRegistration: {archetype: Entity, properties: [registry, registrationId]}
-      RegistrationVersion: {archetype: InformationArtifact, properties: [versionDate, recruitmentStatus]}
-      ProtocolVersion: {archetype: InformationArtifact, properties: [versionName, versionDate]}
+      RegistrationVersion: {archetype: InformationArtifact, properties: [versionDate, observedAt, overallStatus, enrollmentCount, enrollmentCountType, resultsPosted, resultsFirstPostedAt, startDate, startDateType, primaryCompletionDate, primaryCompletionDateType, completionDate, completionDateType, studyType, allocation, interventionModel, masking, primaryPurpose, phase, siteCountries, fdaRegulatedDrug, fdaRegulatedDevice]}
+      ProtocolVersion: {archetype: InformationArtifact, properties: [versionName, versionDate], note: a study protocol document; public consumer protocols use ProtocolEdition in the protocols module}
       StudyArm: {archetype: VersionedState, properties: [name, armType]}
-      StudyIntervention: {archetype: VersionedState, properties: [name, route, schedule, duration]}
-      InterventionComponent: {archetype: VersionedState, properties: [quantity, unitCode, quantityBasis]}
+      StudyIntervention: {archetype: VersionedState, properties: [name, route, dosageForm, schedule, dosesPerDay, durationIso], note: the live GraphQL union of the same name is projected as type ArmIntervention mapped to this label}
+      InterventionComponent: {archetype: VersionedState, properties: [quantity, unitCode, quantityBasis, massBasis, verbatimDoseText]}
       StudyPopulation: {archetype: VersionedState, properties: [populationKind, description, size]}
-      OutcomeDefinition: {archetype: VersionedState, properties: [name, outcomeKind, timepoint, priority]}
-      StudyResult: {archetype: InformationArtifact, properties: [resultKind, estimate, unitCode, pValue, confidenceInterval, analysisPopulation, isStatisticallySignificant]}
-      Publication: {archetype: InformationArtifact, properties: [title, doi, pmid, publishedAt]}
-      EvidenceApplicability: {archetype: EvidenceAssessment, properties: [identityMatch, doseMatch, routeMatch, scheduleMatch, durationMatch, populationMatch, outcomeMatch, summary]}
+      OutcomeDefinition: {archetype: VersionedState, properties: [name, outcomeKind, measureKind, timepoint, priority], derivedProperties: [priority]}
+      StudyResult: {archetype: InformationArtifact, properties: [resultKind, estimate, estimateQualifier, unitCode, pValue, confidenceInterval, analysisPopulation, analysisKind, comparisonKind, statisticalConclusion, multiplicityAdjusted], derivedProperties: [isStatisticallySignificant]}
+      AdverseEventResult: {archetype: InformationArtifact, parentLabel: StudyResult, properties: [eventTerm, eventTermCode, seriousness, participantsAffected, participantsAtRisk, eventCount, collectionMethod, relatednessAssessor]}
+      Publication: {archetype: InformationArtifact, properties: [title, doi, pmid, publishedAt, publicationKind]}
+      Dataset: {archetype: Entity, properties: [name, datasetKind, accessLevel]}
+      EvidenceApplicability: {archetype: EvidenceAssessment, properties: [summary, overallScore, recordedAt, identityMatch, doseMatch, routeMatch, scheduleMatch, durationMatch, populationMatch, outcomeMatch], derivedProperties: [identityMatch, doseMatch, routeMatch, scheduleMatch, durationMatch, populationMatch, outcomeMatch]}
+      ApplicabilityDimension: {archetype: EvidenceAssessment, properties: [dimension, dimensionClass, verdict, identityLevel, evidenceCategory, targetCategory, evidenceValue, targetValue, unitCode, evidenceQuantityBasis, targetQuantityBasis, evidenceMassBasis, targetMassBasis, ratio, missingFacts, rationale]}
+      UseContextProfile: {archetype: Entity, properties: [name, populationDescriptor, doseDescriptor, durationDescriptor], note: non-personal use target for shared applicability (round 0008); personal applicability lives in the private store}
+      EndpointClassification: {archetype: EvidenceAssessment, properties: [endpointClass, biomarkerCategory, surrogateValidationLevel, contextDiseaseOrUse, contextPopulation, contextInterventionMechanism, contextApprovalType, contextMatch, rationale, recordedAt]}
+      ResultInterpretation: {archetype: EvidenceAssessment, properties: [interpretation, meaningfulnessVerdict, thresholdValue, thresholdUnit, rationale, recordedAt]}
+      EvidenceSynthesis: {archetype: EvidenceAssessment, properties: [claimText, verdict, evidenceCutoff, recordedAt, rationale]}
+      EvidenceStrengthAssessment: {archetype: EvidenceAssessment, properties: [scheme, level, criteria, rationale, recordedAt], note: replaces live Study.evidenceLevel and the EvidenceStrength enum on edges}
     relationships:
       REGISTERED_AS: {from: Study, to: TrialRegistration, class: asserted}
-      HAS_REGISTRATION_VERSION: {from: TrialRegistration, to: RegistrationVersion, class: structural}
+      HAS_REGISTRATION_VERSION: {from: TrialRegistration, to: RegistrationVersion, class: structural, temporalProfile: bitemporal_attachment}
       HAS_PROTOCOL_VERSION: {from: Study, to: ProtocolVersion, class: structural}
       HAS_ARM: {from: Study, to: StudyArm, class: structural}
       ASSIGNS_INTERVENTION: {from: StudyArm, to: StudyIntervention, class: asserted}
       HAS_INTERVENTION_COMPONENT: {from: StudyIntervention, to: InterventionComponent, class: structural}
-      USES_INTERVENTION_MATERIAL: {from: InterventionComponent, to: "IngredientMaterial|ProductVariant|ProductLot", class: asserted}
+      USES_INTERVENTION_MATERIAL: {from: InterventionComponent, to: "IngredientMaterial|ProductVariant|ProductLot", class: asserted, qualifiers: [asReportedName], note: the target is the material as administered at study time; a ProductVariant target requires asReportedName}
       HAS_ELIGIBLE_POPULATION: {from: Study, to: StudyPopulation, class: structural}
       HAS_ENROLLED_COHORT: {from: Study, to: StudyPopulation, class: structural}
       HAS_ANALYZED_COHORT: {from: StudyResult, to: StudyPopulation, class: structural}
       DEFINES_OUTCOME: {from: Study, to: OutcomeDefinition, class: structural}
+      DEFINED_IN: {from: OutcomeDefinition, to: "RegistrationVersion|ProtocolVersion|Publication", class: structural}
+      MEASURES_BIOMARKER: {from: OutcomeDefinition, to: Biomarker, class: asserted}
       RESULT_FOR: {from: StudyResult, to: OutcomeDefinition, class: structural}
+      RESULT_FOR_ARM: {from: StudyResult, to: StudyArm, class: structural, qualifiers: [armRole]}
       REPORTS_ON: {from: Publication, to: Study, class: asserted}
-      ASSESSES_APPLICABILITY_TO: {from: EvidenceApplicability, to: "Product|ProductVariant|FormulationVersion|IngredientMaterial|UserContext", class: structural}
-      BASED_ON_EVIDENCE: {from: EvidenceApplicability, to: "Study|StudyResult|Publication", class: structural}
+      PRODUCED_DATASET: {from: Study, to: Dataset, class: asserted}
+      ANALYZES_DATASET: {from: Publication, to: Dataset, class: asserted, requiredQualifiers: [analysisRole]}
+      CORRECTS: {from: Publication, to: Publication, class: asserted, note: publication-level view of a SourceRevisionEvent}
+      RETRACTS: {from: Publication, to: Publication, class: asserted}
+      HAS_EVIDENCE_TARGET: {from: EvidenceApplicability, to: "StudyIntervention|Assertion", class: structural, cardinality: exactly_one}
+      ASSESSES_APPLICABILITY_TO: {from: EvidenceApplicability, to: "Product|ProductVariant|FormulationVersion|ProductLot|IngredientMaterial|UseContextProfile", class: structural, cardinality: exactly_one, note: UserContext removed from the range in 0.2.0 (round 0008); a shared assessment never points at a private record}
+      BASED_ON_EVIDENCE: {from: EvidenceApplicability, to: "Study|StudyResult|Publication|Assertion", class: structural}
+      HAS_DIMENSION: {from: EvidenceApplicability, to: ApplicabilityDimension, class: structural, cardinality: one_per_dimension}
+      CONSIDERS: {from: ApplicabilityDimension, to: Assertion, class: structural}
+      CLASSIFIES_OUTCOME: {from: EndpointClassification, to: OutcomeDefinition, class: structural}
+      CLASSIFIES_BIOMARKER: {from: EndpointClassification, to: Biomarker, class: structural}
+      COMPARED_WITH_CONTEXT: {from: EndpointClassification, to: EndpointClassification, class: structural}
+      INTERPRETS_RESULT_OF: {from: ResultInterpretation, to: StudyResult, class: structural}
+      USES_THRESHOLD_SOURCE: {from: ResultInterpretation, to: SourceLocator, class: structural}
+      ASSESSES_CLAIM: {from: EvidenceSynthesis, to: "Assertion|Claim", class: structural}
+      INCLUDES_RESULT: {from: EvidenceSynthesis, to: "StudyResult|Assertion", class: structural, qualifiers: [inputRole]}
+      TRIGGERED_BY: {from: EvidenceSynthesis, to: "StudyResult|Assertion|Publication|RegistrationVersion", class: structural, requiredQualifiers: [criterionCode, effectOnVerdict]}
+      ASSESSES_STRENGTH_OF: {from: EvidenceStrengthAssessment, to: "Study|StudyResult|EvidenceSynthesis", class: structural}
+    assertedPredicates:
+      - PROVIDES_INVESTIGATIONAL_PRODUCT
+      - ADMINISTERED_AS_COMMERCIAL_PRODUCT   # StudyIntervention -> literal or ProductVariant, as reported
+      - DECLARES_OUTCOME_PRIORITY            # OutcomeDefinition -> literal outcomePriority, per source
+      - RESULT_CLINICALLY_MEANINGFUL         # StudyResult -> boolean, author claim
+      - STUDY_CONDUCTED_DURING               # Study -> literal interval
+    forbiddenImplications:
+      - [USES_INTERVENTION_MATERIAL, EVALUATES_PRODUCT]
+      - [REGISTRY_RESULTS_NOT_POSTED, RESULTS_UNPUBLISHED]
+      - [SURROGATE_IN_CONTEXT, SURROGATE_IN_OTHER_CONTEXT]
+      - [NOT_STATISTICALLY_SIGNIFICANT, NO_EFFECT]
+      - [STATISTICALLY_SIGNIFICANT, CLINICALLY_MEANINGFUL]
+      - [WITHIN_ARM_CHANGE_SIGNIFICANT, BETWEEN_ARM_EFFECT]
+      - [SHARED_INGREDIENT_NAME, EVIDENCE_APPLIES]
+
+  mechanisms:
+    maturity: candidate
+    privacyClass: public
+    dependencies: [kernel, provenance, substances_and_materials, studies_and_evidence]
+    nodes:
+      MechanismEvidenceContext: {archetype: Occurrence, properties: [setting, modelDescriptor, sexScope, ageDescriptor, sampleSize, exposureAmount, exposureUnit, exposureBasis, route, exposureDurationIso, exposureStatus], derivedProperties: [hedValue, hedMethod]}
+      Mechanism: {archetype: Entity, properties: [name, mechanismKind], note: live type kept as reference}
+      Pathway: {archetype: Entity, properties: [name], note: live type kept}
+      MolecularEntity: {archetype: Entity, properties: [name, entityKind], note: live type kept}
+      Species: {archetype: Entity, properties: [scientificName, taxonomyId], note: live type kept}
+      AnatomicalContext: {archetype: Entity, properties: [name, uberonId], note: live type kept; compartment for measured levels}
+      Organ: {archetype: Entity, properties: [name], note: live type kept}
+      Outcome: {archetype: Entity, properties: [name, outcomeKind], note: live type kept}
+      Condition: {archetype: Entity, properties: [name, icd10Code], note: live type kept}
+    relationships:
+      OBSERVED_IN_CONTEXT: {from: Assertion, to: MechanismEvidenceContext, class: structural, cardinality: zero_or_one}
+      IN_SPECIES: {from: MechanismEvidenceContext, to: Species, class: structural}
+      MEASURED_IN: {from: MechanismEvidenceContext, to: AnatomicalContext, class: structural}
+      EXPOSED_TO: {from: MechanismEvidenceContext, to: "IngredientMaterial|ChemicalForm|ChemicalSubstance", class: structural}
+      IN_STUDY_ARM: {from: MechanismEvidenceContext, to: StudyArm, class: structural, cardinality: zero_or_one}
+      MEASURED_IN_MATRIX: {from: Biomarker, to: AnatomicalContext, class: structural, note: compartment-specific measurand; the diagnostics module's Metric.systemKind is the LOINC-side counterpart}
+      AFFECTS_MECHANISM: {from: "IngredientMaterial|ChemicalForm|ChemicalSubstance", to: Mechanism, class: derived, mustBeRegenerable: true}
+      MODULATES: {from: "ChemicalSubstance|IngredientMaterial", to: MolecularEntity, class: derived, mustBeRegenerable: true}
+      APPLIES_TO_SPECIES: {from: Mechanism, to: Species, class: derived, mustBeRegenerable: true}
+      INFLUENCES_OUTCOME: {from: Mechanism, to: Outcome, class: derived, mustBeRegenerable: true}
+    assertedPredicates:   # predicateClass MECHANISM; basisKind required
+      - INCREASES_LEVEL_OF
+      - DECREASES_LEVEL_OF
+      - INCREASES_ACTIVITY_OF
+      - DECREASES_ACTIVITY_OF
+      - INDUCES_PROCESS
+      - INHIBITS_PROCESS
+      - IMPROVES
+      - IMPAIRS
+      - EXTENDS
+      - BINDS
+    forbiddenImplications:
+      - [CHANGES_LEVEL_IN_COMPARTMENT, CHANGES_LEVEL_IN_OTHER_COMPARTMENT]
+      - [MEASURED_IN_SPECIES, APPLIES_IN_OTHER_SPECIES]
+      - [INGREDIENT_MECHANISM_EFFECT, FORMULATION_DELIVERS_EXPOSURE]
+      - [HYPOTHESIZED_STEP, MEASURED_STEP]
+      - [PROXY_MARKER_CHANGED, PROCESS_FLUX_CHANGED]
+
+  diagnostics:
+    maturity: candidate   # promoted from future (round 0004)
+    privacyClass: public
+    dependencies: [kernel, provenance, temporal, identity_resolution, organizations]
+    nodes:
+      Biomarker: {archetype: Entity, properties: [name, biomarkerKind], note: the biological referent; live type kept}
+      Metric: {archetype: Entity, properties: [name, metricKind, loincCode, propertyKind, systemKind, scaleKind, canonicalUnitCode, unitStatus, definitionText], note: what is measured; a LOINC code identifies this level only, never an assay}
+      LabTest: {archetype: Entity, properties: [name, localTestCode, issuerUid], note: the test as offered by a lab; the local name is not identity}
+      PanelDefinition: {archetype: VersionedState, properties: [name, versionLabel, effectiveFrom, effectiveTo]}
+      MeasurementMethod: {archetype: Entity, properties: [name, methodPrinciple]}
+      Specimen: {archetype: Entity, properties: [name, specimenTypeCode], note: specimen type; specimen instances are private}
+      ReferenceSystem: {archetype: Entity, properties: [name, referenceSystemKind], note: NGSP, IFCC reference measurement procedure}
+      AssayVersion: {archetype: VersionedState, properties: [name, assayKitIdentifier, softwareVersion, softwareVersionStatus, reportedUnitCode, effectiveFrom, effectiveTo], note: how a given lab ran the test (lab, method, instrument, kit, software version, traceability); device firmware is treated as the assay's software version until consumer_devices matures}
+      Algorithm: {archetype: Entity, properties: [name], note: family as sources name it; never a comparability path}
+      AlgorithmVersion: {archetype: VersionedState, properties: [name, versionLabel, versionBasis, outputKind, outputUnitCode, trainingPopulationText, retrievedAt]}
+      ReferenceIntervalVersion: {archetype: VersionedState, properties: [lowerBound, upperBound, unitCode, intervalKind, derivationKind, sexPartition, ageMinYears, ageMaxYears, fastingStatus, pregnancyStatus, partitionText, effectiveFrom, effectiveTo], note: replaces live ReferenceRange as the authoritative record; bound to one AssayVersion}
+      ComparabilityAssessment: {archetype: EvidenceAssessment, properties: [verdict, measurandMatch, unitConversionRule, traceabilityMatch, interferenceProfileMatch, referenceIntervalMatch, replicateNoiseBasis, rationale]}
+      DiagnosticResult: {archetype: InformationArtifact, interfaceOnly: true, properties: [resultKind, valueNumber, valueString, unitCode, valueStatus, observedAt, reportedAt, privacyClass], note: a contract any result store must meet; PersonalMeasurement (private store) implements it for people, Observation (protocols) for public source-attributed results}
+    relationships:
+      QUANTIFIES: {from: Metric, to: Biomarker, class: asserted}
+      MEASURES_METRIC: {from: LabTest, to: Metric, class: asserted}
+      PERFORMED_WITH_ASSAY_VERSION: {from: LabTest, to: AssayVersion, class: asserted, temporalProfile: asserted_edge}
+      ASSAY_FOR_METRIC: {from: AssayVersion, to: Metric, class: asserted}
+      ASSAY_OPERATED_BY: {from: AssayVersion, to: Organization, class: asserted, cardinality: exactly_one}
+      USES_METHOD: {from: AssayVersion, to: MeasurementMethod, class: asserted, cardinality: zero_or_one}
+      RUNS_ON_INSTRUMENT: {from: AssayVersion, to: ToolOrInstrument, class: asserted, cardinality: zero_or_one}
+      ACCEPTS_SPECIMEN_TYPE: {from: AssayVersion, to: Specimen, class: asserted}
+      CALIBRATION_TRACEABLE_TO: {from: AssayVersion, to: ReferenceSystem, class: asserted}
+      VERSION_OF_ALGORITHM: {from: AlgorithmVersion, to: Algorithm, class: asserted}
+      DERIVED_FROM_ALGORITHM_VERSION: {from: AlgorithmVersion, to: AlgorithmVersion, class: asserted}
+      REQUIRES_INPUT_METRIC: {from: AlgorithmVersion, to: Metric, class: asserted}
+      COMPATIBLE_WITH_ASSAY_VERSION: {from: AlgorithmVersion, to: AssayVersion, class: asserted}
+      OUTPUTS_METRIC: {from: AlgorithmVersion, to: Metric, class: asserted}
+      FOR_ASSAY_VERSION: {from: ReferenceIntervalVersion, to: AssayVersion, class: asserted, cardinality: exactly_one}
+      FOR_METRIC: {from: ReferenceIntervalVersion, to: Metric, class: asserted}
+      COMPARES: {from: ComparabilityAssessment, to: "AssayVersion|AlgorithmVersion|ReferenceIntervalVersion", class: structural, cardinality: exactly_two}
+      INCLUDES_LABTEST: {from: PanelDefinition, to: LabTest, class: structural}
+      PRODUCED_BY_ASSAY_VERSION: {from: DiagnosticResult, to: AssayVersion, class: structural}
+      COMPUTED_BY_ALGORITHM_VERSION: {from: DiagnosticResult, to: AlgorithmVersion, class: structural}
+      INTERPRETED_WITH_REFERENCE_INTERVAL_VERSION: {from: DiagnosticResult, to: ReferenceIntervalVersion, class: structural}
+      COMPARED_TO: {from: DiagnosticResult, to: DiagnosticResult, class: derived, mustBeRegenerable: true, requiredQualifiers: [derivationRule]}
+      HAS_REFERENCE_RANGE: {from: "Biomarker|Metric", to: ReferenceRange, class: derived, mustBeRegenerable: true, note: live edge demoted to a projection of ReferenceIntervalVersion}
+      SAME_TEST_AS: {from: LabTest, to: LabTest, class: derived, mustBeRegenerable: true, note: only as projection of an accepted ResolutionHypothesis}
+    forbiddenImplications:
+      - [SHARES_LOINC_CODE, SAME_ASSAY_VERSION]
+      - [SIMILAR_TEST_NAME, SAME_METRIC]
+      - [SAME_ALGORITHM_FAMILY, SAME_ALGORITHM_VERSION]
+      - [OUTSIDE_REFERENCE_INTERVAL, INDICATES_CONDITION]
+      - [INFERRED_RESULT, MEASURED_RESULT]
+      - [WITHIN_VERSION_SCORE_DIFFERENCE, MEASURED_BIOLOGICAL_CHANGE]
+
+  consumer_devices:
+    maturity: future
+    privacyClass: public
+    owns: [Device, DeviceModel, FirmwareVersion, Sensor, Modality, DeviceObservation]
+    note: live Device, Sensor, Modality kept as seams; firmware version is handled as AssayVersion.softwareVersion until a round opens this module
 
   quality:
     maturity: provisional
+    privacyClass: public
     nodes:
       ProductLot: {archetype: Entity, properties: [lotCode, manufactureDate, expiryDate]}
       TestSample: {archetype: Entity, properties: [sampleCode, sampledAt, samplingMethod]}
@@ -266,42 +778,298 @@ modules:
       CERTIFIES_RESULTS_FOR: {from: CertificateOfAnalysis, to: "ProductLot|TestExecution", class: asserted}
       PROGRAM_HAS_LISTING: {from: CertificationProgram, to: CertificationListing, class: structural}
       HAS_CERTIFICATION_SCOPE: {from: CertificationListing, to: CertificationScope, class: structural}
-      COVERS: {from: CertificationScope, to: "Product|ProductVariant|ProductLot", class: asserted}
+      COVERS: {from: CertificationScope, to: "Product|ProductVariant|ProductLot|Facility|TradeItemIdentifier", class: asserted}
+      CERTIFIED_UNDER: {from: "Product|ProductVariant|ProductLot", to: CertificationListing, class: derived, mustBeRegenerable: true}
 
   regulatory_and_ip:
     maturity: provisional
+    privacyClass: public
     nodes:
       PatentFamily: {archetype: Entity, properties: [familyIdentifier, title]}
       PatentApplication: {archetype: InformationArtifact, properties: [applicationNumber, jurisdiction, filingDate, status]}
       GrantedPatent: {archetype: InformationArtifact, properties: [patentNumber, jurisdiction, grantDate, status]}
       PatentClaim: {archetype: InformationArtifact, properties: [claimNumber, claimTextHash, claimKind]}
       PatentLicense: {archetype: VersionedState, properties: [exclusive, fieldOfUse, territory, effectiveFrom, effectiveTo]}
-      RegulatorySubmission: {archetype: InformationArtifact, properties: [submissionKind, identifier, jurisdiction, submittedAt]}
-      RegulatoryResponse: {archetype: InformationArtifact, properties: [responseKind, status, issuedAt, jurisdiction]}
-      OrphanDesignation: {archetype: VersionedState, properties: [designationId, indication, jurisdiction, status]}
-      DrugApproval: {archetype: VersionedState, properties: [applicationNumber, indication, jurisdiction, status]}
+      RegulatoryAgency: {archetype: Entity, parentLabel: Organization, properties: [name, agencyCode, jurisdiction]}
+      RegulatoryPathway: {archetype: Entity, properties: [name, pathwayKind, jurisdiction, legalBasisCitation, effectiveFrom, effectiveTo]}
+      RegulatoryStep: {archetype: Entity, properties: [name, stepKind, milestoneCode]}
+      RegulatorySubmission: {archetype: InformationArtifact, properties: [submissionKind, identifier, jurisdiction, submittedAt, filingDate, conditionsOfUseText]}
+      RegulatoryResponse: {archetype: InformationArtifact, properties: [responseKind, issuedAt, jurisdiction, conditionsOfUseText, agencyDisclaimerText]}
+      RegulatoryStatus: {archetype: VersionedState, properties: [statusKind, jurisdiction, scopeText, productCode, pcccAuthorized, legalBasisCitation, effectiveFrom, effectiveTo], note: live name kept; meaning narrowed to a jurisdiction-specific status state. Only statusKind APPROVAL is approval.}
+      OrphanDesignation: {archetype: VersionedState, parentLabel: RegulatoryStatus, properties: [designationId, indication, jurisdiction]}
+      DrugApproval: {archetype: VersionedState, parentLabel: RegulatoryStatus, properties: [applicationNumber, indication, jurisdiction]}
     relationships:
       FAMILY_HAS_APPLICATION: {from: PatentFamily, to: PatentApplication, class: structural}
       APPLICATION_GRANTED_AS: {from: PatentApplication, to: GrantedPatent, class: asserted}
       HAS_PATENT_CLAIM: {from: "PatentApplication|GrantedPatent", to: PatentClaim, class: structural}
       LICENSE_COVERS: {from: PatentLicense, to: "PatentFamily|PatentApplication|GrantedPatent|PatentClaim", class: asserted}
+      UNDER_PATHWAY: {from: RegulatorySubmission, to: RegulatoryPathway, class: structural}
+      SUBMITTED_BY: {from: RegulatorySubmission, to: Organization, class: asserted}
+      SUBMISSION_ABOUT: {from: RegulatorySubmission, to: "IngredientMaterial|Product|ProductVariant|AlgorithmVersion|Facility", class: asserted}
+      SUPERSEDES_SUBMISSION: {from: RegulatorySubmission, to: RegulatorySubmission, class: asserted}
       SUBMISSION_HAS_RESPONSE: {from: RegulatorySubmission, to: RegulatoryResponse, class: structural}
-      DESIGNATION_FOR: {from: OrphanDesignation, to: "IngredientMaterial|StudyIntervention|Product", class: asserted}
-      APPROVAL_FOR: {from: DrugApproval, to: "IngredientMaterial|StudyIntervention|Product", class: asserted}
+      ISSUED_BY: {from: "RegulatoryResponse|RegulatoryStatus", to: RegulatoryAgency, class: structural}
+      STATUS_OF: {from: RegulatoryStatus, to: "Product|ProductVariant|IngredientMaterial|AlgorithmVersion|Facility", class: asserted, cardinality: exactly_one}
+      RESULTS_FROM_RESPONSE: {from: RegulatoryStatus, to: RegulatoryResponse, class: structural, cardinality: zero_or_one}
+      UNDER_LEGAL_BASIS: {from: RegulatoryStatus, to: RegulatoryPathway, class: structural}
+      HAS_REGULATORY_STEP: {from: RegulatoryPathway, to: RegulatoryStep, class: structural}
+      DESIGNATION_FOR: {from: OrphanDesignation, to: "IngredientMaterial|StudyIntervention|Product", class: asserted, note: alias of STATUS_OF for the specialization label}
+      APPROVAL_FOR: {from: DrugApproval, to: "IngredientMaterial|StudyIntervention|Product", class: asserted, note: alias of STATUS_OF for the specialization label}
     forbiddenImplications:
       - [HAS_ORPHAN_DESIGNATION, IS_APPROVED]
       - [NDI_NOTIFICATION_RECEIVED, FDA_APPROVED]
       - [PATENT_CLAIMS, PROVES_EFFICACY]
+      - [ESTABLISHMENT_REGISTERED, FDA_APPROVED]
+      - [ESTABLISHMENT_REGISTERED, CGMP_COMPLIANT]
+      - [DEVICE_LISTED, FDA_CLEARED]
+      - [CLEARED_510K, FDA_APPROVED]
+      - [DE_NOVO_AUTHORIZATION, PMA_APPROVAL]
+      - [GRAS_NO_QUESTIONS, FDA_APPROVED]
+      - [GRAS_NO_QUESTIONS, FDA_GRAS_DETERMINATION]
+      - [ENFORCEMENT_DISCRETION, AUTHORIZATION]
+      - [CLAIMS_CGMP_COMPLIANCE, CGMP_COMPLIANT]
+
+  manufacturing_readiness:
+    maturity: candidate
+    privacyClass: public
+    dependencies: [kernel, provenance, temporal, organizations, products_and_formulations]
+    nodes:
+      ManufacturingCapability: {archetype: VersionedState, properties: [stage, capacityValue, capacityUnitCode, capacityBasis, targetOperationalDate], note: promoted is not a stage; it is the source kind that made the claim}
+    relationships:
+      HAS_CAPABILITY_STATE: {from: "Organization|Facility", to: ManufacturingCapability, class: asserted, temporalProfile: asserted_edge}
+      CAPABILITY_FOR_PROCESS: {from: ManufacturingCapability, to: ManufacturingProcess, class: structural}
+      CAPABILITY_FOR_MATERIAL: {from: ManufacturingCapability, to: IngredientMaterial, class: structural}
+    forbiddenImplications:
+      - [PROMOTES_CAPABILITY, OPERATES_CAPABILITY]
+      - [PLANNED_CAPABILITY, OPERATING_CAPABILITY]
+
+  claims_and_documents:
+    maturity: provisional
+    privacyClass: public
+    dependencies: [kernel, provenance, temporal, identity_resolution, organizations]
+    nodes:
+      Document: {archetype: Entity, parentLabel: Source, properties: [documentKey, documentType, publisher, publishedAt, languageCode, isPeerReviewed, isFinancialDisclosure], note: live Document carried as a Source (one canonicalUri); work-level scholarly identity stays on Publication}
+      Episode: {archetype: Entity, properties: [title, episodeNumber, publishedAt, durationSeconds], note: a published audio or video work; renditions are Sources linked by RENDITION_OF}
+      EpisodeSegment: {archetype: InformationArtifact, properties: [segmentType], note: segmentType SPONSOR_READ answers CQ-CL-08; timing lives on locators}
+      Channel: {archetype: Entity, properties: [name, channelType]}
+      Series: {archetype: Entity, properties: [name, seriesType]}
+      Platform: {archetype: Entity, properties: [name, platformType]}
+      Segmentation: {archetype: InformationArtifact, properties: [segmentationHash, chunkSize, overlap, strategy], note: operational configuration of a chunking run; not evidence}
+      Chunk: {archetype: InformationArtifact, properties: [chunkIndex, text, segmentationHash, charStart, charEnd], note: derived retrieval unit regenerated when segmentation changes; never a SourceLocator}
+      Claim: {archetype: Entity, properties: [claimText, claimType, claimPolarity, isQuantitative, isCausal], deprecated: {evidenceStrength: moved to ClaimEvidenceAssessment, isClinical: evidence setting lives on MechanismEvidenceContext, isPreclinical: evidence setting lives on MechanismEvidenceContext}, note: proposition identity that many assertions instantiate; no truth value, no source}
+      ClaimOccurrence: {archetype: Assertion, parentLabel: Assertion, properties: [utteranceText, assertionBasis, speechAct, reportedSpeechAct], note: a source-attributed assertion by one speaker in one container; Assertion is the contract name, ClaimOccurrence the specific label; live UTTERED_BY maps to ASSERTED_BY}
+      RelationshipAssertion: {archetype: Assertion, parentLabel: Assertion, properties: [predicateText, relationshipType], deprecated: {confidence: use extractionConfidence, SUPPORTED_BY_CLAIM: use INSTANCE_OF for proposition identity}, note: structured relational assertion from a non-utterance span (table, registry field); exactly one subject and one object}
+      ClaimEvidenceAssessment: {archetype: EvidenceAssessment, properties: [evidenceStrength, criteriaVersion, methodVersion, status, assessedAt], note: replaces Claim.evidenceStrength; coordinates with EvidenceSynthesis}
+      RetellingFidelityAssessment: {archetype: EvidenceAssessment, properties: [methodVersion, status, qualificationLost, lostQualificationKinds, speechActChanged, speechActFrom, speechActTo, assertionBasisChanged, scopeBroadened, addedPurposeText, quantityChanged, attributionChanged, correctionIgnored, assessedAt]}
+      ConflictRelevanceAssessment: {archetype: EvidenceAssessment, properties: [methodVersion, status, relevanceLevel, relevanceBasis, temporalOverlap, disclosureFinding, scopeAmbiguity], note: may inform source-reliability assessment; never sets a truth verdict}
+    relationships:
+      OCCURS_IN: {from: ClaimOccurrence, to: "Episode|Document", class: structural, cardinality: exactly_one}
+      APPEARS_IN: {from: "Person|PseudonymousActor", to: Episode, class: asserted, properties: [roleType], note: RoleType gains HOST, CO_HOST, GUEST}
+      HAS_EPISODE: {from: "Channel|Series", to: Episode, class: structural}
+      HAS_SEGMENT: {from: Episode, to: EpisodeSegment, class: structural}
+      RESOLVES_TO_CHUNK: {from: SourceLocator, to: Chunk, class: derived, requiredProperties: [derivationRule, segmentationHash], mustBeRegenerable: true}
+      QUALIFIED_BY: {from: Assertion, to: Assertion, class: structural, requiredProperties: [qualificationKind], note: the qualifier is itself an occurrence in the same container with its own locator}
+      RETELLS: {from: Assertion, to: Assertion, class: structural, requiredProperties: [retellingMode, linkBasis], conditionalProperties: {BELLLABS_MATCH: hypothesisUid, EXPLICIT_CITATION: citationLocatorUid}, alignment: "prov:wasDerivedFrom; VERBATIM_QUOTE = prov:wasQuotedFrom"}
+      ATTRIBUTES_TO: {from: Assertion, to: "Person|Organization|PseudonymousActor|AnonymousActor", class: structural, note: the party a retelling credits; never the asserter of the retelling}
+      INSTANCE_OF: {from: Assertion, to: Claim, class: derived, oneOf: [derivationRule, hypothesisUid]}
+      ASSESSES_CLAIM_EVIDENCE: {from: ClaimEvidenceAssessment, to: Claim, class: structural, cardinality: exactly_one}
+      CLAIM_EVIDENCE_BASED_ON: {from: ClaimEvidenceAssessment, to: "Assertion|Study|StudyResult|Publication", class: structural}
+      ASSESSES_RETELLING: {from: RetellingFidelityAssessment, to: Assertion, class: structural, cardinality: exactly_one}
+      AGAINST_ORIGINAL: {from: RetellingFidelityAssessment, to: Assertion, class: structural, cardinality: exactly_one}
+      IDENTIFIES_LOST_QUALIFICATION: {from: RetellingFidelityAssessment, to: Assertion, class: structural}
+      FOR_OCCURRENCE: {from: ConflictRelevanceAssessment, to: Assertion, class: structural, cardinality: exactly_one}
+      ASSESSES_INTEREST: {from: ConflictRelevanceAssessment, to: Assertion, class: structural, note: targets assertions whose predicate is in FINANCIAL_INTEREST}
+      SUPPORTED_BY_CHUNK: {from: "Assertion|Claim|ClaimOccurrence", to: Chunk, class: derived, requiredProperties: [locatorUid], note: live SUPPORTED_BY -> Chunk edges are derived shortcuts that must name their SourceLocator}
+    assertedPredicates:
+      - SELF_REPORTED_DAILY_INTAKE
+      - RECOMMENDS_DAILY_INTAKE
+      - STATES_INDIVIDUAL_DIFFERENCE
+      - OFFERS_SERVICE_KIND
+    forbiddenImplications:
+      - [REPORTS_PRACTICE, RECOMMENDS]
+      - [MENTIONS_PRODUCT, ENDORSES_PRODUCT]
+      - [RETELLS, SAME_ASSERTION]
+      - [HAS_FINANCIAL_INTEREST, ADJUDICATED_CONTRADICTED]
+      - [NO_FINANCIAL_INTEREST_FOUND, ADJUDICATED_SUPPORTED]
+      - [ROLE_OPEN_AT_OBSERVATION, ROLE_CONTINUES_AFTER_OBSERVATION]
+      - [CHUNK_MATCH, SOURCE_SUPPORT]
+
+  protocols:
+    maturity: provisional
+    privacyClass: public
+    dependencies: [kernel, provenance, temporal, identity_resolution, substances_and_materials, products_and_formulations, diagnostics]
+    nodes:
+      Protocol: {archetype: Entity, properties: [name, protocolType, publicUrl], note: enduring public protocol identity; live versionLabel and lastUpdatedAt become projections of the current edition}
+      ProtocolEdition: {archetype: VersionedState, properties: [editionLabel, payloadHash], note: one edition per observed or published payload change; named ProtocolEdition because ProtocolVersion means a study protocol document}
+      ProtocolStep: {archetype: Entity, properties: [stepKey, stepKind, requirementLevel, requirementBasis, notReportedFields, payloadHash], note: immutable once attached to an edition}
+      Constraint: {archetype: Entity, properties: [name, constraintKind]}
+      MeasurementPlan: {archetype: Entity, properties: [name, planTiming, requiredForEvaluation, maxBaselineAgeDays, cadenceMinDays, cadenceMaxDays]}
+      ProtocolAdjustmentRule: {archetype: Entity, properties: [name, triggerKind, comparator, thresholdValue, thresholdUnitCode, triggerAction, ruleBasis]}
+      Target: {archetype: Entity, properties: [name, targetType]}
+      FunctionalGoal: {archetype: Entity, properties: [name, goalType], note: public goal concept referenced by private goals}
+      Observation: {archetype: InformationArtifact, properties: [observedAt, observationType, observedPopulation], note: ownership decided in round 0008 - public, source-attributed, protocol-linked (live meaning kept); never the private measurement store}
+      ProtocolResult: {archetype: InformationArtifact, properties: [resultSummary]}
+    relationships:
+      HAS_PROTOCOL_EDITION: {from: Protocol, to: ProtocolEdition, class: asserted, temporalProfile: asserted_edge}
+      HAS_PROTOCOL_STEP: {from: ProtocolEdition, to: ProtocolStep, class: structural, properties: [orderIndex], note: live HAS_STEP hangs from Protocol; the catalog places steps on the edition}
+      DEPENDS_ON: {from: ProtocolStep, to: ProtocolStep, class: structural, properties: [dependencyKind]}
+      HAS_CONSTRAINT: {from: "ProtocolEdition|ProtocolStep", to: Constraint, class: structural, properties: [constraintRole]}
+      BASED_ON: {from: Constraint, to: "Condition|Biomarker|LabTest|Metric", class: structural}
+      HAS_MEASUREMENT_PLAN: {from: ProtocolEdition, to: MeasurementPlan, class: structural}
+      TRACKS_METRIC: {from: MeasurementPlan, to: Metric, class: structural}
+      HAS_ADJUSTMENT_RULE: {from: ProtocolEdition, to: ProtocolAdjustmentRule, class: structural}
+      RULE_TRIGGERED_BY: {from: ProtocolAdjustmentRule, to: Metric, class: structural}
+      MODIFIES_STEP: {from: ProtocolAdjustmentRule, to: ProtocolStep, class: structural}
+      HAS_FUNCTIONAL_GOAL: {from: ProtocolEdition, to: FunctionalGoal, class: asserted}
+      FOR_PROTOCOL: {from: ProtocolResult, to: "Protocol|ProtocolEdition", class: asserted}
+      INCLUDES_OBSERVATION: {from: ProtocolResult, to: Observation, class: structural}
+    enums:
+      requirementLevel: [ESSENTIAL, RECOMMENDED, OPTIONAL, CONDITIONAL, NOT_STATED]
+      requirementBasis: [STATED_BY_SOURCE, EDITORIAL_INFERENCE, NOT_STATED]
+      constraintRole: [APPLIES_WHEN, CONTRAINDICATED_WHEN, REQUIRES_BEFORE]
+      constraintKind: [POPULATION, CONDITION_PRESENT, CONDITION_ABSENT, MEASUREMENT_THRESHOLD, PHASE, TIME_WINDOW, CO_INTERVENTION]
+      dependencyKind: [REQUIRES_PRIOR_COMPLETION, REQUIRES_RESULT_OF, CONCURRENT_WITH, MUTUALLY_EXCLUSIVE_WITH]
+      planTiming: [BASELINE, DURING, FOLLOW_UP, PERIODIC]
+      triggerKind: [THRESHOLD_CROSSED, TREND, ADVERSE_EVENT_REPORTED, SCHEDULED_REVIEW]
+      comparator: [GT, GTE, LT, LTE, OUTSIDE_REFERENCE_RANGE]
+      triggerAction: [REVIEW, PAUSE_STEP, STOP_PROTOCOL, ADJUST_DOSE, CONTACT_CLINICIAN]
+      ruleBasis: [STATED_BY_SOURCE, BELLLABS_SAFETY_POLICY]
+      protocolChangeProvenance: [SOURCE_VERSIONED, SNAPSHOT_DIFF, THIRD_PARTY_REPORTED]
+    forbiddenImplications:
+      - [ADOPTED_PROTOCOL_EDITION, FOLLOWS_ALL_STEPS]
+      - [THIRD_PARTY_REPORTS_PROTOCOL_CHANGE, PROTOCOL_EDITION_EXISTS]
+      - [OUTSIDE_REFERENCE_RANGE_TRIGGER, CONDITION_PRESENT]
+
+  safety_and_constraints:
+    maturity: candidate
+    privacyClass: public
+    owns: [SafetySignal, ContraindicationAssertion, InteractionAssertion, UseConstraint]
+    note: live SafetySignal and AdverseEffect kept as seams; round 0002 recommends SafetySignal become an EvidenceAssessment over AdverseEventResults when this module opens (OPEN-QUESTIONS)
+
+  recommendation_decisions:
+    maturity: provisional
+    placement: private_context_store   # round 0008; PolicyVersion and DecisionCriterion are internal and live in the shared graph
+    nodes:
+      RecommendationRequest: {archetype: Occurrence, privacyClass: private-personal, properties: [requestedAt, goalVersionUids, intendedUse]}
+      RecommendationSnapshot: {archetype: Occurrence, privacyClass: private-personal, properties: [decidedAt, recordedAt, requestUid, userContextVersionUid, evidenceRecordedAt, evidenceValidAt, policyVersionUid, algorithmVersion, catalogVersion, intendedUse, decisionOutcome, rationaleSummary, decisionConfidence, decisionConfidenceMethod, missingFactKeys, snapshotHash], note: replaces 0.1.0 RecommendationDecision; keeps personal-context version, evidence versions and viewpoint, options, selection, rationale, uncertainty, intended use, policy and algorithm version; insert-only}
+      RecommendationOption: {archetype: InformationArtifact, privacyClass: private-personal, properties: [subjectUid, subjectType, disposition, rank, rejectionReason, blockingConstraintUids, evidenceAssertionUids, adjudicationUids, applicabilityUids, stateUids, offerObservationUids], note: replaces 0.1.0 RecommendationCandidate}
+      DecisionCriterionValue: {archetype: InformationArtifact, privacyClass: private-personal, properties: [criterionUid, valueNumber, valueString, methodVersion]}
+      UserDecision: {archetype: Occurrence, privacyClass: private-personal, properties: [decisionKind, optionUid, decidedAt], note: the person's own choice, separate from the snapshot's SELECTED option}
+      PolicyVersion: {archetype: VersionedState, privacyClass: internal, placement: shared_graph, properties: [name, payloadHash]}
+      DecisionCriterion: {archetype: Entity, privacyClass: internal, placement: shared_graph, properties: [name, criterionKind, methodVersion]}
+    relationships:
+      HAS_OPTION: {from: RecommendationSnapshot, to: RecommendationOption, class: structural, store: private}
+      FOR_REQUEST: {from: RecommendationSnapshot, to: RecommendationRequest, class: structural, store: private}
+      USED_CONTEXT_VERSION: {from: RecommendationSnapshot, to: UserContextVersion, class: structural, store: private}
+      HAS_CRITERION_VALUE: {from: RecommendationOption, to: DecisionCriterionValue, class: structural, store: private}
+      RESPONDS_TO: {from: UserDecision, to: RecommendationSnapshot, class: structural, store: private}
+    crossStoreReferences: uid_properties_only_with_recorded_time_viewpoint
+    enums:
+      disposition: [SELECTED, ALTERNATIVE, REJECTED, BLOCKED]
+      rejectionReason: [INSUFFICIENT_APPLICABILITY, SAFETY_CONSTRAINT, USER_PREFERENCE, PRICE, AVAILABILITY, DOMINATED_BY_SELECTED]
+      intendedUse: [INFORMATIONAL_COMPARISON, PURCHASE_DECISION_SUPPORT, PROTOCOL_ADJUSTMENT_REVIEW, DISCUSS_WITH_CLINICIAN]
+      decisionOutcome: [RECOMMENDED_ONE, RECOMMENDED_SEVERAL, RECOMMENDED_NONE, BLOCKED_BY_CONSTRAINT, INSUFFICIENT_EVIDENCE]
+      userDecisionKind: [CHOSE, DECLINED, DEFERRED]
+    forbiddenImplications:
+      - [RECOMMENDS, BELLLABS_RECOMMENDS]
+      - [SELECTED_IN_SNAPSHOT, USER_CHOSE]
+      - [RECOMMENDED_FOR, ANY]    # Product RECOMMENDED_FOR Goal is forbidden as a relationship type
+
+  private_context:
+    maturity: provisional
+    privacyClass: private-personal
+    placement: private_context_store   # round 0008: transactional store (PostgreSQL recommended) is the system of record; zero private nodes in the shared graph
+    dependencies: [kernel, temporal, recommendation_decisions, protocols, diagnostics]
+    nodes:
+      UserContext: {archetype: Entity, properties: [], note: uid only; no name, email, or account id}
+      UserContextVersion: {archetype: VersionedState, properties: [goalVersionUids, measurementUids, declaredConditionUids, declaredIntakeUids, preferenceKeys, payloadHash]}
+      UserGoal: {archetype: Entity, properties: []}
+      UserGoalVersion: {archetype: VersionedState, properties: [functionalGoalUid, outcomeUid, metricUid, targetValue, targetUnitCode, priority, goalStatement, payloadHash]}
+      PersonalMeasurement: {archetype: InformationArtifact, properties: [metricUid, labTestUid, assayVersionUid, algorithmVersionUid, deviceUid, methodUid, valueNumber, unitCode, resultQualifier, effectiveAt, recordedAt, provenanceKind, reportedReferenceRangeText, labReportUid], note: implements the DiagnosticResult contract for a person; references shared Metric, LabTest, AssayVersion, AlgorithmVersion, Device by uid}
+      PersonalLabReport: {archetype: InformationArtifact, properties: [reportDate, issuingLabName, fileObjectRef, contentHash, recordedAt]}
+      ProtocolInUse: {archetype: Entity, properties: []}
+      ProtocolAdoptionVersion: {archetype: VersionedState, properties: [adoptedEditionUid, payloadHash]}
+      ProtocolDeviation: {archetype: VersionedState, properties: [stepKey, deviationKind, personalValueNumber, personalUnitCode, substituteSubjectUid]}
+      SharingGrant: {archetype: VersionedState, properties: [granteeKind, granteeRef, dataCategories, recordUids, purpose, permittedActions, decision, payloadHash]}
+      DisclosureEvent: {archetype: Occurrence, properties: [grantUid, occurredAt, dataCategories]}
+      PendingItem: {archetype: Occurrence, properties: [pendingKind, blocksUid, openedAt, expectedBy, resolvedAt, resolvedByUid]}
+      PurchaseEvent: {archetype: Occurrence, properties: [eventKind, occurredAt, offerUid, productVariantUid, packageConfigurationUid, lotUid]}
+      PersonalApplicabilityAssessment: {archetype: EvidenceAssessment, properties: [sharedApplicabilityUid, userContextVersionUid, populationMatch, doseMatch, durationMatch, methodVersion]}
+      ErasureTombstone: {archetype: Occurrence, properties: [subjectKeyHash, erasedAt, scope, propagationStatus]}
+    relationships:
+      HAS_CONTEXT_VERSION: {from: UserContext, to: UserContextVersion, class: structural, temporalProfile: bitemporal_attachment}
+      HAS_GOAL: {from: UserContext, to: UserGoal, class: structural}
+      HAS_GOAL_VERSION: {from: UserGoal, to: UserGoalVersion, class: structural, temporalProfile: bitemporal_attachment}
+      HAS_PROTOCOL_IN_USE: {from: UserContext, to: ProtocolInUse, class: structural}
+      HAS_ADOPTION_VERSION: {from: ProtocolInUse, to: ProtocolAdoptionVersion, class: structural, temporalProfile: bitemporal_attachment}
+      HAS_DEVIATION: {from: ProtocolAdoptionVersion, to: ProtocolDeviation, class: structural}
+      HAS_SHARING_GRANT: {from: UserContext, to: SharingGrant, class: structural, temporalProfile: bitemporal_attachment}
+    enums:
+      resultQualifier: [NUMERIC, BELOW_DETECTION, ABOVE_QUANTIFICATION, NOT_MEASURED, INVALID_SPECIMEN]
+      provenanceKind: [LAB_REPORT_UPLOAD, DEVICE_IMPORT, MANUAL_ENTRY]
+      deviationKind: [OMITTED, MODIFIED_DOSE, MODIFIED_TIMING, ADDED_STEP, SUBSTITUTED_PRODUCT]
+      granteeKind: [NAMED_PERSON, CLINICIAN, COACH, BELLLABS_RESEARCH, DEIDENTIFIED_CONTRIBUTION]
+      permittedAction: [VIEW, EXPORT, CONTRIBUTE_DEIDENTIFIED]
+      grantDecision: [PERMIT, DENY]
+      pendingKind: [AWAITING_LAB_RESULT, AWAITING_DELIVERY, AWAITING_PROTOCOL_PERIOD_END, AWAITING_EVIDENCE_UPDATE, AWAITING_CLINICIAN_INPUT, AWAITING_RESTOCK, REVIEW_TRIGGERED, REVIEW_SUGGESTED, EVIDENCE_REVIEW]
+      purchaseEventKind: [INTENDED, ORDERED, DELIVERED, STARTED_USE, PAUSED_USE, STOPPED_USE, RETURNED]
+    ownership:   # owner of each private data category (round 0008)
+      goals_and_context_versions: private_context_store
+      measurements_and_lab_reports: private_context_store
+      protocol_in_use_and_deviations: private_context_store
+      recommendation_snapshots_and_user_decisions: private_context_store
+      consent_and_sharing_grants: private_context_store
+      purchase_lifecycle: private_context_store
+      policy_versions_and_decision_criteria: shared_graph_internal
+    syncAndDeletion:
+      - private records reference shared uids plus the recorded-time viewpoint used; no relationship crosses the store boundary
+      - a shared uid merge publishes a redirect; private records are not rewritten
+      - erasure deletes whole private records, leaves a content-free ErasureTombstone, and propagates to derived copies and consented de-identified contributions through their HMAC withdrawal token
+      - aggregates contributed to the shared graph are k-anonymous (threshold open: OPEN-QUESTIONS)
+    forbiddenImplications:
+      - [SHARED_WITH_GRANTEE, PUBLISHED]
+      - [PERSONAL_MEASUREMENT_OUTSIDE_REFERENCE_RANGE, CONDITION_PRESENT]
+      - [PERSONAL_MEASUREMENT, OBSERVATION]
+
+  access_and_answers:
+    maturity: candidate
+    privacyClass: internal
+    nodes:
+      AnswerRecord: {archetype: Occurrence, properties: [recordedAsOf, validAt, intervalStart, intervalEnd, schemaDigest, queryShapeId, queryShapeVersion, accessTier, traceDepth, publishedAt], forbiddenProperties: [userUid, ownerUid, questionText], note: a published (shared) answer with its viewpoint so it can be reproduced; an ad hoc answer to one person is private behaviour data}
+    relationships:
+      CITES_ASSERTION: {from: AnswerRecord, to: Assertion, class: structural}
+      CITES_ASSESSMENT: {from: AnswerRecord, to: EvidenceAssessment, class: structural}
+
+kernelChangeDecisions:   # integration owner rulings, 2026-10-03; failing cases are in the named rounds
+  - {id: K-1, round: 0009, decision: ACCEPTED, change: recordedFrom, recordedTo and assertionUid on asserted edges; per-bound validTimeBasis and precision supersede the single validTimeBasis}
+  - {id: K-2, round: 0009, decision: ACCEPTED, change: derived edges cite projectionOfAssertionUid, or derivationRule plus derivedFromAssertionUids}
+  - {id: K-3, round: 0009, decision: ACCEPTED, change: projection request gains accessTier, privateContext, traceDepth (../ontology-lab/projection-contract.yaml)}
+  - {id: K-4, round: 0009, decision: ACCEPTED, change: SUPERSEDES relationship and Assertion.polarity}
+  - {id: K-5, round: 0009, decision: REVISED, change: no PrivateScope marker in the shared graph; round 0008 places private data outside it, so the marker becomes the private uid prefix check (INV-506)}
+  - {id: K-6, round: 0009, decision: ACCEPTED, change: predicateExclusivity declarations}
+  - {id: K-7, round: 0009, decision: ACCEPTED_AS_CANDIDATE, change: AnswerRecord in access_and_answers}
+  - {id: KCR-2a, round: 0002, decision: ACCEPTED, change: SUPERSEDES between EvidenceAssessments and recordedAt on EvidenceAssessment}
+  - {id: KCR-3a, round: 0003, decision: ACCEPTED, change: Assertion.basisKind, required for MECHANISM predicates}
+  - {id: KCR-L3-001, round: 0005, decision: ACCEPTED, change: CALCULATED assertions with derivationRule and DERIVED_FROM_ASSERTION inputs (merged into basisKind)}
+  - {id: KCR-4.1, round: 0006, decision: ACCEPTED, change: typed selector fields on SourceLocator}
+  - {id: KCR-4.2, round: 0006, decision: ACCEPTED, change: assertionBasis, speechAct and extractionConfidence on Assertion; generic confidence deprecated}
+  - {id: KCR-4.3, round: 0006, decision: ACCEPTED, change: an Assertion has at most one asserter; a ClaimOccurrence exactly one asserter and one container (narrows architecture.md section 2)}
+  - {id: KCR-4.4, round: 0006, decision: ACCEPTED, change: Activity node; mongoResearchRunId maps to externalRunId; Agent.runUid retired}
+  - {id: KCR-4.5, round: 0006, decision: ACCEPTED, change: SUPPORTED_BY to Chunk is a derived variant carrying locatorUid}
+  - {id: KCR-4.6, round: 0006, decision: ACCEPTED_WITH_RECONCILIATION, change: Assertion.status is capture fidelity; reconciled with round 0007 by adjudicationKind CAPTURE_FIDELITY versus SUPPORT}
+  - {id: KCR-0007-1, round: 0007, decision: ACCEPTED, change: Assertion.recordedTo and contentHash; status is a current projection}
+  - {id: KCR-0007-2, round: 0007, decision: ACCEPTED, change: Adjudication.recordedAt, immutability, reviewerType POLICY and MIGRATION}
+  - {id: KCR-0007-3, round: 0007, decision: ACCEPTED, change: SourceRevisionEvent; publishedAt and observedAt on SourceSnapshot}
 
 globalInvariants:
   - id: INV-001
-    rule: Every committed node has exactly one globally stable uid and at least one base archetype label.
+    rule: Every committed node has exactly one globally stable uid and exactly one base archetype label.
   - id: INV-002
-    rule: Every ACCEPTED source-derived assertion has at least one SourceLocator.
+    rule: Every ACCEPTED source-derived assertion has at least one reproducible SourceLocator (snapshot with contentHash, contentHashBasis, retrievedAt; selector fields complete for its selectorKind).
   - id: INV-003
-    rule: An Assertion has exactly one subject and either one object or one typed literal value.
+    rule: An Assertion has exactly one subject and either one object or one typed literal value, and at most one asserter.
   - id: INV-004
-    rule: Derived relationships are regenerable and identify their assertion or derivation rule.
+    rule: A derived relationship is regenerable and cites projectionOfAssertionUid, or derivationRule plus derivedFromAssertionUids; the cited predicate is never the premise of a forbidden implication for the edge type.
   - id: INV-005
     rule: Formulation composition is authoritative only through FormulationVersion and IngredientComponent.
   - id: INV-006
@@ -314,4 +1082,115 @@ globalInvariants:
     rule: Organization roles never imply other organization roles without an assertion.
   - id: INV-010
     rule: Regulatory notification, designation, certification, patent status, and approval remain distinct.
+  # round 0009
+  - id: INV-101
+    rule: Every asserted edge carries assertionUid and recordedFrom; recordedFrom < recordedTo when both exist.
+  - id: INV-102
+    rule: A non-null valid-time bound carries its basis and precision; open and unknown bounds are null and never a sentinel date.
+  - id: INV-103
+    rule: Assertion.status is a cache. Every ACCEPTED, REJECTED or DISPUTED status is backed by a CAPTURE_FIDELITY Adjudication reviewed no earlier than the assertion was recorded, and every SUPERSEDED status by a SUPERSEDES record.
+  - id: INV-104
+    rule: A derived edge cites projectionOfAssertionUid, or derivationRule plus derivedFromAssertionUids (see INV-004).
+  - id: INV-105
+    rule: No shared node has a relationship to a private-personal record; private-to-shared references are uid properties; no shared search index covers private data.
+  - id: INV-106
+    rule: uid has the form hu:<type>:<opaque>, and for nodes that have a live id the uid ends with ':' + id.
+  - id: INV-107
+    rule: Derived search text and embeddings are regenerable projections carrying their derivation (searchFields, embeddingModel, embeddingDimensions) and are never evidence.
+  # rounds 0002 and 0003
+  - id: INV-201
+    rule: No Study, StudyArm, StudyIntervention, StudyResult, or Publication has a direct relationship to Product, ProductVariant, or FormulationVersion; evidence reaches commercial identities only through EvidenceApplicability.
+  - id: INV-202
+    rule: Every EvidenceApplicability has exactly one evidence target, exactly one use target, and one ApplicabilityDimension per required dimension for its evidence-target kind; NOT_ASSESSED is explicit.
+  - id: INV-203
+    rule: A DOSE, SCHEDULE, DURATION, or EXPOSURE ratio exists only when quantity basis and mass basis match on both sides; otherwise the ratio is null and the verdict is at most PARTIAL.
+  - id: INV-204
+    rule: Explanation-only dimensions have verdict NOT_SCORED and never enter a composite; a composite requires methodVersion and all required dimensions.
+  - id: INV-205
+    rule: Surrogate-endpoint status is held by an EndpointClassification with a context of use; it is never a Biomarker property and does not transfer across contexts.
+  - id: INV-206
+    rule: When a study's primary prespecified result is NOT_SIGNIFICANT, its secondary, subgroup, within-arm, or post hoc results enter a synthesis only as SUPPORTIVE or HYPOTHESIS_GENERATING.
+  - id: INV-207
+    rule: A reported zero adverse-event count carries a collection method; absence of an AE report is notReported, never zero.
+  - id: INV-208
+    rule: Registry status, enrollment, results-posted, and design facts live on RegistrationVersion with observedAt; Study carries them only as a derived projection naming its RegistrationVersion.
+  - id: INV-209
+    rule: evidenceLevel, isClinicallyMeaningful, and EvidenceStrength values are assessments with method and criteria; on nodes or edges they are derived projections naming the assessment.
+  - id: INV-210
+    rule: Every mechanism-class Assertion has basisKind; DIRECT_MEASUREMENT requires exactly one MechanismEvidenceContext with setting and, except cell-free and in-silico, a species.
+  - id: INV-211
+    rule: Mechanism projections project only ACCEPTED DIRECT_MEASUREMENT assertions; APPLIES_TO_SPECIES targets only species of projected contexts.
+  - id: INV-212
+    rule: An EvidenceApplicability whose evidence target is a mechanism Assertion has an EXPOSURE dimension; MATCH or PARTIAL requires a linked human exposure result for the target's material and form.
+  - id: INV-213
+    rule: Human-equivalent dose is a derived value with hedMethod; it is never an asserted context property.
+  # rounds 0004 and 0005
+  - id: INV-301
+    rule: Two diagnostic results share an axis only if they share AssayVersion (measured) or AlgorithmVersion (calculated or inferred), or a ComparabilityAssessment with verdict COMPARABLE or COMPARABLE_WITH_CONVERSION compares the two versions.
+  - id: INV-302
+    rule: A ReferenceIntervalVersion belongs to exactly one AssayVersion; a result keeps the interval printed at report time.
+  - id: INV-303
+    rule: Every calculated or inferred result names its AlgorithmVersion; an AlgorithmVersion always has a versionBasis.
+  - id: INV-304
+    rule: Only RegulatoryStatus with statusKind APPROVAL is approval; establishment registration is a status of a Facility only.
+  - id: INV-305
+    rule: An OPERATING capability state requires an assertion from a non-marketing source or a SUPPORT Adjudication with verdict SUPPORTED.
+  - id: INV-306
+    rule: Marketplace hosting, listing, fulfillment, and affiliation never imply seller of record; SELLS_PRODUCT is derived only from SELLER_OF_RECORD_FOR assertions.
+  - id: INV-307
+    rule: A label quantity refers to its amountReferent; active-moiety and nutrient-equivalent amounts are CALCULATED assertions and never label declarations.
+  # round 0006
+  - id: INV-401
+    rule: A source-derived ACCEPTED assertion has at least one reproducible locator (see INV-002).
+  - id: INV-402
+    rule: A ClaimOccurrence has exactly one container and one asserter, and every locator supporting it lies in that container or one of its renditions.
+  - id: INV-403
+    rule: A retelling is a distinct Assertion linked by RETELLS; qualification loss is recorded only on a RetellingFidelityAssessment.
+  - id: INV-404
+    rule: A Chunk is never a SourceLocator; Chunk links are derived and name the locator they project.
+  - id: INV-405
+    rule: A financial-interest assertion or its absence never sets an Adjudication verdict; verdicts need locators to evidence about the proposition.
+  - id: INV-406
+    rule: Assertion.status records capture fidelity; it is never read as truth.
+  - id: INV-407
+    rule: Every confidence value names the Activity and method version that produced it.
+  # rounds 0007 and 0008
+  - id: INV-501
+    rule: Valid time on an Assertion and on any bitemporal episode is immutable; corrections and endings are new recorded-time episodes.
+  - id: INV-502
+    rule: Recorded time is assigned by the ingestion service at commit, is never earlier than the supporting snapshot's retrievedAt, and is never backdated.
+  - id: INV-503
+    rule: Asserted-edge and attachment valid bounds equal those of their authorizing assertion.
+  - id: INV-504
+    rule: SourceSnapshots and Adjudications are immutable; revisions are SourceRevisionEvents and superseding adjudications.
+  - id: INV-505
+    rule: EXCLUSIVE attachments never definitely overlap in both valid and recorded time.
+  - id: INV-506
+    rule: The shared graph contains no private-personal node, property, relationship, or private uid value.
+  - id: INV-507
+    rule: RecommendationSnapshots, their options, and UserContextVersions are insert-only; new measurements create new context versions.
+  - id: INV-508
+    rule: A recommendation is a private decision occurrence; no relationship type expresses a timeless product-to-goal recommendation.
+  - id: INV-509
+    rule: Every DisclosureEvent falls inside a currently recorded PERMIT grant episode covering its data categories; grant revocation is never backdated.
 
+enforcement:
+  neo4jConstraints: ../neo4j/constraints.cypher   # uniqueness and node keys everywhere; existence and type constraints need Enterprise
+  validationQueries: ../neo4j/validation.cypher   # V-0xx baseline, V-1xx to V-5xx for 0.2.0; zero rows means valid
+  serviceEnforced: [INV-003 literal-xor-object, INV-004 derivation rules, INV-101 to INV-105, INV-201 to INV-213, INV-301 to INV-307, INV-401 to INV-407, INV-501 to INV-509, temporal profile immutability, exclusive-overlap rejection, private-store boundary]
+
+migration:
+  from: 0.1.0
+  to: 0.2.0
+  breakingMeaningChanges:
+    - Assertion.status is a current projection of CAPTURE_FIDELITY adjudications and SUPERSEDES; it is never truth. Existing ACCEPTED values are reinterpreted as "accepted as an accurate record"; truth verdicts must be re-expressed as SUPPORT Adjudications where they were implied.
+    - Assertion.confidence is deprecated; existing values are read as extractionConfidence with unknown method and no Activity. New writes require extractionConfidence plus WAS_GENERATED_BY.
+    - A single validTimeBasis is replaced by validFromBasis and validToBasis with per-bound precision. Existing assertions without bases are migrated with basis UNKNOWN and a MIGRATION Adjudication.
+    - ASSESSES_APPLICABILITY_TO no longer accepts UserContext; existing targets of that kind move to PersonalApplicabilityAssessment in the private store.
+    - RecommendationDecision becomes RecommendationSnapshot and RecommendationCandidate becomes RecommendationOption, both private-personal and insert-only.
+    - SourceLocator.selector is split into typed selector fields; untyped selectors are kept with selectorKind UNKNOWN until re-anchored.
+    - evidenceStrength, evidenceLevel and isClinicallyMeaningful become assessments; existing attribute values are kept as extraction-time hints marked derived.
+  additiveChanges:
+    - new modules temporal, identity_resolution (Identifier, Mention, EquivalenceAssessment), mechanisms, diagnostics (candidate), manufacturing_readiness (candidate), claims_and_documents, protocols, private_context, access_and_answers (candidate)
+    - new kernel nodes Activity, SourceRevisionEvent; new kernel relationships SUPERSEDES, DERIVED_FROM_ASSERTION, WAS_GENERATED_BY, USED, WAS_ASSOCIATED_WITH, AUTHORIZED_BY
+  previouslyCommittedAssertions: remain interpretable; no 0.1.0 assertion is deleted or rewritten; the Elysium fixture (../examples/elysium-basis.cypher) still validates under V-0xx and is the 0.1.0 compatibility fixture

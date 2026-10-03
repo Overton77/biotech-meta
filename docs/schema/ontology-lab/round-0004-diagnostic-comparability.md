@@ -1,5 +1,8 @@
 # Round 0004: Diagnostic Comparability
 
+> **Integration decision (2026-10-03):** `ACCEPTED`. Diagnostics promoted future -> candidate; AssayVersion, AlgorithmVersion, ReferenceIntervalVersion, ComparabilityAssessment accepted; DiagnosticResult is a contract only, implemented by PersonalMeasurement (private store) and Observation (protocols). Catalog 0.2.0; see [proposal-index.md](./proposal-index.md).
+
+
 ## Header
 
 - Round ID: 0004

@@ -1,6 +1,6 @@
 contract:
   name: belllabs-schema-projection
-  version: 0.1.0
+  version: 0.2.0
   purpose: Bind an agent-visible schema slice to an intent, temporal viewpoint, source schema, and deterministic closure policy.
 
 request:
@@ -28,6 +28,9 @@ request:
       maxNodes: integer
       maxRelationships: integer
       maxTraversalDepth: integer
+    accessTier: PUBLIC_ANSWER_or_OPERATOR_AUDIT_or_AGENT_PROJECTION_or_OWNER_PRIVATE   # round 0009 K-3; default PUBLIC_ANSWER
+    privateContext: EXCLUDED_or_REFERENCED_BY_UID_ONLY_or_INCLUDED_FOR_OWNER            # default EXCLUDED
+    traceDepth: NONE_or_LOCATOR_or_ADJUDICATION                                        # default LOCATOR
     sourceSchemaDigest: sha256
 
 result:
@@ -62,6 +65,9 @@ result:
     generatedAt: datetime
 
 invariants:
+  - accessTier other than OWNER_PRIVATE requires privateContext EXCLUDED and no private-personal module in requestedModules (catalog INV-105, INV-506).
+  - temporalView.recordedAt and validAt are passed to the as-of query shapes (query-shapes.md QS-2) unchanged; agents never write temporal predicates.
+  - maxTraversalDepth is compiled to a literal quantifier bound.
   - The projection source digest equals the admitted canonical schema digest.
   - Every relationship includes valid endpoint identity surfaces.
   - Every relationship property type and referenced enum is included.

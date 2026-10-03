@@ -1,5 +1,8 @@
 # Round 0005: Filing Versus Capability
 
+> **Integration decision (2026-10-03):** `ACCEPTED`. Regulatory split, ManufacturingCapability, commerce role split and amountReferent accepted; KCR-L3-001 accepted as basisKind CALCULATED with derivationRule and DERIVED_FROM_ASSERTION. Catalog 0.2.0; see [proposal-index.md](./proposal-index.md).
+
+
 ## Header
 
 - Round ID: 0005

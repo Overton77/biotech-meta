@@ -1,5 +1,8 @@
 # Ontology Lab Round Record: Round 0006, Claim and Document Provenance
 
+> **Integration decision (2026-10-03):** `REVISED`. Rules accepted; KCR-4.1 to KCR-4.5 accepted; KCR-4.6 accepted with the reconciliation that Adjudication carries adjudicationKind CAPTURE_FIDELITY or SUPPORT so that Assertion.status projects only capture fidelity (round 0007) and never truth (this round). uid token for runs is `activity`. Catalog 0.2.0; see [proposal-index.md](./proposal-index.md).
+
+
 ## Header
 
 - Round ID: 0006

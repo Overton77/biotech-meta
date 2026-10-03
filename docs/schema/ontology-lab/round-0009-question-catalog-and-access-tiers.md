@@ -1,6 +1,9 @@
 # Round 0009: Question Catalog and Access Tiers
 
-Status: `OPEN` (recommendation by Lane 1; the coordinator sets the final status)
+> **Integration decision (2026-10-03):** `ACCEPTED`. K-1, K-2, K-3, K-4, K-6 accepted; K-7 (AnswerRecord) accepted as candidate; K-5 (PrivateScope marker) revised because round 0008 keeps private data out of the shared graph, so the guard is the private uid prefix check (INV-506). FDA_CLEARED_OR_APPROVED forbidden implications are replaced by the split set from round 0005. Catalog 0.2.0; see [proposal-index.md](./proposal-index.md).
+
+
+Status: `ACCEPTED` (integration owner, 2026-10-03). Lane recommendation was: OPEN (recommendation by Lane 1; the coordinator sets the final status)
 
 ## Header
 
@@ -11,7 +14,7 @@ Status: `OPEN` (recommendation by Lane 1; the coordinator sets the final status)
 - Owning module: provenance and temporal (kernel change requests), plus a candidate `access_and_answers` module
 - Candidate schema version: 0.2.0 (candidate)
 - Source schema digest: `sha256:4c3203f57706c43fe508549211ed6f11910e2150947814c047122eb34f29825f` (`catalog/schema.yaml` as read on 2026-10-03)
-- Decision status: `OPEN`
+- Decision status: `ACCEPTED` (set by the integration owner on 2026-10-03; the lane recommendation is preserved below)
 
 ## Intent and competency questions
 
