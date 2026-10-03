@@ -101,7 +101,7 @@ Execution (2026-10-03, embedded Neo4j 5.26 Community in the authoring scratchpad
 
 | Check | Result |
 |---|---|
-| `constraints.cypher` | 58 statements; 45 applied, 13 rejected by the Community edition as Enterprise-only (property existence and property type constraints), as their comments say |
+| `constraints.cypher` | 57 statements; 45 applied, 12 rejected by the Community edition as Enterprise-only (property existence and property type constraints), as their comments say |
 | Six fixtures, each loaded alone | every statement ran; the full validation suite returned zero failing rows for each |
 | Six fixtures loaded together | zero failing rows; informational rows only: V-111b 7, V-212 2, V-223 1, V-331 1, V-401b 1, V-514b 1, V-522 100 (capped) |
 | 16 query-shape blocks | all run under EXPLAIN without error; QS-2b reproduces its worked example (all five rows); QS-3a on `hu:applicability:nct02678611-1x-to-basis-current` returns the 13 dimension nodes weakest first, with MATERIAL_IDENTITY UNKNOWN and its competing-hypothesis rationale |
