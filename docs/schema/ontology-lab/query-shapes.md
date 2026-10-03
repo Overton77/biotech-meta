@@ -5,6 +5,8 @@ Target: Neo4j 5 property graph, catalog `0.2.0` labels and relationship types (`
 
 These are the Cypher shapes every answer must be expressible in. They are the formal side of the competency questions: Grüninger and Fox treat competency questions as tests of a model's commitments, not as sources of commitments, and ask that informal questions be restated in the model's own terms ([SRC-GRUNINGER-FOX-1995]). A question marked Essential or Foundational in `competency-questions.md` is only accepted if it binds to one of these shapes (the binding table is at the end).
 
+> **Integration note (2026-10-03):** QS-5b and QS-6 were drafted with a `PrivateScope` marker label (round 0009 K-5). Round 0008 places all private-personal data outside the shared graph (catalog INV-506), so K-5 was revised: the authoritative boundary is placement, and the in-graph guard is the private uid prefix. Implementers read `NOT n:PrivateScope` as `NOT n.uid STARTS WITH 'hu:private-'` plus the label check as defence in depth. The two quantified-path-pattern statements in QS-5b bind their variables inside the pattern; the per-statement binding checker flags them as a known false positive.
+
 ## How to read the status tags
 
 - `// status: statically-checked` means the statement was parsed with the official Neo4j Cypher language-support linter (`@neo4j-cypher/language-support` 2.0.0-next.6, `lintCypherQuery`, no schema supplied) with zero errors, and the author read it against catalog labels, relationship types and property names, and against the rule that each statement binds all of its own variables. The linter checks syntax and schema-free semantics. It does not check that a label exists, that a property is populated, or that a plan is efficient.
