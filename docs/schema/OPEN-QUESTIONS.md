@@ -85,6 +85,22 @@ These could be read only from documentation in the authoring session, never from
 6. Whether Cypher accepts a parameter as a path-quantifier bound; the query shapes compile a literal (Lane 1 B.9).
 7. The fixtures and V-0xx to V-5xx were executed on an embedded Neo4j 5.26 Community instance (2026-10-03, zero failing rows). Still to run: the Enterprise-only constraints, and the whole suite against a copy of the deployed database, where the V-000a/b vacuity question and the live label set are decided.
 
+## Status after the final schema proposal run 2026-10-04 (Fable 5.1)
+
+Live-stack facts above, as verified on the pinned research stack (not the deployment): (1) `@neo4j/graphql` 7.6.3 accepts additional labels via `@node(labels:)`; the proposal uses no `extend type`; `@unique` does not exist, uniqueness is created by the operations file. (2) The proposal makes archetype labels mandatory and the operations file back-fills them (section 6b), so V-000a/b are no longer vacuous once it has run. (3) Fulltext indexes are created with stored property names (section 4). (4) Edition: Community rejects existence/type constraints; they ship as an unverified Enterprise companion. (6) Query shapes compile literal quantifier bounds (unchanged). (7) The 0.2.0 fixtures were replayed (45 ok / 12 informational), then the translated set and 24 packets' fixtures ran on Neo4j 5.26.31 Community embedded with APOC Core; see the run's `reports/07-validation-report.md`. Still unverified: the deployed version and edition, (5) the live `LISTS_PRODUCT` property set.
+
+Closed by the run (with the ruling): CL-001..CL-018 of the run's conflict ledger (`reports/02-ownership-and-seams.md`); single asserter per Assertion stays (V-410 extended to every Assertion by V-F5); `privacyClass` null is not public (F-W5-11); `RECOMMENDS` derived only (CL-016).
+
+New or sharpened questions:
+
+1. **Public-tier surface.** The operator SDL exposes every type; the PUBLIC_ANSWER tier needs a derived sub-schema (W23) that must build against the final file (`AssertionSubjectTarget` lists `Activity`, which the public subset excludes). Owner: W23 / access. Evidence: Challenger CH-P-01/02.
+2. **Resolver URIs as canonicalUri.** Seven inherited fixture sources use `https://doi.org/...` as `canonicalUri`; CL-003 requires the post-redirect page. Needs network resolution at ingestion. Owner: W19/W00.
+3. **Cross-store copy detection.** An Observation copied from a private PersonalMeasurement is only detectable with the private store online (CH-P-08, CH-R-06); the shared-graph guard is the writer credential. Owner: W23.
+4. **Enterprise verification.** The companion file (1,378 statements) is unverified; a deployment edition decision is needed (handoff user item).
+5. **Vector dimensions and embedding source** for the three provider-less `@vector` indexes (D-014; user item).
+6. **EU/UK `AUTHORIZATION` status kind**, crawler-terms capture policy, k-anonymity threshold, PostgreSQL 18 `WITHOUT OVERLAPS` for the private store: unchanged user items from the handoff.
+7. **Verdict-versus-inputs checks** for EvidenceSynthesis (CH-S-07) and cadence anchors stated only in prose (CH-R-04) have no structural validator; both are review-queue queries.
+
 ## Agent evaluation questions
 
 1. Which graph shapes consistently produce incorrect retrieval or evidence inheritance?

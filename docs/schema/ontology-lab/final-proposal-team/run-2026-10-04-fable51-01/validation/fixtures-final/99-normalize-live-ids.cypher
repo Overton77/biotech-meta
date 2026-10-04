@@ -236,3 +236,6 @@ MATCH (n:MediaRightsRecord) WHERE NOT (n:VersionedState) SET n:VersionedState;
 MATCH (n:AnswerRecord) WHERE NOT (n:Occurrence) SET n:Occurrence;
 MATCH (n:PolicyVersion) WHERE NOT (n:VersionedState) SET n:VersionedState;
 MATCH (n:DecisionCriterion) WHERE NOT (n:Entity) SET n:Entity;
+
+// V-W00-16: OutcomeDefinition token (W09 registry 'outcome-definition'; 'outcome' is W03's Outcome).
+MATCH (d:OutcomeDefinition) WHERE d.uid STARTS WITH 'hu:outcome:' SET d.uid = replace(d.uid, 'hu:outcome:', 'hu:outcome-definition:'), d.id = split(d.uid, ':')[-1];

@@ -1,5 +1,33 @@
 # Schema Changelog
 
+## Unreleased: final schema proposal run 2026-10-04 (Fable 5.1 synthesis; proposal only, live schema unchanged)
+
+Artifacts: `final_biotech_schema_proposal.graphql` (standalone `@neo4j/graphql` 7.6.3 SDL, builds), `neo4j/final_biotech_schema_operations.cypher` (+ `.enterprise.cypher` companion), run directory `ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/` (24 packets, reports, validation evidence). Each line below is a reasoned change with its ruling id; everything else in the proposal restates 0.2.0.
+
+### Breaking meaning changes (proposal)
+
+- `HAS_SNAPSHOT` means Source → SourceSnapshot only; entity state caches (Organization, Product → *Snapshot) attach with `HAS_STATE` and `StateEpisodeProperties` (MR-04, W00-R-16).
+- The live `Study.evaluates` union edge is read-only legacy, stored as `LEGACY_EVALUATES`; `StudyIntervention` is a node type and the live union is `LegacyEvaluatedIntervention` (D-003, MR-05).
+- Retrieval mentions are `MENTIONS_ENTITY` with `RetrievalEdgeProperties`; `MENTIONS` is the kernel SourceLocator → Mention edge only (MR-06, W00-R-19). `IDENTIFIED_BY` folds into `HAS_IDENTIFIER` (MR-08). Media variants use `HAS_MEDIA_VARIANT` (CL-014). Protocol steps hang from `ProtocolEdition` via `HAS_PROTOCOL_STEP {orderIndex}`; a live `Protocol -HAS_STEP->` set migrates to one legacy edition (D-004, CL-013, CH-R-13).
+- `Person -RECOMMENDS->` is a derived projection (`DerivedEdgeProperties`) licensed only by a RECOMMENDS speech-act occurrence; validator V-423 is retired in favour of V-W21-06 / V-423r (CL-016, D-011).
+- `privacyClass` is stored as the GraphQL enum spelling `PUBLIC` / `INTERNAL`; a null class is NOT public: public-tier reads filter `privacyClass = 'PUBLIC'` on every node of the path (MR-10, F-W5-11; the 0.2.0 "default public" convention is withdrawn by this proposal).
+- `Entity.name` is nullable (D-013). `Observation` carries the `DiagnosticResult` label and implements the W07 `DiagnosticResult` interface (CL-008, F-W5-10). `SUPPORTED_BY` is property-less everywhere (F-W5-03); `AFFECTS_MECHANISM` / `MODULATES` carry `AssociationProjectionProperties` on both ends (F-W5-04).
+- Live types retired or merged: `Compound` → `ChemicalSubstance`, `CompoundForm` split, `Ingredient`/`Material` → `IngredientMaterial`, `FoodProduct` → `Product {productKind: CONVENTIONAL_FOOD}`, `PhysicalLocation` → `Facility`, `Listing`/`ListingSnapshot` → `MerchantListing`/`Offer`/`PriceObservation`, `ExperienceReport` → `ClaimOccurrence`, `Association` → assertions, `MediaSource` → `DERIVED_FROM_SOURCE` (report 06, section 2).
+
+### Added (proposal)
+
+- Six-archetype label kernel on every node (`@node(labels: [primary, parents..., archetype])`), uid beside live id, SDL-derived relationship class lists for the validators (`validation/harness/gen-params.mjs`).
+- Interface field `privacyClass` on `Entity`, `ActorIdentity`, `SearchIndexable` (F-W5-11); provider-less `@vector` indexes on `Organization`, `Treatment`, `TechnologyPlatform` (D-014, F-W5-12).
+- `HAS_ANALYTE` (Biomarker → ChemicalSubstance | MolecularEntity, candidate, F-W5-01); `DERIVED_FROM_PROTOCOL` (F-W5-14); `MeasurementPlan.cadenceAnchorAt/cadenceAnchorBasis` (F-W5-13); `Observation.comparedTo` (F-W5-07); `RecommendableTarget`; `SELLS_PRODUCT` and `RECOMMENDS` as declared derived types.
+- Candidate modules `interventions` and `food_lifestyle_exposure`; `manufacturing_readiness` promoted to provisional with `ManufacturingProcess`/`ManufacturingStep` (T-002, T-005).
+- Enum values with failing cases: see decision report sections C and F-W5-05 (e.g. `MaterialKind.FOOD`, `PathwayKind.NOVEL_FOOD_AUTHORISATION`, `RegulatoryStatusKind.DESIGNATION_ENDED_UNSPECIFIED`, `CadenceUnit.YEAR/MINUTE`).
+- Validation: W00 corrections (44 statements replacing 33 of the 0.2.0 queries), Fable Wave 5 validators and generated label checks, compiled into `validation/final-validation-suite.cypher` (the 0.2.0 file itself is unchanged).
+
+### Fixed (run evidence)
+
+- `examples/elysium-basis.cypher` writes `recordedAt = datetime()` (a time bomb for V-110); the run's translated copy pins it. Other translated-fixture repairs are listed in decision report section D (uid tokens, `IDENTIFIED_BY`, derived RECOMMENDS properties, PolicyVersion keys, recordedAt after the cited snapshot, `'synthetic'` privacy class).
+- Runtime facts verified on the pinned stack (`@neo4j/graphql` 7.6.3, Neo4j 5.26.31 Community embedded, APOC Core 5.26.31): no `@unique` directive; `@vector` with `provider:` needs feature configuration; APOC Core is required for DateTime reads (MR-12); relationship property uniqueness constraints work; existence/type constraints are rejected by Community (companion file, unverified on Enterprise).
+
 ## 0.2.0 (2026-10-03)
 
 Provisional semantic contract integrating ontology-lab rounds 0002 to 0009. The live Neo4j GraphQL schema is unchanged; its alignment is recorded per type in `ontology-lab/live-schema-alignment.md` and as an additive projection in `neo4j/proposed-delta.graphql`. The integration record is `ontology-lab/proposal-index.md`.

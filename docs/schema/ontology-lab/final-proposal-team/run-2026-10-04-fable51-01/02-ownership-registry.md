@@ -53,3 +53,9 @@ Legend: W = sole file writer; module = canonical catalog module; "live" = define
 | T-003 | `DocumentTextVersion` | provenance | W20 | none | open |
 | T-004 | `PhysicalLocation` (live, unowned) | — | W01 | `Facility` or seam | open |
 | T-005 | `Treatment`, `Procedure`, `FoodItem`, `FoodProduct`, `Exposure`, `Lifestyle` (live, unowned) | — | W05/W06 | candidate modules | open |
+
+## Wave 5 admissions and status (Fable, after the packets)
+
+Sole-writer additions accepted in `reports/03-decision-report.md` section C are registered to their owners as listed there. Fable-ruled additions at assembly (section F): `HAS_ANALYTE` (W07, candidate; fields on `Biomarker`), `DERIVED_FROM_PROTOCOL` (W16; `Protocol.derivedFromProtocols`), `MeasurementPlan.cadenceAnchorAt` / `cadenceAnchorBasis` (W16), `Observation.comparedTo` (W16 field, W07 relationship `COMPARED_TO`), `RecommendableTarget` (W21), `SELLS_PRODUCT` (W15, derived) and `RECOMMENDS` (W21, derived) declared for the first time, interface field `privacyClass` on `Entity`, `ActorIdentity`, `SearchIndexable` (W00). Cross-owner field slots injected at merge are listed in `reports/04-seam-closure-ledger.md` section 4; the owner of the relationship type stays the registry owner, the owner of the host type owns the field text.
+
+Transfer placeholders: T-001 closed (no transfer); T-002 closed (`ManufacturingProcess`, `ManufacturingStep` and their edges to `manufacturing_readiness`, promoted to provisional; specification pair stays); T-003 closed (no transfer); T-004 closed (`PhysicalLocation` merged into `Facility`); T-005 closed (candidate modules `interventions` and `food_lifestyle_exposure`). Details in `reports/02-ownership-and-seams.md`.
