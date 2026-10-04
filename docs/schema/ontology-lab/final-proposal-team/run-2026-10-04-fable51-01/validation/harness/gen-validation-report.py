@@ -31,8 +31,9 @@ L.append(f"| **All** | {verd.get('PASS',0)} | {verd.get('FAIL',0)} | {verd.get('
 L.append("`recorded` steps are the Enterprise companion (expected rejections on Community) and steps whose expectation is observational by the packet's own documentation.\n")
 # RESCORE: one consistent policy over the raw verdicts
 if plan:
-    import io,contextlib; sys.argv=[sys.argv[0],w6,plan]; buf=io.StringIO()
-    with contextlib.redirect_stdout(buf): exec(open(f"{RUN}/validation/harness/rescore-wave6.py").read())
+    buf=subprocess.run([sys.executable, f"{RUN}/validation/harness/rescore-wave6.py", w6, plan], capture_output=True, text=True)
+    class _B: pass
+    _b=_B(); _b.getvalue=lambda: buf.stdout; buf=_b
     L.append("## 2b. Re-scored under one policy\n")
     L.append("The runner's raw verdicts use each step's own informational list as the plan builder wrote it before the final suite replaced the 0.2.0 file. Re-scoring applies one policy to every step: the 0.2.0 informational ids and every `...i` audit id never fail a step; rows the normalization/backfill removes (`V-117`/`V-F5-61` missing live id, `V-503r` edge bases, label checks) are load-order artifacts, because packet fixtures were loaded after the operations file and before the backfill; `rows:` expectations written against replaced ids are matched against their successors (`V-xxx` -> `V-xxxr` / `V-F5-nn`). Output of `validation/harness/rescore-wave6.py`:\n")
     L.append("```\n"+buf.getvalue().strip()+"\n```\n")
