@@ -1,0 +1,114 @@
+# W17 seam requests (run-2026-10-04-fable51-01). Format per 04-worker-brief.md.
+- id: W17-SR-01
+  targetOwner: Fable (ownership registry)
+  request: >
+    Register under W17 (module safety_and_constraints) the elements beyond the registry row that the fragment defines:
+    relationship types SIGNAL_BASED_ON, CONSTRAINS_USE_OF, CONSTRAINT_SCOPE, RESOLVES_TO_CONSTRAINT; relationship-property
+    types SignalInputProperties, ConstraintScopeProperties; enums SignalStatus, ConstraintLevel, ConstraintScopeRole,
+    SafetySubjectRole; unions SafetySignalInputTarget, UseConstraintScopeTarget.
+  cq: [CQ-ST-06, CQ-RC-06, CQ-RC-07, CQ-SF-C01, CQ-SF-C03]
+  failingCase: "Without SIGNAL_BASED_ON {aeReportedStatus} a not-reported study is either dropped or written as a zero (N3, V-W17-03); without UseConstraint scope edges Q-W17-04 cannot tell case D (block) from E (penalize) or F (out of dose band)."
+  proposedRuling: "Accept; each element maps to a run fixture and validator (02-cq-coverage.md section 2)."
+- id: W17-SR-02
+  targetOwner: W00
+  request: "Register uid tokens AdverseEffect: adverse-effect, SafetySignal: safety-signal, UseConstraint: use-constraint; ContraindicationAssertion and InteractionAssertion use the existing token `assertion` (as RelationshipAssertion)."
+  cq: [CQ-SF-C01, CQ-RC-06]
+  failingCase: "INV-106 / V-106 cannot check hu:safety-signal:, hu:use-constraint:, hu:adverse-effect: uids written by fixtures 00-05; the W23 PCS shared_uid domain accepts them only by regex."
+  proposedRuling: "Accept."
+- id: W17-SR-03
+  targetOwner: W00 (catalog conventions and safety_and_constraints module)
+  request: >
+    Register asserted predicates USE_CONSTRAINED_IN, USE_CONSTRAINED_WITH, INTERACTS_WITH, IDENTIFIES_POTENTIAL_SAFETY_SIGNAL;
+    add forbiddenImplications FI-W17-01..09 (02-cq-coverage.md section 3) to safety_and_constraints; add candidate value SAFETY
+    to PredicateClass (fixtures use OTHER until then).
+  cq: [CQ-RC-06, CQ-SF-C02, CQ-SF-C03, CQ-SF-C04, CQ-AX-04]
+  failingCase: "Fixtures 03-05 write 23 assertions with these predicates; V-W17-04/05 check them by name. QS-4a needs the pairs to guard [NO_INTERACTION_RECORD, NO_INTERACTION] and [POTENTIAL_SIGNAL_LISTED, CAUSAL_ASSOCIATION]."
+  proposedRuling: "Accept as candidate predicates while the module is candidate."
+- id: W17-SR-04
+  targetOwner: W02, W04, W05, W06 (writers of hasSafetySignals) and Fable
+  request: >
+    Keep the field form already written (`hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL",
+    direction: OUT, properties: "SafetyEdgeProperties")`) but change the description class from asserted to structural:
+    the edge is the subject attachment of an immutable SafetySignal assessment, written in its commit. SafetySubjectTarget
+    members answer W02-SR-14 (ChemicalSubstance, IngredientMaterial), W04-SR-10 (ProductVariant), W05-SR-12
+    (IngredientMaterial replaces FoodItem/Ingredient, Product replaces FoodProduct, Exposure added, Lifestyle kept), W06-SR-09
+    (Treatment, Procedure kept).
+  cq: [CQ-ST-06, CQ-SF-C01]
+  failingCase: "Negative N4: an 'asserted' HAS_SAFETY_SIGNAL citing assertionUid of an INTERACTS_WITH assertion; V-W17-11 reports it and QS-4a would report CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE."
+  proposedRuling: "Accept D-W17-02; the registry note 'asserted projection embedding AssertedEdgeProperties' is superseded by the structural profile."
+- id: W17-SR-05
+  targetOwner: W00
+  request: "AssertionSubjectTarget: remove SafetySignal (no source asserts about a BellLabs assessment); keep AdverseEffect (object of agency listings). SupportedRecordTarget: add SafetySignal (agency-import signals are SUPPORTED_BY the listing row and its as-of header)."
+  cq: [CQ-SF-C02]
+  failingCase: "Fixture 02 writes SafetySignal -SUPPORTED_BY-> SourceLocator for the AEMS rows; with the current union the GraphQL inverse `supportedRecords` on SourceLocator cannot return them."
+  proposedRuling: "Accept."
+- id: W17-SR-06
+  targetOwner: W10 (W00 resolves an archetype-subtype dispute)
+  request: >
+    (a) Confirm SafetySignal as a distinct EvidenceAssessment subtype beside EvidenceSynthesis (a signal returns a lifecycle
+    state for a subject-effect pair; a synthesis returns a claim verdict); an EvidenceSynthesis may INCLUDES_RESULT a SafetySignal
+    if W10 wants it. (b) Confirm UseContextProfile may be a POPULATION scope member of a UseConstraint (non-personal
+    descriptors such as 'patients of Chinese descent', 'pregnant patients'). (c) EvidenceStrength stays the legacy hint enum
+    referenced by SafetySignal.legacyEvidenceStrengthHint. (d) Applicability: a study that excluded a co-exposure (NCT02678611
+    excluded lipid-lowering drugs) gives no evidence about that co-exposure (FI-W17-09) -> POPULATION / BACKGROUND_CONTEXT
+    dimension.
+  cq: [CQ-SF-C01, CQ-ST-06, CQ-EV-04]
+  failingCase: "AEMS lenvatinib row 'no action was necessary at the time' has no claim-verdict equivalent; fixture 02 needs CLOSED_NO_ACTION."
+  proposedRuling: "Accept (a)-(c); W10 decides (d) wording."
+- id: W17-SR-07
+  targetOwner: W23
+  request: >
+    Private-store contract: RecommendationOption.blockingConstraintUids accepts hu:use-constraint: uids (and W16
+    hu:constraint: uids for protocol-sourced blocks); evidenceAssertionUids carries the Contraindication/InteractionAssertion
+    uids read at evidenceRecordedAt; when the block is caused by absent interaction data for a declared co-exposure, the option
+    cites the policy DecisionCriterion uid (criterionKind SAFETY_BLOCK) and missingFactKeys 'INTERACTION_DATA:<option uid>:<co-exposure uid>'
+    so the PCS CHECK (BLOCKED requires non-empty blocking uids) holds without fabricating a shared constraint. The mapping
+    ConstraintLevel / interaction polarity -> BLOCK | PENALIZE lives in the RECOMMENDATION_RANKING PolicyVersion payload; the
+    evaluation checks both directions (option as constrained subject or as co-exposure member) as Q-W17-04 does.
+  cq: [CQ-RC-06, CQ-RC-07]
+  failingCase: "Q-W17-04 case G (NR + simvastatin: no record) must block under policy v3 but has no UseConstraint; N10 shows the leak if one is created."
+  proposedRuling: "Accept."
+- id: W17-SR-08
+  targetOwner: W09
+  request: >
+    (a) Optional structural edge AdverseEventResult -> AdverseEffect (e.g. CODED_AS_EFFECT, zero_or_one, from eventTerm/eventTermCode
+    mapping) so cross-study AE comparison groups by concept, not by term string. (b) If W09 keeps live Study.reportsSafetySignals,
+    write it read-only as the derived REPORTS_SAFETY_SIGNAL (rule ss-study/v1, DerivedEdgeProperties). (c) W17 consumes
+    collectionMethod and relatednessAssessor as written; agrees with W09-D07 (Dellinger 'self-reported AEs' -> NOT_DESCRIBED)
+    and with the V-217 / V-217i split.
+  cq: [CQ-ST-06]
+  failingCase: "Fixture 01 related-AE rows and a second trial's 'nausea' rows can only be grouped by text today."
+  proposedRuling: "W09 decides (a); accept (b) and (c)."
+- id: W17-SR-09
+  targetOwner: Fable (merged validation) with W00
+  request: >
+    Adopt V-W17-01..V-W17-13 (fixtures/w17-validation.cypher). Restrict baseline V-231 to predicateClass = 'MECHANISM'
+    assertions, as INV-210 states ('Every mechanism-class Assertion ... DIRECT_MEASUREMENT requires exactly one
+    MechanismEvidenceContext').
+  cq: [CQ-SF-C04, CQ-AX-04]
+  failingCase: "A primary PK study's INTERACTS_WITH assertion with basisKind DIRECT_MEASUREMENT (setting HUMAN_INTERVENTIONAL) is flagged by V-231 although INV-210 does not apply; observed on the first version of fixture 04 (2 rows)."
+  proposedRuling: "Accept both."
+- id: W17-SR-10
+  targetOwner: W03
+  request: "Ruling on W03-SR-08: AFFECTS_ORGAN keeps one meaning (curated anatomical involvement of a reference concept), class structural, property type MechanismLinkProperties, domain AdverseEffect | Condition, range Organ. W17 writes AdverseEffect.affectsOrgans; SafetySignal.affectsOrgans is retired (read through relatesToEffects). If W03 keeps inverse fields on Condition, Condition.relatedSafetySignals = RELATES_TO_CONDITION direction IN, StructuralEdgeProperties."
+  cq: [CQ-SF-C05, CQ-ST-03]
+  failingCase: "N12 (SafetySignal -AFFECTS_ORGAN-> Organ) caught by V-W17-09."
+  proposedRuling: "Accept."
+- id: W17-SR-11
+  targetOwner: W20
+  request: "FDA Drug Safety Communications and AEMS quarterly pages are Documents with type SAFETY_COMMUNICATION; AEMS pages are edited in place (status column 'as of <date>'), so each observation needs its own SourceSnapshot and a SourceRevisionEvent when a row's status text changes. W17 adopts W20-SR-17 derived supportedBy* fields."
+  cq: [CQ-SF-C02]
+  failingCase: "S3: the Jul-Sep 2024 row text was observed only in its 2025-10-24 state; the first-posting text is unknown."
+  proposedRuling: "Accept."
+- id: W17-SR-12
+  targetOwner: W16
+  request: "W17 imports ThresholdComparator for dose bands. Protocol CONTRAINDICATED_WHEN constraints stay W16 Constraints (a condition a step tests); a step that uses a substance may surface that substance's UseConstraints through a read-only join, never by copying them into Constraint nodes."
+  cq: [CQ-RC-06, CQ-PR-03]
+  failingCase: "A sauna step's CONTRAINDICATED_WHEN constraint and simvastatin's label constraints are both block reasons with different identities (hu:constraint: vs hu:use-constraint:)."
+  proposedRuling: "Accept."
+- id: W17-SR-13
+  targetOwner: W16, W18, W10/W20/W21, W03, W22 (owners of ProtocolResultMention, EventSubject, EvidenceSubject, ClaimSubject, AssociationParticipant, EpisodeMentionable, MediaSubject successors)
+  request: "Members SafetySignal and AdverseEffect may stay; note that SafetySignal is now an EvidenceAssessment (a mention of a signal is a mention of an evaluation record, not of a harm fact). Prefer AdverseEffect where the intent is the harm concept."
+  cq: [CQ-SF-C01]
+  failingCase: "An episode that 'mentions liver toxicity' linked to a SafetySignal would read as BellLabs' evaluation being discussed."
+  proposedRuling: "Owners decide per union."

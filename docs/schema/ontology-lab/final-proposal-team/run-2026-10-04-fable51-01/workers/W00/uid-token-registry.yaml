@@ -1,0 +1,997 @@
+registry: uidTypeTokens (keyed by primary label) - W00 reconciliation pass, run-2026-10-04-fable51-01
+rulingId: W00-R-01
+rules:
+  T1: One token per primary label; the uid is hu:<token>:<opaque>; the token is lower-case kebab and never encodes a name.
+  T2: 'Refinement specialization (a node of the parent type may later gain the specialization label: LegalEntity, RegulatoryAgency, TestingLaboratory,
+    the IngredientMaterial subtypes, FoodItem, Organ, LabelSnapshot, DrugApproval, OrphanDesignation) uses the PARENT token, because uid is immutable
+    and reclassification must not mint a new identity (W02-SR-03 failing case fx-02; W05-SR-01; W03-SR-04; W13-SR-02).'
+  T3: 'Creation-time kind (the specialization label is fixed when the record is created: Document, ClaimOccurrence, AdverseEventResult, CohortParticipant,
+    SourceDiscoveryRecord) may carry its own token; the catalog 0.2.0 precedents Document: document and ClaimOccurrence: claim-occurrence are
+    kept.'
+  T4: Lower-case alias keys of catalog 0.2.0 (fixture tokens) stay valid for 0.2.0 fixtures only; production ingestion uses the label-keyed token.
+    V-W00-16 checks the label-keyed map.
+  T5: Retired types (MR-02) get no token; their nodes migrate to the successor type and token with a SAME_IDENTITY_MERGED redirect when the token
+    changes.
+labels:
+  Activity:
+    token: activity
+    status: CATALOG_0.2.0
+    owner: W00
+  Adjudication:
+    token: adjudication
+    status: CATALOG_0.2.0
+    owner: W00
+  AdverseEventResult:
+    token: adverse-event-result
+    status: ACCEPTED
+    requestedBy: W09-SR-04
+    owner: W09
+  AffiliateLink:
+    token: affiliate-link
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  Agent:
+    token: agent
+    status: CATALOG_0.2.0
+    owner: W00
+  Algorithm:
+    token: algorithm
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  AlgorithmVersion:
+    token: algorithm-version
+    status: CATALOG_0.2.0
+    owner: W07
+  AnatomicalContext:
+    token: anatomical-context
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W03
+  AnonymousActor:
+    token: anonymous-actor
+    status: CATALOG_0.2.0
+    owner: W01
+  AnswerRecord:
+    token: answer-record
+    status: CATALOG_0.2.0
+    owner: W23
+  ApplicabilityDimension:
+    token: applicability-dimension
+    status: CATALOG_0.2.0
+    owner: W10
+  AssayVersion:
+    token: assay-version
+    status: CATALOG_0.2.0
+    owner: W07
+  Assertion:
+    token: assertion
+    status: CATALOG_0.2.0
+    owner: W00
+  Biomarker:
+    token: biomarker
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  BotanicalPreparation:
+    token: material
+    status: ACCEPTED
+    requestedBy: W02-SR-03
+    owner: W02
+    note: refinement specialization of IngredientMaterial (rule T2)
+  BotanicalTaxon:
+    token: botanical-taxon
+    status: ACCEPTED
+    requestedBy: W02-SR-03
+    owner: W02
+  BrandedIngredientMaterial:
+    token: material
+    status: ACCEPTED
+    requestedBy: W02-SR-03
+    owner: W02
+    note: refinement specialization of IngredientMaterial (rule T2)
+  Bundle:
+    token: bundle
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  BundleComponent:
+    token: bundle-component
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  CertificateOfAnalysis:
+    token: coa
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  CertificationListing:
+    token: cert-listing
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  CertificationProgram:
+    token: cert-program
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  CertificationScope:
+    token: cert-scope
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  Channel:
+    token: channel
+    status: CATALOG_0.2.0
+    owner: W21
+  ChemicalForm:
+    token: form
+    status: CATALOG_0.2.0
+    owner: W02
+  ChemicalSubstance:
+    token: substance
+    status: CATALOG_0.2.0
+    owner: W02
+  Chunk:
+    token: chunk
+    status: CATALOG_0.2.0
+    owner: W20
+  Claim:
+    token: claim
+    status: CATALOG_0.2.0
+    owner: W21
+  ClaimOccurrence:
+    token: claim-occurrence
+    status: CATALOG_0.2.0
+    owner: W21
+  CohortParticipant:
+    token: cohort-participant
+    status: ACCEPTED
+    requestedBy: W01-SR-01
+    owner: W01
+  CommerceMatch:
+    token: commerce-match
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  ComparabilityAssessment:
+    token: comparability
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  Condition:
+    token: condition
+    status: ACCEPTED
+    requestedBy: W03-SR-04, W16-SR-01
+    owner: W03
+  Constituent:
+    token: constituent
+    status: ACCEPTED
+    requestedBy: W02-SR-03
+    owner: W02
+  Constraint:
+    token: constraint
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W16
+  ConsumerBrand:
+    token: brand
+    status: CATALOG_0.2.0
+    owner: W01
+  Dataset:
+    token: dataset
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W09
+  DecisionCriterion:
+    token: decision-criterion
+    status: ACCEPTED
+    requestedBy: W23-SR-01
+    owner: W23
+  Device:
+    token: device
+    status: ACCEPTED
+    requestedBy: W08-SR-06, W09-SR-04
+    owner: W08
+  Document:
+    token: document
+    status: CATALOG_0.2.0
+    owner: W20
+  DocumentTextVersion:
+    token: text-version
+    status: CATALOG_0.2.0
+    owner: W20
+  DrugApproval:
+    token: regulatory-status
+    status: ACCEPTED
+    requestedBy: W13-SR-02
+    owner: W13
+    note: refinement specialization of RegulatoryStatus (rule T2)
+  EndpointClassification:
+    token: endpoint-classification
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W10
+  Episode:
+    token: episode
+    status: CATALOG_0.2.0
+    owner: W21
+  EpisodeSegment:
+    token: episode-segment
+    status: CATALOG_0.2.0
+    owner: W21
+  EquivalenceAssessment:
+    token: assessment
+    status: ACCEPTED
+    requestedBy: W00-SR-09
+    owner: W00
+    note: shares the registered EvidenceAssessment token (no equivalence-assessment token)
+  EvidenceApplicability:
+    token: applicability
+    status: CATALOG_0.2.0
+    owner: W10
+  EvidenceAssessment:
+    token: assessment
+    status: CATALOG_0.2.0
+    owner: '-'
+  EvidenceSynthesis:
+    token: synthesis
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W10
+  Exposure:
+    token: exposure
+    status: ACCEPTED
+    requestedBy: W05-SR-01
+    owner: W05
+  Facility:
+    token: facility
+    status: CATALOG_0.2.0
+    owner: W01
+  FigurePanel:
+    token: figure-panel
+    status: ACCEPTED
+    requestedBy: W22-SR-01
+    owner: W22
+  FirmwareVersion:
+    token: firmware-version
+    status: ACCEPTED
+    requestedBy: W08-SR-06
+    owner: W08
+  FoodItem:
+    token: material
+    status: ACCEPTED
+    requestedBy: W05-SR-01
+    owner: W05
+    note: refinement specialization of IngredientMaterial (rule T2)
+  FormulationVersion:
+    token: formulation
+    status: CATALOG_0.2.0
+    owner: W04
+  FunctionalGoal:
+    token: functional-goal
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W16
+  GrantedPatent:
+    token: granted-patent
+    status: ACCEPTED
+    requestedBy: W14-SR-01
+    owner: W14
+  GraphView:
+    token: graph-view
+    status: ACCEPTED
+    requestedBy: W22-SR-01
+    owner: W22
+  Identifier:
+    token: identifier
+    status: CATALOG_0.2.0
+    owner: W00
+  IndividualUnit:
+    token: individual-unit
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  IngredientComponent:
+    token: component
+    status: CATALOG_0.2.0
+    owner: W04
+  IngredientMaterial:
+    token: material
+    status: CATALOG_0.2.0
+    owner: W02
+  InterventionComponent:
+    token: intervention-component
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W09
+  InventoryItem:
+    token: inventory-item
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  IpRightStatus:
+    token: ip-status
+    status: ACCEPTED_AS_CANDIDATE
+    requestedBy: W14-SR-01
+    owner: W14
+    note: type is CANDIDATE (W14-SR-02)
+  LabTest:
+    token: lab-test
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  LabelDeclaration:
+    token: label-declaration
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W04
+  LabelSnapshot:
+    token: snapshot
+    status: ACCEPTED
+    requestedBy: W04-SR-01
+    owner: W04
+    note: refinement specialization of SourceSnapshot (rule T2)
+  LegalEntity:
+    token: org
+    status: CATALOG_0.2.0
+    owner: W01
+  Lifestyle:
+    token: lifestyle
+    status: ACCEPTED
+    requestedBy: W05-SR-01
+    owner: W05
+  LotTestSummary:
+    token: lot-test-summary
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  ManufacturingCapability:
+    token: capability
+    status: ACCEPTED
+    requestedBy: W11-SR-08
+    owner: W11
+  ManufacturingProcess:
+    token: process
+    status: ACCEPTED
+    requestedBy: W11-SR-08
+    owner: W11
+  ManufacturingSpecification:
+    token: specification
+    status: ACCEPTED
+    requestedBy: W11-SR-08
+    owner: W11
+  ManufacturingStep:
+    token: process-step
+    status: ACCEPTED
+    requestedBy: W11-SR-08
+    owner: W11
+  MaterialMixture:
+    token: material
+    status: ACCEPTED
+    requestedBy: W02-SR-03
+    owner: W02
+    note: refinement specialization of IngredientMaterial (rule T2)
+  MeasuredResult:
+    token: measured-result
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  MeasurementMethod:
+    token: method
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  MeasurementPlan:
+    token: measurement-plan
+    status: ACCEPTED
+    requestedBy: W16-SR-01
+    owner: W16
+  Mechanism:
+    token: mechanism
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W03
+  MechanismEvidenceContext:
+    token: mech-context
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W03
+  MediaAnnotation:
+    token: media-annotation
+    status: ACCEPTED
+    requestedBy: W22-SR-01, W00-SR-09
+    owner: W22
+  MediaAsset:
+    token: media-asset
+    status: ACCEPTED
+    requestedBy: W22-SR-01
+    owner: W22
+  MediaRightsRecord:
+    token: media-rights
+    status: ACCEPTED
+    requestedBy: W22-SR-01
+    owner: W22
+  MediaSuitabilityAssessment:
+    token: media-assessment
+    status: ACCEPTED
+    requestedBy: W22-SR-01
+    owner: W22
+  MediaVariant:
+    token: media-variant
+    status: ACCEPTED
+    requestedBy: W22-SR-01
+    owner: W22
+  Mention:
+    token: mention
+    status: ACCEPTED
+    requestedBy: W00-SR-09
+    owner: W00
+  MerchantListing:
+    token: listing
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  Metric:
+    token: metric
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  MicrobialPreparation:
+    token: material
+    status: ACCEPTED
+    requestedBy: W02-SR-03
+    owner: W02
+    note: refinement specialization of IngredientMaterial (rule T2)
+  MicrobialStrain:
+    token: microbial-strain
+    status: ACCEPTED
+    requestedBy: W02-SR-03
+    owner: W02
+  MicrobialTaxon:
+    token: microbial-taxon
+    status: ACCEPTED
+    requestedBy: W02-SR-03
+    owner: W02
+  Modality:
+    token: modality
+    status: ACCEPTED
+    requestedBy: W08-SR-06
+    owner: W08
+  MolecularEntity:
+    token: molecular-entity
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W03
+  Nutrient:
+    token: nutrient
+    status: ACCEPTED
+    requestedBy: W02-SR-03
+    owner: W02
+  Observation:
+    token: observation
+    status: ACCEPTED
+    requestedBy: W16-SR-01
+    owner: W16
+  Offer:
+    token: offer
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  Organ:
+    token: anatomical-context
+    status: ACCEPTED
+    requestedBy: W03-SR-04
+    owner: W03
+    note: refinement specialization of AnatomicalContext (rule T2)
+  Organization:
+    token: org
+    status: CATALOG_0.2.0
+    owner: W01
+  OrganizationSnapshot:
+    token: org-snapshot
+    status: ACCEPTED
+    requestedBy: W01-SR-01
+    owner: W01
+  OrphanDesignation:
+    token: regulatory-status
+    status: ACCEPTED
+    requestedBy: W13-SR-02
+    owner: W13
+    note: refinement specialization of RegulatoryStatus (rule T2)
+  Outcome:
+    token: outcome
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W03
+  OutcomeDefinition:
+    token: outcome-definition
+    status: ACCEPTED
+    requestedBy: W09-SR-04
+    owner: W09
+  PackageConfiguration:
+    token: package-configuration
+    status: ACCEPTED
+    requestedBy: W04-SR-01
+    owner: W04
+  PanelDefinition:
+    token: panel-definition
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  PassFailInterpretation:
+    token: pass-fail
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  PatentApplication:
+    token: patent-application
+    status: ACCEPTED
+    requestedBy: W14-SR-01
+    owner: W14
+  PatentClaim:
+    token: patent-claim
+    status: ACCEPTED
+    requestedBy: W14-SR-01
+    owner: W14
+  PatentFamily:
+    token: patent-family
+    status: ACCEPTED
+    requestedBy: W14-SR-01
+    owner: W14
+  PatentLicense:
+    token: patent-license
+    status: ACCEPTED
+    requestedBy: W14-SR-01
+    owner: W14
+  Pathway:
+    token: pathway
+    status: ACCEPTED
+    requestedBy: W03-SR-04, W22-SR-01
+    owner: W03
+  Person:
+    token: person
+    status: CATALOG_0.2.0
+    owner: W01
+  Platform:
+    token: platform
+    status: ACCEPTED
+    requestedBy: W21-SR-01
+    owner: W21
+  PolicyVersion:
+    token: policy-version
+    status: ACCEPTED
+    requestedBy: W23-SR-01
+    owner: W23
+  PriceObservation:
+    token: price-obs
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  Procedure:
+    token: procedure
+    status: ACCEPTED
+    requestedBy: W06-SR-02, W09-SR-04
+    owner: W06
+  Product:
+    token: product
+    status: CATALOG_0.2.0
+    owner: W04
+  ProductLabelRegion:
+    token: label-region
+    status: ACCEPTED
+    requestedBy: W22-SR-01
+    owner: W22
+  ProductLot:
+    token: lot
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  ProductSnapshot:
+    token: product-snapshot
+    status: ACCEPTED
+    requestedBy: W04-SR-01
+    owner: W04
+  ProductVariant:
+    token: product-variant
+    status: CATALOG_0.2.0
+    owner: W04
+  Protocol:
+    token: protocol
+    status: CATALOG_0.2.0
+    owner: W16
+  ProtocolAdjustmentRule:
+    token: protocol-rule
+    status: ACCEPTED
+    requestedBy: W16-SR-01
+    owner: W16
+  ProtocolEdition:
+    token: protocol-edition
+    status: CATALOG_0.2.0
+    owner: W16
+  ProtocolResult:
+    token: protocol-result
+    status: ACCEPTED
+    requestedBy: W16-SR-01
+    owner: W16
+  ProtocolStep:
+    token: protocol-step
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W16
+  ProtocolVersion:
+    token: protocol-version
+    status: ACCEPTED
+    requestedBy: W09-SR-04
+    owner: W09
+  PseudonymousActor:
+    token: pseudonymous-actor
+    status: CATALOG_0.2.0
+    owner: W01
+  Publication:
+    token: publication
+    status: CATALOG_0.2.0
+    owner: W09
+  QuantityDeclaration:
+    token: quantity-declaration
+    status: ACCEPTED
+    requestedBy: W04-SR-01
+    owner: W04
+  ReferenceIntervalVersion:
+    token: ri-version
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  ReferenceRange:
+    token: reference-range
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  ReferenceSystem:
+    token: reference-system
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  RegistrationVersion:
+    token: registration-version
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W09
+  RegulatoryAgency:
+    token: org
+    status: ACCEPTED
+    requestedBy: W13-SR-02
+    owner: W13
+    note: refinement specialization of Organization (rule T2)
+  RegulatoryInspection:
+    token: regulatory-inspection
+    status: ACCEPTED_AS_CANDIDATE
+    requestedBy: W13-SR-04
+    owner: W13
+    note: type is CANDIDATE (W13)
+  RegulatoryPathway:
+    token: reg-pathway
+    status: ACCEPTED
+    requestedBy: W13-SR-02
+    owner: W13
+  RegulatoryPathwayVersion:
+    token: reg-pathway-version
+    status: ACCEPTED
+    requestedBy: W13-SR-04
+    owner: W13
+  RegulatoryResponse:
+    token: reg-response
+    status: ACCEPTED
+    requestedBy: W13-SR-02
+    owner: W13
+  RegulatoryStatus:
+    token: regulatory-status
+    status: CATALOG_0.2.0
+    owner: W13
+  RegulatoryStep:
+    token: reg-step
+    status: ACCEPTED
+    requestedBy: W13-SR-04
+    owner: W13
+  RegulatorySubmission:
+    token: reg-submission
+    status: ACCEPTED
+    requestedBy: W13-SR-02
+    owner: W13
+  RelationshipAssertion:
+    token: assertion
+    status: CATALOG_0.2.0
+    owner: W21
+  ResolutionHypothesis:
+    token: resolution
+    status: CATALOG_0.2.0
+    owner: W00
+  RiskFactor:
+    token: risk-factor
+    status: ACCEPTED
+    requestedBy: W03-SR-04
+    owner: W03
+  Segmentation:
+    token: segmentation
+    status: ACCEPTED
+    requestedBy: W20-SR-02
+    owner: W20
+  Sensor:
+    token: sensor
+    status: ACCEPTED
+    requestedBy: W08-SR-06
+    owner: W08
+  Series:
+    token: series
+    status: CATALOG_0.2.0
+    owner: W21
+  ServingDefinition:
+    token: serving-definition
+    status: ACCEPTED
+    requestedBy: W04-SR-01
+    owner: W04
+  Source:
+    token: source
+    status: CATALOG_0.2.0
+    owner: W00
+  SourceAuthorityAssessment:
+    token: source-authority
+    status: ACCEPTED_AS_CANDIDATE
+    requestedBy: W19-SR-05
+    owner: W19
+    note: types are CANDIDATE (W19); creation-time kind (rule T3)
+  SourceCoverageRequirement:
+    token: coverage-requirement
+    status: ACCEPTED_AS_CANDIDATE
+    requestedBy: W19-SR-05
+    owner: W19
+    note: types are CANDIDATE (W19); creation-time kind (rule T3)
+  SourceDiscoveryRecord:
+    token: source-discovery
+    status: ACCEPTED_AS_CANDIDATE
+    requestedBy: W19-SR-05
+    owner: W19
+    note: types are CANDIDATE (W19); creation-time kind (rule T3)
+  SourceLocator:
+    token: locator
+    status: CATALOG_0.2.0
+    owner: W00
+  SourceRevisionEvent:
+    token: source-revision
+    status: CATALOG_0.2.0
+    owner: W00
+  SourceSnapshot:
+    token: snapshot
+    status: CATALOG_0.2.0
+    owner: W00
+  Species:
+    token: species
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W03
+  SpecificationCriterion:
+    token: spec-criterion
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  SpecificationVersion:
+    token: specification-version
+    status: ACCEPTED
+    requestedBy: W11-SR-08
+    owner: W11
+  Specimen:
+    token: specimen-type
+    status: ACCEPTED
+    requestedBy: W07-SR-12
+    owner: W07
+  Study:
+    token: study
+    status: CATALOG_0.2.0
+    owner: W09
+  StudyArm:
+    token: arm
+    status: CATALOG_0.2.0
+    owner: W09
+  StudyIntervention:
+    token: intervention
+    status: CATALOG_0.2.0
+    owner: W09
+  StudyPopulation:
+    token: study-population
+    status: ACCEPTED
+    requestedBy: W09-SR-04
+    owner: W09
+  StudyResult:
+    token: study-result
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W09
+  SubscriptionPlan:
+    token: subscription-plan
+    status: ACCEPTED
+    requestedBy: W15-SR-08
+    owner: W15
+  Target:
+    token: target
+    status: ACCEPTED
+    requestedBy: W16-SR-01
+    owner: W16
+  TechnologyPlatform:
+    token: technology-platform
+    status: ACCEPTED
+    requestedBy: W08-SR-06
+    owner: W08
+  TestExecution:
+    token: test-execution
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  TestMethod:
+    token: test-method
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  TestSample:
+    token: test-sample
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+  TestingLaboratory:
+    token: org
+    status: ACCEPTED
+    requestedBy: W12-SR-01
+    owner: W12
+    note: refinement specialization of Organization (rule T2)
+  Trademark:
+    token: trademark
+    status: ACCEPTED
+    requestedBy: W14-SR-01
+    owner: W14
+  Treatment:
+    token: treatment
+    status: ACCEPTED
+    requestedBy: W06-SR-02
+    owner: W06
+  TrialRegistration:
+    token: trial-registration
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W09
+  UseContextProfile:
+    token: use-profile
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W10
+aliasKeysKept:
+  algorithm: algorithm
+  anatomical-context: anatomical-context
+  biomarker: biomarker
+  capability: capability
+  chemical-form: chemical-form
+  comparability: comparability
+  constraint: constraint
+  dataset: dataset
+  endpoint-classification: endpoint-classification
+  functional-goal: functional-goal
+  instrument: instrument
+  intervention-component: intervention-component
+  lab-test: lab-test
+  label-declaration: label-declaration
+  listing: listing
+  mech-context: mech-context
+  mechanism: mechanism
+  method: method
+  metric: metric
+  molecular-entity: molecular-entity
+  offer: offer
+  outcome: outcome
+  policy: policy
+  policy-version: policy-version
+  price-obs: price-obs
+  protocol-rule: protocol-rule
+  protocol-step: protocol-step
+  reference-system: reference-system
+  reg-pathway: reg-pathway
+  reg-response: reg-response
+  reg-status: reg-status
+  reg-submission: reg-submission
+  registration-version: registration-version
+  rel: rel
+  result: result
+  ri-version: ri-version
+  species: species
+  specimen-type: specimen-type
+  study-arm: study-arm
+  study-intervention: study-intervention
+  study-result: study-result
+  synthesis: synthesis
+  trade-id: trade-id
+  trial-registration: trial-registration
+  use-profile: use-profile
+rejectedOrResolved:
+- requested: experience-report
+  label: ExperienceReport
+  by: W23-SR-01 (information only)
+  ruling: REJECTED
+  why: type retired by W21-D04 / MR-02; ClaimOccurrence uses claim-occurrence
+- requested: specification-criterion
+  label: SpecificationCriterion
+  by: W11-SR-08 (on behalf of W12)
+  ruling: REJECTED
+  why: 'owner W12 registered spec-criterion (W12-SR-01); owner wins; W11 fixtures that write hu:specification-criterion: migrate'
+- requested: mixture
+  label: MaterialMixture
+  by: W13 fixtures (W13-SR-04 note)
+  ruling: REJECTED
+  why: 'MaterialMixture is a refinement specialization of IngredientMaterial: token material (W02-SR-03, rule T2)'
+- requested: platform
+  label: TechnologyPlatform
+  by: (collision)
+  ruling: RESOLVED
+  why: platform = W21 Platform; TechnologyPlatform = technology-platform (W08-SR-06 yields)
+- requested: outcome
+  label: OutcomeDefinition
+  by: (collision)
+  ruling: RESOLVED
+  why: outcome = W03 Outcome; OutcomeDefinition = outcome-definition; 0.2.0 fixture uids hu:outcome:<id> of OutcomeDefinitions migrate with SAME_IDENTITY_MERGED
+    redirects (W09-SR-04)
+- requested: IMG-REL-XYWH-1 vs IMG-PX1
+  label: (normalizationVersions, not a uid token)
+  by: W00-SR-10 vs W22-SR-05
+  ruling: see W00-R-24
+  why: IMG-PX1 registered; IMG-REL-XYWH-1 withdrawn
+labelsInMergedFragmentsWithoutToken:
+- label: AdverseEffect
+  owner: W17
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: ClaimEvidenceAssessment
+  owner: W21
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: Community
+  owner: W18
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: Conference
+  owner: W18
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: ConflictRelevanceAssessment
+  owner: W21
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: ContraindicationAssertion
+  owner: W17
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: Event
+  owner: W18
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: EventImpactAssessment
+  owner: W18
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: EvidenceStrengthAssessment
+  owner: W10
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: InteractionAssertion
+  owner: W17
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: NarrativeArc
+  owner: W18
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: ResultInterpretation
+  owner: W10
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: RetellingFidelityAssessment
+  owner: W21
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: SafetySignal
+  owner: W17
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: ToolOrInstrument
+  owner: W08
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: TradeItemIdentifier
+  owner: W00
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+- label: UseConstraint
+  owner: W17
+  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
+collisionCheck:
+  unrelatedLabelsSharingAToken: none
