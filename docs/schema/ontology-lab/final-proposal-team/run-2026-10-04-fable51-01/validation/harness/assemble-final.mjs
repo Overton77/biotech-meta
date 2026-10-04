@@ -36,7 +36,31 @@ for (const r of R.fieldTypeFixes || []) {
   if (blk === before) console.log("typefix: no change", r.type, r.field);
   body = body.slice(0, start) + blk + body.slice(end);
 }
+// field injections: append fields (and their descriptions) inside a named type block, before its closing brace
+const injPath = process.argv[5];
+const INJ = injPath ? JSON.parse(readFileSync(injPath, "utf8")) : (R.fieldInjections || []);
+for (const inj of INJ) {
+  const start = body.indexOf(`type ${inj.type} `); if (start < 0) { console.log("inject: type not found", inj.type); continue; }
+  const end = body.indexOf("\n}\n", start);
+  const blk = body.slice(start, end);
+  const existing = new Set([...blk.matchAll(/\n\s+([A-Za-z_][A-Za-z0-9_]*)\s*:/g)].map(m => m[1]));
+  const lines = [];
+  for (const f of inj.fields) { const fname = (f.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*:/m) || [])[1]; if (fname && existing.has(fname)) { console.log(`inject: ${inj.type}.${fname} already present, skipped`); continue; } lines.push("  " + f.trim().split("\n").map((l,i) => i ? "  " + l.trim() : l.trim()).join("\n")); }
+  if (!lines.length) continue;
+  body = body.slice(0, end) + `\n  # ---- fields injected at merge (seam closure; see reports/04-seam-closure-ledger.md) ----\n` + lines.join("\n") + body.slice(end);
+}
 for (const r of R.textReplacements || []) { const before = body; body = body.split(r.from).join(r.to); if (before === body) console.log("text replacement: no match", r.from.slice(0, 60)); }
+// union and enum additions (seam closure files next to the injections file, optional)
+const sidecar = name => { try { return JSON.parse(readFileSync(injPath.replace(/field-injections\.json$/, name), "utf8")); } catch { return []; } };
+const UADD = injPath ? sidecar("union-additions.json") : []; const EADD = injPath ? sidecar("enum-additions.json") : [];
+{
+  const d0 = parse(body); const edits = [];
+  for (const d of d0.definitions) {
+    if (d.kind === Kind.UNION_TYPE_DEFINITION) { const adds = UADD.filter(u => u.union === d.name.value).flatMap(u => u.add); if (adds.length) { const have = new Set((d.types||[]).map(t => t.name.value)); const extra = [...new Set(adds)].filter(a => !have.has(a)); if (extra.length) { const last = d.types[d.types.length-1].loc.end; edits.push({ pos: last, text: " | " + extra.join(" | ") }); console.log(`union ${d.name.value}: +${extra.join(",")}`); } } }
+    if (d.kind === Kind.ENUM_TYPE_DEFINITION) { const adds = EADD.filter(u => u.enum === d.name.value).flatMap(u => u.add); if (adds.length) { const have = new Set((d.values||[]).map(v => v.name.value)); const extra = [...new Set(adds)].filter(a => !have.has(a)); if (extra.length) { const last = d.values[d.values.length-1].loc.end; edits.push({ pos: last, text: "\n  " + extra.join("\n  ") }); console.log(`enum ${d.name.value}: +${extra.join(",")}`); } } }
+  }
+  edits.sort((a,b) => b.pos - a.pos); for (const e of edits) body = body.slice(0, e.pos) + e.text + body.slice(e.pos);
+}
 // prune unions
 const doc = parse(body);
 const labelsOf = new Map();

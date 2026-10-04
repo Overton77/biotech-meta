@@ -91,7 +91,10 @@ def base_cypher():
            "// Snapshots: contentHashBasis SYNTHETIC_FIXTURE (raw bytes not hashed); locator quoteHash = sha256 over NFC-WS1 text.", ""]
     for k, s in SOURCES.items():
         doc = s["doc"]
-        out.append(node(s["src"], ["Document", "Source", "Entity"], {"documentId": oid(s["src"]), "entityType": "Source", "canonicalUri": s["uri"], "url": s["uri"],
+        if k == "pmc":   # same labels as W09 fixture 05 so the two packets MERGE onto one node
+            out.append(node(s["src"], ["Source", "Entity"], {"entityType": "Source", "canonicalUri": s["uri"], "name": s["title"], "sourceKind": s["kind"]}))
+        else:            # W20 Document specialization (D-005) with live stored aliases documentId/title/type/url
+            out.append(node(s["src"], ["Document", "Source", "Entity"], {"documentId": oid(s["src"]), "entityType": "Source", "canonicalUri": s["uri"], "url": s["uri"],
                     "title": s["title"], "name": s["title"], "type": doc, "sourceKind": s["kind"], "publishedAt": dt(s["pub"]) if s["pub"] else None}))
         ret = "2020-05-30T00:00:00Z" if k == "synlabel" else T0
         out.append(node(SNAP[k], ["SourceSnapshot", "InformationArtifact"], {"artifactType": "SourceSnapshot", "canonicalUri": s["uri"], "retrievedAt": dt(ret), "observedAt": dt(ret),

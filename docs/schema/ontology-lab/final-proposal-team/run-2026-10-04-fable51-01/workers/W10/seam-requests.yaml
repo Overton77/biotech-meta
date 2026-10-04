@@ -1,0 +1,69 @@
+# W10 seam requests (run-2026-10-04-fable51-01). Fixture/query ids refer to 06-fixtures-and-queries.md.
+- id: W10-SR-01
+  targetOwner: W00
+  request: "Register primary-label uid tokens in conventions.uidTypeTokens: UseContextProfile: use-profile, EndpointClassification: endpoint-classification, EvidenceSynthesis: synthesis (today registered only as fixture aliases), ResultInterpretation: result-interpretation, EvidenceStrengthAssessment: strength-assessment (today these two fall back to the generic EvidenceAssessment token 'assessment')."
+  cq: [CQ-EV-02, CQ-ST-10, CQ-AX-24]
+  failingCase: "fixtures 04/05 must mint hu:assessment:w10-ri-* and hu:assessment:w10-strength-* because no dedicated token exists; the label cannot be recovered from the uid."
+  proposedRuling: "Register the five tokens; keep 'assessment' valid for existing nodes."
+- id: W10-SR-02
+  targetOwner: W21
+  request: "ClaimEvidenceAssessment follows the W10 method contract (04-model-cards.md, D-W10-12): uses ASSESSES_CLAIM_EVIDENCE / CLAIM_EVIDENCE_BASED_ON only (ASSESSES_CLAIM is EvidenceSynthesis's), evidenceStrength only with criteriaVersion, migrated values as legacy-unspecified PROPOSED, and it cites an existing EvidenceSynthesis for the same Claim (extend CLAIM_EVIDENCE_BASED_ON range to EvidenceSynthesis, or use W00 CONSIDERS_ASSESSMENT once W10-SR-04 lands). Record the proposed-delta ClaimEvidenceAssessment.assessesClaim (ASSESSES_CLAIM) as renamed in the W21 migration map."
+  cq: [CQ-AX-24, CQ-EV-03]
+  failingCase: "docs/schema/neo4j/proposed-delta.graphql ClaimEvidenceAssessment uses @relationship(type: \"ASSESSES_CLAIM\") while the catalog gives ASSESSES_CLAIM to EvidenceSynthesis (catalog line 700) and ASSESSES_CLAIM_EVIDENCE to ClaimEvidenceAssessment (line 946): one relationship type would carry two meanings."
+  proposedRuling: "Accept; one relationship type, one meaning."
+- id: W10-SR-03
+  targetOwner: Fable (registry)
+  request: "Register enum ContextOfUseMatch {FULL PARTIAL NONE} (property card EndpointClassification.contextMatch) and confirm MeaningfulnessVerdict {MEANINGFUL NOT_MEANINGFUL UNDETERMINED} with sole writer W10; both are in the W10 fragment as CANDIDATE."
+  cq: [CQ-ST-03, CQ-ST-10, CQ-EV-C02]
+  failingCase: "N08 (surrogate transfer) is detectable only when contextMatch is a closed vocabulary (W10-V08); delta typed it String."
+  proposedRuling: "Register both."
+- id: W10-SR-04
+  targetOwner: W00
+  request: "Kernel change: extend CONSIDERS_ASSESSMENT domain from Adjudication to EvidenceAssessment (at least ApplicabilityDimension)."
+  cq: [CQ-EV-04, CQ-RC-03]
+  failingCase: "fixture 01 MATERIAL_IDENTITY cites two ResolutionHypothesis records and OUTCOME_RELEVANCE an EndpointClassification; round 0002 R4 requires STUDY_DESIGN_AND_QUALITY to copy an EvidenceStrengthAssessment level. Without the edge the copy is unverifiable (W10-V16 rows on the inherited fixture)."
+  proposedRuling: "Accept domain EvidenceAssessment; class structural."
+  primarySource: "round-0002 section B R4 table"
+- id: W10-SR-05
+  targetOwner: W00
+  request: "Generalize V-504 (no backdating) to EvidenceAssessments: an assessment's recordedAt is never earlier than the retrievedAt of a snapshot whose locator it cites (candidate W10-V16b)."
+  cq: [CQ-ST-09, CQ-TM-01]
+  failingCase: "inherited hu:synthesis:nr-muscle-mito-function-older-humans-v2 has recordedAt 2019-09-15 and SUPPORTED_BY a locator on hu:snapshot:pmc6702140-2026-10-03 (W10-V16b row; V-504 silent)."
+  proposedRuling: "Adopt W10-V16b into the kernel suite."
+  primarySource: "INV-502"
+- id: W10-SR-06
+  targetOwner: W00 (predicate registry) with W09
+  request: "Register candidate predicate REPORTS_POOLED_ESTIMATE (subject Publication; literal valueNumber with unitCode; meta-analytic pooled effect as stated). Decide with W09 whether INV-206 applies to pooled analyses (pooled primary not significant -> pooled subgroups only HYPOTHESIS_GENERATING)."
+  cq: [CQ-ST-09, CQ-ST-05]
+  failingCase: "fixture 05: the 2025 vitamin D review reports OR 0.94 (CI 0.88-1.00) and a significant age 1-15 subgroup; neither is a StudyResult of a Study."
+  proposedRuling: "Register as candidate; INV-206 extension stays a method rule (synthesis-v0.1) until a validator exists."
+- id: W10-SR-07
+  targetOwner: W00
+  request: "Expose uid on EvidenceAssessmentArchetype (or document '... on Entity { uid }') so interface-typed relationship targets (CONSIDERS_ASSESSMENT) can return uids."
+  cq: [CQ-RC-03]
+  failingCase: "GraphQL R1 first attempt failed: Cannot query field uid on type EvidenceAssessmentArchetype."
+  proposedRuling: "Document the inline-fragment pattern; interface text is frozen."
+- id: W10-SR-08
+  targetOwner: Fable (Wave 6 fixture repair)
+  request: "Repair docs/schema/examples/study-vs-product-mismatch.cypher or record as known defects: (a) ApplicabilityDimension uids use token 'applicability' instead of 'applicability-dimension'; (b) EvidenceSynthesis v1/v2 lack ASSESSES_CLAIM; (c) v1/v2 recordedAt 2019 are backdated relative to their cited snapshot (INV-502); (d) OUTCOME_RELEVANCE dimensions do not cite their EndpointClassification; (e) the FDA context classification cites a SECTION locator (W10 fixture 03 adds a TEXT_QUOTE v2)."
+  cq: [CQ-ST-09, CQ-EV-04]
+  failingCase: "run-results 21-w10-validators-positives: W10-V13 1 row, W10-V16 2 rows, W10-V16b 1 row, all on inherited nodes."
+  proposedRuling: "Repair (a)-(d) in the translated fixture; leave the 0.2.0 file as the compatibility record."
+- id: W10-SR-09
+  targetOwner: W04
+  request: "Expose label directions (servings per day) as a source-attributed literal assertion on the ProductVariant or LabelSnapshot (e.g. LABEL_DIRECTS_SERVINGS_PER_DAY, range allowed for '1-3') so a UseContextProfile that restates them can cite the assertion via CONSIDERS."
+  cq: [CQ-EV-C01, CQ-EV-04]
+  failingCase: "Tru Niagen: 'Adults can take one capsule 1-3 times daily'; Basis: 'Take two (2) capsules every morning'. Fixtures 01/02 cite the label locator from the DOSE dimension because no assertion exists."
+  proposedRuling: "Candidate predicate owned by W04; W10 consumes it."
+- id: W10-SR-10
+  targetOwner: W23
+  request: "Private-store contract for PersonalApplicabilityAssessment: references one shared EvidenceApplicability uid plus its recordedAt viewpoint; may re-judge POPULATION/DOSE for a person privately; never writes back to the shared graph; shared UseContextProfile must not be created per person."
+  cq: [CQ-AX-12, CQ-RC-05]
+  failingCase: "N01/N02: a shared EvidenceApplicability targeting a UserContext is caught by V-113/V-520/V-521/V-524; N21: a profile carrying birthDate and a private uid is caught by W10-V14/V-521."
+  proposedRuling: "Accept; document in the W23 private-store interface."
+- id: W10-SR-11
+  targetOwner: W00 (forbidden implications)
+  request: "Register forbidden implications [PATENT_CLAIMS, SYNTHESIS_INPUT] (answer to W14-SR-04) and [INSTANTIATES_TREATMENT + USES_COMPONENT(ADMINISTERED_PRODUCT), EVIDENCE_APPLIES_TO_PRODUCT] (answer to W06-SR-10); efficacy is an EvidenceSynthesis verdict, never an asserted predicate."
+  cq: [CQ-EV-04, CQ-IP-C01]
+  failingCase: "W14 N-2 (CALCULATED PROVES_EFFICACY from a patent claim); W06 N3 (StudyIntervention -[:EVIDENCE_APPLIES_TO]-> CASGEVY)."
+  proposedRuling: "Register both pairs; V-201 and V-112 cover the edges."
