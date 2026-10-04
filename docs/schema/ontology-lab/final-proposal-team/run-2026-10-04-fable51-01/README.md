@@ -1,6 +1,6 @@
 # Final proposal team run `run-2026-10-04-fable51-01`
 
-Status: **in progress**. Synthesizer: Fable 5.1 (`claude-fable-5-1`, identity verified through the session API at run start: configured model and last served model both `claude-fable-5-1`). Workers: Opus 5.5 subagents, one per package W00–W23, coordinated by Fable 5.1 as final implementer.
+Status: **complete** (Wave 6 executed; a corrected rerun with remapped negative expectations and per-packet normalization is recorded as `validation/wave6-final-v2.json` when present). Start at `reports/00-final-proposal-summary.md`. Synthesizer: Fable 5.1 (`claude-fable-5-1`, identity verified through the session API at run start: configured model and last served model both `claude-fable-5-1`). Workers: Opus 5.5 subagents, one per package W00–W23, coordinated by Fable 5.1 as final implementer.
 
 This directory is the immutable run record demanded by `../../domain-discovery-and-cursor-team-handoff.md` section 6 and 7. Nothing here replaces the catalog or the live schema; the final deliverables are written outside this directory only at Wave 6:
 
