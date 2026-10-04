@@ -10,12 +10,12 @@
     "intensityBasis": null,
     "agents": [
      {
-      "__typename": "IngredientMaterial",
+      "__typename": "FoodItem",
       "uid": "hu:material:food-brazil-nut",
       "name": "Brazil nut (preparation not specified)"
      },
      {
-      "__typename": "FoodItem",
+      "__typename": "IngredientMaterial",
       "uid": "hu:material:food-brazil-nut",
       "name": "Brazil nut (preparation not specified)"
      }

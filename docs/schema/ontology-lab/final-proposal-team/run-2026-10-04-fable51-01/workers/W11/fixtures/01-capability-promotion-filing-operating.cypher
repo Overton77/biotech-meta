@@ -299,7 +299,7 @@ MERGE (j)-[:SUPPORTED_BY]->(l2);
 // including the SUPERSEDED-at-01:20 history, says nothing about truth.
 // status: run
 MATCH (a:Assertion)
-WHERE a.uid STARTS WITH 'hu:assertion:nai'
+WHERE a.uid STARTS WITH 'hu:assertion:nai' AND a.status IN ['ACCEPTED', 'REJECTED', 'DISPUTED']
   AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
 MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w11-f01-capture-fidelity-policy'})
 ON CREATE SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.id = coalesce(j.id, split(j.uid, ':')[2]), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',

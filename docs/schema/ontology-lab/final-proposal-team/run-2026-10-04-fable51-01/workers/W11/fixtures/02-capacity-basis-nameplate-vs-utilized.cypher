@@ -124,7 +124,7 @@ MERGE (a)-[:SUPPORTED_BY]->(l);
 
 // status: run
 MATCH (a:Assertion)
-WHERE (a.uid STARTS WITH 'hu:assertion:cyan' OR a.uid STARTS WITH 'hu:assertion:meridian')
+WHERE (a.uid STARTS WITH 'hu:assertion:cyan' OR a.uid STARTS WITH 'hu:assertion:meridian') AND a.status IN ['ACCEPTED', 'REJECTED', 'DISPUTED']
   AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
 MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w11-f02-capture-fidelity-policy'})
 ON CREATE SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.id = coalesce(j.id, split(j.uid, ':')[2]), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
