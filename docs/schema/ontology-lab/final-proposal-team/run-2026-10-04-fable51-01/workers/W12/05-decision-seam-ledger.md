@@ -26,7 +26,8 @@ Status values: ACCEPTED-FOR-PROPOSAL (W12 recommends it to Fable and the fixture
 2. **W12-SR-04 (predicate).** Register `CONFORMS_TO_SPECIFICATION` (assertion-only, no edge projection). Failing case: S3 rows.
 3. **W12-SR-01 (uid tokens).** Register lot, test-sample, test-execution, test-method, measured-result, spec-criterion, pass-fail, lot-test-summary, coa, cert-program, cert-listing, cert-scope.
 4. **W12-SR-03 (SourceKind value).** Add `LABORATORY_REPORT` (S1, S9 are neither marketing pages nor audit reports); fixtures use ORGANIZATION_WEBPAGE meanwhile.
-5. **W12-SR-09 (validator scope).** V-503/V-505 check bound/basis agreement only on Assertions and named episode types; `HAS_CERTIFICATION_SCOPE` (and every StateEpisodeProperties edge) should be included. Failing case N11 is caught only by V-W12-10.
+5. **W12-SR-11 (API identity and runtime).** Round trip: an API create autogenerates `id` that is not the opaque segment of `uid` (INV-106), and DateTime reads require APOC (`apoc.date.convertFormat`). Failing case in 06-fixtures-and-queries.md.
+6. **W12-SR-09 (validator scope).** V-503/V-505 check bound/basis agreement only on Assertions and named episode types; `HAS_CERTIFICATION_SCOPE` (and every StateEpisodeProperties edge) should be included. Failing case N11 is caught only by V-W12-10.
 
 ## Unresolved dependencies (owner, closure criterion)
 

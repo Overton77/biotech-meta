@@ -11,7 +11,7 @@ Rules followed by every `.cypher` fixture: statements separated by `;`; every st
 | `operations.cypher` on fresh 5.26.31 Community | 53 statements, 53 ok | run |
 | `operations-enterprise.cypher` on Community | 34 statements, 0 ok, 34 rejected ("Unable to create Constraint …") — expected; Enterprise behaviour unverified | run |
 | `docs/schema/neo4j/constraints.cypher` after `operations.cypher` | 57 statements, 45 ok, 12 rejected (the same 12 Enterprise-only statements as the baseline replay); no name conflict | run |
-| `fixtures/validation-w00.cypher` (41 statements: catalog V-000a…V-512 kernel subset with inlined parameters, plus V-W00-01…12) | executed after every fixture on a cleared graph | run |
+| `fixtures/validation-w00.cypher` (38 statements: catalog V-000a…V-512 kernel subset with inlined parameters, plus V-W00-01…12) | executed after every fixture on a cleared graph | run |
 
 ## 2. Fixture index and validation outcome
 

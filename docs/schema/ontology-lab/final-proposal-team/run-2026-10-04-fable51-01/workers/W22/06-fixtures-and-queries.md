@@ -50,7 +50,7 @@ Source files: the rendered fixtures are generated from templates by a small scri
 **Derivation MEDIA-EV-1** (write + return): 1 row, `bia-s-biad807-confocal-image-synthetic-file` EVIDENCES `hu:assertion:w22-mtdna-release-observed-in-s-biad807-context`. The generated illustration is not derived (generationMode GENERATED).
 **Q-MP3-1** (2 rows): E1 → `EVIDENCE_PATH_OK` (CAPTURED, ORIGINAL, `sameBytes` true, rights [PUBLIC_DOMAIN]); G1 via bad assertion → `REJECTED_GENERATED_ASSET`.
 **Q-MP3-2** (1 row): only the generated illustration EXPLAINS the mechanism (role MECHANISM_DIAGRAM, `isSynthetic` true).
-**Q-MP3-3** (2 rows): E1 with rule MEDIA-EV-1; G1 with rule null (the bad hand-written edge). V-604 and V-605 flag it.
+**Q-MP3-3** (2 rows): E1 with rule MEDIA-EV-1; G1 with rule null (the bad hand-written edge). V-604 and V-605 flag it. (If MEDIA-EV-1 is re-run after MP5 is loaded, it also derives `elysium-basis-carousel-supplement-facts` EVIDENCES the MP5 `LABEL_FOR` and `HAS_VARIANT` assertions, 4 EVIDENCES edges in total. This was observed in the idempotence run, see 07-operations.md. The extra edges are correct derivations, not duplicates.)
 
 ### MP4 (CQ-MD-C03, CQ-PV-06, CQ-PV-01 state 5)
 **Q-MP4-1** (4 rows): Reactome diagram **ELIGIBLE** (0.78, requiredAttribution "Reactome, Nicotinate metabolism (R-HSA-196807.8), CC BY 4.0", `mustIndicateChanges` true); unchecked diagram EXCLUDED_RIGHTS_NOT_CHECKED (0.92); Elsevier Figure I EXCLUDED_RIGHTS_NOT_PERMITTED (0.96, ALL_RIGHTS_RESERVED); Covarrubias placeholder EXCLUDED_RIGHTS_NOT_PERMITTED (0.90, NO_STATEMENT_FOUND).

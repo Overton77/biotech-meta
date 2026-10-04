@@ -31,11 +31,33 @@ for (const w of workers) {
   });
   merged += `\n# ===================== fragment ${w} =====================\n` + text + "\n";
 }
+// union overlap: a union listing a type together with a type whose @node labels include that type's primary label
+const labelsOf = new Map(); const unions = [];
+for (const w of workers) {
+  const f = join(dir, w, "sdl-fragment.graphql"); if (!existsSync(f)) continue;
+  let doc; try { doc = parse(readFileSync(f, "utf8")); } catch { continue; }
+  for (const d of doc.definitions) {
+    if (d.kind === Kind.OBJECT_TYPE_DEFINITION) {
+      const nd = (d.directives||[]).find(x => x.name.value === "node");
+      const arg = nd && (nd.arguments||[]).find(a => a.name.value === "labels");
+      const labels = arg && arg.value.kind === Kind.LIST ? arg.value.values.map(v => v.value) : [d.name.value];
+      labelsOf.set(d.name.value, labels);
+    }
+    if (d.kind === Kind.UNION_TYPE_DEFINITION) unions.push({ w, name: d.name.value, members: (d.types||[]).map(t => t.name.value) });
+  }
+}
+const overlaps = [];
+for (const u of unions) for (const a of u.members) for (const b of u.members) {
+  if (a === b) continue; const lb = labelsOf.get(b); if (!lb) continue;
+  if (lb.slice(1).includes(a) || (labelsOf.get(a)||[])[0] && lb.includes((labelsOf.get(a)||[])[0]) && lb[0] !== a && lb.indexOf(a) > 0) overlaps.push(`${u.w} ${u.name}: ${b} (labels ${lb.join(",")}) overlaps member ${a}`);
+}
 const undefinedRefs = [...refs.entries()].filter(([n]) => !defs.has(n)).map(([n, ws]) => `${n} <- ${[...ws].join(",")}`);
 console.log(`definitions: ${defs.size}; duplicates: ${dupes.length}; undefined refs: ${undefinedRefs.length}; extend blocks: ${extendBlocks.length}; forbidden directives: ${badDirectives.length}`);
 for (const x of dupes) console.log("  DUP " + x);
 for (const x of undefinedRefs) console.log("  UNDEF " + x);
 for (const x of extendBlocks) console.log("  EXTEND " + x);
 for (const x of badDirectives) console.log("  BADDIR " + x);
+console.log(`union overlaps (type + its specialization in one union): ${overlaps.length}`);
+for (const x of [...new Set(overlaps)]) console.log("  OVERLAP " + x);
 if (out) { writeFileSync(out, merged); console.log("wrote", out); }
 const byKind = {}; for (const [n, d] of defs) byKind[d.kind] = (byKind[d.kind]||0)+1; console.log(JSON.stringify(byKind));
