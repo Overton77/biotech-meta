@@ -1,59 +1,47 @@
 {
- "r4-ops.json": {
+ "r6-ops.json": {
   "total": 11,
   "ok": 11,
   "failed": 0,
   "nonzero": []
  },
- "r4-val-clean.json": {
+ "r6-val-clean.json": {
   "total": 12,
   "ok": 12,
   "failed": 0,
   "nonzero": []
  },
- "r4-cq.json": {
+ "r6-cq.json": {
   "total": 9,
   "ok": 9,
   "failed": 0,
   "nonzero": [
    {
     "n": 1,
-    "rows": 5,
+    "rows": 2,
     "status": "ok",
     "error": null,
     "label": [
-     "// Q-ST-01-food: what did each arm take (material components and practice-definition components)?"
+     "// Q-ST-01-food: what did each arm take (followed definitions and material components)?"
     ],
     "sample": [
      {
       "arm": "DicaBr group (DCB)",
       "duration": "P16W",
       "registryType": "DIETARY_SUPPLEMENT",
-      "qty": null,
-      "unit": null,
-      "qBasis": null,
-      "component": "Brazilian Cardioprotective Diet (DicaBr)",
-      "componentKind": "PRACTICE_DEFINITION"
+      "followsDefinition": "Brazilian Cardioprotective Diet (DicaBr)",
+      "materialComponents": []
      },
      {
       "arm": "DicaBr group and nuts (DCBN)",
       "duration": "P16W",
       "registryType": "DIETARY_SUPPLEMENT",
-      "qty": 10,
-      "unit": "g",
-      "qBasis": "PER_DAY",
-      "component": "Brazil nut (preparation not specified)",
-      "componentKind": "FOOD"
-     },
-     {
-      "arm": "DicaBr group and nuts (DCBN)",
-      "duration": "P16W",
-      "registryType": "DIETARY_SUPPLEMENT",
-      "qty": null,
-      "unit": null,
-      "qBasis": null,
-      "component": "Brazilian Cardioprotective Diet (DicaBr)",
-      "componentKind": "PRACTICE_DEFINITION"
+      "followsDefinition": "Brazilian Cardioprotective Diet (DicaBr)",
+      "materialComponents": [
+       "Peanut (preparation not specified) 10.0 g PER_DAY",
+       "Brazil nut (preparation not specified) 10.0 g PER_DAY",
+       "Cashew nut (preparation not specified) 10.0 g PER_DAY"
+      ]
      }
     ]
    },
@@ -71,8 +59,9 @@
       "variant": "Nuts, brazilnuts, dried, unblanched",
       "variantKind": "PREPARATION",
       "amount": 1917,
-      "unit": "ug",
-      "basis": "PER_100_G",
+      "unit": "ug/hg",
+      "basis": "AMOUNT_PER_MASS_OF_MATERIAL",
+      "statementKind": "TYPICAL_COMPOSITION_REPORTED",
       "portion": "EDIBLE_PORTION",
       "derivation": "ANALYTICAL",
       "min": 136,
@@ -105,8 +94,9 @@
       "variant": "Nuts, brazilnuts, dried, unblanched",
       "variantKind": "PREPARATION",
       "amount": 1520,
-      "unit": "ug",
-      "basis": "PER_100_G",
+      "unit": "ug/hg",
+      "basis": "AMOUNT_PER_MASS_OF_MATERIAL",
+      "statementKind": "TYPICAL_COMPOSITION_REPORTED",
       "portion": "EDIBLE_PORTION",
       "derivation": "ANALYTICAL",
       "min": null,
@@ -314,16 +304,26 @@
    },
    {
     "n": 9,
-    "rows": 1,
+    "rows": 2,
     "status": "ok",
     "error": null,
     "label": [
-     "// Q-FL-C04: practice definitions behind diet arms, and what the registry leaves unstated."
+     "// Q-FL-C04: definitions behind diet arms, which component distinguishes the arms, and what the registry leaves unstated."
     ],
     "sample": [
      {
-      "practiceDefinition": "Brazilian Cardioprotective Diet (DicaBr)",
-      "components": 2,
+      "definition": "Brazilian Cardioprotective Diet (DicaBr)",
+      "intervention": "Brazilian cardioprotective diet",
+      "materialComponents": 0,
+      "knownEditions": 0,
+      "notReported": [
+       "editionContent"
+      ]
+     },
+     {
+      "definition": "Brazilian Cardioprotective Diet (DicaBr)",
+      "intervention": "Brazilian cardioprotective diet plus 30g/day of mixed nuts",
+      "materialComponents": 3,
       "knownEditions": 0,
       "notReported": [
        "editionContent"
@@ -333,7 +333,7 @@
    }
   ]
  },
- "r4-suite-clean.json": {
+ "r6-suite-clean.json": {
   "total": 174,
   "ok": 174,
   "failed": 0,
@@ -344,7 +344,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-118: uid backfill progress over live GraphQL nodes (informational; counts per label)."
+     "// status: statically-checked"
     ],
     "sample": [
      {
@@ -369,20 +369,16 @@
    },
    {
     "n": 66,
-    "rows": 2,
+    "rows": 1,
     "status": "ok",
     "error": null,
     "label": [
-     "// V-221 (R1): non-placebo study interventions have components with quantity, unit, quantityBasis, and massBasis"
+     "// status: statically-checked"
     ],
     "sample": [
      {
-      "intervention": "hu:intervention:dica-nuts-diet-plus-nuts",
-      "incompleteComponent": "hu:intervention-component:dcbn-diet"
-     },
-     {
       "intervention": "hu:intervention:dica-nuts-diet-only",
-      "incompleteComponent": "hu:intervention-component:dcb-diet"
+      "incompleteComponent": null
      }
     ]
    },
@@ -392,7 +388,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-231 (INV-210): DIRECT_MEASUREMENT has exactly one context with setting and species (except cell-free / in silico);"
+     "// status: statically-checked"
     ],
     "sample": [
      {
@@ -413,7 +409,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-401b (informational): ACCEPTED assertions whose only locators are coarse (SECTION or WHOLE_SNAPSHOT). They are"
+     "// status: statically-checked, executed"
     ],
     "sample": [
      {
@@ -427,7 +423,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-514b (informational): assertions without contentHash (legacy or fixture records; new writes must carry it)."
+     "// status: statically-checked, executed"
     ],
     "sample": [
      {
@@ -437,13 +433,13 @@
    }
   ]
  },
- "r4-neg.json": {
+ "r6-neg.json": {
   "total": 10,
   "ok": 10,
   "failed": 0,
   "nonzero": []
  },
- "r4-val-neg.json": {
+ "r6-val-neg.json": {
   "total": 12,
   "ok": 12,
   "failed": 0,
@@ -559,7 +555,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-W05-07: a food composition edge whose zero or value has no stated derivation, or whose per-mass basis lacks its reference amount."
+     "// + the W05-SR-04 qualifiers; the reference mass itself is the UCUM denominator, e.g. ug/hg = per 100 g)."
     ],
     "sample": [
      {
@@ -658,7 +654,7 @@
    }
   ]
  },
- "r4-suite-neg.json": {
+ "r6-suite-neg.json": {
   "total": 174,
   "ok": 174,
   "failed": 0,
@@ -668,17 +664,19 @@
     "rows": 2,
     "status": "ok",
     "error": null,
-    "label": [],
+    "label": [
+     "// Every query below is statically checked (syntax and per-statement vari"
+    ],
     "sample": [
      {
       "relType": "QUANTITATIVELY_CONTAINS",
-      "edgeId": "5:41eae10f-8a95-44dd-9658-f7e91079bac0:188",
+      "edgeId": "5:f32301da-7460-4285-8de0-fedc5c8b0faf:186",
       "recordedFrom": null,
       "assertionUid": "hu:assertion:fdc-170569-dha-zero-underived"
      },
      {
       "relType": "IDENTIFIED_BY",
-      "edgeId": "5:41eae10f-8a95-44dd-9658-f7e91079bac0:191",
+      "edgeId": "5:f32301da-7460-4285-8de0-fedc5c8b0faf:189",
       "recordedFrom": null,
       "assertionUid": null
      }
@@ -690,7 +688,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-112: derived and forbidden-implication edges cite live, matching assertions (QS-4a, zero rows = valid)."
+     "// params: $derivedTypes, $implicationPairs, $ruleOnlyDerivedTypes (catalog relationships with ruleOnly: true)"
     ],
     "sample": [
      {
@@ -710,7 +708,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-118: uid backfill progress over live GraphQL nodes (informational; counts per label)."
+     "// status: statically-checked"
     ],
     "sample": [
      {
@@ -735,20 +733,16 @@
    },
    {
     "n": 66,
-    "rows": 2,
+    "rows": 1,
     "status": "ok",
     "error": null,
     "label": [
-     "// V-221 (R1): non-placebo study interventions have components with quantity, unit, quantityBasis, and massBasis"
+     "// status: statically-checked"
     ],
     "sample": [
      {
-      "intervention": "hu:intervention:dica-nuts-diet-plus-nuts",
-      "incompleteComponent": "hu:intervention-component:dcbn-diet"
-     },
-     {
       "intervention": "hu:intervention:dica-nuts-diet-only",
-      "incompleteComponent": "hu:intervention-component:dcb-diet"
+      "incompleteComponent": null
      }
     ]
    },
@@ -758,7 +752,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-231 (INV-210): DIRECT_MEASUREMENT has exactly one context with setting and species (except cell-free / in silico);"
+     "// status: statically-checked"
     ],
     "sample": [
      {
@@ -779,7 +773,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-401b (informational): ACCEPTED assertions whose only locators are coarse (SECTION or WHOLE_SNAPSHOT). They are"
+     "// status: statically-checked, executed"
     ],
     "sample": [
      {
@@ -793,7 +787,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-423: live Person-[:RECOMMENDS]-> is a projection of an assertion whose own"
+     "// status: statically-checked"
     ],
     "sample": [
      {
@@ -808,7 +802,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-514b (informational): assertions without contentHash (legacy or fixture records; new writes must carry it)."
+     "// status: statically-checked, executed"
     ],
     "sample": [
      {
@@ -822,7 +816,7 @@
     "status": "ok",
     "error": null,
     "label": [
-     "// V-522 (informational): semantic nodes without a privacyClass. Null must never be read as public."
+     "// status: statically-checked"
     ],
     "sample": [
      {
@@ -851,7 +845,7 @@
    }
   ]
  },
- "r4-probe.json": {
+ "r6-probe.json": {
   "total": 4,
   "ok": 1,
   "failed": 3,
@@ -860,16 +854,20 @@
     "n": 1,
     "rows": null,
     "status": "error",
-    "error": "Node(72) already exists with label `Exposure` and property `characterizationHash` = 'sha256:synthetic-exposure-tuple-e1'",
-    "label": [],
+    "error": "Node(70) already exists with label `Exposure` and property `characterizationHash` = 'sha256:synthetic-exposure-tuple-e1'",
+    "label": [
+     "// P1 duplicate characterization (same tuple hash as E1, different uid) -> exposure_characterization_hash."
+    ],
     "sample": []
    },
    {
     "n": 2,
     "rows": null,
     "status": "error",
-    "error": "Node(83) already exists with label `Lifestyle` and property `uid` = 'hu:lifestyle:sauna-bathing'",
-    "label": [],
+    "error": "Node(81) already exists with label `Lifestyle` and property `uid` = 'hu:lifestyle:sauna-bathing'",
+    "label": [
+     "// P2 duplicate uid on a second node -> lifestyle_uid."
+    ],
     "sample": []
    },
    {
@@ -877,7 +875,9 @@
     "rows": null,
     "status": "error",
     "error": "Node(12) already exists with label `IngredientMaterial` and property `uid` = 'hu:material:food-brazil-nut'",
-    "label": [],
+    "label": [
+     "// P3 a FoodItem reusing a material uid with a second node -> material_uid."
+    ],
     "sample": []
    }
   ]

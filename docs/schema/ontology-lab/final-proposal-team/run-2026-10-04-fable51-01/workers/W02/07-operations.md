@@ -58,7 +58,7 @@ Companion executable file: `operations.cypher`, with indexes in Section A and va
 
 ## 6. Idempotence, lifecycle, migration and compatibility
 
-- **Fixture idempotence.** Fixtures and migrations can be re-run: re-running fx-01…07 gives the same node and edge counts.
+- **Fixture idempotence.** Fixtures and migrations can be re-run. Loading fx-01…07 twice on a fresh database gave 165 nodes / 239 relationships after both passes (executed).
 - **Lifecycle.**
   - A material keeps its uid through reclassification, specification revisions and brand-mark changes.
   - A material changes uid only when the identity rule changes (owner, realized substance or form, or brand moved to another material). Then a new node is created, and the old uid stays resolvable.
