@@ -67,6 +67,7 @@ class Fx:
     def node(self, labels, uid, **p):
         p = {k: v for k, v in p.items()}
         p.setdefault("createdAt", "datetime()")
+        p.setdefault("privacyClass", "PUBLIC")  # stored enum name (W23 D-W23-06); V-522
         sets = props({k: v for k, v in p.items() if k != "createdAt"})
         lab = ":".join(labels)
         idv = uid.split(":", 2)[2]
@@ -104,7 +105,7 @@ class Fx:
         uid = f"hu:assertion:{akey}"
         p.setdefault("status", "EXTRACTED")
         p.setdefault("recordedAt", dt("2026-10-04T02:00:00Z"))
-        value = p.get("valueString") or p.get("valueNumber") or ""
+        value = p.get("valueString") or p.get("valueNumber") or ""  # one literal at most (V-003); qualifier text goes to description
         p["contentHash"] = "sha256:" + hashlib.sha256(f"{predicate}|{subj[1]}|{obj[1] if obj else ''}|{value}".encode()).hexdigest()
         self.node(["Assertion"], uid, predicate=predicate, **p)
         self.rel("Assertion", uid, "HAS_SUBJECT", subj[0], subj[1])
@@ -280,7 +281,7 @@ f.assertion("whoop-4-0-measures-heart-rate", "MEASURES_METRIC", ("Device", "hu:d
 f.assertion("whoop-4-0-uses-ppg", "USES_MODALITY", ("Device", "hu:device:whoop-4-0"), ("Modality", "hu:modality:photoplethysmography"),
             locator="whoop-locker-updates-through-firmware", asserter=WHOOP, edge=True, edge_props=dict(usageContext="optical heart-rate sensing", isPrimary=True),
             assertionBasis="MANUFACTURER_CLAIM", speechAct="STATES", predicateClass="OTHER",
-            valueString="page names 'WHOOP' generically; device-model resolution to WHOOP 4.0 is a curation choice (ResolutionHypothesis pending)")
+            description="page names 'WHOOP' generically; device-model resolution to WHOOP 4.0 is a curation choice (ResolutionHypothesis pending)")
 
 f.c("July 2026 accuracy claim: no firmware version, no device model, no number. Kept as a marketing assertion whose")
 f.c("subject is an unresolved assay version; nothing is written onto Device or FirmwareVersion.")
@@ -363,10 +364,10 @@ f.c("Performance claims: applicant statements in the 510(k) Summary about the so
 for key, pred, val, vs in (("afib-sensitivity", "REPORTS_SENSITIVITY", 96.2, "AFib classification, HR 50-150 bpm, classifiable recordings only; reference: cardiologist-read 12-lead ECG; approx. 540 subjects (NCT06622265)"),
                            ("sinus-specificity", "REPORTS_SPECIFICITY", 99.4, "sinus rhythm classification, HR 50-150 bpm, classifiable recordings only"),):
     f.assertion(f"k243236-summary-{key}", pred, ("Product", "hu:product:whoop-ecg-feature"), None, locator="fda-k243236-summary-performance", asserter=WHOOP,
-                valueNumber=val, unitCode="%", valueString=vs, assertionBasis="STUDY_RESULT", basisKind="DIRECT_MEASUREMENT", speechAct="STATES", predicateClass="QUANTITY", polarity="POSITIVE")
+                valueNumber=val, unitCode="%", description=vs, assertionBasis="STUDY_RESULT", speechAct="STATES", predicateClass="QUANTITY", polarity="POSITIVE")
 f.assertion("k243236-summary-inconclusive-rate", "REPORTS_INCONCLUSIVE_RATE", ("Product", "hu:product:whoop-ecg-feature"), None, locator="fda-k243236-summary-inconclusive", asserter=WHOOP,
-            valueNumber=11, unitCode="%", valueString="share of recordings classified inconclusive in the clinical study; excluded from the sensitivity/specificity denominators",
-            assertionBasis="STUDY_RESULT", basisKind="DIRECT_MEASUREMENT", speechAct="STATES", predicateClass="QUANTITY", polarity="NEGATIVE")
+            valueNumber=11, unitCode="%", description="share of recordings classified inconclusive in the clinical study; excluded from the sensitivity/specificity denominators",
+            assertionBasis="STUDY_RESULT", speechAct="STATES", predicateClass="QUANTITY", polarity="NEGATIVE")
 
 f.c("Enforcement discretion for a modified wellness feature: not an authorization, not a clearance (W13 statusKind).")
 f.node(["RegulatoryStatus", "VersionedState"], "hu:reg-status:us-whoop-bpi-as-modified-enforcement-discretion", statusKind="ENFORCEMENT_DISCRETION", jurisdiction="US",
@@ -388,7 +389,8 @@ f = Fx("W08 fixture 4: negative cases (load AFTER fixtures 1-3; each block is ex
     "attached to a Device (V-W08-03); N4 510(k) response read as approval (V-320a); N5 softwareVersion disagrees with",
     "declared FirmwareVersion (V-W08-05); N6 firmware version of two devices (V-W08-06); N7 asserted W08 edge without",
     "assertion (V-W08-04); N8 private device unit leaked into the shared graph (V-113, V-W08-09); N9 retired Sensor",
-    "MEASURES_METRIC (V-W08-08); N10 name collision: two device models named 'WHOOP' (informational V-W08-10, no merge).",
+    "MEASURES_METRIC (V-W08-08); N10 name collision: two device models named 'WHOOP' (informational V-W08-10, no merge);",
+    "N11 performance claim about a device model without asserter or basis (V-W08-11).",
 ])
 f.c("N1")
 f.node(["AssayVersion", "VersionedState"], "hu:assay-version:w08-neg-platform-as-instrument", name="bad: runs on a platform", stateType="ASSAY_VERSION", payloadHash=synth("n1"), softwareVersionStatus="NOT_REPORTED")
@@ -423,5 +425,9 @@ f.rel("Sensor", "hu:sensor:w08-neg-sensor-measures", "MEASURES_METRIC", "Metric"
 f.c("N10")
 f.node(["Device", "Entity"], "hu:device:w08-neg-whoop-name-a", name="WHOOP", entityType="DEVICE", deviceFamily="WHOOP")
 f.node(["Device", "Entity"], "hu:device:w08-neg-whoop-name-b", name="WHOOP", entityType="DEVICE", deviceFamily="WHOOP")
+f.c("N11 performance claim written about a device model, with no asserter and no basis (V-W08-11)")
+f.node(["Assertion"], "hu:assertion:w08-neg-device-accuracy-claim", predicate="REPORTS_ACCURACY", status="EXTRACTED", recordedAt=dt("2026-10-04T04:00:00Z"),
+       valueNumber=99.0, unitCode="%", contentHash=synth("n11"))
+f.rel("Assertion", "hu:assertion:w08-neg-device-accuracy-claim", "HAS_SUBJECT", "Device", "hu:device:whoop-mg")
 f.write("w08-negatives.cypher")
 print("fixtures written")

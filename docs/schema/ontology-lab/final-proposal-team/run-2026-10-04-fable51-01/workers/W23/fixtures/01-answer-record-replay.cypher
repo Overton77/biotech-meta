@@ -3,7 +3,7 @@
 
 // Q-AR-1 (CQ-AX-03): replay answer AR-1 at its stored viewpoint. For each cited assertion, re-run the QS-2a belief test
 // (recorded by R, not superseded by R, valid at V) on the same subject and predicate, and read the adjudication
-// reviewed by R. Expected: one row, sentence 1, replayed = cited = A1, object fv-a1 (200 mg), verdict SUPPORTED,
+// reviewed by R. Expected: one row, sentence 0, replayed = cited = A1, object fv-a1 (200 mg), verdict SUPPORTED,
 // reproduced true, even though A1 was corrected on 2026-06-15.
 MATCH (r:AnswerRecord {uid: 'hu:answer-record:w23-ar1'})-[c:CITES_ASSERTION]->(cited:Assertion)-[:HAS_SUBJECT]->(s)
 WITH r, c, cited, s, r.recordedAsOf AS R, r.validAt AS V
@@ -57,7 +57,7 @@ RETURN r.uid AS answerRecordUid, a.uid AS citedAssertionUid, newer.uid AS supers
 ORDER BY answerRecordUid;
 
 // Q-AR-4 (CQ-AX-01, traceDepth ADJUDICATION): per cited sentence, the locator and snapshot retrieved by R and the
-// adjudications reviewed by R, with named gaps. Expected: one row, sentence 1, A1, one TEXT_QUOTE locator
+// adjudications reviewed by R, with named gaps. Expected: one row, sentence 0, A1, one TEXT_QUOTE locator
 // ('Magnesium (as magnesium glycinate) 200 mg') in snapshot 2026-03-02 with its contentHash, one CAPTURE_FIDELITY
 // SUPPORTED adjudication, gaps [].
 MATCH (r:AnswerRecord {uid: 'hu:answer-record:w23-ar1'})-[c:CITES_ASSERTION]->(a:Assertion)

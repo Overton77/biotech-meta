@@ -10,10 +10,10 @@
 // ---- Part A: legacy live shape (as the live schema stores it), then the migration ----
 MERGE (fp:FoodProduct {id: '7b2f4c1e-0d9a-4e55-9b61-2f0a8c3d5e71'})
 SET fp.name = 'Synthetic Grove Brazil Nuts 16 oz', fp.brandName = 'Synthetic Grove', fp.processingMethods = ['raw', 'shelled'],
-    fp.createdAt = datetime('2026-01-15T00:00:00Z'), fp.updatedAt = datetime('2026-01-15T00:00:00Z');
+    fp.createdAt = datetime('2026-01-15T00:00:00Z'), fp.privacyClass = 'PUBLIC', fp.updatedAt = datetime('2026-01-15T00:00:00Z');
 
 MERGE (ing:Ingredient {id: 'c41d7f02-6a3b-4f8e-8d20-1b9e7a6c5d43'})
-SET ing.name = 'Brazil nuts', ing.ingredientRole = 'primary', ing.createdAt = datetime('2026-01-15T00:00:00Z');
+SET ing.name = 'Brazil nuts', ing.ingredientRole = 'primary', ing.createdAt = datetime('2026-01-15T00:00:00Z'), ing.privacyClass = 'PUBLIC';
 
 MATCH (fp:FoodProduct {id: '7b2f4c1e-0d9a-4e55-9b61-2f0a8c3d5e71'}), (ing:Ingredient {id: 'c41d7f02-6a3b-4f8e-8d20-1b9e7a6c5d43'})
 MERGE (fp)-[r:HAS_INGREDIENT]->(ing)
@@ -33,11 +33,11 @@ REMOVE ing:Ingredient;
 
 // ---- Part B: the product backbone (W04 types) ----
 MERGE (f:FoodItem:IngredientMaterial:Entity {uid: 'hu:material:food-brazil-nut'})
-SET f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z');
+SET f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
 
 MATCH (p:Product {uid: 'hu:product:7b2f4c1e-0d9a-4e55-9b61-2f0a8c3d5e71'})
 MERGE (v:ProductVariant:Entity {uid: 'hu:product-variant:synthetic-grove-brazil-nuts-16oz-us'})
-SET v.entityType = 'ProductVariant', v.name = 'Synthetic Grove Brazil Nuts, raw, shelled, 16 oz (US)', v.jurisdiction = 'US', v.createdAt = datetime('2026-10-04T02:00:00Z')
+SET v.entityType = 'ProductVariant', v.name = 'Synthetic Grove Brazil Nuts, raw, shelled, 16 oz (US)', v.jurisdiction = 'US', v.createdAt = datetime('2026-10-04T02:00:00Z'), v.privacyClass = 'PUBLIC'
 MERGE (p)-[r:HAS_VARIANT]->(v)
 SET r.relationshipUid = 'hu:rel:has-variant-synthetic-grove', r.assertionUid = 'hu:assertion:synthetic-grove-has-variant',
     r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
@@ -45,7 +45,7 @@ SET r.relationshipUid = 'hu:rel:has-variant-synthetic-grove', r.assertionUid = '
 MATCH (v:ProductVariant {uid: 'hu:product-variant:synthetic-grove-brazil-nuts-16oz-us'})
 MERGE (fv:FormulationVersion:VersionedState {uid: 'hu:formulation:synthetic-grove-brazil-nuts-v1'})
 SET fv.stateType = 'FormulationVersion', fv.versionName = 'label observed 2026-01-15', fv.jurisdiction = 'US',
-    fv.payloadHash = 'sha256:synthetic-w05-fv1', fv.createdAt = datetime('2026-10-04T02:00:00Z')
+    fv.payloadHash = 'sha256:synthetic-w05-fv1', fv.createdAt = datetime('2026-10-04T02:00:00Z'), fv.privacyClass = 'PUBLIC'
 MERGE (v)-[r:HAS_FORMULATION_VERSION]->(fv)
 SET r.relationshipUid = 'hu:rel:hfv-synthetic-grove-v1', r.assertionUid = 'hu:assertion:synthetic-grove-formulation-v1', r.jurisdiction = 'US',
     r.validFrom = datetime('2026-01-01T00:00:00Z'), r.validFromPrecision = 'MONTH', r.validFromBasis = 'PUBLICATION_PROXY', r.validToBasis = 'UNKNOWN',
@@ -55,7 +55,7 @@ SET r.relationshipUid = 'hu:rel:hfv-synthetic-grove-v1', r.assertionUid = 'hu:as
 MATCH (fv:FormulationVersion {uid: 'hu:formulation:synthetic-grove-brazil-nuts-v1'}), (f:FoodItem {uid: 'hu:material:food-brazil-nut'})
 MERGE (c:IngredientComponent:VersionedState {uid: 'hu:component:synthetic-grove-brazil-nuts-only'})
 SET c.stateType = 'IngredientComponent', c.role = 'PRIMARY', c.labelOrder = 1, c.declaredAs = 'Brazil nuts',
-    c.amountReferent = 'NOT_STATED', c.payloadHash = 'sha256:synthetic-w05-c1', c.createdAt = datetime('2026-10-04T02:00:00Z')
+    c.amountReferent = 'NOT_STATED', c.payloadHash = 'sha256:synthetic-w05-c1', c.createdAt = datetime('2026-10-04T02:00:00Z'), c.privacyClass = 'PUBLIC'
 MERGE (fv)-[:HAS_INGREDIENT_COMPONENT]->(c)
 MERGE (c)-[r:USES_MATERIAL]->(f)
 SET r.relationshipUid = 'hu:rel:uses-material-synthetic-grove', r.assertionUid = 'hu:assertion:synthetic-grove-component-brazil-nut',
@@ -72,22 +72,22 @@ SET r.derivationRule = 'contains-v1', r.derivedFromAssertionUids = ['hu:assertio
 MATCH (old:IngredientMaterial {uid: 'hu:material:c41d7f02-6a3b-4f8e-8d20-1b9e7a6c5d43'}), (f:FoodItem {uid: 'hu:material:food-brazil-nut'})
 MERGE (h:ResolutionHypothesis:EvidenceAssessment {uid: 'hu:resolution:legacy-ingredient-brazil-nuts-to-food'})
 SET h.assessmentType = 'ResolutionHypothesis', h.methodVersion = 'w05-migration-v1', h.status = 'PROPOSED', h.recordedAt = datetime('2026-10-04T02:00:00Z'),
-    h.resolutionStatus = 'CANDIDATE', h.rationale = 'legacy Ingredient "Brazil nuts" on a food product; same name only', h.createdAt = datetime('2026-10-04T02:00:00Z')
+    h.resolutionStatus = 'CANDIDATE', h.rationale = 'legacy Ingredient "Brazil nuts" on a food product; same name only', h.createdAt = datetime('2026-10-04T02:00:00Z'), h.privacyClass = 'PUBLIC'
 MERGE (h)-[:PROPOSES_MATCH]->(old)
 MERGE (h)-[:PROPOSES_MATCH]->(f);
 
 // Assertions behind Part B asserted edges (synthetic label source).
 MERGE (s:Source:Entity {uid: 'hu:source:synthetic-grove-label-page'})
-SET s.entityType = 'Source', s.canonicalUri = 'https://synthetic-grove.example.invalid/brazil-nuts', s.sourceKind = 'MANUFACTURER_LABEL_PAGE', s.createdAt = datetime('2026-10-04T02:00:00Z');
+SET s.entityType = 'Source', s.canonicalUri = 'https://synthetic-grove.example.invalid/brazil-nuts', s.sourceKind = 'MANUFACTURER_LABEL_PAGE', s.createdAt = datetime('2026-10-04T02:00:00Z'), s.privacyClass = 'PUBLIC';
 
 MATCH (s:Source {uid: 'hu:source:synthetic-grove-label-page'})
 MERGE (sn:SourceSnapshot:InformationArtifact {uid: 'hu:snapshot:synthetic-grove-label-2026-01-15'})
 SET sn.artifactType = 'SourceSnapshot', sn.canonicalUri = s.canonicalUri, sn.retrievedAt = datetime('2026-01-15T00:00:00Z'), sn.observedAt = datetime('2026-01-15T00:00:00Z'),
     sn.contentHash = 'synthetic:hu:snapshot:synthetic-grove-label-2026-01-15', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'COMPLETE',
-    sn.createdAt = datetime('2026-10-04T02:00:00Z')
+    sn.createdAt = datetime('2026-10-04T02:00:00Z'), sn.privacyClass = 'PUBLIC'
 MERGE (s)-[:HAS_SNAPSHOT]->(sn)
 MERGE (l:SourceLocator:InformationArtifact {uid: 'hu:locator:synthetic-grove-ingredients'})
-SET l.artifactType = 'SourceLocator', l.uri = s.canonicalUri, l.selectorKind = 'TEXT_QUOTE', l.exact = 'Ingredients: Brazil nuts.', l.createdAt = datetime('2026-10-04T02:00:00Z')
+SET l.artifactType = 'SourceLocator', l.uri = s.canonicalUri, l.selectorKind = 'TEXT_QUOTE', l.exact = 'Ingredients: Brazil nuts.', l.quoteHash = 'sha256:f73315bd3a33a01041d0dc55fe0b31a21a6e25dce4344cb5fb3d14570aa6d144', l.normalizationVersion = 'NFC-WS1', l.createdAt = datetime('2026-10-04T02:00:00Z'), l.privacyClass = 'PUBLIC'
 MERGE (sn)-[:HAS_LOCATOR]->(l);
 
 UNWIND [['hu:assertion:synthetic-grove-has-variant', 'HAS_VARIANT', 'hu:product:7b2f4c1e-0d9a-4e55-9b61-2f0a8c3d5e71', 'hu:product-variant:synthetic-grove-brazil-nuts-16oz-us'],
@@ -96,7 +96,7 @@ UNWIND [['hu:assertion:synthetic-grove-has-variant', 'HAS_VARIANT', 'hu:product:
 MATCH (subj {uid: row[2]}), (obj {uid: row[3]}), (l:SourceLocator {uid: 'hu:locator:synthetic-grove-ingredients'})
 MERGE (a:Assertion {uid: row[0]})
 SET a.predicate = row[1], a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.basisKind = 'CITED_FROM_PRIOR_WORK', a.assertionBasis = 'MANUFACTURER_CLAIM',
-    a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.contentHash = 'synthetic:' + row[0]
+    a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.privacyClass = 'PUBLIC', a.contentHash = 'synthetic:' + row[0]
 MERGE (a)-[:HAS_SUBJECT]->(subj) MERGE (a)-[:HAS_OBJECT]->(obj) MERGE (a)-[:SUPPORTED_BY]->(l);
 
 // Migration M-W05-03: the legacy HAS_INGREDIENT edge is retired once the component path exists (its dose 454 g was
@@ -104,3 +104,7 @@ MERGE (a)-[:HAS_SUBJECT]->(subj) MERGE (a)-[:HAS_OBJECT]->(obj) MERGE (a)-[:SUPP
 MATCH (p:Product {uid: 'hu:product:7b2f4c1e-0d9a-4e55-9b61-2f0a8c3d5e71'})-[r:HAS_INGREDIENT]->(:IngredientMaterial {uid: 'hu:material:c41d7f02-6a3b-4f8e-8d20-1b9e7a6c5d43'})
 WHERE EXISTS { MATCH (p)-[:HAS_VARIANT]->(:ProductVariant)-[:HAS_FORMULATION_VERSION]->(:FormulationVersion)-[:HAS_INGREDIENT_COMPONENT]->(:IngredientComponent)-[:USES_MATERIAL]->(:IngredientMaterial) }
 DELETE r;
+
+// Valid time of the HAS_FORMULATION_VERSION assertion equals its projected episode (V-505).
+MATCH (a:Assertion {uid: 'hu:assertion:synthetic-grove-formulation-v1'})
+SET a.validFrom = datetime('2026-01-01T00:00:00Z'), a.validFromPrecision = 'MONTH', a.validFromBasis = 'PUBLICATION_PROXY', a.validToBasis = 'UNKNOWN', a.jurisdiction = 'US';

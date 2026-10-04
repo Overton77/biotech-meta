@@ -34,18 +34,18 @@ const create = `mutation {
     schemaDigest: "sha256:8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0",
     queryShapeId: "QS-2a", accessTier: PUBLIC_ANSWER, privateContext: EXCLUDED, traceDepth: ADJUDICATION,
     citesAssertions: { connect: [
-      { where: { node: { uid: { eq: "hu:assertion:w23-rt-a1" } } }, edge: { orderIndex: 1 } },
-      { where: { node: { uid: { eq: "hu:claim-occurrence:w23-rt-co1" } } }, edge: { orderIndex: 2 } } ] },
+      { where: { node: { uid: { eq: "hu:assertion:w23-rt-a1" } } }, edge: { orderIndex: 0 } },
+      { where: { node: { uid: { eq: "hu:claim-occurrence:w23-rt-co1" } } }, edge: { orderIndex: 1 } } ] },
   }]) { answerRecords { uid accessTier privateContext } }
 }`;
 const r1 = await graphql({ schema, source: create, contextValue: {} });
 out.roundTrip.create = r1.errors ? r1.errors.map(e => e.message) : r1.data;
 const connAss = `mutation { createAnswerRecords(input: [{ uid: "hu:answer-record:w23-rt-ar2", occurrenceType: "ANSWER_PUBLICATION",
   recordedAsOf: "2026-04-10T09:00:00Z", schemaDigest: "sha256:x", queryShapeId: "QS-1a", accessTier: PUBLIC_ANSWER, privateContext: EXCLUDED,
-  citesAssessments: { connect: [ { where: { node: { uid: { eq: "hu:adjudication:w23-rt-adj1" } } }, edge: { orderIndex: 1 } } ] } }]) { answerRecords { uid } } }`;
+  citesAssessments: { connect: [ { where: { node: { uid: { eq: "hu:adjudication:w23-rt-adj1" } } }, edge: { orderIndex: 0 } } ] } }]) { answerRecords { uid } } }`;
 const r1b = await graphql({ schema, source: connAss, contextValue: {} });
 out.roundTrip.connectAssessmentByUidThroughInterface = r1b.errors ? r1b.errors.map(e => e.message) : r1b.data;
-await s.run(`MATCH (r:AnswerRecord {uid:'hu:answer-record:w23-rt-ar1'}), (j:Adjudication {uid:'hu:adjudication:w23-rt-adj1'}) MERGE (r)-[:CITES_ASSESSMENT {orderIndex: 1}]->(j)`);
+await s.run(`MATCH (r:AnswerRecord {uid:'hu:answer-record:w23-rt-ar1'}), (j:Adjudication {uid:'hu:adjudication:w23-rt-adj1'}) MERGE (r)-[:CITES_ASSESSMENT {orderIndex: 0}]->(j)`);
 const read = `query { answerRecords(where: { uid: { eq: "hu:answer-record:w23-rt-ar1" } }) {
   uid accessTier privateContext traceDepth
   citesAssertions { __typename uid predicate }

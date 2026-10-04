@@ -71,6 +71,7 @@ UNWIND [
   {uid: 'hu:locator:casgevy-pi-apheresis', snap: 'hu:snapshot:fda-casgevy-pi-20261004', kind: 'TEXT_QUOTE', exact: "CASGEVY is prepared from the patient's own HSCs, which are obtained via apheresis procedure(s).", qh: 'sha256:111f7a075af33cd78f90a1beb090a3e60a073e84a50903157c96a8ed6dbec982', section: '11 DESCRIPTION'},
   {uid: 'hu:locator:casgevy-pi-header', snap: 'hu:snapshot:fda-casgevy-pi-20261004', kind: 'TEXT_QUOTE', exact: 'CASGEVY (exagamglogene autotemcel), suspension for intravenous infusion', qh: 'sha256:eb4728b1e1a71d763cc8a5a29d9e58c4afe1206d2ceeb2138493c9b06ce52c40', section: 'Highlights header'},
   {uid: 'hu:locator:fda-cber-casgevy-header', snap: 'hu:snapshot:fda-cber-casgevy-20261004', kind: 'SECTION', exact: null, qh: null, section: 'Header: STN, Proper Name, Tradename, Manufacturer'},
+  {uid: 'hu:locator:fda-cber-casgevy-supporting-documents', snap: 'hu:snapshot:fda-cber-casgevy-20261004', kind: 'SECTION', exact: null, qh: null, section: 'Supporting Documents (approval letter titles and dates)'},
   {uid: 'hu:locator:fda-cber-casgevy-indication', snap: 'hu:snapshot:fda-cber-casgevy-20261004', kind: 'SECTION', exact: null, qh: null, section: 'Indication'},
   {uid: 'hu:locator:oopd-714319-record', snap: 'hu:snapshot:fda-oopd-714319-20261004', kind: 'WHOLE_SNAPSHOT', exact: null, qh: null, section: null},
   {uid: 'hu:locator:oopd-465514-record', snap: 'hu:snapshot:fda-oopd-465514-20261004', kind: 'WHOLE_SNAPSHOT', exact: null, qh: null, section: null},

@@ -15,7 +15,7 @@ SET a.predicate = 'HAS_REFERENCE_DOSE', a.status = 'SUPERSEDED', a.polarity = 'P
     a.derivationRule = 'IRIS RfD = NOAEL / UF x MF', a.predicateClass = 'QUANTITY',
     a.valueNumber = 0.05, a.unitCode = 'mg/kg/d', a.quantityBasis = 'PER_KG_BODY_WEIGHT_PER_DAY', a.jurisdiction = 'US',
     a.validFrom = datetime('1991-06-01T00:00:00Z'), a.validFromPrecision = 'DAY', a.validFromBasis = 'STATED_BY_SOURCE', a.validToBasis = 'UNKNOWN',
-    a.recordedAt = datetime('2026-10-04T01:30:00Z'), a.recordedTo = datetime('2026-10-04T02:00:00Z'), a.contentHash = 'sha256:synthetic-w05-t01'
+    a.recordedAt = datetime('2026-10-04T01:30:00Z'), a.privacyClass = 'PUBLIC', a.recordedTo = datetime('2026-10-04T02:00:00Z'), a.contentHash = 'sha256:synthetic-w05-t01'
 MERGE (a)-[:HAS_SUBJECT]->(e) MERGE (a)-[:ASSERTED_BY]->(o) MERGE (a)-[:SUPPORTED_BY]->(l);
 
 MATCH (good:Assertion {uid: 'hu:assertion:epa-iris-selenium-oral-rfd'}), (bad:Assertion {uid: 'hu:assertion:epa-iris-selenium-oral-rfd-misextracted'})
@@ -24,25 +24,25 @@ SET s.supersessionKind = 'EXTRACTION_FIX', s.recordedAt = datetime('2026-10-04T0
 
 MERGE (s:Source:Entity {uid: 'hu:source:synthetic-w05-food-composition-2025'})
 SET s.entityType = 'Source', s.canonicalUri = 'https://foodcomposition.example.invalid/records/brazil-nut-dried-2025', s.sourceKind = 'TERMINOLOGY_RECORD',
-    s.createdAt = datetime('2026-10-05T09:00:00Z');
+    s.createdAt = datetime('2026-10-05T09:00:00Z'), s.privacyClass = 'PUBLIC';
 
 MATCH (s:Source {uid: 'hu:source:synthetic-w05-food-composition-2025'})
 MERGE (sn:SourceSnapshot:InformationArtifact {uid: 'hu:snapshot:synthetic-w05-food-composition-2026-10-05'})
 SET sn.artifactType = 'SourceSnapshot', sn.canonicalUri = s.canonicalUri, sn.publishedAt = datetime('2025-04-01T00:00:00Z'),
     sn.retrievedAt = datetime('2026-10-05T09:00:00Z'), sn.observedAt = datetime('2026-10-05T09:00:00Z'),
     sn.contentHash = 'synthetic:hu:snapshot:synthetic-w05-food-composition-2026-10-05', sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = 'COMPLETE',
-    sn.createdAt = datetime('2026-10-05T09:00:00Z')
+    sn.createdAt = datetime('2026-10-05T09:00:00Z'), sn.privacyClass = 'PUBLIC'
 MERGE (s)-[:HAS_SNAPSHOT]->(sn)
 MERGE (l:SourceLocator:InformationArtifact {uid: 'hu:locator:synthetic-w05-food-composition-selenium'})
 SET l.artifactType = 'SourceLocator', l.uri = s.canonicalUri, l.selectorKind = 'SECTION', l.section = 'nutrients/selenium', l.fixtureProvenance = 'SYNTHETIC',
-    l.createdAt = datetime('2026-10-05T09:00:00Z')
+    l.createdAt = datetime('2026-10-05T09:00:00Z'), l.privacyClass = 'PUBLIC'
 MERGE (sn)-[:HAS_LOCATOR]->(l);
 
 MATCH (f:FoodItem {uid: 'hu:material:food-brazil-nut-dried-unblanched'}), (se:ChemicalSubstance {uid: 'hu:substance:selenium'}),
       (l:SourceLocator {uid: 'hu:locator:synthetic-w05-food-composition-selenium'})
 MERGE (a:Assertion {uid: 'hu:assertion:synthetic-2025-brazil-nut-selenium'})
 SET a.predicate = 'QUANTITATIVELY_CONTAINS', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.basisKind = 'DIRECT_MEASUREMENT', a.predicateClass = 'QUANTITY',
-    a.recordedAt = datetime('2026-10-05T09:00:00Z'), a.contentHash = 'synthetic:hu:assertion:synthetic-2025-brazil-nut-selenium'
+    a.recordedAt = datetime('2026-10-05T09:00:00Z'), a.privacyClass = 'PUBLIC', a.contentHash = 'synthetic:hu:assertion:synthetic-2025-brazil-nut-selenium'
 MERGE (a)-[:HAS_SUBJECT]->(f) MERGE (a)-[:HAS_OBJECT]->(se) MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (f)-[r:QUANTITATIVELY_CONTAINS {relationshipUid: 'hu:rel:qc-synthetic-2025-selenium'}]->(se)
 SET r.assertionUid = a.uid, r.quantity = 1520.0, r.unitCode = 'ug', r.basis = 'PER_100_G',

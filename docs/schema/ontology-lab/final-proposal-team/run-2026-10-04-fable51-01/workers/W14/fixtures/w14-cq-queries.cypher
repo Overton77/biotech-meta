@@ -6,7 +6,8 @@
 WITH datetime('2026-10-04T00:00:00Z') AS d, 'US' AS j
 MATCH (m:BrandedIngredientMaterial {uid: 'hu:material:niagen'})
 OPTIONAL MATCH (m)-[rs:REALIZES_SUBSTANCE]->(sub) WHERE rs.recordedTo IS NULL
-WITH d, j, [m] + collect(sub) AS targets
+WITH d, j, m, collect(sub) AS subs
+WITH d, j, [m] + subs AS targets
 MATCH (g:GrantedPatent {jurisdiction: j})-[:HAS_PATENT_CLAIM]->(c:PatentClaim)
 MATCH (a:Assertion {predicate: 'PATENT_CLAIMS'})-[:HAS_SUBJECT]->(subj) WHERE (subj = g OR subj = c) AND a.recordedTo IS NULL
 MATCH (a)-[:HAS_OBJECT]->(tgt) WHERE tgt IN targets

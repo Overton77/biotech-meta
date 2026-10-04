@@ -1,0 +1,18 @@
+[
+ {
+  "name": "T4a legacy assertion shape (fixture 12)",
+  "query": "{ assertions(where: {uid: {eq: \"hu:assertion:w00-legacy-shape\"}}) { uid id updatedAt privacyClass quantityBasis } }"
+ },
+ {
+  "name": "T4b legacy adjudication status FINAL",
+  "query": "{ adjudications(where: {uid: {eq: \"hu:adjudication:w00-legacy-final\"}}) { uid status privacyClass } }"
+ },
+ {
+  "name": "T4c legacy locator without artifactType",
+  "query": "{ sourceLocators(where: {uid: {eq: \"hu:locator:w00-legacy-section\"}}) { uid id artifactType } }"
+ },
+ {
+  "name": "T4d Document read through Source",
+  "query": "{ sources(where: {uid: {eq: \"hu:document:w00-legacy-doc-1\"}}) { uid id canonicalUri } }"
+ }
+]

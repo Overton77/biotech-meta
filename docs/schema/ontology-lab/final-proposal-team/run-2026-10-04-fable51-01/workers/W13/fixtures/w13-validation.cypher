@@ -36,6 +36,17 @@ WHERE p.status = 'APPROVED'
   }
 RETURN 'V-322' AS check, coalesce(p.uid, p.id) AS productWithUnbackedApproval;
 
+// V-322r (proposed revision, W13-D12): Product.status = 'APPROVED' requires a current APPROVAL status of that product that
+// itself results from an approving response; V-322 as written is satisfied by an unbacked APPROVAL status (fixture N-07).
+MATCH (p:Product)
+WHERE p.status = 'APPROVED'
+  AND NOT EXISTS {
+    MATCH (s:RegulatoryStatus {statusKind: 'APPROVAL'})-[e:STATUS_OF]->(p)
+    WHERE e.recordedTo IS NULL
+      AND EXISTS { (s)-[:RESULTS_FROM_RESPONSE]->(r:RegulatoryResponse) WHERE r.responseKind IN ['APPROVED', 'PMA_APPROVED'] }
+  }
+RETURN 'V-322r' AS check, p.uid AS productWithUnbackedApproval;
+
 // V-323 (catalog, verbatim): establishment or facility registration is a status of a Facility only.
 MATCH (s:RegulatoryStatus)-[:STATUS_OF]->(x)
 WHERE s.statusKind = 'ESTABLISHMENT_REGISTRATION' AND NOT x:Facility
@@ -131,7 +142,7 @@ WHERE (n:RegulatoryStatus AND NOT n.statusKind IN ['APPROVAL', 'CLEARANCE', 'DE_
        OR (n:RegulatorySubmission AND NOT n.submissionKind IN ['NDI_NOTIFICATION', 'GRAS_NOTICE', 'PREMARKET_NOTIFICATION_510K',
         'DE_NOVO', 'PMA', 'NDA', 'BLA', 'ORPHAN_DESIGNATION', 'FOOD_FACILITY_REGISTRATION', 'DEVICE_ESTABLISHMENT_REGISTRATION',
         'COMPOUNDING_503B_BULKS_POLICY', 'LDT_POLICY']))
-RETURN 'V-W13-02' AS check, n.uid AS nodeUid, labels(n)[0] AS label,
+RETURN 'V-W13-02' AS check, n.uid AS nodeUid, [l IN labels(n) WHERE l STARTS WITH 'Regulatory'][0] AS label,
        coalesce(n.statusKind, n.responseKind, n.pathwayKind, n.submissionKind) AS value;
 
 // V-W13-03: the response kind belongs to the closed list of its submission's pathway kind.
@@ -209,7 +220,7 @@ WITH n,
 WHERE issuers <> 1
    OR (n:RegulatoryResponse AND submissions <> 1)
    OR (n:RegulatoryStatus AND bases <> 1)
-RETURN 'V-W13-09' AS check, n.uid AS nodeUid, labels(n)[0] AS label, issuers, submissions, bases;
+RETURN 'V-W13-09' AS check, n.uid AS nodeUid, [l IN labels(n) WHERE l STARTS WITH 'Regulatory'][0] AS label, issuers, submissions, bases;
 
 // V-W13-10: jurisdiction partition: a status's jurisdiction equals its legal-basis pathway's; a response's equals its submission's.
 MATCH (s:RegulatoryStatus)-[:UNDER_LEGAL_BASIS]->(pw:RegulatoryPathway)

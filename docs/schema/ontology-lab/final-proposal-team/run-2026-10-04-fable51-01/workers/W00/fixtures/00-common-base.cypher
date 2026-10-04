@@ -20,7 +20,7 @@ MERGE (src)-[:HAS_SNAPSHOT]->(s);
 MATCH (s:SourceSnapshot {uid: 'hu:snapshot:w00-neg-2026-01-01'})
 MERGE (l:SourceLocator:InformationArtifact {uid: 'hu:locator:w00-neg-quote'})
 ON CREATE SET l.id = 'w00-neg-quote', l.artifactType = 'SourceLocator', l.uri = s.canonicalUri, l.selectorKind = 'TEXT_QUOTE',
-  l.exact = 'We both take a gram of NMN every morning.', l.quoteHash = 'sha256:synthetic-quote-w00-neg-quote', l.normalizationVersion = 'NFC-WS1',
+  l.exact = 'We both take a gram of NMN every morning.', l.quoteHash = 'sha256:c79a0d7437fabe69a92f5753554bad7663fb34eab203c8cbc231529bb8559525', l.normalizationVersion = 'NFC-WS1',
   l.privacyClass = 'PUBLIC', l.createdAt = datetime('2026-01-01T00:00:00Z'), l.updatedAt = datetime('2026-01-01T00:00:00Z')
 MERGE (s)-[:HAS_LOCATOR]->(l);
 

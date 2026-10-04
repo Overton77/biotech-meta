@@ -314,7 +314,7 @@ type Metric implements Entity & EntityArchetype & SearchIndexable
   mediaUrl: String @settable(onCreate: false, onUpdate: false)
   "Legacy display; media links move to W22."
   mediaType: String @settable(onCreate: false, onUpdate: false)
-  """class: structural (definitional: the LOINC component names the referent); cardinality: one_or_more; catalog: QUANTIFIES"""
+  """class: structural (definitional: the LOINC component names the referent); cardinality: one_or_more when metricKind = MEASURAND, else many (algorithm outputs and model features may name no referent); catalog: QUANTIFIES"""
   quantifiesBiomarkers: [Biomarker!]! @relationship(type: "QUANTIFIES", direction: OUT, properties: "StructuralEdgeProperties")
   """class: asserted (W00 HAS_IDENTIFIER; LOINC Identifier with release); cardinality: many"""
   identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")

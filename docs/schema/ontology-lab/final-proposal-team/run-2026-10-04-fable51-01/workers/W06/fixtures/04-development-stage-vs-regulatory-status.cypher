@@ -22,7 +22,7 @@ SET s.stateType = 'RegulatoryStatus', s.statusKind = 'APPROVAL', s.jurisdiction 
     s.createdAt = datetime('2026-10-04T02:00:00Z');
 
 UNWIND [
-  {uid: 'hu:reg-status:us-casgevy-tdt-approval-20240116', from: '2024-01-16T00:00:00Z', to: '2026-07-01T00:00:00Z'},
+  {uid: 'hu:reg-status:us-casgevy-tdt-approval-20240116', from: '2024-01-16T00:00:00Z', to: null},
   {uid: 'hu:reg-status:us-casgevy-tdt-approval-20260701', from: '2026-07-01T00:00:00Z', to: null}
 ] AS x
 MATCH (s:RegulatoryStatus {uid: x.uid}), (p:Product {uid: 'hu:product:casgevy'}), (fda:Organization {uid: 'hu:org:us-fda'}), (l:SourceLocator {uid: 'hu:locator:oopd-714319-record'})
@@ -33,7 +33,7 @@ SET a.predicate = 'STATUS_OF', a.status = 'ACCEPTED', a.recordedAt = datetime('2
     a.validTo = CASE WHEN x.to IS NULL THEN null ELSE datetime(x.to) END,
     a.validToPrecision = CASE WHEN x.to IS NULL THEN null ELSE 'DAY' END,
     a.validToBasis = CASE WHEN x.to IS NULL THEN 'UNKNOWN' ELSE 'INFERRED' END,
-    a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(s)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -44,6 +44,20 @@ SET r.assertionUid = a.uid, r.validFrom = a.validFrom, r.validFromPrecision = 'D
     r.recordedFrom = datetime('2026-10-04T02:00:00Z')
 MERGE (s)-[:ISSUED_BY]->(fda);
 
+// ---- W13 approving responses (letters listed on the CBER page; OOPD gives the matching marketing approval dates).
+// The 2024 approval (aged 12+) is NOT ended by the 2026 approval (aged 2+): the indication was broadened, so both stay
+// in force with unknown end. ----
+UNWIND [
+  {uid: 'hu:reg-response:us-casgevy-approval-letter-20240116', at: '2024-01-16T00:00:00Z', st: 'hu:reg-status:us-casgevy-tdt-approval-20240116', title: 'January 16, 2024 Approval Letter - CASGEVY (STN 125785)'},
+  {uid: 'hu:reg-response:us-casgevy-approval-letter-20260701', at: '2026-07-01T00:00:00Z', st: 'hu:reg-status:us-casgevy-tdt-approval-20260701', title: 'July 1, 2026 Approval Letter - CASGEVY (125787)'}
+] AS x
+MATCH (s:RegulatoryStatus {uid: x.st}), (fda:Organization {uid: 'hu:org:us-fda'})
+MERGE (r:RegulatoryResponse:InformationArtifact {uid: x.uid})
+SET r.artifactType = 'RegulatoryResponse', r.responseKind = 'APPROVED', r.issuedAt = datetime(x.at), r.jurisdiction = 'US',
+    r.title = x.title, r.privacyClass = 'PUBLIC', r.createdAt = datetime('2026-10-04T02:00:00Z')
+MERGE (s)-[:RESULTS_FROM_RESPONSE]->(r)
+MERGE (r)-[:ISSUED_BY]->(fda);
+
 // ---- exa-cel developmentStage: CALCULATED display assertion naming its input ----
 MATCH (t:Treatment {uid: 'hu:treatment:exagamglogene-autotemcel'}), (inp:Assertion {uid: 'hu:assertion:w06-us-casgevy-tdt-approval-20240116-status-of'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-exa-cel-development-stage-calc'})
@@ -51,9 +65,12 @@ SET a.predicate = 'DECLARES_DEVELOPMENT_STAGE', a.valueString = 'Approved (US)',
     a.basisKind = 'CALCULATED', a.derivationRule = 'stage-from-reachable-accepted-approval-v1', a.jurisdiction = 'US',
     a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.polarity = 'POSITIVE', a.predicateClass = 'REGULATORY',
     a.validFrom = datetime('2024-01-16T00:00:00Z'), a.validFromPrecision = 'DAY', a.validFromBasis = 'INFERRED',
-    a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(t)
 MERGE (a)-[:DERIVED_FROM_ASSERTION]->(inp)
+WITH t, a
+MATCH (l:SourceLocator {uid: 'hu:locator:oopd-714319-record'})
+MERGE (a)-[:SUPPORTED_BY]->(l)
 SET t.developmentStage = 'Approved (US)', t.developmentStageAssertionUid = a.uid;
 
 // ---- edaravone concept (migrated legacy text, no assertion) ----
@@ -74,7 +91,7 @@ MATCH (t:Treatment {uid: 'hu:treatment:edaravone-als'}), (o {uid: x.obj}), (l:So
 MERGE (a:Assertion {uid: 'hu:assertion:w06-uses-component-' + x.rel})
 SET a.predicate = 'USES_COMPONENT', a.status = CASE WHEN x.loc = 'hu:locator:nda209176-search-description' THEN 'EXTRACTED' ELSE 'ACCEPTED' END,
     a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(t)
 MERGE (a)-[:HAS_OBJECT]->(o)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -92,7 +109,7 @@ MATCH (s:RegulatoryStatus {uid: 'hu:reg-status:us-radicava-nda209176-approval'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-us-radicava-nda209176-approval-status-of'})
 SET a.predicate = 'STATUS_OF', a.status = 'EXTRACTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'REGULATORY', a.jurisdiction = 'US',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(s)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)

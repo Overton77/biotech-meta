@@ -24,11 +24,10 @@
 # Controlled strings marked "(candidate enum X)" are closed vocabularies whose enum registration is requested
 #   (W14-SR-02); they stay String here so no unregistered enum enters the merged file.
 # No new relationship-property type: every edge reuses a frozen W00 type (AssertedEdgeProperties,
-#   StructuralEdgeProperties, IdentifierLinkProperties, SupersessionProperties).
+#   StructuralEdgeProperties, IdentifierLinkProperties).
 # Other owners' types are referenced by name only:
 #   W00: Entity, EntityArchetype, VersionedStateArchetype, InformationArtifactArchetype, PrivacyClass, NodeMaturity,
-#        ReportedStatus, Identifier, AssertedEdgeProperties, StructuralEdgeProperties, IdentifierLinkProperties,
-#        SupersessionProperties
+#        ReportedStatus, Identifier, AssertedEdgeProperties, StructuralEdgeProperties, IdentifierLinkProperties
 #   W01: Organization          W02: BrandedIngredientMaterial
 # Relationship class and cardinality are stated in each field description and are enforced by the operations/validation
 # layer (07-operations.md), never by SDL.
@@ -325,7 +324,8 @@ type PatentClaim implements Entity & InformationArtifactArchetype
 """
 The terms of one patent license as stated by one agreement version (or an amendment): exclusivity, field of use,
 territory, sublicensing right, source-stated effective bounds, the verbatim rights definition and term clause. A license
-amendment or replacement is a new PatentLicense linked by SUPERSEDES. Parties are asserted edges: the licensee through
+amendment or replacement is a new PatentLicense state; the old terms' LICENSES_PATENT / LICENSE_COVERS assertions are
+bounded by SUPERSEDES {VALIDITY_BOUNDED} between ASSERTIONS (states are never linked by SUPERSEDES; catalog V-507). Parties are asserted edges: the licensee through
 LICENSES_PATENT (Organization -> PatentLicense) and the licensor through the CANDIDATE GRANTS_PATENT_LICENSE; the licensor
 is never inferred from the assignee (a sublicense is granted by a licensee). What is licensed is the asserted LICENSE_COVERS
 set exactly as the source names it; the rights-definition text ("and any Foreign Patents issuing therefrom") is kept
@@ -383,8 +383,6 @@ type PatentLicense implements Entity & VersionedStateArchetype
   licensees: [Organization!]! @relationship(type: "LICENSES_PATENT", direction: IN, properties: "AssertedEdgeProperties")
   """class: asserted (inverse view; Organization -> PatentLicense); cardinality: zero_or_one per episode; CANDIDATE: GRANTS_PATENT_LICENSE (licensor side; W14-SR-03)"""
   licensors: [Organization!]! @relationship(type: "GRANTS_PATENT_LICENSE", direction: IN, properties: "AssertedEdgeProperties")
-  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00; amendment or replacement of these terms)"""
-  supersedes: [PatentLicense!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
 }
 
 """
@@ -394,8 +392,10 @@ withdrawn, lapsed, expired, cancelled, or (claim level) held invalid, held unpat
 RegulatoryStatus but is a separate type because patent status and regulatory status must stay distinct (INV-010). scopeText
 carries the scope of the right during the episode (trademark goods/services as amended; claims affected by a decision).
 Who says so is the asserter of the IP_STATUS_OF Assertion (office record, court, PTAB, owner filing, aggregator display);
-an aggregator's display is never the office's status. An end of status is SUPERSEDES {VALIDITY_BOUNDED}; a vacated decision
-or mis-extracted date is SUPERSEDES {SOURCE_CORRECTION | EXTRACTION_FIX} (TM-R2, TM-R3). Archetype VersionedState.
+an aggregator's display is never the office's status. An end of status is a new IP_STATUS_OF Assertion with the same object
+and start and a closed end that SUPERSEDES {VALIDITY_BOUNDED} the open one; a vacated decision or mis-extracted date is
+SUPERSEDES {SOURCE_CORRECTION | EXTRACTION_FIX} -- always between the Assertions, never between states (TM-R2, TM-R3,
+V-507, V-507b). Archetype VersionedState.
 Module regulatory_and_ip.
 """
 type IpRightStatus implements Entity & VersionedStateArchetype
@@ -434,6 +434,4 @@ type IpRightStatus implements Entity & VersionedStateArchetype
   proceedingReference: String
   """class: asserted; cardinality: exactly_one; CANDIDATE: IP_STATUS_OF (status -> right or claim)"""
   statusOf: [IpRightStatusSubjectTarget!]! @relationship(type: "IP_STATUS_OF", direction: OUT, properties: "AssertedEdgeProperties")
-  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00)"""
-  supersedes: [IpRightStatus!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
 }

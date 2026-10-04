@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/01-answer-record-replay.cypher",
- "uri": "bolt://127.0.0.1:39915/",
+ "uri": "bolt://127.0.0.1:38819/",
  "db": "neo4j",
  "explain": false,
  "total": 6,
@@ -25,10 +25,10 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 345,
+   "ms": 1684,
    "sample": [
     {
-     "sentence": 1,
+     "sentence": 0,
      "citedUid": "hu:assertion:w23-a1-variant-fv-a1",
      "replayedAssertionUid": "hu:assertion:w23-a1-variant-fv-a1",
      "objectUid": "hu:formulation:w23-sleepwell-fv-a1",
@@ -57,10 +57,10 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 292,
+   "ms": 845,
    "sample": [
     {
-     "sentence": 1,
+     "sentence": 0,
      "citedUid": "hu:assertion:w23-a1-variant-fv-a1",
      "replayedAssertionUid": "hu:assertion:w23-a2-variant-fv-a1c",
      "objectUid": "hu:formulation:w23-sleepwell-fv-a1c",
@@ -89,7 +89,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 56,
+   "ms": 220,
    "sample": [
     {
      "answerRecordUid": "hu:answer-record:w23-ar1",
@@ -148,7 +148,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 57,
+   "ms": 166,
    "sample": [
     {
      "answerRecordUid": "hu:answer-record:w23-ar1",
@@ -177,10 +177,10 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 349,
+   "ms": 398,
    "sample": [
     {
-     "sentence": 1,
+     "sentence": 0,
      "assertionUid": "hu:assertion:w23-a1-variant-fv-a1",
      "predicate": "HAS_FORMULATION_VERSION",
      "locators": [
@@ -222,7 +222,7 @@
      "gaps": []
     }
    ],
-   "header": "// Q-AR-4 (CQ-AX-01, traceDepth ADJUDICATION): per cited sentence, the locator and snapshot retrieved by R and the\n// adjudications reviewed by R, with named gaps. Expected: one row, sentence 1, A1, one TEXT_QUOTE locator\n// ('Magnesium (as magnesium glycinate) 200 mg') in snapshot 2026-03-02 with i"
+   "header": "// Q-AR-4 (CQ-AX-01, traceDepth ADJUDICATION): per cited sentence, the locator and snapshot retrieved by R and the\n// adjudications reviewed by R, with named gaps. Expected: one row, sentence 0, A1, one TEXT_QUOTE locator\n// ('Magnesium (as magnesium glycinate) 200 mg') in snapshot 2026-03-02 with i"
   },
   {
    "n": 6,
@@ -242,7 +242,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 92,
+   "ms": 302,
    "sample": [
     {
      "publicReproducibilityView": {
@@ -269,7 +269,7 @@
       "citedAssertions": [
        {
         "assertionUid": "hu:assertion:w23-a1-variant-fv-a1",
-        "ordinal": 1
+        "ordinal": 0
        }
       ],
       "validAt": {
@@ -293,7 +293,7 @@
       "citedAssessments": [
        {
         "assessmentUid": "hu:adjudication:w23-cf-a1",
-        "ordinal": 1
+        "ordinal": 0
        }
       ]
      }

@@ -3,12 +3,13 @@
 //   with "†Daily Value (DV) not established"; PubChem PUG REST computed properties: CID 90480033 C11H15ClN2O5 MW 290.70 (charge 0),
 //   CID 439924 C11H15N2O5+ MW 255.25 (charge +1). Calculation: 300 mg x 255.25 / 290.70 = 263.42 mg NR cation per serving (CALCULATED).
 // Synthetic part (SYNTHETIC_FIXTURE): a lot assay result (309 mg NR chloride per capsule). No real certificate of analysis was fetched.
-// Self-contained: re-MERGEs the Tru Niagen nodes of fixture 02 by uid (ON CREATE only), so it loads alone or after fixture 02.
+// Load AFTER fixture 02 (it reuses the Tru Niagen variant, formulation, component, label snapshot and their USES_MATERIAL / LABEL_FOR / serving
+// edges). The ON CREATE re-MERGEs below only keep the file loadable alone; loaded alone it leaves the documented rows V-005, V-W04-09, V-W04-10.
 
 MERGE (v:ProductVariant:Entity {uid: 'hu:product-variant:tru-niagen-300mg-us-capsule'})
 ON CREATE SET v.name = 'Tru Niagen 300mg, 1 vegetarian capsule per serving', v.entityType = 'ProductVariant', v.dosageForm = 'CAPSULE', v.jurisdiction = 'US', v.privacyClass = 'PUBLIC', v.createdAt = datetime('2026-10-04T01:00:00Z');
 
-MERGE (niagen:IngredientMaterial:Entity {uid: 'hu:material:chromadex-niagen'})
+MERGE (niagen:IngredientMaterial:BrandedIngredientMaterial:Entity {uid: 'hu:material:chromadex-niagen'})
 ON CREATE SET niagen.name = 'NIAGEN (nicotinamide riboside chloride)', niagen.entityType = 'IngredientMaterial', niagen.privacyClass = 'PUBLIC', niagen.createdAt = datetime('2026-10-04T01:00:00Z');
 
 MERGE (fv:FormulationVersion:VersionedState {uid: 'hu:formulation:tru-niagen-300mg-observed-2026-10-03'})

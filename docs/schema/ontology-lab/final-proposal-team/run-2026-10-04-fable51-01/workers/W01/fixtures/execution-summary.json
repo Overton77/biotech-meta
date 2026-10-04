@@ -1,0 +1,125 @@
+{
+ "engine": "Neo4j Kernel 5.26.31 community (embedded, org.neo4j.test:neo4j-harness), harness run-cypher.mjs",
+ "executedAt": "2026-10-04",
+ "runs": {
+  "01-role-time-precision": {
+   "statements": 91,
+   "ok": 91,
+   "errors": 0
+  },
+  "02-advises-not-endorses": {
+   "statements": 40,
+   "ok": 40,
+   "errors": 0
+  },
+  "03-brand-vs-legal-entity": {
+   "statements": 50,
+   "ok": 50,
+   "errors": 0
+  },
+  "04-investor-vs-parent": {
+   "statements": 26,
+   "ok": 26,
+   "errors": 0
+  },
+  "05-facility-label-roles": {
+   "statements": 49,
+   "ok": 49,
+   "errors": 0
+  },
+  "06-cohort-participant-identity": {
+   "statements": 25,
+   "ok": 25,
+   "errors": 0
+  }
+ },
+ "queriesPositive": {
+  "#1": 22,
+  "#2": 2,
+  "#3": 6,
+  "#4": 3,
+  "#5": 2,
+  "#6": 1,
+  "#7": 1,
+  "#8": 2,
+  "#9": 2
+ },
+ "validationBaselineParamsPositive": {
+  "#34 V-118": 6,
+  "#117 V-401b": 1,
+  "#166 V-514b": 1
+ },
+ "validationW01ParamsPositive": {
+  "#34 V-118": 6,
+  "#117 V-401b": 1,
+  "#166 V-514b": 1
+ },
+ "queriesAfterNegatives": {
+  "#1": 25,
+  "#2": 2,
+  "#3": 6,
+  "#4": 3,
+  "#5": 2,
+  "#6": 1,
+  "#7": 1,
+  "#8": 4,
+  "#9": 2,
+  "#10": 1,
+  "#11": 6,
+  "#12 V-433": 1,
+  "#13": 1,
+  "#14": 2,
+  "#16": 1
+ },
+ "validationBaselineParamsAfterNegatives": {
+  "#9 V-007": 1,
+  "#28 V-112": 4,
+  "#29 V-113": 1,
+  "#34 V-118": 6,
+  "#117 V-401b": 1,
+  "#138 V-422": 1,
+  "#149 V-433": 1,
+  "#150 V-434": 1,
+  "#166 V-514b": 1,
+  "#169 V-522": 1
+ },
+ "validationW01ParamsAfterNegatives": {
+  "#9 V-007": 1,
+  "#28 V-112": 5,
+  "#29 V-113": 1,
+  "#34 V-118": 6,
+  "#117 V-401b": 1,
+  "#138 V-422": 1,
+  "#149 V-433": 1,
+  "#150 V-434": 1,
+  "#166 V-514b": 1,
+  "#169 V-522": 1
+ },
+ "note": "Statement numbers (#n) are positions in w01-queries.cypher (#1-#9 Q-W01-01..09, #10-#21 V-W01-01..12; #12 is V-W01-03, whose header cites V-433) or in docs/schema/neo4j/validation.cypher. 'W01Params' = validation-params.json plus W01 asserted types and the two candidate forbidden-implication pairs.",
+ "combinedWith020Examples": {
+  "queries": {
+   "#1": 22,
+   "#2": 2,
+   "#3": 6,
+   "#4": 3,
+   "#5": 2,
+   "#6": 1,
+   "#7": 1,
+   "#8": 2,
+   "#9": 2,
+   "#10": 1
+  },
+  "validationW01Params": {
+   "#25 V-110": 3,
+   "#27 V-111b": 7,
+   "#34 V-118": 6,
+   "#53 V-212": 2,
+   "#69 V-223": 1,
+   "#112 V-331": 1,
+   "#117 V-401b": 1,
+   "#166 V-514b": 1,
+   "#169 V-522": 100
+  },
+  "note": "six 0.2.0 example fixtures loaded first, then W01 fixtures: all statements OK; V-110 3 rows are the known elysium-basis load-time defect (01-baseline-rehearsal.md); #10 = V-W01-01 flags the 0.2.0 claim-retelling BOARD_MEMBER_OF edge to a ConsumerBrand (W01-SR-05)."
+ }
+}

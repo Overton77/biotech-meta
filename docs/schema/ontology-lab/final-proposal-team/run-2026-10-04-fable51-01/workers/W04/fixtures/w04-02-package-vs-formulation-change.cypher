@@ -10,8 +10,10 @@
 //   contrasted with fixture 01 Pair B (formulation change, same package).
 
 // ===== Part 1: Tru Niagen 300mg (public) =====
-MERGE (o:Organization:Entity {uid: 'hu:org:chromadex-niagen-bioscience'})
-SET o.name = 'Niagen Bioscience, Inc. (formerly ChromaDex)', o.entityType = 'Organization', o.privacyClass = 'PUBLIC', o.createdAt = datetime('2026-10-04T01:00:00Z');
+// Brand owner: the existing identity hu:org:chromadex-inc (study-vs-product-mismatch.cypher) is reused; a renamed company is the same identity.
+MERGE (o:Entity:Organization:LegalEntity {uid: 'hu:org:chromadex-inc'})
+ON CREATE SET o.name = 'ChromaDex', o.legalName = 'ChromaDex, Inc.', o.createdAt = datetime('2026-10-04T01:00:00Z')
+SET o.entityType = 'Organization', o.privacyClass = coalesce(o.privacyClass, 'PUBLIC');
 
 MERGE (p:Product:Entity {uid: 'hu:product:tru-niagen'})
 SET p.name = 'Tru Niagen', p.entityType = 'Product', p.productKind = 'DIETARY_SUPPLEMENT', p.privacyClass = 'PUBLIC', p.createdAt = datetime('2026-10-04T01:00:00Z');
@@ -23,7 +25,7 @@ UNWIND [
 MERGE (v:ProductVariant:Entity {uid: r.v})
 SET v.name = r.n, v.entityType = 'ProductVariant', v.dosageForm = 'CAPSULE', v.jurisdiction = 'US', v.strengthDescriptor = r.s, v.privacyClass = 'PUBLIC', v.createdAt = datetime('2026-10-04T01:00:00Z');
 
-MERGE (niagen:IngredientMaterial:Entity {uid: 'hu:material:chromadex-niagen'})
+MERGE (niagen:IngredientMaterial:BrandedIngredientMaterial:Entity {uid: 'hu:material:chromadex-niagen'})
 SET niagen.name = 'NIAGEN (nicotinamide riboside chloride)', niagen.entityType = 'IngredientMaterial', niagen.materialKind = 'BRANDED_CHEMICAL_MATERIAL', niagen.privacyClass = 'PUBLIC', niagen.createdAt = datetime('2026-10-04T01:00:00Z');
 
 MERGE (sd:ServingDefinition:VersionedState {uid: 'hu:serving-definition:tru-niagen-300-formulation-1-capsule'})

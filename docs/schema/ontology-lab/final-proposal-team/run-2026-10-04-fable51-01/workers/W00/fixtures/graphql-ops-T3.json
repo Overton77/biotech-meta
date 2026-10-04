@@ -1,0 +1,6 @@
+[
+ {
+  "name": "T3 generic Assertion type reads ClaimOccurrence nodes (fixture 05)",
+  "query": "{ assertions(sort: [{uid: ASC}]) { __typename uid predicate status massBasis subject { __typename ... on ChemicalSubstance { uid } } assertedBy { __typename ... on Person { uid } } } }"
+ }
+]

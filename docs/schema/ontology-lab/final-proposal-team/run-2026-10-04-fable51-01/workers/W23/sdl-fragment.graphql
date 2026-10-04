@@ -97,7 +97,7 @@ type AnswerRecord implements Entity & OccurrenceArchetype
   @mutation(operations: [CREATE]) {
   id: ID! @id
   "hu:answer-record:<opaque>; uniqueness from the Occurrence uid constraint (operations file), not from SDL"
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   "presentation only; never identity"
   name: String
   description: String
@@ -135,7 +135,7 @@ type AnswerRecord implements Entity & OccurrenceArchetype
   publishedAt: DateTime
   """
   class: structural; cardinality: many (zero only when traceDepth NONE); catalog: CITES_ASSERTION.
-  Each cited assertion must have recordedAt <= recordedAsOf (V-W23-02). orderIndex = ordinal of the cited answer
+  Each cited assertion must have recordedAt <= recordedAsOf (V-W23-02). orderIndex = zero-based ordinal of the cited answer
   sentence. A citation records use, never support: the five provenance states are read through the assertion.
   Target is W00's generic Assertion type (labels ["Assertion"]), which every assertion node carries, so each cited
   ClaimOccurrence or RelationshipAssertion is returned exactly once; an AssertionArchetype interface target returns
@@ -174,7 +174,7 @@ type PolicyVersion implements Entity & VersionedStateArchetype
   @mutation(operations: [CREATE]) {
   id: ID! @id
   "hu:policy-version:<opaque> (token registration requested, W23-SR-01)"
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
@@ -211,7 +211,7 @@ type PolicyVersion implements Entity & VersionedStateArchetype
   requiredFactKeys: [String!]
   """
   class: structural; cardinality: many; catalog: none (CANDIDATE relationship DECLARES_CRITERION, W23-SR-04).
-  The criteria a ranking policy version evaluates (CQ-RC-02). orderIndex = evaluation order.
+  The criteria a ranking policy version evaluates (CQ-RC-02). orderIndex = zero-based evaluation order.
   """
   declaresCriteria: [DecisionCriterion!]!
     @relationship(type: "DECLARES_CRITERION", direction: OUT, properties: "StructuralEdgeProperties")
@@ -236,7 +236,7 @@ type DecisionCriterion implements Entity & EntityArchetype
   @mutation(operations: [CREATE]) {
   id: ID! @id
   "hu:decision-criterion:<opaque> (new token requested, W23-SR-01)"
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String

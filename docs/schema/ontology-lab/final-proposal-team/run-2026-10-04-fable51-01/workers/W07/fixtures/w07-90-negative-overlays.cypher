@@ -2,8 +2,9 @@
 // Each block introduces exactly one collapse; expected violation ids and rows are listed per block and in
 // 06-fixtures-and-queries.md. All values synthetic; nodes created here use uids containing 'neg-'.
 
-// N1 (V-302; forbidden [SHARES_LOINC_CODE, SAME_ASSAY_VERSION]): same LOINC 4548-4, different AssayVersion (Mayo D-100
-// HPLC vs Labcorp Tina Quant), trended without a ComparabilityAssessment. Expected V-302: 1 row.
+// N1 (V-302/V-302r; forbidden [SHARES_LOINC_CODE, SAME_ASSAY_VERSION]): same LOINC 4548-4, different AssayVersion (Mayo
+// D-100 HPLC vs Labcorp Tina Quant), trended without a valid ComparabilityAssessment. Expected V-302: 1 row and V-302r: 1 row
+// after this file; after w07-91 (N10) V-302 drops to 0 rows (masked by the malformed assessment) while V-302r keeps 1.
 // status: run
 MATCH (r1:DiagnosticResult {uid: 'hu:result:synthetic-mayo-hba1c-2025-03-14'}), (r2:DiagnosticResult {uid: 'hu:result:synthetic-labcorp-hba1c-2025-04-02'})
 MERGE (r1)-[c:COMPARED_TO]->(r2)
@@ -58,7 +59,7 @@ SET r.id = 'synthetic-neg-hba1c-no-assay-version', r.artifactType = 'DIAGNOSTIC_
 MATCH (r2:DiagnosticResult {uid: 'hu:result:synthetic-grimage2-2025-09-01'}), (r1:DiagnosticResult {uid: 'hu:result:synthetic-grimage2-2025-03-01'})
 MERGE (x:Assertion {uid: 'hu:assertion:neg-grimage2-measured-change'})
 SET x.id = 'neg-grimage2-measured-change', x.predicate = 'CHANGED_BETWEEN', x.status = 'PROPOSED', x.polarity = 'POSITIVE', x.basisKind = 'DIRECT_MEASUREMENT',
-    x.predicateClass = 'QUANTITY', x.recordedAt = datetime('2026-10-04T01:20:00Z'), x.contentHash = 'synthetic:' + x.uid
+    x.predicateClass = 'QUANTITY', x.recordedAt = datetime('2026-10-04T01:20:00Z'), x.contentHash = 'synthetic:' + x.uid, x.privacyClass = 'PUBLIC'
 MERGE (x)-[:HAS_SUBJECT]->(r2)
 MERGE (x)-[:HAS_OBJECT]->(r1);
 
@@ -82,16 +83,6 @@ MERGE (r)-[:COMPUTED_BY_ALGORITHM_VERSION]->(v);
 // status: run
 MATCH (a:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-cobas-c513'}), (lab:Organization {uid: 'hu:org:synthetic-lab-b'})
 MERGE (a)-[:ASSAY_OPERATED_BY]->(lab);
-
-// N10 (V-311): an assessment comparing three versions. Expected V-311: 1 row.
-// status: run
-MATCH (a1:AssayVersion {uid: 'hu:assay-version:mayo-hba1c-biorad-d100'}), (a2:AssayVersion {uid: 'hu:assay-version:labcorp-001453-tina-quant'}), (a3:AssayVersion {uid: 'hu:assay-version:quest-496-tinia'})
-MERGE (ca:ComparabilityAssessment:EvidenceAssessment {uid: 'hu:comparability:neg-three-us-labs'})
-SET ca.id = 'neg-three-us-labs', ca.assessmentType = 'COMPARABILITY', ca.methodVersion = 'w07-comparability-v0', ca.status = 'PROPOSED',
-    ca.recordedAt = datetime('2026-10-04T01:20:00Z'), ca.verdict = 'COMPARABLE', ca.privacyClass = 'PUBLIC', ca.createdAt = datetime('2026-10-04T01:20:00Z')
-MERGE (ca)-[:COMPARES]->(a1)
-MERGE (ca)-[:COMPARES]->(a2)
-MERGE (ca)-[:COMPARES]->(a3);
 
 // N11 (V-310a): malformed LOINC code. Expected V-310a: 1 row.
 // status: run

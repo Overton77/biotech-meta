@@ -37,7 +37,7 @@ MATCH (p:Procedure {uid: 'hu:procedure:' + x.proc}), (n:Identifier {uid: 'hu:ide
 MERGE (a:Assertion {uid: 'hu:assertion:w06-' + x.proc + '-icd10pcs-' + toLower(x.code)})
 SET a.predicate = 'HAS_IDENTIFIER', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(p)
 MERGE (a)-[:HAS_OBJECT]->(n)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -50,8 +50,7 @@ MATCH (o:Organization {uid: 'hu:org:next-health'}), (p:Procedure {uid: 'hu:proce
 MERGE (a:Assertion {uid: 'hu:assertion:w06-next-health-offers-tpe'})
 SET a.predicate = 'OFFERS_PROCEDURE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'COMMERCIAL', a.speechAct = 'STATES', a.assertionBasis = 'MANUFACTURER_CLAIM',
-    a.validFrom = datetime('2026-10-04T00:00:00Z'), a.validFromPrecision = 'DAY', a.validFromBasis = 'OBSERVATION_ONLY',
-    a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'OBSERVATION_ONLY', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(o)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -84,7 +83,7 @@ MATCH (ml:MerchantListing {uid: 'hu:listing:next-health-tpe'}), (p:Procedure {ui
 MERGE (a:Assertion {uid: 'hu:assertion:w06-next-health-listing-lists-tpe'})
 SET a.predicate = 'LISTS_PROCEDURE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'COMMERCIAL', a.speechAct = 'STATES', a.assertionBasis = 'MANUFACTURER_CLAIM',
-    a.validFromBasis = 'OBSERVATION_ONLY', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'OBSERVATION_ONLY', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(ml)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -111,7 +110,7 @@ SET r.assertionUid = 'hu:assertion:w06-synthetic-tpe-practice-has-e1', r.validFr
 MATCH (pr:Protocol {uid: 'hu:protocol:synthetic-tpe-practice'}), (e:ProtocolEdition {uid: 'hu:protocol-edition:synthetic-tpe-practice-e1'}), (l:SourceLocator {uid: 'hu:locator:synthetic-practice-protocol-step'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-synthetic-tpe-practice-has-e1'})
 SET a.predicate = 'HAS_PROTOCOL_EDITION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
-    a.polarity = 'POSITIVE', a.predicateClass = 'OTHER', a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.polarity = 'POSITIVE', a.predicateClass = 'OTHER', a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(pr)
 MERGE (a)-[:HAS_OBJECT]->(e)
 MERGE (a)-[:SUPPORTED_BY]->(l);
@@ -131,7 +130,7 @@ MERGE (a:Assertion {uid: 'hu:assertion:w06-circulate-offers-tpe-to-partner-clini
 SET a.predicate = 'OFFERS_PROCEDURE', a.status = 'EXTRACTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'COMMERCIAL', a.speechAct = 'STATES', a.assertionBasis = 'MANUFACTURER_CLAIM',
     a.valueString = null, a.offeringRoleText = 'partners with clinics to deliver therapeutic plasma exchange as a turnkey, fully supported clinical service',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(o)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -141,10 +140,10 @@ MERGE (a)-[:ASSERTED_BY]->(o);
 MATCH (o:Organization {uid: 'hu:org:circulate-health'}), (g:Organization {uid: 'hu:org:geekwire'}), (l:SourceLocator {uid: 'hu:locator:geekwire-search-snippet'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-geekwire-circulate-treatment-volume'})
 SET a.predicate = 'REPORTS_PROCEDURE_VOLUME', a.status = 'EXTRACTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
-    a.valueNumber = 1000.0, a.valueString = 'more than 1,000 treatments (TPE) since May 2024', a.resultQualifier = 'GREATER_THAN',
+    a.valueNumber = 1000.0, a.resultQualifier = 'GREATER_THAN', a.verbatimText = 'more than 1,000 treatments since May 2024',
     a.polarity = 'POSITIVE', a.predicateClass = 'QUANTITY', a.speechAct = 'REPORTS_PRACTICE', a.assertionBasis = 'THIRD_PARTY_ANECDOTE',
     a.validFrom = datetime('2024-05-01T00:00:00Z'), a.validFromPrecision = 'MONTH', a.validFromBasis = 'STATED_BY_SOURCE',
-    a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(o)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (a)-[:ASSERTED_BY]->(g);

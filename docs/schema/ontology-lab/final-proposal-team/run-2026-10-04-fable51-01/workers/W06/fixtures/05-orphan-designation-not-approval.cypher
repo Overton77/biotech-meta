@@ -8,7 +8,9 @@
 //     Indication". The designation is the sponsor's product's; the generic-name concept's legacy text
 //     ("Orphan designation: Treatment of amyotrophic lateral sclerosis") must not answer "approved". The source does
 //     not say whether the designation was withdrawn or revoked, nor when: the end is recorded with an unknown bound and
-//     statusKind left null (W13 seam W06-SR-05), never guessed.
+//     statusKind left null (W13 seam W06-SR-05), never guessed; baseline V-333 therefore reports it (expected).
+//   Designation states attach with the canonical STATUS_OF edge (DESIGNATION_FOR is its catalog alias; baseline V-333
+//   counts STATUS_OF only, W06-SR-05).
 // Requires fixtures 00, 01, 04. Rule: every statement binds its own nodes by uid.
 // =====================================================================================================================
 
@@ -34,12 +36,12 @@ UNWIND [
 ] AS x
 MATCH (s:RegulatoryStatus {uid: x.s}), (p:Product {uid: x.p}), (l:SourceLocator {uid: x.loc}), (fda:Organization {uid: 'hu:org:us-fda'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-' + x.rel + '-status-of'})
-SET a.predicate = CASE WHEN s:OrphanDesignation THEN 'DESIGNATION_FOR' ELSE 'STATUS_OF' END, a.status = 'ACCEPTED',
+SET a.predicate = 'STATUS_OF', a.status = 'ACCEPTED',
     a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.polarity = 'POSITIVE', a.predicateClass = 'REGULATORY', a.jurisdiction = 'US',
     a.validFrom = CASE WHEN x.from IS NULL THEN null ELSE datetime(x.from) END,
     a.validFromPrecision = CASE WHEN x.from IS NULL THEN null ELSE 'DAY' END,
     a.validFromBasis = CASE WHEN x.from IS NULL THEN 'UNKNOWN' ELSE 'STATED_BY_SOURCE' END,
-    a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(s)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -47,12 +49,12 @@ MERGE (a)-[:ASSERTED_BY]->(fda)
 MERGE (s)-[:ISSUED_BY]->(fda);
 
 MATCH (s:OrphanDesignation {uid: 'hu:reg-status:us-oopd-714319-exa-cel-beta-thalassemia'}), (p:Product {uid: 'hu:product:casgevy'})
-MERGE (s)-[r:DESIGNATION_FOR {relationshipUid: 'hu:rel:w06-exa-cel-designation'}]->(p)
+MERGE (s)-[r:STATUS_OF {relationshipUid: 'hu:rel:w06-exa-cel-designation'}]->(p)
 SET r.assertionUid = 'hu:assertion:w06-exa-cel-designation-status-of', r.validFrom = datetime('2020-04-28T00:00:00Z'), r.validFromPrecision = 'DAY',
     r.validFromBasis = 'STATED_BY_SOURCE', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
 
 MATCH (s:OrphanDesignation {uid: 'hu:reg-status:us-oopd-465514-treeway-edaravone-als'}), (p:Product {uid: 'hu:product:treeway-edaravone-investigational'})
-MERGE (s)-[r:DESIGNATION_FOR {relationshipUid: 'hu:rel:w06-treeway-designation'}]->(p)
+MERGE (s)-[r:STATUS_OF {relationshipUid: 'hu:rel:w06-treeway-designation'}]->(p)
 SET r.assertionUid = 'hu:assertion:w06-treeway-designation-status-of', r.validFrom = datetime('2015-03-12T00:00:00Z'), r.validFromPrecision = 'DAY',
     r.validFromBasis = 'STATED_BY_SOURCE', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
 
@@ -64,8 +66,8 @@ SET r.assertionUid = 'hu:assertion:w06-treeway-designation-ended-status-of', r.v
 MATCH (s:RegulatoryStatus {uid: 'hu:reg-status:us-oopd-465514-treeway-edaravone-als'}), (p:Product {uid: 'hu:product:treeway-edaravone-investigational'}), (o:Organization {uid: 'hu:org:treeway-bv'}), (l:SourceLocator {uid: 'hu:locator:oopd-465514-record'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-treeway-designation-sponsor'})
 SET a.predicate = 'SUBMITTED_BY', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.polarity = 'POSITIVE',
-    a.predicateClass = 'REGULATORY', a.valueString = 'OOPD sponsor of record', a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN',
-    a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.predicateClass = 'REGULATORY', a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN',
+    a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(s)
 MERGE (a)-[:HAS_OBJECT]->(o)
 MERGE (a)-[:SUPPORTED_BY]->(l);

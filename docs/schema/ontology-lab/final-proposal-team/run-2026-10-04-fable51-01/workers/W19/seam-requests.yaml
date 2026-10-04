@@ -1,0 +1,97 @@
+# W19 seam requests (run-2026-10-04-fable51-01). Evidence ids refer to 03-source-manifest.md; fixtures to fixtures/*.cypher.
+- id: W19-SR-01
+  targetOwner: W00
+  request: "Add SourceKind values TRIAL_REGISTRY_RECORD, BIBLIOGRAPHIC_RECORD, NEWS_ARTICLE, LEGISLATION_OR_REGULATION, PRESENTATION_SLIDES, PERSONAL_WEBPAGE, TECHNICAL_DOCUMENTATION, OTHER (with Source.sourceKindNote). Rule: revision states (retracted, corrected) are never kinds."
+  cq: [CQ-PV-C01, CQ-ST-08, CQ-EV-05, CQ-PV-05]
+  failingCase: "46 of 127 registry entries have no catalog sourceKind (registry-authority-mapping.yaml). A ClinicalTrials.gov record (N-06) can only be filed as REGULATORY_RECORD, so registry status passes as an agency action; 4 PubMed record URLs are filed as peer_reviewed_publication though the record renders only the abstract (N-04)."
+  proposedRuling: "Accept all eight as catalog 0.3.0 additive values; OTHER requires sourceKindNote (application-enforced)."
+- id: W19-SR-02
+  targetOwner: W00
+  request: "Add Source.renditionCoverage: RenditionCoverage {FULL, PARTIAL, UNKNOWN} (null when the Source is not a rendition)."
+  cq: [CQ-AX-04, CQ-PV-C02, CQ-EV-05]
+  failingCase: "fixture 03 / Q-08a: a COMPLETE capture of PubMed record 29184669 does not contain the Methods sentence 'provided by Elysium Health'; without renditionCoverage the not-found reads NOT_FOUND_IN_COMPLETE_CAPTURE (eligible for 'not reported'), while the publisher HTML and PMC full text state it (Q-08b FOUND)."
+  proposedRuling: "Accept; extend the forbidden implication [NOT_FOUND_IN_PARTIAL_CAPTURE, NOT_DISCLOSED] to partial renditions and adopt the Q-08 reading rule."
+- id: W19-SR-03
+  targetOwner: W00
+  request: "Add ActivityKind.DISCOVERY and admit SourceDiscoveryRecord as an Activity specialization with labels [SourceDiscoveryRecord, Activity, Occurrence]."
+  cq: [CQ-PV-C03, CQ-ST-08]
+  failingCase: "fixture 05: ClinicalTrials.gov history tab returned HTTP 200 with a '403 Forbidden' error page (N-08); API v2 egress-blocked (N-07). With no record, missing RegistrationVersion history reads 'never changed' (CQ-ST-04)."
+  proposedRuling: "Accept DISCOVERY; keep discovery-only fields on the specialization, not on Activity."
+- id: W19-SR-04
+  targetOwner: W00
+  request: "Admit the AuthorityScope enum (W19-owned, 12 values) and a catalog convention predicateAuthorityScopes mapping predicates to required scopes (initial rows in 04-model-cards.md)."
+  cq: [CQ-PV-C01]
+  failingCase: "fixture 05 / Q-15: an OPERATING capability state supported only by a securities filing passes V-324 (non-marketing kind) though the filing is SELF_DECLARATION; RESULTS_PUBLISHED=false read from the registry's has_results=false (registry notAuthorityFor whether_results_were_published)."
+  proposedRuling: "Accept as candidate; a predicate without a row reads NOT_ASSESSED."
+- id: W19-SR-05
+  targetOwner: W00
+  request: "Register uid tokens source-authority (SourceAuthorityAssessment), coverage-requirement (SourceCoverageRequirement), source-discovery (SourceDiscoveryRecord)."
+  cq: [CQ-PV-C01, CQ-PV-C02, CQ-PV-C03]
+  failingCase: "INV-106 requires a registered token per primary label; fixtures currently borrow assessment, policy and activity, which collide in meaning with EvidenceAssessment, PolicyVersion-era fixture tokens and plain Activity."
+  proposedRuling: "Register when the candidate types are admitted; otherwise keep the borrowed tokens and drop the types."
+- id: W19-SR-06
+  targetOwner: W21
+  request: "Add Publication to the OCCURS_IN range (OccurrenceContainerTarget); a paper's statements occur in the work, located in any rendition."
+  cq: [CQ-CL-01, CQ-PV-05, INV-402]
+  failingCase: "fixture 92 (isolated N7): a ClaimOccurrence whose container is the nature.com HTML Document has a PMC5701244 locator; V-411 reports it as foreign. With container = Publication, V-411 passes for every rendition (fixture 03)."
+  proposedRuling: "Accept; W00 confirms V-411 unchanged."
+- id: W19-SR-07
+  targetOwner: W21
+  request: "A slide deck Document is never RENDITION_OF a talk Episode; provide an asserted link predicate between a presentation document and the talk it accompanies (name for W21, e.g. ACCOMPANIES_PRESENTATION) and decide whether a Presentation work type is needed."
+  cq: [CQ-CL-01, CQ-PV-05]
+  failingCase: "fixtures 90 (N1b) and 91 (N1a): a deck claim moved into the talk's container is caught by V-411 only while the deck is not a rendition; declaring the deck a rendition silences V-411 (Q-04 catches it)."
+  proposedRuling: "Adopt rule R4; add Q-04 to validation as V-4xx."
+- id: W19-SR-08
+  targetOwner: W21
+  request: "State the asserter rule for statements in multi-author publications (first or corresponding author, author group as an actor, or the publication's AnonymousActor)."
+  cq: [CQ-CL-01, INV-402]
+  failingCase: "fixture 03 uses the first author of PMID 29184669 as asserter of a Methods statement; that attribution is a fixture choice, not a source fact."
+  proposedRuling: "Open; W21 with W01."
+- id: W19-SR-09
+  targetOwner: W00
+  request: "V-409 (REANCHORS ordering) and V-512 (REVISION_ORDER) compare retrievedAt; compare coalesce(observedAt, retrievedAt) instead."
+  cq: [CQ-PV-02, CQ-EV-05, INV-504]
+  failingCase: "fixture 04: an archive capture observed 2018-01-15 but retrieved 2026-10-04T03:00Z is older than the live capture retrieved 2026-10-04T00:52Z; V-409 and V-512 report the correct REANCHORS and the correct revision event as violations (run: 1 row each). Q-12b with observedAt: 0 rows."
+  proposedRuling: "Accept; observedAt is the content clock, retrievedAt the recorded-time clock (round 0007 TM-R6)."
+- id: W19-SR-10
+  targetOwner: W00
+  request: "Adopt the canonicalUri rule (post-redirect endpoint, never an identifier resolver, per-kind canonical forms) and rewrite V-235 to join via RENDITION_OF instead of 'https://doi.org/' + doi."
+  cq: [CQ-EV-05, CQ-PV-02]
+  failingCase: "15 registry entries use doi.org URLs; doi.org was unreachable this session (N-15) and only redirects, so it cannot be snapshotted; V-235's join cannot see PMC or PubMed renditions of a retracted publication. Fixture 90 N2 / Q-02."
+  proposedRuling: "Accept; Q-02 becomes a validation query."
+- id: W19-SR-11
+  targetOwner: W09
+  request: "Publication identity: DOI, PMID, PMCID as Identifier nodes on Publication; a correction notice is its own Publication (publicationKind AUTHOR_CORRECTION/ERRATUM) that CORRECTS the article; registry rows whose url is a DOI are work citations to be split into Publication + captured Sources."
+  cq: [CQ-EV-05, CQ-ST-08]
+  failingCase: "PMID 30155270 has its own PMID, DOI and PMCID (N-01, N-02); treating it as a revision of the article record loses the notice's own renditions."
+  proposedRuling: "Accept (consistent with catalog Publication and CORRECTS)."
+- id: W19-SR-12
+  targetOwner: W20
+  request: "Keep DocumentType as genre and derive SourceKind with the migration-map table; caption tracks are DocumentTextVersions of the video snapshot generated by a TRANSCRIPTION activity attributed to the platform or uploader (unknown when not stated); retire Document.isPrimarySource (read-only, derived per assertion)."
+  cq: [CQ-PV-05, CQ-PV-04]
+  failingCase: "fixture 02: captions and the publisher transcript disagree ('I think I know' vs 'I know'); Q-07. The retelling outlet carries isPrimarySource = true and is a retelling (Q-05)."
+  proposedRuling: "Accept."
+- id: W19-SR-13
+  targetOwner: W00
+  request: "QS-7 NOT_DECLARED_IN_COVERING_SOURCE requires a COMPLETE capture of a FULL rendition; otherwise return NOT_FOUND_IN_PARTIAL_CAPTURE."
+  cq: [CQ-AX-04, INV-007]
+  failingCase: "QS-7 counts any LabelSnapshot as covering; fixture 03 shows complete captures of partial renditions and partial captures of full renditions (Q-08a, Q-08c)."
+  proposedRuling: "Accept with W04 (label snapshots)."
+- id: W19-SR-14
+  targetOwner: W23
+  request: "SourceAuthorityAssessment, SourceCoverageRequirement and SourceDiscoveryRecord are INTERNAL and excluded from PUBLIC projections; answers may cite their derived outputs (stale, blocked) as qualifications without exposing the records."
+  cq: [CQ-AX-06, CQ-PV-C02, CQ-PV-C03]
+  failingCase: "discovery records contain endpoint URLs, tool names and block evidence (operational detail) that public answers do not need."
+  proposedRuling: "Accept; projection closure adds no public edge to these types."
+- id: W19-SR-15
+  targetOwner: W00
+  request: "Rule: when a capture service serves a cached copy, SourceSnapshot.observedAt is the service's cache time and retrievedAt the request time; the CAPTURE Activity methodVersion records the cache state."
+  cq: [CQ-AX-06, CQ-PV-02]
+  failingCase: "N-14: Firecrawl returned cacheState hit, cachedAt 2026-10-03T06:00:23Z for a 2026-10-04 request; recording observedAt = request time would overstate freshness by 19 hours."
+  proposedRuling: "Accept as an ingestion rule (no schema change)."
+- id: W19-SR-16
+  targetOwner: W09
+  request: "RegistrationVersion history ingestion must record its retrieval outcome (SourceDiscoveryRecord discoveryTarget RECORD_HISTORY) so CQ-ST-08 answers 'history not retrieved' rather than 'no prior versions'."
+  cq: [CQ-ST-08, CQ-ST-04]
+  failingCase: "N-07, N-08: ClinicalTrials.gov history and API v2 blocked; the connector output has no version number."
+  proposedRuling: "Accept if W19-SR-03 is accepted; otherwise W09 records the qualification in prose only."

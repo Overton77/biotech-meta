@@ -20,6 +20,7 @@ SET t.id = 'exagamglogene-autotemcel', t.entityType = 'Treatment', t.name = 'exa
     t.treatmentClass = 'autologous CRISPR/Cas9 genome-edited CD34+ hematopoietic stem cell therapy',
     t.routeCategory = 'intravenous infusion', t.privacyClass = 'PUBLIC', t.maturity = 'PROVISIONAL',
     t.searchText = 'exagamglogene autotemcel exa-cel CTX001 CRISPR edited autologous hematopoietic stem cell gene therapy',
+    t.searchFields = ['name', 'description', 'treatmentClass', 'identifiers.value'],
     t.createdAt = datetime('2026-10-04T02:00:00Z'), t.updatedAt = datetime('2026-10-04T02:00:00Z');
 
 MERGE (p:Procedure:Entity {uid: 'hu:procedure:hsc-apheresis-collection'})
@@ -34,7 +35,7 @@ SET s.entityType = 'Study', s.name = 'CLIMB SCD-121 (NCT03745287)', s.title = 'A
 
 MERGE (a:StudyArm:VersionedState {uid: 'hu:arm:nct03745287-exa-cel'})
 SET a.stateType = 'StudyArm', a.name = 'Exa-cel (single arm)', a.payloadHash = 'sha256:' + 'synthetic-hu:arm:nct03745287-exa-cel',
-    a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z');
+    a.privacyClass = 'PUBLIC', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z');
 
 MERGE (si:StudyIntervention:VersionedState {uid: 'hu:intervention:nct03745287-exa-cel'})
 SET si.stateType = 'StudyIntervention', si.name = 'Exa-cel', si.registryInterventionType = 'BIOLOGICAL',
@@ -74,7 +75,7 @@ MATCH (t:Treatment {uid: 'hu:treatment:exagamglogene-autotemcel'}), (n:Identifie
 MERGE (a:Assertion {uid: 'hu:assertion:w06-exa-cel-has-identifier-' + i.id})
 SET a.predicate = 'HAS_IDENTIFIER', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(t)
 MERGE (a)-[:HAS_OBJECT]->(n)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -93,7 +94,7 @@ MERGE (a:Assertion {uid: 'hu:assertion:w06-exa-cel-modality-' + toLower(m.v)})
 SET a.predicate = 'HAS_TREATMENT_MODALITY', a.valueString = m.v, a.status = 'ACCEPTED',
     a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.polarity = 'POSITIVE', a.predicateClass = 'OTHER',
     a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED', a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN',
-    a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(t)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (a)-[:ASSERTED_BY]->(fda);
@@ -104,7 +105,7 @@ MATCH (t:Treatment {uid: 'hu:treatment:exagamglogene-autotemcel'}), (p:Product {
 MERGE (a:Assertion {uid: 'hu:assertion:w06-exa-cel-uses-component-casgevy'})
 SET a.predicate = 'USES_COMPONENT', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(t)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -120,7 +121,7 @@ MATCH (t:Treatment {uid: 'hu:treatment:exagamglogene-autotemcel'}), (p:Procedure
 MERGE (a:Assertion {uid: 'hu:assertion:w06-exa-cel-uses-component-hsc-apheresis'})
 SET a.predicate = 'USES_COMPONENT', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'OTHER', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(t)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -140,7 +141,7 @@ MATCH (t:Treatment {uid: 'hu:treatment:exagamglogene-autotemcel'}), (c:Condition
 MERGE (a:Assertion {uid: 'hu:assertion:w06-exa-cel-targets-' + x.c})
 SET a.predicate = 'TARGETS_CONDITION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'OTHER', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.jurisdiction = 'US', a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.jurisdiction = 'US', a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(t)
 MERGE (a)-[:HAS_OBJECT]->(c)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -156,7 +157,7 @@ MATCH (arm:StudyArm {uid: 'hu:arm:nct03745287-exa-cel'}), (si:StudyIntervention 
 MERGE (a:Assertion {uid: 'hu:assertion:w06-nct03745287-assigns-exa-cel'})
 SET a.predicate = 'ASSIGNS_INTERVENTION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'OTHER', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(arm)
 MERGE (a)-[:HAS_OBJECT]->(si)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -169,7 +170,7 @@ MATCH (si:StudyIntervention {uid: 'hu:intervention:nct03745287-exa-cel'}), (t:Tr
 MERGE (a:Assertion {uid: 'hu:assertion:w06-nct03745287-exa-cel-instantiates-treatment'})
 SET a.predicate = 'INSTANTIATES_TREATMENT', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(si)
 MERGE (a)-[:HAS_OBJECT]->(t)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -182,7 +183,7 @@ MATCH (v:Organization {uid: 'hu:org:vertex-pharmaceuticals'}), (s:Study {uid: 'h
 MERGE (a:Assertion {uid: 'hu:assertion:w06-vertex-sponsors-nct03745287'})
 SET a.predicate = 'SPONSORS_STUDY', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'ROLE', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(v)
 MERGE (a)-[:HAS_OBJECT]->(s)
 MERGE (a)-[:SUPPORTED_BY]->(l);
@@ -191,7 +192,7 @@ MATCH (v:Organization {uid: 'hu:org:vertex-pharmaceuticals'}), (p:Product {uid: 
 MERGE (a:Assertion {uid: 'hu:assertion:w06-vertex-manufactures-casgevy'})
 SET a.predicate = 'MANUFACTURES_PRODUCT', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'ROLE', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(v)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -210,7 +211,7 @@ MERGE (a:Assertion {uid: 'hu:assertion:w06-hsc-apheresis-icd10pcs-' + toLower(co
 SET a.predicate = 'HAS_IDENTIFIER', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
     a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN',
-    a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(p)
 MERGE (a)-[:HAS_OBJECT]->(n)
 MERGE (a)-[:SUPPORTED_BY]->(l)

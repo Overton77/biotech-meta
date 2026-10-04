@@ -27,7 +27,7 @@ SET s.entityType = 'Study', s.name = 'HORIZON (NCT06597656)', s.privacyClass = '
 
 MERGE (a:StudyArm:VersionedState {uid: 'hu:arm:nct06597656-tpe-then-gene-therapy'})
 SET a.stateType = 'StudyArm', a.name = 'Plasmapheresis then delandistrogene moxeparvovec (arm name not captured; SYNTHETIC label)',
-    a.payloadHash = 'sha256:' + 'synthetic-hu:arm:nct06597656-tpe-then-gene-therapy', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z');
+    a.payloadHash = 'sha256:' + 'synthetic-hu:arm:nct06597656-tpe-then-gene-therapy', a.privacyClass = 'PUBLIC', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z');
 
 UNWIND [
   {uid: 'hu:intervention:nct06597656-delandistrogene', name: 'delandistrogene moxeparvovec', type: 'GENETIC'},
@@ -46,7 +46,7 @@ MATCH (arm:StudyArm {uid: 'hu:arm:nct06597656-tpe-then-gene-therapy'}), (si:Stud
 MERGE (a:Assertion {uid: 'hu:assertion:w06-' + substring(siUid, 16) + '-assigned'})
 SET a.predicate = 'ASSIGNS_INTERVENTION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'OTHER', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(arm)
 MERGE (a)-[:HAS_OBJECT]->(si)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -59,7 +59,7 @@ MATCH (si:StudyIntervention {uid: 'hu:intervention:nct06597656-delandistrogene'}
 MERGE (a:Assertion {uid: 'hu:assertion:w06-nct06597656-delandistrogene-instantiates'})
 SET a.predicate = 'INSTANTIATES_TREATMENT', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(si)
 MERGE (a)-[:HAS_OBJECT]->(t)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -72,7 +72,7 @@ MATCH (si:StudyIntervention {uid: 'hu:intervention:nct06597656-plasmapheresis'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-nct06597656-plasmapheresis-instantiates-tpe'})
 SET a.predicate = 'INSTANTIATES_PROCEDURE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(si)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
@@ -85,7 +85,7 @@ MATCH (t:Treatment {uid: 'hu:treatment:delandistrogene-moxeparvovec'}), (c:Condi
 MERGE (a:Assertion {uid: 'hu:assertion:w06-delandistrogene-targets-dmd'})
 SET a.predicate = 'TARGETS_CONDITION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'OTHER', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
-    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T02:00:00Z')
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(t)
 MERGE (a)-[:HAS_OBJECT]->(c)
 MERGE (a)-[:SUPPORTED_BY]->(l)

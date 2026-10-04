@@ -10,5 +10,5 @@ SET adj.assessmentType = 'Adjudication', adj.adjudicationKind = 'CAPTURE_FIDELIT
     adj.reviewerType = 'AGENT', adj.methodVersion = 'w06-fixture-capture-review-v1', adj.status = 'ACCEPTED',
     adj.reviewedAt = datetime('2026-10-04T02:30:00Z'), adj.recordedAt = datetime('2026-10-04T02:30:00Z'),
     adj.rationale = 'Locator text or record field matches the assertion as captured on 2026-10-04 (W06 Opus 5.5).',
-    adj.createdAt = datetime('2026-10-04T02:30:00Z')
+    adj.privacyClass = 'PUBLIC', adj.createdAt = datetime('2026-10-04T02:30:00Z')
 MERGE (adj)-[:EVALUATES]->(a);

@@ -64,7 +64,7 @@ MATCH (a:Assertion)-[:HAS_SUBJECT]->(p:Product {uid: 'hu:product:whoop-ecg-featu
 WHERE a.predicate STARTS WITH 'REPORTS_'
 MATCH (a)-[:ASSERTED_BY]->(who)
 MATCH (a)-[:SUPPORTED_BY]->(l:SourceLocator)<-[:HAS_LOCATOR]-(sn:SourceSnapshot)<-[:HAS_SNAPSHOT]-(src:Source)
-RETURN a.predicate AS predicate, a.valueNumber AS value, a.unitCode AS unit, a.valueString AS qualifiers, who.name AS assertedBy,
+RETURN a.predicate AS predicate, a.valueNumber AS value, a.unitCode AS unit, a.description AS qualifiers, who.name AS assertedBy,
        a.assertionBasis AS basis, src.sourceKind AS sourceKind, l.page AS pdfPage
 ORDER BY predicate;
 

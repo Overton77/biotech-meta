@@ -1,7 +1,7 @@
 // W07 validation set (run-2026-10-04-fable51-01). Zero rows = valid unless marked informational.
 // V-301a..V-313 are the catalog 0.2.0 queries copied verbatim from ../../../../../../neo4j/validation.cypher except
 // V-313, whose value list is superseded by V-313r (contract B5: PrivacyClass {PUBLIC INTERNAL}; "synthetic" is fixture
-// provenance). Proposed (W07, not yet in the catalog): V-303r, V-305c, V-313r, V-314, V-315, V-316, V-317, V-318.
+// provenance). Proposed (W07, not yet in the catalog): V-302r, V-304r, V-303r, V-305c, V-313r, V-314, V-315, V-316, V-317, V-318.
 // Executed on embedded Neo4j 5.26.31 Community (see 06-fixtures-and-queries.md for expected and observed rows).
 
 // V-301a: an AssayVersion with more than one method or instrument is a collapsed identity.
@@ -29,6 +29,23 @@ WHERE a1 <> a2
     MATCH (ca:ComparabilityAssessment)-[:COMPARES]->(a1)
     MATCH (ca)-[:COMPARES]->(a2)
     WHERE ca.verdict IN ['COMPARABLE', 'COMPARABLE_WITH_CONVERSION']
+  }
+RETURN r1.uid AS result1, r2.uid AS result2, a1.uid AS assay1, a2.uid AS assay2;
+
+// V-302r (proposed, W07-SR-11): as V-302, but only a well-formed, current assessment licenses the pair (exactly two
+// COMPARES targets, status not SUPERSEDED/WITHDRAWN, recordedTo null). Under V-302 a malformed three-way assessment
+// (N10) masks an unlicensed trend (N1).
+MATCH (r1:DiagnosticResult)-[:COMPARED_TO]-(r2:DiagnosticResult)
+WHERE elementId(r1) < elementId(r2)
+MATCH (r1)-[:PRODUCED_BY_ASSAY_VERSION]->(a1:AssayVersion),
+      (r2)-[:PRODUCED_BY_ASSAY_VERSION]->(a2:AssayVersion)
+WHERE a1 <> a2
+  AND NOT EXISTS {
+    MATCH (ca:ComparabilityAssessment)-[:COMPARES]->(a1)
+    MATCH (ca)-[:COMPARES]->(a2)
+    WHERE ca.verdict IN ['COMPARABLE', 'COMPARABLE_WITH_CONVERSION']
+      AND NOT ca.status IN ['SUPERSEDED', 'WITHDRAWN'] AND ca.recordedTo IS NULL
+      AND COUNT { (ca)-[:COMPARES]->() } = 2
   }
 RETURN r1.uid AS result1, r2.uid AS result2, a1.uid AS assay1, a2.uid AS assay2;
 
@@ -71,6 +88,21 @@ WHERE v1 <> v2
     MATCH (ca:ComparabilityAssessment)-[:COMPARES]->(v1)
     MATCH (ca)-[:COMPARES]->(v2)
     WHERE ca.verdict IN ['COMPARABLE', 'COMPARABLE_WITH_CONVERSION']
+  }
+RETURN r1.uid AS result1, r2.uid AS result2, v1.uid AS algorithmVersion1, v2.uid AS algorithmVersion2;
+
+// V-304r (proposed, W07-SR-11): V-304 with the same well-formed-assessment rule as V-302r.
+MATCH (r1:DiagnosticResult)-[:COMPARED_TO]-(r2:DiagnosticResult)
+WHERE elementId(r1) < elementId(r2)
+MATCH (r1)-[:COMPUTED_BY_ALGORITHM_VERSION]->(v1:AlgorithmVersion),
+      (r2)-[:COMPUTED_BY_ALGORITHM_VERSION]->(v2:AlgorithmVersion)
+WHERE v1 <> v2
+  AND NOT EXISTS {
+    MATCH (ca:ComparabilityAssessment)-[:COMPARES]->(v1)
+    MATCH (ca)-[:COMPARES]->(v2)
+    WHERE ca.verdict IN ['COMPARABLE', 'COMPARABLE_WITH_CONVERSION']
+      AND NOT ca.status IN ['SUPERSEDED', 'WITHDRAWN'] AND ca.recordedTo IS NULL
+      AND COUNT { (ca)-[:COMPARES]->() } = 2
   }
 RETURN r1.uid AS result1, r2.uid AS result2, v1.uid AS algorithmVersion1, v2.uid AS algorithmVersion2;
 

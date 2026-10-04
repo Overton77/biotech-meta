@@ -61,26 +61,17 @@
      "citesAssertions": [
       {
        "__typename": "Assertion",
-       "uid": "hu:assertion:w23-rt-a1",
-       "predicate": "HAS_FORMULATION_VERSION"
+       "uid": "hu:claim-occurrence:w23-rt-co1",
+       "predicate": "RECOMMENDS"
       },
       {
        "__typename": "Assertion",
-       "uid": "hu:claim-occurrence:w23-rt-co1",
-       "predicate": "RECOMMENDS"
+       "uid": "hu:assertion:w23-rt-a1",
+       "predicate": "HAS_FORMULATION_VERSION"
       }
      ],
      "citesAssertionsConnection": {
       "edges": [
-       {
-        "properties": {
-         "orderIndex": 1
-        },
-        "node": {
-         "__typename": "Assertion",
-         "uid": "hu:assertion:w23-rt-a1"
-        }
-       },
        {
         "properties": {
          "orderIndex": 2
@@ -88,6 +79,15 @@
         "node": {
          "__typename": "Assertion",
          "uid": "hu:claim-occurrence:w23-rt-co1"
+        }
+       },
+       {
+        "properties": {
+         "orderIndex": 1
+        },
+        "node": {
+         "__typename": "Assertion",
+         "uid": "hu:assertion:w23-rt-a1"
         }
        }
       ]

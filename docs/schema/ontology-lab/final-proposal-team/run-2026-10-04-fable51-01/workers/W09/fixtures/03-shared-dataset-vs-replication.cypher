@@ -5,7 +5,7 @@
 // published BEFORE the primary report). Independent line: ATLAS (fixture 02) and ENERGIZE NCT03283462 / PMID 35050355.
 // ATLAS and ENERGIZE share the sponsor Amazentis (registry), so they are dataset-independent but not sponsor-independent.
 // PubMed metadata retrieved 2026-10-04 (MCP); ENERGIZE registry search row (sponsor Amazentis SA, enrollment 66) retrieved 2026-10-04 (MCP).
-// Expected on this file (+ fixture 02 loaded): V-218 0 rows; QS-W09-07 returns 1 dependent pair; QS-W09-08 returns the shared sponsor.
+// Expected on this file (+ fixture 02 loaded): V-218 0 rows; V-215r 0 rows; QS-W09-07 returns 1 dependent pair; QS-W09-08 returns the shared sponsor.
 // =====================================================================================================================
 
 // 1. Sources/snapshots/locators for the three PubMed records and the ENERGIZE PMC extract.
@@ -168,15 +168,16 @@ MERGE (a)-[:SUPPORTED_BY]->(loc)
 MERGE (st)-[d:SPONSORED_BY]->(org)
   ON CREATE SET d.derivationRule = 'inverse-of:SPONSORS_STUDY@1', d.derivedFromAssertionUids = [a.uid], d.derivedAt = datetime('2026-10-04T01:00:00Z');
 
-// 8. W10-owned synthesis (fixture content): two INDEPENDENT_REPLICATION inputs from different studies and datasets (valid),
-//    and the two walnut publications entered only as SUPPORTIVE (they share Study and Dataset).
+// 8. W10-owned synthesis (fixture content): two inputs from different studies and datasets. Both are secondary findings of
+//    trials whose primary was null (ATLAS here; ENERGIZE per Liu 2022), so INV-206 allows only SUPPORTIVE/HYPOTHESIS_GENERATING;
+//    their dataset independence is still countable (QS-W09-08). The two walnut publications share Study and Dataset.
 MATCH (r1:StudyResult {uid: 'hu:study-result:atlas-hamstring-ua500-vs-placebo'}), (r2:StudyResult {uid: 'hu:study-result:energize-endurance-ua-vs-placebo-2m'})
 MERGE (syn:EvidenceSynthesis:EvidenceAssessment {uid: 'hu:synthesis:ua-muscle-performance-replication-v1'})
   ON CREATE SET syn.id = 'ua-muscle-performance-replication-v1', syn.assessmentType = 'EvidenceSynthesis', syn.methodVersion = 'synthesis-v0.1', syn.status = 'PROPOSED',
                 syn.claimText = 'Urolithin A improves a muscle performance measure versus placebo in adults', syn.verdict = 'INSUFFICIENT',
                 syn.evidenceCutoff = date('2022-05-31'), syn.recordedAt = datetime('2026-10-04T01:00:00Z'), syn.createdAt = datetime('2026-10-04T01:00:00Z')
-MERGE (syn)-[:INCLUDES_RESULT {inputRole: 'INDEPENDENT_REPLICATION'}]->(r1)
-MERGE (syn)-[:INCLUDES_RESULT {inputRole: 'INDEPENDENT_REPLICATION'}]->(r2);
+MERGE (syn)-[:INCLUDES_RESULT {inputRole: 'SUPPORTIVE'}]->(r1)
+MERGE (syn)-[:INCLUDES_RESULT {inputRole: 'SUPPORTIVE'}]->(r2);
 
 MATCH (w1:StudyResult {uid: 'hu:study-result:berryman-2013-skins-rhi-within'}), (w2:StudyResult {uid: 'hu:study-result:zhang-2011-postprandial-sera-efflux'})
 MERGE (syn:EvidenceSynthesis:EvidenceAssessment {uid: 'hu:synthesis:walnut-components-vascular-v1'})

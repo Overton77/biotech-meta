@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/00-shared-base.cypher",
- "uri": "bolt://127.0.0.1:39915/",
+ "uri": "bolt://127.0.0.1:38819/",
  "db": "neo4j",
  "explain": false,
  "total": 23,
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 182,
+   "ms": 4466,
    "sample": [],
    "header": "// W23 fixture 00: shared-graph base (POSITIVE). Run W23, worker W23 (Opus 5.5), 2026-10-04.\n// SYNTHETIC_FIXTURE: every product, label text, policy and answer here is synthetic; example.invalid URIs only.\n// Shared graph only: no private-personal node, property, relationship or hu:private- value (c"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 58,
+   "ms": 1363,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 61,
+   "ms": 1536,
    "sample": [],
    "header": ""
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 20,
+   "ms": 84,
    "sample": [],
    "header": ""
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 59,
+   "ms": 671,
    "sample": [],
    "header": "// ---- provenance: source, immutable snapshots, reproducible TEXT_QUOTE locators ----"
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 68,
+   "ms": 927,
    "sample": [],
    "header": ""
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 25,
+   "ms": 393,
    "sample": [],
    "header": ""
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 135,
+   "ms": 2159,
    "sample": [],
    "header": ""
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 35,
+   "ms": 178,
    "sample": [],
    "header": ""
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 160,
+   "ms": 2618,
    "sample": [],
    "header": "// ---- assertions (content immutable; recordedTo written once on supersession) ----"
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 117,
+   "ms": 970,
    "sample": [],
    "header": ""
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 115,
+   "ms": 476,
    "sample": [],
    "header": ""
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 59,
+   "ms": 579,
    "sample": [],
    "header": ""
   },
@@ -311,7 +311,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 75,
+   "ms": 1270,
    "sample": [],
    "header": "// asserted attachment episodes (asserted_edge profile; one relationship per recorded-time episode)"
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 76,
+   "ms": 1054,
    "sample": [],
    "header": ""
   },
@@ -355,7 +355,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 285,
+   "ms": 2608,
    "sample": [],
    "header": "// ---- capture-fidelity adjudications (immutable; PUBLIC: verdict, kind and reviewedAt enter the public trace) ----"
   },
@@ -377,7 +377,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 85,
+   "ms": 612,
    "sample": [],
    "header": "// ---- INTERNAL policy layer (shared graph, excluded from PUBLIC_ANSWER) ----"
   },
@@ -399,7 +399,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 549,
    "sample": [],
    "header": ""
   },
@@ -421,7 +421,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 98,
+   "ms": 1103,
    "sample": [],
    "header": ""
   },
@@ -443,7 +443,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 174,
    "sample": [],
    "header": "// ---- answer composition lineage (provenance states 4 and 5) ----"
   },
@@ -465,7 +465,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 170,
+   "ms": 1556,
    "sample": [],
    "header": ""
   },
@@ -487,7 +487,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 126,
+   "ms": 2948,
    "sample": [],
    "header": "// ---- published answers (INTERNAL nodes; PUBLIC_ANSWER exposes the reproducibility allow-list only) ----"
   },
@@ -509,7 +509,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 41,
+   "ms": 222,
    "sample": [],
    "header": ""
   }

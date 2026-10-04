@@ -151,8 +151,8 @@ SET pv.id = 'w23-sleep-support-ranking-v3', pv.stateType = 'POLICY_VERSION', pv.
     pv.createdAt = datetime('2026-03-20T00:00:00Z');
 
 UNWIND [
-  {uid: 'hu:decision-criterion:w23-weakest-applicability-dimension', id: 'w23-weakest-applicability-dimension', key: 'WEAKEST_APPLICABILITY_DIMENSION', kind: 'APPLICABILITY', m: 'applicability-0.3', o: 1},
-  {uid: 'hu:decision-criterion:w23-safety-block', id: 'w23-safety-block', key: 'SAFETY_BLOCK', kind: 'SAFETY_BLOCK', m: 'safety-block-0.1', o: 2}
+  {uid: 'hu:decision-criterion:w23-weakest-applicability-dimension', id: 'w23-weakest-applicability-dimension', key: 'WEAKEST_APPLICABILITY_DIMENSION', kind: 'APPLICABILITY', m: 'applicability-0.3', o: 0},
+  {uid: 'hu:decision-criterion:w23-safety-block', id: 'w23-safety-block', key: 'SAFETY_BLOCK', kind: 'SAFETY_BLOCK', m: 'safety-block-0.1', o: 1}
 ] AS row
 MATCH (pv:PolicyVersion {uid: 'hu:policy-version:w23-sleep-support-ranking-v3'})
 MERGE (dc:DecisionCriterion:Entity {uid: row.uid})
@@ -196,9 +196,9 @@ SET r.id = 'w23-ar1', r.occurrenceType = 'ANSWER_PUBLICATION', r.startedAt = act
     r.traceDepth = 'ADJUDICATION', r.publishedAt = datetime('2026-04-12T09:05:00Z'), r.mongoResearchRunId = 'run-w23-0001',
     r.privacyClass = 'INTERNAL', r.createdAt = datetime('2026-04-12T09:05:00Z'), r.updatedAt = datetime('2026-04-12T09:05:00Z')
 MERGE (r)-[c1:CITES_ASSERTION]->(a)
-SET c1.orderIndex = 1
+SET c1.orderIndex = 0
 MERGE (r)-[c2:CITES_ASSESSMENT]->(j)
-SET c2.orderIndex = 1
+SET c2.orderIndex = 0
 MERGE (r)-[:WAS_GENERATED_BY]->(act);
 
 MATCH (act:Activity {uid: 'hu:activity:w23-compose-ar2'}), (a:Assertion {uid: 'hu:assertion:w23-a2-variant-fv-a1c'}),
@@ -211,7 +211,7 @@ SET r.id = 'w23-ar2', r.occurrenceType = 'ANSWER_PUBLICATION', r.startedAt = act
     r.traceDepth = 'ADJUDICATION', r.publishedAt = datetime('2026-06-20T10:05:00Z'), r.mongoResearchRunId = 'run-w23-0002',
     r.privacyClass = 'INTERNAL', r.createdAt = datetime('2026-06-20T10:05:00Z'), r.updatedAt = datetime('2026-06-20T10:05:00Z')
 MERGE (r)-[c1:CITES_ASSERTION]->(a)
-SET c1.orderIndex = 1
+SET c1.orderIndex = 0
 MERGE (r)-[c2:CITES_ASSESSMENT]->(j)
-SET c2.orderIndex = 1
+SET c2.orderIndex = 0
 MERGE (r)-[:WAS_GENERATED_BY]->(act);

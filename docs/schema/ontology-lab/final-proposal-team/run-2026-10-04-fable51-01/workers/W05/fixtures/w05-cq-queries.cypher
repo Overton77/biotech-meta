@@ -49,7 +49,7 @@ WHERE a.recordedAt <= asOf AND (a.recordedTo IS NULL OR a.recordedTo > asOf)
 RETURN asOf, a.valueNumber AS rfd, a.unitCode AS unit;
 
 // Q-RC-05-practice: who reports doing versus who recommends a practice.
-MATCH (lf:Lifestyle {uid: 'hu:lifestyle:sauna-bathing'})<-[:HAS_SUBJECT]-(a:Assertion)-[:ASSERTED_BY]->(p:Person)
+MATCH (lf:Lifestyle {uid: 'hu:lifestyle:sauna-bathing'})<-[:HAS_SUBJECT|HAS_OBJECT]-(a:Assertion)-[:ASSERTED_BY]->(p:Person)
 OPTIONAL MATCH (p)-[r:RECOMMENDS {assertionUid: a.uid}]->(lf)
 RETURN p.name AS speaker, a.speechAct AS speechAct, a.assertionBasis AS basis, a.predicate AS predicate, r IS NOT NULL AS projectedRecommendation
 ORDER BY speechAct;

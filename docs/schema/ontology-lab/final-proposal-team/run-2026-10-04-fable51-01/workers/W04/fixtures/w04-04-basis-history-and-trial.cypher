@@ -19,7 +19,7 @@ MERGE (v:ProductVariant:Entity {uid: 'hu:product-variant:basis-us-capsule-standa
 ON CREATE SET v.name = 'Basis — US capsules', v.jurisdiction = 'US', v.dosageForm = 'CAPSULE', v.createdAt = datetime('2026-10-04T01:10:00Z')
 SET v.entityType = 'ProductVariant', v.privacyClass = 'PUBLIC';
 
-MERGE (nrE:IngredientMaterial:Entity {uid: 'hu:material:elysium-nr-e'})
+MERGE (nrE:IngredientMaterial:BrandedIngredientMaterial:Entity {uid: 'hu:material:elysium-nr-e'})
 ON CREATE SET nrE.name = 'Elysium NR-E', nrE.brandName = 'NR-E', nrE.createdAt = datetime('2026-10-04T01:10:00Z')
 SET nrE.entityType = 'IngredientMaterial', nrE.privacyClass = 'PUBLIC';
 

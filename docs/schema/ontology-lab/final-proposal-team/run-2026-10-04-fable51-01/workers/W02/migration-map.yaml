@@ -1,0 +1,87 @@
+# W02 migration map: live current_biotech_schema.graphql (digest 86b5e0b5…f112) -> final proposal.
+# action: keep | rename | move | split | merge | derive | retire. Identity rule for every relabel: the live id becomes the
+# opaque segment of the new uid (hu:substance:<id>, hu:form:<id>, hu:material:<id>) unless a ResolutionHypothesis resolves
+# the node to an existing identity, in which case the old uid stays resolvable through an EquivalenceAssessment redirect
+# (contract A2). Disposition of a legacy node happens per node (fx-06): identifier first, never by name.
+- {live: Compound, final: ChemicalSubstance, action: rename, note: "D-002. Relabel nodes that denote one defined chemical structure. Nodes denoting combinations (e.g. 'NRPT') or materials are NOT relabelled: combination -> ResolutionHypothesis to StudyIntervention/FormulationVersion/Product name; material -> IngredientMaterial. Detected by V-W02-03/V-W02-04."}
+- {live: Compound.id, final: ChemicalSubstance.id, action: keep, note: "uid = hu:substance:<id>"}
+- {live: Compound.name, final: ChemicalSubstance.name, action: keep, note: "nullable per D-013; presentation only; preferredName populated from authority record"}
+- {live: Compound.description, final: ChemicalSubstance.description, action: keep, note: ""}
+- {live: Compound.mongoResearchRunId, final: ChemicalSubstance.mongoResearchRunId, action: keep, note: "maps to Activity.externalRunId"}
+- {live: Compound.createdAt, final: ChemicalSubstance.createdAt, action: keep, note: ""}
+- {live: Compound.updatedAt, final: ChemicalSubstance.updatedAt, action: keep, note: ""}
+- {live: Compound.searchText, final: ChemicalSubstance.searchText, action: keep, note: "INV-107 derived"}
+- {live: Compound.searchFields, final: ChemicalSubstance.searchFields, action: keep, note: ""}
+- {live: Compound.embeddingModel, final: ChemicalSubstance.embeddingModel, action: keep, note: ""}
+- {live: Compound.embeddingDimensions, final: ChemicalSubstance.embeddingDimensions, action: keep, note: ""}
+- {live: Compound.searchEmbedding, final: null, action: retire, note: "stored property may remain; field and @vector are re-added only by Fable at merge (D-014) without provider"}
+- {live: Compound.commonName, final: ChemicalSubstance.commonName, action: keep, note: "legacy presentation"}
+- {live: Compound.casNumber, final: "ChemicalSubstance.casNumber + Identifier{scheme: CAS}", action: split, note: "materialized lookup kept for CompoundSearch (D-015); Identifier record authoritative; a CAS of the salt on a node named for the moiety resolves to the salt (fx-06)"}
+- {live: Compound.molecularFormula, final: ChemicalSubstance.molecularFormula, action: keep, note: "authority-versioned descriptor"}
+- {live: Compound.molecularWeight, final: "Assertion{predicate: HAS_MOLECULAR_WEIGHT, valueNumber, unitCode: g/mol}", action: derive, note: "W02-SR-04; input of CALCULATED active-moiety amounts; must cite its authority snapshot"}
+- {live: Compound.compoundClass, final: ChemicalSubstance.compoundClass, action: keep, note: "legacy projection hint; classification is an assertion"}
+- {live: "Compound.forms (IS_FORM_OF IN, RoleMetadata)", final: "ChemicalSubstance.forms (FORM_OF_SUBSTANCE IN, AssertedEdgeProperties)", action: rename, note: "field name kept; relationship type renamed; RoleMetadata dropped; each edge needs an authorizing assertion (V-101)"}
+- {live: "Compound.modulates (MODULATES, AssociationMetadata)", final: "ChemicalSubstance.modulates (MODULATES, DerivedEdgeProperties, read-only)", action: derive, note: "owner W03; projection of ACCEPTED DIRECT_MEASUREMENT mechanism assertions (INV-211); AssociationMetadata fields move to the assertions"}
+- {live: "Compound.hasSafetySignals (HAS_SAFETY_SIGNAL, SafetyMetadata)", final: null, action: move, note: "W17 owns HAS_SAFETY_SIGNAL and SafetySubjectTarget; field not on W02 types until W17 states its property type (W02-SR-14)"}
+- {live: "Compound @fulltext CompoundSearch / searchCompounds", final: "ChemicalSubstance @fulltext CompoundSearch / searchCompounds", action: keep, note: "D-015; fields name, preferredName, description, commonName, casNumber, searchText (stored names)"}
+- {live: "Compound @vector CompoundSearchEmbedding / searchCompoundsBySemanticText", final: null, action: retire, note: "Fable re-adds at merge if justified (D-014); justification in 07-operations.md"}
+- {live: CompoundForm, final: "ChemicalForm | IngredientMaterial | dosage form on ProductVariant/StudyIntervention", action: split, note: "D-002; per node: a stated crystal/polymorph/amorphous form -> ChemicalForm; a supplier or brand material -> IngredientMaterial (BrandedIngredientMaterial when branded); a dose/dosage-form record -> W04/W09 component and dosageForm"}
+- {live: CompoundForm.id, final: "ChemicalForm.id or IngredientMaterial.id", action: keep, note: "uid hu:form:<id> or hu:material:<id>"}
+- {live: CompoundForm.name, final: "ChemicalForm.name | IngredientMaterial.name", action: keep, note: ""}
+- {live: CompoundForm.description, final: "ChemicalForm.description | IngredientMaterial.description", action: keep, note: ""}
+- {live: CompoundForm.mongoResearchRunId, final: "*.mongoResearchRunId", action: keep, note: ""}
+- {live: CompoundForm.createdAt, final: "*.createdAt", action: keep, note: ""}
+- {live: CompoundForm.updatedAt, final: "*.updatedAt", action: keep, note: ""}
+- {live: CompoundForm.dosageForm, final: "ProductVariant.dosageForm | StudyIntervention.dosageForm", action: move, note: "W04/W09; never on a material (V-222b)"}
+- {live: CompoundForm.concentrationText, final: "IngredientComponent.quantity/unitCode/declaredAs | InterventionComponent.quantity/verbatimDoseText", action: move, note: "amount belongs to a component in context"}
+- {live: "CompoundForm.formOf (IS_FORM_OF OUT, RoleMetadata)", final: "ChemicalForm.formOf (FORM_OF_SUBSTANCE OUT, exactly_one) | IngredientMaterial.realizesSubstances (REALIZES_SUBSTANCE)", action: split, note: "chemical-form nodes keep formOf; material nodes get REALIZES_SUBSTANCE"}
+- {live: "CompoundForm.affectsMechanisms (AFFECTS_MECHANISM, AssociationMetadata)", final: "ChemicalForm.affectsMechanisms | IngredientMaterial.affectsMechanisms (derived, read-only)", action: derive, note: "owner W03"}
+- {live: Ingredient, final: IngredientMaterial, action: merge, note: "D-008 sense; the generic live ingredient is a material identity; uid hu:material:<id>; a food-ingredient node that denotes a whole food goes to W05 FoodItem by W05's rule"}
+- {live: Ingredient.id, final: IngredientMaterial.id, action: keep, note: ""}
+- {live: Ingredient.name, final: IngredientMaterial.name, action: keep, note: ""}
+- {live: Ingredient.description, final: IngredientMaterial.description, action: keep, note: ""}
+- {live: Ingredient.mongoResearchRunId, final: IngredientMaterial.mongoResearchRunId, action: keep, note: ""}
+- {live: Ingredient.createdAt, final: IngredientMaterial.createdAt, action: keep, note: ""}
+- {live: Ingredient.updatedAt, final: IngredientMaterial.updatedAt, action: keep, note: ""}
+- {live: Ingredient.searchText, final: IngredientMaterial.searchText, action: keep, note: ""}
+- {live: Ingredient.searchFields, final: IngredientMaterial.searchFields, action: keep, note: ""}
+- {live: Ingredient.embeddingModel, final: IngredientMaterial.embeddingModel, action: keep, note: ""}
+- {live: Ingredient.embeddingDimensions, final: IngredientMaterial.embeddingDimensions, action: keep, note: ""}
+- {live: Ingredient.ingredientRole, final: IngredientComponent.role, action: move, note: "W04; role is contextual to a formulation; when no formulation exists the value is kept only on an Assertion"}
+- {live: "Ingredient.containsCompounds (CONTAINS_COMPOUND, DoseMetadata)", final: "IngredientMaterial.quantitativelyContains (QUANTITATIVELY_CONTAINS, QuantitativeContentProperties) | IngredientMaterial.providesConstituents (PROVIDES_CONSTITUENT)", action: split, note: "dose+doseUnit present -> QUANTITATIVELY_CONTAINS {comparator EQ, contentStatementKind TYPICAL_COMPOSITION_REPORTED unless the source says standardized}; absent -> PROVIDES_CONSTITUENT; DoseMetadata.standardizedTo -> STANDARDIZATION_CLAIM with expressedAs; never infer contains from provides"}
+- {live: "Ingredient.hasSafetySignals (HAS_SAFETY_SIGNAL)", final: null, action: move, note: "W17 (W02-SR-14)"}
+- {live: "Ingredient @fulltext IngredientSearch / searchIngredients", final: "IngredientMaterial @fulltext IngredientSearch / searchIngredients", action: keep, note: "D-015; field ingredientRole dropped from the index (moved to W04)"}
+- {live: Material, final: IngredientMaterial, action: retire, note: "CL-005 / D-008: retired into IngredientMaterial (same uid) unless W11 shows a process-input case IngredientMaterial cannot carry; GRN 635 process inputs (D-ribofuranose tetra-acetate, HCl, ammonium hydroxide; M-21) are carried as IngredientMaterial with role on W11 INPUTS"}
+- {live: Material.id, final: IngredientMaterial.id, action: keep, note: "uid hu:material:<id>"}
+- {live: Material.name, final: IngredientMaterial.name, action: keep, note: ""}
+- {live: Material.description, final: IngredientMaterial.description, action: keep, note: ""}
+- {live: Material.mongoResearchRunId, final: IngredientMaterial.mongoResearchRunId, action: keep, note: ""}
+- {live: Material.createdAt, final: IngredientMaterial.createdAt, action: keep, note: ""}
+- {live: Material.updatedAt, final: IngredientMaterial.updatedAt, action: keep, note: ""}
+- {live: Material.materialType, final: IngredientMaterial.materialKind, action: rename, note: "mapped by value list; unmapped -> OTHER_MATERIAL with the original text kept on an Assertion"}
+- {live: Material.materialGrade, final: "ChemicalForm.grade | SpecificationVersion (W11)", action: move, note: "chemical grade (USP, micronized) -> ChemicalForm.grade; owner grade -> W11"}
+- {live: Material.regulatoryCategoryHint, final: "RegulatoryStatus (W13) STATUS_OF IngredientMaterial", action: move, note: "INV-010: a category hint is not a status"}
+- {live: Material.traceabilityCode, final: "ProductLot / material lot (W12)", action: move, note: "a lot code is not a material identity"}
+- {live: "Material.partOfProducts (PART_OF, DoseMetadata)", final: "FormulationVersion -HAS_INGREDIENT_COMPONENT-> IngredientComponent -USES_MATERIAL-> IngredientMaterial; derived CONTAINS", action: derive, note: "W04; INV-005"}
+- {live: "Material.supportedBy (SUPPORTED_BY Chunk, ExtractionMetadata)", final: "derived chunk support (W20)", action: move, note: "INV-404; not a field on W02 types (W02-SR-15)"}
+- {live: "ManufacturingProcess.inputsMaterials / outputsMaterials / producesMaterials (INPUTS/OUTPUTS/PRODUCES -> Material)", final: "-> IngredientMaterial", action: rename, note: "range change only; relationship types and property successor owned by W11 (W02-SR-10)"}
+- {live: "ManufacturingStep.hasInputMaterials / hasOutputMaterials (HAS_INPUT/HAS_OUTPUT -> Material)", final: "-> IngredientMaterial", action: rename, note: "W11"}
+- {live: "Product.containsCompoundForms (CONTAINS_COMPOUND_FORM, DoseMetadata)", final: "derived CONTAINS_COMPOUND_FORM (Product -> ChemicalForm) and CONTAINS (Product|ProductVariant -> IngredientMaterial)", action: derive, note: "D-002; owner W04; projection of IngredientComponent facts"}
+- {live: "FoodItem.containsCompounds (CONTAINS_COMPOUND -> Compound)", final: "-> ChemicalSubstance (or PROVIDES_CONSTITUENT/QUANTITATIVELY_CONTAINS on a material)", action: rename, note: "owner W05 decides food composition edge (registry: CONTAINS_COMPOUND dispose)"}
+- {live: "FoodProduct.hasIngredients (HAS_INGREDIENT -> Ingredient)", final: "-> IngredientMaterial", action: rename, note: "owner W05 (registry: HAS_INGREDIENT dispose)"}
+- {live: "DoseMetadata (on CONTAINS_COMPOUND_FORM, CONTAINS_COMPOUND, HAS_INGREDIENT, PART_OF, INPUTS/OUTPUTS/PRODUCES)", final: "IngredientComponent fields (W04) | QuantitativeContentProperties (W02) | W11 ProcessIoProperties", action: split, note: "dose/doseUnit -> quantity/unitCode; role/componentName -> role/declaredAs (W04); standardizedTo -> QuantitativeContentProperties {STANDARDIZATION_CLAIM}; quantity (Int) -> dropped (undocumented); notes -> Assertion text"}
+- {live: "union ExposureAgent (Ingredient | Compound members)", final: "ExposureAgentTarget (W05): IngredientMaterial | ChemicalSubstance", action: rename, note: "W02-SR-12"}
+- {live: "union TreatmentComponent (Compound | CompoundForm members)", final: "TreatmentComponentTarget (W06): ChemicalSubstance | ChemicalForm | IngredientMaterial", action: rename, note: "W02-SR-19"}
+- {live: "union SafetySubject (Compound | Ingredient members)", final: "SafetySubjectTarget (W17): ChemicalSubstance | IngredientMaterial", action: rename, note: "W02-SR-14"}
+- {live: "union StudyIntervention (Compound | CompoundForm members)", final: "LegacyEvaluatedIntervention (W09, read-only): ChemicalSubstance | ChemicalForm | IngredientMaterial", action: rename, note: "D-003; W02-SR-20"}
+- {live: "union StepSubstance (Compound | CompoundForm)", final: "StepSubstanceTarget (W16): ChemicalSubstance | ChemicalForm | IngredientMaterial", action: rename, note: "W02-SR-21"}
+- {live: "union ProtocolResultMention (Compound)", final: "ProtocolResultMentionTarget (W16): ChemicalSubstance | IngredientMaterial", action: rename, note: "W02-SR-21"}
+- {live: "union Recommendable (Compound)", final: "successor owned per registry (W21/W23): ChemicalSubstance | IngredientMaterial", action: rename, note: "W02-SR-22"}
+- {live: "union EventParticipant / EventSubject (Compound)", final: "EventParticipantTarget / EventSubjectTarget (W18): ChemicalSubstance", action: rename, note: "W02-SR-23"}
+- {live: "union EvidenceSubject / ClaimSubject / AssociationParticipant (Compound | CompoundForm | Ingredient | Material)", final: "AssertionSubjectTarget (W00) and W03 Association disposition: ChemicalSubstance | ChemicalForm | IngredientMaterial", action: rename, note: "W02-SR-24"}
+- {live: "union EpisodeMentionable (Material)", final: "EpisodeMentionableTarget (W21): IngredientMaterial", action: rename, note: "W02-SR-22"}
+- {live: "union MediaSubject (Compound | CompoundForm | Ingredient | Material) / ProductLabelMention (Compound | Ingredient)", final: "MediaSubjectTarget / ProductLabelMentionTarget (W22): ChemicalSubstance | ChemicalForm | IngredientMaterial", action: rename, note: "W02-SR-25"}
+- {live: "union ContractManufacturingTarget (CompoundForm)", final: "W11/W01 successor: IngredientMaterial", action: rename, note: "W02-SR-10"}
+- {live: MolecularEntity, final: MolecularEntity, action: keep, note: "owner W03; CL-002 rule: gene-encoded entities only; no chemical keys (V-W02-06); metabolites are ChemicalSubstance"}
+- {live: "0.2.0 fixture value materialKind BRANDED_CHEMICAL_MATERIAL", final: "materialKind CHEMICALLY_DEFINED_MATERIAL + BrandedIngredientMaterial label", action: rename, note: "legacy enum value kept readable; no new writes"}
+- {live: "0.2.0 fixture uid token chemical-form", final: "form", action: keep, note: "registered alias; existing uid hu:chemical-form:nr-chloride-crystal-niagen kept; new forms use hu:form:"}

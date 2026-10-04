@@ -1,0 +1,183 @@
+{
+ "parse": "ok",
+ "build": "ok",
+ "rootFields": {
+  "technologyPlatforms": {
+   "query": true,
+   "createMutation": true
+  },
+  "toolOrInstruments": {
+   "query": true,
+   "createMutation": true
+  },
+  "devices": {
+   "query": true,
+   "createMutation": true
+  },
+  "sensors": {
+   "query": true,
+   "createMutation": true
+  },
+  "modalities": {
+   "query": true,
+   "createMutation": true
+  },
+  "firmwareVersions": {
+   "query": true,
+   "createMutation": true
+  },
+  "searchTechnologyPlatforms": {
+   "query": true,
+   "createMutation": false
+  }
+ },
+ "roundTrip": {
+  "create": {
+   "createDevices": {
+    "devices": [
+     {
+      "uid": "hu:device:w08-rt-ring",
+      "name": "Synthetic ring (round trip)"
+     }
+    ]
+   }
+  },
+  "readEdge": {
+   "devices": [
+    {
+     "uid": "hu:device:w08-rt-ring",
+     "implementsPlatformsConnection": {
+      "edges": [
+       {
+        "properties": {
+         "relationshipUid": "hu:rel:w08-rt-impl",
+         "assertionUid": "hu:assertion:w08-rt-impl",
+         "usageContext": "optical sensing",
+         "isPrimary": true,
+         "validFromBasis": "UNKNOWN"
+        },
+        "node": {
+         "uid": "hu:technology-platform:w08-rt-ppg",
+         "name": "PPG wearable platform (round trip)"
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "unionTarget": {
+   "products": [
+    {
+     "uid": "hu:product:illumina-iscan-system",
+     "embodiesModels": [
+      {
+       "__typename": "ToolOrInstrument",
+       "uid": "hu:instrument:illumina-iscan-system",
+       "name": "Illumina iScan System",
+       "toolClass": "array scanner"
+      }
+     ]
+    }
+   ]
+  },
+  "firmwareLineage": {
+   "devices": [
+    {
+     "name": "WHOOP 4.0",
+     "firmwareVersions": [
+      {
+       "versionLabel": "1.0",
+       "componentLabel": null,
+       "versionBasis": null,
+       "declaredByAssayVersions": []
+      },
+      {
+       "versionLabel": "17.2.2.0",
+       "componentLabel": "Bluetooth firmware",
+       "versionBasis": "VENDOR_VERSION_STRING",
+       "declaredByAssayVersions": []
+      },
+      {
+       "versionLabel": "41.11.7.0",
+       "componentLabel": "core firmware",
+       "versionBasis": "VENDOR_VERSION_STRING",
+       "declaredByAssayVersions": []
+      },
+      {
+       "versionLabel": "41.16.1.0",
+       "componentLabel": "core firmware",
+       "versionBasis": "VENDOR_VERSION_STRING",
+       "declaredByAssayVersions": [
+        {
+         "uid": "hu:assay-version:w08-neg-firmware-mismatch",
+         "softwareVersion": "41.16.2.0"
+        },
+        {
+         "uid": "hu:assay-version:whoop-4-0-heart-rate-fw-41-16-1-0",
+         "softwareVersion": "41.16.1.0"
+        }
+       ]
+      },
+      {
+       "versionLabel": "41.15.3.0",
+       "componentLabel": "core firmware",
+       "versionBasis": "VENDOR_VERSION_STRING",
+       "declaredByAssayVersions": [
+        {
+         "uid": "hu:assay-version:whoop-4-0-heart-rate-fw-41-15-3-0",
+         "softwareVersion": "41.15.3.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "deviceRunsOnSide": {
+   "devices": [
+    {
+     "name": "WHOOP MG",
+     "compatibleSoftwareProducts": [
+      {
+       "uid": "hu:product:whoop-ecg-feature",
+       "name": "WHOOP ECG (electrocardiogram) Feature"
+      }
+     ],
+     "hasSensors": [
+      {
+       "name": "WHOOP MG ECG electrodes (wrist and clasp)"
+      }
+     ],
+     "usesModalities": [
+      {
+       "name": "Single-lead ECG (Lead I-like)"
+      }
+     ]
+    }
+   ]
+  },
+  "stored": [
+   {
+    "deviceLabels": [
+     "Entity",
+     "Device"
+    ],
+    "platformLabels": [
+     "Entity",
+     "TechnologyPlatform"
+    ],
+    "edgeKeys": [
+     "validToBasis",
+     "relationshipUid",
+     "assertionUid",
+     "isPrimary",
+     "recordedFrom",
+     "validFromBasis",
+     "usageContext"
+    ],
+    "hasId": true
+   }
+  ]
+ }
+}

@@ -277,9 +277,11 @@ type ProductSnapshot implements Entity & VersionedStateArchetype & SearchIndexab
 
 """
 A time-bounded composition of one variant in one jurisdiction: an immutable payload (its IngredientComponents and the
-ServingDefinition their per-serving amounts refer to) attached to the variant by asserted, bitemporal, EXCLUSIVE
-HAS_FORMULATION_VERSION episodes. Any composition change (material, amount, basis, serving size) is a new version; a label
-text change that does not establish a composition change is not (it is a new LabelSnapshot, CQ-ID-05). A correction makes a
+ServingDefinition their per-serving amounts refer to) as stated by its authorizing source, attached to the variant by
+asserted, bitemporal, EXCLUSIVE HAS_FORMULATION_VERSION episodes. Any change of material, amount, unit, basis or serving is a
+new version; label wording alone (declaredAs) is not. A new version whose material, amount and serving are unchanged and whose
+declared mass basis or referent differs is classified DECLARED_BASIS_CHANGED_COMPOSITION_NOT_ESTABLISHED, never 'reformulated'
+(CQ-ID-05, Basis 2025-09 -> 2026-03 labels). A correction makes a
 replacement version and closes the old episode in recorded time (SOURCE_CORRECTION); a reformulation bounds the old episode
 in valid time (VALIDITY_BOUNDED) (round 0007). It is NOT a measured composition (INV-006), NOT a lot, NOT a study
 intervention. Serves CQ-ID-01, CQ-ID-02, CQ-ID-05, CQ-AX-17, CQ-AX-25, CQ-TM-01/02/05. Canonical module
