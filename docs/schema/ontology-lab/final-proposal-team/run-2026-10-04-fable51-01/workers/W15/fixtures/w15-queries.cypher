@@ -119,7 +119,7 @@ WITH v, ml, t, off, collect(p)[0] AS latest
 OPTIONAL MATCH (ta:Assertion {predicate: 'LISTING_TITLE_AMOUNT'})-[:HAS_SUBJECT]->(ml)
 OPTIONAL MATCH (ls:LabelSnapshot)-[:LABEL_FOR]->(v)
 RETURN 'Q-W15-07' AS q, ml.marketplace AS marketplace, ml.merchantListingId AS listing, t.name AS item, latest.amount AS latestOneTimePrice,
-       toString(latest.observedAt) AS lastObservedAt, ta.valueString AS listingTitleClaim,
+       toString(latest.observedAt) AS lastObservedAt, toString(ta.valueNumber) + ' ' + ta.unitCode + ' (merchant title claim)' AS listingTitleClaim,
        CASE WHEN ls IS NULL THEN 'NO_LABEL_SNAPSHOT_IN_THIS_PACKET (W04 supplies label amounts)' ELSE ls.uid END AS labelAmountSource
 ORDER BY marketplace, listing;
 

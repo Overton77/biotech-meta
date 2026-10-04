@@ -140,6 +140,7 @@ RETURN 'V-W15-10' AS check, labels(n) AS labels, n.uid AS item;
 MATCH (off:Offer)-[:HAS_PRICE_OBSERVATION]->(a:PriceObservation), (off)-[:HAS_PRICE_OBSERVATION]->(b:PriceObservation)
 WHERE a.uid < b.uid AND a.priceKind = b.priceKind AND a.amount <> b.amount
   AND coalesce(a.subscriptionPlanUid, '-') = coalesce(b.subscriptionPlanUid, '-')
+  AND (coalesce(a.captureMethod, '-') <> coalesce(b.captureMethod, '-') OR coalesce(a.conditionText, '-') = coalesce(b.conditionText, '-'))
   AND abs(duration.inSeconds(a.observedAt, b.observedAt).seconds) <= 600
 RETURN 'V-W15-11 (informational)' AS check, off.uid AS offerUid, a.priceKind AS priceKind,
        [a.amount, b.amount] AS amounts, [a.captureMethod, b.captureMethod] AS captureMethods, [toString(a.observedAt), toString(b.observedAt)] AS observedAt;
