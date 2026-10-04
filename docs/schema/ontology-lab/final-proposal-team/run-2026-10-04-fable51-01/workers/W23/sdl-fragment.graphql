@@ -1,0 +1,263 @@
+# =====================================================================================================
+# W23 Access, answers, policy and private-store boundary (sdl-fragment.graphql)
+# Worker: W23, run run-2026-10-04-fable51-01, model Opus 5.5 (claude-opus-5-5). Coordinator: Fable 5.1.
+# Catalog modules: access_and_answers (AnswerRecord, CITES_ASSERTION, CITES_ASSESSMENT);
+#                  recommendation_decisions, shared-graph INTERNAL part only (PolicyVersion, DecisionCriterion).
+# Competency questions: CQ-AX-01, CQ-AX-03, CQ-AX-11, CQ-AX-12, CQ-AX-13, CQ-RC-02, CQ-RC-03, CQ-RC-04, CQ-PC-08;
+#                       candidates CQ-AX-C01, CQ-AX-C02 (see 02-cq-coverage.md).
+# Source digest: catalog/schema.yaml 8fb50ff0…84f0 (8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0).
+#
+# Privacy (contract A9, D-012): this fragment defines NO private-personal type, field, enum value, relationship
+# or uid prefix. Every private record (UserContext, PersonalMeasurement, RecommendationSnapshot, SharingGrant, ...)
+# is an external private-context-store contract in private-store-interface.md and never appears in SDL.
+#
+# Imports by name only (owners): Entity, EntityArchetype, VersionedStateArchetype, OccurrenceArchetype,
+# AssertionArchetype, EvidenceAssessmentArchetype, PrivacyClass, NodeMaturity, UseKind, Activity,
+# StructuralEdgeProperties, AuthorizationProperties (all W00). Relationship types WAS_GENERATED_BY and
+# AUTHORIZED_BY are W00's; this fragment adds endpoint fields on its own types only (seam W23-SR-02).
+#
+# Enforcement note: nothing below is enforced by SDL alone. Insert-only behaviour is narrowed at the API by
+# @mutation(operations: [CREATE]); uniqueness, privacy-class values, forbidden properties and citation
+# visibility are enforced by the write service and audited by V-121 and V-W23-01 ... V-W23-10 (07-operations.md).
+# Tier closure (which fields leave the graph per AccessTier) is a projection rule, not an SDL directive
+# (04-model-cards.md section "Projection closure").
+# =====================================================================================================
+
+"""
+Audience and access tier of a projection request or a recorded answer (round 0009 K-3; projection-contract.yaml).
+PUBLIC_ANSWER: consumer and researcher answers built from PUBLIC shared records only. OPERATOR_AUDIT: internal
+lineage, reviewer identity and trace gaps; private records only as counts or uids. AGENT_PROJECTION: purpose-bound
+schema and data slice for an agent intent, private context excluded. OWNER_PRIVATE: served only by the private
+context store service to the record owner; it is a request tier, never the tier of a shared-graph record
+(V-W23-01 rejects an AnswerRecord carrying it). The value names a tier; it is not private data (D-012 analysis
+in 05-decision-seam-ledger.md, D-W23-04).
+"""
+enum AccessTier {
+  PUBLIC_ANSWER
+  OPERATOR_AUDIT
+  AGENT_PROJECTION
+  OWNER_PRIVATE
+}
+
+"""
+How far a returned trace reaches (round 0009 K-3). NONE: answer values only. LOCATOR: each cited assertion with
+its SourceLocator and SourceSnapshot (hash, retrievedAt). ADJUDICATION: LOCATOR plus the Adjudications reviewed
+by the recorded viewpoint.
+"""
+enum TraceDepth {
+  NONE
+  LOCATOR
+  ADJUDICATION
+}
+
+"""
+How a projection request treats private user context (round 0009 K-3 field `privateContext`). EXCLUDED: no private
+record is read. REFERENCED_BY_UID_ONLY: the private store sends shared uids only (CQ-AX-21 access pattern); no
+private value reaches the shared side. INCLUDED_FOR_OWNER: OWNER_PRIVATE tier inside the private store only.
+Any tier other than OWNER_PRIVATE requires EXCLUDED (projection-contract invariant 1; modules.yaml closurePolicies.access).
+A shared AnswerRecord always records EXCLUDED (V-W23-01).
+"""
+enum PrivateContextMode {
+  EXCLUDED
+  REFERENCED_BY_UID_ONLY
+  INCLUDED_FOR_OWNER
+}
+
+"""
+CANDIDATE (W23-SR-05). What a PolicyVersion governs. USE_AUTHORIZATION: provenance state 5, the permission an
+Activity cites through AUTHORIZED_BY {useKind} to quote, summarize, use as recommendation evidence or share a
+source-derived record. RECOMMENDATION_RANKING: the ranking and safety policy a private RecommendationSnapshot names
+by policyVersionUid. SAFETY_REVIEW: BellLabs review rules referenced by ProtocolAdjustmentRule.ruleBasis
+BELLLABS_SAFETY_POLICY. DATA_RETENTION: per-category retention of private-store records (round 0008 "policy-versioned"
+retention); the policy text holds no personal data. Failing case without it: an answer-composition Activity
+AUTHORIZED_BY a ranking policy passes V-429 (fixture 13, V-W23-07).
+"""
+enum PolicyKind {
+  USE_AUTHORIZATION
+  RECOMMENDATION_RANKING
+  SAFETY_REVIEW
+  DATA_RETENTION
+}
+
+"""
+A published (shared) answer recorded with the viewpoint and query shape that produced it, so that it can be replayed
+(CQ-AX-03), its trace audited (CQ-AX-01) and its dependence on a later-corrected assertion found (CQ-AX-11).
+It is an Occurrence: something that happened once (an answer was composed and published), immutable after commit.
+It is NOT a log of what a person asked: it never holds the asker's identity, account, session or question text
+(forbidden properties userUid, ownerUid, questionText; V-121, V-W23-01b). An ad hoc answer to one person is private
+behaviour data and, if kept at all, lives in the private context store (OPEN-QUESTIONS P2 private item 7).
+Answer prose is outside the graph; citations are uids with an ordinal (orderIndex) per cited sentence.
+Archetype: Occurrence. Catalog module: access_and_answers (maturity candidate, K-7). Privacy: the node is INTERNAL;
+PUBLIC_ANSWER exposes only its reproducibility allow-list (uid, recordedAsOf, validAt, intervalStart, intervalEnd,
+schemaDigest, queryShapeId, queryShapeVersion, accessTier, traceDepth, publishedAt, cited uids).
+CQs: CQ-AX-01, CQ-AX-03, CQ-AX-11, CQ-AX-12, CQ-RC-04 (shared half).
+"""
+type AnswerRecord implements Entity & OccurrenceArchetype
+  @node(labels: ["AnswerRecord", "Occurrence"])
+  @mutation(operations: [CREATE]) {
+  id: ID! @id
+  "hu:answer-record:<opaque>; uniqueness from the Occurrence uid constraint (operations file), not from SDL"
+  uid: String!
+  "presentation only; never identity"
+  name: String
+  description: String
+  "operational lineage (Activity.externalRunId); OPERATOR_AUDIT and AGENT_PROJECTION only"
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  "INTERNAL for every AnswerRecord (V-W23-01); the public allow-list is a projection rule"
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "constant ANSWER_PUBLICATION"
+  occurrenceType: String!
+  "start of answer composition (equals the composing Activity.startedAt when linked)"
+  startedAt: DateTime
+  endedAt: DateTime
+  "R: the recorded-time viewpoint passed to the query shape (QS-2 $recordedAsOf); never later than createdAt"
+  recordedAsOf: DateTime!
+  "V: valid-time instant (QS-2 $validAt); null means no valid-time filter, never 'now'"
+  validAt: DateTime
+  "half-open valid-time interval when the shape used one (QS-2b-interval)"
+  intervalStart: DateTime
+  intervalEnd: DateTime
+  "sha256:<hex> of the admitted canonical schema the projection was compiled against"
+  schemaDigest: String!
+  "query shape id from query-shapes.md, for example QS-2a"
+  queryShapeId: String!
+  queryShapeVersion: String
+  "tier of the published answer; never OWNER_PRIVATE (V-W23-01)"
+  accessTier: AccessTier!
+  "always EXCLUDED for a shared record (V-W23-01); stored so replay re-issues the identical K-3 request"
+  privateContext: PrivateContextMode!
+  traceDepth: TraceDepth
+  "when the answer was published; recordedAsOf <= publishedAt (V-W23-02)"
+  publishedAt: DateTime
+  """
+  class: structural; cardinality: many (zero only when traceDepth NONE); catalog: CITES_ASSERTION.
+  Each cited assertion must have recordedAt <= recordedAsOf (V-W23-02). orderIndex = ordinal of the cited answer
+  sentence. A citation records use, never support: the five provenance states are read through the assertion.
+  """
+  citesAssertions: [AssertionArchetype!]!
+    @relationship(type: "CITES_ASSERTION", direction: OUT, properties: "StructuralEdgeProperties")
+  """
+  class: structural; cardinality: many; catalog: CITES_ASSESSMENT. Adjudications and evidence assessments the answer
+  relied on; each recordedAt <= recordedAsOf (V-W23-02).
+  """
+  citesAssessments: [EvidenceAssessmentArchetype!]!
+    @relationship(type: "CITES_ASSESSMENT", direction: OUT, properties: "StructuralEdgeProperties")
+  """
+  class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (W00; domain extension requested in
+  W23-SR-02). The ANSWER_COMPOSITION Activity whose USED and AUTHORIZED_BY {useKind} edges carry provenance state 5.
+  """
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+}
+
+"""
+An immutable version of a BellLabs policy document: a use/rights authorization policy (provenance state 5), a
+recommendation ranking and safety policy, a safety review policy, or a retention policy. Payload is identified by
+payloadHash; the stated effective period (effectiveFrom, effectiveTo = expiry) is part of the payload, not an
+attachment episode. Versions of one policy share policyKey; there is no Policy Entity (smallest model; 01 section 6).
+It is NOT a person's decision, NOT a legal determination, and NOT a source license: asset rights and attribution are
+W22 records; this node states what BellLabs permits itself to do with a record (QUOTE_IN_ANSWER ...). Unknown rights
+are not permission. It contains no personal data. Archetype: VersionedState. Catalog module: recommendation_decisions
+(placement shared_graph, privacyClass internal). Privacy: INTERNAL; excluded from PUBLIC_ANSWER and AGENT_PROJECTION
+data slices; OPERATOR_AUDIT reads it; OWNER_PRIVATE may resolve the identity fields of the version its own
+snapshot names. CQs: CQ-RC-02, CQ-RC-03, CQ-RC-04, CQ-AX-01 (state 5), CQ-PC-05 (DATA_RETENTION).
+"""
+type PolicyVersion implements Entity & VersionedStateArchetype
+  @node(labels: ["PolicyVersion", "VersionedState"])
+  @mutation(operations: [CREATE]) {
+  id: ID! @id
+  "hu:policy-version:<opaque> (token registration requested, W23-SR-01)"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  "INTERNAL for every PolicyVersion (V-W23-08)"
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "constant POLICY_VERSION"
+  stateType: String!
+  "sha256:<hex> over the canonical policy document (D-016); replay compares versions by this hash"
+  payloadHash: String!
+  "stated start of applicability (payload); null = not stated"
+  effectiveFrom: DateTime
+  "stated expiry (payload); null = not stated, never 'perpetual'"
+  effectiveTo: DateTime
+  "stable family key shared by all versions of one policy; no two versions of a key overlap in effective time (V-W23-08)"
+  policyKey: String!
+  "the policy's own version label, for example v3"
+  versionLabel: String!
+  "CANDIDATE enum (W23-SR-05)"
+  policyKind: PolicyKind!
+  """
+  CANDIDATE payload vocabulary (USE_AUTHORIZATION only): the use kinds this version permits. An AUTHORIZED_BY
+  {useKind} edge must name one of them, inside [effectiveFrom, effectiveTo) (V-W23-07). Null or empty = permits
+  nothing. W3C ODRL was NOT reviewed in this run; no ODRL term or semantics is claimed.
+  """
+  permittedUseKinds: [UseKind!]
+  """
+  RECOMMENDATION_RANKING only: controlled keys of facts the policy requires; a snapshot's missingFactKeys must be a
+  subset (private-store check, CQ-RC-03).
+  """
+  requiredFactKeys: [String!]
+  """
+  class: structural; cardinality: many; catalog: none (CANDIDATE relationship DECLARES_CRITERION, W23-SR-04).
+  The criteria a ranking policy version evaluates (CQ-RC-02). orderIndex = evaluation order.
+  """
+  declaresCriteria: [DecisionCriterion!]!
+    @relationship(type: "DECLARES_CRITERION", direction: OUT, properties: "StructuralEdgeProperties")
+  """
+  class: structural; cardinality: many; catalog: AUTHORIZED_BY (W00) seen from the policy side. Activities that cite
+  this version for a downstream use (provenance state 5).
+  """
+  authorizedActivities: [Activity!]!
+    @relationship(type: "AUTHORIZED_BY", direction: IN, properties: "AuthorizationProperties")
+}
+
+"""
+A named, method-versioned criterion a ranking policy evaluates for each option (for example weakest applicability
+dimension, safety block, price per declared daily amount, stated preference). Its identity includes its method
+version: a changed method is a new DecisionCriterion, so that a private DecisionCriterionValue (criterionUid, value,
+methodVersion) keeps one meaning on replay. It is NOT a value for any person (values live in the private store),
+NOT an evidence assessment and NOT a recommendation. Archetype: Entity. Catalog module: recommendation_decisions
+(placement shared_graph, privacyClass internal). Privacy: INTERNAL. CQs: CQ-RC-01, CQ-RC-02, CQ-RC-06 (record shape).
+"""
+type DecisionCriterion implements Entity & EntityArchetype
+  @node(labels: ["DecisionCriterion", "Entity"])
+  @mutation(operations: [CREATE]) {
+  id: ID! @id
+  "hu:decision-criterion:<opaque> (new token requested, W23-SR-01)"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  "INTERNAL for every DecisionCriterion (V-W23-08)"
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "constant DECISION_CRITERION"
+  entityType: String!
+  "stable controlled key, for example WEAKEST_APPLICABILITY_DIMENSION"
+  criterionKey: String!
+  """
+  controlled string, candidate values APPLICABILITY, SAFETY_BLOCK, EVIDENCE_ASSESSMENT, PRICE, AVAILABILITY,
+  STATED_PREFERENCE; an enum is deferred until a policy corpus exists (05 D-W23-09)
+  """
+  criterionKind: String!
+  "method version that computes the criterion value; part of identity"
+  methodVersion: String!
+  "UCUM unit of numeric criterion values when the criterion is a quantity; null otherwise"
+  valueUnitCode: String
+  """
+  class: structural; cardinality: many; catalog: none (CANDIDATE DECLARES_CRITERION, W23-SR-04), incoming side.
+  """
+  declaredByPolicyVersions: [PolicyVersion!]!
+    @relationship(type: "DECLARES_CRITERION", direction: IN, properties: "StructuralEdgeProperties")
+}

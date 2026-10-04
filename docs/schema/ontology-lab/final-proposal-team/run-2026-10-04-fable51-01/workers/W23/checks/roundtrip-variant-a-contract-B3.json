@@ -1,0 +1,49 @@
+{
+ "parse": "ok",
+ "build": "ok",
+ "rootFields": {
+  "AnswerRecord": {
+   "queries": [
+    "answerRecordsConnection",
+    "answerRecords"
+   ],
+   "mutations": [
+    "createAnswerRecords"
+   ]
+  },
+  "PolicyVersion": {
+   "queries": [
+    "policyVersionsConnection",
+    "policyVersions"
+   ],
+   "mutations": [
+    "createPolicyVersions"
+   ]
+  },
+  "DecisionCriterion": {
+   "queries": [
+    "decisionCriteriaConnection",
+    "decisionCriteria"
+   ],
+   "mutations": [
+    "createDecisionCriteria"
+   ]
+  }
+ },
+ "roundTrip": {
+  "create": [
+   "Field \"uid\" is not defined by type \"AssertionArchetypeWhere\". Did you mean \"AND\"?",
+   "Field \"uid\" is not defined by type \"AssertionArchetypeWhere\". Did you mean \"AND\"?",
+   "Field \"uid\" is not defined by type \"EvidenceAssessmentArchetypeWhere\". Did you mean \"AND\"?"
+  ],
+  "read": [
+   "Cannot query field \"uid\" on type \"AssertionArchetype\". Did you mean to use an inline fragment on \"Entity\", \"Assertion\", or \"ClaimOccurrence\"?",
+   "Cannot query field \"uid\" on type \"AssertionArchetype\". Did you mean to use an inline fragment on \"Entity\", \"Assertion\", or \"ClaimOccurrence\"?",
+   "Cannot query field \"uid\" on type \"EvidenceAssessmentArchetype\". Did you mean to use an inline fragment on \"Entity\", \"Adjudication\", or \"EvidenceApplicability\"?"
+  ],
+  "updateAttempt": [
+   "Cannot query field \"updateAnswerRecords\" on type \"Mutation\". Did you mean \"createAnswerRecords\" or \"updateAssertions\"?"
+  ],
+  "storedNode": []
+ }
+}

@@ -1,0 +1,65 @@
+{
+ "parse": "ok",
+ "build": "ok",
+ "rootFields": {
+  "AnswerRecord": {
+   "queries": [
+    "answerRecordsConnection",
+    "answerRecords"
+   ],
+   "mutations": [
+    "createAnswerRecords"
+   ]
+  },
+  "PolicyVersion": {
+   "queries": [
+    "policyVersionsConnection",
+    "policyVersions"
+   ],
+   "mutations": [
+    "createPolicyVersions"
+   ]
+  },
+  "DecisionCriterion": {
+   "queries": [
+    "decisionCriteriaConnection",
+    "decisionCriteria"
+   ],
+   "mutations": [
+    "createDecisionCriteria"
+   ]
+  }
+ },
+ "roundTrip": {
+  "create": {
+   "createAnswerRecords": {
+    "answerRecords": [
+     {
+      "uid": "hu:answer-record:w23-rt-ar1",
+      "accessTier": "PUBLIC_ANSWER",
+      "privateContext": "EXCLUDED"
+     }
+    ]
+   }
+  },
+  "read": [
+   "Unknown function 'apoc.date.convertFormat' (line 53, column 78 (offset: 1940))\n\"RETURN this { .uid, .accessTier, .privateContext, .traceDepth, recordedAsOf: apoc.date.convertFormat(toString(this.recordedAsOf), 'iso_zoned_date_time', 'iso_offset_date_time'), citesAssertions: var2, citesAssertionsConnection: var9, citesAssessments: var12 } AS this\"\n                                                                              ^"
+  ],
+  "updateAttempt": [
+   "Cannot query field \"updateAnswerRecords\" on type \"Mutation\". Did you mean \"createAnswerRecords\" or \"updateAssertions\"?"
+  ],
+  "storedNode": [
+   {
+    "labels": [
+     "AnswerRecord",
+     "Occurrence"
+    ],
+    "accessTier": "PUBLIC_ANSWER",
+    "privacyClass": "INTERNAL",
+    "privateContext": "EXCLUDED",
+    "hasId": true,
+    "hasCreatedAt": true
+   }
+  ]
+ }
+}
