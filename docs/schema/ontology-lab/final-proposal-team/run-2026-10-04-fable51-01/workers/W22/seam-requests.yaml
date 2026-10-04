@@ -132,3 +132,15 @@
   cq: [CQ-MD-C02, CQ-MD-C05]
   failingCase: "union members must exist in the merged schema (B6)"
   proposedRuling: W03 answers; Fable prunes.
+
+- id: W22-SR-13
+  targetOwner: W00
+  request: >
+    In W00's AssertionSubjectTarget (sdl-fragment line ~1623, "# W22" members) remove MediaSource (retired by W22-D01;
+    otherwise the merged schema has an undefined union member) and add MediaRightsRecord (VersionedState, promoted
+    from candidate with failing cases mp1/mp2/mp4): it is the HAS_OBJECT of every HAS_RIGHTS_RECORD assertion.
+    W00's SourceLocator.regionAnnotation (LOCATES_REGION OUT -> MediaAnnotation) matches W22's inverse field
+    MediaAnnotation.locatedBy; no change needed there.
+  cq: [CQ-MD-C03, CQ-PV-06]
+  failingCase: "merge-fragments.mjs over all worker fragments reports 'UNDEF MediaSource <- W00'; mp1/mp2/mp4 HAS_RIGHTS_RECORD assertions have a MediaRightsRecord object that the current union cannot type"
+  proposedRuling: drop MediaSource, add MediaRightsRecord to AssertionSubjectTarget.

@@ -1,0 +1,9 @@
+G0: COMMIT
+G1: COMMIT
+G2: ROLLBACK [{"assertion":"hu:assertion:w00-guard-g2","violations":["ASSERTER_COUNT"]}]
+G3: ROLLBACK [{"assertion":"hu:assertion:w00-guard-g3","violations":["LITERAL_XOR_OBJECT"]}]
+G4: ROLLBACK [{"assertion":"hu:assertion:w00-guard-g4","violations":["EXCLUSIVE_DEFINITE_OVERLAP"]}]
+G5: ROLLBACK [{"assertion":"hu:assertion:w00-guard-g5","violations":["BACKDATED_RECORDED_AT"]}]
+G6: ROLLBACK [{"assertion":"hu:assertion:w00-guard-g1","violations":["IMMUTABLE_CONTENT_CONFLICT"]}]
+persisted guard assertions: [{"uid":"hu:assertion:w00-guard-g1","contentHash":"sha256:g1-content","validFrom":"2026-01-01T00:00:00Z"}]
+persisted guard formulations: ["hu:formulation:w00-guard-fv1"]

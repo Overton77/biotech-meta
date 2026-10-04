@@ -1,0 +1,61 @@
+# W12 seam requests (run-2026-10-04-fable51-01, worker W12, Opus 5.5). Fable copies these into 03-conflict-ledger.md.
+- id: W12-SR-01
+  targetOwner: W00
+  request: Register uid type tokens lot, test-sample, test-execution, test-method, measured-result, spec-criterion, pass-fail, lot-test-summary, coa, cert-program, cert-listing, cert-scope (TestingLaboratory keeps org).
+  cq: [CQ-PF-03, CQ-AX-19, CQ-QA-C01, CQ-QA-C02, CQ-QA-C03, CQ-QA-C04]
+  failingCase: catalog conventions.uidTypeTokens has no token for any quality type; fixtures w12-00..w12-40 would otherwise violate INV-106 registration.
+  proposedRuling: register as listed.
+- id: W12-SR-02
+  targetOwner: W00
+  request: Extend the SUPPORTED_BY domain (SupportedRecordTarget) to MeasuredResult, LotTestSummary and CertificateOfAnalysis (InformationArtifacts that record what a source reported).
+  cq: [CQ-AX-19, CQ-QA-C01, CQ-QA-C02]
+  failingCase: "Tru Niagen COA T25189001 potency 555 mg/capsule (S1, PDF p.1 row) cannot cite its locator; the value becomes unprovenanced (V-W12-03, V-W12-12 depend on SUPPORTED_BY)."
+  proposedRuling: accept; structural class, StructuralEdgeProperties; fallback one REPORTS_RESULT Assertion per result.
+- id: W12-SR-03
+  targetOwner: W00
+  request: Add SourceKind value LABORATORY_REPORT.
+  cq: [CQ-QA-C01]
+  failingCase: S1 (lab certificate) and S9 (company analytical survey) must be distinguishable from MARKETING_PAGE / ORGANIZATION_WEBPAGE for source-kind-sensitive rules (analogue of V-324).
+  proposedRuling: accept as a closed-enum addition.
+- id: W12-SR-04
+  targetOwner: W00
+  request: Register asserted predicate CONFORMS_TO_SPECIFICATION (subject ProductLot|TestExecution, object SpecificationCriterion; assertion-only, no edge projection; polarity NEGATIVE for "does not conform").
+  cq: [CQ-QA-C02, CQ-QA-C03, CQ-PF-03]
+  failingCase: Elysium P098-01 "Conforms to internal specs" (S3) and COA "☑ Pass" rows (S1) need a sourced pass/fail assertion (architecture section 8) and currently use an unregistered predicate.
+  proposedRuling: register in the quality module's assertedPredicates.
+- id: W12-SR-05
+  targetOwner: W04
+  request: Add read-only `certifiedUnder` fields (CERTIFIED_UNDER, DerivedEdgeProperties, @settable false) on Product and ProductVariant, or confirm the edge stays lot-only in SDL.
+  cq: [CQ-PF-03]
+  failingCase: catalog CERTIFIED_UNDER domain is Product|ProductVariant|ProductLot; only ProductLot (W12) can declare the field.
+  proposedRuling: W04 adds the fields; the rule writes them only when a scope COVERS the product or variant itself.
+- id: W12-SR-06
+  targetOwner: W15
+  request: State how recalled, expired, counterfeit-suspected and gray-market inventory is represented on InventoryItem / IndividualUnit / Offer, using ProductLot only as an identity (no lot status property); W13/W18 own recall records that name lots.
+  cq: [CQ-AX-19, CQ-CM-02]
+  failingCase: "Niagen survey (S9): counterfeit Tru Niagen units carried 'outdated and out-of-market lot numbers'; a real lot code on a counterfeit unit must not make the lot counterfeit."
+  proposedRuling: counterfeit = UNIT_FROM_LOT absent or contradicted by an adjudication; expired computed from ProductLot.expiryDate at query time; recall = W13/W18 record naming lots.
+- id: W12-SR-07
+  targetOwner: W00
+  request: Add quality-module forbiddenImplications [FACILITY_GMP_CERTIFIED, CERTIFIED_UNDER], [LOT_COVERED, PRODUCT_CERTIFIED], [CONFORMS_TO_SPECIFICATION, MEASURED_VALUE], [LOT_TEST_SUMMARY, CERTIFICATE_OF_ANALYSIS], [CLAIMS_THIRD_PARTY_TESTING, INDEPENDENT_LABORATORY], [LISTING_ABSENT_IN_LATER_CAPTURE, LISTING_WITHDRAWN].
+  cq: [CQ-PF-03, CQ-MF-06, CQ-QA-C01]
+  failingCase: catalog quality module lists no forbidden implication; negatives N02-N06, N11, N18 exercise each.
+  proposedRuling: register; validators V-332, V-W12-01/05/06/07/10/12.
+- id: W12-SR-08
+  targetOwner: W01
+  request: Migrate LocationType.GMP_FACILITY and (with W11) ManufacturingProcess.qualitySystemKind to a CLAIMS_CGMP_COMPLIANCE assertion or a FACILITY-programme CertificationListing COVERS Facility; never a location type or a product certification.
+  cq: [CQ-MF-06]
+  failingCase: a GMP_FACILITY location reads as certification with no certifier, programme, listing or time.
+  proposedRuling: retire GMP_FACILITY as a location type; migration per migration-map.yaml.
+- id: W12-SR-09
+  targetOwner: W00
+  request: Extend V-503/V-505 (bound, precision, basis agreement) to every StateEpisodeProperties edge, including HAS_CERTIFICATION_SCOPE.
+  cq: [CQ-QA-C04]
+  failingCase: "Negative N11 sets validTo with validToBasis OBSERVATION_ONLY on HAS_CERTIFICATION_SCOPE; V-503 (assertions only) returns no row; only V-W12-10 catches it."
+  proposedRuling: generalize the edge-type list in V-503/V-505 to the bitemporal_attachment profile.
+- id: W12-SR-10
+  targetOwner: W11
+  request: Define SpecificationVersion (D-009) and accept CRITERION_OF_SPECIFICATION (SpecificationCriterion -> SpecificationVersion, structural, exactly_one) as the only criterion link; expose an inverse field if wanted, same type name.
+  cq: [CQ-QA-C03]
+  failingCase: architecture section 8 draws MeasuredResult -> SpecificationCriterion -> SpecificationVersion but the catalog names no relationship for the second hop (CL-010).
+  proposedRuling: accept CRITERION_OF_SPECIFICATION.

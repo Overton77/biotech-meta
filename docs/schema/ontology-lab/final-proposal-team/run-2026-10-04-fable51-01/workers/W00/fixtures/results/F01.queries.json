@@ -1,0 +1,134 @@
+[
+ {
+  "n": 1,
+  "status": "ok",
+  "rows": 2,
+  "result": [
+   {
+    "q": "Q01-a",
+    "variant": "hu:product-variant:w00-pair8-a-us-capsule",
+    "formulation": "hu:formulation:w00-pair8-a-fv1-200mg",
+    "authorizedBy": "hu:assertion:w00-pair8-a1"
+   },
+   {
+    "q": "Q01-a",
+    "variant": "hu:product-variant:w00-pair8-b-us-powder",
+    "formulation": "hu:formulation:w00-pair8-b-fv1-3g",
+    "authorizedBy": "hu:assertion:w00-pair8-b1"
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 2,
+  "status": "ok",
+  "rows": 2,
+  "result": [
+   {
+    "q": "Q01-b",
+    "variant": "hu:product-variant:w00-pair8-a-us-capsule",
+    "formulation": "hu:formulation:w00-pair8-a-fv1c-120mg",
+    "authorizedBy": "hu:assertion:w00-pair8-a2-corrected",
+    "validTo": null
+   },
+   {
+    "q": "Q01-b",
+    "variant": "hu:product-variant:w00-pair8-b-us-powder",
+    "formulation": "hu:formulation:w00-pair8-b-fv1-3g",
+    "authorizedBy": "hu:assertion:w00-pair8-b1-bounded",
+    "validTo": {
+     "year": 2026,
+     "month": 6,
+     "day": 10,
+     "hour": 0,
+     "minute": 0,
+     "second": 0,
+     "nanosecond": 0,
+     "timeZoneOffsetSeconds": 0
+    }
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 3,
+  "status": "ok",
+  "rows": 2,
+  "result": [
+   {
+    "q": "Q01-c",
+    "variant": "hu:product-variant:w00-pair8-a-us-capsule",
+    "formulation": "hu:formulation:w00-pair8-a-fv1c-120mg"
+   },
+   {
+    "q": "Q01-c",
+    "variant": "hu:product-variant:w00-pair8-b-us-powder",
+    "formulation": "hu:formulation:w00-pair8-b-fv2-2g"
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 4,
+  "status": "ok",
+  "rows": 2,
+  "result": [
+   {
+    "q": "Q01-d",
+    "subject": "hu:product-variant:w00-pair8-a-us-capsule",
+    "kind": "SOURCE_CORRECTION",
+    "revisionEvent": "hu:source-revision:w00-pair8-a-erratum-2026-06",
+    "oldState": "hu:formulation:w00-pair8-a-fv1-200mg",
+    "oldStateStillAttached": false,
+    "reading": "CORRECTED_RECORD_NEVER_HELD"
+   },
+   {
+    "q": "Q01-d",
+    "subject": "hu:product-variant:w00-pair8-b-us-powder",
+    "kind": "VALIDITY_BOUNDED",
+    "revisionEvent": null,
+    "oldState": "hu:formulation:w00-pair8-b-fv1-3g",
+    "oldStateStillAttached": true,
+    "reading": "FACT_ENDED_STATE_KEPT_FOR_BOUNDED_INTERVAL"
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 5,
+  "status": "ok",
+  "rows": 2,
+  "result": [
+   {
+    "q": "Q01-e",
+    "recordedAsOf": "2026-04-10T00:00:00Z",
+    "currentStatusCache": "SUPERSEDED",
+    "statusAsOfR": "ACCEPTED"
+   },
+   {
+    "q": "Q01-e",
+    "recordedAsOf": "2026-07-01T00:00:00Z",
+    "currentStatusCache": "SUPERSEDED",
+    "statusAsOfR": "SUPERSEDED"
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 6,
+  "status": "ok",
+  "rows": 1,
+  "result": [
+   {
+    "q": "Q01-f",
+    "revisionKind": "ERRATUM",
+    "publisherTime": "2026-06-14T00:00:00Z",
+    "learnedAt": "2026-06-15T08:05:00Z",
+    "affectedAssertion": "hu:assertion:w00-pair8-a1",
+    "supersededBy": "hu:assertion:w00-pair8-a2-corrected",
+    "supersessionKind": "SOURCE_CORRECTION"
+   }
+  ],
+  "error": null
+ }
+]

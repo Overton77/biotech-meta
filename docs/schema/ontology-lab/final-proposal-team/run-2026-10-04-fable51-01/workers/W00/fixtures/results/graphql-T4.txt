@@ -1,0 +1,12 @@
+== T4a legacy assertion shape (fixture 12)
+errors: [{"message":"Cannot return null for non-nullable field Assertion.id.","path":["assertions",0,"id"]}]
+data: null
+== T4b legacy adjudication status FINAL
+errors: [{"message":"Enum \"AssessmentStatus\" cannot represent value: \"FINAL\"","path":["adjudications",0,"status"]}]
+data: null
+== T4c legacy locator without artifactType
+errors: [{"message":"Cannot return null for non-nullable field SourceLocator.id.","path":["sourceLocators",0,"id"]}]
+data: null
+== T4d Document read through Source
+errors: [{"message":"Cannot return null for non-nullable field Source.id.","path":["sources",0,"id"]}]
+data: null

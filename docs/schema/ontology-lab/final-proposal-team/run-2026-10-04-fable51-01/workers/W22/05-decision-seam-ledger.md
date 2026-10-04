@@ -46,6 +46,7 @@ Status words: **ACCEPTED-FOR-PROPOSAL** (W22 decides inside its own scope; Fable
 | U-08 | Real RAW_BYTES capture of at least one image (Commons original, BIA file) to replace synthetic hashes | W19 / operator with egress | one fixture rerun with a real `sha256:` over bytes and `contentHashBasis: RAW_BYTES` |
 | U-09 | ODRL 2.2 alignment or adoption for rights and policy | W23, user | review recorded; MediaRightsRecord kept as the stated-terms layer either way |
 | U-10 | GraphView INCLUDES_SUBJECT derivation (GRAPHVIEW-INCLUDE-1) has no fixture | W22 follow-up | a GraphView fixture with a viewpoint and a correction |
+| U-11 | W00 AssertionSubjectTarget still lists retired MediaSource and lacks MediaRightsRecord (found by running merge-fragments.mjs over all worker fragments on 2026-10-04) | W00 (W22-SR-13) | merged schema has no undefined union member; HAS_RIGHTS_RECORD assertion objects typed |
 
 ## 4. Kernel-change requests
 

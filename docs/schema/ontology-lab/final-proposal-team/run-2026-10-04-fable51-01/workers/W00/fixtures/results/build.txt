@@ -1,0 +1,3 @@
+graphql-js parse: OK
+Neo4jGraphQL build: OK in 4346ms; vectorProviderConfigured=false; generated types=10131; queries=347; mutations=481; printed SDL chars=5814034
+wrote /tmp/claude-0/-home-user-biotech-meta/c83435a6-8371-518c-961a-6504ccbc2c3e/scratchpad/w00/w00-generated.graphql

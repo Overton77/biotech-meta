@@ -9,7 +9,7 @@
 #
 # Contains ONLY the elements the ownership registry assigns to W21 (plus the two new structural relationship types
 # DELIMITED_BY, IN_RENDITION, DISTRIBUTES_RENDITION and the property type InstanceOfProperties, each requested for
-# registry admission in seam-requests.yaml W21-SR-03/04/05). Every other name (Source, SourceSnapshot,
+# registry admission in seam-requests.yaml W21-SR-03/04/05/12). Every other name (Source, SourceSnapshot,
 # SourceLocator, Assertion, Activity, Agent, Person, Organization, ConsumerBrand, PseudonymousActor,
 # AnonymousActor, Document, Publication, Chunk, Study, StudyResult, MediaAsset, Event, TechnologyPlatform,
 # ToolOrInstrument, ManufacturingProcess, ManufacturingStep, IngredientMaterial, Treatment, Procedure,
