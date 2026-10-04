@@ -1,0 +1,67 @@
+interface Entity { id: ID! name: String! description: String }
+interface EntityArchetype { uid: String! entityType: String! createdAt: DateTime! }
+interface AssertionArchetype { uid: String! predicate: String! status: AssertionStatus! recordedAt: DateTime! }
+enum AssertionStatus { EXTRACTED PROPOSED ACCEPTED REJECTED DISPUTED SUPERSEDED UNRESOLVED }
+enum PrivacyClass { PUBLIC INTERNAL }
+type AssertedEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+}
+type Product implements Entity & EntityArchetype @node(labels: ["Product", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  entityType: String!
+  privacyClass: PrivacyClass
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  variants: [ProductVariant!]! @relationship(type: "HAS_VARIANT", direction: OUT, properties: "AssertedEdgeProperties")
+  legacyEvaluatedBy: [Study!]! @relationship(type: "EVALUATES", direction: IN) @settable(onCreate: false, onUpdate: false)
+}
+type ProductVariant implements Entity & EntityArchetype @node(labels: ["ProductVariant", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  entityType: String!
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  product: [Product!]! @relationship(type: "HAS_VARIANT", direction: IN, properties: "AssertedEdgeProperties")
+}
+type Study implements Entity & EntityArchetype @node(labels: ["Study", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String!
+  description: String
+  entityType: String!
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+}
+type Assertion implements AssertionArchetype @node(labels: ["Assertion"]) {
+  id: ID! @id
+  uid: String!
+  predicate: String!
+  status: AssertionStatus!
+  recordedAt: DateTime!
+  subject: [Product!]! @relationship(type: "HAS_SUBJECT", direction: OUT)
+}
+type ClaimOccurrence implements AssertionArchetype @node(labels: ["ClaimOccurrence", "Assertion"]) {
+  id: ID! @id
+  uid: String!
+  predicate: String!
+  status: AssertionStatus!
+  recordedAt: DateTime!
+  utteranceText: String
+}
+type Document implements Entity & EntityArchetype @node(labels: ["Document", "Source", "Entity"]) {
+  id: ID! @id @alias(property: "documentId")
+  uid: String!
+  name: String! @alias(property: "title")
+  description: String
+  entityType: String!
+  sourceUrl: String @alias(property: "url")
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+}
