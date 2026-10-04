@@ -1,0 +1,127 @@
+# W05 seam requests. Format per 04-worker-brief: {id, targetOwner, request, cq, failingCase, proposedRuling}.
+
+- id: W05-SR-01
+  targetOwner: W00
+  request: "Register uid tokens `exposure` (Exposure) and `lifestyle` (Lifestyle). Confirm the rule that a parent-label specialization uses its parent's token (FoodItem -> `material`, as LegalEntity -> `org`)."
+  cq: [CQ-FL-C02, CQ-RC-05]
+  failingCase: "fixtures 04/05 use hu:exposure:* and hu:lifestyle:*; INV-106 token checks report them until registered."
+  proposedRuling: "Add Exposure: exposure, Lifestyle: lifestyle to conventions.uidTypeTokens; state the specialization-token rule in the contract."
+
+- id: W05-SR-02
+  targetOwner: W02
+  request: "Admit FoodItem as a parent-label specialization of IngredientMaterial (labels FoodItem, IngredientMaterial, Entity; catalog `FoodItem: {archetype: Entity, parentLabel: IngredientMaterial}` in candidate module food_lifestyle_exposure) and add materialKind value FOOD."
+  cq: [CQ-ST-01, CQ-ST-02, CQ-FL-C01, CQ-FL-C03]
+  failingCase: "fixture 01: InterventionComponent USES_INTERVENTION_MATERIAL -> 'Brazil nut'; fixture 03: IngredientComponent USES_MATERIAL -> the same node; without the parent label the food is a second identity beside a material."
+  proposedRuling: "Accept; FoodItem keeps its food-only fields; identity rules of IngredientMaterial apply (no merge by name)."
+
+- id: W05-SR-03
+  targetOwner: W02
+  request: "Allow DERIVED_FROM_TAXON from FoodItem (or from any IngredientMaterial) to BotanicalTaxon, so a reference food can name its taxon (FDC 170569: Bertholletia excelsa, NCBITaxon_3645)."
+  cq: [CQ-FL-C01]
+  failingCase: "FDC record carries scientificName and NCBI Taxon IRI; current domain is BotanicalPreparation only."
+  proposedRuling: "Widen domain to IngredientMaterial; until then FoodItem.scientificNameVerbatim holds the string."
+
+- id: W05-SR-04
+  targetOwner: W02
+  request: "QuantitativeContentProperties (QUANTITATIVELY_CONTAINS) must carry, besides relationshipUid/assertionUid/asserted-edge fields and quantity/unitCode/basis (V-006): referenceAmount: Float, referenceUnitCode: String (UCUM), portionBasis (EDIBLE_PORTION | AS_PURCHASED | DRY_WEIGHT | AS_PREPARED | NOT_STATED), valueDerivation (ANALYTICAL | CALCULATED | IMPUTED | ASSUMED_ZERO | BELOW_LOQ | NOT_STATED), sourceDerivationCode: String, dataPoints: Int, minValue: Float, maxValue: Float; and a basis value PER_100_G (W02 composition-basis enum, not the kernel QuantityBasis, which is dose-oriented). Also register a uid token for Nutrient."
+  cq: [CQ-FL-C01, CQ-EV-04, CQ-AX-04]
+  failingCase: "FDC 170569: selenium 1917 ug, n 15, min 136, max 2740, derivation A; folic acid 0 derivation Z (assumed zero); DHA 0 with dataPoints 0 and no derivation; the record itself states no mass basis (documentation: 100 g edible portion; dry beans on 0% moisture basis). Without these fields a zero reads as measured absence and a per-100 g value as a dose."
+  proposedRuling: "Accept the fields on W02's type; W05 does not define FoodCompositionProperties (kept CANDIDATE as fallback)."
+
+- id: W05-SR-05
+  targetOwner: W03
+  request: "(a) Extend the domain of derived AFFECTS_MECHANISM, ASSOCIATED_WITH_CONDITION and ASSOCIATED_WITH_OUTCOME to Lifestyle (live Lifestyle fields). (b) Route values: W05 owns enum ExposureRoute; MechanismEvidenceContext.route candidate strings map GAVAGE/DIET -> ORAL (+ medium), IP/IV -> PARENTERAL, TOPICAL -> DERMAL; IN_MEDIUM has no ExposureRoute value (in vitro). W03 should not create a second enum named ExposureRoute. (c) Scope V-231 (INV-210) to predicateClass MECHANISM."
+  cq: [CQ-MX-01, CQ-FL-C02, CQ-FL-C01]
+  failingCase: "(a) live Lifestyle.affectsMechanisms exists and has no catalog domain; (c) baseline suite on W05 fixtures: V-231 reports the FDC composition assertions (basisKind DIRECT_MEASUREMENT, predicateClass QUANTITY) for lacking a MechanismEvidenceContext."
+  proposedRuling: "(a) accept as derived read-only; (b) keep W03 route as a string or adopt ExposureRoute plus a vehicle field; (c) add `AND a.predicateClass = 'MECHANISM'` to V-231."
+
+- id: W05-SR-06
+  targetOwner: W09
+  request: "Add asserted relationship USES_PRACTICE_DEFINITION (InterventionComponent -> Lifestyle | Protocol, qualifier asReportedName) for diet prescriptions and other non-material components; refine V-221 so components with USES_PRACTICE_DEFINITION are exempt from quantity/quantityBasis/massBasis (or carry quantityStatus NOT_APPLICABLE). Keep the registry intervention type verbatim (registryInterventionType) and never infer a Product from DIETARY_SUPPLEMENT. Confirm USES_INTERVENTION_MATERIAL to an IngredientMaterial accepts FoodItem nodes (no FoodItem union member: W05-SR-09). Accept dosageForm WHOLE_FOOD and UCUM count annotations ('{nut}')."
+  cq: [CQ-ST-01, CQ-FL-C04]
+  failingCase: "DICA-NUTS (NCT03728127): both arms share 'Brazilian cardioprotective diet prescription'; only DCBN adds 10 g/day each of peanuts, cashew nuts and Brazil nuts; registry type DIETARY_SUPPLEMENT for both. Baseline V-221 reports the two practice components."
+  proposedRuling: "Accept the edge and the V-221 exemption."
+
+- id: W05-SR-07
+  targetOwner: W03
+  request: "ExposureBasis has no value for an ambient physical level (temperature, light intensity, sound level). Decide whether to add AMBIENT_LEVEL or keep such intensities as text."
+  cq: [CQ-FL-C02]
+  failingCase: "fixture 05: sauna 'about 80 degrees' cannot be given an intensityBasis; stored as intensityText only."
+  proposedRuling: "Defer; text-only until a physical-agent CQ (CQ-FL-C05) is admitted."
+
+- id: W05-SR-08
+  targetOwner: W16
+  request: "StepSubstanceTarget: replace live FoodItem | FoodProduct with IngredientMaterial | ProductVariant (FoodItem resolves through IngredientMaterial). Remove Exposure from StepInstrumentTarget. Provide a step practice target that can reference a Lifestyle (sauna step, fasting window). Never relate ProtocolStep to Exposure directly."
+  cq: [CQ-PR-02, CQ-FL-C02, CQ-FL-C04]
+  failingCase: "fixture 04: step 'eat two Brazil nuts' and IRIS exposure share an agent; negative N7 adds a step->exposure edge and V-W05-10 rejects it; live StepInstrument includes Exposure."
+  proposedRuling: "Accept; record forbidden implication [PROTOCOL_STEP_USES_AGENT, EXPOSURE_CHARACTERIZED] in protocols."
+
+- id: W05-SR-09
+  targetOwner: W00
+  request: "Contract rule for unions: a union never lists a specialization type together with its parent label type."
+  cq: [CQ-FL-C02]
+  failingCase: "Tested 2026-10-04, @neo4j/graphql 7.6.3 on Neo4j 5.26.31 Community: ExposureAgentTarget = FoodItem | IngredientMaterial | ... returned the node hu:material:food-brazil-nut twice (once as FoodItem, once as IngredientMaterial) for one HAS_EXPOSURE_AGENT edge."
+  proposedRuling: "Add to contract B6; Fable checks every union at merge (Organization/TestingLaboratory/RegulatoryAgency, Source/Document, IngredientMaterial/BotanicalPreparation/FoodItem, Assertion/ClaimOccurrence)."
+
+- id: W05-SR-10
+  targetOwner: W18
+  request: "Relationship type INVOLVES keeps one meaning (Event participant). W05 renames the Exposure use to HAS_EXPOSURE_AGENT."
+  cq: [CQ-FL-C02]
+  failingCase: "live Exposure.involves and Event.involves both use INVOLVES with RoleMetadata; registry lists INVOLVES under W05 and W18."
+  proposedRuling: "Accept (CL-014 precedent)."
+
+- id: W05-SR-11
+  targetOwner: W21
+  request: "(a) Register candidate predicate SELF_REPORTED_PRACTICE (subject Lifestyle, asserter Person, speechAct REPORTS_PRACTICE) beside SELF_REPORTED_DAILY_INTAKE. (b) RECOMMENDS range (successor of Recommendable): IngredientMaterial (covers FoodItem), Product, Lifestyle; FoodProduct member retired. (c) Resolve the property name on the projected RECOMMENDS edge: V-423 and CL-016 read assertionUid, D-011 says derived edges carry projectionOfAssertionUid."
+  cq: [CQ-RC-05, CQ-CL-02]
+  failingCase: "fixture 05 (sauna report vs recommendation); negative N5 trips V-423, V-112 and V-W05-09."
+  proposedRuling: "(a) register; (b) accept; (c) W00/W21 pick one name; W05 fixtures use assertionUid as the baseline fixtures do."
+
+- id: W05-SR-12
+  targetOwner: W17
+  request: "SafetySubjectTarget: replace FoodItem | FoodProduct | Ingredient with IngredientMaterial | Product, keep Lifestyle, add Exposure. Own candidate predicate HAS_REFERENCE_DOSE (subject Exposure, literal value with unit and quantityBasis) for agency reference values; an RfD is never a safety verdict for a product or protocol."
+  cq: [CQ-FL-C02, CQ-RC-06]
+  failingCase: "fixture 04: EPA IRIS selenium oral RfD 5E-3 mg/kg/day recorded as an Assertion about the Exposure; fixture 06 corrects a mis-extraction."
+  proposedRuling: "Accept; forbidden implication [EXPOSURE_REFERENCE_VALUE, SAFE_FOR_PROTOCOL_OR_PRODUCT]."
+
+- id: W05-SR-13
+  targetOwner: W00
+  request: "AssertionSubjectTarget (and the object range) include Exposure and Lifestyle; register candidate predicate CHARACTERIZES_EXPOSURE_IN_POPULATION (literal population descriptor) or route it to W10 UseContextProfile."
+  cq: [CQ-FL-C02, CQ-RC-05]
+  failingCase: "fixtures 04 and 05 write assertions whose subject is an Exposure or a Lifestyle."
+  proposedRuling: "Accept the range; predicate decision with W10."
+
+- id: W05-SR-14
+  targetOwner: W06
+  request: "TreatmentComponentTarget: replace FoodProduct with Product/ProductVariant; keep Lifestyle; a treatment that uses a food reaches it through IngredientMaterial."
+  cq: [CQ-ST-01]
+  failingCase: "live TreatmentComponent includes FoodProduct, which no longer exists."
+  proposedRuling: "Accept."
+
+- id: W05-SR-15
+  targetOwner: W01
+  request: "Producible (OFFERS / MANUFACTURES ranges) loses FoodProduct; use Product."
+  cq: [CQ-FL-C03]
+  failingCase: "fixture 03 migrates a FoodProduct into a Product; a Producible member with no type breaks the merged schema."
+  proposedRuling: "Accept."
+
+- id: W05-SR-16
+  targetOwner: W04
+  request: "Confirm productKind CONVENTIONAL_FOOD for migrated FoodProducts; accept FoodItem nodes as USES_MATERIAL targets and as CONTAINS targets; the migrated legacy HAS_INGREDIENT dose is reviewed into PackageConfiguration.netQuantity or IngredientComponent.quantity (never both)."
+  cq: [CQ-FL-C03, CQ-ST-02]
+  failingCase: "fixture 03: legacy HAS_INGREDIENT {dose 454 g} on a 16 oz bag is the net quantity, not a composition amount."
+  proposedRuling: "Accept."
+
+- id: W05-SR-17
+  targetOwner: W22
+  request: "MediaSubject successor (and W10/W20/W21 EvidenceSubject, ClaimSubject successors, W03 AssociationParticipant, W18 EventSubject, W16 ProtocolResultMention): drop FoodProduct and Ingredient; keep Exposure, Lifestyle; use IngredientMaterial instead of FoodItem where IngredientMaterial is a member (W05-SR-09)."
+  cq: [CQ-FL-C03]
+  failingCase: "live unions list FoodProduct and Ingredient, both retired."
+  proposedRuling: "Accept at merge."
+
+- id: W05-SR-18
+  targetOwner: W10
+  request: "For the EXPOSURE applicability dimension, allow an ApplicabilityDimension to cite the Exposure characterizations it compared (evidence-side and target-side) and record per-unit composition calculations (fdc-portion-v1) as CALCULATED inputs."
+  cq: [CQ-EV-04, CQ-FL-C02]
+  failingCase: "SUBRANUT: one nut/day; FDC 1 kernel = 5 g; selenium 136-2740 ug/100 g -> about 7-137 ug per nut; a dimension can only say UNKNOWN today, with no structured pointer to the inputs."
+  proposedRuling: "Open; W10 decides between CONSIDERS -> Assertion only and an explicit Exposure reference."

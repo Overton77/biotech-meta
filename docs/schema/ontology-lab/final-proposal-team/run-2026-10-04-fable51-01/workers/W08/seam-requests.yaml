@@ -1,0 +1,79 @@
+# W08 seam requests (run run-2026-10-04-fable51-01). Fable copies these into 03-conflict-ledger.md.
+- id: W08-SR-01
+  targetOwner: W07
+  request: "Widen RUNS_ON_INSTRUMENT range from ToolOrInstrument to union EquipmentModelTarget (ToolOrInstrument | Device; defined by W08 as the B6 rename of live ProductClassification), and widen PERFORMED_WITH_ASSAY_VERSION domain from LabTest to LabTest | Device (asserted, asserted_edge profile, AssertedEdgeProperties as W07 already uses). Confirm that ASSAY_OPERATED_BY for a device-run AssayVersion is the organization that runs the estimation pipeline (the device maker), still exactly_one."
+  cq: [CQ-DX-01, CQ-DX-03, CQ-DX-09]
+  failingCase: "fixtures/w08-device-firmware-assay.cypher: WHOOP 4.0 heart-rate AssayVersions RUNS_ON_INSTRUMENT the Device hu:device:whoop-4-0; under the catalog range the edge has no legal target and the catalog seam 'firmware = AssayVersion.softwareVersion' cannot say which device the firmware belongs to. Device PERFORMED_WITH_ASSAY_VERSION carries the (unknown) rollout validity; without the Device domain there is no LabTest to hang it on."
+  proposedRuling: "Accept both widenings; W07's AssayVersion.runsOnInstrument becomes [EquipmentModelTarget!]!; V-301a counts EquipmentModelTarget members; V-W08-01 added to the suite."
+- id: W08-SR-02
+  targetOwner: W07
+  request: "MEASURES_METRIC from Device stays asserted with MeasurementEdgeProperties (as W07 already states). Remove Sensor from the MeasurementEdgeProperties description: Sensor MEASURES_METRIC is retired (a sensor emits a signal; metrics come from AssayVersion/AlgorithmVersion)."
+  cq: [CQ-DX-02]
+  failingCase: "fixtures/w08-negatives.cypher N9: Sensor MEASURES_METRIC Metric is reported by V-W08-08 and by baseline V-101 (no assertion); no source in this run ties a sensor component alone to a metric."
+  proposedRuling: "Device domain kept, Sensor domain retired; forbidden implication [DEVICE_MEASURES_METRIC, MEASURED_RESULT] added to consumer_devices."
+- id: W08-SR-03
+  targetOwner: W04
+  request: "Answer to W04-SR-08: add Product.embodiesModels: [EquipmentModelTarget!]! @relationship(type: \"EMBODIES_MODEL\", direction: OUT, properties: \"AssertedEdgeProperties\") (asserted, candidate) as the successor of live CLASSIFIED_AS; keep the two legacy read-only CLASSIFIED_AS fields for migration."
+  cq: [CQ-DX-C02, CQ-MF-02]
+  failingCase: "fixtures/w08-platform-vs-instrument.cypher: Product 'iScan System (Illumina product)' EMBODIES_MODEL ToolOrInstrument 'Illumina iScan System'. 'CLASSIFIED_AS' collides with regulatory classification wording (K243236 'Device Classification Name: Electrocardiograph Software For Over-The-Counter Use', product code QDA) and invites storing product codes as a classification edge."
+  proposedRuling: "Rename to EMBODIES_MODEL; regulatory classification stays on W13 RegulatoryStatus.productCode / legalBasisCitation."
+- id: W08-SR-04
+  targetOwner: W04
+  request: "Add candidate Product.runsOnDevices: [Device!]! @relationship(type: \"RUNS_ON_DEVICE\", direction: OUT, properties: \"AssertedEdgeProperties\") for software products (apps, SaMD features) that run on a device model."
+  cq: [CQ-DX-C02, CQ-MF-02, CQ-MF-03]
+  failingCase: "fixtures/w08-clearance-and-performance-claim.cypher: K243236 clears 'WHOOP ECG (electrocardiogram) Feature (1.0)', 'a software-only mobile medical application integrated into the consumer (non-device) WHOOP System', compatible with 'WHOOP Strap version - WHOOP MG'. Without RUNS_ON_DEVICE the clearance is unreachable from WHOOP MG (Q-W08-06), and the shortcut (status on the Device) is wrong (negative N3, V-W08-03)."
+  proposedRuling: "Accept as CANDIDATE; asserted; the asserter is normally the applicant (510(k) Summary) or the vendor."
+- id: W08-SR-05
+  targetOwner: W07
+  request: "If FirmwareVersion (W08 CANDIDATE) is admitted, add AssayVersion.runsFirmwareVersion: [FirmwareVersion!]! @relationship(type: \"RUNS_FIRMWARE_VERSION\", direction: OUT, properties: \"StructuralEdgeProperties\") (structural, zero_or_one) and the rule softwareVersion = FirmwareVersion.versionLabel when the edge exists (V-W08-05). softwareVersion stays the materialized string and stays identity-defining."
+  cq: [CQ-DX-09, CQ-DX-C01]
+  failingCase: "fixtures/w08-device-firmware-assay.cypher F-1/F-2: release notes whose subject is the firmware build; core vs Bluetooth firmware; negative N5 (softwareVersion 41.16.2.0 declaring firmware 41.16.1.0) is caught only with the edge."
+  proposedRuling: "Admit FirmwareVersion as CANDIDATE in consumer_devices; W07 adds the OUT field; otherwise W08 removes FirmwareVersion and its two relationship types from the fragment."
+- id: W08-SR-06
+  targetOwner: W00
+  request: "Register uid tokens device (Device), technology-platform (TechnologyPlatform; 'platform' is left for W21 Platform), sensor (Sensor), modality (Modality), firmware-version (FirmwareVersion). Register predicates (candidate): DEVELOPS_PLATFORM, USES_PLATFORM, USES_EQUIPMENT, IMPLEMENTS_PLATFORM, USES_MODALITY, HAS_SENSOR, EMBODIES_MODEL, RUNS_ON_DEVICE (asserted relationship types; add to $assertedTypes for V-101), RELEASE_NOTE_STATES, REPORTS_SENSITIVITY, REPORTS_SPECIFICITY, REPORTS_INCONCLUSIVE_RATE, REPORTS_ACCURACY, CLAIMS_ACCURACY_IMPROVEMENT. Add FirmwareVersion to AssertionSubjectTarget (and to the HAS_OBJECT range) if admitted."
+  cq: [CQ-DX-09, CQ-DX-C01, CQ-MF-03]
+  failingCase: "All W08 fixtures use hu:device:, hu:technology-platform:, hu:sensor:, hu:modality:, hu:firmware-version: uids that INV-106 cannot accept until registered; release-note assertions have a FirmwareVersion subject that AssertionSubjectTarget (W00 fragment line 1561) does not list."
+  proposedRuling: "Register tokens and predicates as candidates."
+- id: W08-SR-07
+  targetOwner: W01
+  request: "Organization OUT fields: developsPlatforms (DEVELOPS_PLATFORM, AssertedEdgeProperties), usesPlatforms (USES_PLATFORM, UsageEdgeProperties), usesEquipment (USES_EQUIPMENT, UsageEdgeProperties). Live usesTools (USES) is renamed to USES_EQUIPMENT (removes the collision with W16 ProtocolStep USES)."
+  cq: [CQ-MF-04, CQ-DX-C03]
+  failingCase: "fixtures/w08-platform-vs-instrument.cypher: Illumina DEVELOPS_PLATFORM Infinium; Synthetic Lab C USES_EQUIPMENT iScan (isPrimary true) and NextSeq 550; W01's fragment currently has no field for these relationship types, so the GraphQL API cannot write them from the Organization side."
+  proposedRuling: "W01 adds the three fields; forbidden implication [USES_PLATFORM | USES_EQUIPMENT, OPERATING_CAPABILITY] recorded."
+- id: W08-SR-08
+  targetOwner: Fable (registry) 
+  request: "Register W08 as sole writer of union EquipmentModelTarget (rename of live ProductClassification) and of candidate relationship types FIRMWARE_VERSION_OF, RUNS_FIRMWARE_VERSION, EMBODIES_MODEL, RUNS_ON_DEVICE; add the consumer_devices forbiddenImplications listed in 01-domain-recommendation.md section 6; move consumer_devices from future to candidate with owns [Device, Sensor, Modality, FirmwareVersion (candidate)] and DeviceModel recorded as alias of Device, DeviceObservation retired."
+  cq: [CQ-DX-01, CQ-DX-09, CQ-DX-C01, CQ-DX-C02, CQ-DX-C03]
+  failingCase: "See W08-SR-01, -03, -04, -05; the registry v0 lists none of these names."
+  proposedRuling: "Accept; ownership by research worker W08."
+- id: W08-SR-09
+  targetOwner: W13
+  request: "Keep Device, ToolOrInstrument, TechnologyPlatform, Sensor, Modality and FirmwareVersion out of RegulatorySubjectTarget (as W13's fragment already does) and adopt V-W08-03. Decide whether a version-scoped clearance ('WHOOP ECG (electrocardiogram) Feature (1.0)') is a Product with scopeText (as in the W08 fixture) or a ProductVariant/version subject."
+  cq: [CQ-MF-02, CQ-DX-C02]
+  failingCase: "fixtures/w08-negatives.cypher N3 (CLEARANCE STATUS_OF Device) and N4 (APPROVAL resulting from SUBSTANTIALLY_EQUIVALENT; caught by V-320a, V-336, V-333)."
+  proposedRuling: "Subject set unchanged; version scope recorded in scopeText until W04/W13 define a software-version product identity."
+- id: W08-SR-10
+  targetOwner: W21
+  request: "Allow QUALIFIED_BY (QualificationProperties) on generic Assertions, so performance-claim qualifiers (heart-rate range, 'classifiable recordings only', population) are structured instead of description text."
+  cq: [CQ-MF-03]
+  failingCase: "fixtures/w08-clearance-and-performance-claim.cypher: REPORTS_SENSITIVITY 96.2 % holds its scope only in Assertion.description because V-003 allows one literal; the 11 % inconclusive rate changes the meaning of the figure."
+  proposedRuling: "Accept; qualificationKind POPULATION_SCOPE / CONDITIONAL_USE."
+- id: W08-SR-11
+  targetOwner: W16
+  request: "Confirm StepInstrumentTarget members Device and ToolOrInstrument are model-level references (a step never references a unit), and that a step employing a device without a stated firmware/assay version is reported by CQ-PR-03 as a missing detail; FROM_DEVICE alone is not sufficient for comparability (PRODUCED_BY_ASSAY_VERSION required, W07 rule)."
+  cq: [CQ-PR-02, CQ-PR-03]
+  failingCase: "Q-W08-09 shows WHOOP 4.0 with 4 firmware versions, none dated, and 2 assay episodes with unknown start: a protocol step 'wear a WHOOP' cannot be tied to one assay version."
+  proposedRuling: "Accept (documentation only)."
+- id: W08-SR-12
+  targetOwner: W07
+  request: "Optional: record an instrument operating mode as AssayVersion configuration text (e.g. 'NextSeq 550Dx in Research Mode'), so that the Dx and research uses of one hardware model are two AssayVersions on one ToolOrInstrument rather than two instrument identities."
+  cq: [CQ-DX-01, CQ-DX-03]
+  failingCase: "S5 lists 'NextSeq 550Dx in Research Mode' as an instrument option for the RUO EPIC v2.0 kit; the Dx product's regulatory status (W13, on a Product) must not attach to research-mode assay results."
+  proposedRuling: "Accept as optional AssayVersion property (verbatim string), identity-defining when present."
+- id: W08-SR-13
+  targetOwner: W11
+  request: "Confirm USES_EQUIPMENT and USES_PLATFORM from ManufacturingStep are asserted with UsageEdgeProperties (W11's fragment already does) and that a step's equipment statement never creates a ManufacturingCapability."
+  cq: [CQ-MF-04]
+  failingCase: "Q-W08-10: hasCapabilityState false for an organization that uses equipment."
+  proposedRuling: "Agreed; no change."

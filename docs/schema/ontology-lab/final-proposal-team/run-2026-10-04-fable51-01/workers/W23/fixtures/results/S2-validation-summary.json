@@ -13,9 +13,21 @@
    "error": null,
    "sample": [
     {
+     "label": "Occurrence",
+     "nodes": 4,
+     "withUid": 4,
+     "missingUid": 0
+    },
+    {
      "label": "Entity",
      "nodes": 7,
      "withUid": 7,
+     "missingUid": 0
+    },
+    {
+     "label": "EvidenceAssessment",
+     "nodes": 4,
+     "withUid": 4,
      "missingUid": 0
     },
     {
@@ -26,18 +38,6 @@
     },
     {
      "label": "InformationArtifact",
-     "nodes": 4,
-     "withUid": 4,
-     "missingUid": 0
-    },
-    {
-     "label": "Assertion",
-     "nodes": 3,
-     "withUid": 3,
-     "missingUid": 0
-    },
-    {
-     "label": "EvidenceAssessment",
      "nodes": 4,
      "withUid": 4,
      "missingUid": 0

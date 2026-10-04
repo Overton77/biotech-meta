@@ -1,0 +1,51 @@
+# W08 migration map (run run-2026-10-04-fable51-01). Live = docs/schema/current_biotech_schema.graphql (86b5e0b5…f112).
+# action: keep | rename | move | split | merge | derive | retire
+- {live: TechnologyPlatform, final: TechnologyPlatform, action: keep, note: "labels [TechnologyPlatform, Entity]; add uid (token technology-platform, requested), entityType 'TECHNOLOGY_PLATFORM', privacyClass, maturity, schemaVersion; meaning narrowed to platform class"}
+- {live: TechnologyPlatform.id, final: TechnologyPlatform.id, action: keep, note: "id = opaque segment of uid (contract A2)"}
+- {live: TechnologyPlatform.name, final: TechnologyPlatform.name, action: keep, note: "String! -> String (D-013); presentation only"}
+- {live: TechnologyPlatform.description, final: TechnologyPlatform.description, action: keep, note: ""}
+- {live: TechnologyPlatform.mongoResearchRunId, final: TechnologyPlatform.mongoResearchRunId, action: keep, note: "internal tier"}
+- {live: TechnologyPlatform.createdAt, final: TechnologyPlatform.createdAt, action: keep, note: ""}
+- {live: TechnologyPlatform.updatedAt, final: TechnologyPlatform.updatedAt, action: keep, note: ""}
+- {live: TechnologyPlatform.searchText, final: TechnologyPlatform.searchText, action: keep, note: "SearchIndexable; @fulltext TechnologyPlatformSearch kept (D-015)"}
+- {live: TechnologyPlatform.searchFields, final: TechnologyPlatform.searchFields, action: keep, note: ""}
+- {live: TechnologyPlatform.embeddingModel, final: TechnologyPlatform.embeddingModel, action: keep, note: ""}
+- {live: TechnologyPlatform.embeddingDimensions, final: TechnologyPlatform.embeddingDimensions, action: keep, note: ""}
+- {live: TechnologyPlatform.searchEmbedding, final: TechnologyPlatform.searchEmbedding, action: keep, note: "stored property only; no @vector declared (D-014); Fable decides"}
+- {live: TechnologyPlatform.platformClass, final: TechnologyPlatform.platformClass, action: keep, note: "display/filter text"}
+- {live: ToolOrInstrument, final: ToolOrInstrument, action: keep, note: "labels [ToolOrInstrument, Entity]; uid token instrument (registered); entityType 'TOOL_OR_INSTRUMENT'"}
+- {live: ToolOrInstrument.name, final: ToolOrInstrument.name, action: keep, note: "String! -> String (D-013)"}
+- {live: ToolOrInstrument.toolClass, final: ToolOrInstrument.toolClass, action: keep, note: ""}
+- {live: "ToolOrInstrument.(id, description, mongoResearchRunId, createdAt, updatedAt)", final: same, action: keep, note: ""}
+- {live: Device, final: Device, action: keep, note: "= catalog consumer_devices DeviceModel; model-level only; labels [Device, Entity]; uid token device (requested); entityType 'DEVICE'"}
+- {live: Device.name, final: Device.name, action: keep, note: "String! -> String (D-013)"}
+- {live: Device.deviceClass, final: Device.deviceClass, action: keep, note: "display; never regulatory class"}
+- {live: Device.deviceFamily, final: Device.deviceFamily, action: keep, note: "grouping text, never identity"}
+- {live: "Device.(id, description, mongoResearchRunId, createdAt, updatedAt)", final: same, action: keep, note: ""}
+- {live: "Device.usesModalities USES_MODALITY {UsageMetadata}", final: "Device.usesModalities USES_MODALITY {UsageEdgeProperties}", action: keep, note: "class asserted; each live edge needs an authorizing Assertion (backfill: assertionBasis UNSTATED, status EXTRACTED, validFromBasis/validToBasis UNKNOWN, recordedFrom = migration commit time) or is dropped"}
+- {live: "Device.hasSensors HAS_SENSOR {RoleMetadata}", final: "Device.hasSensors HAS_SENSOR {AssertedEdgeProperties}", action: keep, note: "RoleMetadata role/title fields dropped (never meaningful for components); RoleMetadata.validFrom/validTo/recordedFrom carried if present"}
+- {live: "Device.implementsPlatforms IMPLEMENTS_PLATFORM {UsageMetadata}", final: "Device.implementsPlatforms IMPLEMENTS_PLATFORM {UsageEdgeProperties}", action: keep, note: "class asserted"}
+- {live: "Device.measuresMetrics MEASURES_METRIC {MeasurementMetadata}", final: "Device.measuresMetrics MEASURES_METRIC {MeasurementEdgeProperties (W07)}", action: keep, note: "class asserted; MeasurementMetadata.accuracy/rangeMin/rangeMax/samplingRateHz/signalType stay as verbatim extraction text only; authoritative values move to AssayVersion or to performance Assertions"}
+- {live: Modality, final: Modality, action: keep, note: "labels [Modality, Entity]; uid token modality (requested); meaning narrowed to device sensing/energy principle"}
+- {live: "Modality.(modalityClass, modalityFamily, parameterNames, parameterUnits)", final: same, action: keep, note: "parameterUnits normalised to UCUM where possible; original text retained in an Assertion if changed"}
+- {live: Sensor, final: Sensor, action: keep, note: "labels [Sensor, Entity]; uid token sensor (requested)"}
+- {live: Sensor.sensorType, final: Sensor.sensorType, action: keep, note: ""}
+- {live: "Sensor.measuresMetrics MEASURES_METRIC", final: null, action: retire, note: "re-express as Device MEASURES_METRIC for each device that HAS_SENSOR it only where a source asserts it; otherwise drop with an audit row (V-W08-08)"}
+- {live: UsageMetadata, final: UsageEdgeProperties, action: rename, note: "embeds every AssertedEdgeProperties field; usageContext, isPrimary, notes kept"}
+- {live: UsageMetadata.confidence, final: null, action: retire, note: "becomes Assertion.extractionConfidence with WAS_GENERATED_BY Activity (contract A4)"}
+- {live: "Organization.developsPlatforms DEVELOPS_PLATFORM {RoleMetadata}", final: "DEVELOPS_PLATFORM {AssertedEdgeProperties}", action: keep, note: "W01 writes Organization field (W08-SR-07); W08 writes TechnologyPlatform.developedBy"}
+- {live: "Organization.usesPlatforms USES_PLATFORM {UsageMetadata}", final: "USES_PLATFORM {UsageEdgeProperties}", action: keep, note: "W01 field (W08-SR-07)"}
+- {live: "Organization.usesTools USES {UsageMetadata}", final: "USES_EQUIPMENT {UsageEdgeProperties}", action: rename, note: "relabel statement: MATCH (o:Organization)-[r:USES]->(t:ToolOrInstrument) CREATE (o)-[r2:USES_EQUIPMENT]->(t) SET r2 = properties(r) DELETE r (plus assertion backfill); removes collision with W16 ProtocolStep USES"}
+- {live: "ManufacturingStep.usesPlatforms USES_PLATFORM {UsageMetadata}", final: "USES_PLATFORM {UsageEdgeProperties}", action: keep, note: "W11 field (already in W11 fragment)"}
+- {live: "ManufacturingStep.usesEquipment USES_EQUIPMENT {UsageMetadata}", final: "USES_EQUIPMENT {UsageEdgeProperties}", action: keep, note: "W11 field (already in W11 fragment)"}
+- {live: "LabTest.usesPlatforms USES_PLATFORM {MeasurementMetadata}", final: "query path LabTest-PERFORMED_WITH_ASSAY_VERSION->AssayVersion-RUNS_ON_INSTRUMENT->x-IMPLEMENTS_PLATFORM->TechnologyPlatform", action: retire, note: "W07 owns the LabTest field; one relationship type cannot be both asserted (Organization) and a projection (LabTest); live edges become evidence for AssayVersion backfill"}
+- {live: "MeasurementMethod.runsOnPlatforms RUNS_ON_PLATFORM {MeasurementMetadata}", final: "RUNS_ON_PLATFORM {StructuralEdgeProperties}", action: keep, note: "class structural (W07 fragment); never used for comparability"}
+- {live: "Product.implementsPlatforms IMPLEMENTS {UsageMetadata}", final: "IMPLEMENTS_PLATFORM {UsageEdgeProperties}", action: rename, note: "W04 field (already renamed in W04 fragment)"}
+- {live: "Product.classifiedAs CLASSIFIED_AS {RoleMetadata} -> ProductClassification", final: "EMBODIES_MODEL {AssertedEdgeProperties} -> EquipmentModelTarget", action: rename, note: "W04 keeps legacy read-only CLASSIFIED_AS fields; new writes use EMBODIES_MODEL (W08-SR-03); relabel after assertion backfill"}
+- {live: "union ProductClassification", final: "union EquipmentModelTarget", action: rename, note: "same members ToolOrInstrument | Device (contract B6 naming)"}
+- {live: "Observation.fromDevices FROM_DEVICE", final: "W16 Observation.fromDevices FROM_DEVICE", action: keep, note: "W16 owns; comparability needs PRODUCED_BY_ASSAY_VERSION (W07)"}
+- {live: "catalog consumer_devices.DeviceModel", final: Device, action: merge, note: "no separate type; catalog name recorded as alias"}
+- {live: "catalog consumer_devices.FirmwareVersion", final: FirmwareVersion, action: keep, note: "CANDIDATE (CQ-DX-C01); if not admitted, AssayVersion.softwareVersion remains the only firmware record"}
+- {live: "catalog consumer_devices.DeviceObservation", final: null, action: retire, note: "public: W16 Observation; private: PersonalMeasurement provenanceKind DEVICE_IMPORT (W23 contract)"}
+- {live: "catalog diagnostics AssayVersion.softwareVersion (firmware seam)", final: "AssayVersion.softwareVersion + RUNS_FIRMWARE_VERSION", action: keep, note: "materialized label must equal FirmwareVersion.versionLabel (V-W08-05)"}
+- {live: "catalog diagnostics RUNS_ON_INSTRUMENT -> ToolOrInstrument", final: "RUNS_ON_INSTRUMENT -> EquipmentModelTarget", action: keep, note: "range widened by request W08-SR-01 (W07 writes the field)"}

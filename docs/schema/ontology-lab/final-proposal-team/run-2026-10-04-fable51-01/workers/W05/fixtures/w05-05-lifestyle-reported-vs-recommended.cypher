@@ -58,11 +58,12 @@ MERGE (a)-[:HAS_SUBJECT]->(lf) MERGE (a)-[:ASSERTED_BY]->(p) MERGE (a)-[:OCCURS_
 
 // O2: recommendation (shape of the baseline recommendation-snapshot fixture: predicate RECOMMENDS, subject the
 // recommender, object the recommended practice, so V-112 sees the cited predicate equal to the projected edge type).
+// No literal: an assertion has one object OR one literal (V-003); the frequency stays in utteranceText.
 MATCH (lf:Lifestyle {uid: 'hu:lifestyle:sauna-bathing'}), (p:Person {uid: 'hu:person:synthetic-host-w05'}), (e:Episode {uid: 'hu:episode:synthetic-w05-sauna-episode'}),
       (l:SourceLocator {uid: 'hu:locator:synthetic-w05-host-recommendation'})
 MERGE (a:Assertion:ClaimOccurrence {uid: 'hu:claim-occurrence:synthetic-w05-host-recommends-sauna'})
 SET a.predicate = 'RECOMMENDS', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.assertionBasis = 'EXPERT_OPINION', a.speechAct = 'RECOMMENDS',
-    a.valueString = 'at least 4 per week', a.utteranceText = l.exact, a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN',
+    a.utteranceText = l.exact, a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN',
     a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.privacyClass = 'PUBLIC',
     a.contentHash = 'synthetic:hu:claim-occurrence:synthetic-w05-host-recommends-sauna'
 MERGE (a)-[:HAS_SUBJECT]->(p) MERGE (a)-[:HAS_OBJECT]->(lf) MERGE (a)-[:ASSERTED_BY]->(p) MERGE (a)-[:OCCURS_IN]->(e) MERGE (a)-[:SUPPORTED_BY]->(l);

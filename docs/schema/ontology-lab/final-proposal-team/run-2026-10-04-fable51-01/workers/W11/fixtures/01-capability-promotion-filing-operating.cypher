@@ -32,10 +32,10 @@ UNWIND [
   {s: 'hu:source:nai-online-manufacturing', uri: 'https://www.nai-online.com/our-capabilities/manufacturing', title: 'Manufacturing - Natural Alternatives International', kind: 'MARKETING_PAGE', pub: null, cc: 'PARTIAL_EXCERPT'}
 ] AS row
 MERGE (s:Source:Entity {uid: row.s})
-SET s.canonicalUri = row.uri, s.title = row.title, s.sourceKind = row.kind, s.entityType = 'SOURCE',
+SET s.privacyClass = coalesce(s.privacyClass, 'PUBLIC'), s.canonicalUri = row.uri, s.title = row.title, s.sourceKind = row.kind, s.entityType = 'SOURCE',
     s.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (sn:SourceSnapshot:InformationArtifact {uid: replace(row.s, 'hu:source:', 'hu:snapshot:') + '-2026-10-04'})
-SET sn.artifactType = 'SOURCE_SNAPSHOT', sn.canonicalUri = row.uri, sn.publishedAt = row.pub,
+SET sn.privacyClass = coalesce(sn.privacyClass, 'PUBLIC'), sn.artifactType = 'SOURCE_SNAPSHOT', sn.canonicalUri = row.uri, sn.publishedAt = row.pub,
     sn.retrievedAt = datetime('2026-10-04T00:58:00Z'), sn.observedAt = datetime('2026-10-04T00:58:00Z'),
     sn.contentHashBasis = 'SYNTHETIC_FIXTURE', sn.captureCompleteness = row.cc,
     sn.createdAt = datetime('2026-10-04T01:05:00Z')
@@ -79,7 +79,7 @@ UNWIND [
 ] AS row
 MATCH (sn:SourceSnapshot {uid: row.sn})
 MERGE (l:SourceLocator:InformationArtifact {uid: row.l})
-SET l.artifactType = 'SOURCE_LOCATOR', l.selectorKind = 'TEXT_QUOTE', l.exact = row.exact, l.quoteHash = row.qh,
+SET l.privacyClass = coalesce(l.privacyClass, 'PUBLIC'), l.artifactType = 'SOURCE_LOCATOR', l.selectorKind = 'TEXT_QUOTE', l.exact = row.exact, l.quoteHash = row.qh,
     l.normalizationVersion = 'NFC-WS1', l.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (sn)-[:HAS_LOCATOR]->(l);
 
@@ -89,23 +89,23 @@ MERGE (sn)-[:HAS_LOCATOR]->(l);
 
 // status: run
 MERGE (o:Organization:LegalEntity:Entity {uid: 'hu:org:natural-alternatives-international-inc'})
-SET o.name = 'Natural Alternatives International', o.legalName = 'Natural Alternatives International, Inc.',
+SET o.privacyClass = coalesce(o.privacyClass, 'PUBLIC'), o.name = 'Natural Alternatives International', o.legalName = 'Natural Alternatives International, Inc.',
     o.entityType = 'ORGANIZATION', o.organizationKind = 'COMPANY', o.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // status: run
 MERGE (f:Facility:Entity {uid: 'hu:facility:nai-carlsbad-powder-facility'})
-SET f.name = 'NAI Carlsbad, CA powder filling, packaging, distribution and storage facility', f.entityType = 'FACILITY',
+SET f.privacyClass = coalesce(f.privacyClass, 'PUBLIC'), f.name = 'NAI Carlsbad, CA powder filling, packaging, distribution and storage facility', f.entityType = 'FACILITY',
     f.city = 'Carlsbad', f.region = 'CA', f.country = 'US', f.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // status: run
 MERGE (p:ManufacturingProcess:Entity {uid: 'hu:process:nai-carlsbad-powder-blending-and-packaging'})
-SET p.name = 'High-volume powder blending and packaging (NAI Carlsbad)', p.entityType = 'MANUFACTURING_PROCESS',
+SET p.privacyClass = coalesce(p.privacyClass, 'PUBLIC'), p.name = 'High-volume powder blending and packaging (NAI Carlsbad)', p.entityType = 'MANUFACTURING_PROCESS',
     p.processKind = 'BLENDING', p.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // The promoted scope names capsule and tablet supplements, which no captured filing places at Carlsbad.
 // status: run
 MERGE (p:ManufacturingProcess:Entity {uid: 'hu:process:nai-capsule-tablet-powder-supplement-manufacturing-as-promoted'})
-SET p.name = 'Capsule, tablet and powder supplement manufacturing (as promoted)', p.entityType = 'MANUFACTURING_PROCESS',
+SET p.privacyClass = coalesce(p.privacyClass, 'PUBLIC'), p.name = 'Capsule, tablet and powder supplement manufacturing (as promoted)', p.entityType = 'MANUFACTURING_PROCESS',
     p.processKind = 'DOSAGE_FORM_MANUFACTURING', p.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ SET p.name = 'Capsule, tablet and powder supplement manufacturing (as promoted)'
 // payload {"stage":"PLANNED","capacityValue":null,"capacityUnitCode":null,"capacityBasis":"NOT_REPORTED","capacityVerbatim":null,"targetOperationalDate":null,"targetOperationalDatePrecision":null,"forProcessUid":"hu:process:nai-carlsbad-powder-blending-and-packaging","forMaterialUid":null}
 // status: run
 MERGE (c:ManufacturingCapability:VersionedState {uid: 'hu:capability:nai-carlsbad-powder-planned-2021'})
-SET c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'PLANNED', c.capacityBasis = 'NOT_REPORTED',
+SET c.privacyClass = coalesce(c.privacyClass, 'PUBLIC'), c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'PLANNED', c.capacityBasis = 'NOT_REPORTED',
     c.payloadHash = 'sha256:80e91a970f55466fc2937404aab26cdcc73d62480368c8946a4e08ac5e100e69}',
     c.createdAt = datetime('2026-10-04T01:10:00Z');
 
@@ -123,14 +123,14 @@ SET c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'PLANNED', c.capacityBas
 // payload {"stage":"OPERATING","capacityValue":null,"capacityUnitCode":null,"capacityBasis":"NOT_REPORTED","capacityVerbatim":null,"targetOperationalDate":null,"targetOperationalDatePrecision":null,"forProcessUid":"hu:process:nai-carlsbad-powder-blending-and-packaging","forMaterialUid":null}
 // status: run
 MERGE (c:ManufacturingCapability:VersionedState {uid: 'hu:capability:nai-carlsbad-powder-operating'})
-SET c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'OPERATING', c.capacityBasis = 'NOT_REPORTED',
+SET c.privacyClass = coalesce(c.privacyClass, 'PUBLIC'), c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'OPERATING', c.capacityBasis = 'NOT_REPORTED',
     c.payloadHash = 'sha256:ccb8e6055e2bbcb0897e6852c26f67bf61099b411f179a7ef1b8a62a32e0ccdf}',
     c.createdAt = datetime('2026-10-04T01:20:00Z');
 
 // payload {"stage":"SUSPENDED","capacityValue":null,"capacityUnitCode":null,"capacityBasis":"NOT_REPORTED","capacityVerbatim":"temporarily closed in October 2023 due to a significant reduction in customer orders","targetOperationalDate":null,"targetOperationalDatePrecision":null,"forProcessUid":"hu:process:nai-carlsbad-powder-blending-and-packaging","forMaterialUid":null}
 // status: run
 MERGE (c:ManufacturingCapability:VersionedState {uid: 'hu:capability:nai-carlsbad-powder-suspended-2023'})
-SET c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'SUSPENDED', c.capacityBasis = 'NOT_REPORTED',
+SET c.privacyClass = coalesce(c.privacyClass, 'PUBLIC'), c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'SUSPENDED', c.capacityBasis = 'NOT_REPORTED',
     c.capacityVerbatim = 'temporarily closed in October 2023 due to a significant reduction in customer orders',
     c.payloadHash = 'sha256:915531f70bba4c2c9fbd109dbed8a0f893ee08574f3bcdf5bc038c4be2e20d79}',
     c.createdAt = datetime('2026-10-04T01:20:00Z');
@@ -139,7 +139,7 @@ SET c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'SUSPENDED', c.capacityB
 // payload {"stage":"DISCONTINUED","capacityValue":null,"capacityUnitCode":null,"capacityBasis":"NOT_REPORTED","capacityVerbatim":"reduce persistent excess capacity in our contract manufacturing segment","targetOperationalDate":null,"targetOperationalDatePrecision":null,"forProcessUid":"hu:process:nai-carlsbad-powder-blending-and-packaging","forMaterialUid":null}
 // status: run
 MERGE (c:ManufacturingCapability:VersionedState {uid: 'hu:capability:nai-carlsbad-powder-exit-as-planned-fy2026'})
-SET c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'DISCONTINUED', c.capacityBasis = 'NOT_REPORTED',
+SET c.privacyClass = coalesce(c.privacyClass, 'PUBLIC'), c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'DISCONTINUED', c.capacityBasis = 'NOT_REPORTED',
     c.capacityVerbatim = 'reduce persistent excess capacity in our contract manufacturing segment',
     c.payloadHash = 'sha256:8e38b1454f2b4dc204344798ef849b467019762528efa4155630648f859af61a}',
     c.createdAt = datetime('2026-10-04T01:20:00Z');
@@ -148,7 +148,7 @@ SET c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'DISCONTINUED', c.capaci
 // payload {"stage":"OPERATING","capacityValue":null,"capacityUnitCode":null,"capacityBasis":"NOT_REPORTED","capacityVerbatim":"expanding our capacity to provide high-quality capsule, tablet, and powder supplements","targetOperationalDate":null,"targetOperationalDatePrecision":null,"forProcessUid":"hu:process:nai-capsule-tablet-powder-supplement-manufacturing-as-promoted","forMaterialUid":null}
 // status: run
 MERGE (c:ManufacturingCapability:VersionedState {uid: 'hu:capability:nai-carlsbad-as-promoted'})
-SET c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'OPERATING', c.capacityBasis = 'NOT_REPORTED',
+SET c.privacyClass = coalesce(c.privacyClass, 'PUBLIC'), c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = 'OPERATING', c.capacityBasis = 'NOT_REPORTED',
     c.capacityVerbatim = 'expanding our capacity to provide high-quality capsule, tablet, and powder supplements',
     c.payloadHash = 'sha256:89d996a540fc7493b831bd33921f4bf9f661fdbba51ae3022f25ef2994a71af0}',
     c.createdAt = datetime('2026-10-04T01:20:00Z');
@@ -174,7 +174,7 @@ MATCH (f:Facility {uid: 'hu:facility:nai-carlsbad-powder-facility'}), (c:Manufac
       (nai:Organization {uid: 'hu:org:natural-alternatives-international-inc'}),
       (l1:SourceLocator {uid: 'hu:locator:prn-nai-2021-closed-aug-20'}), (l2:SourceLocator {uid: 'hu:locator:prn-nai-2021-scheduled-retrofit'})
 MERGE (a:Assertion {uid: 'hu:assertion:nai-carlsbad-planned-2021'})
-SET a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.validFrom = datetime('2021-08-20T00:00:00Z'), a.validFromPrecision = 'DAY', a.validFromBasis = 'STATED_BY_SOURCE',
     a.validToBasis = 'UNKNOWN', a.polarity = 'POSITIVE', a.speechAct = 'STATES', a.assertionBasis = 'MANUFACTURER_CLAIM',
     a.predicateClass = 'OTHER', a.contentHash = 'sha256:ac8027a281c5490001c8db442b7b94f8a12011bc17897fa09fb87c851e244a21', a.createdAt = datetime('2026-10-04T01:10:00Z')
@@ -200,7 +200,7 @@ UNWIND [
 MATCH (f:Facility {uid: 'hu:facility:nai-carlsbad-powder-facility'}), (c:ManufacturingCapability {uid: row.c}),
       (nai:Organization {uid: 'hu:org:natural-alternatives-international-inc'}), (l:SourceLocator {uid: 'hu:locator:naii-10k-fy2024-carlsbad-note-6'})
 MERGE (a:Assertion {uid: row.a})
-SET a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:20:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:20:00Z'),
     a.validFrom = row.vf, a.validFromPrecision = 'MONTH', a.validFromBasis = 'STATED_BY_SOURCE',
     a.validTo = row.vt, a.validToPrecision = CASE WHEN row.vt IS NULL THEN null ELSE 'MONTH' END,
     a.validToBasis = CASE WHEN row.vt IS NULL THEN 'UNKNOWN' ELSE 'STATED_BY_SOURCE' END,
@@ -222,9 +222,10 @@ MATCH (old:Assertion {uid: 'hu:assertion:nai-carlsbad-planned-2021'}), (f:Facili
       (c:ManufacturingCapability {uid: 'hu:capability:nai-carlsbad-powder-planned-2021'}), (nai:Organization {uid: 'hu:org:natural-alternatives-international-inc'}),
       (l1:SourceLocator {uid: 'hu:locator:prn-nai-2021-closed-aug-20'}), (l2:SourceLocator {uid: 'hu:locator:naii-10k-fy2024-carlsbad-note-6'})
 MERGE (b:Assertion {uid: 'hu:assertion:nai-carlsbad-planned-2021-bounded'})
-SET b.predicate = 'HAS_CAPABILITY_STATE', b.status = 'ACCEPTED', b.recordedAt = datetime('2026-10-04T01:20:00Z'),
+SET b.privacyClass = coalesce(b.privacyClass, 'PUBLIC'), b.predicate = 'HAS_CAPABILITY_STATE', b.status = 'ACCEPTED', b.recordedAt = datetime('2026-10-04T01:20:00Z'),
     b.validFrom = old.validFrom, b.validFromPrecision = 'DAY', b.validFromBasis = 'STATED_BY_SOURCE',
     b.validTo = datetime('2023-04-01T00:00:00Z'), b.validToPrecision = 'MONTH', b.validToBasis = 'INFERRED',
+    b.derivationRule = 'w11-capability-bound/v1: a PLANNED state of a capability line ends at the stated start of the first OPERATING state of the same line',
     b.polarity = 'POSITIVE', b.speechAct = 'STATES', b.assertionBasis = 'MANUFACTURER_CLAIM', b.predicateClass = 'OTHER',
     b.contentHash = 'sha256:bf01cfc014a2494d97129de47c33453e0ef3beb2cdafc96518b2908a825d03be', b.createdAt = datetime('2026-10-04T01:20:00Z')
 SET old.status = 'SUPERSEDED', old.recordedTo = datetime('2026-10-04T01:20:00Z')
@@ -253,7 +254,7 @@ SET h2.assertionUid = 'hu:assertion:nai-carlsbad-planned-2021-bounded', h2.valid
 MATCH (f:Facility {uid: 'hu:facility:nai-carlsbad-powder-facility'}), (c:ManufacturingCapability {uid: 'hu:capability:nai-carlsbad-as-promoted'}),
       (nai:Organization {uid: 'hu:org:natural-alternatives-international-inc'}), (l:SourceLocator {uid: 'hu:locator:nai-online-manufacturing-carlsbad'})
 MERGE (a:Assertion {uid: 'hu:assertion:nai-online-promotes-carlsbad-capability'})
-SET a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:20:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:20:00Z'),
     a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.polarity = 'POSITIVE', a.speechAct = 'STATES',
     a.assertionBasis = 'MANUFACTURER_CLAIM', a.predicateClass = 'OTHER',
     a.contentHash = 'sha256:14b647171569d72d73f87ac03607277ab78b29994a8b78889bd42da4410a39db', a.createdAt = datetime('2026-10-04T01:20:00Z')
@@ -268,7 +269,7 @@ MATCH (f:Facility {uid: 'hu:facility:nai-carlsbad-powder-facility'}), (c:Manufac
       (nai:Organization {uid: 'hu:org:natural-alternatives-international-inc'}),
       (l1:SourceLocator {uid: 'hu:locator:naii-10k-fy2026-carlsbad-sale'}), (l2:SourceLocator {uid: 'hu:locator:naii-10k-fy2026-excess-capacity'})
 MERGE (a:Assertion {uid: 'hu:assertion:naii-10k-fy2026-carlsbad-exit-planned'})
-SET a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:20:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:20:00Z'),
     a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.statedTense = 'FUTURE', a.polarity = 'POSITIVE',
     a.speechAct = 'STATES', a.assertionBasis = 'MANUFACTURER_CLAIM', a.predicateClass = 'OTHER',
     a.contentHash = 'sha256:18c8e2a5938469db87776ae7985e4b7adf1d7c312b5ae2d5fa5afb69c16666a7', a.createdAt = datetime('2026-10-04T01:20:00Z')
@@ -285,7 +286,7 @@ MERGE (a)-[:SUPPORTED_BY]->(l2);
 MATCH (a:Assertion {uid: 'hu:assertion:nai-online-promotes-carlsbad-capability'}),
       (l1:SourceLocator {uid: 'hu:locator:naii-10k-fy2025-carlsbad-powder'}), (l2:SourceLocator {uid: 'hu:locator:naii-10k-fy2026-carlsbad-sale'})
 MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:nai-carlsbad-promotion-support-2026-10-04'})
-SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'SUPPORT', j.verdict = 'PARTIALLY_SUPPORTED',
+SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'SUPPORT', j.verdict = 'PARTIALLY_SUPPORTED',
     j.reviewerType = 'AGENT', j.methodVersion = 'w11-capability-adjudication-v0', j.status = 'ACCEPTED',
     j.reviewedAt = datetime('2026-10-04T01:30:00Z'), j.recordedAt = datetime('2026-10-04T01:30:00Z'),
     j.rationale = 'FY2024/FY2025 10-Ks: Carlsbad is a dedicated high-volume powder blending and packaging facility, operational April 2023, closed October 2023, reopened May 2024. No captured filing places capsule or tablet manufacturing at Carlsbad. FY2026 10-K: sale of Carlsbad determined. The promotion supports at most an operating powder capability.',
@@ -301,7 +302,7 @@ MATCH (a:Assertion)
 WHERE a.uid STARTS WITH 'hu:assertion:nai'
   AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
 MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w11-f01-capture-fidelity-policy'})
-ON CREATE SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
+ON CREATE SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
     j.reviewerType = 'POLICY', j.methodVersion = 'w11-fixture-capture-policy-1', j.status = 'ACCEPTED',
     j.reviewedAt = datetime('2026-10-04T01:40:00Z'), j.recordedAt = datetime('2026-10-04T01:40:00Z'),
     j.rationale = 'Fixture capture policy: propositions match the cited spans as read by W11.', j.privacyClass = 'INTERNAL',

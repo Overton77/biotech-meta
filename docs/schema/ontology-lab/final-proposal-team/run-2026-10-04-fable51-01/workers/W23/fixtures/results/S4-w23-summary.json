@@ -1,0 +1,78 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+ "total": 12,
+ "ok": 12,
+ "failed": 0,
+ "rowsByStatement": [
+  {
+   "n": 7,
+   "id": null,
+   "title": "V-W23-05: public-person-only rule (CL-018, CL-008). RECORDS (Person->Observation) and P",
+   "status": "ok",
+   "rows": 4,
+   "error": null,
+   "sample": [
+    {
+     "relType": "RECORDS",
+     "fromUid": "hu:person:w23-bellabs-user-jane",
+     "toUid": "hu:observation:w23-user-serum-mg-copy",
+     "violations": [
+      "NOT_ASSERTION_BACKED"
+     ]
+    },
+    {
+     "relType": "RECORDS",
+     "fromUid": "hu:person:w23-bellabs-user-jane",
+     "toUid": "hu:observation:w23-user-serum-mg-marked",
+     "violations": [
+      "NOT_ASSERTION_BACKED"
+     ]
+    },
+    {
+     "relType": "POSTS_RESULT",
+     "fromUid": "hu:person:w23-bellabs-user-jane",
+     "toUid": "hu:protocol-result:w23-user-outcome",
+     "violations": [
+      "NOT_ASSERTION_BACKED",
+      "ENDPOINT_NOT_PUBLIC"
+     ]
+    },
+    {
+     "relType": "HAS_PARTICIPANT_TOKEN",
+     "fromUid": "hu:person:w23-public-biohacker",
+     "toUid": "hu:cohort-participant:w23-case-series-participant-12",
+     "violations": [
+      "RETIRED_REIDENTIFICATION_EDGE",
+      "NOT_ASSERTION_BACKED"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "id": null,
+   "title": "V-W23-06: CohortParticipant token hygiene. participantToken is the label a public sourc",
+   "status": "ok",
+   "rows": 2,
+   "error": null,
+   "sample": [
+    {
+     "cohortParticipantUid": "hu:cohort-participant:w23-token-pcs",
+     "participantToken": "pcs-user-7f3a",
+     "violations": [
+      "TOKEN_LOOKS_LIKE_INTERNAL_IDENTIFIER",
+      "PARTICIPANT_WITHOUT_SOURCED_RECORD"
+     ]
+    },
+    {
+     "cohortParticipantUid": "hu:cohort-participant:w23-token-hmac",
+     "participantToken": "13c0a9a23716d669d80ce270bd404d381d5ef10b2b812a115616f629e76e3d44",
+     "violations": [
+      "TOKEN_LOOKS_LIKE_INTERNAL_IDENTIFIER",
+      "PARTICIPANT_WITHOUT_SOURCED_RECORD"
+     ]
+    }
+   ]
+  }
+ ]
+}

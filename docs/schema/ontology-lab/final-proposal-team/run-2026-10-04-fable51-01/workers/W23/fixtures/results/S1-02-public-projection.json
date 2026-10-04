@@ -25,23 +25,23 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1884,
+   "ms": 308,
    "sample": [
     {
      "reachedNodes": 15,
      "reachedLabels": [
       "Assertion",
+      "EvidenceAssessment",
+      "Adjudication",
+      "InformationArtifact",
+      "SourceLocator",
       "Entity",
       "ProductVariant",
       "Product",
-      "InformationArtifact",
-      "SourceLocator",
       "VersionedState",
       "FormulationVersion",
       "SourceSnapshot",
-      "Source",
-      "EvidenceAssessment",
-      "Adjudication"
+      "Source"
      ],
      "reachesPolicyLayer": false,
      "reachesLineage": false,
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 937,
+   "ms": 166,
    "sample": [
     {
      "reachedNodes": 21,
@@ -102,7 +102,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 456,
+   "ms": 87,
    "sample": [
     {
      "admittedPublicNodes": 16,

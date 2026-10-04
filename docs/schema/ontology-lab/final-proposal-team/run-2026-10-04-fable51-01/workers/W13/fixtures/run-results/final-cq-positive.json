@@ -1,0 +1,460 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-cq-queries.cypher",
+ "uri": "bolt://127.0.0.1:44793/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 9,
+ "ok": 9,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 8,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 3355,
+   "sample": [
+    {
+     "subjectUid": "hu:assay-version:synthetic-ldt-nad-panel-v1",
+     "state": "RECORDED",
+     "standings": [
+      {
+       "isApproval": false,
+       "statusKind": "ENFORCEMENT_DISCRETION",
+       "response": null,
+       "scope": "LDT after vacatur of the 2024 rule (synthetic)",
+       "jurisdiction": "US",
+       "submission": null,
+       "issuedAt": null
+      }
+     ]
+    },
+    {
+     "subjectUid": "hu:facility:synthetic-supplement-plant",
+     "state": "RECORDED",
+     "standings": [
+      {
+       "isApproval": false,
+       "statusKind": "ESTABLISHMENT_REGISTRATION",
+       "response": null,
+       "scope": "food facility registration (synthetic)",
+       "jurisdiction": "US",
+       "submission": null,
+       "issuedAt": null
+      }
+     ]
+    },
+    {
+     "subjectUid": "hu:material:niagen-nrc",
+     "state": "RECORDED",
+     "standings": [
+      {
+       "isApproval": false,
+       "statusKind": "NOTIFICATION_ON_FILE",
+       "response": "GRAS_NO_QUESTIONS",
+       "scope": "GRAS notice GRN 000635, FDA no questions; intended food uses at up to 0.0057% by weight as consumed; not dietary supplements",
+       "jurisdiction": "US",
+       "submission": "GRN 000635",
+       "issuedAt": "2016-08-03"
+      }
+     ]
+    },
+    {
+     "subjectUid": "hu:mixture:nr-and-pterostilbene-oopd-628218",
+     "state": "RECORDED",
+     "standings": [
+      {
+       "isApproval": false,
+       "statusKind": "DESIGNATION",
+       "response": "ORPHAN_DESIGNATION_GRANTED",
+       "scope": "Orphan Designation Status: Designated; FDA Orphan Approval Status: Not FDA Approved for Orphan Indication",
+       "jurisdiction": "US",
+       "submission": null,
+       "issuedAt": "2018-03-19"
+      }
+     ]
+    },
+    {
+     "subjectUid": "hu:product:dexcom-stelo",
+     "state": "RECORDED",
+     "standings": [
+      {
+       "isApproval": false,
+       "statusKind": "CLEARANCE",
+       "response": "SUBSTANTIALLY_EQUIVALENT",
+       "scope": "Integrated Continuous Glucose Monitor For Non-Intensive Glucose Monitoring, Over-The-Counter (21 CFR 862.1355)",
+       "jurisdiction": "US",
+       "submission": "K234070",
+       "issuedAt": "2024-03-05"
+      }
+     ]
+    }
+   ],
+   "header": "// W13 competency-question queries (read-only). Parameters are inlined as literals so the file runs without a params\n// file; production versions take the commented $parameters. Expected rows are documented in 06-fixtures-and-queries.md.\n// Q-MF-02a (CQ-MF-02, CQ-AX-23): what regulatory standing doe"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 809,
+   "sample": [
+    {
+     "characterization": "hu:assertion:truniagen-characterizes-grn-000635-2026-10-04",
+     "asserter": "Niagen Bioscience, Inc. (formerly ChromaDex, Inc.)",
+     "companyWording": "FDA GRAS no objection for Niagen (nicotinamide riboside chloride) on August 05, 2016; Dose: 180 mg/day; GRN 635",
+     "agencyResponseKind": "GRAS_NO_QUESTIONS",
+     "agencyDate": "2016-08-03",
+     "agencyConditions": "as a source of vitamin B3 in vitamin waters, protein shakes, nutrition bars, gum, chews, and powdered beverages at a maximum level of 0.0057% by weight as consumed",
+     "agencyDisclaimer": "The agency has not, however, made its own determination regarding the GRAS status of the subject use of NR. | Accordingly, this response should not be construed to be a statement that foods that contain NR, if introduced or delivered for introduction into interstate commerce, would not violate section 301(ll). | The Office of Food Additive Safety neither consulted with ONFL on this labeling issue nor evaluated the information in your notice to determine whether it would support any claims made about NR on the label or in labeling.",
+     "verdict": "PARTIALLY_SUPPORTED",
+     "adjudicationUid": "hu:adjudication:truniagen-grn-000635-w13"
+    }
+   ],
+   "header": "// Q-MF-03 (CQ-MF-03): company characterization versus the agency record, with the current SUPPORT adjudication."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 310,
+   "sample": [
+    {
+     "submission": "GRN 000635",
+     "responseKind": "GRAS_NO_QUESTIONS",
+     "jurisdiction": "US",
+     "agencyConditions": "as a source of vitamin B3 in vitamin waters, protein shakes, nutrition bars, gum, chews, and powdered beverages at a maximum level of 0.0057% by weight as consumed",
+     "submittedConditions": "as a source of vitamin B3 in vitamin waters, protein shakes, nutrition bars, gum, chews, and powdered beverages at a maximum level of 0.0057% by weight as consumed"
+    }
+   ],
+   "header": "// Q-PF-04 (CQ-PF-04): what conditions of use does the agency response state (verbatim), versus the submitter's proposal."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1398,
+   "sample": [
+    {
+     "noticeDated": "2016-03-08",
+     "received": "2016-03-09",
+     "filed": "2016-03-29",
+     "responseIssued": "2016-08-03",
+     "statusValidFrom": "2016-08-03",
+     "recorded": "2026-10-04T02:00:00Z",
+     "legalBasisAtFiling": "proposed 21 CFR 170.36 (62 FR 18938; April 17, 1997)"
+    }
+   ],
+   "header": "// Q-TM-03 (CQ-TM-03): the clocks of one regulatory record kept apart (GRN 000635)."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 749,
+   "sample": [
+    {
+     "knownAsOf": "2025-02-01T00:00:00Z",
+     "regime": "LDT rule 2024 (vacated)",
+     "basis": "21 CFR 809.3(a) as amended by 89 FR 37286",
+     "from": "2024-07-05T00:00:00Z",
+     "to": null,
+     "codifiedTextTo": "2025-09-19T00:00:00Z"
+    },
+    {
+     "knownAsOf": "2026-10-04T03:00:00Z",
+     "regime": "LDTs after vacatur (text reverted)",
+     "basis": "21 CFR 809.3(a) as it existed prior to 89 FR 37286 (FR Doc. 2025-18239)",
+     "from": "2025-03-31T00:00:00Z",
+     "to": null,
+     "codifiedTextTo": null
+    }
+   ],
+   "header": "// Q-MF-C02 (CQ-MF-C02 candidate): which legal basis governed pathway P at valid time V, as known at recorded time R.\n// Two runs: R = 2025-02-01 (before the vacatur was ingested) and R = 2026-10-04, both for V = 2025-06-01."
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 3,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 426,
+   "sample": [
+    {
+     "statusUid": "hu:regulatory-status:us-synthetic-ldt-ed-v1",
+     "kind": "ENFORCEMENT_DISCRETION",
+     "regime": "LDTs under general enforcement discretion",
+     "basisEnded": "2024-07-05T00:00:00Z",
+     "statusEpisodeEnds": "2024-07-05T00:00:00Z",
+     "episodeRecorded": "2026-10-04T02:00:00Z",
+     "episodeClosed": null
+    },
+    {
+     "statusUid": "hu:regulatory-status:us-synthetic-ldt-ed-v2",
+     "kind": "ENFORCEMENT_DISCRETION",
+     "regime": "LDT rule 2024 (vacated)",
+     "basisEnded": "2025-03-31T00:00:00Z",
+     "statusEpisodeEnds": null,
+     "episodeRecorded": "2024-07-10T00:00:00Z",
+     "episodeClosed": "2025-04-02T00:00:00Z"
+    },
+    {
+     "statusUid": "hu:regulatory-status:us-synthetic-ldt-ed-v2",
+     "kind": "ENFORCEMENT_DISCRETION",
+     "regime": "LDT rule 2024 (vacated)",
+     "basisEnded": "2025-03-31T00:00:00Z",
+     "statusEpisodeEnds": "2025-03-31T00:00:00Z",
+     "episodeRecorded": "2025-04-02T00:00:00Z",
+     "episodeClosed": null
+    }
+   ],
+   "header": "// Q-MF-C02b: statuses whose legal basis was later bounded (vacatur), with their bounded episodes."
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 4,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 605,
+   "sample": [
+    {
+     "jurisdiction": "EU",
+     "statusKinds": [],
+     "scopes": [],
+     "state": "NOT_RECORDED"
+    },
+    {
+     "jurisdiction": "GB-GBN",
+     "statusKinds": [],
+     "scopes": [],
+     "state": "NOT_RECORDED"
+    },
+    {
+     "jurisdiction": "GB-NIR",
+     "statusKinds": [],
+     "scopes": [],
+     "state": "NOT_RECORDED"
+    },
+    {
+     "jurisdiction": "US",
+     "statusKinds": [
+      "NOTIFICATION_ON_FILE"
+     ],
+     "scopes": [
+      "GRAS notice GRN 000635, FDA no questions; intended food uses at up to 0.0057% by weight as consumed; not dietary supplements"
+     ],
+     "state": "RECORDED"
+    }
+   ],
+   "header": "// Q-MF-C03 (CQ-MF-C03 candidate): jurisdiction-partitioned standings of one material; a missing jurisdiction is unknown."
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 3,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 3982,
+   "sample": [
+    {
+     "facility": "hu:facility:anti-lage-riverside-ca",
+     "registration": "NOT_RECORDED",
+     "cgmpClaim": "none captured",
+     "inspection": "hu:regulatory-inspection:us-fda-anti-lage-2024-09",
+     "inspectedFrom": "2024-09-17",
+     "inspectedTo": "CONFLICTING: September 17, 2024, through October 7, 2024 | September 17, 2024, through October 4, 2024 | ",
+     "form483": true,
+     "findings": [],
+     "classification": "NOT_CAPTURED",
+     "rule": "never CGMP_COMPLIANT by projection"
+    },
+    {
+     "facility": "hu:facility:nutratech-phoenix-ny",
+     "registration": "NOT_RECORDED",
+     "cgmpClaim": "none captured",
+     "inspection": "hu:regulatory-inspection:us-fda-nutratech-2025-09",
+     "inspectedFrom": "2025-09-22",
+     "inspectedTo": "2025-10-15",
+     "form483": true,
+     "findings": [
+      "21 CFR 111.70(e)"
+     ],
+     "classification": "NOT_CAPTURED",
+     "rule": "never CGMP_COMPLIANT by projection"
+    },
+    {
+     "facility": "hu:facility:synthetic-supplement-plant",
+     "registration": "ESTABLISHMENT_REGISTRATION",
+     "cgmpClaim": "Made in our FDA-registered, cGMP-compliant facility (company claim, EXTRACTED)",
+     "inspection": null,
+     "inspectedFrom": null,
+     "inspectedTo": null,
+     "form483": null,
+     "findings": [],
+     "classification": null,
+     "rule": "never CGMP_COMPLIANT by projection"
+    }
+   ],
+   "header": "// Q-MF-06 / Q-MF-C01 (CQ-MF-06, CQ-MF-C01 candidate): what quality-relevant regulatory signals exist for a facility,\n// kept separate: registration status, company cGMP claim, inspection (period, 483, findings, classification)."
+  },
+  {
+   "n": 9,
+   "id": null,
+   "status": "ok",
+   "rows": 5,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1098,
+   "sample": [
+    {
+     "subjectUid": "hu:material:niagen-nrc",
+     "fdaApproved": false,
+     "otherStandingsNotApproval": [
+      "NOTIFICATION_ON_FILE"
+     ]
+    },
+    {
+     "subjectUid": "hu:product:dexcom-stelo",
+     "fdaApproved": false,
+     "otherStandingsNotApproval": [
+      "CLEARANCE"
+     ]
+    },
+    {
+     "subjectUid": "hu:product:paige-prostate",
+     "fdaApproved": false,
+     "otherStandingsNotApproval": [
+      "DE_NOVO_AUTHORIZATION"
+     ]
+    },
+    {
+     "subjectUid": "hu:product:rezdiffra",
+     "fdaApproved": true,
+     "otherStandingsNotApproval": []
+    },
+    {
+     "subjectUid": "hu:product:tru-niagen-300-capsules",
+     "fdaApproved": false,
+     "otherStandingsNotApproval": []
+    }
+   ],
+   "header": "// Q-AX-23-guard (CQ-AX-23): \"is X FDA approved?\" answers yes only from APPROVAL statuses with an approving response."
+  }
+ ]
+}

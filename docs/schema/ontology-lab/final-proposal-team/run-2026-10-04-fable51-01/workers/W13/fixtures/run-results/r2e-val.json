@@ -1,0 +1,885 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-validation.cypher",
+ "uri": "bolt://127.0.0.1:36313/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 25,
+ "ok": 25,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "V-320a",
+   "status": "ok",
+   "rows": 3,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 164,
+   "sample": [
+    {
+     "check": "V-320a",
+     "statusUid": "hu:regulatory-status:neg-nrc-gras-approval",
+     "responseUid": "hu:reg-response:us-fda-grn-000635",
+     "responseKind": "GRAS_NO_QUESTIONS"
+    },
+    {
+     "check": "V-320a",
+     "statusUid": "hu:regulatory-status:neg-orphan-as-drug-approval",
+     "responseUid": "hu:reg-response:us-fda-orphan-nr-pterostilbene-als-granted",
+     "responseKind": "ORPHAN_DESIGNATION_GRANTED"
+    },
+    {
+     "check": "V-320a",
+     "statusUid": "hu:regulatory-status:neg-stelo-approval",
+     "responseUid": "hu:reg-response:us-fda-510k-k234070-sese",
+     "responseKind": "SUBSTANTIALLY_EQUIVALENT"
+    }
+   ],
+   "header": "// W13 validation suite: catalog regulatory validators (verbatim where unchanged, \"r\" suffix where W13 proposes a\n// revision) plus proposed V-W13-01..12. Every query returns zero rows on a valid committed graph. Read-only.\n// Run status per query is recorded in 06-fixtures-and-queries.md (embedded "
+  },
+  {
+   "n": 2,
+   "id": "V-320b",
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 27,
+   "sample": [
+    {
+     "check": "V-320b",
+     "statusUid": "hu:regulatory-status:neg-nrc-gras-approval",
+     "pathwayKind": "GRAS_NOTICE"
+    },
+    {
+     "check": "V-320b",
+     "statusUid": "hu:regulatory-status:neg-stelo-approval",
+     "pathwayKind": "PREMARKET_NOTIFICATION_510K"
+    }
+   ],
+   "header": "// V-320b (catalog, verbatim): an approval status may not sit under a non-approval legal basis."
+  },
+  {
+   "n": 3,
+   "id": "V-321",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 28,
+   "sample": [],
+   "header": "// V-321 (catalog, verbatim): regulatory record kinds never share one node."
+  },
+  {
+   "n": 4,
+   "id": "V-322",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 6,
+   "sample": [],
+   "header": "// V-322 (catalog, verbatim): live projection Product.status = 'APPROVED' requires an APPROVAL status of that product."
+  },
+  {
+   "n": 5,
+   "id": "V-322r",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 185,
+   "sample": [
+    {
+     "check": "V-322r",
+     "productWithUnbackedApproval": "hu:product:tru-niagen-300-capsules"
+    }
+   ],
+   "header": "// V-322r (proposed revision, W13-D12): Product.status = 'APPROVED' requires a current APPROVAL status of that product that\n// itself results from an approving response; V-322 as written is satisfied by an unbacked APPROVAL status (fixture N-07)."
+  },
+  {
+   "n": 6,
+   "id": "V-323",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 24,
+   "sample": [
+    {
+     "check": "V-323",
+     "statusUid": "hu:regulatory-status:us-synthetic-plant-ffr",
+     "attachedTo": [
+      "Entity",
+      "Product"
+     ],
+     "attachedUid": "hu:product:tru-niagen-300-capsules"
+    }
+   ],
+   "header": "// V-323 (catalog, verbatim): establishment or facility registration is a status of a Facility only."
+  },
+  {
+   "n": 7,
+   "id": "V-333",
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 28,
+   "sample": [
+    {
+     "check": "V-333",
+     "statusUid": "hu:regulatory-status:us-synthetic-ldt-ed-v2",
+     "statusKind": "ENFORCEMENT_DISCRETION",
+     "subjects": 2
+    },
+    {
+     "check": "V-333",
+     "statusUid": "hu:regulatory-status:us-synthetic-plant-ffr",
+     "statusKind": "ESTABLISHMENT_REGISTRATION",
+     "subjects": 2
+    }
+   ],
+   "header": "// V-333 (catalog, verbatim): regulatory statuses carry a known status kind, a jurisdiction, and exactly one subject.\n// W13-D11: counts STATUS_OF edges, so it fires on a status with two recorded-time episodes; see V-333r."
+  },
+  {
+   "n": 8,
+   "id": "V-333r",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 10,
+   "sample": [
+    {
+     "check": "V-333r",
+     "statusUid": "hu:regulatory-status:us-synthetic-plant-ffr",
+     "statusKind": "ESTABLISHMENT_REGISTRATION",
+     "subjects": 2,
+     "currentEpisodes": 2
+    }
+   ],
+   "header": "// V-333r (proposed revision): exactly one distinct subject over all STATUS_OF episodes; at most one current episode."
+  },
+  {
+   "n": 9,
+   "id": "V-334",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 87,
+   "sample": [],
+   "header": "// V-334 (catalog, verbatim): a status cannot outlive the legal basis it depends on."
+  },
+  {
+   "n": 10,
+   "id": "V-334r",
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 43,
+   "sample": [
+    {
+     "check": "V-334r",
+     "statusUid": "hu:regulatory-status:neg-ldt-outlives-vacatur",
+     "versionUid": "hu:reg-pathway-version:us-fda-ldt-rule-2024",
+     "statusFrom": {
+      "year": 2024,
+      "month": 7,
+      "day": 5,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "statusTo": {
+      "year": 2025,
+      "month": 9,
+      "day": 19,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "basisFrom": {
+      "year": 2024,
+      "month": 7,
+      "day": 5,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "basisTo": {
+      "year": 2025,
+      "month": 3,
+      "day": 31,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    },
+    {
+     "check": "V-334r",
+     "statusUid": "hu:regulatory-status:neg-version-from-other-pathway",
+     "versionUid": "hu:reg-pathway-version:us-fda-ldt-rule-2024",
+     "statusFrom": {
+      "year": 2016,
+      "month": 8,
+      "day": 3,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "statusTo": null,
+     "basisFrom": {
+      "year": 2024,
+      "month": 7,
+      "day": 5,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "basisTo": {
+      "year": 2025,
+      "month": 3,
+      "day": 31,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    }
+   ],
+   "header": "// V-334r (proposed revision): the current STATUS_OF episode of a status under a legal-basis version neither starts before\n// nor ends after the current HAS_PATHWAY_VERSION episode of that version (null validTo on the status = may outlive)."
+  },
+  {
+   "n": 11,
+   "id": "V-335",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 77,
+   "sample": [
+    {
+     "check": "V-335",
+     "unadjudicatedCharacterization": "hu:assertion:neg-unadjudicated-characterization"
+    }
+   ],
+   "header": "// V-335 (catalog, verbatim): an accepted company characterization of an agency action requires a BellLabs adjudication."
+  },
+  {
+   "n": 12,
+   "id": "V-336",
+   "status": "ok",
+   "rows": 6,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 35,
+   "sample": [
+    {
+     "check": "V-336",
+     "approvalStatusWithoutApprovingResponse": "hu:regulatory-status:eu-nrc-novel-food"
+    },
+    {
+     "check": "V-336",
+     "approvalStatusWithoutApprovingResponse": "hu:regulatory-status:gb-nrc-novel-food"
+    },
+    {
+     "check": "V-336",
+     "approvalStatusWithoutApprovingResponse": "hu:regulatory-status:neg-tru-niagen-approval-no-response"
+    },
+    {
+     "check": "V-336",
+     "approvalStatusWithoutApprovingResponse": "hu:regulatory-status:neg-nrc-gras-approval"
+    },
+    {
+     "check": "V-336",
+     "approvalStatusWithoutApprovingResponse": "hu:regulatory-status:neg-orphan-as-drug-approval"
+    }
+   ],
+   "header": "// V-336 (catalog, verbatim; INV-304): an APPROVAL status results from an approving agency response."
+  },
+  {
+   "n": 13,
+   "id": "V-331",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 67,
+   "sample": [],
+   "header": "// V-331 (catalog, verbatim; informational): NDI and GRAS responses keep the agency's conditions of use."
+  },
+  {
+   "n": 14,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 53,
+   "sample": [],
+   "header": "// V-W13-01: STATUS_OF / SUBMISSION_ABOUT targets are RegulatorySubjectTarget members; ESTABLISHMENT_REGISTRATION <-> Facility\n// in both directions; OrphanDesignation / DrugApproval subjects are material, mixture, intervention or product."
+  },
+  {
+   "n": 15,
+   "id": null,
+   "status": "ok",
+   "rows": 5,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 95,
+   "sample": [
+    {
+     "check": "V-W13-02",
+     "nodeUid": "hu:reg-pathway:eu-novel-food",
+     "label": "RegulatoryPathway",
+     "value": "NOVEL_FOOD_AUTHORISATION"
+    },
+    {
+     "check": "V-W13-02",
+     "nodeUid": "hu:reg-pathway:gb-novel-food",
+     "label": "RegulatoryPathway",
+     "value": "NOVEL_FOOD_AUTHORISATION"
+    },
+    {
+     "check": "V-W13-02",
+     "nodeUid": "hu:reg-submission:eu-novel-food-nrc-chromadex",
+     "label": "RegulatorySubmission",
+     "value": "NOVEL_FOOD_AUTHORISATION"
+    },
+    {
+     "check": "V-W13-02",
+     "nodeUid": "hu:reg-response:eu-2020-16-nrc",
+     "label": "RegulatoryResponse",
+     "value": "NOVEL_FOOD_AUTHORISED"
+    },
+    {
+     "check": "V-W13-02",
+     "nodeUid": "hu:reg-response:us-fda-ndi-1062-filing-ack",
+     "label": "RegulatoryResponse",
+     "value": "NDI_FILING_ACKNOWLEDGED"
+    }
+   ],
+   "header": "// V-W13-02: closed enum values (service-enforced in GraphQL; this detects Cypher writes)."
+  },
+  {
+   "n": 16,
+   "id": null,
+   "status": "ok",
+   "rows": 3,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 13,
+   "sample": [
+    {
+     "check": "V-W13-03",
+     "submissionUid": "hu:reg-submission:eu-novel-food-nrc-chromadex",
+     "kind": "NOVEL_FOOD_AUTHORISATION",
+     "responseUid": "hu:reg-response:eu-2020-16-nrc",
+     "responseKind": "NOVEL_FOOD_AUTHORISED"
+    },
+    {
+     "check": "V-W13-03",
+     "submissionUid": "hu:reg-submission:us-fda-ndi-1062",
+     "kind": "NDI_NOTIFICATION",
+     "responseUid": "hu:reg-response:us-fda-ndi-1062-filing-ack",
+     "responseKind": "NDI_FILING_ACKNOWLEDGED"
+    },
+    {
+     "check": "V-W13-03",
+     "submissionUid": "hu:reg-submission:neg-gras-notice-se-response",
+     "kind": "GRAS_NOTICE",
+     "responseUid": "hu:reg-response:neg-gras-notice-se-response",
+     "responseKind": "SUBSTANTIALLY_EQUIVALENT"
+    }
+   ],
+   "header": "// V-W13-03: the response kind belongs to the closed list of its submission's pathway kind."
+  },
+  {
+   "n": 17,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 44,
+   "sample": [
+    {
+     "check": "V-W13-04",
+     "submissionUid": "hu:reg-submission:neg-kind-mismatch",
+     "kind": "NDI_NOTIFICATION",
+     "pathwayKinds": [
+      "PREMARKET_NOTIFICATION_510K"
+     ]
+    }
+   ],
+   "header": "// V-W13-04: exactly one UNDER_PATHWAY per submission, and submissionKind equals that pathway's pathwayKind; jurisdictions agree."
+  },
+  {
+   "n": 18,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 24,
+   "sample": [
+    {
+     "check": "V-W13-05",
+     "recordUid": "hu:regulatory-status:neg-version-from-other-pathway",
+     "versionUid": "hu:reg-pathway-version:us-fda-ldt-rule-2024",
+     "pathways": [
+      "hu:reg-pathway:us-fda-gras-notice"
+     ]
+    }
+   ],
+   "header": "// V-W13-05: a legal-basis version used by a status or submission belongs to that record's pathway."
+  },
+  {
+   "n": 19,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 29,
+   "sample": [
+    {
+     "check": "V-W13-06",
+     "pathwayUid": "hu:reg-pathway:us-fda-gras-notice",
+     "version1": "hu:reg-pathway-version:us-fda-gras-proposed-170-36",
+     "version2": "hu:reg-pathway-version:us-fda-gras-subpart-e"
+    },
+    {
+     "check": "V-W13-06",
+     "pathwayUid": "hu:reg-pathway:us-fda-gras-notice",
+     "version1": "hu:reg-pathway-version:us-fda-gras-subpart-e",
+     "version2": "hu:reg-pathway-version:us-fda-gras-subpart-e"
+    }
+   ],
+   "header": "// V-W13-06: HAS_PATHWAY_VERSION is EXCLUSIVE per pathway: no two current episodes to different versions overlap in valid\n// time, and one version has at most one current episode (null bounds are unknown and treated as possibly overlapping)."
+  },
+  {
+   "n": 20,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 82,
+   "sample": [],
+   "header": "// V-W13-07: asserted regulatory edges carry the asserted_edge profile and cite an assertion with the same predicate, subject and object."
+  },
+  {
+   "n": 21,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 35,
+   "sample": [
+    {
+     "check": "V-W13-08",
+     "edge": "HAS_REGULATORY_STATUS",
+     "productUid": "hu:product:tru-niagen-300-capsules",
+     "targetUid": "hu:regulatory-status:us-synthetic-plant-ffr",
+     "inputs": [
+      "hu:assertion:synthetic-plant-claims-cgmp"
+     ]
+    }
+   ],
+   "header": "// V-W13-08: legacy derived HAS_REGULATORY_STATUS / FOLLOWS_PATHWAY carry a rule and only matching input assertions."
+  },
+  {
+   "n": 22,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 48,
+   "sample": [],
+   "header": "// V-W13-09: every response has exactly one submission and one issuer; every status has exactly one issuer and one legal basis."
+  },
+  {
+   "n": 23,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 40,
+   "sample": [],
+   "header": "// V-W13-10: jurisdiction partition: a status's jurisdiction equals its legal-basis pathway's; a response's equals its submission's."
+  },
+  {
+   "n": 24,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 27,
+   "sample": [],
+   "header": "// V-W13-11 (candidate): an inspection has exactly one inspected Facility and one conducting agency; it never yields a status."
+  },
+  {
+   "n": 25,
+   "id": null,
+   "status": "ok",
+   "rows": 5,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 115,
+   "sample": [
+    {
+     "check": "V-W13-12",
+     "conclusionUid": "hu:assertion:neg-paige-pma-approval-inferred",
+     "conclusion": "PMA_APPROVAL",
+     "premiseUid": "hu:assertion:status-of-us-paige-prostate-den200080",
+     "premises": [
+      "STATUS_OF",
+      "DE_NOVO_AUTHORIZATION",
+      null
+     ]
+    },
+    {
+     "check": "V-W13-12",
+     "conclusionUid": "hu:assertion:neg-cgmp-from-registration",
+     "conclusion": "CGMP_COMPLIANT",
+     "premiseUid": "hu:assertion:status-of-us-synthetic-plant-ffr",
+     "premises": [
+      "STATUS_OF",
+      "ESTABLISHMENT_REGISTRATION",
+      null
+     ]
+    },
+    {
+     "check": "V-W13-12",
+     "conclusionUid": "hu:assertion:neg-cgmp-from-claim",
+     "conclusion": "CGMP_COMPLIANT",
+     "premiseUid": "hu:assertion:synthetic-plant-claims-cgmp",
+     "premises": [
+      "CLAIMS_CGMP_COMPLIANCE",
+      null,
+      null
+     ]
+    },
+    {
+     "check": "V-W13-12",
+     "conclusionUid": "hu:assertion:neg-gras-determination",
+     "conclusion": "FDA_GRAS_DETERMINATION",
+     "premiseUid": "hu:assertion:status-of-us-nrc-grn-000635-on-file",
+     "premises": [
+      "STATUS_OF",
+      "NOTIFICATION_ON_FILE",
+      null
+     ]
+    },
+    {
+     "check": "V-W13-12",
+     "conclusionUid": "hu:assertion:neg-ldt-authorized",
+     "conclusion": "AUTHORIZATION",
+     "premiseUid": "hu:assertion:status-of-us-synthetic-ldt-ed-v3",
+     "premises": [
+      "STATUS_OF",
+      "ENFORCEMENT_DISCRETION",
+      null
+     ]
+    }
+   ],
+   "header": "// V-W13-12: forbidden regulatory implications used as derivation premises (12 catalog pairs, premise read from the input\n// assertion's predicate, or the statusKind / responseKind of its subject)."
+  }
+ ]
+}

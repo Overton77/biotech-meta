@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 317,
+   "ms": 218,
    "sample": [],
    "header": "// W23 fixture 04: uid redirect after a shared identity merge, read from a private record's stored uid (load 00 first).\n// CQ-RC-04, CQ-ID-01 (identity), OPEN-QUESTIONS P0 item 8. The private snapshot (decided 2026-04-10) holds the uid that\n// existed then; the shared graph merges the duplicate on 2"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 445,
+   "ms": 167,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 301,
+   "ms": 328,
    "sample": [
     {
      "heldUid": "hu:product-variant:w23-sleepwell-capsule-listing-dup",
@@ -99,7 +99,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 157,
+   "ms": 27,
    "sample": [
     {
      "heldUid": "hu:product-variant:w23-sleepwell-capsule-listing-dup",
@@ -138,7 +138,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 222,
+   "ms": 78,
    "sample": [],
    "header": "// Q-RD-3: redirect chains terminate and never point at a private uid (the private store follows at most 5 hops).\n// Expected: zero rows."
   }

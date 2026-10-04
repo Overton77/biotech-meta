@@ -157,7 +157,7 @@
 - {live: RoleMetadata.roleType, final: "edge type + RoleEdgeProperties.roleType", action: split, note: "selects the predicate (see Person.holdsRoleAt) and is kept as refinement"}
 - {live: RoleMetadata.corporateRoleType, final: RoleEdgeProperties.corporateRoleType, action: keep}
 - {live: RoleMetadata.seniorityLevel, final: RoleEdgeProperties.seniorityLevel, action: keep}
-- {live: "RoleMetadata.validFrom/validTo/recordedFrom/recordedTo", final: "RoleEdgeProperties asserted_edge fields", action: keep, note: "precision required with a bound; missing precision on legacy edges -> INSTANT with basis UNKNOWN is forbidden; use the coarsest the source allows or null the bound and keep the value on the migration Assertion description"}
+- {live: "RoleMetadata.validFrom/validTo/recordedFrom/recordedTo", final: "RoleEdgeProperties asserted_edge fields", action: keep, note: "precision cannot be recovered from a live DateTime; the migration Assertion gets null bounds with basis UNKNOWN and the live values in its description until a source review restores bound, precision and basis"}
 - {live: RoleMetadata.confidence, final: null, action: retire, note: "INV-407"}
 - {live: RoleMetadata.notes, final: null, action: retire}
 - {live: RoleMetadata.mongoResearchRunId, final: RoleEdgeProperties.mongoResearchRunId, action: keep}

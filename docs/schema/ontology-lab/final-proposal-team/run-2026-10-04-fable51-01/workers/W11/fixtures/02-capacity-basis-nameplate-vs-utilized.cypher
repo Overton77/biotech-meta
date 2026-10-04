@@ -19,9 +19,9 @@ UNWIND [
   {s: 'hu:source:sec-meridian-sc13d-cyan-2018', uri: 'https://www.sec.gov/Archives/edgar/data/768408/000144586618001193/meridian_sc13d.htm', title: 'Schedule 13D (Meridian) regarding Cyanotech Corporation, 2018', kind: 'SECURITIES_FILING', ch: 'sha256:a0854d32d57975d94eb2bb6ffc4713367110d938cbe732d3e8a44d1c6954f66a'}
 ] AS row
 MERGE (s:Source:Entity {uid: row.s})
-SET s.canonicalUri = row.uri, s.title = row.title, s.sourceKind = row.kind, s.entityType = 'SOURCE', s.createdAt = datetime('2026-10-04T01:05:00Z')
+SET s.privacyClass = coalesce(s.privacyClass, 'PUBLIC'), s.canonicalUri = row.uri, s.title = row.title, s.sourceKind = row.kind, s.entityType = 'SOURCE', s.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (sn:SourceSnapshot:InformationArtifact {uid: replace(row.s, 'hu:source:', 'hu:snapshot:') + '-2026-10-04'})
-SET sn.artifactType = 'SOURCE_SNAPSHOT', sn.canonicalUri = row.uri, sn.retrievedAt = datetime('2026-10-04T00:58:00Z'),
+SET sn.privacyClass = coalesce(sn.privacyClass, 'PUBLIC'), sn.artifactType = 'SOURCE_SNAPSHOT', sn.canonicalUri = row.uri, sn.retrievedAt = datetime('2026-10-04T00:58:00Z'),
     sn.observedAt = datetime('2026-10-04T00:58:00Z'), sn.contentHash = row.ch, sn.contentHashBasis = 'SYNTHETIC_FIXTURE',
     sn.captureCompleteness = 'PARTIAL_EXCERPT', sn.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (s)-[:HAS_SNAPSHOT]->(sn);
@@ -40,21 +40,21 @@ UNWIND [
 ] AS row
 MATCH (sn:SourceSnapshot {uid: row.sn})
 MERGE (l:SourceLocator:InformationArtifact {uid: row.l})
-SET l.artifactType = 'SOURCE_LOCATOR', l.selectorKind = 'TEXT_QUOTE', l.exact = row.exact, l.quoteHash = row.qh,
+SET l.privacyClass = coalesce(l.privacyClass, 'PUBLIC'), l.artifactType = 'SOURCE_LOCATOR', l.selectorKind = 'TEXT_QUOTE', l.exact = row.exact, l.quoteHash = row.qh,
     l.normalizationVersion = 'NFC-WS1', l.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (sn)-[:HAS_LOCATOR]->(l);
 
 // status: run
 MERGE (o:Organization:LegalEntity:Entity {uid: 'hu:org:cyanotech-corporation'})
-SET o.name = 'Cyanotech', o.legalName = 'Cyanotech Corporation', o.entityType = 'ORGANIZATION', o.createdAt = datetime('2026-10-04T01:05:00Z');
+SET o.privacyClass = coalesce(o.privacyClass, 'PUBLIC'), o.name = 'Cyanotech', o.legalName = 'Cyanotech Corporation', o.entityType = 'ORGANIZATION', o.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // status: run
 MERGE (o:Organization:Entity {uid: 'hu:org:meridian-13d-reporting-person'})
-SET o.name = 'Meridian (Schedule 13D reporting person for Cyanotech, 2018)', o.entityType = 'ORGANIZATION', o.createdAt = datetime('2026-10-04T01:05:00Z');
+SET o.privacyClass = coalesce(o.privacyClass, 'PUBLIC'), o.name = 'Meridian (Schedule 13D reporting person for Cyanotech, 2018)', o.entityType = 'ORGANIZATION', o.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // status: run
 MERGE (f:Facility:Entity {uid: 'hu:facility:cyanotech-kona-host-park'})
-SET f.name = 'Cyanotech microalgae production facility, HOST Park, Kailua-Kona, Hawaii', f.entityType = 'FACILITY',
+SET f.privacyClass = coalesce(f.privacyClass, 'PUBLIC'), f.name = 'Cyanotech microalgae production facility, HOST Park, Kailua-Kona, Hawaii', f.entityType = 'FACILITY',
     f.city = 'Kailua-Kona', f.region = 'HI', f.country = 'US', f.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // status: run
@@ -64,7 +64,7 @@ UNWIND [
   ['hu:process:cyanotech-phytodome-closed-culture-as-planned', 'Astaxanthin production in PhytoDome closed culture system (as planned, FY2002)', 'CULTIVATION']
 ] AS p
 MERGE (pr:ManufacturingProcess:Entity {uid: p[0]})
-SET pr.name = p[1], pr.processKind = p[2], pr.entityType = 'MANUFACTURING_PROCESS', pr.createdAt = datetime('2026-10-04T01:05:00Z');
+SET pr.privacyClass = coalesce(pr.privacyClass, 'PUBLIC'), pr.name = p[1], pr.processKind = p[2], pr.entityType = 'MANUFACTURING_PROCESS', pr.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // payloads (payloadHash input):
 // N: {"stage":"OPERATING","capacityValue":200000,"capacityUnitCode":"m2","capacityBasis":"NAMEPLATE","capacityVerbatim":"totaling approximately 200,000 square meters, all of which are currently available for production","targetOperationalDate":null,"targetOperationalDatePrecision":null,"forProcessUid":"hu:process:cyanotech-open-pond-microalgae-cultivation","forMaterialUid":null}
@@ -81,7 +81,7 @@ UNWIND [
 ] AS row
 MATCH (pr:ManufacturingProcess {uid: row.pr})
 MERGE (c:ManufacturingCapability:VersionedState {uid: row.c})
-SET c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = row.stage, c.capacityValue = row.v, c.capacityUnitCode = row.u,
+SET c.privacyClass = coalesce(c.privacyClass, 'PUBLIC'), c.stateType = 'MANUFACTURING_CAPABILITY', c.stage = row.stage, c.capacityValue = row.v, c.capacityUnitCode = row.u,
     c.capacityBasis = row.b, c.capacityVerbatim = row.verb, c.payloadHash = row.ph, c.createdAt = datetime('2026-10-04T01:10:00Z')
 MERGE (c)-[:CAPABILITY_FOR_PROCESS]->(pr);
 
@@ -95,7 +95,7 @@ UNWIND [
 MATCH (f:Facility {uid: 'hu:facility:cyanotech-kona-host-park'}), (c:ManufacturingCapability {uid: row.c}),
       (cy:Organization {uid: 'hu:org:cyanotech-corporation'}), (l:SourceLocator {uid: row.l})
 MERGE (a:Assertion {uid: row.a})
-SET a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.validFromBasis = 'OBSERVATION_ONLY', a.validToBasis = 'UNKNOWN', a.polarity = 'POSITIVE', a.speechAct = 'STATES',
     a.assertionBasis = 'MANUFACTURER_CLAIM', a.predicateClass = 'OTHER', a.contentHash = row.ch, a.createdAt = datetime('2026-10-04T01:10:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(f)
@@ -111,7 +111,7 @@ SET h.assertionUid = a.uid, h.validFromBasis = 'OBSERVATION_ONLY', h.validToBasi
 MATCH (f:Facility {uid: 'hu:facility:cyanotech-kona-host-park'}), (c:ManufacturingCapability {uid: 'hu:capability:cyanotech-astaxanthin-ponds-utilized-2018-07-per-meridian'}),
       (m:Organization {uid: 'hu:org:meridian-13d-reporting-person'}), (l:SourceLocator {uid: 'hu:locator:meridian-sc13d-july-2018-ponds'})
 MERGE (a:Assertion {uid: 'hu:assertion:meridian-sc13d-cyan-astaxanthin-ponds-half-empty-2018-07'})
-SET a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'HAS_CAPABILITY_STATE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.validFrom = datetime('2018-07-01T00:00:00Z'), a.validFromPrecision = 'MONTH', a.validFromBasis = 'STATED_BY_SOURCE',
     a.validTo = datetime('2018-08-01T00:00:00Z'), a.validToPrecision = 'MONTH', a.validToBasis = 'STATED_BY_SOURCE',
     a.basisKind = 'INFERRED_FROM_MEASUREMENT', a.polarity = 'POSITIVE', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
@@ -127,7 +127,7 @@ MATCH (a:Assertion)
 WHERE (a.uid STARTS WITH 'hu:assertion:cyan' OR a.uid STARTS WITH 'hu:assertion:meridian')
   AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
 MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w11-f02-capture-fidelity-policy'})
-ON CREATE SET j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
+ON CREATE SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
     j.reviewerType = 'POLICY', j.methodVersion = 'w11-fixture-capture-policy-1', j.status = 'ACCEPTED',
     j.reviewedAt = datetime('2026-10-04T01:40:00Z'), j.recordedAt = datetime('2026-10-04T01:40:00Z'),
     j.rationale = 'Fixture capture policy: propositions match the cited spans as read by W11.', j.privacyClass = 'INTERNAL',

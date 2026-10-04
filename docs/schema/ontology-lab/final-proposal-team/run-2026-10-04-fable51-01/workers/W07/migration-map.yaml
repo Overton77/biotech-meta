@@ -1,0 +1,87 @@
+# W07 migration map: live current_biotech_schema.graphql (digest 86b5e0b5...f112) -> final W07 SDL.
+# Global steps for every W07 node label: backfill uid = 'hu:<token>:' + id (tokens: biomarker, metric, lab-test,
+# panel-definition (requested), method, specimen-type, reference-range (requested)); add the archetype label
+# (Entity, VersionedState or InformationArtifact); backfill entityType/stateType/artifactType; privacyClass 'PUBLIC';
+# Entity.name becomes nullable (D-013, no data change). Legacy asserted edges are readable through non-null
+# MeasurementEdgeProperties/AssertedEdgeProperties only after their assertions are backfilled (operations 07, step M3).
+
+- {live: Biomarker, final: Biomarker, action: keep, note: "labels [Biomarker, Entity]; add uid, entityType, biomarkerKind"}
+- {live: Biomarker.id, final: Biomarker.id, action: keep, note: "opaque segment of uid"}
+- {live: Biomarker.name, final: Biomarker.name, action: keep, note: "now nullable (D-013); display only"}
+- {live: Biomarker.description, final: Biomarker.description, action: keep, note: ""}
+- {live: Biomarker.mongoResearchRunId, final: Biomarker.mongoResearchRunId, action: keep, note: ""}
+- {live: Biomarker.createdAt, final: Biomarker.createdAt, action: keep, note: ""}
+- {live: Biomarker.updatedAt, final: Biomarker.updatedAt, action: keep, note: ""}
+- {live: "Biomarker.searchText|searchFields|embeddingModel|embeddingDimensions|searchEmbedding", final: "Biomarker.(same)", action: keep, note: "BiomarkerSearch fulltext retained (D-015)"}
+- {live: Biomarker.biomarkerType, final: Biomarker.biomarkerType, action: keep, note: "read-only legacy display; category is W10 EndpointClassification (INV-205)"}
+- {live: Biomarker.specimenMatrix, final: Biomarker.measuredInMatrix, action: derive, note: "text kept read-only; W03 maps text to AnatomicalContext and writes MEASURED_IN_MATRIX; specimen type goes to AssayVersion.acceptsSpecimenTypes"}
+- {live: Biomarker.moleculeClass, final: Biomarker.moleculeClass, action: keep, note: "display"}
+- {live: Biomarker.measurementDirectness, final: DiagnosticResult.resultKind, action: move, note: "kept read-only as display; measured vs inferred is per result"}
+- {live: Biomarker.clinicalSignificance, final: Biomarker.clinicalSignificance, action: keep, note: "read-only legacy; significance is a W10 assessment"}
+- {live: Biomarker.commonUnits, final: Metric.canonicalUnitCode, action: move, note: "kept read-only as display"}
+- {live: Biomarker.agingHallmark, final: Biomarker.agingHallmark, action: keep, note: "read-only legacy; mechanism classification is W03's"}
+- {live: "Biomarker.indicatesConditions (INDICATES, AssociationMetadata)", final: "Biomarker.indicatesConditions (INDICATES, AssociationProjectionProperties)", action: keep, note: "read-only derived; each edge needs projectionOfAssertionUid of an INDICATES assertion; unbacked edges are reported by V-112 and become Assertions (W03)"}
+- {live: "Biomarker.reflectsMechanisms (REFLECTS_MECHANISM, MechanismLinkMetadata)", final: "Biomarker.reflectsMechanisms (MechanismLinkProperties)", action: keep, note: "W03 property type"}
+- {live: "Biomarker.inPathways (IN_PATHWAY, AssociationMetadata)", final: "Biomarker.inPathways (MechanismLinkProperties)", action: keep, note: "read-only pending W03 ruling (W07-SR-07)"}
+- {live: "Biomarker.expressedInOrgans (EXPRESSED_IN, AssociationMetadata)", final: "Biomarker.expressedInOrgans (MechanismLinkProperties)", action: keep, note: "read-only legacy; W03 maps Organ to AnatomicalContext"}
+- {live: "Biomarker.expressedInContexts (EXPRESSED_IN_CONTEXT, AssociationMetadata)", final: "Biomarker.expressedInContexts (MechanismLinkProperties)", action: keep, note: "read-only pending W03 ruling"}
+- {live: "Biomarker.encodedByGenes (ENCODES IN, AssociationMetadata)", final: "Biomarker.encodedByGenes (MechanismLinkProperties)", action: keep, note: "matches W03 MolecularEntity.encodesBiomarkers"}
+- {live: "Biomarker.hasReferenceRanges (HAS_REFERENCE_RANGE, AssociationMetadata)", final: "Biomarker.hasReferenceRanges (DerivedEdgeProperties)", action: keep, note: "read-only derived; V-305a lists unregenerated edges"}
+- {live: "Biomarker.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)", final: "Biomarker.supportedBy (SUPPORTED_BY_CHUNK, DerivedSupportProperties)", action: rename, note: "W20 migration relabels the edge and adds locatorUid; field name kept"}
+- {live: Metric, final: Metric, action: keep, note: "labels [Metric, Entity]"}
+- {live: Metric.metricType, final: Metric.metricKind, action: rename, note: "values normalized to MEASURAND, ALGORITHM_OUTPUT, MODEL_FEATURE, CALCULATED_QUANTITY where mappable; else kept verbatim"}
+- {live: Metric.canonicalUnit, final: Metric.canonicalUnitCode, action: merge, note: "with ucumUnit; prefer ucumUnit when both; non-UCUM text stays in description"}
+- {live: Metric.ucumUnit, final: Metric.canonicalUnitCode, action: merge, note: ""}
+- {live: Metric.loincCode, final: Metric.loincCode, action: keep, note: "normalize to ^[0-9]{1,7}-[0-9]$ before the uniqueness constraint; non-conforming values go to an Identifier with status review (V-310a); duplicates resolved before constraint creation (V-310b)"}
+- {live: null, final: "Metric.propertyKind|systemKind|scaleKind", action: derive, note: "from the LOINC record for the loincCode (O); null when no LOINC"}
+- {live: null, final: Metric.unitStatus, action: derive, note: "REPORTED when a unit was migrated; otherwise left null (unknown) until reviewed; never NOT_REPORTED by default"}
+- {live: Metric.formulaExpression, final: AlgorithmVersion, action: move, note: "kept read-only; an executable formula becomes an AlgorithmVersion (outputKind CALCULATED_QUANTITY) with REQUIRES_INPUT_METRIC; versionBasis UNKNOWN unless a source states one"}
+- {live: Metric.formulaVariables, final: AlgorithmVersion.requiresInputMetrics, action: move, note: "kept read-only"}
+- {live: Metric.mediaUrl, final: null, action: move, note: "read-only; media links move to W22"}
+- {live: Metric.mediaType, final: null, action: move, note: "read-only; W22"}
+- {live: "Metric.quantifiesBiomarkers (QUANTIFIES, AssociationMetadata)", final: "Metric.quantifiesBiomarkers (StructuralEdgeProperties)", action: keep, note: "class structural; association qualifiers dropped"}
+- {live: "Metric.reflectsMechanisms", final: "Metric.reflectsMechanisms (MechanismLinkProperties)", action: keep, note: ""}
+- {live: "Metric.measuredInOrgans (MEASURED_IN -> Organ)", final: null, action: retire, note: "type name collides with W03 MEASURED_IN (MechanismEvidenceContext -> AnatomicalContext); each edge becomes an Assertion for W03 review (Biomarker MEASURED_IN_MATRIX) and Metric.systemKind is read from LOINC; edge deleted after the assertion is written"}
+- {live: "Metric.hasReferenceRanges", final: "Metric.hasReferenceRanges (DerivedEdgeProperties)", action: keep, note: "read-only derived"}
+- {live: "Metric.supportedBy", final: "Metric.supportedBy (SUPPORTED_BY_CHUNK)", action: rename, note: "W20"}
+- {live: ReferenceRange, final: ReferenceRange, action: keep, note: "read-only legacy InformationArtifact [ReferenceRange, InformationArtifact]; artifactType 'LEGACY_REFERENCE_RANGE'; no new writes"}
+- {live: "ReferenceRange.lowerBound|upperBound|ageMinYears|ageMaxYears|fastingStatus|pregnancyStatus", final: "ReferenceRange.(same)", action: keep, note: "read-only"}
+- {live: ReferenceRange.unit, final: ReferenceRange.unit, action: keep, note: "read-only text"}
+- {live: ReferenceRange.sex, final: ReferenceRange.sex, action: keep, note: "read-only; ReferenceIntervalVersion.sexPartition for regenerated intervals"}
+- {live: "ReferenceRange.populationNotes|stratifiersText", final: "ReferenceRange.(same)", action: keep, note: "read-only; ReferenceIntervalVersion.partitionText when regenerated"}
+- {live: ReferenceRange (as authority), final: ReferenceIntervalVersion, action: split, note: "a ReferenceRange becomes a ReferenceIntervalVersion only when its AssayVersion is known from a source; otherwise it stays legacy (no assay can be invented: V-305b)"}
+- {live: LabTest, final: LabTest, action: keep, note: "labels [LabTest, Entity]; add localTestCode, issuerUid"}
+- {live: LabTest.testType, final: LabTest.testType, action: keep, note: "display"}
+- {live: "LabTest.searchText|searchFields|embeddingModel|embeddingDimensions|searchEmbedding", final: "LabTest.(same)", action: keep, note: "LabTestSearch fulltext retained"}
+- {live: "LabTest.measuresMetrics (MEASURES_METRIC, MeasurementMetadata)", final: "LabTest.measuresMetrics (MeasurementEdgeProperties)", action: keep, note: "backfill one Assertion per edge (predicate MEASURES_METRIC) and relationshipUid/assertionUid/recordedFrom/validFromBasis/validToBasis UNKNOWN; MeasurementMetadata fields copied verbatim"}
+- {live: "LabTest.measuresBiomarkers (MEASURES, MeasurementMetadata)", final: "LabTest.measuresBiomarkers (DerivedEdgeProperties)", action: derive, note: "read-only; regenerated from MEASURES_METRIC + QUANTIFIES (derivationRule 'measures-via-metric-v1'); live qualifiers copied onto the matching MEASURES_METRIC edge when a Metric resolves, else kept as an Assertion"}
+- {live: "LabTest.usesMethods (USES_METHOD, MeasurementMetadata)", final: AssayVersion.usesMethod, action: move, note: "create AssayVersion per (LabTest issuer, method, platform, specimen set) with softwareVersionStatus NOT_REPORTED, operator = issuer only when the issuer is the performing lab; PERFORMED_WITH_ASSAY_VERSION asserted with validFromBasis UNKNOWN. A LabTest -> USES_METHOD edge is deleted (USES_METHOD is AssayVersion's structural type)"}
+- {live: "LabTest.requiresSpecimens (REQUIRES_SPECIMEN)", final: AssayVersion.acceptsSpecimenTypes, action: move, note: "Labcorp and Quest accept different tube types for one LOINC; specimen acceptance is per assay"}
+- {live: "LabTest.usesPlatforms (USES_PLATFORM)", final: "AssayVersion.runsOnInstrument (ToolOrInstrument) / W08 IMPLEMENTS_PLATFORM", action: move, note: "platform class moves through the instrument (W08); TruDiagnostic runs clocks on MSA and EPIC v2"}
+- {live: PanelDefinition, final: PanelDefinition, action: keep, note: "archetype refined Entity -> VersionedState: labels [PanelDefinition, VersionedState]; stateType 'PANEL_DEFINITION'; payloadHash over issuer, panel code, versionLabel, ordered LabTest uids"}
+- {live: PanelDefinition.panelType, final: PanelDefinition.panelType, action: keep, note: "display"}
+- {live: PanelDefinition.versionLabel, final: PanelDefinition.versionLabel, action: keep, note: ""}
+- {live: null, final: "PanelDefinition.effectiveFrom|effectiveTo", action: derive, note: "null (unknown) unless a source states them"}
+- {live: "PanelDefinition.includesLabTests (INCLUDES_LABTEST, RoleMetadata)", final: "PanelDefinition.includesLabTests (StructuralEdgeProperties)", action: keep, note: "RoleMetadata dropped; ordering -> orderIndex"}
+- {live: "PanelDefinition.includesBiomarkers (INCLUDES_BIOMARKER, RoleMetadata)", final: "PanelDefinition.includesBiomarkers (DerivedEdgeProperties)", action: derive, note: "read-only; regenerated via INCLUDES_LABTEST -> MEASURES_METRIC -> QUANTIFIES"}
+- {live: MeasurementMethod, final: MeasurementMethod, action: keep, note: "labels [MeasurementMethod, Entity]"}
+- {live: MeasurementMethod.methodClass, final: MeasurementMethod.methodPrinciple, action: rename, note: ""}
+- {live: "MeasurementMethod.runsOnPlatforms (RUNS_ON_PLATFORM, MeasurementMetadata)", final: "MeasurementMethod.runsOnPlatforms (StructuralEdgeProperties)", action: keep, note: "W08 relationship type; class confirmation W07-SR-08"}
+- {live: Specimen, final: Specimen, action: keep, note: "labels [Specimen, Entity]; type only"}
+- {live: Specimen.specimenType, final: Specimen.specimenTypeCode, action: rename, note: ""}
+- {live: Specimen.collectionSetting, final: Specimen.collectionSetting, action: keep, note: ""}
+- {live: MeasurementMetadata, final: MeasurementEdgeProperties, action: split, note: "on asserted MEASURES_METRIC (LabTest, Device, Sensor) all fields kept verbatim plus AssertedEdgeProperties; on structural/derived uses the type is not carried (Observation payload edges are W16's)"}
+- {live: MeasurementMetadata.role, final: MeasurementEdgeProperties.role, action: keep, note: "verbatim"}
+- {live: MeasurementMetadata.method, final: "MeasurementEdgeProperties.method + AssayVersion.usesMethod", action: split, note: "text kept; authoritative method on AssayVersion"}
+- {live: MeasurementMetadata.methodRole, final: MeasurementEdgeProperties.methodRole, action: keep, note: ""}
+- {live: MeasurementMetadata.unit, final: MeasurementEdgeProperties.unit, action: keep, note: "reported unit text"}
+- {live: MeasurementMetadata.sampleType, final: "MeasurementEdgeProperties.sampleType + AssayVersion.acceptsSpecimenTypes", action: split, note: ""}
+- {live: "MeasurementMetadata.signalType|samplingRateHz|rangeMin|rangeMax|accuracy", final: "MeasurementEdgeProperties.(same)", action: keep, note: "device descriptors (W08 uses)"}
+- {live: MeasurementMetadata.referenceRangeText, final: "MeasurementEdgeProperties.referenceRangeText + ReferenceIntervalVersion.intervalText", action: split, note: "verbatim kept; structured interval is a node"}
+- {live: MeasurementMetadata.notes, final: MeasurementEdgeProperties.notes, action: keep, note: ""}
+- {live: MeasurementMetadata.mongoResearchRunId, final: MeasurementEdgeProperties.mongoResearchRunId, action: keep, note: ""}
+- {live: "Observation.fromLabTests (FROM_LAB_TEST, MeasurementMetadata)", final: "DiagnosticResult.producedByAssayVersion", action: move, note: "W16 owns Observation; FROM_LAB_TEST is not sufficient for comparability (W07-SR-02)"}
+- {live: "Target.comparedToRanges (COMPARED_TO_REFERENCE -> ReferenceRange)", final: "ReferenceIntervalVersion (W16 decision)", action: move, note: "W16 seam; ReferenceRange is read-only"}
+- {live: "proposed-delta union ComparableVersion", final: ComparableVersionTarget, action: rename, note: "contract B6"}
+- {live: "proposed-delta AssertedTemporalMetadata on AssayVersion payload edges", final: StructuralEdgeProperties, action: retire, note: "payload edges are structural (catalog)"}
+- {live: "proposed-delta enum ReportedStatus", final: "ReportedStatus (W00)", action: move, note: "kernel enum"}

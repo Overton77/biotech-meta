@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1684,
+   "ms": 329,
    "sample": [
     {
      "sentence": 0,
@@ -57,7 +57,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 845,
+   "ms": 129,
    "sample": [
     {
      "sentence": 0,
@@ -89,7 +89,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 220,
+   "ms": 47,
    "sample": [
     {
      "answerRecordUid": "hu:answer-record:w23-ar1",
@@ -148,7 +148,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 166,
+   "ms": 30,
    "sample": [
     {
      "answerRecordUid": "hu:answer-record:w23-ar1",
@@ -177,7 +177,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 398,
+   "ms": 166,
    "sample": [
     {
      "sentence": 0,
@@ -242,7 +242,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 302,
+   "ms": 51,
    "sample": [
     {
      "publicReproducibilityView": {

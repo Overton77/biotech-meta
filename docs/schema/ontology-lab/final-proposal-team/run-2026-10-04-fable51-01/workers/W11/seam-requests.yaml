@@ -1,0 +1,79 @@
+# W11 seam requests (run-2026-10-04-fable51-01). Fable copies these into 03-conflict-ledger.md with ledger ids.
+- id: W11-SR-01
+  targetOwner: Fable (catalog conventions; enum owner W11)
+  request: "Register ProcessKind values CHEMICAL_SYNTHESIS, FERMENTATION, BIOCATALYSIS, CULTIVATION, EXTRACTION, PURIFICATION, BLENDING, DOSAGE_FORM_MANUFACTURING, PACKAGING, OTHER, UNKNOWN as conventions.processKind (catalog 0.2.0 names ManufacturingProcess.processKind without values)."
+  cq: [CQ-MF-C04, CQ-MF-04]
+  failingCase: "Live processClass is free text; GRN 000635 route (CHEMICAL_SYNTHESIS), Cyanotech ponds (CULTIVATION) and NAI Carlsbad (BLENDING) cannot be filtered or compared without a closed set (fixtures 01-03)."
+  proposedRuling: "Accept as listed; FERMENTATION and BIOCATALYSIS flagged as uncaptured-case values kept for live migration."
+- id: W11-SR-02
+  targetOwner: Fable (catalog forbiddenImplications; V-112 implicationPairs)
+  request: "Add forbidden implications [OWNS_SPECIFICATION, PERFORMS_PROCESS], [SHARES_SPECIFICATION, SAME_MATERIAL_IDENTITY], [SPECIFICATION_VERSION_CHANGE, MATERIAL_IDENTITY_CHANGE], [INPUTS, CONTAINS] to products_and_formulations / manufacturing_readiness, and the asserted-form pairs to validation-params implicationPairs."
+  cq: [CQ-MF-01, CQ-MF-C03, CQ-MF-C05]
+  failingCase: "Niagen Bioscience owns the Niagen specification while its FY2025 10-K names W.R. Grace as single NRC supplier (spec owner is not performer); the USP NRCl monograph governs any conforming NRCl, so sharing it does not merge materials; Niagen 2015 and 2019 specification versions govern one material (fixture 03; negatives N5, V-W11-11, V-W11-13); methanol is a process input, never a product constituent."
+  proposedRuling: "Accept; validators V-W11-11 (review queue), V-W11-13, V-112 parameter extension."
+- id: W11-SR-03
+  targetOwner: W12
+  request: "Define the SpecificationCriterion -> SpecificationVersion relationship (proposed name CRITERION_OF_SPECIFICATION, structural, exactly_one) and add SpecificationCriterion.thresholdUpper (Float, for ranges) and SpecificationCriterion.limitStage (controlled RELEASE | SHELF_LIFE | IN_PROCESS | NOT_STATED). Criterion payloadHash feeds SpecificationVersion.criteriaDigest (sorted, newline-joined, sha256)."
+  cq: [CQ-MF-C02, CQ-PF-03]
+  failingCase: "GRN 000635 dossier purity 95-102 wt% (range, stage not stated) vs EFSA 2019 NRC >= 90 wt% set 'to account for the degradation ... over the course of shelf-life': without limitStage the shelf-life limit reads as a specification change; without thresholdUpper the range is lossy (fixture 03, Q-MF-C02)."
+  proposedRuling: "W12 adopts the names or supplies its own; W11 fixtures are renamed at merge. Also closes the representation half of OPEN-QUESTIONS Priority 2 quality item 2 (release vs shelf-life limits)."
+- id: W11-SR-04
+  targetOwner: W00 (conventions.predicateExclusivity)
+  request: "Add HAS_CAPABILITY_STATE {mode: EXCLUSIVE, scope: subject, partitionBy: [CAPABILITY_FOR_PROCESS target, CAPABILITY_FOR_MATERIAL target]} and GOVERNED_BY_SPECIFICATION {mode: EXCLUSIVE, scope: subject, partitionBy: [VERSION_OF_SPECIFICATION target]} (optionally + jurisdiction). Partition keys are graph paths, not edge properties; V-108 cannot evaluate them, so W11 supplies V-W11-02/02b and V-W11-07/07b."
+  cq: [CQ-MF-04, CQ-MF-C02]
+  failingCase: "Negative N10 (OPERATING episode inside the reported NAI closure Oct 2023 - May 2024) and N4 (two Niagen spec versions definitely overlapping) are invisible to V-108 because the subject has several legitimate parallel lines/specs."
+  proposedRuling: "Accept with path-based partitions, enforced by the ingestion service in the write transaction and audited by V-W11-02/07."
+- id: W11-SR-05
+  targetOwner: W02
+  request: "Insert on IngredientMaterial: governedBySpecificationVersions: [SpecificationVersion!]! @relationship(type: \"GOVERNED_BY_SPECIFICATION\", direction: OUT, properties: \"AssertedEdgeProperties\"); producedByProcesses: [ManufacturingProcess!]! @relationship(type: \"PRODUCED_BY_PROCESS\", direction: OUT, properties: \"AssertedEdgeProperties\"); capabilityStates: [ManufacturingCapability!]! @relationship(type: \"CAPABILITY_FOR_MATERIAL\", direction: IN, properties: \"StructuralEdgeProperties\"); usedAsProcessInput: [ManufacturingStep!]! @relationship(type: \"INPUTS\", direction: IN, properties: \"ProcessIoProperties\"). On ChemicalSubstance: usedAsProcessInput / producedAsProcessOutput (INPUTS/OUTPUTS IN from ManufacturingStep). Confirm D-008 retirement of live Material (no ProcessMaterial) and whether BrandedIngredientMaterial.specificationOwnerUid becomes a projection of the OWNS_SPECIFICATION assertion."
+  cq: [CQ-MF-01, CQ-MF-C02, CQ-MF-C05]
+  failingCase: "Without the OUT field the GraphQL API cannot traverse material -> specification version; specificationOwnerUid duplicates an asserted fact without provenance."
+  proposedRuling: "Fable inserts fields at merge; W02 rules on specificationOwnerUid."
+- id: W11-SR-06
+  targetOwner: W01
+  request: "Field slots (W01-SR-20 pattern) on Organization: performsProcesses: [ManufacturingProcess!]! @relationship(type: \"PERFORMS_PROCESS\", direction: OUT, properties: \"AssertedEdgeProperties\"); capabilityStates: [ManufacturingCapability!]! @relationship(type: \"HAS_CAPABILITY_STATE\", direction: OUT, properties: \"AssertedEdgeProperties\"). On Facility: hostsProcesses: [ManufacturingProcess!]! @relationship(type: \"HOSTS_PROCESS\", direction: OUT, properties: \"AssertedEdgeProperties\"); capabilityStates: [ManufacturingCapability!]! @relationship(type: \"HAS_CAPABILITY_STATE\", direction: OUT, properties: \"AssertedEdgeProperties\")."
+  cq: [CQ-MF-01, CQ-MF-04]
+  failingCase: "Live Organization.performsProcesses and PhysicalLocation.hostsProcesses exist (live lines 566, 649); dropping them breaks API compatibility."
+  proposedRuling: "Fable inserts at merge."
+- id: W11-SR-07
+  targetOwner: W01
+  request: "Deprecate LocationType values GMP_FACILITY and PILOT_PLANT for Facility.facilityKind; migrate to MANUFACTURING_SITE plus a PROPOSED CLAIMS_CGMP_COMPLIANCE assertion (GMP) or a ManufacturingCapability{stage: PILOTING} assertion (pilot)."
+  cq: [CQ-MF-06, CQ-MF-04]
+  failingCase: "A facility kind GMP_FACILITY asserts compliance with no asserter, period or certifier (forbidden CLAIMS_CGMP_COMPLIANCE -> CGMP_COMPLIANT); PILOT_PLANT is a stage that changes over time (live-schema-alignment round 0005 PhysicalLocation row)."
+  proposedRuling: "Accept; keep values readable as DEPRECATED for one release if removal breaks clients."
+- id: W11-SR-08
+  targetOwner: W00
+  request: "Register uid type tokens: ManufacturingSpecification: specification; SpecificationVersion: specification-version; ManufacturingProcess: process; ManufacturingStep: process-step; ManufacturingCapability: capability (promote the existing fixture token). W12 needs specification-criterion (used provisionally in fixture 03)."
+  cq: [CQ-MF-C02, CQ-MF-04]
+  failingCase: "INV-106/V-117 cannot check W11 uids; fixtures 01-03 use these tokens."
+  proposedRuling: "Accept."
+- id: W11-SR-09
+  targetOwner: W00 / W01 (assertedPredicates)
+  request: "Register candidate predicates CLAIMS_THIRD_PARTY_CERTIFICATION (organizations; subject Organization|Facility; literal valueString; never projects to COVERS or CERTIFIED_UNDER) and SPECIFICATION_EFFECTIVE_FROM (products_and_formulations; subject SpecificationVersion; literal; provenance for an announced effective date)."
+  cq: [CQ-MF-06, CQ-MF-C02]
+  failingCase: "NAI FY2025 10-K: Carlsbad 'third-party GMP certified ... as of November 2024' with no certifier listing captured; Niagen press release: USP monograph 'expected to be codified and enforced in October 2026' (fixture 03-04; both kept PROPOSED)."
+  proposedRuling: "Register both, or rule an existing predicate (CHARACTERIZES_* family) as the carrier."
+- id: W11-SR-10
+  targetOwner: W13
+  request: "Support the candidate RegulatoryInspection occurrence (inspection end date, classification NAI/VAI/OAI, Form 483 issued, follow-up action) with this failing case."
+  cq: [CQ-MF-06]
+  failingCase: "FDA Registered Outsourcing Facilities list (as of 9/30/2026): Navinta III 'Not yet inspected' vs MedisourceRx 'Last Inspection 6/10/2025 | Form 483 Issued: Yes | Warning Letter Issued 12/12/2025, Closeout Issued 7/27/2026': registration, inspection and enforcement are three different records; the current model can hold only the registration status."
+  proposedRuling: "W13 decides; W11 needs only that inspection never derive from CLAIMS_CGMP_COMPLIANCE (V-W11-06)."
+- id: W11-SR-11
+  targetOwner: Fable (catalog validation) with W00/W19 (SourceKind guidance)
+  request: "Replace V-324 by V-324r (allowlist SECURITIES_FILING, REGULATORY_RECORD, AUDIT_REPORT, CERTIFICATION_LISTING, LEGAL_RECORD + current SUPPORTED SUPPORT adjudication); state in SourceKind guidance that a press release furnished as an 8-K exhibit is typed PRESS_RELEASE."
+  cq: [CQ-MF-04, CQ-MF-05]
+  failingCase: "V-324 denylist lets ORGANIZATION_WEBPAGE, SELF_DISCLOSURE_PAGE, MANUFACTURER_LABEL_PAGE or MARKETPLACE_LISTING authorize OPERATING."
+  proposedRuling: "Accept V-324r; keep V-324 id for continuity."
+- id: W11-SR-12
+  targetOwner: Fable (validation-params.json)
+  request: "Add PERFORMS_PROCESS, HOSTS_PROCESS, INPUTS, OUTPUTS to assertedTypes; add HAS_CAPABILITY_STATE and GOVERNED_BY_SPECIFICATION to the V-504/V-505 relationship lists (or adopt V-W11-01)."
+  cq: [CQ-MF-01, CQ-MF-04]
+  failingCase: "Negative N2 (an OPERATING edge authorized by the PLANNED assertion with a different object and valid time) is not detected by V-504/V-505, which list only HAS_STATE-family types; V-W11-01 detects it."
+  proposedRuling: "Accept."
+- id: W11-SR-13
+  targetOwner: W12
+  request: "Receive live Material.traceabilityCode as ProductLot.lotCode or an Identifier on a material lot; confirm MANUFACTURED_UNDER -> SpecificationVersion semantics (lot released against a version)."
+  cq: [CQ-PF-03]
+  failingCase: "EFSA 2019 Table 1 lots 40C910-16214-81 ... 40C910-17205-21 analysed against the proposed specification; traceability codes have no home after Material retires."
+  proposedRuling: "W12 accepts."

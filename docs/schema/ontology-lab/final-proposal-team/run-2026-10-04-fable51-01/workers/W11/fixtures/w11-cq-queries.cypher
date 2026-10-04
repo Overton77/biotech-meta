@@ -10,7 +10,7 @@ OPTIONAL MATCH (c)-[:CAPABILITY_FOR_PROCESS]->(p:ManufacturingProcess)
 OPTIONAL MATCH (a:Assertion {uid: h.assertionUid})-[:SUPPORTED_BY]->(:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot)<-[:HAS_SNAPSHOT]-(s:Source)
 RETURN c.stage AS stage, toString(h.validFrom) AS validFrom, h.validFromPrecision AS fromPrecision, toString(h.validTo) AS validTo,
        p.processKind AS processKind, collect(DISTINCT s.sourceKind) AS sourceKinds
-ORDER BY h.validFrom;
+ORDER BY validFrom;
 
 // Q-MF04-b (CQ-MF-04, bitemporal): stage at valid time 2023-12-01 as currently recorded.
 // status: run

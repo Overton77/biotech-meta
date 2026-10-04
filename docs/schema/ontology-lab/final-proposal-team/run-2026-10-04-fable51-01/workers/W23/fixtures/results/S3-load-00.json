@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 118,
+   "ms": 154,
    "sample": [],
    "header": "// W23 fixture 00: shared-graph base (POSITIVE). Run W23, worker W23 (Opus 5.5), 2026-10-04.\n// SYNTHETIC_FIXTURE: every product, label text, policy and answer here is synthetic; example.invalid URIs only.\n// Shared graph only: no private-personal node, property, relationship or hu:private- value (c"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 59,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 25,
    "sample": [],
    "header": ""
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 33,
+   "ms": 29,
    "sample": [],
    "header": ""
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 32,
+   "ms": 113,
    "sample": [],
    "header": "// ---- provenance: source, immutable snapshots, reproducible TEXT_QUOTE locators ----"
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 32,
+   "ms": 6,
    "sample": [],
    "header": ""
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 73,
+   "ms": 42,
    "sample": [],
    "header": ""
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 76,
+   "ms": 26,
    "sample": [],
    "header": ""
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 29,
+   "ms": 112,
    "sample": [],
    "header": "// ---- assertions (content immutable; recordedTo written once on supersession) ----"
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 36,
+   "ms": 75,
    "sample": [],
    "header": ""
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 24,
+   "ms": 59,
    "sample": [],
    "header": ""
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 29,
+   "ms": 47,
    "sample": [],
    "header": ""
   },
@@ -311,7 +311,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1558,
+   "ms": 38,
    "sample": [],
    "header": "// asserted attachment episodes (asserted_edge profile; one relationship per recorded-time episode)"
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 171,
+   "ms": 35,
    "sample": [],
    "header": ""
   },
@@ -355,7 +355,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 301,
+   "ms": 58,
    "sample": [],
    "header": "// ---- capture-fidelity adjudications (immutable; PUBLIC: verdict, kind and reviewedAt enter the public trace) ----"
   },
@@ -377,7 +377,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 68,
+   "ms": 36,
    "sample": [],
    "header": "// ---- INTERNAL policy layer (shared graph, excluded from PUBLIC_ANSWER) ----"
   },
@@ -399,7 +399,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 70,
+   "ms": 21,
    "sample": [],
    "header": ""
   },
@@ -421,7 +421,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 189,
+   "ms": 44,
    "sample": [],
    "header": ""
   },
@@ -443,7 +443,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 73,
+   "ms": 51,
    "sample": [],
    "header": "// ---- answer composition lineage (provenance states 4 and 5) ----"
   },
@@ -465,7 +465,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 503,
+   "ms": 133,
    "sample": [],
    "header": ""
   },
@@ -487,7 +487,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 364,
+   "ms": 136,
    "sample": [],
    "header": "// ---- published answers (INTERNAL nodes; PUBLIC_ANSWER exposes the reproducibility allow-list only) ----"
   },
@@ -509,7 +509,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 185,
+   "ms": 34,
    "sample": [],
    "header": ""
   }

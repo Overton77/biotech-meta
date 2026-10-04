@@ -1,0 +1,31 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+ "total": 12,
+ "ok": 12,
+ "failed": 0,
+ "rowsByStatement": [
+  {
+   "n": 6,
+   "id": "V-115",
+   "title": "V-W23-04: no shared index (range, text, point, lookup, fulltext or vector) covers a pri",
+   "status": "ok",
+   "rows": 1,
+   "error": null,
+   "sample": [
+    {
+     "violation": "INDEX_COVERS_PRIVATE_LABEL_OR_PROPERTY",
+     "indexName": "w23_leak_goal_search",
+     "indexType": "FULLTEXT",
+     "labelsOrTypes": [
+      "UserGoalVersion",
+      "Product"
+     ],
+     "properties": [
+      "goalStatement",
+      "name"
+     ]
+    }
+   ]
+  }
+ ]
+}

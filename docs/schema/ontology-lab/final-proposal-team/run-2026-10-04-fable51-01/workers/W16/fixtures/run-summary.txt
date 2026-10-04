@@ -1,0 +1,154 @@
+W16 fixture execution log: embedded Neo4j 5.26.31 Community (org.neo4j.test:neo4j-harness), harness run-cypher.mjs, 2026-10-04.
+Each fixture loaded into an emptied database, then 00-w16-validators.cypher. Rows shown are the driver's sample (first 5 rows max).
+
+======== 01-edition-diff-by-stepkey statements 51/51 ok
+  Q-W16-01 (CQ-PR-01): step-level diff of two editions by stepKey and payloadHash, with change provenance and (rows=5)
+     {"stepKey": "aspirate-plasma-half", "changeKind": "MODIFIED", "oldOrder": 2, "newOrder": 3, "reordered": true, "changeProvenance": "SOURCE_VERSIONED", "oldLabel": "V.1", "newLabel": "V.2"}
+     {"stepKey": "centrifuge-cpt-tube", "changeKind": "MODIFIED", "oldOrder": 1, "newOrder": 2, "reordered": true, "changeProvenance": "SOURCE_VERSIONED", "oldLabel": "V.1", "newLabel": "V.2"}
+     {"stepKey": "collect-cells", "changeKind": "MODIFIED", "oldOrder": 3, "newOrder": 4, "reordered": true, "changeProvenance": "SOURCE_VERSIONED", "oldLabel": "V.1", "newLabel": "V.2"}
+     {"stepKey": "mix-by-inversion", "changeKind": "ADDED_OR_NOT_CAPTURED", "oldOrder": null, "newOrder": 1, "reordered": false, "changeProvenance": "SOURCE_VERSIONED", "oldLabel": "V.1", "newLabel": "V.2"}
+     {"stepKey": "spin-down-collected", "changeKind": "ADDED_OR_NOT_CAPTURED", "oldOrder": null, "newOrder": 5, "reordered": false, "changeProvenance": "SOURCE_VERSIONED", "oldLabel": "V.1", "newLabel": "V.2"}
+  validators with rows: none
+======== 02-source-change-same-identity statements 75/75 ok
+  Q-W16-02a: the enduring identity is one Protocol node with two editions; the protocol uid and its propertie (rows=1)
+     {"protocolUid": "hu:protocol:blueprint-bryan-johnson", "editions": 2, "provenances": ["SNAPSHOT_DIFF", "SNAPSHOT_DIFF"]}
+  Q-W16-02b (CQ-PR-01): dose changes for the same stepKey across the two observed editions (declared dose, ba (rows=3)
+     {"stepKey": "acarbose-daily", "sameStepNode": false, "oldQty": 200, "oldBasis": "PER_DAY", "newQty": 200, "newBasis": "PER_DOSE", "newPerDay": 2, "oldText": "Acarbose 200 mg daily", "newText": "Acarbose 200 mg (Rx) (twice daily); Acarbose 400 mg daily"}
+     {"stepKey": "creatine-pre-workout", "sameStepNode": false, "oldQty": 2.5, "oldBasis": "PER_DOSE", "newQty": 5, "newBasis": "PER_DOSE", "newPerDay": null, "oldText": "Creatine 2.5 g (Longevity Mix has 2.5 g for 5 g total)", "newText": "Creatine 5 g (Longevity Mix has 2.5 g for 7.5 g total)"}
+     {"stepKey": "tadalafil-daily", "sameStepNode": false, "oldQty": 2.5, "oldBasis": "PER_DAY", "newQty": 5, "newBasis": "PER_DAY", "newPerDay": null, "oldText": "Tadalafil 2.5 mg daily", "newText": "Tadalafil 5 mg daily"}
+  Q-W16-02c (CQ-PR-01): change-provenance labelled history: editions plus third-party assertions; unobserved  (rows=4)
+     {"item": "hu:protocol-edition:blueprint-observed-2026-01-24", "provenance": "SNAPSHOT_DIFF", "observedAt": {"year": 2026, "month": 1, "day": 24, "hour": 5, "minute": 28, "second": 36, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "validFrom": {"year": 2026, "month": 1, "day": 23, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "validFromBasis": "PUBLICATION_PROXY", "validTo": null, "validToBasis": "UNKNOWN"}
+     {"item": "hu:protocol-edition:blueprint-observed-2026-10-04", "provenance": "SNAPSHOT_DIFF", "observedAt": {"year": 2026, "month": 10, "day": 4, "hour": 0, "minute": 56, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "validFrom": null, "validFromBasis": "OBSERVATION_ONLY", "validTo": null, "validToBasis": "UNKNOWN"}
+     {"item": "hu:assertion:nadcom-nmn-six-days-a-week", "provenance": "THIRD_PARTY_REPORTED", "observedAt": null, "validFrom": null, "validFromBasis": "UNKNOWN", "validTo": null, "validToBasis": "UNKNOWN"}
+     {"item": "hu:assertion:nadcom-rapamycin-stopped-2024", "provenance": "THIRD_PARTY_REPORTED", "observedAt": null, "validFrom": null, "validFromBasis": "UNKNOWN", "validTo": {"year": 2024, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "validToBasis": "STATED_BY_SOURCE"}
+  validators with rows: [('V-509 (in', 1), ('V-530p: a', 1)]
+     V-509 (in {"subjectUid": "hu:protocol:blueprint-bryan-johnson", "relType": "HAS_PROTOCOL_EDITION", "state1": "hu:protocol-edition:blueprint-observed-2026-01-24", "state2": "hu:protocol-edition:blueprint-observed-2026-10-04", "action": "POSSIBLE_OVERLAP_REVIEW"}
+     V-530p: a {"violation": "EDITION_FROM_THIRD_PARTY_REPORT", "item": "hu:protocol-edition:blueprint-neg-from-nadcom-report", "detail": null}
+======== 03-repeated-step-plus-prerequisite statements 44/44 ok
+  Q-W16-03 (CQ-PR-02): repeated steps with their repetition structure and prerequisites (kind, lag) in one ed (rows=4)
+     {"stepKey": "baseline-tests-when-starting", "rec": "1.10.14", "pattern": "ONE_TIME", "cadMin": null, "cadMax": null, "unit": null, "repeatUntil": null, "courseDaysMin": null, "prereqs": []}
+     {"stepKey": "start-lithium", "rec": "1.10.14", "pattern": "ONE_TIME", "cadMin": null, "cadMax": null, "unit": null, "repeatUntil": null, "courseDaysMin": null, "prereqs": [{"lag": null, "kind": "REQUIRES_RESULT_OF", "on": "baseline-tests-when-starting"}]}
+     {"stepKey": "plasma-lithium-titration-checks", "rec": "1.10.15", "pattern": "EVENT_DRIVEN", "cadMin": 1, "cadMax": 1, "unit": "WEEK", "repeatUntil": "weekly until the levels are stable", "courseDaysMin": null, "prereqs": [{"lag": "1..1 WEEK", "kind": "REQUIRES_PRIOR_COMPLETION", "on": "start-lithium"}]}
+     {"stepKey": "plasma-lithium-year1", "rec": "1.10.19", "pattern": "RECURRING", "cadMin": 3, "cadMax": 3, "unit": "MONTH", "repeatUntil": null, "courseDaysMin": 365, "prereqs": [{"lag": null, "kind": "REQUIRES_PRIOR_COMPLETION", "on": "start-lithium"}]}
+  Q-W16-03b: HBOT repetition fields. (rows=1)
+     {"stepKey": "hbot-course", "total": 60, "perPeriod": 5, "period": "WEEK", "minutes": 90, "instrument": "HPO Tech hard shell hyperbaric chamber"}
+  validators with rows: [('V-527p: a', 1), ('V-528p: o', 1)]
+     V-527p: a {"violation": "SELF_DEPENDENCY", "item": "hu:protocol-edition:nice-cg185-neg-loop", "detail": "plasma-lithium-loop -> plasma-lithium-loop"}
+     V-528p: o {"violation": "ORDERING_CYCLE", "item": "hu:protocol-edition:nice-cg185-neg-loop", "detail": "plasma-lithium-loop"}
+======== 04-conditional-branch-missing-condition statements 71/71 ok
+  Q-W16-04a (CQ-PR-02): conditional steps with their CNF condition structure (group, negation, kind, threshol (rows=14)
+     {"stepKey": "full-body-mri-annual", "role": "APPLIES_WHEN", "orGroup": "g1", "negated": false, "kind": "POPULATION", "cmp": "GT", "threshold": 40, "unit": "a"}
+     {"stepKey": "full-body-mri-annual", "role": "APPLIES_WHEN", "orGroup": "g1", "negated": false, "kind": "CONDITION_PRESENT", "cmp": null, "threshold": null, "unit": null}
+     {"stepKey": "plasma-lithium-after-year1-intensive", "role": "APPLIES_WHEN", "orGroup": "any-risk-group", "negated": false, "kind": "CO_INTERVENTION", "cmp": null, "threshold": null, "unit": null}
+     {"stepKey": "plasma-lithium-after-year1-intensive", "role": "APPLIES_WHEN", "orGroup": "any-risk-group", "negated": false, "kind": "MEASUREMENT_THRESHOLD", "cmp": "GTE", "threshold": 0.8, "unit": "mmol/L"}
+     {"stepKey": "plasma-lithium-after-year1-intensive", "role": "APPLIES_WHEN", "orGroup": "any-risk-group", "negated": false, "kind": "POPULATION", "cmp": null, "threshold": null, "unit": null}
+  Q-W16-04b: three-valued evaluation of the NICE branches against a HYPOTHETICAL non-personal fact set (in pr (rows=2)
+     {"stepKey": "plasma-lithium-after-year1-intensive", "applicability": "APPLIES", "missingFactConstraintUids": []}
+     {"stepKey": "plasma-lithium-after-year1-standard", "applicability": "DOES_NOT_APPLY", "missingFactConstraintUids": []}
+  Q-W16-04c: Case 2: four groups known false, 'older people' and 'poor adherence' not declared -> both branch (rows=2)
+     {"stepKey": "plasma-lithium-after-year1-intensive", "applicability": "UNKNOWN_MISSING_FACT", "missingFactConstraintUids": ["hu:constraint:nice-cg185-poor-adherence", "hu:constraint:nice-cg185-older-people"]}
+     {"stepKey": "plasma-lithium-after-year1-standard", "applicability": "UNKNOWN_MISSING_FACT", "missingFactConstraintUids": ["hu:constraint:nice-cg185-poor-adherence", "hu:constraint:nice-cg185-older-people"]}
+  Q-W16-04d: Blueprint MRI disjunction with only 'family history' known true -> APPLIES although age is unkno (rows=1)
+     {"stepKey": "full-body-mri-annual", "applicability": "APPLIES", "missingFactConstraintUids": ["hu:constraint:blueprint-age-over-40"]}
+  Q-W16-04e (CQ-PR-03, shared part): facts a person would have to declare before conditional steps of an edit (rows=6)
+     {"constraintUid": "hu:constraint:nice-cg185-interacting-drugs", "kind": "CO_INTERVENTION", "gatesSteps": ["plasma-lithium-after-year1-standard", "plasma-lithium-after-year1-intensive"], "resolvableVia": null, "factForm": "TEXT_ONLY_FACT"}
+     {"constraintUid": "hu:constraint:nice-cg185-last-level-gte-0.8", "kind": "MEASUREMENT_THRESHOLD", "gatesSteps": ["plasma-lithium-after-year1-standard", "plasma-lithium-after-year1-intensive"], "resolvableVia": "hu:metric:plasma-lithium-substance-concentration", "factForm": "STRUCTURED_FACT"}
+     {"constraintUid": "hu:constraint:nice-cg185-older-people", "kind": "POPULATION", "gatesSteps": ["plasma-lithium-after-year1-standard", "plasma-lithium-after-year1-intensive"], "resolvableVia": null, "factForm": "TEXT_ONLY_FACT"}
+     {"constraintUid": "hu:constraint:nice-cg185-poor-adherence", "kind": "POPULATION", "gatesSteps": ["plasma-lithium-after-year1-standard", "plasma-lithium-after-year1-intensive"], "resolvableVia": null, "factForm": "TEXT_ONLY_FACT"}
+     {"constraintUid": "hu:constraint:nice-cg185-poor-symptom-control", "kind": "CONDITION_PRESENT", "gatesSteps": ["plasma-lithium-after-year1-standard", "plasma-lithium-after-year1-intensive"], "resolvableVia": null, "factForm": "TEXT_ONLY_FACT"}
+  validators with rows: [('V-525p: s', 1)]
+     V-525p: s {"violation": "CONDITIONAL_STEP_WITHOUT_CONDITION", "item": "hu:protocol-step:blueprint-neg-mole-check-annual-v1", "detail": "mole-check-annual"}
+======== 05-parallel-steps-concurrent statements 32/32 ok
+  Q-W16-05a: parallel groups (CONCURRENT_WITH, symmetric) and sequence (ordering kinds) for one edition. (rows=2)
+     {"step": "groin-ice-pack-during-sauna", "kind": "CONCURRENT_WITH", "other": "dry-sauna-daily", "structure": "PARALLEL"}
+     {"step": "rehydrate-after-sauna", "kind": "REQUIRES_PRIOR_COMPLETION", "other": "dry-sauna-daily", "structure": "SEQUENTIAL"}
+  Q-W16-05b: what the source RECOMMENDS to readers vs what the author REPORTS doing (a practice report is not (rows=2)
+     {"stepKey": "sauna-reader-guidance", "speechAct": "RECOMMENDS", "perWeekMin": 3, "perWeekMax": 5, "minMin": 15, "minMax": 20}
+     {"stepKey": "dry-sauna-daily", "speechAct": "REPORTS_PRACTICE", "perWeekMin": 7, "perWeekMax": 7, "minMin": 20, "minMax": 20}
+  Q-W16-05c (CQ-RC-06 shared part): contraindication constraint uids that would BLOCK the sauna steps (any on (rows=2)
+     {"stepKey": "dry-sauna-daily", "orGroup": "avoid-if-any", "blockingConstraintUids": ["hu:constraint:blueprint-sauna-beta-blockers", "hu:constraint:blueprint-sauna-pregnant", "hu:constraint:blueprint-sauna-serious-heart-issues"]}
+     {"stepKey": "sauna-reader-guidance", "orGroup": "avoid-if-any", "blockingConstraintUids": ["hu:constraint:blueprint-sauna-beta-blockers", "hu:constraint:blueprint-sauna-pregnant", "hu:constraint:blueprint-sauna-serious-heart-issues"]}
+  validators with rows: [('V-531p: d', 2)]
+     V-531p: d {"violation": "EXCLUSIVE_AND_CONCURRENT_WITH", "item": "hu:protocol-step:blueprint-neg-shockwave-v1", "detail": "red-light"}
+     V-531p: d {"violation": "EXCLUSIVE_AND_CONCURRENT_WITH", "item": "hu:protocol-step:blueprint-neg-red-light-v1", "detail": "shockwave"}
+======== 06-optional-step-no-nonadherence statements 33/33 ok
+  Q-W16-06a: what the public template requires; an omitted OPTIONAL step is consistent with the template (no  (rows=2)
+     {"stepKey": "fixed-bedtime", "level": "ESSENTIAL", "basis": "STATED_BY_SOURCE", "templateReading": "TEMPLATE_REQUIRES"}
+     {"stepKey": "screen-free-hour", "level": "OPTIONAL", "basis": "STATED_BY_SOURCE", "templateReading": "OMISSION_CONSISTENT_WITH_TEMPLATE"}
+  Q-W16-06b: does the shared graph hold anyone's adherence for this edition? Expected: no adherence records;  (rows=2)
+     {"stepKey": "fixed-bedtime", "publicPracticeReports": 0, "adherence": "ADHERENCE_NOT_IN_SHARED_GRAPH"}
+     {"stepKey": "screen-free-hour", "publicPracticeReports": 1, "adherence": "ADHERENCE_NOT_IN_SHARED_GRAPH"}
+  validators with rows: [('V-534p: n', 2)]
+     V-534p: n {"violation": "EXECUTION_DATA_ON_PUBLIC_PROTOCOL", "item": "hu:protocol-step:synthetic-wind-down-neg-screen-free-hour-v1", "detail": ["adherence", "omittedByUser"]}
+     V-534p: n {"violation": "EXECUTION_EDGE_ON_PUBLIC_PROTOCOL", "item": "hu:protocol-step:synthetic-wind-down-screen-free-hour-v1", "detail": "OMITTED_STEP"}
+======== 07-public-vs-private-leak-probe statements 31/31 ok
+  Q-W16-07a (QS-6a defence in depth): 2-hop traversal from the public edition never returns a private node ev (rows=1)
+     {"reachableNodes": 8, "reachesPrivate": false}
+  Q-W16-07b (CQ-AX-22 shared part): which public edition did a public result/observation use; the private sto (rows=1)
+     {"observationUid": "hu:observation:blueprint-hscrp-after-hbot", "editionUid": "hu:protocol-edition:blueprint-observed-2026-10-04", "attribution": "hu:assertion:bj-records-hscrp-observation", "sameEditionAsQueried": true}
+  validators with rows: [('V-113', 1), ('V-520: no', 2), ('V-521: no', 3), ('V-524: sh', 1), ('V-532p: e', 1), ('V-534p: n', 1)]
+     V-113 {"sharedLabels": ["ProtocolEdition", "VersionedState"], "sharedUid": "hu:protocol-edition:blueprint-observed-2026-10-04", "relType": "ADOPTED_IN_PRIVATE", "privateUid": "hu:private-protocol-in-use:leak-probe-1"}
+     V-520: no {"labels": ["Entity", "ProtocolInUse"], "privateNodeInSharedGraph": "hu:private-protocol-in-use:leak-probe-1"}
+     V-520: no {"labels": ["InformationArtifact", "Observation", "PersonalMeasurement"], "privateNodeInSharedGraph": "hu:private-personal-measurement:leak-probe-2"}
+     V-521: no {"kind": "NODE", "item": "hu:protocol-step:blueprint-hbot-course-v1"}
+     V-521: no {"kind": "NODE", "item": "hu:private-protocol-in-use:leak-probe-1"}
+     V-521: no {"kind": "NODE", "item": "hu:private-personal-measurement:leak-probe-2"}
+     V-524: sh {"violation": "OBSERVATION_PERSONAL_MEASUREMENT_COLLAPSE", "item": "hu:private-personal-measurement:leak-probe-2"}
+     V-532p: e {"violation": "UNATTRIBUTED_OBSERVATION", "item": "hu:private-personal-measurement:leak-probe-2", "detail": null}
+     V-534p: n {"violation": "EXECUTION_DATA_ON_PUBLIC_PROTOCOL", "item": "hu:protocol-step:blueprint-hbot-course-v1", "detail": ["lastDeviationUid"]}
+======== 08-device-assay-formulation-version-change statements 74/74 ok
+  Q-W16-08a: material binding of a step: PINNED when USES targets a FormulationVersion; otherwise the formula (rows=3)
+     {"edition": "hu:protocol-edition:blueprint-observed-2026-01-24", "usesLabel": "ProductVariant", "observedAt": {"year": 2026, "month": 1, "day": 24, "hour": 5, "minute": 28, "second": 36, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "binding": "RESOLVED_AS_OF", "formulationUid": "hu:formulation:longevity-mix-blood-orange-synthetic-f1"}
+     {"edition": "hu:protocol-edition:blueprint-observed-2026-10-04", "usesLabel": "ProductVariant", "observedAt": {"year": 2026, "month": 10, "day": 4, "hour": 0, "minute": 56, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "binding": "RESOLVED_AS_OF", "formulationUid": "hu:formulation:longevity-mix-blood-orange-synthetic-f2"}
+     {"edition": "hu:protocol-edition:blueprint-synthetic-pinned", "usesLabel": "FormulationVersion", "observedAt": null, "binding": "PINNED", "formulationUid": "hu:formulation:longevity-mix-blood-orange-synthetic-f1"}
+  Q-W16-08b: instrument change shows up as a MODIFIED step (new payloadHash, same stepKey) in the edition dif (rows=3)
+     {"stepKey": "hbot-course", "changeKind": "MODIFIED", "oldOrder": 2, "newOrder": 2, "reordered": false, "changeProvenance": "SNAPSHOT_DIFF", "oldLabel": null, "newLabel": null}
+     {"stepKey": "longevity-mix-pre-workout", "changeKind": "UNCHANGED", "oldOrder": 1, "newOrder": 1, "reordered": false, "changeProvenance": "SNAPSHOT_DIFF", "oldLabel": null, "newLabel": null}
+     {"stepKey": "routine-blood-draw", "changeKind": "UNCHANGED", "oldOrder": 3, "newOrder": 3, "reordered": false, "changeProvenance": "SNAPSHOT_DIFF", "oldLabel": null, "newLabel": null}
+  Q-W16-08c (INV-301 via W07 contract): can the two public hsCRP observations be compared on one axis? (rows=1)
+     {"sameAssayVersion": false, "comparabilityAssessed": false, "comparability": "NOT_ESTABLISHED"}
+  validators with rows: [('V-509 (in', 1)]
+     V-509 (in {"subjectUid": "hu:protocol:blueprint-bryan-johnson", "relType": "HAS_PROTOCOL_EDITION", "state1": "hu:protocol-edition:blueprint-observed-2026-10-04", "state2": "hu:protocol-edition:blueprint-observed-2026-01-24", "action": "POSSIBLE_OVERLAP_REVIEW"}
+======== 09-assertion-backed-role-evidence statements 65/65 ok
+  Q-W16-09a (CQ-PR-06): evidence per step versus the protocol as a whole. (rows=3)
+     {"level": "STEP", "item": "sauna-weekly", "citedEvidence": [], "reading": "NO_STEP_EVIDENCE_CITED"}
+     {"level": "STEP", "item": "fmd-5-day-monthly", "citedEvidence": ["hu:publication:pmid-28202779"], "reading": "STEP_EVIDENCE_CITED_NOT_ASSESSED_FOR_APPLICABILITY"}
+     {"level": "PROTOCOL", "item": "hu:protocol-edition:synthetic-combined-longevity-stack-e1", "citedEvidence": [], "reading": "NO_PROTOCOL_LEVEL_EVIDENCE"}
+  Q-W16-09b: role attribution for steps and edition with asserter and locator. (rows=2)
+     {"predicate": "AUTHORED_PROTOCOL_EDITION", "subject": "hu:protocol-edition:nice-cg185-lithium-2025-09-02", "roleOrAgent": "hu:org:nice", "asserter": "hu:org:nice", "locator": "hu:locator:nice-cg185-using-lithium"}
+     {"predicate": "REQUIRES_PERFORMER_ROLE", "subject": "start-lithium", "roleOrAgent": "prescriber with a shared-care arrangement with the person's GP", "asserter": "hu:org:nice", "locator": "hu:locator:nice-cg185-using-lithium"}
+  validators with rows: [('V-538p: c', 1)]
+     V-538p: c {"violation": "COMPONENT_EVIDENCE_TRANSFERRED_TO_PROTOCOL", "item": "hu:assertion:neg-combined-stack-effective", "detail": "hu:protocol-edition:synthetic-combined-longevity-stack-e1"}
+======== 10-cadence-range-3-to-6-months statements 16/16 ok
+  Q-W16-10a: the cadence as stored: both bounds, unit and verbatim text. (rows=1)
+     {"stepKey": "routine-blood-draw", "minMonths": 3, "maxMonths": 6, "unit": "MONTH", "minDays": 90, "maxDays": 183, "text": "Blood draw, every 3 to 6 months"}
+  Q-W16-10b: due window after a given public draw date (literal 2026-01-15): earliest/latest, never a single  (rows=1)
+     {"lastDraw": {"year": 2026, "month": 1, "day": 15}, "windowOpens": {"year": 2026, "month": 4, "day": 15}, "windowCloses": {"year": 2026, "month": 7, "day": 17}, "statusOn20260601": "WITHIN_WINDOW"}
+  validators with rows: [('V-529p: b', 1), ('V-529b (i', 2)]
+     V-529p: b {"violation": "RANGE_INVERTED", "item": "hu:measurement-plan:neg-inverted", "detail": "cadenceMinDays > cadenceMaxDays"}
+     V-529b (i {"finding": "POSSIBLE_RANGE_COLLAPSE", "item": "hu:protocol-step:blueprint-neg-routine-blood-draw-v1", "detail": "Blood draw, every 3 to 6 months"}
+     V-529b (i {"finding": "POSSIBLE_RANGE_COLLAPSE", "item": "hu:measurement-plan:neg-collapsed", "detail": "every 3 to 6 months"}
+======== 11-wait-for-lab-result statements 47/47 ok
+  Q-W16-11a (CQ-PR-02/CQ-PR-03): for each step, the results it must wait for and the metrics those results me (rows=2)
+     {"waitingStep": "lithium-dose-adjustment", "waitsForResultOf": "plasma-lithium-titration-checks", "basis": "EDITORIAL_INFERENCE", "gatingMetrics": ["hu:metric:plasma-lithium-substance-concentration"]}
+     {"waitingStep": "start-lithium", "waitsForResultOf": "baseline-tests-when-starting", "basis": "EDITORIAL_INFERENCE", "gatingMetrics": []}
+  Q-W16-11b (CQ-PR-04): review rules of the edition, what triggers them, which steps they modify; public trig (rows=1)
+     {"rule": "hu:protocol-rule:nice-cg185-egfr-falling", "triggerKind": "TREND", "action": "REVIEW", "basis": "STATED_BY_SOURCE", "metrics": ["hu:metric:egfr"], "modifies": ["plasma-lithium-year1"]}
+  validators with rows: [('V-531p: d', 1), ('V-533p: r', 1)]
+     V-531p: d {"violation": "RESULT_DEPENDENCY_ON_NON_RESULT_STEP", "item": "hu:protocol-step:neg-after-capsule-v1", "detail": "take-capsule"}
+     V-533p: r {"violation": "RULE_BASIS_PRIVACY_MISMATCH", "item": "hu:protocol-rule:neg-policy-rule-public", "detail": "BELLLABS_SAFETY_POLICY"}
+======== 12-mutually-exclusive-steps statements 25/25 ok
+  Q-W16-12: alternative sets in an edition (connected components over MUTUALLY_EXCLUSIVE_WITH), with each alt (rows=2)
+     {"alternativeA": "hbot-session-9am", "alternativeB": "ihht-session-9am", "a": "90 min", "b": "42 min"}
+     {"alternativeA": "nad-precursor-nmn", "alternativeB": "nad-precursor-nr", "a": "500.0 mg", "b": "450.0 mg"}
+  validators with rows: [('V-531p: d', 3)]
+     V-531p: d {"violation": "EXCLUSIVE_AND_REQUIRES_PRIOR_COMPLETION", "item": "hu:protocol-step:blueprint-neg-nad-precursor-nmn-v1", "detail": "nad-precursor-nr"}
+     V-531p: d {"violation": "EXCLUSIVE_AND_REQUIRES_PRIOR_COMPLETION", "item": "hu:protocol-step:blueprint-neg-nad-precursor-nr-v1", "detail": "nad-precursor-nmn"}
+     V-531p: d {"violation": "EXCLUSIVE_PAIR_BOTH_ESSENTIAL", "item": "hu:protocol-step:blueprint-neg-nad-precursor-nr-v1", "detail": "nad-precursor-nmn"}
+======== 13-subprotocol-edition-binding statements 30/30 ok
+  Q-W16-13: which subprotocol edition does each parent include at a valid-time instant V (2021-06-01 and 2023 (rows=4)
+     {"parentEdition": "hu:protocol-edition:synthetic-floating-parent-e1", "validAt": "2021-06-01", "binding": "RESOLVED_AS_OF", "includedEdition": "V.1", "validityClass": "KNOWN_WITHIN"}
+     {"parentEdition": "hu:protocol-edition:synthetic-floating-parent-e1", "validAt": "2023-06-01", "binding": "RESOLVED_AS_OF", "includedEdition": "V.2", "validityClass": "OPEN_END_UNVERIFIED"}
+     {"parentEdition": "hu:protocol-edition:synthetic-pinned-parent-e1", "validAt": "2021-06-01", "binding": "PINNED", "includedEdition": "V.2", "validityClass": null}
+     {"parentEdition": "hu:protocol-edition:synthetic-pinned-parent-e1", "validAt": "2023-06-01", "binding": "PINNED", "includedEdition": "V.2", "validityClass": null}
+  validators with rows: none

@@ -1,0 +1,54 @@
+# W05 migration map: every live element in W05 scope (current_biotech_schema.graphql lines 496, 688-694, 930-1019,
+# 1070, 1597, 1756-1764, 2044, 2149, 2181-2185, 2375). Actions: keep | rename | move | split | merge | derive | retire.
+# Migration statements M-W05-01..06 are illustrated in fixtures/w05-03-food-product-is-product.cypher and 07-operations.md.
+
+- {live: FoodItem, final: FoodItem, action: keep, note: "relabel to FoodItem:IngredientMaterial:Entity; uid = 'hu:material:' + live id; entityType 'FoodItem'; materialKind FOOD (W05-SR-02). M-W05-04"}
+- {live: FoodItem.id, final: FoodItem.id, action: keep, note: "equals opaque uid segment"}
+- {live: FoodItem.name, final: FoodItem.name, action: keep, note: "nullable (D-013); presentation only; copy into descriptionVerbatim only when the value is verbatim from a reference source"}
+- {live: FoodItem.description, final: FoodItem.description, action: keep, note: ""}
+- {live: FoodItem.mongoResearchRunId, final: FoodItem.mongoResearchRunId, action: keep, note: ""}
+- {live: FoodItem.createdAt, final: FoodItem.createdAt, action: keep, note: ""}
+- {live: FoodItem.updatedAt, final: FoodItem.updatedAt, action: keep, note: ""}
+- {live: "FoodItem.searchText|searchFields|embeddingModel|embeddingDimensions", final: "FoodItem (SearchIndexable)", action: keep, note: "FoodItemSearch fulltext index name and query name searchFoodItems retained (D-015)"}
+- {live: FoodItem.foodGroup, final: FoodItem.foodGroup, action: keep, note: "meaning narrowed to a category of one named system; backfill foodGroupSystem or leave null and accept V-W05-05 rows until reviewed"}
+- {live: FoodItem.variantKind, final: FoodVariantProperties.variantKind, action: move, note: "copied onto the node's outgoing VARIANT_OF edge(s); unmappable strings -> OTHER with the string in the authorizing assertion valueString"}
+- {live: FoodItem.productionType, final: FoodItem.productionType, action: keep, note: "source-stated production system"}
+- {live: FoodItem.processingMethods, final: FoodItem.processingMethods, action: keep, note: ""}
+- {live: FoodItem.preparationNotes, final: FoodItem.preparationNotes, action: keep, note: ""}
+- {live: FoodItem.hasVariants (VARIANT_OF, RoleMetadata), final: "VARIANT_OF (FoodVariantProperties)", action: keep, note: "class becomes asserted: each live edge gets a backfilled Assertion (predicate VARIANT_OF, status PROPOSED, basisKind UNSTATED source = migration Activity) and assertionUid; RoleMetadata.role/title/corporateRole/roleType/seniority dropped (meaningless here); confidence -> extractionConfidence on the assertion with unknown method; notes -> assertion valueString"}
+- {live: FoodItem.containsCompounds (CONTAINS_COMPOUND, DoseMetadata), final: "QUANTITATIVELY_CONTAINS (W02) or PROVIDES_CONSTITUENT (W02)", action: retire, note: "per edge: dose+doseUnit present -> QUANTITATIVELY_CONTAINS to ChemicalSubstance (live Compound per D-002) with basis NOT_STATED, valueDerivation NOT_STATED, assertion status PROPOSED; no dose -> PROVIDES_CONSTITUENT. standardizedTo -> MARKER_CONSTITUENT note. Never invent PER_100_G. M-W05-05"}
+- {live: FoodItem.hasSafetySignals (HAS_SAFETY_SIGNAL, SafetyMetadata), final: "HAS_SAFETY_SIGNAL (W17 SafetyEdgeProperties)", action: keep, note: "W17 maps SafetyMetadata"}
+- {live: FoodProduct, final: Product, action: merge, note: "M-W05-01: SET n:Product:Entity, uid 'hu:product:' + id, entityType 'Product', productKind CONVENTIONAL_FOOD, legacyLabels ['FoodProduct']; REMOVE n:FoodProduct. One identity; no FoodProduct type in the final schema. If a Product node already represents the same item, publish an EquivalenceAssessment redirect instead of merging by name"}
+- {live: FoodProduct.brandName, final: "ConsumerBrand via OWNS_BRAND (W01); Product.legacyBrandName", action: move, note: "brand identity resolved by W01; the string is kept as a legacy display value"}
+- {live: FoodProduct.processingMethods, final: "ProductVariant.name / LabelDeclaration (W04); FoodItem.processingMethods of the component material", action: move, note: "marketing text stays on the variant/label; food-level preparation belongs to the FoodItem the component uses"}
+- {live: FoodProduct.preparationNotes, final: "LabelDeclaration DIRECTIONS (W04)", action: move, note: ""}
+- {live: "FoodProduct.searchText|searchFields|embeddingModel|embeddingDimensions", final: "Product (SearchIndexable)", action: merge, note: "FoodProductSearch index and searchFoodProducts query are dropped; ProductSearch covers the merged nodes. Compatibility note for clients"}
+- {live: FoodProduct.hasIngredients (HAS_INGREDIENT, DoseMetadata), final: "HAS_VARIANT -> HAS_FORMULATION_VERSION -> HAS_INGREDIENT_COMPONENT -> USES_MATERIAL (W04)", action: retire, note: "M-W05-03: build the component path (assertion status PROPOSED) then delete the legacy edge; DoseMetadata.dose with a net-quantity meaning -> PackageConfiguration.netQuantity; otherwise IngredientComponent.quantity with amountReferent NOT_STATED"}
+- {live: FoodProduct.hasSafetySignals, final: "Product HAS_SAFETY_SIGNAL (W17)", action: move, note: ""}
+- {live: Exposure, final: Exposure, action: keep, note: "relabel Exposure:Entity; uid 'hu:exposure:' + id (token W05-SR-01); characterizationHash computed at migration (exposure-tuple/v1); duplicates by hash merged through EquivalenceAssessment redirects. M-W05-06"}
+- {live: "Exposure.id|name|description|mongoResearchRunId|createdAt|updatedAt", final: "Exposure (same fields)", action: keep, note: "name nullable"}
+- {live: Exposure.exposureType, final: "Exposure.setting + Exposure.description", action: split, note: "mappable values -> ExposureSetting; others -> NOT_STATED with the string appended to description"}
+- {live: Exposure.exposureContext, final: "Exposure.mediumText / Exposure.description", action: split, note: "medium words (diet, air, water) -> mediumText; rest -> description"}
+- {live: Exposure.involves (INVOLVES, RoleMetadata), final: "HAS_EXPOSURE_AGENT (StructuralEdgeProperties)", action: rename, note: "relationship type renamed for Exposure start nodes only; Event INVOLVES (W18) unchanged; RoleMetadata dropped except notes -> StructuralEdgeProperties.notes"}
+- {live: "union ExposureAgent", final: "union ExposureAgentTarget", action: rename, note: "members: FoodItem->IngredientMaterial (label), FoodProduct->Product, Ingredient->IngredientMaterial, Compound->ChemicalSubstance, Lifestyle kept; ProductVariant and Nutrient added"}
+- {live: Lifestyle, final: Lifestyle, action: keep, note: "relabel Lifestyle:Entity; uid 'hu:lifestyle:' + id (token W05-SR-01)"}
+- {live: "Lifestyle.id|name|description|mongoResearchRunId|createdAt|updatedAt|searchText|searchFields|embeddingModel|embeddingDimensions", final: "Lifestyle (same)", action: keep, note: "LifestyleSearch / searchLifestyles retained"}
+- {live: Lifestyle.lifestyleClass, final: Lifestyle.lifestyleClass, action: keep, note: "display facet"}
+- {live: Lifestyle.lifestyleDomain, final: Lifestyle.lifestyleDomain, action: keep, note: "display facet"}
+- {live: Lifestyle.intensitySummary, final: "Exposure.intensityText (new Exposure with HAS_EXPOSURE_AGENT -> the Lifestyle)", action: move, note: "only when the text characterizes an exposure; otherwise -> description"}
+- {live: Lifestyle.exposurePattern, final: "Exposure.frequencyText", action: move, note: "same Exposure as intensitySummary"}
+- {live: Lifestyle.affectsMechanisms (AFFECTS_MECHANISM, AssociationMetadata), final: "AFFECTS_MECHANISM derived (W03 AssociationProjectionProperties)", action: derive, note: "each live edge becomes a backfilled mechanism Assertion (W03 rules); the edge is regenerated as a projection; W05-SR-05"}
+- {live: Lifestyle.associatedWithConditions (ASSOCIATED_WITH_CONDITION), final: "ASSOCIATED_WITH_CONDITION derived (W03)", action: derive, note: "W05-SR-05"}
+- {live: Lifestyle.associatedWithOutcomes (ASSOCIATED_WITH_OUTCOME), final: "ASSOCIATED_WITH_OUTCOME derived (W03)", action: derive, note: "W05-SR-05"}
+- {live: Lifestyle.hasSafetySignals, final: "HAS_SAFETY_SIGNAL (W17)", action: keep, note: ""}
+- {live: Lifestyle.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata), final: "SUPPORTED_BY_DOCUMENT derived (W20 DerivedSupportProperties)", action: derive, note: "W20 maps ExtractionMetadata; read-only"}
+- {live: Lifestyle.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata), final: "SUPPORTED_BY_CHUNK derived (W20)", action: derive, note: "must name its SourceLocator (catalog)"}
+- {live: "union Producible (Product | FoodProduct)", final: "Product (W01 field ranges)", action: merge, note: "W05-SR-15 to W01; FoodProduct member disappears"}
+- {live: "union TreatmentComponent members Lifestyle, FoodProduct", final: "TreatmentComponentTarget (W06): Lifestyle, Product/ProductVariant", action: rename, note: "W05-SR-14"}
+- {live: "union SafetySubject members FoodItem, FoodProduct, Ingredient, Lifestyle", final: "SafetySubjectTarget (W17): IngredientMaterial, Product, Lifestyle, Exposure", action: rename, note: "W05-SR-12; FoodItem via IngredientMaterial (union rule)"}
+- {live: "union Recommendable members FoodItem, FoodProduct, Lifestyle", final: "W21 RECOMMENDS range: IngredientMaterial, Product, Lifestyle", action: rename, note: "W05-SR-11"}
+- {live: "union StudyIntervention members FoodItem, FoodProduct, Lifestyle", final: "LegacyEvaluatedIntervention (W09, read-only)", action: keep, note: "D-003; FoodProduct member -> Product; FoodItem/Lifestyle stay readable only through Study.evaluates"}
+- {live: "union StepSubstance members FoodItem, FoodProduct", final: "StepSubstanceTarget (W16): IngredientMaterial, ProductVariant", action: rename, note: "W05-SR-08"}
+- {live: "union StepInstrument member Exposure", final: null, action: retire, note: "an Exposure is not an instrument; live EMPLOYS edges to Exposure become step notes or a W16 practice target to the Exposure's Lifestyle agent (W05-SR-08)"}
+- {live: "unions EventSubject, EvidenceSubject, ClaimSubject, AssociationParticipant, MediaSubject, ProtocolResultMention (members FoodItem, FoodProduct, Ingredient, Exposure, Lifestyle)", final: "owners' successor unions", action: rename, note: "FoodProduct -> Product; FoodItem and Ingredient -> IngredientMaterial where IngredientMaterial is present; Exposure and Lifestyle kept (W05-SR-17)"}
+- {live: "Ingredient (type)", final: IngredientMaterial, action: merge, note: "owned by W02; listed for completeness of W05 edges (HAS_INGREDIENT targets)"}

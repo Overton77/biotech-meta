@@ -1,0 +1,71 @@
+# W06 migration map: live current_biotech_schema.graphql (digest 86b5e0b5...f112) -> W06 final proposal.
+# action: keep | rename | move | split | merge | derive | retire
+- {live: Treatment, final: Treatment, action: keep, note: "labels ['Treatment','Entity']; meaning narrowed to the treatment concept; add uid hu:treatment:<id> (token requested W06-SR-02), entityType 'Treatment', privacyClass PUBLIC"}
+- {live: Treatment.id, final: Treatment.id, action: keep, note: "equals opaque segment of uid (INV-106)"}
+- {live: Treatment.name, final: Treatment.name, action: keep, note: "String! -> String (D-013); presentation only"}
+- {live: Treatment.description, final: Treatment.description, action: keep, note: ""}
+- {live: Treatment.mongoResearchRunId, final: Treatment.mongoResearchRunId, action: keep, note: "internal lineage; maps to Activity.externalRunId"}
+- {live: Treatment.createdAt, final: Treatment.createdAt, action: keep, note: ""}
+- {live: Treatment.updatedAt, final: Treatment.updatedAt, action: keep, note: ""}
+- {live: Treatment.searchText, final: Treatment.searchText, action: keep, note: "regenerable; V-119 requires searchFields"}
+- {live: Treatment.searchFields, final: Treatment.searchFields, action: keep, note: ""}
+- {live: Treatment.embeddingModel, final: Treatment.embeddingModel, action: keep, note: ""}
+- {live: Treatment.embeddingDimensions, final: Treatment.embeddingDimensions, action: keep, note: ""}
+- {live: Treatment.searchEmbedding, final: Treatment.searchEmbedding, action: keep, note: "@vector TreatmentSearchEmbedding re-declared by Fable without provider (D-014)"}
+- {live: Treatment.modality, final: Treatment.modalities, action: split, note: "modalities = [modality] when non-null; live modality kept as read-only projection Treatment.modality (single element only, else null). COMBINATION values are reviewed: if the concept has < 2 components, V-W06-05 reports it for reclassification"}
+- {live: Treatment.treatmentClass, final: Treatment.treatmentClass, action: keep, note: "display"}
+- {live: Treatment.developmentStage, final: Treatment.developmentStage, action: derive, note: "read-only display projection; migrated verbatim with developmentStageAssertionUid null (V-W06-02 reports); approval wording must be backed by an ACCEPTED W13 APPROVAL reachable via ADMINISTERED_PRODUCT (V-W06-01). New writes come from DECLARES_DEVELOPMENT_STAGE assertions"}
+- {live: Treatment.orphanDrugDesignation, final: OrphanDesignation (W13) + Treatment.orphanDrugDesignation (display), action: derive, note: "live-schema-alignment round 0005 row: string becomes projection of RegulatoryStatus:OrphanDesignation; migration creates no OrphanDesignation from the text alone (needs the agency record); text kept read-only with orphanDesignationStatusUids empty until backed; never approval (V-W06-03)"}
+- {live: Treatment.routeCategory, final: Treatment.routeCategory, action: keep, note: "display; not an applicability input"}
+- {live: Treatment.regimenSummary, final: Treatment.regimenSummary, action: keep, note: "display; not dose authority"}
+- {live: Treatment.targetedPopulation, final: Treatment.targetedPopulation, action: keep, note: "display; not an indication or StudyPopulation"}
+- {live: "Treatment.targetsConditions / TARGETS_CONDITION (TreatmentTargetMetadata)", final: "TARGETS_CONDITION (TreatmentTargetProperties)", action: keep, note: "becomes asserted edge: migration creates one Assertion(predicate TARGETS_CONDITION, status per MIGRATION adjudication, validFromBasis/validToBasis UNKNOWN) per edge and sets assertionUid, relationshipUid, recordedFrom = migration commit time"}
+- {live: TreatmentTargetMetadata.targetRole, final: TreatmentTargetProperties.intentKind, action: rename, note: "curated mapping to TreatmentIntentKind; unmapped -> NOT_STATED"}
+- {live: TreatmentTargetMetadata.indicationType, final: TreatmentTargetProperties.intentBasis, action: rename, note: "curated mapping to TreatmentIntentBasis; unmapped -> NOT_STATED; verbatim kept in indicationTextVerbatim"}
+- {live: TreatmentTargetMetadata.patientSubset, final: TreatmentTargetProperties.patientSubsetText, action: rename, note: ""}
+- {live: TreatmentTargetMetadata.evidenceStrength, final: TreatmentTargetProperties.legacyEvidenceStrengthHint, action: move, note: "extraction-time hint only (INV-209); an EvidenceStrengthAssessment is produced by W10 if needed (W06-SR-10)"}
+- {live: TreatmentTargetMetadata.confidence, final: null, action: retire, note: "INV-407; read as extractionConfidence with unknown method on the migration Assertion"}
+- {live: TreatmentTargetMetadata.notes, final: null, action: retire, note: "moved to the migration Assertion description if non-empty"}
+- {live: TreatmentTargetMetadata.mongoResearchRunId, final: TreatmentTargetProperties.mongoResearchRunId, action: keep, note: ""}
+- {live: TreatmentTargetMetadata, final: TreatmentTargetProperties, action: rename, note: "successor embeds AssertedEdgeProperties (contract B4)"}
+- {live: "Treatment.usesComponents / USES_COMPONENT (TreatmentComponentMetadata)", final: "USES_COMPONENT (TreatmentComponentProperties)", action: keep, note: "asserted edge; migration Assertion per edge as for TARGETS_CONDITION"}
+- {live: TreatmentComponentMetadata.role, final: "TreatmentComponentProperties.componentRole + roleTextVerbatim", action: split, note: "verbatim kept; componentRole curated (NOT_STATED when unmapped)"}
+- {live: TreatmentComponentMetadata.doseText, final: TreatmentComponentProperties.doseText, action: keep, note: "display only"}
+- {live: TreatmentComponentMetadata.route, final: TreatmentComponentProperties.routeText, action: rename, note: ""}
+- {live: TreatmentComponentMetadata.frequency, final: TreatmentComponentProperties.frequencyText, action: rename, note: ""}
+- {live: TreatmentComponentMetadata.durationText, final: TreatmentComponentProperties.durationText, action: keep, note: ""}
+- {live: TreatmentComponentMetadata.confidence, final: null, action: retire, note: "INV-407"}
+- {live: TreatmentComponentMetadata.notes, final: null, action: retire, note: "to migration Assertion description"}
+- {live: TreatmentComponentMetadata.mongoResearchRunId, final: TreatmentComponentProperties.mongoResearchRunId, action: keep, note: ""}
+- {live: TreatmentComponentMetadata, final: TreatmentComponentProperties, action: rename, note: "successor embeds AssertedEdgeProperties"}
+- {live: "union TreatmentComponent", final: "union TreatmentComponentTarget", action: rename, note: "Compound -> ChemicalSubstance; CompoundForm -> ChemicalForm or IngredientMaterial per W02 split (D-002); Product, Device, Procedure, Protocol kept; Lifestyle, FoodProduct pending W05 (W06-SR-07)"}
+- {live: "Treatment.developedBy / DEVELOPS_TREATMENT (RoleMetadata)", final: "DEVELOPS_TREATMENT (AssertedEdgeProperties)", action: keep, note: "asserted; RoleMetadata role/title/corporate fields dropped (not meaningful for org->concept); validFrom/validTo/recordedFrom/recordedTo carried; confidence retired"}
+- {live: "Treatment.offeredBy / OFFERS_TREATMENT (RoleMetadata)", final: "OFFERS_TREATMENT (AssertedEdgeProperties)", action: keep, note: "as DEVELOPS_TREATMENT"}
+- {live: "Treatment.evaluatedInStudies / EVALUATES (InterventionArmMetadata)", final: "StudyIntervention -[:INSTANTIATES_TREATMENT]-> Treatment (+ legacy Study.evaluates read-only, W09)", action: retire, note: "inverse field removed from Treatment; legacy EVALUATES edges stay readable from Study.evaluates (D-003, CL-017); W09 migration creates StudyIntervention + INSTANTIATES_TREATMENT where arm facts are recoverable"}
+- {live: "Treatment.hasSafetySignals / HAS_SAFETY_SIGNAL (SafetyMetadata)", final: "HAS_SAFETY_SIGNAL (SafetyEdgeProperties, W17)", action: keep, note: "W17 owns the relationship type and property mapping"}
+- {live: "Treatment.supportedByDocuments / SUPPORTED_BY_DOCUMENT (ExtractionMetadata)", final: "SUPPORTED_BY_DOCUMENT (DerivedSupportProperties, W20)", action: derive, note: "read-only derived shortcut naming a locator"}
+- {live: "Treatment.supportedByChunks / SUPPORTED_BY_CHUNK (ExtractionMetadata)", final: "SUPPORTED_BY_CHUNK (DerivedSupportProperties, W20)", action: derive, note: ""}
+- {live: "@fulltext TreatmentSearch", final: "@fulltext TreatmentSearch", action: keep, note: "same fields; D-015"}
+- {live: "@vector TreatmentSearchEmbedding (provider OPEN_AI)", final: "@vector TreatmentSearchEmbedding (no provider)", action: keep, note: "added by Fable at merge (D-014)"}
+- {live: Procedure, final: Procedure, action: keep, note: "labels ['Procedure','Entity']; definition only; uid hu:procedure:<id> (token requested)"}
+- {live: "Procedure.id/name/description/mongoResearchRunId/createdAt/updatedAt/searchText/searchFields/embeddingModel/embeddingDimensions", final: "same", action: keep, note: "name nullable (D-013)"}
+- {live: Procedure.procedureType, final: Procedure.procedureType, action: keep, note: "display"}
+- {live: Procedure.setting, final: Procedure.setting, action: keep, note: "typical setting of the definition"}
+- {live: Procedure.deliveryRoute, final: Procedure.deliveryRoute, action: keep, note: ""}
+- {live: Procedure.invasiveness, final: Procedure.invasiveness, action: keep, note: ""}
+- {live: Procedure.durationSummary, final: Procedure.durationSummary, action: keep, note: "definition-level display, not a performance"}
+- {live: Procedure.preparationSummary, final: Procedure.preparationSummary, action: keep, note: ""}
+- {live: Procedure.recoverySummary, final: Procedure.recoverySummary, action: keep, note: ""}
+- {live: "Procedure.listedIn / LISTS_PROCEDURE (TemporalMetadata)", final: "MerchantListing -[:LISTS_PROCEDURE {ListingEdgeProperties}]-> Procedure (W15)", action: move, note: "Listing -> MerchantListing (D-007); property mapping by W15"}
+- {live: "Procedure.offeredBy / OFFERS_PROCEDURE (RoleMetadata)", final: "OFFERS_PROCEDURE (AssertedEdgeProperties)", action: keep, note: "asserted; migration Assertion per edge"}
+- {live: "Procedure.hasSafetySignals", final: "HAS_SAFETY_SIGNAL (W17)", action: keep, note: ""}
+- {live: "Procedure.supportedByDocuments / supportedByChunks", final: "derived W20 shortcuts", action: derive, note: ""}
+- {live: "@fulltext ProcedureSearch", final: "@fulltext ProcedureSearch", action: keep, note: ""}
+- {live: null, final: "Procedure.identifiers / Treatment.identifiers (HAS_IDENTIFIER, W00)", action: keep, note: "additive; codes never establish identity"}
+- {live: null, final: "INSTANTIATES_TREATMENT, INSTANTIATES_PROCEDURE", action: keep, note: "additive; requested (W06-SR-01, W06-SR-03)"}
+- {live: enum TreatmentModality, final: enum TreatmentModality, action: keep, note: "12 values unchanged; COMBINATION meaning narrowed"}
+- {live: null, final: "enums TreatmentComponentRole, TreatmentIntentKind, TreatmentIntentBasis", action: keep, note: "additive successors of free-text role/indicationType"}
+- {live: "Organization.offersProcedures / developsTreatments / offersTreatments", final: "W01 Organization fields over W06 relationship types", action: keep, note: "seam W06-SR-06; property type AssertedEdgeProperties"}
+- {live: "Condition.treatedBy (TARGETS_CONDITION IN)", final: "optional read-only inverse on W03 Condition", action: keep, note: "seam W06-SR-11"}
+- {live: "union StudyIntervention (members Treatment, Procedure)", final: "union LegacyEvaluatedIntervention (W09)", action: rename, note: "D-003; Treatment and Procedure remain members"}
+- {live: "unions SafetySubject, Recommendable, ProtocolResultMention, EventParticipant, EventSubject, EvidenceSubject, ClaimSubject, AssociationParticipant, EpisodeMentionable, MediaSubject (members Treatment/Procedure)", final: "owners' successor unions", action: keep, note: "W06 requests membership retained where the union survives; owners decide"}

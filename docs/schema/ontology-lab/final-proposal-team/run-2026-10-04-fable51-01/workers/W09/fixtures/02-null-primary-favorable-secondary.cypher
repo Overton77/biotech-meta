@@ -65,6 +65,20 @@ MERGE (pub:Publication:InformationArtifact {uid: 'hu:publication:pmid-35584623'}
                 pub.doi = '10.1016/j.xcrm.2022.100633', pub.pmid = '35584623', pub.pmcid = 'PMC9133463', pub.venueName = 'Cell Reports Medicine',
                 pub.publishedAt = datetime('2022-05-17T00:00:00Z'), pub.publishedAtPrecision = 'DAY', pub.createdAt = datetime('2026-10-04T01:00:00Z');
 
+// 2b. REGISTERED_AS (asserted edge with its assertion).
+MATCH (st:Study {uid: 'hu:study:nct03464500-atlas'}), (reg:TrialRegistration {uid: 'hu:trial-registration:ctgov-nct03464500'}),
+      (loc:SourceLocator {uid: 'hu:locator:ctgov-nct03464500-2026-10-04-outcomes'})
+MERGE (a:Assertion {uid: 'hu:assertion:atlas-registered-as-nct03464500'})
+  ON CREATE SET a.id = 'atlas-registered-as-nct03464500', a.predicate = 'REGISTERED_AS', a.status = 'ACCEPTED', a.polarity = 'POSITIVE',
+                a.recordedAt = datetime('2026-10-04T01:00:00Z'), a.contentHash = 'sha256:synthetic-atlas-registered-as',
+                a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.createdAt = datetime('2026-10-04T01:00:00Z')
+MERGE (a)-[:HAS_SUBJECT]->(st)
+MERGE (a)-[:HAS_OBJECT]->(reg)
+MERGE (a)-[:SUPPORTED_BY]->(loc)
+MERGE (st)-[e:REGISTERED_AS]->(reg)
+  ON CREATE SET e.relationshipUid = 'hu:rel:atlas-registered-as-nct03464500', e.assertionUid = a.uid, e.recordedFrom = a.recordedAt,
+                e.validFromBasis = 'UNKNOWN', e.validToBasis = 'UNKNOWN';
+
 // 3. Arms, interventions, components. Material identity of 'Mitopure' is W02's (branded material); asReportedName kept.
 UNWIND [
   {arm: 'hu:arm:atlas-placebo', armName: 'Placebo', armType: 'PLACEBO_COMPARATOR', si: 'hu:intervention:atlas-placebo', siName: '4 placebo softgels daily', ic: null, qty: null, txt: null},

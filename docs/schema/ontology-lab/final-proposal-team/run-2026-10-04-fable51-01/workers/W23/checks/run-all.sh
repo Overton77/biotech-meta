@@ -28,6 +28,11 @@ run "$F/01-answer-record-replay.cypher" --json "$R/S1-01-answer-record-replay.js
 run "$F/02-public-projection.cypher" --json "$R/S1-02-public-projection.json"
 run "$F/03-decision-replay-after-correction.cypher" --params "$F/replay-params.json" --json "$R/S1-03-decision-replay-after-correction.json"
 scenario S2 04-uid-redirect.cypher; validate S2 "$V/validation-params.json"
+# S3a: the leaking index exists before any private node: node-based V-115 sees nothing, index-metadata V-W23-04 does
+run "$F/reset.cypher" >/dev/null; run "$F/00-shared-base.cypher" >/dev/null
+node query.mjs "$B" "CREATE FULLTEXT INDEX w23_leak_goal_search IF NOT EXISTS FOR (n:UserGoalVersion|Product) ON EACH [n.goalStatement, n.name]" >/dev/null
+node query.mjs "$B" "CALL db.awaitIndexes(60)" >/dev/null
+validate S3a "$F/params-leak.json"
 scenario S3 10-leak-probe-qs6.cypher; validate S3 "$F/params-leak.json"
 run "$F/10-leak-probe-queries.cypher" --json "$R/S3-10-leak-probe-queries.json"
 scenario S4 11-public-person-only.cypher; validate S4 "$V/validation-params.json"

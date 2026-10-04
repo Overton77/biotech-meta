@@ -1,0 +1,109 @@
+# W07 seam requests (run-2026-10-04-fable51-01). Fable copies these to 03-conflict-ledger.md and assigns resolvers.
+- id: W07-SR-01
+  targetOwner: W00
+  request: "Add @declareRelationship to contract B1's allowed field directives (interface fields only)."
+  cq: [CQ-DX-02, CQ-DX-03, CQ-DX-06]
+  failingCase: "DiagnosticResult interface fields producedByAssayVersion/computedByAlgorithmVersion/interpretedWithReferenceIntervalVersion; without the directive the interface exposes no relationship traversal and implementers are not forced to declare the edges. Verified in @neo4j/graphql 7.6.3 (args nestedOperations, aggregate; implementer without @relationship fails the build)."
+  proposedRuling: "Allow @declareRelationship on interface fields; no arguments in fragments."
+- id: W07-SR-02
+  targetOwner: W16
+  request: "Observation implements Entity & InformationArtifactArchetype & DiagnosticResult with @node(labels: [\"Observation\", \"DiagnosticResult\", \"InformationArtifact\"]) and the three @relationship fields named exactly producedByAssayVersion (PRODUCED_BY_ASSAY_VERSION), computedByAlgorithmVersion (COMPUTED_BY_ALGORITHM_VERSION), interpretedWithReferenceIntervalVersion (INTERPRETED_WITH_REFERENCE_INTERVAL_VERSION), OUT, properties StructuralEdgeProperties; plus comparedTo (COMPARED_TO, DerivedEdgeProperties, read-only). FROM_LAB_TEST is not a comparability path."
+  cq: [CQ-DX-02, CQ-DX-03, CQ-DX-08]
+  failingCase: "fixtures/w07-04: V-302..V-316 match :DiagnosticResult; without the label every check returns zero rows vacuously. Build probe: missing @relationship on an implementer fails."
+  proposedRuling: "Accept as stated (CL-008 implementation detail)."
+- id: W07-SR-03
+  targetOwner: W00
+  request: "Register enum ResultQualifier (catalog private_context.resultQualifier values) as a W07-owned shared enum used by DiagnosticResult.valueStatus; consider adding NOT_REPORTED for source-attributed public results."
+  cq: [CQ-DX-02, CQ-DX-08]
+  failingCase: "A public Observation reporting 'below detection' or 'invalid specimen' cannot be stored with ReportedStatus (0.2.0 fixture used valueStatus 'REPORTED')."
+  proposedRuling: "Register ResultQualifier with the five catalog values under W07; NOT_REPORTED as a ledger value request."
+- id: W07-SR-04
+  targetOwner: W16
+  request: "Confirm Observation.measuresMetrics (MEASURES_METRIC) uses StructuralEdgeProperties (payload of the result), not MeasurementEdgeProperties (asserted). Optionally add measuresMetric to the DiagnosticResult contract."
+  cq: [CQ-DX-01, CQ-DX-02]
+  failingCase: "MeasurementEdgeProperties has non-null assertionUid; a result's own metric is structural and has no authorizing assertion."
+  proposedRuling: "Structural on Observation; contract edge deferred until W16 agrees."
+- id: W07-SR-05
+  targetOwner: W16
+  request: "FOR_METRIC is one structural relationship type owned by W07 (catalog: ReferenceIntervalVersion -> Metric); W16's Target.forMetric reuses the same type and meaning ('is defined for metric'), with StructuralEdgeProperties instead of RoleMetadata."
+  cq: [CQ-DX-06, CQ-PR-03]
+  failingCase: "Registry lists FOR_METRIC under W07 and W16; two meanings or two property shapes for one type violate 'one relationship type, one meaning'."
+  proposedRuling: "One type, W07 owner, domain ReferenceIntervalVersion|Target, structural."
+- id: W07-SR-06
+  targetOwner: W00
+  request: "Ledger value request: ReferenceIntervalDerivation.ADOPTED_FROM_GUIDELINE."
+  cq: [CQ-DX-06]
+  failingCase: "Quest 496 prints '<5.7 %' and states 'Interpretative ranges are based on ADA guidelines'; Mayo and Labcorp print ADA limits in the reference-values field. Today these must be NOT_REPORTED, which loses a stated basis."
+  proposedRuling: "Add the value; keep EP28 kinds unchanged."
+- id: W07-SR-07
+  targetOwner: W03
+  request: "Rule the class and property type of Biomarker IN_PATHWAY, EXPRESSED_IN (to Organ), EXPRESSED_IN_CONTEXT and INDICATES (to Condition). W07 wrote IN_PATHWAY/EXPRESSED_IN*/ENCODES/REFLECTS_MECHANISM with MechanismLinkProperties (read-only where legacy) and INDICATES as derived with AssociationProjectionProperties."
+  cq: [CQ-MX-02, CQ-ST-03]
+  failingCase: "W03's fragment covers ENCODES and REFLECTS_MECHANISM but not IN_PATHWAY, EXPRESSED_IN, EXPRESSED_IN_CONTEXT or INDICATES; the inverse fields on Pathway/Organ/AnatomicalContext/Condition must use the same property type."
+  proposedRuling: "W03 confirms or supplies the property type; W07 updates Biomarker fields to match."
+- id: W07-SR-08
+  targetOwner: W08
+  request: "Confirm RUNS_ON_PLATFORM (MeasurementMethod -> TechnologyPlatform) is structural with StructuralEdgeProperties, and that MEASURES_METRIC on Device/Sensor uses W07's MeasurementEdgeProperties."
+  cq: [CQ-DX-01, CQ-DX-09]
+  failingCase: "Live uses MeasurementMetadata on both; the successor must be one property type per relationship type."
+  proposedRuling: "Accept as stated."
+- id: W07-SR-09
+  targetOwner: W00
+  request: "Replace catalog V-303 with V-303r: a MEASURED result may be pending through an UNRESOLVED PRODUCED_BY_ASSAY_VERSION assertion (literal reason allowed)."
+  cq: [CQ-DX-02, CQ-DX-C02]
+  failingCase: "Everlywell HbA1c (S7): performing lab not named; positive fixture returns 1 V-303 row and 0 V-303r rows; negative N5 fails both."
+  proposedRuling: "Adopt V-303r (fixtures/w07-validation.cypher)."
+- id: W07-SR-10
+  targetOwner: W00
+  request: "Mark COMPARED_TO ruleOnly: true for the INV-301 same-version clause (derivationRule 'INV-301 same AssayVersion' or 'INV-301 same AlgorithmVersion'); cross-version COMPARED_TO still requires derivedFromAssessmentUids."
+  cq: [CQ-DX-03]
+  failingCase: "Catalog V-112 reports 2 DERIVATION_WITHOUT_SOURCE_ASSERTIONS rows for same-version COMPARED_TO in the positive fixture; there is no assertion or assessment to cite."
+  proposedRuling: "Add COMPARED_TO to ruleOnlyDerivedTypes with the same-version restriction enforced by V-302r/V-304r."
+- id: W07-SR-11
+  targetOwner: W00
+  request: "Add proposed validators V-302r, V-304r (well-formed current licence), V-305c (INV-302 exactly one AssayVersion), V-314..V-318; record that INV-302 is checked by V-305b/V-305c/V-306, not V-302."
+  cq: [CQ-DX-03, CQ-DX-05, CQ-DX-06, CQ-DX-07, CQ-DX-C01, CQ-DX-C03, CQ-DX-C04]
+  failingCase: "N4 (interval bound to two assays) passes all catalog V-3xx except V-306 (which fires only when a result uses it); N10 masks N1 under V-302; N6, N7, N8, N13, N14 pass every catalog query."
+  proposedRuling: "Adopt into validation.cypher at merge."
+- id: W07-SR-12
+  targetOwner: W00
+  request: "Register uid tokens panel-definition (PanelDefinition) and reference-range (ReferenceRange); register label-keyed entries for the W07 primary labels using the existing fixture tokens (Biomarker: biomarker, Metric: metric, LabTest: lab-test, MeasurementMethod: method, Specimen: specimen-type, ReferenceSystem: reference-system, Algorithm: algorithm, ReferenceIntervalVersion: ri-version, ComparabilityAssessment: comparability)."
+  cq: [CQ-DX-03]
+  failingCase: "PanelDefinition and ReferenceRange have no token, so no fixture can create them with a registered uid (PanelDefinition is unfixtured in this packet)."
+  proposedRuling: "Register."
+- id: W07-SR-13
+  targetOwner: W00
+  request: "Register asserted predicate CHANGED_BETWEEN (predicateClass QUANTITY; subject later result, object earlier result; no literal)."
+  cq: [CQ-DX-05]
+  failingCase: "Vendor statement 'decreased by 4 years' between two GrimAge2 scores has no registered predicate; the first fixture form with object + literal failed V-003."
+  proposedRuling: "Register as candidate; V-314 guards basisKind."
+- id: W07-SR-14
+  targetOwner: W23
+  request: "Confirm ComparabilityAssessment is PUBLIC (projected to public answers) rather than INTERNAL as the 0.2.0 property card says."
+  cq: [CQ-AX-21]
+  failingCase: "CQ-AX-21 (PUBLIC tier) is answered only by the assessment; INTERNAL would remove it from public projections."
+  proposedRuling: "PUBLIC; method rationale may be INTERNAL text."
+- id: W07-SR-15
+  targetOwner: W00
+  request: "Supersede catalog V-313's value list with V-313r (PrivacyClass PUBLIC/INTERNAL; no hu:private- uid)."
+  cq: [CQ-DX-08]
+  failingCase: "Catalog V-313 reports all 15 positive fixture results because it expects lower-case values including 'synthetic'."
+  proposedRuling: "Adopt V-313r."
+- id: W07-SR-16
+  targetOwner: W12
+  request: "Include AssayVersion (and the performing Organization) in CertificationCoverageTarget so NGSP certification is a time-bounded CertificationListing on the assay version."
+  cq: [CQ-DX-03]
+  failingCase: "SRC-NGSP-CERTIFIED lists certified methods and labs as of a page date; a boolean on AssayVersion would certify historical results."
+  proposedRuling: "Accept."
+- id: W07-SR-17
+  targetOwner: W13
+  request: "Allow RegulatoryStatus to scope to an AlgorithmVersion when the regulatory record names a build; otherwise scope to the device and link the version by ResolutionHypothesis."
+  cq: [CQ-DX-04, CQ-MF-02]
+  failingCase: "SRC-FDA-DEN200080 (Paige Prostate) grants a device with no PCCP; later builds are not covered."
+  proposedRuling: "Accept."
+- id: W07-SR-18
+  targetOwner: W01
+  request: "ASSAY_OPERATED_BY targets Organization (the performing laboratory legal/organizational identity); a performing site (Mayo 'Rochester Main Campus', Labcorp site '01 Burlington NC') is a W01 Facility reached by OPERATES_FACILITY, not a second operator."
+  cq: [CQ-DX-01]
+  failingCase: "V-301b requires exactly one operator; recording the site as an Organization would create two operators for one assay."
+  proposedRuling: "Accept; site-level assay versions are a future refinement if a failing case appears."

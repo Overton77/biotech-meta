@@ -1,0 +1,92 @@
+# W14 execution log (Neo4j [{"name":"Neo4jKernel","versions":["5.26.31"],"edition":"community"}]); harness run-cypher.mjs; 2026-10-04
+# order: core, minimal-pairs, kernel validation.cypher (params validation/validation-params.json), w14-validation, w14-cq-queries, negative, w14-validation, kernel validation, w14-cq-queries
+ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-ip-core.cypher: 375 statements, 375 ok, 0 error
+ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-ip-minimal-pairs.cypher: 152 statements, 152 ok, 0 error
+neo4j/validation.cypher: 174 statements, 174 ok, 0 error
+ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-validation.cypher: 14 statements, 14 ok, 0 error
+ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-cq-queries.cypher: 12 statements, 12 ok, 0 error
+ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-ip-negative.cypher: 34 statements, 34 ok, 0 error
+ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-validation.cypher: 14 statements, 14 ok, 0 error
+neo4j/validation.cypher: 174 statements, 174 ok, 0 error
+ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-cq-queries.cypher: 12 statements, 12 ok, 0 error
+## w14val-clean
+#11 // V-W14-11 (informational): granted patents with no (or sev rows=2 
+     {"check": "V-W14-11", "grantUid": "hu:granted-patent:us-8383086", "applicationLinks": 0}
+     {"check": "V-W14-11", "grantUid": "hu:granted-patent:syn-us-b", "applicationLinks": 0}
+#13 // V-W14-13 (informational): license terms unknown (value nu rows=1 
+     {"check": "V-W14-13", "licenseUid": "hu:patent-license:dartmouth-chromadex-inc-2012-07-13", "fieldUnknown": true, "territoryUnknown": true, "exclusivityUnknown": true}
+## w14val-neg
+#1 // V-W14-11 (2 rows) and V-W14-13 (1 row). After also loadin rows=1 
+     {"check": "V-W14-01", "kind": "OWNS_STUDY", "subjectUid": "hu:org:chromadex-inc", "objectUid": "hu:study:nct02712593"}
+#2 // V-W14-02: [PATENT_CLAIMS, PROVES_EFFICACY] -- no efficacy rows=1 
+     {"check": "V-W14-02", "assertionUid": "hu:assertion:w14-neg-proves-efficacy", "premiseUid": "hu:assertion:w14-patent-claims-us8197807-c1-nr-curator"}
+#3 // V-W14-03: every W14 asserted edge cites one Assertion who rows=1 
+     {"check": "V-W14-03", "relType": "LICENSE_COVERS", "relationshipUid": "hu:rel:w14-neg-family-coverage", "assertionUid": "hu:assertion:w14-licensee-l2014-chromadex-inc", "citedPredicate": "LICENSES_PATENT"}
+#5 // V-W14-05: license coverage is exactly what a LICENSE_COVE rows=1 
+     {"check": "V-W14-05", "licenseUid": "hu:patent-license:dartmouth-chromadex-inc-2014-05-16", "targetUid": "hu:patent-application:ep-05722944", "citedAssertionUid": "hu:assertion:w14-licensee-l2014-chromadex-inc"}
+#7 // V-W14-07: claim-level status kinds only on claims, patent rows=1 
+     {"check": "V-W14-07", "statusUid": "hu:assertion:w14-neg-c1-confirmed-from-active", "statusKind": "derived-from-patent-level", "targetUid": "hu:granted-patent:us-8197807"}
+#8 // V-W14-08: an office identifier attached to an IP right mu rows=1 
+     {"check": "V-W14-08", "rightUid": "hu:trademark:us-sn85932490-niagen", "rightJurisdiction": "US", "scheme": "WIPO_MADRID_IR", "value": "1336169", "identifierJurisdiction": "WO"}
+#9 // V-W14-09: legal status is never a stored property of an I rows=1 
+     {"check": "V-W14-09", "uid": "hu:granted-patent:us-8197807", "legacyStatus": "Active"}
+#11 // V-W14-11 (informational): granted patents with no (or sev rows=2 
+     {"check": "V-W14-11", "grantUid": "hu:granted-patent:us-8383086", "applicationLinks": 0}
+     {"check": "V-W14-11", "grantUid": "hu:granted-patent:syn-us-b", "applicationLinks": 0}
+#12 // V-W14-12: no commercial role is derived from trademark ow rows=1 
+     {"check": "V-W14-12", "assertionUid": "hu:assertion:w14-neg-supplies-from-mark", "predicate": "SUPPLIES_INGREDIENT_MATERIAL", "premiseUid": "hu:assertion:w14-owns-tm-niagen-chromadex-inc"}
+#13 // V-W14-13 (informational): license terms unknown (value nu rows=1 
+     {"check": "V-W14-13", "licenseUid": "hu:patent-license:dartmouth-chromadex-inc-2012-07-13", "fieldUnknown": true, "territoryUnknown": true, "exclusivityUnknown": true}
+## cq-clean
+#1 // Q-01 CQ-IP-C01: which granted claims are asserted to co rows=4 
+     {"patent": "8,197,807", "claim": 1, "coverageLevel": "claim", "coverageAsserter": "W14 worker (Opus 5.5)", "basis": "UNSTATED", "patentInForce": true, "patentTerminated": false, "claimHeldInvalid": true, "enforceableAsOfD": false}
+     {"patent": "8,197,807", "claim": 1, "coverageLevel": "patent", "coverageAsserter": "Niagen Bioscience, Inc.", "basis": "MANUFACTURER_CLAIM", "patentInForce": true, "patentTerminated": false, "claimHeldInvalid": true, "enforceableAsOfD": false}
+     {"patent": "8,197,807", "claim": 2, "coverageLevel": "patent", "coverageAsserter": "Niagen Bioscience, Inc.", "basis": "MANUFACTURER_CLAIM", "patentInForce": true, "patentTerminated": false, "claimHeldInvalid": true, "enforceableAsOfD": false}
+     {"patent": "8,197,807", "claim": 3, "coverageLevel": "patent", "coverageAsserter": "Niagen Bioscience, Inc.", "basis": "MANUFACTURER_CLAIM", "patentInForce": true, "patentTerminated": false, "claimHeldInvalid": true, "enforceableAsOfD": false}
+#2 // Q-02 CQ-IP-C01 at D = 2022-06-01 (before the captured app rows=2 
+     {"d": {"year": 2022, "month": 6, "day": 1, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "patentInForce": true, "patentTerminated": false, "claimHeldInvalid": false}
+     {"d": {"year": 2026, "month": 12, "day": 1, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "patentInForce": false, "patentTerminated": true, "claimHeldInvalid": true}
+#3 // Q-03 CQ-IP-C02: who licenses US 8,197,807 (directly, thro rows=1 
+     {"license": "hu:patent-license:dartmouth-chromadex-inc-2014-05-16", "licensee": "ChromaDex, Inc.", "licensor": "Trustees of Dartmouth College", "exclusive": true, "fieldOfUse": "human and animal therapeutics", "fieldStatus": "REPORTED", "territory": "worldwide", "territoryCodes": ["WORLDWIDE"], "validFrom": {"year": 2014, "month": 5, "day": 16, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0,
+#4 // Q-04 CQ-IP-C02 (synthetic family-level coverage) at D = 2 rows=3 
+     {"d": {"year": 2023, "month": 6, "day": 1, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "license": "hu:patent-license:syn-licensee-a-sublicensee-b-2021", "licensee": "Synthetic Sublicensee B", "licensor": "Synthetic Licensee A", "fieldOfUse": "dietary supplements", "territoryCodes": null, "territoryStatus": "NOT_REPORTED", "validTo": null, "validToBasis": "UNK
+     {"d": {"year": 2023, "month": 6, "day": 1, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "license": "hu:patent-license:syn-univ-licensee-a-2020", "licensee": "Synthetic Licensee A", "licensor": "Synthetic University", "fieldOfUse": "dietary supplements", "territoryCodes": ["US"], "territoryStatus": "REPORTED", "validTo": {"year": 2025, "month": 1, "day": 1, "ho
+     {"d": {"year": 2026, "month": 10, "day": 4, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "license": "hu:patent-license:syn-licensee-a-sublicensee-b-2021", "licensee": "Synthetic Sublicensee B", "licensor": "Synthetic Licensee A", "fieldOfUse": "dietary supplements", "territoryCodes": null, "territoryStatus": "NOT_REPORTED", "validTo": null, "validToBasis": "UN
+#5 // Q-05 failing case for "licensor = assignee": the naive in rows=4 
+     {"license": "hu:patent-license:dartmouth-chromadex-inc-2014-05-16", "naiveLicensorFromAssignee": "Trustees of Dartmouth College", "assertedLicensor": "Trustees of Dartmouth College", "sameParty": true}
+     {"license": "hu:patent-license:dartmouth-chromadex-inc-2014-05-16", "naiveLicensorFromAssignee": "Trustees of Dartmouth College", "assertedLicensor": "Trustees of Dartmouth College", "sameParty": true}
+     {"license": "hu:patent-license:syn-licensee-a-sublicensee-b-2021", "naiveLicensorFromAssignee": "Synthetic University", "assertedLicensor": "Synthetic Licensee A", "sameParty": false}
+     {"license": "hu:patent-license:syn-univ-licensee-a-2020", "naiveLicensorFromAssignee": "Synthetic University", "assertedLicensor": "Synthetic University", "sameParty": true}
+#6 // Q-06 CQ-IP-C03: does holding a license (or a claim's subj rows=1 
+     {"licensesHeld": 2, "assertedStudyRoles": 0, "acceptedEfficacyAssertions": 0}
+#7 // Q-07 CQ-IP-C04: for the branded material Niagen -- the ma rows=1 
+     {"mark": "NIAGEN", "jurisdiction": "US", "registration": "4606519", "owners": ["ChromaDex, Inc."], "statusesAtD": ["RENEWED", "REGISTERED"], "suppliers": ["Niagen Bioscience, Inc."], "markUseAsserter": "Niagen Bioscience, Inc."}
+#8 // Q-08 CQ-IP-C04 lapsed mark: synthetic EXAMPLEMARK status  rows=3 
+     {"d": {"year": 2020, "month": 1, "day": 1, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "statusesAtD": ["REGISTERED"]}
+     {"d": {"year": 2021, "month": 7, "day": 6, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "statusesAtD": ["CANCELLED"]}
+     {"d": {"year": 2026, "month": 10, "day": 4, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "statusesAtD": ["CANCELLED"]}
+#9 // Q-09 CQ-IP-C05: family structure under its stated definit rows=4 
+     {"family": "hu:patent-family:gp-us8197807-worldwide", "definition": "SOURCE_DISPLAYED", "jurisdiction": "EP", "application": "EP05722944", "grant": null, "applicationStatuses": ["WITHDRAWN"]}
+     {"family": "hu:patent-family:gp-us8197807-worldwide", "definition": "SOURCE_DISPLAYED", "jurisdiction": "US", "application": "11/912,400", "grant": "8,197,807", "applicationStatuses": []}
+     {"family": "hu:patent-family:syn-fam-a", "definition": "DOCDB_SIMPLE", "jurisdiction": "EP", "application": "EPSYN000001", "grant": null, "applicationStatuses": []}
+     {"family": "hu:patent-family:syn-fam-a", "definition": "DOCDB_SIMPLE", "jurisdiction": "US", "application": "SYN/000,001", "grant": "SYN-9,000,001", "applicationStatuses": []}
+#10 // Q-10 CQ-EC-01: IP neighbourhood of ChromaDex, Inc. valid  rows=3 
+     {"role": "LICENSES_PATENT", "node": "hu:patent-license:dartmouth-chromadex-inc-2012-07-13", "validFrom": {"year": 2012, "month": 7, "day": 13, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "validFromBasis": "STATED_BY_SOURCE", "covers": ["US:13260392"]}
+     {"role": "LICENSES_PATENT", "node": "hu:patent-license:dartmouth-chromadex-inc-2014-05-16", "validFrom": {"year": 2014, "month": 5, "day": 16, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "validFromBasis": "STATED_BY_SOURCE", "covers": ["US:8383086", "US:8197807"]}
+     {"role": "OWNS_TRADEMARK", "node": "hu:trademark:us-sn85932490-niagen", "validFrom": null, "validFromBasis": "OBSERVATION_ONLY", "covers": []}
+#11 // Q-11 temporal correction (MP-5): the in-force episode for rows=2 
+     {"asRecordedAt": {"year": 2026, "month": 10, "day": 4, "hour": 1, "minute": 25, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "state": "hu:ip-status:syn-us-b-in-force-v0", "validTo": {"year": 2035, "month": 3, "day": 2, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "validToBasis": "INFERRED", "inForceOn20350601": false}
+     {"asRecordedAt": {"year": 2026, "month": 10, "day": 4, "hour": 1, "minute": 35, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "state": "hu:ip-status:syn-us-b-in-force-v1", "validTo": {"year": 2035, "month": 9, "day": 30, "hour": 0, "minute": 0, "second": 0, "nanosecond": 0, "timeZoneOffsetSeconds": 0}, "validToBasis": "STATED_BY_SOURCE", "inForceOn20350601": true}
+#12 // Q-12 CQ-EC-02 / identity: same digits across issuers and  rows=5 
+     {"scheme": "US_PATENT_NUMBER", "issuer": "USPTO", "value": "8197807", "identifies": ["hu:granted-patent:us-8197807"]}
+     {"scheme": "WIPO_MADRID_IR", "issuer": "WIPO", "value": "1336169", "identifies": ["hu:trademark:wo-ir1336169-niagen"]}
+     {"scheme": "JP_PATENT_NUMBER", "issuer": "JPO", "value": "8197807", "identifies": []}
+     {"scheme": "Trademark", "issuer": "US", "value": "US:85932490", "identifies": ["hu:trademark:us-sn85932490-niagen"]}
+     {"scheme": "Trademark", "issuer": "WO", "value": "WO:1336169", "identifies": ["hu:trademark:wo-ir1336169-niagen"]}
+## kernel-clean (non-zero rows only)
+  // V-401b (informational): ACCEPTED assertions whose only locators are coarse (S rows= 1 {"acceptedAssertionsWithOnlyCoarseLocators": 13}
+  // V-514b (informational): assertions without contentHash (legacy or fixture rec rows= 1 {"assertionsWithoutContentHash": 0}
+## kernel-neg (non-zero rows only)
+  // V-112: derived and forbidden-implication edges cite live, matching assertions rows= 1 {"edgeType": "OWNS_STUDY", "startUid": "hu:org:chromadex-inc", "endUid": "hu:study:nct02712593", "violations": ["FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"]}
+  // V-401b (informational): ACCEPTED assertions whose only locators are coarse (S rows= 1 {"acceptedAssertionsWithOnlyCoarseLocators": 13}
+  // V-514b (informational): assertions without contentHash (legacy or fixture rec rows= 1 {"assertionsWithoutContentHash": 0}

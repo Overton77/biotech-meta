@@ -7,7 +7,8 @@
 // added, "corrected in the PDF and HTML versions of the article". No pre-correction capture of the article exists in this
 // run: PRIOR_SNAPSHOT is absent (unknown), never invented.
 // publicationKind: AUTHOR_CORRECTION (journal designation); PubMed's "Published Erratum" maps to revisionKind ERRATUM.
-// Expected: QS-W09-06 returns the correction with its event; V-W09-04 0 rows; V-W09-06 0 rows; no assertion deleted.
+// Expected: QS-W09-06 returns the correction with its event; V-W09-04 0 rows; V-W09-06 0 rows; no assertion deleted;
+// V-223 returns 1 informational row (Blood NAD+: SECONDARY registry vs PRIMARY paper Discussion).
 // =====================================================================================================================
 
 // 1. Work-level publications.
@@ -182,3 +183,31 @@ MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w09-fixture-06-c
                 j.reviewerType = 'POLICY', j.methodVersion = 'w09-fixture-capture-policy-1', j.status = 'ACCEPTED',
                 j.reviewedAt = datetime('2026-10-04T01:16:00Z'), j.recordedAt = datetime('2026-10-04T01:16:00Z'), j.createdAt = datetime('2026-10-04T01:16:00Z')
 MERGE (j)-[:EVALUATES]->(a);
+
+// 9. Outcome priority disagreement (CQ-ST-04, V-223 informational): the registry version observed 2026-10-04 lists
+//    "Blood NAD+" as SECONDARY (MCP retrieval); the paper's Discussion calls NAD+ "the major efficacy endpoint" (INHERITED
+//    locator from round 0002; not re-fetched). Two attributed assertions; the derived registered priority is SECONDARY.
+MATCH (st:Study {uid: 'hu:study:nct02678611-basis-nrpt'}), (rv:RegistrationVersion {uid: 'hu:registration-version:nct02678611-observed-2026-10-04'}),
+      (rloc:SourceLocator {uid: 'hu:locator:ctgov-nct02678611-2026-10-04-record'}), (src:Source {uid: 'hu:source:pmc5701244'}), (snap:SourceSnapshot {uid: 'hu:snapshot:pmc5701244-2026-10-04'})
+MERGE (dloc:SourceLocator:InformationArtifact {uid: 'hu:locator:pmc5701244-discussion-major-endpoint'})
+  ON CREATE SET dloc.id = 'pmc5701244-discussion-major-endpoint', dloc.artifactType = 'SourceLocator', dloc.uri = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5701244/',
+                dloc.selectorKind = 'TEXT_QUOTE', dloc.section = 'Discussion', dloc.exact = 'The major efficacy endpoint of the trial was NAD+ concentration', dloc.createdAt = datetime('2026-10-04T01:15:00Z')
+MERGE (snap)-[:HAS_LOCATOR]->(dloc)
+MERGE (od:OutcomeDefinition:VersionedState {uid: 'hu:outcome:nct02678611-nad-whole-blood'})
+  ON CREATE SET od.id = 'nct02678611-nad-whole-blood', od.stateType = 'OutcomeDefinition', od.payloadHash = 'sha256:synthetic-nct02678611-nad', od.name = 'Blood NAD+',
+                od.measureKind = 'BIOMARKER', od.timepoint = '8 weeks', od.createdAt = datetime('2026-10-04T01:15:00Z')
+MERGE (st)-[:DEFINES_OUTCOME]->(od)
+MERGE (od)-[:DEFINED_IN]->(rv)
+MERGE (a1:Assertion {uid: 'hu:assertion:nct02678611-nad-priority-registry'})
+  ON CREATE SET a1.id = 'nct02678611-nad-priority-registry', a1.predicate = 'DECLARES_OUTCOME_PRIORITY', a1.valueString = 'SECONDARY', a1.status = 'ACCEPTED', a1.polarity = 'POSITIVE',
+                a1.recordedAt = datetime('2026-10-04T01:15:00Z'), a1.contentHash = 'sha256:synthetic-nad-priority-registry', a1.validFromBasis = 'UNKNOWN', a1.validToBasis = 'UNKNOWN',
+                a1.createdAt = datetime('2026-10-04T01:15:00Z')
+MERGE (a1)-[:HAS_SUBJECT]->(od)
+MERGE (a1)-[:SUPPORTED_BY]->(rloc)
+MERGE (a2:Assertion {uid: 'hu:assertion:nct02678611-nad-priority-paper-discussion'})
+  ON CREATE SET a2.id = 'nct02678611-nad-priority-paper-discussion', a2.predicate = 'DECLARES_OUTCOME_PRIORITY', a2.valueString = 'PRIMARY', a2.status = 'ACCEPTED', a2.polarity = 'POSITIVE',
+                a2.recordedAt = datetime('2026-10-04T01:15:00Z'), a2.contentHash = 'sha256:synthetic-nad-priority-paper', a2.validFromBasis = 'UNKNOWN', a2.validToBasis = 'UNKNOWN',
+                a2.createdAt = datetime('2026-10-04T01:15:00Z')
+MERGE (a2)-[:HAS_SUBJECT]->(od)
+MERGE (a2)-[:SUPPORTED_BY]->(dloc)
+SET od.priority = 'SECONDARY', od.priorityAssertionUid = a1.uid;

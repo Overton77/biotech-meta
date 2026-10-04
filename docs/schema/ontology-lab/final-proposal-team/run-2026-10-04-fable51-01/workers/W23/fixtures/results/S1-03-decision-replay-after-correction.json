@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 850,
+   "ms": 211,
    "sample": [
     {
      "subjectUid": "hu:product-variant:w23-sleepwell-us-capsule",
@@ -54,7 +54,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 372,
+   "ms": 74,
    "sample": [
     {
      "subjectUid": "hu:product-variant:w23-sleepwell-us-capsule",
@@ -83,7 +83,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 144,
+   "ms": 81,
    "sample": [
     {
      "supersededEvidence": "hu:assertion:w23-a1-variant-fv-a1",
@@ -121,7 +121,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 116,
+   "ms": 30,
    "sample": [
     {
      "adjudicationUid": "hu:adjudication:w23-cf-a1",
@@ -160,7 +160,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 481,
+   "ms": 146,
    "sample": [
     {
      "policyKey": "sleep-support-ranking",
