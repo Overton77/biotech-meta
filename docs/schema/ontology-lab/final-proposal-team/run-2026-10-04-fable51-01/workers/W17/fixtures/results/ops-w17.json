@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/operations.cypher",
- "uri": "bolt://127.0.0.1:39337/",
+ "uri": "bolt://127.0.0.1:35591/",
  "db": "neo4j",
  "explain": false,
  "total": 21,
@@ -25,7 +25,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 130,
+   "ms": 98,
    "sample": [],
    "header": "// W17 safety_and_constraints operations -- Community-runnable baseline (Neo4j 5.26.31 Community; also valid on Enterprise).\n// Run: run-2026-10-04-fable51-01, worker W17. Recommendation for Fable's final operations file; not a deployment script.\n// Every statement is idempotent (IF NOT EXISTS). Arc"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 36,
+   "ms": 35,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 38,
+   "ms": 33,
    "sample": [],
    "header": ""
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 26,
+   "ms": 30,
    "sample": [],
    "header": ""
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 30,
    "sample": [],
    "header": ""
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 30,
+   "ms": 28,
    "sample": [],
    "header": ""
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 30,
    "sample": [],
    "header": ""
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 53,
+   "ms": 30,
    "sample": [],
    "header": ""
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 28,
    "sample": [],
    "header": "// B. Natural identity: one UseConstraint per canonical scope tuple (uc-key/v1). Concurrent writers MERGE on this key."
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 38,
+   "ms": 30,
    "sample": [],
    "header": "// C. Relationship-episode identity for the structural subject attachment (MERGE key for parallel subjects)."
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 40,
+   "ms": 32,
    "sample": [],
    "header": "// D. Range indexes for Q-W17-03/07/08 (signal state and method filters) and Q-W17-04 (directive level)."
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 32,
+   "ms": 57,
    "sample": [],
    "header": ""
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 30,
+   "ms": 103,
    "sample": [],
    "header": ""
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 32,
+   "ms": 28,
    "sample": [],
    "header": ""
   },
@@ -355,7 +355,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 28,
+   "ms": 29,
    "sample": [],
    "header": ""
   },
@@ -377,7 +377,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 32,
+   "ms": 23,
    "sample": [],
    "header": ""
   },
@@ -399,7 +399,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 56,
+   "ms": 23,
    "sample": [],
    "header": ""
   },
@@ -421,7 +421,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 132,
+   "ms": 24,
    "sample": [],
    "header": ""
   },
@@ -443,7 +443,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 39,
    "sample": [],
    "header": "// E. Full-text indexes keeping the live index and query names (D-015), over stored property names."
   },
@@ -465,7 +465,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 34,
    "sample": [],
    "header": ""
   }

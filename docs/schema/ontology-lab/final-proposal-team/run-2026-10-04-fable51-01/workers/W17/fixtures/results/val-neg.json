@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/w17-validation.cypher",
- "uri": "bolt://127.0.0.1:39337/",
+ "uri": "bolt://127.0.0.1:35591/",
  "db": "neo4j",
  "explain": false,
  "total": 13,
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 71,
+   "ms": 76,
    "sample": [
     {
      "signal": "hu:safety-signal:neg-w17-n1-hint-as-verdict",
@@ -61,7 +61,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 10,
+   "ms": 7,
    "sample": [
     {
      "signal": "hu:safety-signal:neg-w17-n1-hint-as-verdict",
@@ -124,7 +124,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 9,
+   "ms": 6,
    "sample": [
     {
      "assertion": "hu:assertion:neg-w17-n14-in-substance-no-level",
@@ -183,7 +183,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 8,
+   "ms": 9,
    "sample": [
     {
      "record": "hu:use-constraint:neg-w17-n10-personal",
@@ -214,7 +214,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 6,
+   "ms": 69,
    "sample": [
     {
      "signal": "hu:safety-signal:w17-legacy-live-row-0001",
@@ -243,7 +243,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 5,
+   "ms": 6,
    "sample": [
     {
      "record": "hu:assertion:neg-w17-n7-dose-limit-without-dose",
@@ -270,7 +270,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 5,
+   "ms": 6,
    "sample": [
     {
      "start": "hu:safety-signal:w17-legacy-live-row-0001",
@@ -327,7 +327,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 7,
+   "ms": 5,
    "sample": [
     {
      "signal": "hu:safety-signal:w17-nrpt-gi-tolerability-v2",
@@ -355,7 +355,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 11,
+   "ms": 12,
    "sample": [
     {
      "node": "hu:use-constraint:neg-w17-n10-personal",
@@ -384,7 +384,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 6,
+   "ms": 5,
    "sample": [
     {
      "node": "hu:adverse-effect:neg-w17-n13-rhabdo-merged",

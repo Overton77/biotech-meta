@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/operations.cypher",
- "uri": "bolt://127.0.0.1:39337/",
+ "uri": "bolt://127.0.0.1:35591/",
  "db": "neo4j",
  "explain": false,
  "total": 53,
@@ -25,7 +25,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 975,
+   "ms": 876,
    "sample": [],
    "header": "// W00 kernel operations — Community-runnable baseline (Neo4j 5.26.31 Community; also valid on Enterprise).\n// Run: run-2026-10-04-fable51-01, worker W00. Recommendation for Fable's\n// docs/schema/neo4j/final_biotech_schema_operations.cypher; not a deployment script.\n// Every statement is idempotent"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 94,
+   "ms": 63,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 55,
+   "ms": 45,
    "sample": [],
    "header": ""
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 46,
    "sample": [],
    "header": ""
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 44,
    "sample": [],
    "header": ""
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 40,
    "sample": [],
    "header": ""
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 45,
    "sample": [],
    "header": "// ---------------------------------------------------------------------------------------------------\n// B. Primary-label uid and live-id uniqueness for W00 types. A uniqueness constraint is index-backed; the\n//    planner uses a label's index only when the pattern names that label, so Cypher that "
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 55,
+   "ms": 40,
    "sample": [],
    "header": ""
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 43,
    "sample": [],
    "header": ""
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 37,
    "sample": [],
    "header": ""
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 61,
+   "ms": 36,
    "sample": [],
    "header": ""
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 30,
    "sample": [],
    "header": ""
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 37,
    "sample": [],
    "header": ""
   },
@@ -311,7 +311,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 37,
    "sample": [],
    "header": ""
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 36,
+   "ms": 44,
    "sample": [],
    "header": ""
   },
@@ -355,7 +355,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 35,
    "sample": [],
    "header": ""
   },
@@ -377,7 +377,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -399,7 +399,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 35,
    "sample": [],
    "header": ""
   },
@@ -421,7 +421,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 61,
+   "ms": 32,
    "sample": [],
    "header": ""
   },
@@ -465,7 +465,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 60,
+   "ms": 32,
    "sample": [],
    "header": ""
   },
@@ -487,7 +487,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 58,
+   "ms": 43,
    "sample": [],
    "header": ""
   },
@@ -509,7 +509,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 55,
+   "ms": 32,
    "sample": [],
    "header": ""
   },
@@ -531,7 +531,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 66,
+   "ms": 36,
    "sample": [],
    "header": ""
   },
@@ -553,7 +553,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 35,
    "sample": [],
    "header": ""
   },
@@ -575,7 +575,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 40,
    "sample": [],
    "header": ""
   },
@@ -597,7 +597,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 39,
+   "ms": 31,
    "sample": [],
    "header": ""
   },
@@ -619,7 +619,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 60,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -641,7 +641,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 51,
+   "ms": 32,
    "sample": [],
    "header": ""
   },
@@ -663,7 +663,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 33,
    "sample": [],
    "header": "// ---------------------------------------------------------------------------------------------------\n// C. Natural keys (Community uniqueness; on Enterprise the Identifier key is also a NODE KEY, see companion).\n//    Uniqueness does not require presence: a node missing a key property is not check"
   },
@@ -685,7 +685,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 60,
+   "ms": 46,
    "sample": [],
    "header": "// (scheme, issuer, value): the same (scheme, value) from two issuers is two identifiers (forbidden implication\n// SHARED_IDENTIFIER_SCHEME_VALUE_ACROSS_ISSUERS -> SAME_IDENTITY). Covers TradeItemIdentifier (it carries :Identifier)."
   },
@@ -707,7 +707,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 38,
    "sample": [],
    "header": ""
   },
@@ -729,7 +729,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 98,
+   "ms": 38,
    "sample": [],
    "header": ""
   },
@@ -751,7 +751,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 96,
+   "ms": 40,
    "sample": [],
    "header": "// ---------------------------------------------------------------------------------------------------\n// D. Relationship-episode identity (relationship property uniqueness, Neo4j 5.7+, accepted by 5.26 Community).\n//    One relationship per recorded-time episode; relationshipUid is the MERGE key fo"
   },
@@ -773,7 +773,7 @@
     "constraintsAdded": 1,
     "constraintsRemoved": 0
    },
-   "ms": 66,
+   "ms": 32,
    "sample": [],
    "header": ""
   },
@@ -795,7 +795,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 64,
+   "ms": 58,
    "sample": [],
    "header": "// ---------------------------------------------------------------------------------------------------\n// E. Range indexes required by QS-1 (trace), QS-2 (as-of), QS-4 (guard), V-1xx/V-5xx audits.\n// ---------------------------------------------------------------------------------------------------\n"
   },
@@ -817,7 +817,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 31,
+   "ms": 30,
    "sample": [],
    "header": ""
   },
@@ -861,7 +861,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 32,
    "sample": [],
    "header": ""
   },
@@ -883,7 +883,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 30,
+   "ms": 25,
    "sample": [],
    "header": "// QS-1a / CQ-TM-01: adjudications as of R (recordedAt is the recorded-time clock; reviewedAt kept for QS-1a text)."
   },
@@ -927,7 +927,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 29,
    "sample": [],
    "header": "// QS-1a / V-111 / V-504: snapshot clocks and reproducibility lookups."
   },
@@ -949,7 +949,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 57,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -971,7 +971,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 31,
    "sample": [],
    "header": ""
   },
@@ -993,7 +993,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 62,
+   "ms": 32,
    "sample": [],
    "header": "// Echo detection / re-anchoring: same quote across snapshots and sources."
   },
@@ -1015,7 +1015,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 37,
+   "ms": 45,
    "sample": [],
    "header": "// CQ-TM-06: revisions learned in a window."
   },
@@ -1037,7 +1037,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 42,
+   "ms": 39,
    "sample": [],
    "header": "// QS-8 / CQ-ID-04: cross-issuer lookup by value (the composite uniqueness index leads with scheme, issuer)."
   },
@@ -1059,7 +1059,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 32,
    "sample": [],
    "header": "// QS-2b on asserted edges: recordedFrom per relationship type, and assertionUid for regeneration on supersession.\n// Template for EVERY asserted relationship type T:\n//   CREATE INDEX <t>_recorded_from IF NOT EXISTS FOR ()-[r:T]-() ON (r.recordedFrom);\n//   CREATE INDEX <t>_assertion_uid IF NOT EXI"
   },
@@ -1081,7 +1081,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 58,
+   "ms": 30,
    "sample": [],
    "header": ""
   },
@@ -1103,7 +1103,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 26,
    "sample": [],
    "header": ""
   },
@@ -1125,7 +1125,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 55,
+   "ms": 24,
    "sample": [],
    "header": ""
   },
@@ -1147,7 +1147,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 29,
    "sample": [],
    "header": "// Supersession audits (V-506, V-507) and CQ-RC-07 triage by commit time."
   },
@@ -1169,7 +1169,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 405,
+   "ms": 364,
    "sample": [],
    "header": "// QS-8 candidates from extracted surface forms (lexical score only; never identity)."
   }

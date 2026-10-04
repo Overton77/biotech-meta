@@ -1,10 +1,10 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/90-negative-must-fail.cypher",
- "uri": "bolt://127.0.0.1:39337/",
+ "uri": "bolt://127.0.0.1:35591/",
  "db": "neo4j",
  "explain": false,
- "total": 34,
- "ok": 34,
+ "total": 37,
+ "ok": 37,
  "failed": 0,
  "results": [
   {
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 148,
+   "ms": 142,
    "sample": [],
    "header": "// W17 fixture 90: MUST-FAIL cases. Each block names the validator that must report it (06-fixtures-and-queries.md).\n// Load into a database that already holds fixtures 00-05; every uid is prefixed 'neg-'."
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 56,
+   "ms": 46,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 57,
+   "ms": 35,
    "sample": [],
    "header": ""
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 56,
+   "ms": 69,
    "sample": [],
    "header": ""
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 18,
+   "ms": 15,
    "sample": [],
    "header": ""
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 38,
+   "ms": 33,
    "sample": [],
    "header": ""
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 47,
    "sample": [],
    "header": ""
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 18,
+   "ms": 17,
    "sample": [],
    "header": ""
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 57,
+   "ms": 43,
    "sample": [],
    "header": ""
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 33,
    "sample": [],
    "header": ""
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 36,
    "sample": [],
    "header": ""
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 38,
    "sample": [],
    "header": ""
   },
@@ -311,7 +311,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 40,
+   "ms": 37,
    "sample": [],
    "header": ""
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 39,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -355,7 +355,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 37,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -377,7 +377,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 35,
+   "ms": 32,
    "sample": [],
    "header": ""
   },
@@ -399,7 +399,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 40,
    "sample": [],
    "header": ""
   },
@@ -443,7 +443,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -465,7 +465,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 43,
    "sample": [],
    "header": ""
   },
@@ -487,7 +487,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 77,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -509,7 +509,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 18,
+   "ms": 17,
    "sample": [],
    "header": ""
   },
@@ -531,7 +531,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 14,
+   "ms": 19,
    "sample": [],
    "header": ""
   },
@@ -553,7 +553,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 37,
    "sample": [],
    "header": ""
   },
@@ -575,7 +575,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 59,
+   "ms": 39,
    "sample": [],
    "header": ""
   },
@@ -597,7 +597,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 38,
+   "ms": 31,
    "sample": [],
    "header": ""
   },
@@ -619,7 +619,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 59,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -641,7 +641,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 30,
    "sample": [],
    "header": ""
   },
@@ -663,7 +663,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 30,
+   "ms": 21,
    "sample": [],
    "header": ""
   },
@@ -685,7 +685,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 16,
+   "ms": 17,
    "sample": [],
    "header": ""
   },
@@ -707,7 +707,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 60,
+   "ms": 40,
    "sample": [],
    "header": ""
   },
@@ -729,7 +729,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 39,
+   "ms": 32,
    "sample": [],
    "header": ""
   },
@@ -751,7 +751,73 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 71,
+   "ms": 44,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 35,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 13,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 232,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 36,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 1,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 54,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 37,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 1,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 17,
    "sample": [],
    "header": ""
   }

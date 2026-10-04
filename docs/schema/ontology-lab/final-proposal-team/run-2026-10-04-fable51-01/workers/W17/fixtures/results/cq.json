@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/w17-cq-queries.cypher",
- "uri": "bolt://127.0.0.1:39337/",
+ "uri": "bolt://127.0.0.1:35591/",
  "db": "neo4j",
  "explain": false,
  "total": 10,
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 184,
+   "ms": 175,
    "sample": [
     {
      "arm": "NRPT 1X",
@@ -88,7 +88,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 218,
+   "ms": 174,
    "sample": [
     {
      "study": "hu:study:nct02678611-basis-nrpt",
@@ -141,7 +141,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 318,
+   "ms": 178,
    "sample": [
     {
      "signal": "hu:safety-signal:w17-nrpt-gi-tolerability-v1",
@@ -204,7 +204,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 2007,
+   "ms": 1088,
    "sample": [
     {
      "case": "A kava + warfarin",
@@ -305,7 +305,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 748,
+   "ms": 307,
    "sample": [
     {
      "subject": "hu:material:american-ginseng-preparation-unspecified",
@@ -376,7 +376,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 207,
+   "ms": 130,
    "sample": [
     {
      "recordedAsOf": "2021-03-01T00:00:00Z",
@@ -431,7 +431,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 71,
+   "ms": 66,
    "sample": [
     {
      "signal": "hu:safety-signal:w17-fda-aems-daptomycin-hyperkalemia",
@@ -494,7 +494,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 252,
+   "ms": 112,
    "sample": [
     {
      "subject": "daptomycin",
@@ -533,7 +533,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 318,
+   "ms": 140,
    "sample": [
     {
      "useConstraint": "hu:use-constraint:statin-therapy-in-pregnancy",
@@ -566,7 +566,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 126,
+   "ms": 60,
    "sample": [
     {
      "substance": "nicotinamide riboside",

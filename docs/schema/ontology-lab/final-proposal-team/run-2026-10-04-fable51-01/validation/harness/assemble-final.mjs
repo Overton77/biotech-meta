@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { parse, Kind } from "graphql";
 const [dir, out, rulingsPath] = process.argv.slice(2);
+const injPath0 = () => process.argv[5];
 const R = JSON.parse(readFileSync(rulingsPath, "utf8"));
 let body = "";
 for (const sec of R.sections) {
@@ -19,6 +20,8 @@ for (const sec of R.sections) {
     body += `\n# ---- fragment ${w} ----\n` + t.trimEnd() + "\n";
   }
 }
+// extra definitions supplied by seam closure (unions/types nobody owned), appended before rulings
+if (injPath0()) { try { const extra = readFileSync(injPath0().replace(/field-injections\.json$/, "extra-definitions.graphql"), "utf8"); body += `\n# ${"=".repeat(96)}\n# SEAM CLOSURE: definitions added at merge (sole writer Fable; see reports/04-seam-closure-ledger.md)\n# ${"=".repeat(96)}\n` + extra + "\n"; console.log("extra definitions appended"); } catch {} }
 // textual rulings: rename fields inside a named type block
 for (const r of R.fieldRenames || []) {
   const start = body.indexOf(`type ${r.type} `); if (start < 0) { console.log("rename: type not found", r.type); continue; }

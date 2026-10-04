@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/05-statin-pregnancy-validity-bounded.cypher",
- "uri": "bolt://127.0.0.1:39337/",
+ "uri": "bolt://127.0.0.1:35591/",
  "db": "neo4j",
  "explain": false,
  "total": 46,
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 108,
+   "ms": 77,
    "sample": [],
    "header": "// W17 fixture 05: statin pregnancy contraindication removed by the FDA (DSC 2021-07-20). Correction vs validity-bounded:\n// the earlier contraindication was not wrong when stated; it ENDED (SUPERSEDES {VALIDITY_BOUNDED}). Late arrival: W17 ingests\n// the 2021 change on 2026-10-04. The pre-2021 asse"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 43,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 23,
+   "ms": 15,
    "sample": [],
    "header": ""
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 40,
+   "ms": 16,
    "sample": [],
    "header": ""
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 24,
+   "ms": 14,
    "sample": [],
    "header": ""
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 17,
+   "ms": 15,
    "sample": [],
    "header": ""
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 69,
+   "ms": 38,
    "sample": [],
    "header": ""
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 42,
    "sample": [],
    "header": ""
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 53,
+   "ms": 47,
    "sample": [],
    "header": ""
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 14,
+   "ms": 15,
    "sample": [],
    "header": ""
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 14,
+   "ms": 20,
    "sample": [],
    "header": ""
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 15,
+   "ms": 13,
    "sample": [],
    "header": ""
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 18,
+   "ms": 17,
    "sample": [],
    "header": ""
   },
@@ -311,7 +311,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 86,
+   "ms": 45,
    "sample": [],
    "header": ""
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 29,
+   "ms": 15,
    "sample": [],
    "header": ""
   },
@@ -355,7 +355,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 23,
+   "ms": 18,
    "sample": [],
    "header": ""
   },
@@ -377,7 +377,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 19,
+   "ms": 14,
    "sample": [],
    "header": ""
   },
@@ -399,7 +399,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 18,
+   "ms": 12,
    "sample": [],
    "header": ""
   },
@@ -421,7 +421,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 17,
+   "ms": 13,
    "sample": [],
    "header": ""
   },
@@ -443,7 +443,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 13,
+   "ms": 14,
    "sample": [],
    "header": ""
   },
@@ -465,7 +465,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 15,
+   "ms": 14,
    "sample": [],
    "header": ""
   },
@@ -487,7 +487,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 63,
+   "ms": 44,
    "sample": [],
    "header": ""
   },
@@ -509,7 +509,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -531,7 +531,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 24,
+   "ms": 17,
    "sample": [],
    "header": ""
   },
@@ -553,7 +553,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 80,
+   "ms": 58,
    "sample": [],
    "header": ""
   },
@@ -575,7 +575,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 27,
+   "ms": 13,
    "sample": [],
    "header": ""
   },
@@ -597,7 +597,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 24,
+   "ms": 13,
    "sample": [],
    "header": ""
   },
@@ -619,7 +619,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 15,
+   "ms": 16,
    "sample": [],
    "header": ""
   },
@@ -641,7 +641,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 17,
+   "ms": 15,
    "sample": [],
    "header": ""
   },
@@ -663,7 +663,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 13,
+   "ms": 14,
    "sample": [],
    "header": ""
   },
@@ -685,7 +685,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 14,
+   "ms": 17,
    "sample": [],
    "header": ""
   },
@@ -707,7 +707,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 42,
+   "ms": 19,
    "sample": [],
    "header": ""
   },
@@ -729,7 +729,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 63,
+   "ms": 46,
    "sample": [],
    "header": ""
   },
@@ -751,7 +751,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 20,
+   "ms": 13,
    "sample": [],
    "header": ""
   },
@@ -773,7 +773,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 24,
+   "ms": 12,
    "sample": [],
    "header": ""
   },
@@ -795,7 +795,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 17,
+   "ms": 12,
    "sample": [],
    "header": ""
   },
@@ -817,7 +817,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 14,
+   "ms": 16,
    "sample": [],
    "header": ""
   },
@@ -839,7 +839,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 19,
+   "ms": 13,
    "sample": [],
    "header": ""
   },
@@ -883,7 +883,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 55,
+   "ms": 50,
    "sample": [],
    "header": ""
   },
@@ -927,7 +927,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 23,
+   "ms": 13,
    "sample": [],
    "header": ""
   },
@@ -949,7 +949,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 24,
+   "ms": 14,
    "sample": [],
    "header": ""
   },
@@ -971,7 +971,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 14,
+   "ms": 13,
    "sample": [],
    "header": ""
   },
@@ -993,7 +993,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 14,
+   "ms": 12,
    "sample": [],
    "header": ""
   },
@@ -1015,7 +1015,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 21,
+   "ms": 15,
    "sample": [],
    "header": ""
   }
