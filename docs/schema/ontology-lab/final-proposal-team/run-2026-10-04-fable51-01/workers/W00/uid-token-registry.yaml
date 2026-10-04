@@ -843,6 +843,11 @@ labels:
     requestedBy: W12-SR-01
     owner: W12
     note: refinement specialization of Organization (rule T2)
+  TradeItemIdentifier:
+    token: trade-id
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias; creation-time kind, rule T3)
+    owner: W00
   Trademark:
     token: trademark
     status: ACCEPTED
@@ -986,9 +991,6 @@ labelsInMergedFragmentsWithoutToken:
   action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 - label: ToolOrInstrument
   owner: W08
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: TradeItemIdentifier
-  owner: W00
   action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 - label: UseConstraint
   owner: W17
