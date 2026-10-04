@@ -10,52 +10,52 @@
 // nodes it needs so it also runs alone.
 
 MERGE (n:Product:Entity {uid: 'hu:product:elysium-basis'})
-SET n.name = 'Basis', n.entityType = 'PRODUCT';
+SET n.privacyClass = 'PUBLIC', n.name = 'Basis', n.entityType = 'PRODUCT';
 
 MERGE (n:ProductVariant:Entity {uid: 'hu:product-variant:basis-us-capsule-standard'})
-SET n.name = 'Basis - US capsules', n.entityType = 'PRODUCT_VARIANT', n.jurisdiction = 'US';
+SET n.privacyClass = 'PUBLIC', n.name = 'Basis - US capsules', n.entityType = 'PRODUCT_VARIANT', n.jurisdiction = 'US';
 
 MERGE (n:Organization:Entity {uid: 'hu:org:elysium-health-inc'})
-SET n.name = 'Elysium Health', n.entityType = 'ORGANIZATION';
+SET n.privacyClass = 'PUBLIC', n.name = 'Elysium Health', n.entityType = 'ORGANIZATION';
 
 MERGE (n:Agent:Entity {uid: 'hu:agent:belllabs-w22-curator'})
-SET n.name = 'BellLabs W22 media curator', n.entityType = 'AGENT', n.agentKind = 'MANUAL_AGENT';
+SET n.privacyClass = 'PUBLIC', n.name = 'BellLabs W22 media curator', n.entityType = 'AGENT', n.agentKind = 'MANUAL_AGENT';
 
 MERGE (n:Agent:Entity {uid: 'hu:agent:belllabs-crop-tool-v1'})
-SET n.name = 'BellLabs crop tool', n.entityType = 'AGENT', n.agentKind = 'AUTOMATED_AGENT', n.toolVersion = 'bl-crop-v1';
+SET n.privacyClass = 'PUBLIC', n.name = 'BellLabs crop tool', n.entityType = 'AGENT', n.agentKind = 'AUTOMATED_AGENT', n.toolVersion = 'bl-crop-v1';
 
 MERGE (n:Activity:Occurrence {uid: 'hu:activity:w22-curation-2026-10-04'})
-SET n.occurrenceType = 'ACTIVITY', n.activityKind = 'EXTRACTION', n.startedAt = datetime('2026-10-04T01:10:00Z'), n.endedAt = datetime('2026-10-04T02:00:00Z'), n.methodVersion = 'w22-manual-media-curation-v0.1';
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'EXTRACTION', n.startedAt = datetime('2026-10-04T01:10:00Z'), n.endedAt = datetime('2026-10-04T02:00:00Z'), n.methodVersion = 'w22-manual-media-curation-v0.1';
 
 MERGE (n:Activity:Occurrence {uid: 'hu:activity:w22-crop-basis-supplement-facts-panel'})
-SET n.occurrenceType = 'ACTIVITY', n.activityKind = 'MEDIA_TRANSFORMATION', n.startedAt = datetime('2026-10-04T02:50:00Z'), n.endedAt = datetime('2026-10-04T02:50:02Z'), n.methodVersion = 'bl-crop-v1';
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'MEDIA_TRANSFORMATION', n.startedAt = datetime('2026-10-04T02:50:00Z'), n.endedAt = datetime('2026-10-04T02:50:02Z'), n.methodVersion = 'bl-crop-v1';
 
 MERGE (n:Activity:Occurrence {uid: 'hu:activity:w22-ocr-basis-supplement-facts-panel'})
-SET n.occurrenceType = 'ACTIVITY', n.activityKind = 'TEXT_EXTRACTION', n.startedAt = datetime('2026-10-04T02:51:00Z'), n.endedAt = datetime('2026-10-04T02:51:05Z'), n.methodVersion = 'ocr-engine-unspecified-v0';
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'TEXT_EXTRACTION', n.startedAt = datetime('2026-10-04T02:51:00Z'), n.endedAt = datetime('2026-10-04T02:51:05Z'), n.methodVersion = 'ocr-engine-unspecified-v0';
 
 MATCH (a:Activity {uid: 'hu:activity:w22-crop-basis-supplement-facts-panel'}), (g:Agent {uid: 'hu:agent:belllabs-crop-tool-v1'})
 MERGE (a)-[:WAS_ASSOCIATED_WITH]->(g);
 
 // ---- The label image capture (same nodes as MP1).
 MERGE (n:Source:Entity {uid: 'hu:source:elysium-cdn-basis-supplement-facts-w1946'})
-SET n.entityType = 'SOURCE', n.canonicalUri = 'https://www.elysiumhealth.com/cdn/shop/files/5_Basis_Carousel_SupplementFacts_SEP26_1_1_33f99ab8-54b6-4178-b1fd-12c206b8064f.jpg?v=1790519922&width=1946', n.sourceKind = 'MEDIA_FILE';
+SET n.privacyClass = 'PUBLIC', n.entityType = 'SOURCE', n.canonicalUri = 'https://www.elysiumhealth.com/cdn/shop/files/5_Basis_Carousel_SupplementFacts_SEP26_1_1_33f99ab8-54b6-4178-b1fd-12c206b8064f.jpg?v=1790519922&width=1946', n.sourceKind = 'MEDIA_FILE';
 
 MERGE (n:SourceSnapshot:InformationArtifact:LabelSnapshot {uid: 'hu:snapshot:elysium-cdn-basis-supplement-facts-w1946-synthetic'})
-SET n.artifactType = 'SOURCE_SNAPSHOT', n.canonicalUri = 'https://www.elysiumhealth.com/cdn/shop/files/5_Basis_Carousel_SupplementFacts_SEP26_1_1_33f99ab8-54b6-4178-b1fd-12c206b8064f.jpg?v=1790519922&width=1946', n.retrievedAt = datetime('2026-10-04T02:00:00Z'),
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_SNAPSHOT', n.canonicalUri = 'https://www.elysiumhealth.com/cdn/shop/files/5_Basis_Carousel_SupplementFacts_SEP26_1_1_33f99ab8-54b6-4178-b1fd-12c206b8064f.jpg?v=1790519922&width=1946', n.retrievedAt = datetime('2026-10-04T01:05:00Z'),
     n.contentHash = 'sha256:dc65afc729347a6161f42190a9f665338ac2f44bec7b7c368fc29cdcb415e592', n.contentHashBasis = 'SYNTHETIC_FIXTURE', n.captureCompleteness = 'UNKNOWN', n.mimeType = 'image/jpeg', n.jurisdiction = 'US';
 
 MATCH (s:Source {uid: 'hu:source:elysium-cdn-basis-supplement-facts-w1946'}), (ss:SourceSnapshot {uid: 'hu:snapshot:elysium-cdn-basis-supplement-facts-w1946-synthetic'})
 MERGE (s)-[:HAS_SNAPSHOT]->(ss);
 
 MERGE (m:MediaAsset:InformationArtifact {uid: 'hu:media-asset:elysium-basis-carousel-supplement-facts'})
-SET m.artifactType = 'MEDIA_ASSET', m.assetType = 'IMAGE', m.mediaPurpose = 'LABEL_IMAGE', m.contentHash = 'sha256:dc65afc729347a6161f42190a9f665338ac2f44bec7b7c368fc29cdcb415e592', m.contentHashBasis = 'SYNTHETIC_FIXTURE';
+SET m.privacyClass = 'PUBLIC', m.artifactType = 'MEDIA_ASSET', m.assetType = 'IMAGE', m.mediaPurpose = 'LABEL_IMAGE', m.contentHash = 'sha256:dc65afc729347a6161f42190a9f665338ac2f44bec7b7c368fc29cdcb415e592', m.contentHashBasis = 'SYNTHETIC_FIXTURE';
 
 MERGE (v:MediaVariant:InformationArtifact {uid: 'hu:media-variant:elysium-basis-supplement-facts-w1946'})
-SET v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'ORIGINAL', v.mediaFormat = 'JPEG', v.mimeType = 'image/jpeg', v.widthPx = 1946,
+SET v.privacyClass = 'PUBLIC', v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'ORIGINAL', v.mediaFormat = 'JPEG', v.mimeType = 'image/jpeg', v.widthPx = 1946,
     v.contentHash = 'sha256:dc65afc729347a6161f42190a9f665338ac2f44bec7b7c368fc29cdcb415e592', v.contentHashBasis = 'SYNTHETIC_FIXTURE';
 
 MERGE (v:MediaVariant:InformationArtifact {uid: 'hu:media-variant:elysium-basis-supplement-facts-w416'})
-SET v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'RESIZED', v.mediaFormat = 'JPEG', v.mimeType = 'image/jpeg', v.widthPx = 416,
+SET v.privacyClass = 'PUBLIC', v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'RESIZED', v.mediaFormat = 'JPEG', v.mimeType = 'image/jpeg', v.widthPx = 416,
     v.contentHash = 'sha256:425835749ee3773e041d1900338a4cd0260ff70d4542fcb7949c71a872787a97', v.contentHashBasis = 'SYNTHETIC_FIXTURE';
 
 MATCH (m:MediaAsset {uid: 'hu:media-asset:elysium-basis-carousel-supplement-facts'}), (v1:MediaVariant {uid: 'hu:media-variant:elysium-basis-supplement-facts-w1946'}), (v2:MediaVariant {uid: 'hu:media-variant:elysium-basis-supplement-facts-w416'})
@@ -63,11 +63,11 @@ MERGE (m)-[:HAS_MEDIA_VARIANT]->(v1) MERGE (m)-[:HAS_MEDIA_VARIANT]->(v2);
 
 // ---- Region annotation on the ORIGINAL rendition (coordinates in IMG-PX1 on the 1946 px raster; synthetic values).
 MERGE (ann:MediaAnnotation:InformationArtifact {uid: 'hu:media-annotation:basis-supplement-facts-panel-w1946'})
-SET ann.artifactType = 'MEDIA_ANNOTATION', ann.annotationType = 'BOUNDING_BOX', ann.normalizationVersion = 'IMG-PX1', ann.x = 310.0, ann.y = 240.0, ann.width = 1320.0, ann.height = 1180.0,
+SET ann.privacyClass = 'PUBLIC', ann.artifactType = 'MEDIA_ANNOTATION', ann.annotationType = 'BOUNDING_BOX', ann.normalizationVersion = 'IMG-PX1', ann.x = 310.0, ann.y = 240.0, ann.width = 1320.0, ann.height = 1180.0,
     ann.label = 'Supplement Facts panel (synthetic coordinates)';
 
 MERGE (n:SourceLocator:InformationArtifact {uid: 'hu:locator:basis-supplement-facts-panel-image-region'})
-SET n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'IMAGE_REGION', n.mediaAnnotationUid = 'hu:media-annotation:basis-supplement-facts-panel-w1946', n.normalizationVersion = 'IMG-PX1';
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'IMAGE_REGION', n.mediaAnnotationUid = 'hu:media-annotation:basis-supplement-facts-panel-w1946', n.normalizationVersion = 'IMG-PX1';
 
 MATCH (v:MediaVariant {uid: 'hu:media-variant:elysium-basis-supplement-facts-w1946'}), (ann:MediaAnnotation {uid: 'hu:media-annotation:basis-supplement-facts-panel-w1946'}),
       (ss:SourceSnapshot {uid: 'hu:snapshot:elysium-cdn-basis-supplement-facts-w1946-synthetic'}), (l:SourceLocator {uid: 'hu:locator:basis-supplement-facts-panel-image-region'}),
@@ -76,10 +76,10 @@ MERGE (v)-[:HAS_ANNOTATION]->(ann) MERGE (ss)-[:HAS_LOCATOR]->(l) MERGE (l)-[:LO
 
 // ---- ProductLabelRegion and the W04 label declaration it contains.
 MERGE (r:ProductLabelRegion:InformationArtifact {uid: 'hu:label-region:basis-supplement-facts-panel'})
-SET r.artifactType = 'PRODUCT_LABEL_REGION', r.labelRegionType = 'SUPPLEMENT_FACTS', r.extractedText = 'Elysium NR (Nicotinamide Riboside Chloride) 250 mg (OCR text, synthetic)';
+SET r.privacyClass = 'PUBLIC', r.artifactType = 'PRODUCT_LABEL_REGION', r.labelRegionType = 'SUPPLEMENT_FACTS', r.extractedText = 'Elysium NR (Nicotinamide Riboside Chloride) 250 mg (OCR text, synthetic)';
 
 MERGE (d:LabelDeclaration:InformationArtifact {uid: 'hu:label-declaration:basis-sf-image-elysium-nr-250mg'})
-SET d.artifactType = 'LABEL_DECLARATION', d.verbatimText = 'Elysium NR (Nicotinamide Riboside Chloride) 250 mg', d.declarationKind = 'INGREDIENT_AMOUNT', d.panelOrder = 1;
+SET d.privacyClass = 'PUBLIC', d.artifactType = 'LABEL_DECLARATION', d.verbatimText = 'Elysium NR (Nicotinamide Riboside Chloride) 250 mg', d.declarationKind = 'INGREDIENT_AMOUNT', d.panelOrder = 1;
 
 MATCH (r:ProductLabelRegion {uid: 'hu:label-region:basis-supplement-facts-panel'}), (ann:MediaAnnotation {uid: 'hu:media-annotation:basis-supplement-facts-panel-w1946'}),
       (d:LabelDeclaration {uid: 'hu:label-declaration:basis-sf-image-elysium-nr-250mg'}), (ss:SourceSnapshot {uid: 'hu:snapshot:elysium-cdn-basis-supplement-facts-w1946-synthetic'}),
@@ -91,7 +91,7 @@ MERGE (d)-[:WAS_GENERATED_BY]->(ocr);
 
 // W04 asserted LABEL_FOR (the label snapshot is the label of the US capsule variant), cited by the region locator.
 MERGE (x:Assertion {uid: 'hu:assertion:w22-basis-sf-image-label-for-us-variant'})
-SET x.predicate = 'LABEL_FOR', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T02:52:00Z'), x.predicateClass = 'IDENTITY', x.validFromBasis = 'OBSERVATION_ONLY', x.validToBasis = 'UNKNOWN';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'LABEL_FOR', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T02:52:00Z'), x.predicateClass = 'IDENTITY', x.validFromBasis = 'OBSERVATION_ONLY', x.validToBasis = 'UNKNOWN';
 
 MATCH (x:Assertion {uid: 'hu:assertion:w22-basis-sf-image-label-for-us-variant'}), (ss:SourceSnapshot {uid: 'hu:snapshot:elysium-cdn-basis-supplement-facts-w1946-synthetic'}), (pv:ProductVariant {uid: 'hu:product-variant:basis-us-capsule-standard'}),
       (o:Organization {uid: 'hu:org:elysium-health-inc'}), (l:SourceLocator {uid: 'hu:locator:basis-supplement-facts-panel-image-region'}), (cur:Activity {uid: 'hu:activity:w22-curation-2026-10-04'})
@@ -99,13 +99,19 @@ MERGE (x)-[:HAS_SUBJECT]->(ss) MERGE (x)-[:HAS_OBJECT]->(pv) MERGE (x)-[:ASSERTE
 MERGE (ss)-[e:LABEL_FOR {relationshipUid: 'hu:rel:w22-basis-sf-image-label-for-us-variant'}]->(pv)
 SET e.assertionUid = x.uid, e.validFromBasis = 'OBSERVATION_ONLY', e.validToBasis = 'UNKNOWN', e.recordedFrom = datetime('2026-10-04T02:52:00Z');
 
-MATCH (p:Product {uid: 'hu:product:elysium-basis'}), (pv:ProductVariant {uid: 'hu:product-variant:basis-us-capsule-standard'})
-MERGE (p)-[:HAS_VARIANT]->(pv);
+MERGE (x:Assertion {uid: 'hu:assertion:w22-basis-has-us-capsule-variant'})
+SET x.privacyClass = 'PUBLIC', x.predicate = 'HAS_VARIANT', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T02:52:00Z'), x.predicateClass = 'IDENTITY', x.validFromBasis = 'OBSERVATION_ONLY', x.validToBasis = 'UNKNOWN';
+
+MATCH (x:Assertion {uid: 'hu:assertion:w22-basis-has-us-capsule-variant'}), (p:Product {uid: 'hu:product:elysium-basis'}), (pv:ProductVariant {uid: 'hu:product-variant:basis-us-capsule-standard'}),
+      (o:Organization {uid: 'hu:org:elysium-health-inc'}), (l:SourceLocator {uid: 'hu:locator:basis-supplement-facts-panel-image-region'}), (cur:Activity {uid: 'hu:activity:w22-curation-2026-10-04'})
+MERGE (x)-[:HAS_SUBJECT]->(p) MERGE (x)-[:HAS_OBJECT]->(pv) MERGE (x)-[:ASSERTED_BY]->(o) MERGE (x)-[:SUPPORTED_BY]->(l) MERGE (x)-[:WAS_GENERATED_BY]->(cur)
+MERGE (p)-[e:HAS_VARIANT {relationshipUid: 'hu:rel:w22-basis-has-us-capsule-variant'}]->(pv)
+SET e.assertionUid = x.uid, e.validFromBasis = 'OBSERVATION_ONLY', e.validToBasis = 'UNKNOWN', e.recordedFrom = datetime('2026-10-04T02:52:00Z');
 
 // ---- The CROP: a new rendition of the same asset, generated by MEDIA_TRANSFORMATION that USED the ORIGINAL rendition and
 // ---- the region annotation (and the locator, so the crop's citation path is recoverable without reading pixels).
 MERGE (c:MediaVariant:InformationArtifact {uid: 'hu:media-variant:basis-supplement-facts-panel-crop'})
-SET c.artifactType = 'MEDIA_VARIANT', c.variantKind = 'CROPPED', c.mediaFormat = 'PNG', c.mimeType = 'image/png', c.widthPx = 1320, c.heightPx = 1180,
+SET c.privacyClass = 'PUBLIC', c.artifactType = 'MEDIA_VARIANT', c.variantKind = 'CROPPED', c.mediaFormat = 'PNG', c.mimeType = 'image/png', c.widthPx = 1320, c.heightPx = 1180,
     c.storageUri = 'urn:belllabs:media-store:basis-sf-panel-crop', c.contentHash = 'sha256:16323c1ae0e87f2455bf73d67889f1ba9f69a2395006909bf5f1737a02a41c0d', c.contentHashBasis = 'SYNTHETIC_FIXTURE';
 
 MATCH (m:MediaAsset {uid: 'hu:media-asset:elysium-basis-carousel-supplement-facts'}), (c:MediaVariant {uid: 'hu:media-variant:basis-supplement-facts-panel-crop'}),
@@ -121,13 +127,13 @@ MERGE (ocr)-[:USED]->(c);
 // ---- locator on the ORIGINAL snapshot - coordinate frame and bytes differ (V-602, V-606); (n2) an IMAGE_REGION locator
 // ---- that names an annotation uid but has no LOCATES_REGION edge (V-601).
 MERGE (ann:MediaAnnotation:InformationArtifact {uid: 'hu:media-annotation:bad-nr-line-on-crop'})
-SET ann.artifactType = 'MEDIA_ANNOTATION', ann.annotationType = 'BOUNDING_BOX', ann.normalizationVersion = 'IMG-PX1', ann.x = 20.0, ann.y = 300.0, ann.width = 1200.0, ann.height = 60.0, ann.label = 'NR line (crop coordinates)';
+SET ann.privacyClass = 'PUBLIC', ann.artifactType = 'MEDIA_ANNOTATION', ann.annotationType = 'BOUNDING_BOX', ann.normalizationVersion = 'IMG-PX1', ann.x = 20.0, ann.y = 300.0, ann.width = 1200.0, ann.height = 60.0, ann.label = 'NR line (crop coordinates)';
 
 MERGE (n:SourceLocator:InformationArtifact {uid: 'hu:locator:bad-nr-line-region-on-original-snapshot'})
-SET n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'IMAGE_REGION', n.mediaAnnotationUid = 'hu:media-annotation:bad-nr-line-on-crop', n.normalizationVersion = 'IMG-PX1';
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'IMAGE_REGION', n.mediaAnnotationUid = 'hu:media-annotation:bad-nr-line-on-crop', n.normalizationVersion = 'IMG-PX1';
 
 MERGE (n:SourceLocator:InformationArtifact {uid: 'hu:locator:bad-dangling-image-region'})
-SET n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'IMAGE_REGION', n.mediaAnnotationUid = 'hu:media-annotation:does-not-exist', n.normalizationVersion = 'IMG-PX1';
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'IMAGE_REGION', n.mediaAnnotationUid = 'hu:media-annotation:does-not-exist', n.normalizationVersion = 'IMG-PX1';
 
 MATCH (c:MediaVariant {uid: 'hu:media-variant:basis-supplement-facts-panel-crop'}), (ann:MediaAnnotation {uid: 'hu:media-annotation:bad-nr-line-on-crop'}),
       (ss:SourceSnapshot {uid: 'hu:snapshot:elysium-cdn-basis-supplement-facts-w1946-synthetic'}), (l:SourceLocator {uid: 'hu:locator:bad-nr-line-region-on-original-snapshot'}),
@@ -135,7 +141,7 @@ MATCH (c:MediaVariant {uid: 'hu:media-variant:basis-supplement-facts-panel-crop'
 MERGE (c)-[:HAS_ANNOTATION]->(ann) MERGE (ss)-[:HAS_LOCATOR]->(l) MERGE (l)-[:LOCATES_REGION]->(ann) MERGE (ss)-[:HAS_LOCATOR]->(l2);
 
 MERGE (x:Assertion {uid: 'hu:assertion:bad-nr-declaration-cited-on-crop-region'})
-SET x.predicate = 'DECLARATION_IDENTIFIES_MATERIAL', x.status = 'PROPOSED', x.recordedAt = datetime('2026-10-04T02:55:00Z'), x.predicateClass = 'IDENTITY';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'DECLARATION_IDENTIFIES_MATERIAL', x.status = 'PROPOSED', x.recordedAt = datetime('2026-10-04T02:55:00Z'), x.predicateClass = 'IDENTITY', x.valueString = 'Elysium NR (Nicotinamide Riboside Chloride)';
 
 MATCH (x:Assertion {uid: 'hu:assertion:bad-nr-declaration-cited-on-crop-region'}), (d:LabelDeclaration {uid: 'hu:label-declaration:basis-sf-image-elysium-nr-250mg'}), (l:SourceLocator {uid: 'hu:locator:bad-nr-line-region-on-original-snapshot'})
 MERGE (x)-[:HAS_SUBJECT]->(d) MERGE (x)-[:SUPPORTED_BY]->(l);
@@ -148,6 +154,16 @@ WHERE lf.recordedTo IS NULL AND l.mediaAnnotationUid = ann.uid
 MERGE (r)-[e:ABOUT_PRODUCT {derivationRule: 'LABEL-REGION-PRODUCT-1'}]->(p)
 SET e.derivedFromAssertionUids = [lf.assertionUid], e.derivedAt = datetime('2026-10-04T03:00:00Z')
 RETURN r.uid AS region, p.uid AS product;
+
+// ---- Capture-fidelity adjudications for this fixture's ACCEPTED assertions (kernel V-110; synthetic review record:
+// ---- 'the record accurately captures what the asserter stated in the cited span', never a truth verdict).
+MATCH (g:Agent {uid: 'hu:agent:belllabs-w22-curator'})
+UNWIND ['hu:assertion:w22-basis-sf-image-label-for-us-variant', 'hu:assertion:w22-basis-has-us-capsule-variant'] AS u
+MATCH (a:Assertion {uid: u})
+MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w22-cf-' + substring(u, 13)})
+SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'w22-capture-fidelity-review-v0', j.status = 'ACCEPTED', j.adjudicationKind = 'CAPTURE_FIDELITY',
+    j.verdict = 'SUPPORTED', j.reviewerType = 'HUMAN', j.reviewedAt = a.recordedAt + duration('PT1M'), j.recordedAt = a.recordedAt + duration('PT1M'), j.privacyClass = 'PUBLIC'
+MERGE (j)-[:EVALUATES]->(a) MERGE (j)-[:ASSESSED_BY]->(g);
 
 // =====================================================================================================================
 // Queries

@@ -1,0 +1,288 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/w06-validation.cypher",
+ "uri": "bolt://127.0.0.1:37117/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 11,
+ "ok": 11,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "V-322",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 6278,
+   "sample": [
+    {
+     "check": "V-W06-01",
+     "treatmentUid": "hu:treatment:edaravone-als",
+     "stageText": "Approved",
+     "reason": "APPROVAL_ONLY_FROM_UNACCEPTED_CAPTURE"
+    }
+   ],
+   "header": "// =====================================================================================================================\n// W06 proposed validators V-W06-01 .. V-W06-08b (zero rows = valid, except V-W06-02 and V-W06-07i which are\n// informational reports). Static Cypher for Neo4j 5.26; no APOC. Expe"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1416,
+   "sample": [
+    {
+     "check": "V-W06-02",
+     "treatmentUid": "hu:treatment:edaravone-als",
+     "unbackedDisplayFields": [
+      "developmentStage",
+      "orphanDrugDesignation"
+     ]
+    }
+   ],
+   "header": "// V-W06-02 (informational): display projections without a named source (migrated legacy text)."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 619,
+   "sample": [],
+   "header": "// V-W06-03: orphan designation text read as approval: designation text present, stage text reads approved, and only\n// DESIGNATION states (no APPROVAL state of any capture status) are reachable."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1704,
+   "sample": [],
+   "header": "// V-W06-04: INV-201 through the concept: any edge from a study-side record to a commercial identity, or any edge whose\n// derivation cites INSTANTIATES_TREATMENT / USES_COMPONENT assertions and ends at a Product."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 716,
+   "sample": [],
+   "header": "// V-W06-05: COMBINATION requires at least two USES_COMPONENT edges."
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1899,
+   "sample": [],
+   "header": "// V-W06-06 (warning): a preparatory/collection/co-intervention component whose authorizing assertion rests only on\n// trial-registration locators (a study-specific regimen promoted to the concept)."
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 552,
+   "sample": [],
+   "header": "// V-W06-07: procedure or treatment identities equated on a shared classification code alone."
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 371,
+   "sample": [
+    {
+     "check": "V-W06-07i",
+     "scheme": "ICD-10-PCS",
+     "code": "6A550Z3",
+     "procedures": [
+      "hu:procedure:therapeutic-plasma-exchange",
+      "hu:procedure:plasma-donation-plasmapheresis"
+     ]
+    },
+    {
+     "check": "V-W06-07i",
+     "scheme": "ICD-10-PCS",
+     "code": "6A551Z3",
+     "procedures": [
+      "hu:procedure:therapeutic-plasma-exchange",
+      "hu:procedure:plasma-donation-plasmapheresis"
+     ]
+    }
+   ],
+   "header": "// V-W06-07i (informational): classification codes shared by more than one Procedure (never an identity signal)."
+  },
+  {
+   "n": 9,
+   "id": "QS-4a",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1162,
+   "sample": [],
+   "header": "// V-W06-08: W06 asserted edges must cite a live assertion of the same predicate, subject and object (INV-101, QS-4a core)."
+  },
+  {
+   "n": 10,
+   "id": "V-113",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 131,
+   "sample": [],
+   "header": "// V-W06-08b: no private-personal content on W06 shared types (INV-506; companion of V-113..V-116)."
+  },
+  {
+   "n": 11,
+   "id": "QS-4a",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1622,
+   "sample": [],
+   "header": "// QS-4a instantiated with W06 forbidden-implication pairs (zero rows = valid)."
+  }
+ ]
+}

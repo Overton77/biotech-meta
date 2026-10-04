@@ -1,0 +1,187 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/04-development-stage-vs-regulatory-status.cypher",
+ "uri": "bolt://127.0.0.1:37117/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 8,
+ "ok": 8,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "V-322",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 2,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 18,
+    "labelsAdded": 6,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 365,
+   "sample": [],
+   "header": "// =====================================================================================================================\n// W06 fixture 04: Treatment.developmentStage display text versus W13 RegulatoryStatus{APPROVAL} (V-322-style guard,\n// V-W06-01) and an indication change over valid time (late fa"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 2,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 12,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 44,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 2259,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 2,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 4,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 16,
+    "labelsAdded": 4,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1607,
+   "sample": [],
+   "header": "// ---- W13 approving responses (letters listed on the CBER page; OOPD gives the matching marketing approval dates).\n// The 2024 approval (aged 12+) is NOT ended by the 2026 approval (aged 2+): the indication was broadened, so both stay\n// in force with unknown end. ----"
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 3,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 18,
+    "labelsAdded": 1,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 2121,
+   "sample": [],
+   "header": "// ---- exa-cel developmentStage: CALCULATED display assertion naming its input ----"
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 13,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 571,
+   "sample": [],
+   "header": "// ---- edaravone concept (migrated legacy text, no assertion) ----"
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 3,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 12,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 48,
+    "labelsAdded": 3,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 984,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 10,
+    "labelsAdded": 3,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 470,
+   "sample": [],
+   "header": "// RADICAVA approval: known only from a search extract (no reproducible locator) -> status EXTRACTED; date not established."
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 4,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 16,
+    "labelsAdded": 1,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 685,
+   "sample": [],
+   "header": ""
+  }
+ ]
+}

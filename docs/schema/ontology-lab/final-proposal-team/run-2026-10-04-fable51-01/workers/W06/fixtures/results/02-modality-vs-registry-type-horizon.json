@@ -1,0 +1,231 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/02-modality-vs-registry-type-horizon.cypher",
+ "uri": "bolt://127.0.0.1:37117/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 10,
+ "ok": 10,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 11,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 507,
+   "sample": [],
+   "header": "// =====================================================================================================================\n// W06 fixture 02: modality classification versus registry intervention type; concept component versus study-specific\n// co-intervention (HORIZON, NCT06597656).\n//   - Treatment d"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 9,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 63,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 5,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 95,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 6,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 58,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 2,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 14,
+    "labelsAdded": 4,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 638,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 1,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 53,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 2,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 10,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 34,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 593,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 5,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 17,
+    "labelsAdded": 1,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 984,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 9,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 5,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 17,
+    "labelsAdded": 1,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 772,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 10,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 5,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 21,
+    "labelsAdded": 1,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 871,
+   "sample": [],
+   "header": ""
+  }
+ ]
+}

@@ -1,0 +1,209 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/00-shared-sources-and-referenced-identities.cypher",
+ "uri": "bolt://127.0.0.1:37117/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 9,
+ "ok": 9,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 12,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 84,
+    "labelsAdded": 24,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 9447,
+   "sample": [],
+   "header": "// =====================================================================================================================\n// W06 fixture 00: sources, snapshots, locators (W00 kernel shapes) and other owners' identities referenced by W06\n// fixtures 01-05 and 99. Run run-2026-10-04-fable51-01, worker "
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 12,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 120,
+    "labelsAdded": 24,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 5546,
+   "sample": [],
+   "header": "// ---- Snapshots (immutable captures) ----"
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 12,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 4522,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 4,
+   "id": "V-401b",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 20,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 20,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 200,
+    "labelsAdded": 40,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 3596,
+   "sample": [],
+   "header": "// ---- Locators (TEXT_QUOTE carry exact + quoteHash under NFC-WS1; SECTION / WHOLE_SNAPSHOT are coarse, V-401b) ----"
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 6,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 30,
+    "labelsAdded": 12,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1600,
+   "sample": [],
+   "header": "// ---- Referenced identities owned by other workers (minimal properties) ----"
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 6,
+    "labelsAdded": 3,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1166,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 5,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 25,
+    "labelsAdded": 10,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 1160,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 3,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 15,
+    "labelsAdded": 6,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 969,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 9,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 5,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 534,
+   "sample": [],
+   "header": ""
+  }
+ ]
+}

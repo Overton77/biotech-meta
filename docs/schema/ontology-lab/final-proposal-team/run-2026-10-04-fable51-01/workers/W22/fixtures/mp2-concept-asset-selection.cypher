@@ -9,37 +9,37 @@
 // Generated explainers (C2, C4) and the legacy asset (C3) are SYNTHETIC.
 
 MERGE (n:Mechanism:Entity {uid: 'hu:mechanism:mtor-signaling'})
-SET n.name = 'mTOR signaling', n.entityType = 'MECHANISM';
+SET n.privacyClass = 'PUBLIC', n.name = 'mTOR signaling', n.entityType = 'MECHANISM';
 
 MERGE (n:Metric:Entity {uid: 'hu:metric:tissue-nad-concentration'})
-SET n.name = 'Tissue NAD+ concentration', n.entityType = 'METRIC';
+SET n.privacyClass = 'PUBLIC', n.name = 'Tissue NAD+ concentration', n.entityType = 'METRIC';
 
 MERGE (n:Agent:Entity {uid: 'hu:agent:belllabs-w22-curator'})
-SET n.name = 'BellLabs W22 media curator', n.entityType = 'AGENT', n.agentKind = 'MANUAL_AGENT';
+SET n.privacyClass = 'PUBLIC', n.name = 'BellLabs W22 media curator', n.entityType = 'AGENT', n.agentKind = 'MANUAL_AGENT';
 
 MERGE (n:Agent:Entity {uid: 'hu:agent:belllabs-image-generator-synthetic'})
-SET n.name = 'BellLabs illustration generator (synthetic fixture)', n.entityType = 'AGENT', n.agentKind = 'COMPUTATIONAL_MODEL', n.model = 'unspecified-image-model', n.promptVersion = 'explainer-prompt-v0';
+SET n.privacyClass = 'PUBLIC', n.name = 'BellLabs illustration generator (synthetic fixture)', n.entityType = 'AGENT', n.agentKind = 'COMPUTATIONAL_MODEL', n.model = 'unspecified-image-model', n.promptVersion = 'explainer-prompt-v0';
 
 MERGE (n:Agent:Entity {uid: 'hu:agent:legacy-mongo-research'})
-SET n.name = 'Legacy mongo research pipeline (pre-migration)', n.entityType = 'AGENT', n.agentKind = 'AUTOMATED_AGENT';
+SET n.privacyClass = 'PUBLIC', n.name = 'Legacy mongo research pipeline (pre-migration)', n.entityType = 'AGENT', n.agentKind = 'AUTOMATED_AGENT';
 
 MERGE (n:PseudonymousActor:Entity {uid: 'hu:pseudonymous-actor:commons-user-lybbar12'})
-SET n.name = 'Lybbar12 (Wikimedia Commons user)', n.entityType = 'PSEUDONYMOUS_ACTOR';
+SET n.privacyClass = 'PUBLIC', n.name = 'Lybbar12 (Wikimedia Commons user)', n.entityType = 'PSEUDONYMOUS_ACTOR';
 
 MERGE (n:Activity:Occurrence {uid: 'hu:activity:w22-capture-2026-10-04'})
-SET n.occurrenceType = 'ACTIVITY', n.activityKind = 'CAPTURE', n.startedAt = datetime('2026-10-04T00:48:00Z'), n.endedAt = datetime('2026-10-04T01:10:00Z'), n.methodVersion = 'w22-firecrawl-scrape-2026-10-04';
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'CAPTURE', n.startedAt = datetime('2026-10-04T00:48:00Z'), n.endedAt = datetime('2026-10-04T01:10:00Z'), n.methodVersion = 'w22-firecrawl-scrape-2026-10-04';
 
 MERGE (n:Activity:Occurrence {uid: 'hu:activity:w22-curation-2026-10-04'})
-SET n.occurrenceType = 'ACTIVITY', n.activityKind = 'EXTRACTION', n.startedAt = datetime('2026-10-04T01:10:00Z'), n.endedAt = datetime('2026-10-04T02:00:00Z'), n.methodVersion = 'w22-manual-media-curation-v0.1';
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'EXTRACTION', n.startedAt = datetime('2026-10-04T01:10:00Z'), n.endedAt = datetime('2026-10-04T02:00:00Z'), n.methodVersion = 'w22-manual-media-curation-v0.1';
 
 MERGE (n:Activity:Occurrence {uid: 'hu:activity:w22-quality-assessment-2026-10-04'})
-SET n.occurrenceType = 'ACTIVITY', n.activityKind = 'MEDIA_ASSESSMENT', n.startedAt = datetime('2026-10-04T02:00:00Z'), n.endedAt = datetime('2026-10-04T02:05:00Z'), n.methodVersion = 'bl-media-display-quality-v1';
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'MEDIA_ASSESSMENT', n.startedAt = datetime('2026-10-04T02:00:00Z'), n.endedAt = datetime('2026-10-04T02:05:00Z'), n.methodVersion = 'bl-media-display-quality-v1';
 
 MERGE (n:Activity:Occurrence {uid: 'hu:activity:w22-generate-mtor-explainer-synthetic'})
-SET n.occurrenceType = 'ACTIVITY', n.activityKind = 'MEDIA_GENERATION', n.startedAt = datetime('2026-10-04T02:20:00Z'), n.endedAt = datetime('2026-10-04T02:21:00Z'), n.methodVersion = 'explainer-prompt-v0';
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'MEDIA_GENERATION', n.startedAt = datetime('2026-10-04T02:20:00Z'), n.endedAt = datetime('2026-10-04T02:21:00Z'), n.methodVersion = 'explainer-prompt-v0';
 
 MERGE (n:Activity:Occurrence {uid: 'hu:activity:w22-generate-nad-metric-explainer-synthetic'})
-SET n.occurrenceType = 'ACTIVITY', n.activityKind = 'MEDIA_GENERATION', n.startedAt = datetime('2026-10-04T02:22:00Z'), n.endedAt = datetime('2026-10-04T02:23:00Z'), n.methodVersion = 'explainer-prompt-v0';
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'MEDIA_GENERATION', n.startedAt = datetime('2026-10-04T02:22:00Z'), n.endedAt = datetime('2026-10-04T02:23:00Z'), n.methodVersion = 'explainer-prompt-v0';
 
 MATCH (a:Activity {uid: 'hu:activity:w22-generate-mtor-explainer-synthetic'}), (g:Agent {uid: 'hu:agent:belllabs-image-generator-synthetic'})
 MERGE (a)-[:WAS_ASSOCIATED_WITH]->(g);
@@ -49,31 +49,31 @@ MERGE (a)-[:WAS_ASSOCIATED_WITH]->(g);
 
 // ---- Commons file page record (real retrieval) and the file bytes (not retrieved -> synthetic snapshot).
 MERGE (n:Source:Entity {uid: 'hu:source:commons-file-mtor-signal-pathway'})
-SET n.entityType = 'SOURCE', n.canonicalUri = 'https://commons.wikimedia.org/wiki/File:MTOR_signal_pathway.jpg', n.title = 'File:MTOR signal pathway.jpg', n.sourceKind = 'MEDIA_REPOSITORY_RECORD';
+SET n.privacyClass = 'PUBLIC', n.entityType = 'SOURCE', n.canonicalUri = 'https://commons.wikimedia.org/wiki/File:MTOR_signal_pathway.jpg', n.title = 'File:MTOR signal pathway.jpg', n.sourceKind = 'MEDIA_REPOSITORY_RECORD';
 
 MERGE (n:SourceSnapshot:InformationArtifact {uid: 'hu:snapshot:commons-api-mtor-imageinfo-2026-10-04'})
-SET n.artifactType = 'SOURCE_SNAPSHOT', n.canonicalUri = 'https://commons.wikimedia.org/w/api.php?action=query&titles=File:MTOR%20signal%20pathway.jpg&prop=imageinfo&iiprop=url|size|sha1|mime|timestamp|user|extmetadata&format=json',
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_SNAPSHOT', n.canonicalUri = 'https://commons.wikimedia.org/w/api.php?action=query&titles=File:MTOR%20signal%20pathway.jpg&prop=imageinfo&iiprop=url|size|sha1|mime|timestamp|user|extmetadata&format=json',
     n.retrievedAt = datetime('2026-10-04T00:49:00Z'), n.observedAt = datetime('2026-10-04T00:49:00Z'), n.contentHash = 'sha256:3d336c9b79e63f221498cec2390d66ea6ce192a8ac3c851559118ca591c35dcf', n.contentHashBasis = 'SYNTHETIC_FIXTURE',
     n.captureCompleteness = 'COMPLETE', n.mimeType = 'application/json';
 
 MERGE (n:Source:Entity {uid: 'hu:source:commons-upload-mtor-signal-pathway-jpg'})
-SET n.entityType = 'SOURCE', n.canonicalUri = 'https://upload.wikimedia.org/wikipedia/commons/3/3d/MTOR_signal_pathway.jpg', n.sourceKind = 'MEDIA_FILE';
+SET n.privacyClass = 'PUBLIC', n.entityType = 'SOURCE', n.canonicalUri = 'https://upload.wikimedia.org/wikipedia/commons/3/3d/MTOR_signal_pathway.jpg', n.sourceKind = 'MEDIA_FILE';
 
 MERGE (n:SourceSnapshot:InformationArtifact {uid: 'hu:snapshot:commons-upload-mtor-jpg-synthetic'})
-SET n.artifactType = 'SOURCE_SNAPSHOT', n.canonicalUri = 'https://upload.wikimedia.org/wikipedia/commons/3/3d/MTOR_signal_pathway.jpg', n.retrievedAt = datetime('2026-10-04T02:00:00Z'),
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_SNAPSHOT', n.canonicalUri = 'https://upload.wikimedia.org/wikipedia/commons/3/3d/MTOR_signal_pathway.jpg', n.retrievedAt = datetime('2026-10-04T01:05:00Z'),
     n.contentHash = 'sha256:121c33df0bbcbe69a26ebe3b7e16fd8b10adade02afc027f7b2ebf289276748d', n.contentHashBasis = 'SYNTHETIC_FIXTURE', n.captureCompleteness = 'UNKNOWN', n.mimeType = 'image/jpeg';
 
 MERGE (n:SourceLocator:InformationArtifact {uid: 'hu:locator:commons-mtor-license-short-name'})
-SET n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'TEXT_QUOTE', n.normalizationVersion = 'NFC-WS1', n.prefix = '"LicenseShortName":{"value":"', n.exact = 'CC BY-SA 3.0', n.quoteHash = 'sha256:5975213b61b0c2db14643c803368d253a9f2bf6d138f6ff5b9305f703a162576';
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'TEXT_QUOTE', n.normalizationVersion = 'NFC-WS1', n.prefix = '"LicenseShortName":{"value":"', n.exact = 'CC BY-SA 3.0', n.quoteHash = 'sha256:5975213b61b0c2db14643c803368d253a9f2bf6d138f6ff5b9305f703a162576';
 
 MERGE (n:SourceLocator:InformationArtifact {uid: 'hu:locator:commons-mtor-categories-gfdl'})
-SET n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'TEXT_QUOTE', n.normalizationVersion = 'NFC-WS1', n.prefix = '"Categories":{"value":"', n.exact = 'GFDL|Human proteins|Signal transduction|License migration redundant', n.quoteHash = 'sha256:b9f0d10ec3fd7bee319f725bd021c96c7cdd3b6457d4df3d6c874932bd48bb7f';
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'TEXT_QUOTE', n.normalizationVersion = 'NFC-WS1', n.prefix = '"Categories":{"value":"', n.exact = 'GFDL|Human proteins|Signal transduction|License migration redundant', n.quoteHash = 'sha256:b9f0d10ec3fd7bee319f725bd021c96c7cdd3b6457d4df3d6c874932bd48bb7f';
 
 MERGE (n:SourceLocator:InformationArtifact {uid: 'hu:locator:commons-mtor-image-description'})
-SET n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'TEXT_QUOTE', n.normalizationVersion = 'NFC-WS1', n.prefix = '"ImageDescription":{"value":"', n.exact = 'mTOR signal pathway', n.quoteHash = 'sha256:4ba3129244686b7df9cf1d8adb45a0243c17945ba344addca4800ef2a980c281';
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'TEXT_QUOTE', n.normalizationVersion = 'NFC-WS1', n.prefix = '"ImageDescription":{"value":"', n.exact = 'mTOR signal pathway', n.quoteHash = 'sha256:4ba3129244686b7df9cf1d8adb45a0243c17945ba344addca4800ef2a980c281';
 
 MERGE (n:SourceLocator:InformationArtifact {uid: 'hu:locator:commons-upload-mtor-jpg-whole'})
-SET n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'WHOLE_SNAPSHOT';
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'WHOLE_SNAPSHOT';
 
 MATCH (s:Source {uid: 'hu:source:commons-file-mtor-signal-pathway'}), (ss:SourceSnapshot {uid: 'hu:snapshot:commons-api-mtor-imageinfo-2026-10-04'}),
       (l1:SourceLocator {uid: 'hu:locator:commons-mtor-license-short-name'}), (l2:SourceLocator {uid: 'hu:locator:commons-mtor-categories-gfdl'}), (l3:SourceLocator {uid: 'hu:locator:commons-mtor-image-description'}),
@@ -85,13 +85,13 @@ MERGE (s)-[:HAS_SNAPSHOT]->(ss) MERGE (ss)-[:HAS_LOCATOR]->(l);
 
 // ---- C1: Commons mTOR diagram (real metadata, synthetic bytes).
 MERGE (m:MediaAsset:InformationArtifact {uid: 'hu:media-asset:commons-mtor-signal-pathway'})
-SET m.artifactType = 'MEDIA_ASSET', m.name = 'MTOR signal pathway.jpg (Wikimedia Commons)', m.title = 'MTOR signal pathway', m.assetType = 'DIAGRAM', m.mediaPurpose = 'PATHWAY_DIAGRAM',
+SET m.privacyClass = 'PUBLIC', m.artifactType = 'MEDIA_ASSET', m.name = 'MTOR signal pathway.jpg (Wikimedia Commons)', m.title = 'MTOR signal pathway', m.assetType = 'DIAGRAM', m.mediaPurpose = 'PATHWAY_DIAGRAM',
     m.generationMode = 'UNKNOWN', m.capturedAt = datetime('2012-09-25T00:00:00Z'), m.capturedAtPrecision = 'DAY', m.publishedAt = datetime('2012-09-25T11:06:13Z'), m.publishedAtPrecision = 'INSTANT',
     m.canonicalUrl = 'https://commons.wikimedia.org/wiki/File:MTOR_signal_pathway.jpg', m.caption = 'mTOR signal pathway',
     m.contentHash = 'sha256:121c33df0bbcbe69a26ebe3b7e16fd8b10adade02afc027f7b2ebf289276748d', m.contentHashBasis = 'SYNTHETIC_FIXTURE', m.privacyClass = 'PUBLIC', m.maturity = 'CANDIDATE';
 
 MERGE (v:MediaVariant:InformationArtifact {uid: 'hu:media-variant:commons-mtor-original'})
-SET v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'ORIGINAL', v.mediaFormat = 'JPEG', v.mimeType = 'image/jpeg', v.widthPx = 433, v.heightPx = 594, v.fileSizeBytes = 55293,
+SET v.privacyClass = 'PUBLIC', v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'ORIGINAL', v.mediaFormat = 'JPEG', v.mimeType = 'image/jpeg', v.widthPx = 433, v.heightPx = 594, v.fileSizeBytes = 55293,
     v.url = 'https://upload.wikimedia.org/wikipedia/commons/3/3d/MTOR_signal_pathway.jpg', v.statedChecksum = '232dfb2e0276842448a20a019c2b187d68215840', v.statedChecksumAlgorithm = 'SHA-1',
     v.contentHash = 'sha256:121c33df0bbcbe69a26ebe3b7e16fd8b10adade02afc027f7b2ebf289276748d', v.contentHashBasis = 'SYNTHETIC_FIXTURE';
 
@@ -102,7 +102,7 @@ MERGE (v)-[:WAS_GENERATED_BY]->(cap) MERGE (m)-[:WAS_GENERATED_BY]->(cap);
 
 // Two rights records for one file: the extmetadata licence offer and the GFDL category (dual licence).
 MERGE (r:MediaRightsRecord:VersionedState {uid: 'hu:media-rights:commons-mtor-cc-by-sa-3'})
-SET r.stateType = 'MEDIA_RIGHTS', r.payloadHash = 'sha256:7068dcc6474584dc10d93a73747fda5e488d4fdb13e210d4ad9b8924bb154a9c', r.rightsStatus = 'OPEN_LICENSE', r.statementKind = 'LICENSE_OFFER', r.statementScope = 'THIS_ASSET',
+SET r.privacyClass = 'PUBLIC', r.stateType = 'MEDIA_RIGHTS', r.payloadHash = 'sha256:7068dcc6474584dc10d93a73747fda5e488d4fdb13e210d4ad9b8924bb154a9c', r.rightsStatus = 'OPEN_LICENSE', r.statementKind = 'LICENSE_OFFER', r.statementScope = 'THIS_ASSET',
     r.licenseName = 'CC BY-SA 3.0', r.licenseUri = 'https://creativecommons.org/licenses/by-sa/3.0', r.attributionText = 'Lybbar12', r.rightsHolderText = 'Lybbar12',
     r.attributionRequired = true, r.shareAlikeRequired = true, r.privacyClass = 'PUBLIC', r.maturity = 'CANDIDATE';
 
@@ -111,7 +111,7 @@ SET r.stateType = 'MEDIA_RIGHTS', r.payloadHash = 'sha256:8f6b1259867ec4a18b8f09
     r.licenseName = 'GFDL (version not stated in the retrieved metadata)', r.rightsHolderText = 'Lybbar12', r.privacyClass = 'PUBLIC', r.maturity = 'CANDIDATE';
 
 MERGE (x:Assertion {uid: 'hu:assertion:w22-c1-rights-cc-by-sa'})
-SET x.predicate = 'HAS_RIGHTS_RECORD', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T01:30:00Z'), x.predicateClass = 'OTHER', x.validFrom = datetime('2012-09-25T11:06:13Z'), x.validFromPrecision = 'INSTANT', x.validFromBasis = 'PUBLICATION_PROXY', x.validToBasis = 'UNKNOWN';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'HAS_RIGHTS_RECORD', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T01:30:00Z'), x.predicateClass = 'OTHER', x.validFrom = datetime('2012-09-25T11:06:13Z'), x.validFromPrecision = 'INSTANT', x.validFromBasis = 'PUBLICATION_PROXY', x.validToBasis = 'UNKNOWN';
 
 MATCH (x:Assertion {uid: 'hu:assertion:w22-c1-rights-cc-by-sa'}), (m:MediaAsset {uid: 'hu:media-asset:commons-mtor-signal-pathway'}), (r:MediaRightsRecord {uid: 'hu:media-rights:commons-mtor-cc-by-sa-3'}),
       (u:PseudonymousActor {uid: 'hu:pseudonymous-actor:commons-user-lybbar12'}), (l:SourceLocator {uid: 'hu:locator:commons-mtor-license-short-name'}), (cur:Activity {uid: 'hu:activity:w22-curation-2026-10-04'})
@@ -120,7 +120,7 @@ MERGE (m)-[e:HAS_RIGHTS_RECORD {relationshipUid: 'hu:rel:w22-c1-rights-cc-by-sa'
 SET e.assertionUid = x.uid, e.validFrom = datetime('2012-09-25T11:06:13Z'), e.validFromPrecision = 'INSTANT', e.validFromBasis = 'PUBLICATION_PROXY', e.validToBasis = 'UNKNOWN', e.recordedFrom = datetime('2026-10-04T01:30:00Z');
 
 MERGE (x:Assertion {uid: 'hu:assertion:w22-c1-rights-gfdl'})
-SET x.predicate = 'HAS_RIGHTS_RECORD', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T01:31:00Z'), x.predicateClass = 'OTHER', x.validFrom = datetime('2012-09-25T11:06:13Z'), x.validFromPrecision = 'INSTANT', x.validFromBasis = 'PUBLICATION_PROXY', x.validToBasis = 'UNKNOWN';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'HAS_RIGHTS_RECORD', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T01:31:00Z'), x.predicateClass = 'OTHER', x.validFrom = datetime('2012-09-25T11:06:13Z'), x.validFromPrecision = 'INSTANT', x.validFromBasis = 'PUBLICATION_PROXY', x.validToBasis = 'UNKNOWN';
 
 MATCH (x:Assertion {uid: 'hu:assertion:w22-c1-rights-gfdl'}), (m:MediaAsset {uid: 'hu:media-asset:commons-mtor-signal-pathway'}), (r:MediaRightsRecord {uid: 'hu:media-rights:commons-mtor-gfdl'}),
       (u:PseudonymousActor {uid: 'hu:pseudonymous-actor:commons-user-lybbar12'}), (l:SourceLocator {uid: 'hu:locator:commons-mtor-categories-gfdl'}), (cur:Activity {uid: 'hu:activity:w22-curation-2026-10-04'})
@@ -129,7 +129,7 @@ MERGE (m)-[e:HAS_RIGHTS_RECORD {relationshipUid: 'hu:rel:w22-c1-rights-gfdl'}]->
 SET e.assertionUid = x.uid, e.validFrom = datetime('2012-09-25T11:06:13Z'), e.validFromPrecision = 'INSTANT', e.validFromBasis = 'PUBLICATION_PROXY', e.validToBasis = 'UNKNOWN', e.recordedFrom = datetime('2026-10-04T01:31:00Z');
 
 MERGE (x:Assertion {uid: 'hu:assertion:w22-c1-explains-mtor'})
-SET x.predicate = 'EXPLAINS', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T01:32:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'UNKNOWN', x.validToBasis = 'UNKNOWN';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'EXPLAINS', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T01:32:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'UNKNOWN', x.validToBasis = 'UNKNOWN';
 
 MATCH (x:Assertion {uid: 'hu:assertion:w22-c1-explains-mtor'}), (m:MediaAsset {uid: 'hu:media-asset:commons-mtor-signal-pathway'}), (k:Mechanism {uid: 'hu:mechanism:mtor-signaling'}),
       (u:PseudonymousActor {uid: 'hu:pseudonymous-actor:commons-user-lybbar12'}), (l:SourceLocator {uid: 'hu:locator:commons-mtor-image-description'}), (cur:Activity {uid: 'hu:activity:w22-curation-2026-10-04'})
@@ -139,25 +139,25 @@ SET e.assertionUid = x.uid, e.role = 'PATHWAY_DIAGRAM', e.isPrimary = false, e.s
 
 // ---- C2: SYNTHETIC BellLabs-generated mTOR explainer (operator record; generation disclosed).
 MERGE (n:Source:Entity {uid: 'hu:source:belllabs-media-store-mtor-explainer'})
-SET n.entityType = 'SOURCE', n.canonicalUri = 'urn:belllabs:media-store:mtor-explainer-v0', n.sourceKind = 'MEDIA_FILE';
+SET n.privacyClass = 'PUBLIC', n.entityType = 'SOURCE', n.canonicalUri = 'urn:belllabs:media-store:mtor-explainer-v0', n.sourceKind = 'MEDIA_FILE';
 
 MERGE (n:SourceSnapshot:InformationArtifact {uid: 'hu:snapshot:belllabs-mtor-explainer-synthetic'})
-SET n.artifactType = 'SOURCE_SNAPSHOT', n.canonicalUri = 'urn:belllabs:media-store:mtor-explainer-v0', n.retrievedAt = datetime('2026-10-04T02:21:00Z'),
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_SNAPSHOT', n.canonicalUri = 'urn:belllabs:media-store:mtor-explainer-v0', n.retrievedAt = datetime('2026-10-04T02:21:00Z'),
     n.contentHash = 'sha256:0be2c99c56e34b73cacd00fb103ae80a5d9cc53e4ee2e3ce5754486135cf58e3', n.contentHashBasis = 'SYNTHETIC_FIXTURE', n.captureCompleteness = 'COMPLETE', n.mimeType = 'image/png';
 
 MERGE (n:SourceLocator:InformationArtifact {uid: 'hu:locator:belllabs-mtor-explainer-whole'})
-SET n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'WHOLE_SNAPSHOT';
+SET n.privacyClass = 'PUBLIC', n.artifactType = 'SOURCE_LOCATOR', n.selectorKind = 'WHOLE_SNAPSHOT';
 
 MATCH (s:Source {uid: 'hu:source:belllabs-media-store-mtor-explainer'}), (ss:SourceSnapshot {uid: 'hu:snapshot:belllabs-mtor-explainer-synthetic'}), (l:SourceLocator {uid: 'hu:locator:belllabs-mtor-explainer-whole'})
 MERGE (s)-[:HAS_SNAPSHOT]->(ss) MERGE (ss)-[:HAS_LOCATOR]->(l);
 
 MERGE (m:MediaAsset:InformationArtifact {uid: 'hu:media-asset:belllabs-generated-mtor-explainer-synthetic'})
-SET m.artifactType = 'MEDIA_ASSET', m.name = 'Generated mTOR signaling explainer (synthetic fixture)', m.assetType = 'DIAGRAM', m.mediaPurpose = 'EDUCATIONAL', m.generationMode = 'GENERATED',
+SET m.privacyClass = 'PUBLIC', m.artifactType = 'MEDIA_ASSET', m.name = 'Generated mTOR signaling explainer (synthetic fixture)', m.assetType = 'DIAGRAM', m.mediaPurpose = 'EDUCATIONAL', m.generationMode = 'GENERATED',
     m.isSynthetic = true, m.editDisclosureText = 'AI-generated illustration; simplified; not a source of evidence.', m.contentHash = 'sha256:0be2c99c56e34b73cacd00fb103ae80a5d9cc53e4ee2e3ce5754486135cf58e3', m.contentHashBasis = 'SYNTHETIC_FIXTURE',
     m.privacyClass = 'PUBLIC', m.maturity = 'CANDIDATE';
 
 MERGE (v:MediaVariant:InformationArtifact {uid: 'hu:media-variant:belllabs-generated-mtor-explainer-original'})
-SET v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'ORIGINAL', v.mediaFormat = 'PNG', v.mimeType = 'image/png', v.widthPx = 1600, v.heightPx = 1200,
+SET v.privacyClass = 'PUBLIC', v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'ORIGINAL', v.mediaFormat = 'PNG', v.mimeType = 'image/png', v.widthPx = 1600, v.heightPx = 1200,
     v.storageUri = 'urn:belllabs:media-store:mtor-explainer-v0', v.contentHash = 'sha256:0be2c99c56e34b73cacd00fb103ae80a5d9cc53e4ee2e3ce5754486135cf58e3', v.contentHashBasis = 'SYNTHETIC_FIXTURE';
 
 MATCH (m:MediaAsset {uid: 'hu:media-asset:belllabs-generated-mtor-explainer-synthetic'}), (v:MediaVariant {uid: 'hu:media-variant:belllabs-generated-mtor-explainer-original'}),
@@ -168,12 +168,12 @@ MERGE (v)-[:WAS_GENERATED_BY]->(gen) MERGE (m)-[:WAS_GENERATED_BY]->(gen);
 
 // ---- C4: SYNTHETIC generated explainer for the Metric.
 MERGE (m:MediaAsset:InformationArtifact {uid: 'hu:media-asset:belllabs-generated-nad-metric-explainer-synthetic'})
-SET m.artifactType = 'MEDIA_ASSET', m.name = 'Generated explainer: what tissue NAD+ concentration measures (synthetic fixture)', m.assetType = 'DIAGRAM', m.mediaPurpose = 'EDUCATIONAL',
+SET m.privacyClass = 'PUBLIC', m.artifactType = 'MEDIA_ASSET', m.name = 'Generated explainer: what tissue NAD+ concentration measures (synthetic fixture)', m.assetType = 'DIAGRAM', m.mediaPurpose = 'EDUCATIONAL',
     m.generationMode = 'GENERATED', m.isSynthetic = true, m.editDisclosureText = 'AI-generated illustration; not a source of evidence.', m.contentHash = 'sha256:352c6ee92681400b435ee47eef138307d4918478575c0d96c7a59fb4bed7c3cb', m.contentHashBasis = 'SYNTHETIC_FIXTURE',
     m.privacyClass = 'PUBLIC', m.maturity = 'CANDIDATE';
 
 MERGE (v:MediaVariant:InformationArtifact {uid: 'hu:media-variant:belllabs-generated-nad-metric-explainer-original'})
-SET v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'ORIGINAL', v.mediaFormat = 'PNG', v.mimeType = 'image/png', v.widthPx = 1600, v.heightPx = 900,
+SET v.privacyClass = 'PUBLIC', v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'ORIGINAL', v.mediaFormat = 'PNG', v.mimeType = 'image/png', v.widthPx = 1600, v.heightPx = 900,
     v.contentHash = 'sha256:352c6ee92681400b435ee47eef138307d4918478575c0d96c7a59fb4bed7c3cb', v.contentHashBasis = 'SYNTHETIC_FIXTURE';
 
 MATCH (m:MediaAsset {uid: 'hu:media-asset:belllabs-generated-nad-metric-explainer-synthetic'}), (v:MediaVariant {uid: 'hu:media-variant:belllabs-generated-nad-metric-explainer-original'}), (gen:Activity {uid: 'hu:activity:w22-generate-nad-metric-explainer-synthetic'})
@@ -184,7 +184,7 @@ SET r.stateType = 'MEDIA_RIGHTS', r.payloadHash = 'sha256:d9c368c2cefe3c823d3623
     r.rightsHolderText = 'BellLabs (synthetic fixture)', r.restrictionsText = 'Generator service terms not reviewed in this fixture; operator record only.', r.privacyClass = 'PUBLIC', r.maturity = 'CANDIDATE';
 
 MERGE (x:Assertion {uid: 'hu:assertion:w22-c2-rights-operator'})
-SET x.predicate = 'HAS_RIGHTS_RECORD', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T02:25:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'STATED_BY_SOURCE', x.validToBasis = 'UNKNOWN';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'HAS_RIGHTS_RECORD', x.status = 'ACCEPTED', x.recordedAt = datetime('2026-10-04T02:25:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'STATED_BY_SOURCE', x.validToBasis = 'UNKNOWN';
 
 MATCH (x:Assertion {uid: 'hu:assertion:w22-c2-rights-operator'}), (m:MediaAsset {uid: 'hu:media-asset:belllabs-generated-mtor-explainer-synthetic'}), (r:MediaRightsRecord {uid: 'hu:media-rights:belllabs-operator-generated-explainers'}),
       (g:Agent {uid: 'hu:agent:belllabs-w22-curator'}), (l:SourceLocator {uid: 'hu:locator:belllabs-mtor-explainer-whole'}), (cur:Activity {uid: 'hu:activity:w22-curation-2026-10-04'})
@@ -193,7 +193,7 @@ MERGE (m)-[e:HAS_RIGHTS_RECORD {relationshipUid: 'hu:rel:w22-c2-rights-operator'
 SET e.assertionUid = x.uid, e.validFromBasis = 'STATED_BY_SOURCE', e.validToBasis = 'UNKNOWN', e.recordedFrom = datetime('2026-10-04T02:25:00Z');
 
 MERGE (x:Assertion {uid: 'hu:assertion:w22-c4-rights-operator'})
-SET x.predicate = 'HAS_RIGHTS_RECORD', x.status = 'PROPOSED', x.recordedAt = datetime('2026-10-04T02:25:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'STATED_BY_SOURCE', x.validToBasis = 'UNKNOWN';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'HAS_RIGHTS_RECORD', x.status = 'PROPOSED', x.recordedAt = datetime('2026-10-04T02:25:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'STATED_BY_SOURCE', x.validToBasis = 'UNKNOWN';
 
 MATCH (x:Assertion {uid: 'hu:assertion:w22-c4-rights-operator'}), (m:MediaAsset {uid: 'hu:media-asset:belllabs-generated-nad-metric-explainer-synthetic'}), (r:MediaRightsRecord {uid: 'hu:media-rights:belllabs-operator-generated-explainers'}),
       (g:Agent {uid: 'hu:agent:belllabs-w22-curator'}), (cur:Activity {uid: 'hu:activity:w22-curation-2026-10-04'})
@@ -203,7 +203,7 @@ SET e.assertionUid = x.uid, e.validFromBasis = 'STATED_BY_SOURCE', e.validToBasi
 
 // EXPLAINS by BellLabs: the generator was prompted to explain the concept (asserted by the curator, PROPOSED).
 MERGE (x:Assertion {uid: 'hu:assertion:w22-c2-explains-mtor'})
-SET x.predicate = 'EXPLAINS', x.status = 'PROPOSED', x.recordedAt = datetime('2026-10-04T02:26:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'UNKNOWN', x.validToBasis = 'UNKNOWN';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'EXPLAINS', x.status = 'PROPOSED', x.recordedAt = datetime('2026-10-04T02:26:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'UNKNOWN', x.validToBasis = 'UNKNOWN';
 
 MATCH (x:Assertion {uid: 'hu:assertion:w22-c2-explains-mtor'}), (m:MediaAsset {uid: 'hu:media-asset:belllabs-generated-mtor-explainer-synthetic'}), (k:Mechanism {uid: 'hu:mechanism:mtor-signaling'}),
       (g:Agent {uid: 'hu:agent:belllabs-w22-curator'}), (cur:Activity {uid: 'hu:activity:w22-curation-2026-10-04'})
@@ -212,7 +212,7 @@ MERGE (m)-[e:EXPLAINS {relationshipUid: 'hu:rel:w22-c2-explains-mtor'}]->(k)
 SET e.assertionUid = x.uid, e.role = 'GENERATED_EXPLAINER', e.validFromBasis = 'UNKNOWN', e.validToBasis = 'UNKNOWN', e.recordedFrom = datetime('2026-10-04T02:26:00Z');
 
 MERGE (x:Assertion {uid: 'hu:assertion:w22-c4-explains-nad-metric'})
-SET x.predicate = 'EXPLAINS', x.status = 'PROPOSED', x.recordedAt = datetime('2026-10-04T02:26:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'UNKNOWN', x.validToBasis = 'UNKNOWN';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'EXPLAINS', x.status = 'PROPOSED', x.recordedAt = datetime('2026-10-04T02:26:00Z'), x.predicateClass = 'OTHER', x.validFromBasis = 'UNKNOWN', x.validToBasis = 'UNKNOWN';
 
 MATCH (x:Assertion {uid: 'hu:assertion:w22-c4-explains-nad-metric'}), (m:MediaAsset {uid: 'hu:media-asset:belllabs-generated-nad-metric-explainer-synthetic'}), (k:Metric {uid: 'hu:metric:tissue-nad-concentration'}),
       (g:Agent {uid: 'hu:agent:belllabs-w22-curator'}), (cur:Activity {uid: 'hu:activity:w22-curation-2026-10-04'})
@@ -226,20 +226,20 @@ SET m.artifactType = 'MEDIA_ASSET', m.name = 'Legacy concept diagram with unsour
     m.qualityScore = 0.95, m.mongoResearchRunId = 'legacy-run-0002', m.privacyClass = 'PUBLIC', m.maturity = 'CANDIDATE';
 
 MERGE (a:MediaSuitabilityAssessment:EvidenceAssessment {uid: 'hu:media-assessment:legacy-concept-diagram-quality'})
-SET a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'legacy-unsourced', a.status = 'PROPOSED', a.recordedAt = datetime('2026-10-04T02:10:00Z'),
+SET a.privacyClass = 'PUBLIC', a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'legacy-unsourced', a.status = 'PROPOSED', a.recordedAt = datetime('2026-10-04T02:10:00Z'),
     a.dimension = 'DISPLAY_QUALITY', a.verdict = 'UNKNOWN', a.overallScore = 0.95, a.scoreScale = 'unknown (live qualityScore, no method recorded)', a.mongoResearchRunId = 'legacy-run-0002';
 
 MATCH (a:MediaSuitabilityAssessment {uid: 'hu:media-assessment:legacy-concept-diagram-quality'}), (m:MediaAsset {uid: 'hu:media-asset:legacy-concept-diagram-unsourced-synthetic'})
 MERGE (a)-[:ASSESSES_MEDIA]->(m);
 
 MERGE (n:Activity:Occurrence {uid: 'hu:activity:legacy-run-0002'})
-SET n.occurrenceType = 'ACTIVITY', n.activityKind = 'EXTRACTION', n.externalRunSystem = 'mongo-research', n.externalRunId = 'legacy-run-0002', n.methodVersion = 'unknown';
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'EXTRACTION', n.externalRunSystem = 'mongo-research', n.externalRunId = 'legacy-run-0002', n.methodVersion = 'unknown';
 
 MERGE (x:Assertion {uid: 'hu:assertion:w22-c3-legacy-explains-mtor'})
-SET x.predicate = 'EXPLAINS', x.status = 'EXTRACTED', x.recordedAt = datetime('2026-10-04T02:10:00Z'), x.predicateClass = 'OTHER', x.mongoResearchRunId = 'legacy-run-0002';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'EXPLAINS', x.status = 'EXTRACTED', x.recordedAt = datetime('2026-10-04T02:10:00Z'), x.predicateClass = 'OTHER', x.mongoResearchRunId = 'legacy-run-0002';
 
 MERGE (x:Assertion {uid: 'hu:assertion:w22-c3-legacy-explains-nad-metric'})
-SET x.predicate = 'EXPLAINS', x.status = 'EXTRACTED', x.recordedAt = datetime('2026-10-04T02:10:00Z'), x.predicateClass = 'OTHER', x.mongoResearchRunId = 'legacy-run-0002';
+SET x.privacyClass = 'PUBLIC', x.predicate = 'EXPLAINS', x.status = 'EXTRACTED', x.recordedAt = datetime('2026-10-04T02:10:00Z'), x.predicateClass = 'OTHER', x.mongoResearchRunId = 'legacy-run-0002';
 
 MATCH (x:Assertion {uid: 'hu:assertion:w22-c3-legacy-explains-mtor'}), (m:MediaAsset {uid: 'hu:media-asset:legacy-concept-diagram-unsourced-synthetic'}), (k:Mechanism {uid: 'hu:mechanism:mtor-signaling'}),
       (g:Agent {uid: 'hu:agent:legacy-mongo-research'}), (act:Activity {uid: 'hu:activity:legacy-run-0002'})
@@ -256,30 +256,30 @@ SET e.assertionUid = x.uid, e.role = 'GENERATED_EXPLAINER', e.validFromBasis = '
 // ---- Method-versioned assessments. The Commons diagram is MARGINAL for a mechanism diagram slot (433 x 594 px) but
 // ---- SUITABLE as a thumbnail: suitability is per role, not a property of the asset.
 MERGE (a:MediaSuitabilityAssessment:EvidenceAssessment {uid: 'hu:media-assessment:c1-display-quality-mechanism-diagram'})
-SET a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-display-quality-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:05:00Z'),
+SET a.privacyClass = 'PUBLIC', a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-display-quality-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:05:00Z'),
     a.dimension = 'DISPLAY_QUALITY', a.verdict = 'MARGINAL', a.overallScore = 0.55, a.scoreScale = '0..1 higher-better', a.intendedRole = 'MECHANISM_DIAGRAM',
     a.criteriaSummary = 'short edge >= 800 px for diagram slots; labels legible at display width (433 x 594 px original fails the size criterion)';
 
 MERGE (a:MediaSuitabilityAssessment:EvidenceAssessment {uid: 'hu:media-assessment:c1-display-quality-thumbnail'})
-SET a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-display-quality-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:05:00Z'),
+SET a.privacyClass = 'PUBLIC', a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-display-quality-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:05:00Z'),
     a.dimension = 'DISPLAY_QUALITY', a.verdict = 'SUITABLE', a.overallScore = 0.80, a.scoreScale = '0..1 higher-better', a.intendedRole = 'THUMBNAIL',
     a.criteriaSummary = 'short edge >= 300 px for thumbnails';
 
 MERGE (a:MediaSuitabilityAssessment:EvidenceAssessment {uid: 'hu:media-assessment:c2-display-quality-mechanism-diagram'})
-SET a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-display-quality-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:30:00Z'),
+SET a.privacyClass = 'PUBLIC', a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-display-quality-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:30:00Z'),
     a.dimension = 'DISPLAY_QUALITY', a.verdict = 'SUITABLE', a.overallScore = 0.88, a.scoreScale = '0..1 higher-better', a.intendedRole = 'MECHANISM_DIAGRAM',
     a.criteriaSummary = 'short edge >= 800 px for diagram slots; labels legible at display width';
 
 MERGE (a:MediaSuitabilityAssessment:EvidenceAssessment {uid: 'hu:media-assessment:c2-depiction-accuracy'})
-SET a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-depiction-review-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:31:00Z'),
+SET a.privacyClass = 'PUBLIC', a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-depiction-review-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:31:00Z'),
     a.dimension = 'DEPICTION_ACCURACY', a.verdict = 'SUITABLE', a.intendedRole = 'MECHANISM_DIAGRAM', a.summary = 'Expert review: components and arrows match the curated mechanism assertions (synthetic).';
 
 MERGE (a:MediaSuitabilityAssessment:EvidenceAssessment {uid: 'hu:media-assessment:c2-authenticity'})
-SET a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-authenticity-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:31:00Z'),
+SET a.privacyClass = 'PUBLIC', a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-authenticity-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:31:00Z'),
     a.dimension = 'AUTHENTICITY', a.verdict = 'SUITABLE', a.summary = 'Generation disclosed (isSynthetic true, disclosure text present); not presented as a capture.';
 
 MERGE (a:MediaSuitabilityAssessment:EvidenceAssessment {uid: 'hu:media-assessment:c4-display-quality-explainer'})
-SET a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-display-quality-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:30:00Z'),
+SET a.privacyClass = 'PUBLIC', a.assessmentType = 'MEDIA_SUITABILITY', a.methodVersion = 'bl-media-display-quality-v1', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:30:00Z'),
     a.dimension = 'DISPLAY_QUALITY', a.verdict = 'SUITABLE', a.overallScore = 0.84, a.scoreScale = '0..1 higher-better', a.intendedRole = 'GENERATED_EXPLAINER';
 
 MATCH (a:MediaSuitabilityAssessment {uid: 'hu:media-assessment:c1-display-quality-mechanism-diagram'}), (m:MediaAsset {uid: 'hu:media-asset:commons-mtor-signal-pathway'}), (v:MediaVariant {uid: 'hu:media-variant:commons-mtor-original'}),
@@ -304,6 +304,16 @@ MERGE (a)-[:ASSESSES_MEDIA]->(m) MERGE (a)-[:WAS_GENERATED_BY]->(act);
 MATCH (a:MediaSuitabilityAssessment {uid: 'hu:media-assessment:c4-display-quality-explainer'}), (m:MediaAsset {uid: 'hu:media-asset:belllabs-generated-nad-metric-explainer-synthetic'}),
       (k:Metric {uid: 'hu:metric:tissue-nad-concentration'}), (act:Activity {uid: 'hu:activity:w22-quality-assessment-2026-10-04'})
 MERGE (a)-[:ASSESSES_MEDIA]->(m) MERGE (a)-[:ASSESSES_SUITABILITY_FOR]->(k) MERGE (a)-[:WAS_GENERATED_BY]->(act);
+
+// ---- Capture-fidelity adjudications for this fixture's ACCEPTED assertions (kernel V-110; synthetic review record:
+// ---- 'the record accurately captures what the asserter stated in the cited span', never a truth verdict).
+MATCH (g:Agent {uid: 'hu:agent:belllabs-w22-curator'})
+UNWIND ['hu:assertion:w22-c1-rights-cc-by-sa', 'hu:assertion:w22-c1-rights-gfdl', 'hu:assertion:w22-c1-explains-mtor', 'hu:assertion:w22-c2-rights-operator'] AS u
+MATCH (a:Assertion {uid: u})
+MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w22-cf-' + substring(u, 13)})
+SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'w22-capture-fidelity-review-v0', j.status = 'ACCEPTED', j.adjudicationKind = 'CAPTURE_FIDELITY',
+    j.verdict = 'SUPPORTED', j.reviewerType = 'HUMAN', j.reviewedAt = a.recordedAt + duration('PT1M'), j.recordedAt = a.recordedAt + duration('PT1M'), j.privacyClass = 'PUBLIC'
+MERGE (j)-[:EVALUATES]->(a) MERGE (j)-[:ASSESSED_BY]->(g);
 
 // =====================================================================================================================
 // Queries
