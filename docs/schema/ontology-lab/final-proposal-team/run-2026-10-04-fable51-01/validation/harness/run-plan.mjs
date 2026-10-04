@@ -4,6 +4,9 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import neo4j from "neo4j-driver";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+const HERE = dirname(fileURLToPath(import.meta.url));
 const [planFile, outFile] = process.argv.slice(2);
 const plan = JSON.parse(readFileSync(planFile, "utf8"));
 const uri = readFileSync(plan.uriFile, "utf8").trim();
@@ -11,8 +14,8 @@ const driver = neo4j.driver(uri, neo4j.auth.none(), { disableLosslessIntegers: t
 const results = [];
 for (const s of plan.steps) {
   if (s.reset) { const ses = driver.session(); await ses.run("MATCH (n) DETACH DELETE n"); await ses.close(); }
-  const tmp = `/tmp/run-plan-${Date.now()}.json`;
-  const args = ["run-cypher.mjs", uri, s.file, "--json", tmp]; if (s.params) args.push("--params", s.params); if (s.explain) args.push("--explain");
+  const tmp = join(HERE, `.run-plan-${Date.now()}.json`);
+  const args = [join(HERE, "run-cypher.mjs"), uri, s.file, "--json", tmp]; if (s.params) args.push("--params", s.params); if (s.explain) args.push("--explain");
   let stdout = ""; try { stdout = execFileSync("node", args, { encoding: "utf8", maxBuffer: 64*1024*1024 }); } catch (e) { stdout = (e.stdout||"") + (e.stderr||""); }
   let r; try { r = JSON.parse(readFileSync(tmp, "utf8")); } catch { r = { total: 0, ok: 0, failed: 1, results: [], raw: stdout.slice(0, 2000) }; }
   const rowsById = {}; for (const x of r.results) if (x.status === "ok" && x.rows > 0) rowsById[x.id || `#${x.n}`] = x.rows;

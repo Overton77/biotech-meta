@@ -56,3 +56,25 @@ Deferred (no failing case or user input needed): W21-SR-19 `EXCERPTS_FROM`; W21-
 ## E. Items for the user (nonblocking, unchanged from the handoff plus new)
 
 Fable 5.1 availability: verified for this run. New user-dependent items: whether EU/UK authorisations are a new `AUTHORIZATION` status kind; crawler-term capture policy for media; the k-anonymity threshold; PostgreSQL 18 for `WITHOUT OVERLAPS` in the private store; deployment edition for existence/type constraints; vector index dimensions and embedding source.
+
+## F. Wave 5 synthesis rulings (Fable, at assembly)
+
+Mechanics: `validation/harness/assemble-final.mjs` with `assembly-rulings.json` (header, 24 domain banners, field renames, field type fixes, text replacements) and the seam-closure files (`field-injections.json`, `union-additions.json`, `enum-additions.json`, `extra-definitions.graphql`; ledger `04-seam-closure-ledger.md`). Output `docs/schema/final_biotech_schema_proposal.graphql` builds with `@neo4j/graphql` 7.6.3 (BUILD OK, 34 s).
+
+| Id | Ruling | Why | Effect |
+|---|---|---|---|
+| F-W5-01 | `HAS_ANALYTE` admitted as a W07 candidate structural relationship on `Biomarker` → `ChemicalSubstance` / `MolecularEntity` (W03-SR-03, W02-SR-08). | A measurand must name its analyte for CQ-DX comparability and the W02 salt/moiety cases; no owner objected, W07 did not answer. | Two injected fields; registry row at Wave 6. |
+| F-W5-02 | `AssayVersion.runsOnInstrument` retyped to `[EquipmentModelTarget!]!` (W08-SR-01); the stop-gap `runsOnDevices` injection dropped. | One field for one relationship; the union already exists (W08). | fieldTypeFix. |
+| F-W5-03 | `SUPPORTED_BY` is property-less everywhere; W12's four fields lose `StructuralEdgeProperties`. | One relationship type, one property shape; the kernel declaration wins. | text replacement (4 occurrences). |
+| F-W5-04 | `AFFECTS_MECHANISM` and `MODULATES` carry `AssociationProjectionProperties` on both ends (W02's outgoing fields switched from `DerivedEdgeProperties`). | W03 owns both relationship types; its property type is a superset of `DerivedEdgeProperties`, so nothing W02 wrote is lost. | text replacement (13 occurrences). |
+| F-W5-05 | Seam-ledger enum additions without an explicit prior admission are ACCEPTED: `MaterialKind.FOOD` (W05-SR-02), `PathwayKind.NOVEL_FOOD_AUTHORISATION` and `RegulatoryResponseKind.NOVEL_FOOD_AUTHORISED` (W13-SR-03, EU 2020/16), `RegulatoryStatusKind.DESIGNATION_ENDED_UNSPECIFIED` (W06-SR-05, OOPD 465514). | Each has a stated failing case with a real identifier; the alternative (null kind + text) hides the case from queries. | kept in enum-additions. |
+| F-W5-06 | Section 5 text replacements of the seam ledger applied: Product `HAS_SNAPSHOT`→`HAS_STATE`, `EVALUATES`→`LEGACY_EVALUATES` on `Study.evaluates`, `IDENTIFIED_BY`→`HAS_IDENTIFIER` (3), retrieval `MENTIONS`→`MENTIONS_ENTITY` with `RetrievalEdgeProperties` (3, W00-R-19 name wins over the MR-06 default). | MR-04..MR-08 as reconciled by W00. | stored types in the final file. |
+| F-W5-07 | `Observation.comparedTo` (derived `COMPARED_TO`, `DerivedEdgeProperties`, read-only) injected; W16 omitted the field W07's model card places on `Observation`. | CQ-DX-03 comparability queries need the field on the implementer. | injection. |
+| F-W5-08 | Remaining `HAS_VARIANT` (Product→ProductVariant, W04), `HAS_STEP` (ManufacturingProcess→ManufacturingStep, W11), `EVALUATES` (Adjudication→Assertion, kernel) and `HAS_SNAPSHOT` (Source/Document→SourceSnapshot) stay: each is a distinct catalog relationship with disjoint endpoints from the renamed one. | MR-04/MR-05/CL-014/D-004 renamed the colliding uses only. | none. |
+| F-W5-09 | Union pruning at assembly (MR-01/MR-02): 14 members removed (retired types `FoodProduct`, `ExperienceReport`, `Association`; specializations beside their parent in `RegulatorySubjectTarget`, `StepSubstanceTarget`, `MediaSubjectTarget`, `MediaVisualizableRelationshipTarget`). | A union never lists a type and its specialization; labels make the specialization reachable through the parent. | listed in the assembly log. |
+
+Deferred from the seam ledger (owner decided otherwise, or a removal): W04-SR-05/-07 endpoint widenings (W22/W01 keep their rules), retired-field requests (W21 AUTHORS/REPORTS, W06 Treatment.evaluatedInStudies, W20 chunk-support shortcuts), removal requests to owners, and new enums nobody defined (`DosageForm`, `AdministrationRoute`, `EpisodeType`, `CommerceMatch*`); each stays a controlled String until a packet owner defines the enum with failing cases.
+
+## G. Challenger objections (Wave 5) and resolutions
+
+Filled after the five Challenger reports in `validation/challengers/` (see the final validation report 07 for re-run evidence).
