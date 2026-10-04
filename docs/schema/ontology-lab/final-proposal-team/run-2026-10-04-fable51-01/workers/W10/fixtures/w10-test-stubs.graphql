@@ -1,0 +1,32 @@
+# TEST STUBS ONLY (not owned by W10, not a proposal): minimal stand-ins for W00/W01/W02/W04/W07/W09/W12/W21 types so the
+# W10 fragment can be built with @neo4j/graphql 7.6.3 and round-tripped. Interfaces and enums copied from contract B3/B5.
+interface Entity { id: ID!  uid: String!  name: String  description: String  mongoResearchRunId: String }
+interface EntityArchetype { entityType: String! }
+interface EvidenceAssessmentArchetype { assessmentType: String!  methodVersion: String!  status: AssessmentStatus!  recordedAt: DateTime!  recordedTo: DateTime  summary: String  overallScore: Float  confidence: Float }
+enum PrivacyClass { PUBLIC INTERNAL }
+enum NodeMaturity { CANDIDATE PROVISIONAL ACCEPTED DEPRECATED }
+enum AssessmentStatus { PROPOSED ACCEPTED SUPERSEDED WITHDRAWN }
+enum AdjudicationVerdict { SUPPORTED PARTIALLY_SUPPORTED CONTRADICTED INSUFFICIENT NOT_APPLICABLE }
+enum QuantityBasis { PER_DAY PER_DOSE PER_SERVING PER_KG_BODY_WEIGHT_PER_DAY SINGLE_DOSE }
+enum MassBasis { SALT_FORM ACTIVE_MOIETY MATERIAL_AS_IS UNSPECIFIED }
+enum SupersessionKind { SOURCE_CORRECTION VALIDITY_BOUNDED EXTRACTION_FIX RESOLUTION_FIX DUPLICATE_MERGE RE_REVIEW SOURCE_REVISION }
+type SupersessionProperties @relationshipProperties { supersessionKind: SupersessionKind!  recordedAt: DateTime!  sourceRevisionEventUid: String }
+type SourceLocator @node(labels: ["SourceLocator", "InformationArtifact"]) { id: ID! @id  uid: String!  section: String  exact: String }
+type Assertion @node(labels: ["Assertion"]) { id: ID! @id  uid: String!  predicate: String!  valueString: String }
+type Activity @node(labels: ["Activity", "Occurrence"]) { id: ID! @id  uid: String! }
+type Agent @node(labels: ["Agent", "Entity"]) { id: ID! @id  uid: String! }
+type Person @node(labels: ["Person", "Entity"]) { id: ID! @id  uid: String!  name: String }
+type IngredientMaterial @node(labels: ["IngredientMaterial", "Entity"]) { id: ID! @id  uid: String!  name: String }
+type Product @node(labels: ["Product", "Entity"]) { id: ID! @id  uid: String!  name: String }
+type ProductVariant @node(labels: ["ProductVariant", "Entity"]) { id: ID! @id  uid: String!  name: String }
+type FormulationVersion @node(labels: ["FormulationVersion", "VersionedState"]) { id: ID! @id  uid: String!  versionName: String }
+type ProductLot @node(labels: ["ProductLot", "Entity"]) { id: ID! @id  uid: String! }
+type Biomarker @node(labels: ["Biomarker", "Entity"]) { id: ID! @id  uid: String!  name: String }
+type Study @node(labels: ["Study", "Entity"]) { id: ID! @id  uid: String!  name: String }
+type StudyIntervention @node(labels: ["StudyIntervention", "VersionedState"]) { id: ID! @id  uid: String!  name: String }
+type OutcomeDefinition @node(labels: ["OutcomeDefinition", "VersionedState"]) { id: ID! @id  uid: String!  name: String }
+type StudyResult @node(labels: ["StudyResult", "InformationArtifact"]) { id: ID! @id  uid: String!  analysisKind: String  statisticalConclusion: String }
+type Publication @node(labels: ["Publication", "InformationArtifact"]) { id: ID! @id  uid: String!  pmid: String  publishedAt: DateTime }
+type RegistrationVersion @node(labels: ["RegistrationVersion", "InformationArtifact"]) { id: ID! @id  uid: String! }
+type Claim @node(labels: ["Claim", "Entity"]) { id: ID! @id  uid: String!  claimText: String }
+type ResolutionHypothesis implements Entity & EvidenceAssessmentArchetype @node(labels: ["ResolutionHypothesis", "EvidenceAssessment"]) { id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String  assessmentType: String!  methodVersion: String!  status: AssessmentStatus!  recordedAt: DateTime!  recordedTo: DateTime  summary: String  overallScore: Float  confidence: Float  resolutionStatus: String }

@@ -61,24 +61,24 @@
      "citesAssertions": [
       {
        "__typename": "Assertion",
-       "uid": "hu:claim-occurrence:w23-rt-co1",
-       "predicate": "RECOMMENDS"
+       "uid": "hu:assertion:w23-rt-a1",
+       "predicate": "HAS_FORMULATION_VERSION"
       },
       {
        "__typename": "Assertion",
-       "uid": "hu:assertion:w23-rt-a1",
-       "predicate": "HAS_FORMULATION_VERSION"
+       "uid": "hu:claim-occurrence:w23-rt-co1",
+       "predicate": "RECOMMENDS"
       }
      ],
      "citesAssertionsConnection": {
       "edges": [
        {
         "properties": {
-         "orderIndex": 2
+         "orderIndex": 0
         },
         "node": {
          "__typename": "Assertion",
-         "uid": "hu:claim-occurrence:w23-rt-co1"
+         "uid": "hu:assertion:w23-rt-a1"
         }
        },
        {
@@ -87,7 +87,7 @@
         },
         "node": {
          "__typename": "Assertion",
-         "uid": "hu:assertion:w23-rt-a1"
+         "uid": "hu:claim-occurrence:w23-rt-co1"
         }
        }
       ]
@@ -112,8 +112,8 @@
   "storedNode": [
    {
     "labels": [
-     "AnswerRecord",
-     "Occurrence"
+     "Occurrence",
+     "AnswerRecord"
     ],
     "accessTier": "PUBLIC_ANSWER",
     "privacyClass": "INTERNAL",

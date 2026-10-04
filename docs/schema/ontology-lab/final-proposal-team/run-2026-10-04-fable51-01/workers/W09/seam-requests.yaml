@@ -1,0 +1,129 @@
+# W09 seam requests and conflict requests. Fable copies these into 03-conflict-ledger.md with ids and resolvers.
+# Failing cases cite fixtures in workers/W09/fixtures and rows in fixtures/run-results-2026-10-04.json.
+- id: W09-SR-01
+  targetOwner: Fable (registry)
+  request: "Register under W09 the enums ArmType, ArmRole, AeSeriousness, RelatednessAssessor, DatasetAccessLevel, StudyPopulationKind, AnalysisSetKind, StudyResultKind, EstimateQualifier, StudyKind and the CANDIDATE union InterventionDefinitionTarget."
+  cq: [CQ-ST-01, CQ-ST-05, CQ-ST-06, CQ-ST-07, CQ-EV-03, CQ-ST-C02]
+  failingCase: "Property cards define closed vocabularies (armRole, seriousness, accessLevel) and the 0.2.0 fixture uses free values (PERCENT_CHANGE, INTERVENTIONAL_RCT) that no enum constrains; contract B2 requires enums for closed vocabularies."
+  proposedRuling: "Accept as W09-owned domain enums; values as in sdl-fragment.graphql."
+- id: W09-SR-02
+  targetOwner: Fable (registry) / W00
+  request: "Register PublicationRevisionProperties (AssertedEdgeProperties + sourceRevisionEventUid!) and LegacyInterventionArmProperties (read-only legacy stored names of InterventionArmMetadata) as W09 relationship-property types."
+  cq: [CQ-EV-05, INV-201]
+  failingCase: "fixtures/06: CORRECTS must name the ERRATUM SourceRevisionEvent (QS-W09-06, V-W09-04); Study.evaluates needs a properties type because B4 forbids carrying InterventionArmMetadata as-is."
+  proposedRuling: "Accept."
+- id: W09-SR-03
+  targetOwner: W00
+  request: "Extend SUPPORTED_BY domain (and SupportedRecordTarget) to StudyResult (covers AdverseEventResult by parent label), RegistrationVersion and ProtocolVersion: captured study records need their own locators."
+  cq: [CQ-ST-05, CQ-ST-06, CQ-ST-08, INV-002]
+  failingCase: "fixtures/02, 05: each StudyResult/AdverseEventResult cites its TEXT_QUOTE locator; catalog SUPPORTED_BY domain is Assertion|Adjudication|EvidenceAssessment only, and W00's SupportedRecordTarget omits them."
+  proposedRuling: "Add the three types to the SUPPORTED_BY domain and union; alternative (rejected as heavier): wrap every result in a REPORTS_RESULT Assertion."
+- id: W09-SR-04
+  targetOwner: W00
+  request: "Register uid tokens: protocol-version (ProtocolVersion), study-population (StudyPopulation), outcome-definition (OutcomeDefinition; 'outcome' stays W03's), adverse-event-result (AdverseEventResult); and, for W08/W06 nodes used in W09 fixtures, device (Device) and procedure (Procedure)."
+  cq: [INV-106]
+  failingCase: "fixtures/04, 05 create hu:study-population:..., hu:device:..., hu:procedure:...; catalog uidTypeTokens has no token for these labels; 'outcome' is ambiguous between W03 Outcome and OutcomeDefinition."
+  proposedRuling: "Register the tokens; migrate fixture uids hu:outcome:<id> of OutcomeDefinitions to hu:outcome-definition:<id> with redirects."
+- id: W09-SR-05
+  targetOwner: W01
+  request: "(a) Register an investigator-role predicate Person -> Study (e.g. HOLDS_STUDY_ROLE {roleType: PRINCIPAL_INVESTIGATOR}) as the input of derived INVESTIGATED_BY; (b) register COLLABORATES_ON_STUDY (registry 'collaborator') distinct from SERVES_AS_CRO_FOR and FUNDS_STUDY; (c) confirm SPONSORS_STUDY and SERVES_AS_CRO_FOR have subject Organization and object Study."
+  cq: [CQ-AX-05, CQ-ST-01]
+  failingCase: "S-01/S-08: KGK Science is the registry 'collaborator' of NCT02678611 and NCT03464500; ClinicalTrials.gov defines a collaborator as providing support for funding, design, implementation, analysis or reporting (S-20), which does not establish a CRO role. Negative N21 (V-W09-11) shows OPERATED_BY written from the collaborator listing."
+  proposedRuling: "Accept (a) and (b); OPERATED_BY derives only from SERVES_AS_CRO_FOR."
+- id: W09-SR-06
+  targetOwner: W04 (with W02)
+  request: "Own shared DosageForm and AdministrationRoute enums used by ProductVariant and StudyIntervention, including WHOLE_FOOD, FOOD_FRACTION, BEVERAGE, SOFTGEL, CAPSULE, DEVICE_SESSION, ORAL, TRANSCRANIAL, TOPICAL, INHALED, OTHER."
+  cq: [CQ-ST-01, CQ-EV-04]
+  failingCase: "fixtures/04: walnut meal, pomegranate juice and a transcranial device session cannot be expressed with the 0.2.0 card list (CAPSULE, SOFTGEL, TABLET, POWDER, GUMMY, LIQUID, INJECTION, OTHER); DOSAGE_FORM/ROUTE applicability dimensions compare StudyIntervention with ProductVariant and need one vocabulary."
+  proposedRuling: "W04 defines both enums once; W09 switches the two String fields to them at merge."
+- id: W09-SR-07
+  targetOwner: W02 (with W05)
+  request: "Confirm that a food or food fraction administered in a study (whole walnut kernels 85 g, separated skins 5.6 g, de-fatted nutmeat 34 g, walnut oil 51 g, pomegranate juice) is an IngredientMaterial (materialKind for food materials, DERIVED_FROM_TAXON Juglans regia), and how it links to a W05 FoodItem concept."
+  cq: [CQ-ST-01, CQ-ST-02]
+  failingCase: "fixtures/04 NCT00938340: four materials of one food are four different interventions; USES_INTERVENTION_MATERIAL range is IngredientMaterial|ProductVariant|ProductLot."
+  proposedRuling: "Food materials are IngredientMaterial; FoodItem stays the generic concept; no FoodItem in USES_INTERVENTION_MATERIAL range."
+- id: W09-SR-08
+  targetOwner: W08
+  request: "Accept Device as the range of the CANDIDATE relationship USES_INTERVENTION_DEVICE; decide whether the target is a device model (MedX 1116 Rehab Console) or a unit (DeviceModel candidate), and where delivery settings (wavelength 808-904 nm, session parameters) live."
+  cq: [CQ-ST-C01]
+  failingCase: "fixtures/04 NCT02582593: real vs sham arms use the same console; settings exist only as verbatim text."
+  proposedRuling: "Target = W08 Device (model level); sham is the arm's armType; settings stay verbatimDoseText until W08 has a FirmwareVersion/DeviceModel failing case."
+- id: W09-SR-09
+  targetOwner: W06, W16, W05, W02
+  request: "(a) Keep Procedure, Treatment (W06), ProtocolEdition (W16), Lifestyle (W05) as node types so InterventionDefinitionTarget resolves; (b) W06 makes Treatment.evaluatedInStudies read-only (@settable false) with properties LegacyInterventionArmProperties; (c) W02/W05/W06/W08/W16 confirm the successor names of the live union members used by LegacyEvaluatedIntervention."
+  cq: [CQ-ST-C02, INV-201]
+  failingCase: "Live union StudyIntervention has 10 members; any member renamed or retired breaks the legacy union at merge."
+  proposedRuling: "Fable resolves LegacyEvaluatedIntervention members at merge to the surviving successor types."
+- id: W09-SR-10
+  targetOwner: W17
+  request: "Study.reportsSafetySignals is retired from Study; W17 decides SafetySignal.reportedInStudies and any SafetySignal -> AdverseEventResult evidence edge."
+  cq: [CQ-ST-06]
+  failingCase: "A signal is an interpretation; per-arm AE rows with collection method are the W09 record."
+  proposedRuling: "W17 owns REPORTS_SAFETY_SIGNAL semantics; W09 writes no safety-signal edge."
+- id: W09-SR-11
+  targetOwner: W10
+  request: "(a) INCLUDES_RESULT/BASED_ON_EVIDENCE/INTERPRETS_RESULT_OF target StudyResult (AdverseEventResult included by label); (b) adopt V-215r (INV-206 complete); (c) HAS_EVIDENCE_TARGET -> StudyIntervention (D-003 type name)."
+  cq: [CQ-ST-05, CQ-EV-04, CQ-ST-09]
+  failingCase: "fixtures/90 N08: a secondary result after a null primary entered as INDEPENDENT_REPLICATION passes frozen V-215 and fails V-215r."
+  proposedRuling: "Accept."
+- id: W09-SR-12
+  targetOwner: W00
+  request: "Define where an asserted edge's qualifiers (ANALYZES_DATASET.analysisRole, USES_INTERVENTION_MATERIAL.asReportedName, RESULT_FOR_ARM.armRole when asserted) are carried on the authorizing Assertion."
+  cq: [INV-003, INV-503]
+  failingCase: "First run of fixtures/03: putting analysisRole in Assertion.valueString while the assertion also has HAS_OBJECT returned V-003 rows (literal-xor-object)."
+  proposedRuling: "Add a typed `qualifiers` map-like convention (e.g. Assertion.qualifierKeys/qualifierValues string lists) or require the edge as the qualifier carrier with the assertion's contentHash covering the qualifiers."
+- id: W09-SR-13
+  targetOwner: W00 / Fable
+  request: "Relationship type EVALUATES has two meanings: Adjudication -> Assertion (W00) and legacy Study -> intervention (W09). Rename the legacy stored type to LEGACY_EVALUATES by migration, keeping the GraphQL field Study.evaluates."
+  cq: [INV-201, CL-017]
+  failingCase: "MATCH ()-[:EVALUATES]->() mixes adjudications and legacy study edges; CL-014 precedent (HAS_VARIANT)."
+  proposedRuling: "Rename at migration; fragment keeps EVALUATES until ruled."
+- id: W09-SR-14
+  targetOwner: W19 / W00
+  request: "Add SourceKind values TRIAL_REGISTRY_RECORD and BIBLIOGRAPHIC_DATABASE_RECORD."
+  cq: [CQ-ST-08, CQ-EV-05, CQ-PV-05]
+  failingCase: "fixtures use REGULATORY_RECORD for ClinicalTrials.gov records and null for the PubMed record of PMID 30155270; neither is a regulatory record or a publication rendition."
+  proposedRuling: "Add both values."
+- id: W09-SR-15
+  targetOwner: W13
+  request: "Model the sponsor's registry phrase 'FDA-approved as a nonsignificant risk' as a characterization (CHARACTERIZES_REGULATORY_STATUS, PROPOSED until adjudicated, V-335) and decide whether an IDE nonsignificant-risk determination needs a RegulatoryStatus kind."
+  cq: [CQ-AX-06, INV-010]
+  failingCase: "S-15 NCT02582593 detailed description; fixtures/04 statement 3b."
+  proposedRuling: "No approval is inferred; W13 decides the status kind."
+- id: W09-SR-16
+  targetOwner: W00 (predicate registry)
+  request: "Register candidate asserted predicates CITES_AS_REFERENCE (publication -> literal citation; used for SOURCE_CORRECTION) and EVALUATES_RISK_FACTOR (migration target of the retired live edge); list RESULTS_UNPUBLISHED as a forbidden registry-only inference (V-W09-05)."
+  cq: [CQ-EV-05, CQ-ST-08]
+  failingCase: "fixtures/06 statement 6; fixtures/90 N16."
+  proposedRuling: "Register as candidates."
+- id: W09-SR-17
+  targetOwner: Fable (operations, with W23)
+  request: "Record that @neo4j/graphql 7.6.3 projects DateTime fields with apoc.date.convertFormat, so APOC Core is a runtime requirement of the API on Neo4j 5.26."
+  cq: [operations]
+  failingCase: "W09 GraphQL read of fixture data on embedded 5.26.31 Community without APOC: 'Unknown function apoc.date.convertFormat' when selecting RegistrationVersion.observedAt; the same query without DateTime fields succeeds."
+  proposedRuling: "Operations file declares APOC Core as required for the GraphQL API (or the API avoids DateTime fields, which is not acceptable)."
+# ---- conflict requests against frozen validators (contract A10: change only with primary source + failing case) ----
+- id: W09-CR-01
+  targetOwner: W00 / Fable
+  request: "Split V-217: V-217r (hard) = collectionMethod IS NULL; V-217i (informational) = zero count with NOT_DESCRIBED. INV-207 text unchanged."
+  cq: [CQ-ST-06, INV-207]
+  failingCase: "S-07 Basis ('self-reported AEs'; 'no serious AEs reported') and S-19 ENERGIZE ('recorded and coded according to MedDRA'; 'No serious AEs were reported'): frozen V-217 returns 5 rows on faithful captures; the 0.2.0 fixture avoided this only by recording SYSTEMATIC, which the text does not support."
+  proposedRuling: "Adopt V-217r + V-217i (80-queries.cypher)."
+- id: W09-CR-02
+  targetOwner: W00 / Fable
+  request: "Replace V-221 with V-221r: null armType is checked; SHAM_COMPARATOR and NO_INTERVENTION exempt; bases required only when quantityStatus is REPORTED; device components need quantityStatus NOT_APPLICABLE; definition-only interventions (FOLLOWS_INTERVENTION_DEFINITION, no component) are complete."
+  cq: [CQ-ST-01, CQ-ST-C01, CQ-ST-C02]
+  failingCase: "fixtures/04: frozen V-221 returns 4 false positives (NCT02582593 real and sham device components, NCT04985630 pomegranate juice with unreported amount, synthetic sauna) and silently skips the four walnut arms whose armType is null."
+  proposedRuling: "Adopt V-221r (0 rows on positives; still catches N23)."
+- id: W09-CR-03
+  targetOwner: W00 / Fable
+  request: "V-211: use count(DISTINCT r) for owners."
+  cq: [CQ-ST-08]
+  failingCase: "fixtures/01 statement 6: the round 0007 re-bounding shape (closed episode e1 + new episode e1b to the same version) makes frozen V-211 report owners = 2."
+  proposedRuling: "Adopt V-211r."
+- id: W09-CR-04
+  targetOwner: W10 / W00
+  request: "Extend V-215 to every inputRole other than SUPPORTIVE and HYPOTHESIS_GENERATING (V-215r), matching INV-206."
+  cq: [CQ-ST-05, INV-206]
+  failingCase: "fixtures/90 N08 (and W09's own first draft of fixture 03): secondary findings after a null primary entered as INDEPENDENT_REPLICATION; frozen V-215 returns 0 rows, V-215r returns them."
+  proposedRuling: "Adopt V-215r."

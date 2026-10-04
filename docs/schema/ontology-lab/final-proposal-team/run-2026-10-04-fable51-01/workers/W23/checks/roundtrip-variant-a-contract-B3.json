@@ -68,7 +68,7 @@
       "edges": [
        {
         "properties": {
-         "orderIndex": 2
+         "orderIndex": 1
         },
         "node": {
          "__typename": "Assertion",
@@ -77,7 +77,7 @@
        },
        {
         "properties": {
-         "orderIndex": 1
+         "orderIndex": 0
         },
         "node": {
          "__typename": "Assertion",
@@ -106,8 +106,8 @@
   "storedNode": [
    {
     "labels": [
-     "AnswerRecord",
-     "Occurrence"
+     "Occurrence",
+     "AnswerRecord"
     ],
     "accessTier": "PUBLIC_ANSWER",
     "privacyClass": "INTERNAL",
