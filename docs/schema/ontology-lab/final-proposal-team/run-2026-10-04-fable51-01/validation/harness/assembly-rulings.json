@@ -1,0 +1,63 @@
+{
+  "header": [
+    "# BellLabs biotech knowledge graph: FINAL SCHEMA PROPOSAL (standalone, executable @neo4j/graphql SDL)",
+    "#",
+    "# Status: PROPOSAL produced by run run-2026-10-04-fable51-01 (docs/schema/ontology-lab/final-proposal-team/).",
+    "# Synthesizer: Fable 5.1 (claude-fable-5-1). Research/modeling workers: Opus 5.5, packages W00-W23.",
+    "# It does NOT replace docs/schema/current_biotech_schema.graphql (read-only) and does not change catalog 0.2.0 semantics",
+    "# except where the run's decision report records a reasoned, fixture-backed ruling. Semantic authority remains the",
+    "# catalog and architecture; this file is their executable GraphQL projection with full type definitions (no extend blocks).",
+    "#",
+    "# Verified build target: @neo4j/graphql 7.6.3, graphql 16.14.2, neo4j-driver 6.2.0, Node 22; Neo4j 5.26.31 Community",
+    "# (embedded) with APOC Core 5.26.31. APOC Core is REQUIRED: the library's generated Cypher calls apoc.date.convertFormat",
+    "# for every DateTime field read. Enterprise behaviour (property existence/type constraints) is unverified.",
+    "# Operations: docs/schema/neo4j/final_biotech_schema_operations.cypher (baseline, all editions) and the",
+    "# final_biotech_schema_operations.enterprise.cypher companion. Validation and fixtures: the run's validation/ directory.",
+    "#",
+    "# Reading guide: every node type lists its stored labels (primary label first, archetype label last) in @node(labels:),",
+    "# carries uid (hu:<token>:<opaque>) beside the live id, and states for each relationship field its class",
+    "# (structural | asserted | derived) and cardinality in the field description. Asserted edges carry AssertedEdgeProperties",
+    "# (one Assertion per episode); derived edges carry DerivedEdgeProperties and are regenerable; nothing private-personal",
+    "# exists in this file. Uniqueness, indexes and application-enforced invariants live in the operations file and the",
+    "# validation suite: SDL nullability is not database enforcement.",
+    "#",
+    "# Domain banners below name the purpose and the competency questions each section serves (handoff section 7.3).",
+    ""
+  ],
+  "sections": [
+    {"title": "KERNEL: archetypes, identity, time, assertion, Evidence Provenance (W00)", "purpose": "Six archetype interfaces, shared enums and edge-property profiles, Source/Snapshot/Locator/Revision, Assertion, Adjudication, Activity/Agent, Identifier, Mention, EquivalenceAssessment. Status is capture fidelity, never truth; one asserter per assertion; bitemporal immutable history.", "cqs": "CQ-EV-01/02/05, CQ-TM-01..07, CQ-PV-01..04/06, CQ-ID-04, CQ-AX-07..09, CQ-AX-14..16; QS-1, QS-2, QS-4, QS-7, QS-8", "modules": "kernel, provenance, temporal, identity_resolution", "workers": ["W00"]},
+    {"title": "ACTORS AND INSTITUTIONS (W01)", "purpose": "Organizations, legal entities, brands, facilities, people and pseudonymous/anonymous actors; roles and the FINANCIAL_INTEREST family as time-bounded asserted edges. Brand is not legal entity; investment is not control; advising is not endorsement.", "cqs": "CQ-EC-01..04, CQ-CL-05, CQ-MF-01, CQ-AX-18", "modules": "organizations", "workers": ["W01"]},
+    {"title": "SUBSTANCES AND MATERIALS (W02)", "purpose": "Chemical substances and forms, ingredient materials, botanical and microbial preparations, mixtures, constituents and nutrients. Substance similarity never establishes material equivalence or active dose.", "cqs": "CQ-ID-03/04/06, CQ-PF-01, CQ-ST-01/02", "modules": "substances_and_materials", "workers": ["W02"]},
+    {"title": "BIOLOGY AND MECHANISMS (W03)", "purpose": "Reference biology (mechanisms, pathways, molecular entities, species, anatomical contexts, conditions, outcomes, risk factors) and MechanismEvidenceContext. Inference is not measurement; compartment and species transfer is qualified.", "cqs": "CQ-MX-01..06, CQ-ST-03, CQ-AX-20", "modules": "mechanisms", "workers": ["W03"]},
+    {"title": "PRODUCTS, FORMULATIONS AND LABELS (W04)", "purpose": "Enduring products, variants, package configurations, formulation versions and components, label snapshots and declarations. Current marketed product is not historical intervention; a declaration is not a measurement.", "cqs": "CQ-ID-01/02/05, CQ-PF-01..04, CQ-AX-17, CQ-AX-25", "modules": "products_and_commerce (identity), products_and_formulations, labels", "workers": ["W04"]},
+    {"title": "FOOD, LIFESTYLE AND EXPOSURES (W05)", "purpose": "Foods as ingredient materials, exposure characterizations and lifestyle practice concepts; intervention definition versus execution.", "cqs": "CQ-ST-01/02, CQ-EV-04, CQ-PR-02/03/06, CQ-FL-C01..C05 (candidates)", "modules": "food_lifestyle_exposure (candidate)", "workers": ["W05"]},
+    {"title": "TREATMENTS, PROCEDURES AND INTERVENTION MODALITIES (W06)", "purpose": "Treatment concepts and procedure definitions; intent is not result, definition is not performance; no care records.", "cqs": "CQ-ST-01, CQ-EV-04, CQ-MF-02, CQ-AX-23", "modules": "interventions (candidate)", "workers": ["W06"]},
+    {"title": "DIAGNOSTICS AND MEASUREMENT (W07)", "purpose": "Biomarkers, metrics, lab tests, panels, assay/algorithm/reference-interval versions, comparability and the DiagnosticResult contract. Same name or unit does not justify a shared trend axis.", "cqs": "CQ-DX-01..09, CQ-AX-21", "modules": "diagnostics", "workers": ["W07"]},
+    {"title": "PLATFORMS, INSTRUMENTS AND DEVICES (W08)", "purpose": "Technology platforms, instrument models, devices, sensors and modalities; device identity differs from assay configuration, performance claims and firmware.", "cqs": "CQ-DX-01..04/09, CQ-PR-02/03, CQ-MF-04", "modules": "consumer_devices (future)", "workers": ["W08"]},
+    {"title": "STUDIES, INTERVENTIONS AND RESULTS (W09)", "purpose": "Study identity, registrations and their versions, arms, interventions and components, populations, outcome definitions, results, adverse events, publications and datasets. Registered is not completed; a shared dataset is not independent replication.", "cqs": "CQ-ST-01..10, CQ-EV-03/05, CQ-ID-01/02, CQ-AX-05/24", "modules": "studies_and_evidence", "workers": ["W09"]},
+    {"title": "EVIDENCE ASSESSMENT, APPLICABILITY AND SYNTHESIS (W10)", "purpose": "EvidenceApplicability and its dimensions, use-context profiles, endpoint classification, result interpretation, synthesis and strength assessments. Evidence reaches commercial products only through applicability; confidence and truth differ.", "cqs": "CQ-EV-02..06, CQ-ST-03/05/09/10, CQ-AX-05/20/24, CQ-RC-03; QS-3", "modules": "studies_and_evidence", "workers": ["W10"]},
+    {"title": "MANUFACTURING, SPECIFICATIONS AND SUPPLY READINESS (W11)", "purpose": "Specifications and versions, processes and steps, capability states. Promotional language does not establish operating capacity.", "cqs": "CQ-MF-01/04..06, CQ-PF-01", "modules": "products_and_formulations, manufacturing_readiness", "workers": ["W11"]},
+    {"title": "QUALITY TESTING AND CERTIFICATION (W12)", "purpose": "Lots, samples, executions, methods, measured results, criteria, pass/fail interpretations, COAs and certification scope. Facility certification is not lot certification; a pass summary is not a measurement.", "cqs": "CQ-PF-03, CQ-MF-06, CQ-AX-19", "modules": "quality", "workers": ["W12"]},
+    {"title": "REGULATION AND JURISDICTIONS (W13)", "purpose": "Agencies, pathways and their versions, submissions, responses and statuses. Only APPROVAL is approval; marketed is not approved.", "cqs": "CQ-MF-02/03/06, CQ-AX-23, CQ-PF-04", "modules": "regulatory_and_ip", "workers": ["W13"]},
+    {"title": "INTELLECTUAL PROPERTY AND LICENSING (W14)", "purpose": "Patent families, applications, grants, claims, licenses and trademarks. A license implies neither study ownership nor efficacy.", "cqs": "CQ-EC-01/02, CQ-MF-01, CQ-IP-C01..C03 (candidates)", "modules": "regulatory_and_ip, products_and_formulations (Trademark)", "workers": ["W14"]},
+    {"title": "COMMERCE AND ACCESS TO PRODUCTS (W15)", "purpose": "Merchant listings, offers, price observations, subscriptions, bundles, inventory and affiliate links. Hosting, listing and fulfilment never imply seller of record.", "cqs": "CQ-CM-01..05, CQ-AX-06, CQ-AX-17", "modules": "products_and_commerce", "workers": ["W15"]},
+    {"title": "PROTOCOLS AND PUBLIC WORKFLOW DEFINITIONS (W16)", "purpose": "Public protocols, immutable editions, steps with stable keys, dependencies, constraints, plans, adjustment rules, targets, public observations and results. Adoption never implies adherence; private execution stays outside the graph.", "cqs": "CQ-PR-01..06, CQ-PC-08, CQ-AX-22", "modules": "protocols", "workers": ["W16"]},
+    {"title": "SAFETY AND USE CONSTRAINTS (W17)", "purpose": "Safety signals, adverse effects, contraindication and interaction assertions, shared use constraints. No events reported is not no events; unknown safety is not safe.", "cqs": "CQ-ST-06, CQ-RC-06, CQ-PR-03/04", "modules": "safety_and_constraints (candidate)", "workers": ["W17"]},
+    {"title": "COMMUNITIES, EVENTS AND NARRATIVE ARCS (W18)", "purpose": "Communities, conferences, dated events and curated narrative arcs. Timeline or interpretation is never causal evidence.", "cqs": "CQ-EC-01, CQ-ST-09, CQ-TM-03, CQ-EN-C01.. (candidates)", "modules": "events_and_narrative (future)", "workers": ["W18"]},
+    {"title": "SOURCE INTELLIGENCE (W19)", "purpose": "Candidate source authority, coverage and discovery records; source classification by claim type. No source-wide truth score.", "cqs": "CQ-PV-05, CQ-AX-07, CQ-ST-08, CQ-PV-C01..C03 (candidates)", "modules": "provenance (candidates)", "workers": ["W19"]},
+    {"title": "DOCUMENTS, TEXT VERSIONS AND CHUNKS (W20)", "purpose": "Document as Source specialization, text versions bound to snapshots, segmentations and derived chunks. A chunk is never a locator.", "cqs": "CQ-PV-02/03, CQ-AX-07, CQ-AX-14; QS-8", "modules": "claims_and_documents, provenance", "workers": ["W20"]},
+    {"title": "NARRATIVE MEDIA, SPEAKERS AND CLAIMS (W21)", "purpose": "Platforms, channels, series, episodes and segments; Claim identity; ClaimOccurrence and RelationshipAssertion as assertions; retelling, qualification and conflict-relevance assessments. Human source content is not truth.", "cqs": "CQ-CL-01..09, CQ-PV-02/05, CQ-CM-04, CQ-EC-03, CQ-AX-05/18", "modules": "claims_and_documents", "workers": ["W21"]},
+    {"title": "MEDIA ASSETS, DEPICTIONS AND RIGHTS (W22)", "purpose": "Media assets and renditions, annotations, figure panels, label regions, graph views, suitability assessments and rights records for entities AND concepts. Depiction is not proof; availability is not permission.", "cqs": "CQ-PV-01/02/06, CQ-CL-08, CQ-MD-C01..C06 (candidates)", "modules": "media (future)", "workers": ["W22"]},
+    {"title": "ACCESS, ANSWERS, POLICY AND PRIVATE-STORE BOUNDARY (W23)", "purpose": "AnswerRecord, PolicyVersion, DecisionCriterion and access tiers. The shared graph holds no private-personal element; private records are external contracts referencing shared uids.", "cqs": "CQ-AX-01..28, CQ-PC, CQ-RC, CQ-PV-06; QS-5, QS-6", "modules": "access_and_answers, recommendation_decisions (internal part)", "workers": ["W23"]}
+  ],
+  "fieldRenames": [
+    {"type": "Observation", "from": "producedByAssayVersions", "to": "producedByAssayVersion"},
+    {"type": "Observation", "from": "computedByAlgorithmVersions", "to": "computedByAlgorithmVersion"},
+    {"type": "Observation", "from": "interpretedWithReferenceIntervalVersions", "to": "interpretedWithReferenceIntervalVersion"}
+  ],
+  "fieldTypeFixes": [
+    {"type": "Observation", "field": "resultKind", "from": "DiagnosticResultKind", "to": "DiagnosticResultKind!"},
+    {"type": "Observation", "field": "valueStatus", "from": "ReportedStatus", "to": "ResultQualifier"}
+  ],
+  "textReplacements": []
+}

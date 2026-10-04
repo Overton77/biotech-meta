@@ -1,0 +1,226 @@
+### R1 applicability v2 with dimensions, union targets and use profile
+{
+ "data": {
+  "evidenceApplicabilities": [
+   {
+    "uid": "hu:applicability:w10-nct02678611-1x-to-basis-current-v2",
+    "methodVersion": "applicability-v0.2-candidate",
+    "status": "PROPOSED",
+    "identityMatch": "UNKNOWN",
+    "doseMatch": "PARTIAL",
+    "scheduleMatch": "MATCH",
+    "overallScore": null,
+    "evidenceTarget": [
+     {
+      "__typename": "StudyIntervention",
+      "uid": "hu:study-intervention:nct02678611-nrpt-1x"
+     }
+    ],
+    "useTarget": [
+     {
+      "__typename": "FormulationVersion",
+      "uid": "hu:formulation:basis-us-current-2026-07-10"
+     }
+    ],
+    "forUseContext": [
+     {
+      "uid": "hu:use-profile:basis-us-label-directions-one-serving-daily",
+      "servingsPerDay": 1,
+      "doseDescriptor": "label directions: take two capsules (one serving) every morning with or without food"
+     }
+    ],
+    "supersedes": [
+     {
+      "uid": "hu:applicability:nct02678611-1x-to-basis-current"
+     }
+    ],
+    "dimensions": [
+     {
+      "dimension": "MATERIAL_IDENTITY",
+      "dimensionClass": "CATEGORICAL",
+      "verdict": "UNKNOWN",
+      "identityLevel": "SAME_SUBSTANCE_MATERIAL_UNRESOLVED",
+      "ratio": null,
+      "evidenceMassBasis": null,
+      "targetMassBasis": null,
+      "missingFacts": [
+       "supplier and specification of the NR administered in NCT02678611 (Jan-Jul 2016)",
+       "pterostilbene material administered in NCT02678611",
+       "whether Elysium NR-E existed in 2016 and matches the trial NR"
+      ],
+      "considersAssessments": [
+       {
+        "__typename": "ResolutionHypothesis",
+        "assessmentType": "ResolutionHypothesis",
+        "methodVersion": "resolution-v0.1"
+       },
+       {
+        "__typename": "ResolutionHypothesis",
+        "assessmentType": "ResolutionHypothesis",
+        "methodVersion": "resolution-v0.1"
+       }
+      ]
+     },
+     {
+      "dimension": "DOSE",
+      "dimensionClass": "CONTINUOUS",
+      "verdict": "PARTIAL",
+      "identityLevel": null,
+      "ratio": null,
+      "evidenceMassBasis": "UNSPECIFIED",
+      "targetMassBasis": "SALT_FORM",
+      "missingFacts": [
+       "mass basis of \"125 mg of NR\" per capsule in PMID 29184669 Methods (NR chloride salt or NR cation not stated)"
+      ],
+      "considersAssessments": []
+     },
+     {
+      "dimension": "SCHEDULE",
+      "dimensionClass": "CONTINUOUS",
+      "verdict": "MATCH",
+      "identityLevel": null,
+      "ratio": 1,
+      "evidenceMassBasis": null,
+      "targetMassBasis": null,
+      "missingFacts": [],
+      "considersAssessments": []
+     }
+    ]
+   }
+  ]
+ }
+}
+### R2 synthesis versions with trigger and input edge properties
+{
+ "data": {
+  "evidenceSyntheses": [
+   {
+    "uid": "hu:synthesis:w10-vitamin-d-ari-prevention-v3",
+    "verdict": "INSUFFICIENT",
+    "evidenceCutoff": "2025-02-21",
+    "recordedAt": "2026-10-04T02:12:00.000Z",
+    "assessesClaim": [
+     {
+      "uid": "hu:claim:w10-vitamin-d-prevents-acute-respiratory-infection",
+      "claimText": "Vitamin D supplementation reduces the risk of acute respiratory infection"
+     }
+    ],
+    "supersedes": [
+     {
+      "uid": "hu:synthesis:w10-vitamin-d-ari-prevention-v2",
+      "verdict": "SUPPORTED"
+     }
+    ],
+    "triggeredByPublicationsConnection": {
+     "edges": [
+      {
+       "properties": {
+        "criterionCode": "POOLED_ESTIMATE_CI_INCLUDES_NULL",
+        "effectOnVerdict": "WEAKENED",
+        "evidencePublishedAt": "2025-02-21"
+       },
+       "node": {
+        "uid": "hu:publication:pmid-39993397",
+        "pmid": "39993397"
+       }
+      }
+     ]
+    },
+    "includesConnection": {
+     "edges": [
+      {
+       "properties": {
+        "inputRole": "HYPOTHESIS_GENERATING"
+       },
+       "node": {
+        "__typename": "Assertion",
+        "uid": "hu:assertion:w10-pmid39993397-subgroup-age-1-15-or",
+        "valueString": null
+       }
+      },
+      {
+       "properties": {
+        "inputRole": "CONFIRMATORY"
+       },
+       "node": {
+        "__typename": "Assertion",
+        "uid": "hu:assertion:w10-pmid39993397-pooled-or-any-ari",
+        "valueString": null
+       }
+      }
+     ]
+    },
+    "strengthAssessments": [
+     {
+      "scheme": "GRADE",
+      "level": "moderate",
+      "methodVersion": "grade-as-reported-by-review-v0"
+     }
+    ]
+   }
+  ]
+ }
+}
+### R3 endpoint classifications for NADPARK outcomes
+{
+ "data": {
+  "endpointClassifications": [
+   {
+    "uid": "hu:endpoint-classification:w10-nadpark-pdrp-fdg-pet",
+    "endpointClass": "BIOMARKER_NOT_SURROGATE",
+    "biomarkerCategory": "PHARMACODYNAMIC_RESPONSE",
+    "surrogateValidationLevel": "NOT_ESTABLISHED",
+    "contextMatch": "NONE"
+   },
+   {
+    "uid": "hu:endpoint-classification:w10-nadpark-mds-updrs",
+    "endpointClass": "CLINICAL_OUTCOME",
+    "biomarkerCategory": null,
+    "surrogateValidationLevel": null,
+    "contextMatch": null
+   }
+  ]
+ }
+}
+### M1 create applicability WITHOUT methodVersion (must be rejected by the API)
+{
+ "errors": [
+  {
+   "message": "Field \"EvidenceApplicabilityCreateInput.methodVersion\" of required type \"String!\" was not provided.",
+   "locations": [
+    {
+     "line": 2,
+     "column": 41
+    }
+   ]
+  }
+ ]
+}
+### M2 try to update a judgement field (must be rejected: verdict not settable on update)
+{
+ "errors": [
+  {
+   "message": "Field \"verdict\" is not defined by type \"ApplicabilityDimensionUpdateInput\".",
+   "locations": [
+    {
+     "line": 2,
+     "column": 141
+    }
+   ]
+  }
+ ]
+}
+### M3 try to delete an assessment (must be rejected: no delete mutation)
+{
+ "errors": [
+  {
+   "message": "Cannot query field \"deleteEvidenceApplicabilities\" on type \"Mutation\". Did you mean \"createEvidenceApplicabilities\" or \"updateEvidenceApplicabilities\"?",
+   "locations": [
+    {
+     "line": 1,
+     "column": 12
+    }
+   ]
+  }
+ ]
+}

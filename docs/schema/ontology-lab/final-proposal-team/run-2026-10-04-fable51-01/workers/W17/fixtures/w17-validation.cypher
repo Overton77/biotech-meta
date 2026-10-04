@@ -54,12 +54,13 @@ WITH a, [v IN [CASE WHEN NOT a.predicate IN ['USE_CONSTRAINED_IN', 'USE_CONSTRAI
 WHERE size(violations) > 0
 RETURN a.uid AS assertion, violations ORDER BY assertion;
 
-// V-W17-05 (INV-007, QS-7, FI NO_INTERACTION_RECORD -> NO_INTERACTION): InteractionAssertion shape. NEGATIVE needs a direct
-// measurement; a measured or inferred basis names its evidence setting; a reported grade names its scheme.
+// V-W17-05 (INV-007, QS-7, FI NO_INTERACTION_RECORD -> NO_INTERACTION): InteractionAssertion shape. NEGATIVE is a studied
+// absence: it names the evidence setting and has a measured or cited basis (never HYPOTHESIS or null); a measured or
+// inferred basis names its evidence setting; a reported grade names its scheme.
 MATCH (a:InteractionAssertion)
 WITH a, [v IN [CASE WHEN a.predicate <> 'INTERACTS_WITH' THEN 'UNREGISTERED_PREDICATE' END,
                CASE WHEN a.polarity IS NULL THEN 'NO_POLARITY' END,
-               CASE WHEN a.polarity = 'NEGATIVE' AND coalesce(a.basisKind, '') <> 'DIRECT_MEASUREMENT' THEN 'NEGATIVE_WITHOUT_MEASUREMENT' END,
+               CASE WHEN a.polarity = 'NEGATIVE' AND (a.evidenceSetting IS NULL OR NOT coalesce(a.basisKind, '') IN ['DIRECT_MEASUREMENT', 'CITED_FROM_PRIOR_WORK']) THEN 'NEGATIVE_WITHOUT_STUDIED_ABSENCE' END,
                CASE WHEN a.basisKind IN ['DIRECT_MEASUREMENT', 'INFERRED_FROM_MEASUREMENT'] AND a.evidenceSetting IS NULL THEN 'NO_EVIDENCE_SETTING' END,
                CASE WHEN a.reportedEvidenceGrade IS NOT NULL AND a.reportedEvidenceGradeScheme IS NULL THEN 'GRADE_WITHOUT_SCHEME' END]
          WHERE v IS NOT NULL] AS violations

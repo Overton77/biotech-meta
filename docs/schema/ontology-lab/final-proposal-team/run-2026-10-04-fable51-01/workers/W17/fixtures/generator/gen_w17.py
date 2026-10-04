@@ -25,7 +25,7 @@ TC = "2026-10-04T02:00:00Z"
 RUN = "w17-fixture-run-2026-10-04"
 
 def node(uid, labels, p):
-    base = {"id": oid(uid), "createdAt": dt(TC), "privacyClass": "PUBLIC", "mongoResearchRunId": RUN}
+    base = {"id": oid(uid), "createdAt": dt(TC), "privacyClass": "PUBLIC"}
     base.update(p)
     lab = ":".join(labels)
     return f"MERGE (n:{lab} {{uid: {lit(uid)}}})\n  ON CREATE SET {setp('n', base)};"
@@ -153,7 +153,7 @@ def base_cypher():
 def assertion(uid, labels, a, subj, slab, obj, olab, locs, asserter=None, alab=None, effects=(), gen="hu:activity:w17-extract-2026-10-04"):
     content = {k: a.get(k) for k in sorted(a)}
     content.update({"subject": subj, "object": obj})
-    p = {"predicate": a["predicate"], "status": a.get("status", "EXTRACTED"), "recordedAt": dt(a.get("recordedAt", TR)), "contentHash": sha(json.dumps(content, sort_keys=True))}
+    p = {"predicate": a["predicate"], "predicateClass": "OTHER", "status": a.get("status", "EXTRACTED"), "recordedAt": dt(a.get("recordedAt", TR)), "contentHash": sha(json.dumps(content, sort_keys=True))}
     p.update({k: (dt(v) if k in ("validFrom", "validTo", "recordedTo") and v else v) for k, v in a.items() if k not in ("predicate", "status", "recordedAt")})
     s = [node(uid, labels, p)]
     s.append(edge(uid, labels[0], "HAS_SUBJECT", subj, slab))
@@ -251,14 +251,14 @@ def interactions_cypher():
      ("hu:assertion:w17-afp-green-tea-simvastatin", IA, dict(predicate="INTERACTS_WITH", polarity="POSITIVE", speechAct="STATES", basisKind="CITED_FROM_PRIOR_WORK", assertionBasis="STUDY_RESULT",
         interactionMechanism="NOT_STATED", interactionEffect="INCREASES_OBJECT_EXPOSURE", exposureChangeText="has been shown to increase simvastatin (Zocor) concentrations", description="mechanism hedged by the source ('may be due to P-gp inhibition')", **bnd()),
         "hu:material:green-tea-extract-unspecified", "IngredientMaterial", "hu:substance:simvastatin", "ChemicalSubstance", ["p-gte"], A, [], "hu:use-constraint:green-tea-extract-with-simvastatin"),
-     ("hu:assertion:w17-afp-sjw-warfarin-interaction", IA, dict(predicate="INTERACTS_WITH", polarity="POSITIVE", speechAct="STATES", basisKind="DIRECT_MEASUREMENT", assertionBasis="STUDY_RESULT",
+     ("hu:assertion:w17-afp-sjw-warfarin-interaction", IA, dict(predicate="INTERACTS_WITH", polarity="POSITIVE", speechAct="STATES", basisKind="CITED_FROM_PRIOR_WORK", assertionBasis="STUDY_RESULT",
         evidenceSetting="HUMAN_INTERVENTIONAL", interactionMechanism="CYP3A4_INDUCTION", interactionEffect="DECREASES_OBJECT_EXPOSURE", exposureChangeText="Clinical studies have shown reductions in ... warfarin",
         reportedEvidenceGrade="C", reportedEvidenceGradeScheme="SORT (AFP): C = consensus, disease-oriented evidence, usual practice, expert opinion, or case series", **bnd()),
         "hu:material:st-johns-wort-preparation-unspecified", "IngredientMaterial", "hu:substance:warfarin", "ChemicalSubstance", ["p-sjw", "p-sort"], A, ["hu:adverse-effect:anticoagulant-effect-altered"], "hu:use-constraint:st-johns-wort-with-warfarin"),
      ("hu:assertion:w17-afp-sjw-warfarin-avoid", CA, dict(predicate="USE_CONSTRAINED_WITH", polarity="POSITIVE", speechAct="RECOMMENDS", assertionBasis="EXPERT_OPINION", constraintLevel="AVOID",
         levelVerbatim="It is strongly recommended to avoid concurrent use of St. John's wort with over-the-counter and prescription medications.", **bnd()),
         "hu:material:st-johns-wort-preparation-unspecified", "IngredientMaterial", "hu:substance:warfarin", "ChemicalSubstance", ["p-sjw"], A, [], "hu:use-constraint:st-johns-wort-with-warfarin"),
-     ("hu:assertion:w17-afp-american-ginseng-indinavir", IA, dict(predicate="INTERACTS_WITH", polarity="NEGATIVE", speechAct="STATES", basisKind="DIRECT_MEASUREMENT", assertionBasis="STUDY_RESULT",
+     ("hu:assertion:w17-afp-american-ginseng-indinavir", IA, dict(predicate="INTERACTS_WITH", polarity="NEGATIVE", speechAct="STATES", basisKind="CITED_FROM_PRIOR_WORK", assertionBasis="STUDY_RESULT",
         evidenceSetting="HUMAN_INTERVENTIONAL", interactionMechanism="NOT_STATED", interactionEffect="NOT_STATED", description="Two human trials demonstrated no effect (a measured absence within those trials)", **bnd()),
         "hu:material:american-ginseng-preparation-unspecified", "IngredientMaterial", "hu:substance:indinavir", "ChemicalSubstance", ["p-amgin"], A, [], "hu:use-constraint:american-ginseng-with-indinavir"),
      ("hu:assertion:w17-ods-vitk-warfarin-interaction", IA, dict(predicate="INTERACTS_WITH", polarity="POSITIVE", speechAct="STATES", basisKind="CITED_FROM_PRIOR_WORK", assertionBasis="EXPERT_OPINION",
@@ -469,6 +469,9 @@ def negative_cypher():
     o.append(edge("hu:safety-signal:w17-legacy-live-row-0001", "SafetySignal", "AFFECTS_ORGAN", "hu:anatomical-context:skeletal-muscle", "Organ"))
     # N13 AdverseEffect merged with a Condition by name (one node carrying both labels)
     o.append(node("hu:adverse-effect:neg-w17-n13-rhabdo-merged", ["AdverseEffect", "Condition", "Entity"], {"entityType": "ADVERSE_EFFECT", "name": "rhabdomyolysis"}))
+    # N14 directive with no level and a substance as the object of USE_CONSTRAINED_IN
+    o += assertion("hu:assertion:neg-w17-n14-in-substance-no-level", CA, dict(predicate="USE_CONSTRAINED_IN", polarity="POSITIVE", speechAct="CAUTIONS", **bnd()),
+                   "hu:substance:simvastatin", "ChemicalSubstance", "hu:substance:verapamil", "ChemicalSubstance", [], gen=None)
     return o
 
 def write(name, lines):
