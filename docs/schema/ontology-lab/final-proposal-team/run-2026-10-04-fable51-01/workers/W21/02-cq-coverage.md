@@ -30,7 +30,7 @@ Priority and answerability are copied from `competency-questions.md`; nothing is
 | Id | Question | Rationale and failing case | Elements it justifies |
 |---|---|---|---|
 | CQ-CL-C01 (candidate, Foundational) | Which sponsors and ad segments did each rendition of a work carry, at what stated time, as observed when? | Dynamic ad insertion: the same episode's YouTube rendition and feed audio carried different sponsors at different chapter times on 2026-10-04 (fx01). Without rendition binding, AG1 is claimed for the video. | `IN_RENDITION`, `DELIMITED_BY`, `DISTRIBUTES_RENDITION`, `EpisodeSegment.delimitationBasis` |
-| CQ-CL-C02 (candidate, Foundational) | Was a talk statement shown on a slide, said aloud, or both, and by whom? | Merck JPM 2026: the deck (Merck) and the speech (CEO) state the same forecast with different wording; a deck treated as a rendition would let the speech cite the slide (fx06 N06-b). | `OccurrenceContainerTarget` includes `Document`; V-W21-03; `episodeType` CONFERENCE_TALK |
+| CQ-CL-C02 (candidate, Foundational) | Was a talk statement shown on a slide, said aloud, or both, and by whom? | Merck JPM 2026: the deck (Merck) and the speech (CEO) state the same forecast with different wording; a deck treated as a rendition would let the speech cite the slide (fx06 N06-b); Q06-5 walks spoken claim -> ACCOMPANIES_TALK deck -> slide 11. | `OccurrenceContainerTarget` includes `Document`; `ACCOMPANIES_TALK`; V-W21-03; `episodeType` CONFERENCE_TALK |
 | CQ-CL-C03 (candidate, Essential) | Do the captured texts of one utterance differ between renditions, and which rendition does an answer quote? | Publisher text "or I know if" versus YouTube captions "or I think I know if" (fx03 Q03-4): a hedge present in one rendition only. | per-rendition locators; Q03-4 query; capture-fidelity review routing (W00 `Adjudication`) |
 | CQ-CL-C04 (candidate, Expansion) | Which works are re-edits or excerpts of which, so a re-released utterance is not counted as a new act of asserting? | "Essentials" re-edit (2025-10-30) of episode 52 material; NMN.com cites an Essentials video. | none in SDL yet (candidate `EXCERPTS_FROM`, W21-SR-19) |
 
@@ -41,11 +41,11 @@ Priority and answerability are copied from `competency-questions.md`; nothing is
 | `Platform` (+ `platformType`, `url`, `hostsChannels`, `pseudonymousAccounts`) | CQ-CL-01, CQ-CL-C01, CQ-CL-07 |
 | `Channel` (+ `platform`, `operators`, `hosts`, `hasSeries`, `hasEpisodes`, `distributesRenditions`, sponsoring fields) | CQ-CL-01, CQ-CL-05, CQ-CL-C01 |
 | `Series` (+ fields) | CQ-CL-01, CQ-CL-C04 (identity collision, fx01 Q01-5) |
-| `Episode` (+ all fields) | CQ-CL-01, CQ-CL-05, CQ-CL-08, CQ-AX-18, D-005; `mentions` legacy read-only (migration) |
+| `Episode` (+ all fields) | CQ-CL-01, CQ-CL-05, CQ-CL-08, CQ-AX-18, D-005; `accompanyingDocuments` CQ-CL-C02; `mentions` legacy read-only (migration) |
 | `EpisodeSegment` (+ `segmentType`, `chapterTitleVerbatim`, `delimitationBasis`, `inRendition`, `delimitedBy`, `claimOccurrences`) | CQ-CL-08, CQ-CL-C01 |
-| `Claim` (+ fields, `occurrences`, `relationshipAssertions`, `evidenceAssessments`) | CQ-CL-06, CQ-AX-05, CQ-EV-03, V-417, V-418 |
+| `Claim` (+ fields, `occurrences`, `relationshipAssertions`, `evidenceAssessments`, read-only `supportedByChunks`) | CQ-CL-06, CQ-AX-05, CQ-EV-03, V-417, V-418, V-407 (W20-SR-14) |
 | `ClaimOccurrence` (+ kernel fields, `utteranceText`, `roleTitleVerbatim`, `statedTense`, `segmentKind`, all relationship fields) | CQ-CL-01..06, CQ-CL-08, INV-402, V-410, V-411 |
-| `RelationshipAssertion` (+ fields) | CQ-EV-02, V-419, V-420 |
+| `RelationshipAssertion` (+ fields, `qualifiedBy`) | CQ-EV-02, V-419, V-420, CQ-CL-03 for structured claims (W08-SR-10, V-W21-12) |
 | `ClaimEvidenceAssessment` | CQ-EV-03, CQ-AX-24, V-418 |
 | `RetellingFidelityAssessment` | CQ-CL-04, V-414, V-415 |
 | `ConflictRelevanceAssessment` | CQ-CL-05, CQ-EC-03, V-424..V-427, V-W21-09 |
@@ -58,6 +58,7 @@ Priority and answerability are copied from `competency-questions.md`; nothing is
 | `AppearanceProperties` | CQ-CL-01, asserted_edge profile (INV-101) |
 | `INSTANCE_OF` fields with W00 `DerivedEdgeProperties` | CQ-CL-06, V-417 |
 | `IN_RENDITION`, `DELIMITED_BY`, `DISTRIBUTES_RENDITION` (new relationship types) | CQ-CL-C01, CQ-CL-08, V-W21-05 |
+| `ACCOMPANIES_TALK` (new asserted relationship) | CQ-CL-C02, W19-SR-07 |
 | `SPONSORS_CONTENT` fields | CQ-CL-05, CQ-CL-08, FINANCIAL_INTEREST, V-421, V-W21-07 |
 
 Elements without a mapping were kept out of the fragment: `Presentation`/`Talk` (rejected), `EXCERPTS_FROM` and `RECORDS_EVENT` (candidates), `RecommendableTarget` (owner seam), enum candidates for `platformType`/`channelType`/`seriesType`/`segmentType`/`episodeType` (strings kept).

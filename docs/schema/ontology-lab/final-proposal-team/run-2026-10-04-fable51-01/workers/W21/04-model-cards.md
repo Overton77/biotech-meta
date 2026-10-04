@@ -29,7 +29,7 @@ Conventions: every node type carries the B2 skeleton fields (`id`, `uid`, `name`
 - Archetype Entity; labels `["Episode","Entity"]`; uid token `episode`; implements `SearchIndexable`; `@fulltext EpisodeSearch` on stored `name`, `title`, `summaryText` (D-015).
 - Properties: `episodeType` String (FULL, TRAILER, BONUS, EXCERPT, RE_EDIT, CONFERENCE_TALK, LECTURE, WEBINAR, PANEL; O from RSS itunes:episodeType where available); `title` String (O); `episodeNumber` Int (O, publisher number, not identity); `seasonNumber` Int (O); `publishedAt` DateTime (O; first publication of the work per feed/directory; null when only the live session time is known, as for fx06); `publishedAtPrecision` TimePrecision; `durationSeconds` Int (O, nominal); `summaryText` String; `searchEmbedding` [Float] (C, derived retrieval, INV-107).
 - Temporal: `publishedAt` is the PUBLICATION_PROXY anchor for in-container statements; immutable unless a SOURCE_CORRECTION.
-- Edges: `RENDITION_OF` <- Source; `HAS_SEGMENT` -> EpisodeSegment; `HAS_EPISODE` <- Channel/Series; `APPEARS_IN` <- Person/PseudonymousActor (asserted, `AppearanceProperties`); `SPONSORS_CONTENT` <- Organization/ConsumerBrand; `OCCURS_IN` <- ClaimOccurrence; legacy `MENTIONS` -> EpisodeMentionableTarget (read-only).
+- Edges: `RENDITION_OF` <- Source; `HAS_SEGMENT` -> EpisodeSegment; `HAS_EPISODE` <- Channel/Series; `APPEARS_IN` <- Person/PseudonymousActor (asserted, `AppearanceProperties`); `SPONSORS_CONTENT` <- Organization/ConsumerBrand; `OCCURS_IN` <- ClaimOccurrence; `ACCOMPANIES_TALK` <- Document (asserted; a deck or handout that accompanied a recorded talk); legacy `MENTIONS` -> EpisodeMentionableTarget (read-only).
 - Sources: SRC-W21-01..04, 06..09.
 
 ### EpisodeSegment
@@ -42,9 +42,9 @@ Conventions: every node type carries the B2 skeleton fields (`id`, `uid`, `name`
 ### Claim
 - Meaning: proposition identity; no source, asserter, truth or evidence strength.
 - Archetype Entity; labels `["Claim","Entity"]`; uid token `claim`; `@fulltext ClaimSearch`.
-- Properties: `claimText` String (I, BellLabs normalized wording); `claimType` ClaimType (I); `claimPolarity` AssociationPolarity (I; direction inside the proposition); `isQuantitative`, `isCausal`, `isMechanistic` Boolean (I); `searchEmbedding` (C).
-- Edges: `INSTANCE_OF` <- ClaimOccurrence/RelationshipAssertion (derived ruleOnly, W00 `DerivedEdgeProperties`; hypothesis uid in `derivedFromAssessmentUids`); `ASSESSES_CLAIM_EVIDENCE` <- ClaimEvidenceAssessment.
-- Removed: `evidenceStrength` (V-418), `isClinical`, `isPreclinical`, `about`, `supportedBy`.
+- Properties: `claimText` String (I, BellLabs normalized wording); `claimType` ClaimType (I); `claimPolarity` Polarity (I; direction inside the proposition; W00 enum per W03-SR-13); `isQuantitative`, `isCausal`, `isMechanistic` Boolean (I); `searchEmbedding` (C).
+- Edges: `SUPPORTED_BY_CHUNK` -> Chunk (derived, read-only, W20 `DerivedSupportProperties`; retrieval shortcut through occurrences, W20-SR-14); `INSTANCE_OF` <- ClaimOccurrence/RelationshipAssertion (derived ruleOnly, W00 `DerivedEdgeProperties`; hypothesis uid in `derivedFromAssessmentUids`); `ASSESSES_CLAIM_EVIDENCE` <- ClaimEvidenceAssessment.
+- Removed: `evidenceStrength` (V-418), `isClinical`, `isPreclinical`, `about`; `supportedBy` replaced by the read-only derived `supportedByChunks`.
 
 ### ClaimOccurrence
 - Meaning: one asserter's act of asserting in one container, supported by locators in that container's renditions.
@@ -57,7 +57,7 @@ Conventions: every node type carries the B2 skeleton fields (`id`, `uid`, `name`
 ### RelationshipAssertion
 - Meaning: a structured relational assertion from a non-utterance span. Labels `["RelationshipAssertion","Assertion"]`; uid token `assertion`.
 - Properties: kernel fields (same immutability as ClaimOccurrence); `roleTitleVerbatim`, `roleCodeVerbatim` String (O; structured role sources such as a disclosure page); `predicateText` String (O, verbatim); `relationshipType` String (deprecated verbatim); `subjectLabel`, `objectLabel` String (O, surface forms).
-- Edges: `HAS_SUBJECT` (exactly_one), `HAS_OBJECT` (zero_or_one), `ASSERTED_BY` -> AsserterTarget (at_most_one), `SUPPORTED_BY`, `WAS_GENERATED_BY`, `INSTANCE_OF`, `SUPERSEDES`, `VISUALIZES` <- MediaAsset (W22 `MediaLinkProperties`).
+- Edges: `HAS_SUBJECT` (exactly_one), `HAS_OBJECT` (zero_or_one), `ASSERTED_BY` -> AsserterTarget (at_most_one), `SUPPORTED_BY`, `WAS_GENERATED_BY`, `INSTANCE_OF`, `QUALIFIED_BY` -> Assertion (W08-SR-10; V-W21-12), `SUPERSEDES`, `VISUALIZES` <- MediaAsset (W22 `MediaLinkProperties`).
 - Rules: V-419, V-420.
 
 ### ClaimEvidenceAssessment
@@ -100,7 +100,8 @@ Conventions: every node type carries the B2 skeleton fields (`id`, `uid`, `name`
 | IN_RENDITION (new) | EpisodeSegment -> Source | structural | zero_or_one | none | W21-SR-04 |
 | DELIMITED_BY (new) | EpisodeSegment -> SourceLocator | structural | at most one per rendition | none | W21-SR-03 |
 | DISTRIBUTES_RENDITION (new) | Channel -> Source | structural | zero_or_one channel per rendition | StructuralEdgeProperties | W21-SR-05 |
-| QUALIFIED_BY | Assertion -> Assertion (SDL: ClaimOccurrence) | structural | many; same container | QualificationProperties | V-416 |
+| ACCOMPANIES_TALK (new) | Document -> Episode | asserted | many | AssertedEdgeProperties | W19-SR-07, W21-SR-22; the deck stays its own container (V-W21-03) |
+| QUALIFIED_BY | Assertion -> Assertion (SDL: ClaimOccurrence, RelationshipAssertion) | structural | many; same container, or same snapshot when container-less | QualificationProperties | V-416; V-W21-12 amendment (W08-SR-10) |
 | RETELLS | Assertion -> Assertion | structural | many; acyclic | RetellingProperties | V-412, V-413 |
 | ATTRIBUTES_TO | Assertion -> Person / Organization / PseudonymousActor / AnonymousActor | structural | zero_or_one | none | never the asserter (V-W21-04) |
 | INSTANCE_OF | Assertion -> Claim | derived (ruleOnly) | zero_or_one | DerivedEdgeProperties (W00) | V-417; hypothesis-backed edges set `derivationRule` and put the hypothesis uid in `derivedFromAssessmentUids` (W00 D-W00-18) |
@@ -128,7 +129,7 @@ Conventions: every node type carries the B2 skeleton fields (`id`, `uid`, `name`
 - `ClaimSpeakerTarget` = Person | Organization | PseudonymousActor | AnonymousActor (replaces live ClaimSpeaker and ExperienceAuthor).
 - `OccurrenceContainerTarget` = Episode | Document | Publication.
 - `EpisodeMentionableTarget` = Event | TechnologyPlatform | ToolOrInstrument | ManufacturingProcess | ManufacturingStep | IngredientMaterial | Treatment | Procedure | SafetySignal (legacy read-only).
-- Candidates not in SDL: `RecommendableTarget` (owner seam W21-SR-18: Protocol | ChemicalSubstance | IngredientMaterial | FoodItem | FoodProduct | Organization | ConsumerBrand | Product | Treatment | Lifestyle | Procedure); string-vocabulary enums `PlatformType`, `ChannelType`, `SeriesType`, `EpisodeType`, `EpisodeSegmentType` (W21-SR-02).
+- Candidates not in SDL: `RecommendableTarget` (owner seam W21-SR-18: Protocol | ChemicalSubstance | IngredientMaterial | Organization | ConsumerBrand | Product | ProductVariant | Treatment | Lifestyle | Procedure; FoodItem is read through IngredientMaterial and FoodProduct is retired per W05-SR-11; ProductVariant per W04-SR-10); string-vocabulary enums `PlatformType`, `ChannelType`, `SeriesType`, `EpisodeType`, `EpisodeSegmentType` (W21-SR-02).
 
 ## E. Asserted predicates used or requested by W21
 

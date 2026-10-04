@@ -2,11 +2,11 @@
 
 ## 1. Execution scope
 
-All fixtures were **RUN** on 2026-10-04 on an isolated in-process Neo4j **5.26.31 Community** (the run harness `EmbeddedNeo4j`, own data directory, JVM heap 512 MB), driven by the run's `validation/harness/run-cypher.mjs` (one transaction per statement; variables never cross `;`). For each fixture, in a wiped database: (1) baseline `docs/schema/neo4j/constraints.cypher` (57 statements: 45 applied, 12 Enterprise-only rejected, as in `00-baseline.md`); (2) the fixture; (3) the full baseline `docs/schema/neo4j/validation.cypher` (174 statements) with the coordinator's parameters plus SPONSORS_CONTENT/OPERATES_CHANNEL/SERVES_ON_CHANNEL in `assertedTypes` and RECOMMENDS in `derivedTypes`; (4) `fixtures/w21-validation.cypher` (11 candidate validators); (5) the fixture's `*.queries.cypher`; (6) where present, the `*.neg.cypher` injections followed by both validation suites again. `operations.cypher` was also run on Community (section 4 of `07-operations.md`) and fx01 + fx04 were loaded together under it without uniqueness conflicts.
+All fixtures were **RUN** on 2026-10-04 on an isolated in-process Neo4j **5.26.31 Community** (the run harness `EmbeddedNeo4j`, own data directory, JVM heap 512 MB), driven by the run's `validation/harness/run-cypher.mjs` (one transaction per statement; variables never cross `;`). For each fixture, in a wiped database: (1) baseline `docs/schema/neo4j/constraints.cypher` (57 statements: 45 applied, 12 Enterprise-only rejected, as in `00-baseline.md`); (2) the fixture; (3) the full baseline `docs/schema/neo4j/validation.cypher` (174 statements) with the coordinator's parameters plus SPONSORS_CONTENT/OPERATES_CHANNEL/SERVES_ON_CHANNEL in `assertedTypes` and RECOMMENDS in `derivedTypes`; (4) `fixtures/w21-validation.cypher` (12 candidate validators); (5) the fixture's `*.queries.cypher`; (6) where present, the `*.neg.cypher` injections followed by both validation suites again. `operations.cypher` was also run on Community (section 4 of `07-operations.md`) and fx01 + fx04 were loaded together under it without uniqueness conflicts.
 
 Files: positive fixture `fixtures/<name>.cypher`; queries `fixtures/<name>.queries.cypher`; defect injections `fixtures/<name>.neg.cypher`; validators `fixtures/w21-validation.cypher`. Every node carries its primary label plus its archetype label; every statement binds its nodes by uid; snapshots are STORED_EXCERPT_TEXT (real, hashed excerpts in `excerpts/`) or SYNTHETIC_FIXTURE.
 
-Informational baseline rows that appear for every fixture and are not failures: V-118 (uid backfill counts), V-401b (count 0), V-514b (assertions without `contentHash`; fixtures do not compute assertion payload hashes), V-522 (nodes without `privacyClass`).
+Informational baseline rows that appear for every fixture and are not failures: V-118 (uid backfill counts), V-401b (count 0), V-514b (assertions without `contentHash`; fixtures do not compute assertion payload hashes), V-522 (nodes without `privacyClass`), and, after `operations.cypher` had been applied to the instance, V-120 listing `ClaimSearch` on `[name, description, searchText]` ONLINE, which is exactly the expected definition. All positive fixtures were re-run against the final 12-validator file after the W00/W03/W08/W19/W20 alignment: 0 failing rows in every positive fixture except the intended V-423 row of fx07.
 
 ## 2. Fixtures, expected and observed results
 
@@ -80,7 +80,7 @@ Baseline validation: 0 failing rows. W21 validators: 0 rows.
 
 Negative injections: N05-a one occurrence with two asserters -> **V-410** 1 (containers 1, asserters 2); N05-b the host's question counted as an instance -> **V-W21-11** 1; N05-c question attributed to its own asserter -> **V-W21-04** 1.
 
-### fx06 `fx06-presentation-slide-vs-talk.cypher` (39 ok) — mandatory pair: presentation slide locator (PDF_PAGE) vs the talk's MEDIA_TIME locator
+### fx06 `fx06-presentation-slide-vs-talk.cypher` (41 ok) — mandatory pair: presentation slide locator (PDF_PAGE) vs the talk's MEDIA_TIME locator
 
 Baseline validation: 0 failing rows. W21 validators: 0 rows.
 
@@ -90,8 +90,9 @@ Baseline validation: 0 failing rows. W21 validators: 0 rows.
 | Q06-2 | webcast rendition: revisions [WITHDRAWAL], 0 locators, 0 MEDIA_TIME; transcript PDF rendition: 3 locators, 0 MEDIA_TIME |
 | Q06-3 | Merck claim: 2 occurrences, 2 distinct asserters (Person, Organization; the CEO's employment is not asserted here, so their dependence is a W01 role question); synthetic claim: 2 occurrences, 1 distinct asserter |
 | Q06-4 | Christopher Schott MODERATOR ("Analyst"); Dean Li SPEAKER; Robert Davis SPEAKER |
+| Q06-5 (CQ-CL-C02) | 1 row: from the CEO's spoken statement to deck `merck-jpm-2026-presentation-pdf` via `ACCOMPANIES_TALK` (asserted by Merck's event page) and its slide occurrence: PDF_PAGE page 11 "Commercial opportunity from new growth drivers is more than double consensus 2028 total KEYTRUDA sales" |
 
-Negative injections: N06-a deck as rendition -> **V-W21-03** 1; N06-b spoken occurrence citing the slide -> **V-411** 1; N06-c invented media offset on the transcript PDF -> **V-W21-01** 1.
+Negative injections: N06-a deck as rendition -> **V-W21-03** 1; N06-b spoken occurrence citing the slide -> **V-411** 1; N06-c invented media offset on the transcript PDF -> **V-W21-01** 1; N06-d qualifier taken from another container -> **V-416** 1 and **V-W21-12** 1.
 
 ### fx07 `fx07-recommends-derived-projection.cypher` (9 ok, SYNTHETIC) — derived RECOMMENDS (CL-016)
 
@@ -120,6 +121,7 @@ Negative injections: N06-a deck as rendition -> **V-W21-03** 1; N06-b spoken occ
 | V-W21-09 disclosure needs a span | N03-d (and inherited fixture) | [NOT_FOUND_IN_PARTIAL_CAPTURE, NOT_DISCLOSED] companion |
 | V-W21-10 attribution drift (informational) | fx04 N04-c side effect | [RETELLS, SAME_ASSERTION] |
 | V-W21-11 question is not an instance | N05-b | CQ-CL-06 counting |
+| V-W21-12 qualifier container-or-snapshot rule (amends V-416) | N06-d | CQ-CL-03; W08-SR-10 |
 
 Module forbidden implications and where they are exercised: [REPORTS_PRACTICE, RECOMMENDS] fx04 N04-a (V-W21-06, V-423); [MENTIONS_PRODUCT, ENDORSES_PRODUCT] fx01 Q01-7 and N01-d, fx03 N03-b (V-422, V-112); [RETELLS, SAME_ASSERTION] fx04 N04-c (V-410), V-412; [HAS_FINANCIAL_INTEREST, ADJUDICATED_CONTRADICTED] fx03 N03-a (V-424); [NO_FINANCIAL_INTEREST_FOUND, ADJUDICATED_SUPPORTED] V-424 (same query, SUPPORTED branch; not separately injected); [ROLE_OPEN_AT_OBSERVATION, ROLE_CONTINUES_AFTER_OBSERVATION] fx01 Q01-3 (OBSERVATION_ONLY bases) and baseline V-427 / QS-2 (W01); [CHUNK_MATCH, SOURCE_SUPPORT] V-406/V-407 (W20; no chunks in W21 fixtures).
 

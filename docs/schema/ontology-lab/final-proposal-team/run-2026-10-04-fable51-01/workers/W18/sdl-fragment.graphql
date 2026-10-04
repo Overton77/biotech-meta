@@ -163,7 +163,7 @@ type EventRoleEdgeProperties @relationshipProperties {
   recordedFrom: DateTime!
   recordedTo: DateTime
   mongoResearchRunId: String
-  """Controlled string: PRESENTER, SPEAKER, MODERATOR, PANELIST, HOST, ORGANIZER, EXHIBITOR, ATTENDEE, APPLICANT, DECISION_MAKER, ANNOUNCER, ACQUIRER, TARGET, LICENSOR, LICENSEE, COUNTERPARTY, OTHER."""
+  """Controlled string: PRESENTER, SPEAKER, MODERATOR, PANELIST, HOST, ORGANIZER, EXHIBITOR, ATTENDEE, APPLICANT, DECISION_MAKER, MARKETING_AUTHORIZATION_HOLDER, ANNOUNCER, ACQUIRER, TARGET, LICENSOR, LICENSEE, COUNTERPARTY, OTHER."""
   participantRole: String!
   """Role or title exactly as printed in the source (never normalized by guesswork)."""
   roleTitleVerbatim: String

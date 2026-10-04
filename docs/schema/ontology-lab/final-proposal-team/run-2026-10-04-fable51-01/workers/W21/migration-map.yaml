@@ -38,7 +38,7 @@
 - {live: Claim, final: Claim, action: keep, note: "labels [Claim, Entity]"}
 - {live: Claim.claimText, final: Claim.claimText, action: keep, note: null}
 - {live: Claim.claimType, final: Claim.claimType, action: keep, note: null}
-- {live: Claim.claimPolarity, final: Claim.claimPolarity, action: keep, note: definition refined (direction inside proposition)}
+- {live: Claim.claimPolarity, final: Claim.claimPolarity, action: keep, note: "retyped AssociationPolarity -> W00 Polarity (W03-SR-13): POSITIVE, NEGATIVE, MIXED, UNKNOWN unchanged; NEUTRAL -> UNKNOWN plus review item (a no-effect proposition belongs in claimText)"}
 - {live: Claim.isQuantitative, final: Claim.isQuantitative, action: keep, note: null}
 - {live: Claim.isCausal, final: Claim.isCausal, action: keep, note: null}
 - {live: Claim.isMechanistic, final: Claim.isMechanistic, action: keep, note: null}
@@ -46,7 +46,7 @@
 - {live: Claim.isClinical, final: null, action: retire, note: evidence setting belongs to W03 MechanismEvidenceContext / W09 design; values kept in migration archive}
 - {live: Claim.isPreclinical, final: null, action: retire, note: as isClinical}
 - {live: Claim.about (ABOUT, ClaimSubject), final: null, action: retire, note: derivable from instance assertions' HAS_SUBJECT/HAS_OBJECT; W20 owns retrieval ABOUT}
-- {live: Claim.supportedBy (SUPPORTED_BY -> Chunk), final: null, action: retire, note: a Claim has no source; move support to the instance occurrences with a locator (V-407)}
+- {live: Claim.supportedBy (SUPPORTED_BY -> Chunk), final: Claim.supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only), action: derive, note: "kept only where an instantiating occurrence and its locator exist (W20-SR-14); derivedFromAssertionUids = instantiating assertions; otherwise dropped"}
 - {live: Claim.occurrences (INSTANCE_OF, RoleMetadata), final: Claim.occurrences (INSTANCE_OF, DerivedEdgeProperties), action: derive, note: "set derivationRule = 'legacy-instance-of' on existing edges (V-417); RoleMetadata dropped"}
 - {live: Claim @fulltext ClaimSearch, final: Claim @fulltext ClaimSearch, action: keep, note: operations.cypher}
 - {live: ClaimOccurrence, final: ClaimOccurrence, action: keep, note: "add label Assertion; add predicate/status/recordedAt/polarity/assertionBasis/speechAct; status from MIGRATION CAPTURE_FIDELITY adjudication"}
@@ -89,3 +89,6 @@
 - {live: OrderingMetadata (on HAS_EPISODE, HAS_SERIES, INCLUDES_EPISODE, HAS_SEGMENT, OCCURS_IN_SEGMENT), final: "StructuralEdgeProperties + Episode fields + SourceLocator", action: split, note: see rows above}
 - {live: RoleMetadata (on APPEARS_IN, SERVES_ON_CHANNEL, OPERATES_CHANNEL, HOSTS_CHANNEL, ON_PLATFORM, OCCURS_IN, UTTERED_BY, INSTANCE_OF, AUTHORS, REPORTS), final: "AppearanceProperties | AssertedEdgeProperties | StructuralEdgeProperties | DerivedEdgeProperties | none", action: split, note: per relationship class}
 - {live: PseudonymousActor.onPlatforms (ON_PLATFORM, RoleMetadata), final: "ON_PLATFORM (StructuralEdgeProperties)", action: keep, note: W01 writes PseudonymousActor field; W21 Platform.pseudonymousAccounts is the inverse}
+- {live: null, final: ACCOMPANIES_TALK, action: keep, note: "new asserted relationship Document -> Episode (W19-SR-07, W21-SR-22)"}
+- {live: null, final: RelationshipAssertion.qualifiedBy (QUALIFIED_BY), action: keep, note: "W08-SR-10; V-W21-12 amends V-416"}
+- {live: AssociationPolarity, final: Polarity, action: merge, note: "W03-SR-13; enum retired"}

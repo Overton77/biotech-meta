@@ -50,6 +50,7 @@ CREATE INDEX w21_appears_in_assertion IF NOT EXISTS FOR ()-[r:APPEARS_IN]-() ON 
 CREATE INDEX w21_sponsors_content_assertion IF NOT EXISTS FOR ()-[r:SPONSORS_CONTENT]-() ON (r.assertionUid);
 CREATE INDEX w21_retells_relationship_uid IF NOT EXISTS FOR ()-[r:RETELLS]-() ON (r.relationshipUid);
 CREATE INDEX w21_qualified_by_relationship_uid IF NOT EXISTS FOR ()-[r:QUALIFIED_BY]-() ON (r.relationshipUid);
+CREATE INDEX w21_accompanies_talk_assertion IF NOT EXISTS FOR ()-[r:ACCOMPANIES_TALK]-() ON (r.assertionUid);
 
 // A4: live @fulltext indexes retained by name (D-015), created over STORED property names.
 CREATE FULLTEXT INDEX EpisodeSearch IF NOT EXISTS FOR (n:Episode) ON EACH [n.name, n.title, n.summaryText];

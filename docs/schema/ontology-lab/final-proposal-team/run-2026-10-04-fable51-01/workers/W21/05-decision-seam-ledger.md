@@ -29,4 +29,31 @@ Status values: ACCEPTED-FOR-PROPOSAL (W21 recommends; Fable rules), UNRESOLVED (
 
 ## Seam requests
 
-See `seam-requests.yaml` (W21-SR-01 … W21-SR-21) for target owner, request, CQ, failing case and proposed ruling. Closure criteria per request are in its `proposedRuling`.
+See `seam-requests.yaml` (W21-SR-01 … W21-SR-25) for target owner, request, CQ, failing case and proposed ruling. Closure criteria per request are in its `proposedRuling`.
+
+## Alignment after reading published peer packets (2026-10-04, same run)
+
+Before finishing, W21 read the fragments and seam requests that other workers had published in this run and aligned where a peer had already decided, without editing any other directory:
+
+| Peer item | W21 response | Change made |
+|---|---|---|
+| W00 generic `Assertion` conventions (`@mutation` without DELETE, `@settable` immutability, `massBasis`/`amountReferent`, `roleCodeVerbatim`) and W00 seam asking W21 to mirror A11 qualifiers | accepted | ClaimOccurrence and RelationshipAssertion mirror them; all W21 node types omit DELETE; stub build shows no `delete*` mutations for W21 types |
+| W00 D-W00-18 (INSTANCE_OF uses `DerivedEdgeProperties`, hypothesis uid in `derivedFromAssessmentUids`) | accepted | `InstanceOfProperties` withdrawn; W21-SR-12 now asks only for the V-417 wording |
+| W00 R4 / W19-SR-07 (deck never a rendition; link predicate; Presentation type?) | accepted R4; link = asserted `ACCOMPANIES_TALK`; no Presentation type | SDL field `Episode.accompanyingDocuments`; fx06 Q06-5; W21-SR-22 |
+| W19-SR-06 / W00 awaiting W21 on OCCURS_IN Publication | agreed (same as W21-D05) | W21-SR-06 |
+| W19-SR-08 multi-author asserter rule | proposed AnonymousActor AUTHOR_GROUP per Publication | W21-SR-24 (UNRESOLVED; W01/W09) |
+| W01-SR-21 (SPONSORS_CONTENT may use W01 RoleEdgeProperties with compensationKind; AFFILIATED_WITH only as a hop) | SPONSORS_CONTENT keeps the frozen `AssertedEdgeProperties`: payment terms of a sponsorship are not observed in narrative sources, and compensation is the separate FINANCIAL_INTEREST member RECEIVES_COMPENSATION_FROM; AFFILIATED_WITH as a hop only: agreed | none |
+| W01-SR-05 (correct the inherited fixture's year-precision validTo) | agreed; W21 fixtures do not carry the affiliations-page roles | folded into W21-SR-17 scope |
+| W02-SR-22 (Material -> IngredientMaterial; Compound -> ChemicalSubstance/IngredientMaterial) | accepted | EpisodeMentionableTarget; RecommendableTarget proposal |
+| W03-SR-13 (retire AssociationPolarity; use W00 Polarity) | accepted | `Claim.claimPolarity: Polarity`; W21-SR-11 resolved; migration row |
+| W04-SR-10 (add ProductVariant where dose/composition matters) | accepted for RecommendableTarget | W21-SR-18 |
+| W05-SR-11 (SELF_REPORTED_PRACTICE; RECOMMENDS range; property name on RECOMMENDS) | (a) accepted, W05 subject form adopted as preferred; (b) accepted; (c) answered by W21-D07 / W21-SR-07 (DerivedEdgeProperties; V-423 amended) | W21-SR-15, W21-SR-18 |
+| W06-SR-14 (no timeless recommendation; benefit wording is a ClaimOccurrence) | agreed; RECOMMENDS is only a derived projection of a source's own RECOMMENDS speech act (V-W21-06), never a BellLabs recommendation (INV-508 unaffected) | none |
+| W08-SR-10 (QUALIFIED_BY on generic assertions) | accepted with a validator amendment | `RelationshipAssertion.qualifiedBy`; V-W21-12; W21-SR-23 (W00 field) |
+| W14-SR-06 (NAMED_INVENTOR for CQ-CL-05) | not needed for CQ-CL-05: relevance uses HAS_IP_INTEREST_IN (FINANCIAL_INTEREST); a named inventor without an IP interest is not a financial tie; defer agreed | none |
+| W20-SR-14 (Claim.supportedByChunks read-only; ClaimOccurrence chunk shortcut) | accepted | `Claim.supportedByChunks` |
+| W20-SR-15 (remove Episode.hasTranscriptVersions) | accepted (already retired) | none |
+| W22-SR-11 (renditions and MediaAssets share bytes only via contentHash and DERIVED_FROM_SOURCE; frames are MediaAssets, never locators; covers depict Series/Channel and imply no sponsorship) | confirmed | none |
+| W23-SR-13 (shared record shape for a consented de-identified contribution) | a ClaimOccurrence with assertionBasis PERSONAL_EXPERIENCE, ASSERTED_BY an AnonymousActor (anonymityClass CONSENTED_CONTRIBUTION), OCCURS_IN a contribution Document; any contribution token belongs on that Source/Document (W00/W20), never on the occurrence; no CohortParticipant node | none in W21 SDL; sourceKind value is W00's |
+
+Full-merge check (all published fragments, `merge-fragments.mjs`, 2026-10-04T01:49Z): 471 definitions, 0 duplicates; W21 contributes no duplicate definition and, after the W03 alignment, references no undefined name (`SafetySignal` resolved once W17 published). Remaining undefined names in the merge are other packets' (`Association`, `FoodProduct`, `MediaSource`) plus `ExperienceReport`, which W00 and W22 still list although W21 retires it (W21-SR-25). A full `Neo4jGraphQL` build of the merged file currently fails on other packets' references (`Association`), not on W21 definitions; W21's fragment builds alone with stubs.

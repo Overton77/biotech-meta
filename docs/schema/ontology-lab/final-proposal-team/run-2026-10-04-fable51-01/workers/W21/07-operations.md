@@ -12,9 +12,9 @@ Target: `@neo4j/graphql` 7.6.3, Neo4j 5.26 (tested 5.26.31 Community embedded). 
 | `w21_episode_published_at` | statement date joins (CQ-CL-05, CQ-AX-18) | applied |
 | `w21_claim_type` | CQ-CL-02 facet | applied |
 | `w21_conflict_relevance_level` (relevanceLevel, disclosureFinding) | CQ-CL-05 | applied |
-| relationship-property indexes `APPEARS_IN(roleType)`, `APPEARS_IN(assertionUid)`, `SPONSORS_CONTENT(assertionUid)`, `RETELLS(relationshipUid)`, `QUALIFIED_BY(relationshipUid)` | idempotent MERGE keys; QS-4a citation lookups | applied |
+| relationship-property indexes `APPEARS_IN(roleType)`, `APPEARS_IN(assertionUid)`, `SPONSORS_CONTENT(assertionUid)`, `ACCOMPANIES_TALK(assertionUid)`, `RETELLS(relationshipUid)`, `QUALIFIED_BY(relationshipUid)` | idempotent MERGE keys; QS-4a citation lookups | applied |
 | `FULLTEXT EpisodeSearch` on Episode(name, title, summaryText); `FULLTEXT ClaimSearch` on Claim(name, description, searchText) | live `@fulltext` names retained (D-015); the library requires the index to exist | applied |
-| Existence constraints: ClaimOccurrence.predicate, EpisodeSegment.segmentType, ConflictRelevanceAssessment.methodVersion, QUALIFIED_BY.qualificationKind, RETELLS.retellingMode, APPEARS_IN.roleType; type constraint SourceLocator.mediaEndSeconds :: FLOAT | defence in depth | **rejected on Community (7 of 36 statements), as expected; Enterprise behaviour unverified** |
+| Existence constraints: ClaimOccurrence.predicate, EpisodeSegment.segmentType, ConflictRelevanceAssessment.methodVersion, QUALIFIED_BY.qualificationKind, RETELLS.retellingMode, APPEARS_IN.roleType; type constraint SourceLocator.mediaEndSeconds :: FLOAT | defence in depth | **rejected on Community (7 of 37 statements; 30 applied), as expected; Enterprise behaviour unverified** |
 
 Already in the baseline and reused (not repeated): archetype uid uniqueness, `live_claim_uid`, `live_claim_occurrence_uid`, `source_canonical_uri`, `assertion_basis`, `assertion_speech_act`, `assertion_predicate(_recorded)`, `source_locator_quote_hash`, `retells_link_basis_exists` (Enterprise).
 
@@ -39,7 +39,8 @@ Write-time rules the ingestion service must enforce, each with its report query:
 | every locator of an occurrence lies in its container or a rendition | V-411 |
 | MEDIA_TIME only on playable renditions, with `mediaTimeBasis` | V-W21-01 |
 | segment/occurrence sponsor-read agreement; segment locators on the segment's rendition | V-W21-02, V-W21-05 |
-| deck never RENDITION_OF a talk | V-W21-03 |
+| deck never RENDITION_OF a talk; accompaniment only as an asserted ACCOMPANIES_TALK | V-W21-03, V-421-style assertion backing (add ACCOMPANIES_TALK to assertedTypes) |
+| QUALIFIED_BY inside one container, or one snapshot when container-less | V-416 / V-W21-12 |
 | RETELLS acyclic, typed, distinct span; fidelity flags only on assessments | V-412..V-415 |
 | QUALIFIED_BY inside one container | V-416 |
 | INSTANCE_OF names rule or hypothesis; never from QUESTIONS | V-417, V-W21-11 |

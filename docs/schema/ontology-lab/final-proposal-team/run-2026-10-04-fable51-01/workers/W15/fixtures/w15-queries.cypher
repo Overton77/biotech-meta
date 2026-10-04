@@ -69,7 +69,7 @@ CALL {
 MATCH (ml)-[:HAS_OFFER]->(off:Offer)
 OPTIONAL MATCH (off)-[:HAS_PRICE_OBSERVATION]->(p:PriceObservation) WHERE p.observedAt <= D
 WITH D, ml, t, identityState, off, max(p.observedAt) AS lastObservedBeforeD, min(p.observedAt) AS firstObserved
-RETURN 'Q-W15-04' AS q, ml.marketplace AS marketplace, ml.merchantListingId AS listing, labels(t)[0] AS listedItemType, identityState,
+RETURN 'Q-W15-04' AS q, ml.marketplace AS marketplace, ml.merchantListingId AS listing, head([l IN labels(t) WHERE l IN ['ProductVariant', 'PackageConfiguration', 'Bundle']]) AS listedItemType, identityState,
        off.uid AS offer, toString(firstObserved) AS firstObserved, toString(lastObservedBeforeD) AS lastObservedBeforeD
 ORDER BY marketplace, listing;
 
@@ -105,7 +105,7 @@ OPTIONAL MATCH (ml)-[lf:LISTING_FOR]->(t)
 OPTIONAL MATCH (ml)-[:HAS_OFFER]->(off:Offer)<-[ar:AFFILIATE_FOR_OFFER]-(holder)
 OPTIONAL MATCH (aa:Assertion {uid: ar.assertionUid})
 RETURN 'Q-W15-06' AS q, al.anchorText AS anchorText, al.affiliateProgram AS program, al.trackingParameter + '=' + al.trackingValue AS tracking,
-       ml.merchantListingId AS listing, labels(t)[0] AS listingIsFor, holder.name AS affiliate, aa.status AS affiliateAssertionStatus;
+       ml.merchantListingId AS listing, head([l IN labels(t) WHERE l IN ['ProductVariant', 'PackageConfiguration', 'Bundle']]) AS listingIsFor, holder.name AS affiliate, aa.status AS affiliateAssertionStatus;
 
 // Q-W15-07 CQ-AX-17 (commerce leg, Foundational/Q): offers for the studied variant with latest one-time price and freshness; listing-title
 // amounts are returned as merchant claims in their own column, never as the label amount (label amounts come from W04 LabelSnapshots).
@@ -137,7 +137,7 @@ MATCH (cm:CommerceMatch) WHERE cm.matchKind IN ['RECALL_SCOPE', 'AUTHORIZED_CHAN
 OPTIONAL MATCH (cm)-[:SUPPORTED_BY]->(l:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot)<-[:HAS_SNAPSHOT]-(src:Source)
 OPTIONAL MATCH (cm)-[:MATCHES_COMMERCE_ITEM]->(x)
 RETURN 'Q-W15-09' AS q, cm.matchKind AS kind, cm.matchOutcome AS outcome, cm.status AS status,
-       collect(DISTINCT labels(x)[0]) AS comparedTypes, collect(DISTINCT src.sourceKind) AS supportKinds
+       collect(DISTINCT head([l IN labels(x) WHERE NOT l IN ['Entity', 'VersionedState', 'Occurrence', 'InformationArtifact', 'EvidenceAssessment']])) AS comparedTypes, collect(DISTINCT src.sourceKind) AS supportKinds
 ORDER BY kind, outcome;
 
 // Q-W15-10 CQ-CM-02/03: subscription plans an offer can be bought under, with the plan's own declared adjustment and the observed

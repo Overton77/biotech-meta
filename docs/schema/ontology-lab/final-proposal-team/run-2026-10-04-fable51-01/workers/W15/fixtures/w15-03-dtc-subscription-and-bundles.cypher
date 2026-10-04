@@ -495,6 +495,32 @@ MERGE (n:PriceObservation:Occurrence {uid: 'hu:price-obs:truniagen-4190535391648
 ON CREATE SET n.id = 'truniagen-41905353916485-2026-10-04t0118-one-time-json', n.amount = 244.0, n.currency = 'USD', n.observedAt = datetime('2026-10-04T01:18:33Z'), n.startedAt = datetime('2026-10-04T01:18:33Z'), n.priceKind = 'ONE_TIME', n.availabilityObserved = 'IN_STOCK', n.sourceLocatorUid = 'hu:locator:truniagen-300mg-js-variant-180', n.captureMethod = 'RAW_STRUCTURED_DATA', n.priceTextVerbatim = 'price 24400', n.observationRegion = 'US', n.occurrenceType = 'PriceObservation', n.privacyClass = 'PUBLIC', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
 MATCH (a:Offer {uid: 'hu:offer:truniagen-shopify-41905353916485'}), (b:PriceObservation {uid: 'hu:price-obs:truniagen-41905353916485-2026-10-04t0118-one-time-json'})
 MERGE (a)-[r:HAS_PRICE_OBSERVATION]->(b);
+// Identity licence for the DTC entries: the variant barcode in the brand's own JSON equals the package GTIN (W04 IDENTIFIED_BY) -> ACCEPTED SAME_ITEM;
+// the "180" kit composition is not stated -> PROPOSED / UNRESOLVED (its LISTING_FOR to the Bundle stays asserted-only).
+MERGE (n:CommerceMatch:EvidenceAssessment {uid: 'hu:commerce-match:truniagen-shopify-41905353850949-to-item'})
+ON CREATE SET n.id = 'truniagen-shopify-41905353850949-to-item', n.assessmentType = 'CommerceMatch', n.methodVersion = 'w15-gtin-title-match/v0', n.status = 'ACCEPTED', n.recordedAt = datetime('2026-10-04T02:00:00Z'), n.matchKind = 'LISTING_TO_ITEM', n.matchOutcome = 'SAME_ITEM', n.rationale = 'Brand JSON variant barcode 850015311857 equals the 30-count package GTIN.', n.privacyClass = 'PUBLIC', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
+MATCH (a:CommerceMatch {uid: 'hu:commerce-match:truniagen-shopify-41905353850949-to-item'}), (b:MerchantListing {uid: 'hu:listing:truniagen-shopify-41905353850949'})
+MERGE (a)-[r:MATCHES_COMMERCE_ITEM]->(b);
+MATCH (a:CommerceMatch {uid: 'hu:commerce-match:truniagen-shopify-41905353850949-to-item'}), (b:PackageConfiguration {uid: 'hu:package-configuration:tru-niagen-300mg-30ct'})
+MERGE (a)-[r:MATCHES_COMMERCE_ITEM]->(b);
+MATCH (a:CommerceMatch {uid: 'hu:commerce-match:truniagen-shopify-41905353850949-to-item'}), (b:SourceLocator {uid: 'hu:locator:truniagen-300mg-js-variant-30'})
+MERGE (a)-[r:SUPPORTED_BY]->(b);
+MERGE (n:CommerceMatch:EvidenceAssessment {uid: 'hu:commerce-match:truniagen-shopify-41905353883717-to-item'})
+ON CREATE SET n.id = 'truniagen-shopify-41905353883717-to-item', n.assessmentType = 'CommerceMatch', n.methodVersion = 'w15-gtin-title-match/v0', n.status = 'ACCEPTED', n.recordedAt = datetime('2026-10-04T02:00:00Z'), n.matchKind = 'LISTING_TO_ITEM', n.matchOutcome = 'SAME_ITEM', n.rationale = 'Brand JSON variant barcode 850015311895 equals the 90-count package GTIN.', n.privacyClass = 'PUBLIC', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
+MATCH (a:CommerceMatch {uid: 'hu:commerce-match:truniagen-shopify-41905353883717-to-item'}), (b:MerchantListing {uid: 'hu:listing:truniagen-shopify-41905353883717'})
+MERGE (a)-[r:MATCHES_COMMERCE_ITEM]->(b);
+MATCH (a:CommerceMatch {uid: 'hu:commerce-match:truniagen-shopify-41905353883717-to-item'}), (b:PackageConfiguration {uid: 'hu:package-configuration:tru-niagen-300mg-90ct'})
+MERGE (a)-[r:MATCHES_COMMERCE_ITEM]->(b);
+MATCH (a:CommerceMatch {uid: 'hu:commerce-match:truniagen-shopify-41905353883717-to-item'}), (b:SourceLocator {uid: 'hu:locator:truniagen-300mg-js-variant-90'})
+MERGE (a)-[r:SUPPORTED_BY]->(b);
+MERGE (n:CommerceMatch:EvidenceAssessment {uid: 'hu:commerce-match:truniagen-shopify-41905353916485-to-item'})
+ON CREATE SET n.id = 'truniagen-shopify-41905353916485-to-item', n.assessmentType = 'CommerceMatch', n.methodVersion = 'w15-gtin-title-match/v0', n.status = 'PROPOSED', n.recordedAt = datetime('2026-10-04T02:00:00Z'), n.matchKind = 'LISTING_TO_ITEM', n.matchOutcome = 'UNRESOLVED', n.rationale = 'Kit SKU CTNUS3006090010-KIT and barcode 850064273106; component count not stated, so the bundle composition is unresolved.', n.privacyClass = 'PUBLIC', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
+MATCH (a:CommerceMatch {uid: 'hu:commerce-match:truniagen-shopify-41905353916485-to-item'}), (b:MerchantListing {uid: 'hu:listing:truniagen-shopify-41905353916485'})
+MERGE (a)-[r:MATCHES_COMMERCE_ITEM]->(b);
+MATCH (a:CommerceMatch {uid: 'hu:commerce-match:truniagen-shopify-41905353916485-to-item'}), (b:Bundle {uid: 'hu:bundle:tru-niagen-300mg-180-kit'})
+MERGE (a)-[r:MATCHES_COMMERCE_ITEM]->(b);
+MATCH (a:CommerceMatch {uid: 'hu:commerce-match:truniagen-shopify-41905353916485-to-item'}), (b:SourceLocator {uid: 'hu:locator:truniagen-300mg-js-variant-180'})
+MERGE (a)-[r:SUPPORTED_BY]->(b);
 MERGE (n:PriceObservation:Occurrence {uid: 'hu:price-obs:truniagen-41905353850949-2026-10-04t0118-subscription-json'})
 ON CREATE SET n.id = 'truniagen-41905353850949-2026-10-04t0118-subscription-json', n.amount = 49.0, n.currency = 'USD', n.observedAt = datetime('2026-10-04T01:18:33Z'), n.startedAt = datetime('2026-10-04T01:18:33Z'), n.priceKind = 'SUBSCRIPTION', n.availabilityObserved = 'IN_STOCK', n.sourceLocatorUid = 'hu:locator:truniagen-300mg-js-alloc-30-monthly', n.captureMethod = 'RAW_STRUCTURED_DATA', n.priceTextVerbatim = 'per_delivery_price 4900 (price_adjustments [])', n.observationRegion = 'US', n.subscriptionPlanUid = 'hu:subscription-plan:truniagen-shopify-1316552773', n.occurrenceType = 'PriceObservation', n.privacyClass = 'PUBLIC', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
 MATCH (a:Offer {uid: 'hu:offer:truniagen-shopify-41905353850949'}), (b:PriceObservation {uid: 'hu:price-obs:truniagen-41905353850949-2026-10-04t0118-subscription-json'})

@@ -111,8 +111,8 @@ E2 = event("hu:event:rezdiffra-us-accelerated-approval", "FDA accelerated approv
            effectiveFromBasis="STATED_BY_SOURCE", effectiveAssertionUid="hu:assertion:w18-e2-effective-fda", eventStatus="COMPLETED")
 E3 = event("hu:event:rezdiffra-us-launch", "Rezdiffra first shipments and first patients (US)", "PRODUCT_EVENT", "LAUNCH",
            jurisdiction="US", startedAt=DT("2024-04-01T00:00:00Z"), startedAtPrecision="MONTH", startedAtBasis="STATED_BY_SOURCE",
-           timeAssertionUid="hu:assertion:w18-e3-occurred-8k", announcedAt=DT("2024-05-07T00:00:00Z"), announcedAtPrecision="DAY",
-           announcementAssertionUid="hu:assertion:w18-e3-occurred-8k", eventStatus="COMPLETED")
+           timeAssertionUid="hu:assertion:w18-e3-occurred-8k", announcedAt=DT("2024-03-14T00:00:00Z"), announcedAtPrecision="DAY",
+           announcementAssertionUid="hu:assertion:w18-e3-scheduled-mdgl", eventStatus="COMPLETED")
 E4 = event("hu:event:rezdiffra-eu-conditional-authorisation", "EU conditional marketing authorisation of Rezdiffra", "REGULATORY_EVENT", "CONDITIONAL_APPROVAL",
            jurisdiction="EU", startedAt=DT("2025-08-18T00:00:00Z"), startedAtPrecision="DAY", startedAtBasis="STATED_BY_SOURCE",
            timeAssertionUid="hu:assertion:w18-e4-occurred-ema", announcedAt=DT("2025-08-19T00:00:00Z"), announcedAtPrecision="DAY",
@@ -160,7 +160,10 @@ proj("INVOLVES", E2, MDGL, MDGL, L_AP[:1], R_PR, participantRole="APPLICANT")
 proj("EVENT_ABOUT", E3, PROD, MDGL, L_8K, R_PR)
 proj("EVENT_ABOUT", E4, PROD, MDGL, L_EC[:1], R_PR)
 proj("INVOLVES", E4, EC, MDGL, L_EC[:1], R_PR, participantRole="DECISION_MAKER", roleTitleVerbatim="European Commission (EC)")
+proj("INVOLVES", E4, MDGL, MDGL, L_EC[:1], R_PR, participantRole="MARKETING_AUTHORIZATION_HOLDER")
+proj("INVOLVES", E3, MDGL, MDGL, L_8K, R_PR, participantRole="ANNOUNCER")
 proj("EVENT_ABOUT", E5, PROD, MDGL, L_Q3, R_PR)
+proj("INVOLVES", E5, MDGL, MDGL, L_Q3, R_PR, participantRole="ANNOUNCER")
 
 # DOCUMENTED_BY_RECORD: BellLabs resolution (CALCULATED from the record assertion)
 for ev, rec_uid, inp, k in [(E2, RESP, "hu:assertion:w18-e2-occurred-fda", "e2"), (E6, PUB, "hu:assertion:w18-e6-occurred-pubmed", "e6")]:
