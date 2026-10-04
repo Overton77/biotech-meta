@@ -40,7 +40,7 @@ SET r.assertionUid = 'hu:assertion:w12-neg-455-2-covers-lot', r.recordedFrom = d
 MATCH (loc:SourceLocator {uid: 'hu:locator:elysium-basis-lot-p098-01-nr'})
 MERGE (m:MeasuredResult:InformationArtifact {uid: 'hu:measured-result:w12-neg-invented-from-summary'})
 SET m.id = 'w12-neg-invented-from-summary', m.artifactType = 'MEASURED_RESULT', m.analyte = 'Nicotinamide Riboside Chloride', m.value = 250.0, m.unitCode = 'mg',
-    m.qualifier = 'QUANTIFIED', m.privacyClass = 'PUBLIC', m.createdAt = datetime('2026-10-04T04:00:00Z'), m.updatedAt = datetime('2026-10-04T04:00:00Z')
+    m.qualifier = 'NUMERIC', m.privacyClass = 'PUBLIC', m.createdAt = datetime('2026-10-04T04:00:00Z'), m.updatedAt = datetime('2026-10-04T04:00:00Z')
 MERGE (m)-[:SUPPORTED_BY]->(loc);
 
 // N06 -> V-W12-01 (ISSUER_COUNT_0, NO_CERTIFIED_EXECUTION, NO_REPORT_NUMBER_OR_DATE): the lot page promoted to a "COA".
@@ -63,15 +63,15 @@ MERGE (n:LotTestSummary:CertificateOfAnalysis:InformationArtifact {uid: 'hu:lot-
 SET n.id = 'w12-neg-collapsed', n.artifactType = 'LOT_TEST_SUMMARY', n.signatureEvidence = 'NOT_CAPTURED', n.privacyClass = 'PUBLIC',
     n.createdAt = datetime('2026-10-04T04:00:00Z'), n.updatedAt = datetime('2026-10-04T04:00:00Z');
 
-// N08 -> V-W12-04 (QUANTIFIED_WITHOUT_VALUE) and V-W12-04 (VALUE_WITH_NON_QUANTIFIED_QUALIFIER: "ND" stored as 0).
+// N08 -> V-W12-04 (NUMERIC_WITHOUT_VALUE) and V-W12-04 (VALUE_WITH_NON_NUMERIC_QUALIFIER: "ND" stored as 0).
 MATCH (x:TestExecution {uid: 'hu:test-execution:synthetic-lab-z-70579-ecoli'}), (loc:SourceLocator {uid: 'hu:locator:synthetic-lab-z-70579-ecoli'})
 MERGE (m:MeasuredResult:InformationArtifact {uid: 'hu:measured-result:w12-neg-nd-as-zero'})
-SET m.id = 'w12-neg-nd-as-zero', m.artifactType = 'MEASURED_RESULT', m.analyte = 'E. coli', m.value = 0.0, m.unitCode = '[CFU]/g', m.qualifier = 'NOT_DETECTED',
+SET m.id = 'w12-neg-nd-as-zero', m.artifactType = 'MEASURED_RESULT', m.analyte = 'E. coli', m.value = 0.0, m.unitCode = '[CFU]/g', m.qualifier = 'BELOW_DETECTION',
     m.privacyClass = 'PUBLIC', m.createdAt = datetime('2026-10-04T04:00:00Z'), m.updatedAt = datetime('2026-10-04T04:00:00Z')
 MERGE (x)-[:PRODUCED_RESULT]->(m)
 MERGE (m)-[:SUPPORTED_BY]->(loc)
 MERGE (q:MeasuredResult:InformationArtifact {uid: 'hu:measured-result:w12-neg-quantified-null'})
-SET q.id = 'w12-neg-quantified-null', q.artifactType = 'MEASURED_RESULT', q.analyte = 'E. coli', q.unitCode = '[CFU]/g', q.qualifier = 'QUANTIFIED',
+SET q.id = 'w12-neg-quantified-null', q.artifactType = 'MEASURED_RESULT', q.analyte = 'E. coli', q.unitCode = '[CFU]/g', q.qualifier = 'NUMERIC',
     q.privacyClass = 'PUBLIC', q.createdAt = datetime('2026-10-04T04:00:00Z'), q.updatedAt = datetime('2026-10-04T04:00:00Z')
 MERGE (x)-[:PRODUCED_RESULT]->(q)
 MERGE (q)-[:SUPPORTED_BY]->(loc);
@@ -102,7 +102,7 @@ SET h.validTo = datetime('2026-10-04T00:00:00Z'), h.validToPrecision = 'DAY', h.
 
 // N12 -> V-011, V-W12-02: a label declaration stored as a measured result.
 MERGE (n:LabelDeclaration:MeasuredResult:InformationArtifact {uid: 'hu:label-declaration:w12-neg-declared-as-measured'})
-SET n.artifactType = 'LABEL_DECLARATION', n.verbatimText = 'Nicotinamide Riboside Chloride 250 mg', n.analyte = 'NR', n.value = 250.0, n.unitCode = 'mg', n.qualifier = 'QUANTIFIED',
+SET n.artifactType = 'LABEL_DECLARATION', n.verbatimText = 'Nicotinamide Riboside Chloride 250 mg', n.analyte = 'NR', n.value = 250.0, n.unitCode = 'mg', n.qualifier = 'NUMERIC',
     n.privacyClass = 'PUBLIC', n.createdAt = datetime('2026-10-04T04:00:00Z'), n.updatedAt = datetime('2026-10-04T04:00:00Z');
 
 // N13 -> V-008 and V-W12-01: a certificate that reports on nothing.
@@ -145,8 +145,16 @@ SET r.assertionUid = 'hu:assertion:w12-sample-from-survey-unit', r.recordedFrom 
 MATCH (p:PassFailInterpretation {uid: 'hu:pass-fail:truniagen-t25189001-lead-source'}), (x:TestExecution {uid: 'hu:test-execution:truniagen-t25189001-lead'}),
       (loc:SourceLocator {uid: 'hu:locator:truniagen-coa-t25189001-lead'})
 MERGE (m:MeasuredResult:InformationArtifact {uid: 'hu:measured-result:w12-neg-lead-from-pass'})
-SET m.id = 'w12-neg-lead-from-pass', m.artifactType = 'MEASURED_RESULT', m.analyte = 'Lead', m.value = 0.5, m.unitCode = '[ppm]', m.qualifier = 'QUANTIFIED',
+SET m.id = 'w12-neg-lead-from-pass', m.artifactType = 'MEASURED_RESULT', m.analyte = 'Lead', m.value = 0.5, m.unitCode = '[ppm]', m.qualifier = 'NUMERIC',
     m.privacyClass = 'PUBLIC', m.createdAt = datetime('2026-10-04T04:00:00Z'), m.updatedAt = datetime('2026-10-04T04:00:00Z')
 MERGE (x)-[:PRODUCED_RESULT]->(m)
 MERGE (m)-[:SUPPORTED_BY]->(loc)
 MERGE (p)-[:INTERPRETS_RESULT]->(m);
+
+// N19 -> V-W12-04 (NOT_MEASURED_WRITTEN_AS_A_RESULT): "not measured" written as a result record for lot 70918.
+MATCH (x:TestExecution {uid: 'hu:test-execution:synthetic-lab-z-70579-ecoli'}), (loc:SourceLocator {uid: 'hu:locator:synthetic-lab-z-70579-ecoli'})
+MERGE (m:MeasuredResult:InformationArtifact {uid: 'hu:measured-result:w12-neg-not-measured-record'})
+SET m.id = 'w12-neg-not-measured-record', m.artifactType = 'MEASURED_RESULT', m.analyte = 'E. coli', m.qualifier = 'NOT_MEASURED', m.privacyClass = 'PUBLIC',
+    m.createdAt = datetime('2026-10-04T04:00:00Z'), m.updatedAt = datetime('2026-10-04T04:00:00Z')
+MERGE (x)-[:PRODUCED_RESULT]->(m)
+MERGE (m)-[:SUPPORTED_BY]->(loc);

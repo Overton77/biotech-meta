@@ -47,16 +47,18 @@ WITH m, count(x) AS producers, EXISTS { MATCH (m)-[:SUPPORTED_BY]->(:SourceLocat
 WHERE producers <> 1 OR NOT hasLocator
 RETURN m.uid AS result, producers, hasLocator;
 
-// V-W12-04: value and qualifier agree (INV-007). QUANTIFIED <=> value present; a non-value state never carries a number
-// (an "ND" stored as 0 is the classic collapse); uncertainty needs a value and a unit and is positive; a qualitative
-// outcome states its sample quantity.
+// V-W12-04: value and qualifier agree (INV-007; shared ResultQualifier, contract A7). NUMERIC <=> value present; a
+// non-value state never carries a number (an "ND" stored as 0 is the classic collapse); NOT_MEASURED is never written on
+// a MeasuredResult (not measured = no record); uncertainty needs a value and a unit and is positive; a qualitative outcome
+// states its sample quantity. Accepted values = catalog resultQualifier + the quality additions requested in W12-SR-12.
 MATCH (m:MeasuredResult)
 WITH m, [v IN [
   CASE WHEN m.qualifier IS NULL THEN 'QUALIFIER_MISSING' END,
-  CASE WHEN m.qualifier IS NOT NULL AND NOT m.qualifier IN ['QUANTIFIED', 'NOT_DETECTED', 'DETECTED_NOT_QUANTIFIED', 'BELOW_REPORTING_LIMIT',
-                                                             'ABOVE_QUANTITATION_RANGE', 'QUALITATIVE_ABSENT', 'QUALITATIVE_PRESENT'] THEN 'UNKNOWN_QUALIFIER' END,
-  CASE WHEN m.qualifier = 'QUANTIFIED' AND m.value IS NULL THEN 'QUANTIFIED_WITHOUT_VALUE' END,
-  CASE WHEN m.qualifier <> 'QUANTIFIED' AND m.value IS NOT NULL THEN 'VALUE_WITH_NON_QUANTIFIED_QUALIFIER' END,
+  CASE WHEN m.qualifier IS NOT NULL AND NOT m.qualifier IN ['NUMERIC', 'BELOW_DETECTION', 'ABOVE_QUANTIFICATION', 'NOT_MEASURED', 'INVALID_SPECIMEN',
+                                                             'BELOW_REPORTING_LIMIT', 'QUALITATIVE_ABSENT', 'QUALITATIVE_PRESENT'] THEN 'UNKNOWN_QUALIFIER' END,
+  CASE WHEN m.qualifier = 'NOT_MEASURED' THEN 'NOT_MEASURED_WRITTEN_AS_A_RESULT' END,
+  CASE WHEN m.qualifier = 'NUMERIC' AND m.value IS NULL THEN 'NUMERIC_WITHOUT_VALUE' END,
+  CASE WHEN m.qualifier <> 'NUMERIC' AND m.value IS NOT NULL THEN 'VALUE_WITH_NON_NUMERIC_QUALIFIER' END,
   CASE WHEN m.value IS NOT NULL AND m.unitCode IS NULL THEN 'VALUE_WITHOUT_UNIT' END,
   CASE WHEN m.uncertainty IS NOT NULL AND (m.value IS NULL OR m.unitCode IS NULL) THEN 'UNCERTAINTY_WITHOUT_VALUE_OR_UNIT' END,
   CASE WHEN m.uncertainty IS NOT NULL AND m.uncertainty <= 0 THEN 'NON_POSITIVE_UNCERTAINTY' END,
@@ -90,7 +92,8 @@ WHERE size(violations) > 0
 RETURN p.uid AS interpretation, violations;
 
 // V-W12-06: a programme's scopes cover only the kind of object it certifies. A FACILITY programme (NSF/ANSI 455-2 GMP)
-// covers only Facility; a LOT programme only ProductLot or TradeItemIdentifier; facility GMP never covers a product.
+// covers only Facility; a LOT programme only ProductLot or TradeItemIdentifier; an ASSAY_VERSION programme (NGSP) only
+// AssayVersion; facility GMP never covers a product.
 MATCH (prog:CertificationProgram)-[:PROGRAM_HAS_LISTING]->(l:CertificationListing)-[:HAS_CERTIFICATION_SCOPE]->(s:CertificationScope)-[:COVERS]->(x)
 WITH prog, l, s, x,
      CASE prog.certifiedObjectKind
@@ -99,6 +102,7 @@ WITH prog, l, s, x,
        WHEN 'LOT' THEN (x:ProductLot OR x:TradeItemIdentifier)
        WHEN 'PRODUCT' THEN (x:Product OR x:ProductVariant OR x:ProductLot OR x:TradeItemIdentifier)
        WHEN 'INGREDIENT_MATERIAL' THEN x:IngredientMaterial
+       WHEN 'ASSAY_VERSION' THEN x:AssayVersion
        ELSE false END AS fits
 WHERE NOT fits
 RETURN prog.uid AS program, prog.certifiedObjectKind AS certifies, l.uid AS listing, x.uid AS coveredItem, labels(x) AS coveredLabels;

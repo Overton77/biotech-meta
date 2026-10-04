@@ -74,13 +74,14 @@ enum SpecComparator {
 When a SpecificationCriterion applies (OPEN-QUESTIONS P2 quality 2; ICH Q6A section 2.2). RELEASE: at batch release
 (in-house release limits may be tighter than shelf-life limits). SHELF_LIFE: throughout shelf-life (stability).
 RELEASE_AND_SHELF_LIFE: one criterion stated for both (the US/Japan regulatory default in ICH Q6A). NOT_STATED: the
-source does not say (for example "Internal Specifications ≥ 250 mg/dose"). A label claim is never a criterion: it is a
-W04 QuantityDeclaration (INV-006).
+source does not say (for example "Internal Specifications ≥ 250 mg/dose"). IN_PROCESS: an in-process control at a
+manufacturing step (adopted from W11-SR-03). A label claim is never a criterion: it is a W04 QuantityDeclaration (INV-006).
 """
 enum CriterionPurpose {
   RELEASE
   SHELF_LIFE
   RELEASE_AND_SHELF_LIFE
+  IN_PROCESS
   NOT_STATED
 }
 
