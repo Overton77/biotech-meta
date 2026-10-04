@@ -15,8 +15,8 @@
 #
 # Owned here (sole writer): node types ProductLot, TestSample, TestExecution, TestMethod, TestingLaboratory,
 # MeasuredResult, SpecificationCriterion, PassFailInterpretation, LotTestSummary, CertificateOfAnalysis,
-# CertificationProgram, CertificationListing, CertificationScope; union CertificationCoverageTarget; enums listed below
-# (all PROPOSED: the catalog defines no quality enum); relationship types LOT_OF, MANUFACTURED_UNDER, SAMPLE_FROM,
+# CertificationProgram, CertificationListing, CertificationScope; union CertificationCoverageTarget; the 12 enums
+# below (all PROPOSED: the catalog defines no quality enum; ResultQualifier is shared, not owned here); relationship types LOT_OF, MANUFACTURED_UNDER, SAMPLE_FROM,
 # TESTED_SAMPLE, USED_METHOD, PERFORMED_BY_LAB, PRODUCED_RESULT, EVALUATED_AGAINST, INTERPRETS_RESULT,
 # SUMMARIZES_TESTING, CERTIFIES_RESULTS_FOR, PROGRAM_HAS_LISTING, HAS_CERTIFICATION_SCOPE, COVERS, CERTIFIED_UNDER and
 # the four proposed types APPLIES_CRITERION, INTERPRETS_TESTING_OF, CRITERION_OF_SPECIFICATION, COA_ISSUED_BY
@@ -29,6 +29,10 @@
 #        StateEpisodeProperties, DerivedEdgeProperties, StructuralEdgeProperties
 #   W01: Organization, Facility        W02: IngredientMaterial        W04: Product, ProductVariant, FormulationVersion
 #   W11: SpecificationVersion (D-009)  W15: IndividualUnit
+#   W07: ResultQualifier (catalog private_context.resultQualifier, shared per contract A7; ownership W07-SR-03) and
+#        AssayVersion (CertificationCoverageTarget member accepted from W07-SR-16). MeasuredResult.qualifier uses the
+#        shared enum; the quality values BELOW_REPORTING_LIMIT, QUALITATIVE_ABSENT, QUALITATIVE_PRESENT are requested
+#        additions (W12-SR-12), not defined here.
 # SUPPORTED_BY is a W00 relationship type; the endpoint fields on MeasuredResult, LotTestSummary and
 # CertificateOfAnalysis need W00 to admit those labels into the SUPPORTED_BY domain (seam W12-SR-02). The field on
 # PassFailInterpretation is already inside the catalog domain (EvidenceAssessment).
@@ -42,26 +46,6 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # Enums (PROPOSED, owner W12). Each value has a failing case in fixtures/ (see 04-model-cards.md).
 # ---------------------------------------------------------------------------------------------------------------------
-
-"""
-Which analytical state a MeasuredResult records (INV-007; V-124, V-W12-04). It is never "not measured" (no
-MeasuredResult exists) and never "not reported" (a source gave only a pass/fail: see PassFailInterpretation
-.resultValueReported). QUANTIFIED requires value; every other value requires value = null.
-NOT_DETECTED: below the method's detection limit ("ND"). DETECTED_NOT_QUANTIFIED: detected below the quantitation
-limit. BELOW_REPORTING_LIMIT: below a stated reporting limit that is not a detection limit ("BRL", for example
-"1% or less of label claim"). ABOVE_QUANTITATION_RANGE: above the calibrated range, value not reported.
-QUALITATIVE_ABSENT / QUALITATIVE_PRESENT: outcome of a presence/absence test in a stated sample quantity (for example
-E. coli "Absent/10g"); a qualitative absence is a test outcome at the method's capability, never proof of zero content.
-"""
-enum ResultQualifier {
-  QUANTIFIED
-  NOT_DETECTED
-  DETECTED_NOT_QUANTIFIED
-  BELOW_REPORTING_LIMIT
-  ABOVE_QUANTITATION_RANGE
-  QUALITATIVE_ABSENT
-  QUALITATIVE_PRESENT
-}
 
 """Kind of measurement uncertainty stated with a MeasuredResult. EXPANDED requires coverageFactor (k) when the source
 states it; STANDARD is a standard uncertainty (k = 1)."""
@@ -204,10 +188,11 @@ enum CertifiedObjectKind {
 """
 Range of COVERS (CertificationScope -> covered identity). Catalog range Product|ProductVariant|ProductLot|Facility|
 TradeItemIdentifier (round 0005) plus TestingLaboratory (laboratory accreditation, PROPOSED; fixture
-w12-30-certification-scope.cypher). IngredientMaterial (NSF 173DI) and AssayVersion (NGSP) stay CANDIDATE members until
-a fixture needs them. Coverage of one member never implies coverage of another (V-332, V-W12-06).
+w12-30-certification-scope.cypher) and AssayVersion (NGSP method certification; W07-SR-16, failing case in the W07
+packet: a boolean on AssayVersion would certify historical results). IngredientMaterial (NSF 173DI) stays a CANDIDATE
+member until a fixture needs it. Coverage of one member never implies coverage of another (V-332, V-W12-06).
 """
-union CertificationCoverageTarget = Product | ProductVariant | ProductLot | Facility | TradeItemIdentifier | TestingLaboratory
+union CertificationCoverageTarget = Product | ProductVariant | ProductLot | Facility | TradeItemIdentifier | TestingLaboratory | AssayVersion
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Node types
@@ -421,7 +406,7 @@ type MeasuredResult implements Entity & InformationArtifactArchetype
   analyte: String!
   "uid of the resolved analyte identity (ChemicalSubstance, Constituent, Nutrient, MicrobialTaxon ...); null when unresolved. A pointer, not an edge (precedent QuantityDeclaration.amountReferentUid)."
   analyteUid: String
-  "Reported value; non-null only when qualifier = QUANTIFIED (V-W12-04)."
+  "Reported value; non-null only when qualifier = NUMERIC (V-W12-04)."
   value: Float
   "Verbatim result cell (\"555 mg/capsule\", \"261\", \"ND\", \"BRL\")."
   valueTextVerbatim: String
@@ -438,6 +423,13 @@ type MeasuredResult implements Entity & InformationArtifactArchetype
   reportingLimit: Float
   "Verbatim reporting-limit statement (\"Reporting Limit – 1% or less of label claim\")."
   reportingLimitText: String
+  """
+  Value state (shared catalog enum ResultQualifier, contract A7). On a MeasuredResult: NUMERIC (value present),
+  BELOW_DETECTION ("ND"), ABOVE_QUANTIFICATION, INVALID_SPECIMEN, and the requested quality values
+  BELOW_REPORTING_LIMIT ("BRL", a reporting limit that is not a detection limit), QUALITATIVE_ABSENT /
+  QUALITATIVE_PRESENT (presence/absence in sampleQuantity; an absence outcome is never proof of zero). NOT_MEASURED is
+  never written on a MeasuredResult: not measured = no MeasuredResult exists (V-W12-04).
+  """
   qualifier: ResultQualifier!
   "Sample quantity of a presence/absence test (10 for \"Absent/10g\") with its unit."
   sampleQuantity: Float
