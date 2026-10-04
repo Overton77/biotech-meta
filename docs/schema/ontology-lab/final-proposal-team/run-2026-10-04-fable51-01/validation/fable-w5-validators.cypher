@@ -651,3 +651,131 @@ MATCH (s:Source)-[:RENDITION_OF]->(w)
 WITH s, collect(DISTINCT w) AS works
 WHERE size(works) > 1 OR any(w IN works WHERE w:Source OR NOT (w:Episode OR w:Publication))
 RETURN 'V-F5-53' AS check, s.uid AS rendition, [w IN works | w.uid] AS works;
+
+// ------------------------------------------------- kernel (W00) -------------------------------------------------------
+
+// V-F5-54 -- resolves CH-K-01a; replaces V-504 first branch (all asserted edge types, not five episode types); rule: an edge that names its authorizing assertion is never recorded before that assertion was recorded nor before any snapshot supporting the assertion was retrieved.
+MATCH (x)-[r]->(y)
+WHERE r.assertionUid IS NOT NULL AND r.recordedFrom IS NOT NULL
+MATCH (a:Assertion {uid: r.assertionUid})
+WITH r, a, [(a)-[:SUPPORTED_BY]->(:SourceLocator)<-[:HAS_LOCATOR]-(s:SourceSnapshot) WHERE s.retrievedAt IS NOT NULL AND s.retrievedAt > r.recordedFrom | s.uid] AS laterSnapshots
+WHERE (a.recordedAt IS NOT NULL AND r.recordedFrom < a.recordedAt) OR size(laterSnapshots) > 0
+RETURN 'V-F5-54' AS check, type(r) AS relType, coalesce(r.relationshipUid, elementId(r)) AS episode, a.uid AS assertion,
+       r.recordedFrom AS recordedFrom, a.recordedAt AS assertionRecordedAt, laterSnapshots;
+
+// V-F5-55 -- resolves CH-K-02b; new (V-504b); rule: a record WAS_GENERATED_BY an Activity is never recorded before that activity started (PROV-O generation inside the activity; recorded time is never backdated).
+MATCH (x)-[:WAS_GENERATED_BY]->(act:Activity)
+WITH x, act, coalesce(x.recordedAt, x.recordedFrom) AS recorded
+WHERE recorded IS NOT NULL AND act.startedAt IS NOT NULL AND recorded < act.startedAt
+RETURN 'V-F5-55' AS check, x.uid AS item, act.uid AS activity, recorded, act.startedAt AS activityStartedAt;
+
+// V-F5-56 -- resolves CH-K-03a; new (V-507c); rule: a SOURCE_CORRECTION or SOURCE_REVISION supersession that names a sourceRevisionEventUid resolves to a SourceRevisionEvent, and one that names none never has the fact-ending shape (same object and validFrom, the older open-ended, the newer only closing validTo), which must be VALIDITY_BOUNDED.
+MATCH (n:Assertion)-[s:SUPERSEDES]->(o:Assertion)
+WHERE s.supersessionKind IN ['SOURCE_CORRECTION', 'SOURCE_REVISION']
+WITH n, s, o,
+     s.sourceRevisionEventUid IS NOT NULL AND NOT EXISTS { MATCH (:SourceRevisionEvent {uid: s.sourceRevisionEventUid}) } AS unresolved,
+     s.sourceRevisionEventUid IS NULL
+       AND [(n)-[:HAS_OBJECT]->(x) | x.uid] = [(o)-[:HAS_OBJECT]->(x) | x.uid]
+       AND coalesce(toString(n.validFrom), '-') = coalesce(toString(o.validFrom), '-')
+       AND coalesce(toString(n.valueNumber), '-') = coalesce(toString(o.valueNumber), '-')
+       AND coalesce(n.valueString, '-') = coalesce(o.valueString, '-')
+       AND o.validTo IS NULL AND n.validTo IS NOT NULL AS endingShape
+WHERE unresolved OR endingShape
+RETURN 'V-F5-56' AS check, n.uid AS newer, o.uid AS older, s.supersessionKind AS kind,
+       CASE WHEN unresolved THEN 'SOURCE_REVISION_EVENT_MISSING' ELSE 'FACT_ENDING_RECORDED_AS_CORRECTION' END AS violation;
+
+// V-F5-57 -- resolves CH-K-04; compiles packet V-W00-06; rule: an Assertion is immutable after commit (INV-501/INV-504 analogue): updatedAt never exceeds createdAt; a change of valid time is a new assertion that SUPERSEDES the old one.
+MATCH (a:Assertion)
+WHERE a.updatedAt IS NOT NULL AND a.createdAt IS NOT NULL AND a.updatedAt > a.createdAt
+RETURN 'V-F5-57' AS check, a.uid AS assertion, a.createdAt AS createdAt, a.updatedAt AS updatedAt, 'ASSERTION_EDITED_IN_PLACE' AS violation;
+
+// V-F5-58 -- resolves CH-K-05b, CH-K-05c, CH-K-05d, CH-K-05e; replaces V-104 and V-502 (all temporal properties of all nodes and relationships); rule: no temporal value is a sentinel: year >= 9000, year <= 1, or the Unix epoch 1970-01-01T00:00Z (open and unknown bounds are null).
+WITH ['validFrom', 'validTo', 'recordedAt', 'recordedFrom', 'recordedTo', 'effectiveFrom', 'effectiveTo', 'startedAt', 'endedAt', 'observedAt',
+      'retrievedAt', 'publishedAt', 'reviewedAt', 'createdAt', 'updatedAt', 'derivedAt', 'reportedAt', 'intervalStart', 'intervalEnd',
+      'recordedAsOf', 'validAt', 'evidenceCutoff', 'migratedAt'] AS tk
+MATCH (n)
+WITH n, [k IN keys(n) WHERE k IN tk AND (n[k] IS :: DATE OR n[k] IS :: ZONED DATETIME OR n[k] IS :: LOCAL DATETIME)
+                            AND (n[k].year >= 9000 OR n[k].year <= 1 OR (n[k].year = 1970 AND n[k].month = 1 AND n[k].day = 1
+                                 AND (n[k] IS :: DATE OR (n[k].hour = 0 AND n[k].minute = 0 AND n[k].second = 0))))] AS sentinels
+WHERE size(sentinels) > 0
+RETURN 'V-F5-58' AS check, 'NODE' AS kind, coalesce(n.uid, elementId(n)) AS item, sentinels
+UNION
+WITH ['validFrom', 'validTo', 'recordedAt', 'recordedFrom', 'recordedTo', 'effectiveFrom', 'effectiveTo', 'startedAt', 'endedAt', 'observedAt',
+      'retrievedAt', 'publishedAt', 'reviewedAt', 'createdAt', 'updatedAt', 'derivedAt', 'reportedAt', 'evidencePublishedAt'] AS tk
+MATCH ()-[r]->()
+WITH r, [k IN keys(r) WHERE k IN tk AND (r[k] IS :: DATE OR r[k] IS :: ZONED DATETIME OR r[k] IS :: LOCAL DATETIME)
+                            AND (r[k].year >= 9000 OR r[k].year <= 1 OR (r[k].year = 1970 AND r[k].month = 1 AND r[k].day = 1
+                                 AND (r[k] IS :: DATE OR (r[k].hour = 0 AND r[k].minute = 0 AND r[k].second = 0))))] AS sentinels
+WHERE size(sentinels) > 0
+RETURN 'V-F5-58' AS check, 'RELATIONSHIP' AS kind, coalesce(r.relationshipUid, elementId(r)) AS item, sentinels;
+
+// V-F5-59 -- resolves CH-K-06; compiles packet V-W00-01 (generalizes V-410's asserter half to every Assertion); rule: an Assertion has at most one ASSERTED_BY (INV-003, contract A.3).
+MATCH (a:Assertion)-[:ASSERTED_BY]->(w)
+WITH a, collect(DISTINCT coalesce(w.uid, elementId(w))) AS asserters, count(*) AS edges
+WHERE edges > 1
+RETURN 'V-F5-59' AS check, a.uid AS assertion, asserters, edges;
+
+// V-F5-60 -- resolves CH-K-07b, CH-K-07c; new (V-402b); rule: every SourceSnapshot belongs to exactly one Source (one incoming HAS_SNAPSHOT) and that Source has a canonicalUri, so every locator is reproducible from a retrieval endpoint.
+MATCH (s:SourceSnapshot)
+WITH s, [(src)-[:HAS_SNAPSHOT]->(s) | src] AS sources
+WHERE size(sources) <> 1 OR NOT sources[0]:Source OR sources[0].canonicalUri IS NULL
+RETURN 'V-F5-60' AS check, s.uid AS snapshot, [x IN sources | x.uid] AS sources,
+       CASE WHEN size(sources) = 0 THEN 'SNAPSHOT_WITHOUT_SOURCE' WHEN size(sources) > 1 THEN 'SNAPSHOT_CLAIMED_BY_SEVERAL_SOURCES'
+            ELSE 'SOURCE_WITHOUT_CANONICAL_URI' END AS violation;
+
+// V-F5-61 -- resolves CH-K-11b, CH-K-11c; replaces V-117 (V-117r) and compiles V-W00-08; rule: the live id is read from the property of the node's own type (Document documentId, DocumentTextVersion documentTextVersionId, Segmentation segmentationId, Chunk chunkId, otherwise id); every uid-bearing archetype node has it, it equals the uid's opaque segment, and a Document-family node carries no stray `id` that differs from its alias.
+MATCH (n)
+WHERE n.uid IS NOT NULL AND NOT n:PrivateRecord
+  AND (n:Entity OR n:VersionedState OR n:Occurrence OR n:InformationArtifact OR n:Assertion OR n:EvidenceAssessment)
+WITH n, CASE WHEN n:Document THEN n.documentId WHEN n:DocumentTextVersion THEN n.documentTextVersionId WHEN n:Segmentation THEN n.segmentationId
+             WHEN n:Chunk THEN n.chunkId ELSE n.id END AS liveId,
+     (n:Document OR n:DocumentTextVersion OR n:Segmentation OR n:Chunk) AS aliased
+WITH n, liveId, [v IN [
+        CASE WHEN liveId IS NULL THEN 'LIVE_ID_MISSING' END,
+        CASE WHEN liveId IS NOT NULL AND NOT n.uid ENDS WITH (':' + liveId) THEN 'LIVE_ID_DIFFERS_FROM_UID_SEGMENT' END,
+        CASE WHEN aliased AND n.id IS NOT NULL AND n.id <> coalesce(liveId, '') THEN 'STRAY_ID_DIFFERS_FROM_ALIAS' END
+     ] WHERE v IS NOT NULL] AS violations
+WHERE size(violations) > 0
+RETURN 'V-F5-61' AS check, labels(n) AS labels, n.uid AS uid, liveId, violations;
+
+// V-F5-62 -- resolves CH-K-12b, CH-K-12c; replaces V-W00-16 (V-W00-16r); rule: the uid token is the registered token of the node's own domain label (archetype labels count only when the node has no tokened domain label); a 0.2.0 alias token is a migration item only when $uidAliasTokenLabels maps it to one of the node's labels, otherwise it is a violation.
+MATCH (n)
+WHERE n.uid IS NOT NULL AND n.uid STARTS WITH 'hu:' AND NOT n.uid STARTS WITH 'hu:private-' AND NOT n:PrivateRecord
+WITH n, split(n.uid, ':')[1] AS token,
+     [l IN labels(n) WHERE NOT l IN ['Entity', 'VersionedState', 'Occurrence', 'InformationArtifact', 'Assertion', 'EvidenceAssessment'] AND $uidTypeTokens[l] IS NOT NULL | $uidTypeTokens[l]] AS domainTokens,
+     [l IN labels(n) WHERE $uidTypeTokens[l] IS NOT NULL | $uidTypeTokens[l]] AS anyTokens
+WITH n, token, CASE WHEN size(domainTokens) > 0 THEN domainTokens ELSE anyTokens END AS expected
+WHERE NOT token IN expected
+  AND NOT any(l IN coalesce($uidAliasTokenLabels[token], []) WHERE l IN labels(n))
+RETURN 'V-F5-62' AS check, n.uid AS uid, labels(n) AS labels, token, expected,
+       CASE WHEN token IN $uidAliasTokens THEN 'ALIAS_TOKEN_OF_ANOTHER_TYPE' WHEN size(expected) = 0 THEN 'LABEL_HAS_NO_TOKEN'
+            ELSE 'TOKEN_NOT_REGISTERED_FOR_PRIMARY_LABEL' END AS violation;
+
+// V-F5-63 -- resolves CH-K-14b, CH-K-14c; extends V-102/V-103/V-501 to every interval pair on nodes and relationships, and V-506/V-507 to strict order; rule: every half-open interval is non-empty (from < to) for (validFrom, validTo), (recordedAt, recordedTo), (recordedFrom, recordedTo), (effectiveFrom, effectiveTo), (startedAt, endedAt), (intervalStart, intervalEnd); a superseding assertion is recorded strictly after the one it supersedes.
+WITH [['validFrom', 'validTo'], ['recordedAt', 'recordedTo'], ['recordedFrom', 'recordedTo'], ['effectiveFrom', 'effectiveTo'], ['startedAt', 'endedAt'], ['intervalStart', 'intervalEnd']] AS pairs
+MATCH (n)
+WITH n, [p IN pairs WHERE n[p[0]] IS NOT NULL AND n[p[1]] IS NOT NULL AND n[p[0]] >= n[p[1]] | p[0] + '>=' + p[1]] AS empty
+WHERE size(empty) > 0
+RETURN 'V-F5-63' AS check, 'NODE_INTERVAL_EMPTY' AS violation, coalesce(n.uid, elementId(n)) AS item, empty AS detail
+UNION
+WITH [['validFrom', 'validTo'], ['recordedFrom', 'recordedTo'], ['effectiveFrom', 'effectiveTo']] AS pairs
+MATCH ()-[r]->()
+WITH r, [p IN pairs WHERE r[p[0]] IS NOT NULL AND r[p[1]] IS NOT NULL AND r[p[0]] >= r[p[1]] | p[0] + '>=' + p[1]] AS empty
+WHERE size(empty) > 0
+RETURN 'V-F5-63' AS check, 'RELATIONSHIP_INTERVAL_EMPTY' AS violation, coalesce(r.relationshipUid, elementId(r)) AS item, empty AS detail
+UNION
+MATCH (n:Assertion)-[:SUPERSEDES]->(o:Assertion)
+WHERE n.recordedAt IS NOT NULL AND o.recordedAt IS NOT NULL AND n.recordedAt <= o.recordedAt
+RETURN 'V-F5-63' AS check, 'SUPERSESSION_NOT_STRICTLY_LATER' AS violation, n.uid AS item, [o.uid] AS detail;
+
+// V-F5-64 -- resolves CH-K-15; new (V-514c); rule: every Assertion predicate is a controlled string registered in the catalog ($registeredPredicates = catalog assertedPredicates and relationship names, final SDL relationship types, W00 predicate-registry REGISTERED/CANDIDATE/CONFIRMED).
+MATCH (a:Assertion)
+WHERE a.predicate IS NULL OR NOT a.predicate IN $registeredPredicates
+RETURN 'V-F5-64' AS check, a.uid AS assertion, a.predicate AS predicate, 'PREDICATE_NOT_REGISTERED' AS violation;
+
+// V-F5-65 -- resolves CH-K-17c; new (V-101b); rule: a relationshipUid is a stable audit id: it names exactly one relationship across ALL relationship types (the per-type constraints cannot see cross-type reuse or types without a constraint).
+MATCH ()-[r]->()
+WHERE r.relationshipUid IS NOT NULL
+WITH r.relationshipUid AS relationshipUid, collect(type(r)) AS types
+WHERE size(types) > 1
+RETURN 'V-F5-65' AS check, relationshipUid, types;
