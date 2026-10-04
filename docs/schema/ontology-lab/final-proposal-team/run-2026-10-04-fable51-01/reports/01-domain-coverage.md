@@ -13,7 +13,7 @@ Run `run-2026-10-04-fable51-01`; 24 packets (W00–W23). Coverage is computed me
 | unclassified | 1 | 1 | 1 |
 | **All** | 126 | 123 | 106 |
 
-Not covered by any packet: CQ-AX-10, CQ-AX-26, CQ-AX-27. All three are operator-audit Expansion questions (adjudications needing re-review after a newer snapshot; agent-run and reviewer provenance). They are answerable from kernel elements already present (SourceRevisionEvent + Adjudication.reviewedAt + SUPERSEDES; Activity/Agent) and get their queries in the final validation suite (Q-AX-10, Q-AX-26, Q-AX-27) at Wave 6 rather than a new element. The handoff counted 127 questions; the parser found 126 ids in the tables (CQ-ID-06 carries no priority cell in its table and is listed as unclassified).
+Not covered by any packet: CQ-AX-10, CQ-AX-26, CQ-AX-27. All three are operator-audit Expansion questions (adjudications needing re-review after a newer snapshot; agent-run and reviewer provenance). They are answerable from kernel elements already present (SourceRevisionEvent + Adjudication.reviewedAt + SUPERSEDES; Activity/Agent) and get their queries in `validation/kernel-cq-queries.cypher` (written at Wave 5, EXPLAIN-checked against the final operations in the Wave 6 run) rather than a new element; with them every one of the 126 questions has an owner and an executable query or fixture: 126/126. The handoff counted 127 questions; the parser found 126 ids in the tables (CQ-ID-06 carries no priority cell in its table and is listed as unclassified).
 
 ## 2. Candidate competency questions proposed by the packets
 

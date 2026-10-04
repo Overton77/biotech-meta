@@ -1216,5 +1216,11 @@
    "withFixtureOrQuery": 1,
    "total": 1
   }
- }
+ },
+ "kernelQueries": {
+  "CQ-AX-10": "validation/kernel-cq-queries.cypher (stale adjudication queue)",
+  "CQ-AX-26": "validation/kernel-cq-queries.cypher (what a named speaker said, in context; pointer to CQ-CL-01/02)",
+  "CQ-AX-27": "validation/kernel-cq-queries.cypher (same person via ORCID Identifier and ResolutionHypothesis)"
+ },
+ "answerableTotal": 126
 }
