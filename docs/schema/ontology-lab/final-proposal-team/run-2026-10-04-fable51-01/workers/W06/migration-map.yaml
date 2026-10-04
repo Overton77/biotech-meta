@@ -38,10 +38,10 @@
 - {live: TreatmentComponentMetadata.notes, final: null, action: retire, note: "to migration Assertion description"}
 - {live: TreatmentComponentMetadata.mongoResearchRunId, final: TreatmentComponentProperties.mongoResearchRunId, action: keep, note: ""}
 - {live: TreatmentComponentMetadata, final: TreatmentComponentProperties, action: rename, note: "successor embeds AssertedEdgeProperties"}
-- {live: "union TreatmentComponent", final: "union TreatmentComponentTarget", action: rename, note: "Compound -> ChemicalSubstance; CompoundForm -> ChemicalForm or IngredientMaterial per W02 split (D-002); Product, Device, Procedure, Protocol kept; Lifestyle, FoodProduct pending W05 (W06-SR-07)"}
+- {live: "union TreatmentComponent", final: "union TreatmentComponentTarget", action: rename, note: "Compound -> ChemicalSubstance; CompoundForm -> ChemicalForm or IngredientMaterial per W02 split (D-002); Product, Device, Procedure, Protocol, Lifestyle kept; FoodProduct members re-point to the W04 Product that W05 creates for the retired FoodProduct (W06-SR-07)"}
 - {live: "Treatment.developedBy / DEVELOPS_TREATMENT (RoleMetadata)", final: "DEVELOPS_TREATMENT (AssertedEdgeProperties)", action: keep, note: "asserted; RoleMetadata role/title/corporate fields dropped (not meaningful for org->concept); validFrom/validTo/recordedFrom/recordedTo carried; confidence retired"}
 - {live: "Treatment.offeredBy / OFFERS_TREATMENT (RoleMetadata)", final: "OFFERS_TREATMENT (AssertedEdgeProperties)", action: keep, note: "as DEVELOPS_TREATMENT"}
-- {live: "Treatment.evaluatedInStudies / EVALUATES (InterventionArmMetadata)", final: "StudyIntervention -[:INSTANTIATES_TREATMENT]-> Treatment (+ legacy Study.evaluates read-only, W09)", action: retire, note: "inverse field removed from Treatment; legacy EVALUATES edges stay readable from Study.evaluates (D-003, CL-017); W09 migration creates StudyIntervention + INSTANTIATES_TREATMENT where arm facts are recoverable"}
+- {live: "Treatment.evaluatedInStudies / EVALUATES (InterventionArmMetadata)", final: "StudyIntervention -[:FOLLOWS_INTERVENTION_DEFINITION]-> Treatment (W09 candidate; + legacy Study.evaluates read-only)", action: retire, note: "inverse field removed from Treatment; legacy EVALUATES edges stay readable from Study.evaluates (D-003, CL-017); W09 migration creates StudyIntervention + FOLLOWS_INTERVENTION_DEFINITION where arm facts are recoverable"}
 - {live: "Treatment.hasSafetySignals / HAS_SAFETY_SIGNAL (SafetyMetadata)", final: "HAS_SAFETY_SIGNAL (SafetyEdgeProperties, W17)", action: keep, note: "W17 owns the relationship type and property mapping"}
 - {live: "Treatment.supportedByDocuments / SUPPORTED_BY_DOCUMENT (ExtractionMetadata)", final: "SUPPORTED_BY_DOCUMENT (DerivedSupportProperties, W20)", action: derive, note: "read-only derived shortcut naming a locator"}
 - {live: "Treatment.supportedByChunks / SUPPORTED_BY_CHUNK (ExtractionMetadata)", final: "SUPPORTED_BY_CHUNK (DerivedSupportProperties, W20)", action: derive, note: ""}
@@ -62,7 +62,7 @@
 - {live: "Procedure.supportedByDocuments / supportedByChunks", final: "derived W20 shortcuts", action: derive, note: ""}
 - {live: "@fulltext ProcedureSearch", final: "@fulltext ProcedureSearch", action: keep, note: ""}
 - {live: null, final: "Procedure.identifiers / Treatment.identifiers (HAS_IDENTIFIER, W00)", action: keep, note: "additive; codes never establish identity"}
-- {live: null, final: "INSTANTIATES_TREATMENT, INSTANTIATES_PROCEDURE", action: keep, note: "additive; requested (W06-SR-01, W06-SR-03)"}
+- {live: null, final: "Treatment/Procedure.instantiatedByStudyInterventions (inverse of W09 FOLLOWS_INTERVENTION_DEFINITION)", action: keep, note: "additive; W09 owns the relationship type (W06-SR-03)"}
 - {live: enum TreatmentModality, final: enum TreatmentModality, action: keep, note: "12 values unchanged; COMBINATION meaning narrowed"}
 - {live: null, final: "enums TreatmentComponentRole, TreatmentIntentKind, TreatmentIntentBasis", action: keep, note: "additive successors of free-text role/indicationType"}
 - {live: "Organization.offersProcedures / developsTreatments / offersTreatments", final: "W01 Organization fields over W06 relationship types", action: keep, note: "seam W06-SR-06; property type AssertedEdgeProperties"}

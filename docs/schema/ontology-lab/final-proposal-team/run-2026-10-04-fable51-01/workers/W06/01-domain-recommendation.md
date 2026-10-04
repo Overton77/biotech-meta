@@ -31,7 +31,7 @@ The model keeps three pairs apart:
 4. **Intent.** `TARGETS_CONDITION`, with `intentKind` and `intentBasis`.
 5. **Composition.** `USES_COMPONENT`, with a required `componentRole`. Examples: the CASGEVY label's "obtained via apheresis procedure(s)" gives a STARTING_MATERIAL_COLLECTION component. The tie from proper name to tradename gives an ADMINISTERED_PRODUCT component.
 6. **Roles.** `DEVELOPS_TREATMENT`, `OFFERS_TREATMENT` and `OFFERS_PROCEDURE` are asserted roles. Developing is not sponsoring, manufacturing or holding a designation. Offering is not performing, listing, hosting, recommending or being approved.
-7. **Concept links from administered interventions.** `INSTANTIATES_TREATMENT` and `INSTANTIATES_PROCEDURE` are requested here, with the outbound field on W09's `StudyIntervention`.
+7. **Concept links from administered interventions.** These use W09's candidate relationship `FOLLOWS_INTERVENTION_DEFINITION` (StudyIntervention → `InterventionDefinitionTarget` = Procedure \| Treatment \| ProtocolEdition \| Lifestyle). W06 adopted it in place of its own earlier proposal of two separate relationship types, so that one meaning keeps one relationship type, and declares only the inverse views.
 8. **Display projections.** `developmentStage`, `orphanDrugDesignation`, `regimenSummary`, `targetedPopulation`, `routeCategory`, `treatmentClass` and the Procedure summaries. All are presentation fields and none answers a regulatory or dose question.
 
 ## 3. Disposition of every live and catalog element in scope
@@ -55,10 +55,10 @@ The model keeps three pairs apart:
 | `targetedPopulation` | keep (display) | It is not a `StudyPopulation` and not an indication. |
 | `targetsConditions` / `TARGETS_CONDITION` / `TreatmentTargetMetadata` | **keep, refine** | Becomes an asserted edge with the successor property type `TreatmentTargetProperties`: AssertedEdgeProperties plus `intentKind`, `intentBasis`, `indicationTextVerbatim`, `patientSubsetText` and `legacyEvidenceStrengthHint`. `evidenceStrength` becomes a hint and its assessment goes to W10 (INV-209). `confidence` and `notes` are dropped (INV-407). |
 | `usesComponents` / `USES_COMPONENT` / `TreatmentComponentMetadata` | **keep, refine** | Asserted edge with `TreatmentComponentProperties`: AssertedEdgeProperties plus the required `componentRole` and verbatim role, dose, route, frequency and duration text plus `orderIndex`. |
-| union `TreatmentComponent` | **rename and remap** | Becomes `TreatmentComponentTarget` = ChemicalSubstance \| ChemicalForm \| IngredientMaterial \| Product \| Device \| Procedure \| Protocol \| Lifestyle \| FoodProduct, following D-002 for Compound and CompoundForm. W05 names are pending (W06-SR-07). |
+| union `TreatmentComponent` | **rename and remap** | Becomes `TreatmentComponentTarget` = ChemicalSubstance \| ChemicalForm \| IngredientMaterial \| Product \| Device \| Procedure \| Protocol \| Lifestyle, following D-002 for Compound and CompoundForm. Live FoodProduct is dropped because W05 retires it into W04 Product (W06-SR-07). |
 | `developedBy` / `DEVELOPS_TREATMENT` (RoleMetadata) | **keep, refine** | Asserted with `AssertedEdgeProperties`. The Organization field is W01's (W06-SR-06). |
 | `offeredBy` / `OFFERS_TREATMENT` (RoleMetadata) | **keep, refine** | Same as above. |
-| `evaluatedInStudies` / `EVALUATES` (InterventionArmMetadata) | **retire from Treatment** | The legacy `Study.evaluates` stays read-only on W09's side (D-003, CL-017). The concept link is `StudyIntervention -[:INSTANTIATES_TREATMENT]-> Treatment`. |
+| `evaluatedInStudies` / `EVALUATES` (InterventionArmMetadata) | **retire from Treatment** | The legacy `Study.evaluates` stays read-only on W09's side (D-003, CL-017). The concept link is `StudyIntervention -[:FOLLOWS_INTERVENTION_DEFINITION]-> Treatment` (W09). |
 | `hasSafetySignals` / `HAS_SAFETY_SIGNAL` (SafetyMetadata) | keep (seam W17) | `SafetyEdgeProperties` from W17 (W06-SR-09). |
 | `supportedByDocuments`, `supportedByChunks` | keep, now derived read-only | Use W20's `DerivedSupportProperties`. |
 | `@fulltext TreatmentSearch` | keep (D-015) | Same fields. An `orphanDrugDesignation` hit is a lookup candidate, never an answer. |
@@ -72,7 +72,7 @@ The model keeps three pairs apart:
 | `listedIn` / `LISTS_PROCEDURE` (TemporalMetadata) | seam to W15 | `ListingEdgeProperties`. A listing is not identity and not an offer. |
 | `offeredBy` / `OFFERS_PROCEDURE` (RoleMetadata) | **keep, refine** | Asserted with `AssertedEdgeProperties`. |
 | `hasSafetySignals`, `supportedBy*` | as on Treatment | — |
-| (new) `identifiers`, `componentOfTreatments`, `instantiatedByStudyInterventions` | add | `HAS_IDENTIFIER` (W00), the inverse view of `USES_COMPONENT`, and the requested `INSTANTIATES_PROCEDURE`. |
+| (new) `identifiers`, `componentOfTreatments`, `instantiatedByStudyInterventions` | add | `HAS_IDENTIFIER` (W00), the inverse view of `USES_COMPONENT`, and the inverse view of W09's `FOLLOWS_INTERVENTION_DEFINITION`. |
 | `@fulltext ProcedureSearch` | keep | — |
 
 ### Enum and unions
@@ -106,7 +106,7 @@ The model keeps three pairs apart:
 
 - **Two Entity types**: `Treatment` and `Procedure`. Their live fields are kept, with display fields made explicit and read-only where they are projections. No new node type.
 - **One live enum kept** (`TreatmentModality`, now used as a list) and **three small enums added** (component role, intent kind, intent basis).
-- **Seven relationship types.** Five are kept from live: `TARGETS_CONDITION`, `USES_COMPONENT`, `DEVELOPS_TREATMENT`, `OFFERS_TREATMENT`, `OFFERS_PROCEDURE`. Two are added: `INSTANTIATES_TREATMENT` and `INSTANTIATES_PROCEDURE`. All are asserted edges under the frozen `asserted_edge` profile.
+- **Five relationship types**, all kept from live: `TARGETS_CONDITION`, `USES_COMPONENT`, `DEVELOPS_TREATMENT`, `OFFERS_TREATMENT`, `OFFERS_PROCEDURE`. The study-side concept link reuses W09's `FOLLOWS_INTERVENTION_DEFINITION`. All five are asserted edges under the frozen `asserted_edge` profile.
 - **Two relationship-property types** (`TreatmentComponentProperties`, `TreatmentTargetProperties`). Each embeds every frozen `AssertedEdgeProperties` field.
 - **Ten validators** (V-W06-01 to V-W06-08b, including the informational V-W06-02 and V-W06-07i) plus QS-4a instantiated with the W06 forbidden-implication pairs.
 - **Candidate CQ area `CQ-IV`** (interventions), with five candidates.

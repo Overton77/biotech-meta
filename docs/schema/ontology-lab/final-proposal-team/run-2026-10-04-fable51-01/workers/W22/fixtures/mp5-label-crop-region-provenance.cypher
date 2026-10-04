@@ -58,8 +58,12 @@ MERGE (v:MediaVariant:InformationArtifact {uid: 'hu:media-variant:elysium-basis-
 SET v.privacyClass = 'PUBLIC', v.artifactType = 'MEDIA_VARIANT', v.variantKind = 'RESIZED', v.mediaFormat = 'JPEG', v.mimeType = 'image/jpeg', v.widthPx = 416,
     v.contentHash = 'sha256:425835749ee3773e041d1900338a4cd0260ff70d4542fcb7949c71a872787a97', v.contentHashBasis = 'SYNTHETIC_FIXTURE';
 
-MATCH (m:MediaAsset {uid: 'hu:media-asset:elysium-basis-carousel-supplement-facts'}), (v1:MediaVariant {uid: 'hu:media-variant:elysium-basis-supplement-facts-w1946'}), (v2:MediaVariant {uid: 'hu:media-variant:elysium-basis-supplement-facts-w416'})
-MERGE (m)-[:HAS_MEDIA_VARIANT]->(v1) MERGE (m)-[:HAS_MEDIA_VARIANT]->(v2);
+MERGE (n:Activity:Occurrence {uid: 'hu:activity:w22-capture-2026-10-04'})
+SET n.privacyClass = 'PUBLIC', n.occurrenceType = 'ACTIVITY', n.activityKind = 'CAPTURE', n.startedAt = datetime('2026-10-04T00:48:00Z'), n.endedAt = datetime('2026-10-04T01:10:00Z'), n.methodVersion = 'w22-firecrawl-scrape-2026-10-04';
+
+MATCH (m:MediaAsset {uid: 'hu:media-asset:elysium-basis-carousel-supplement-facts'}), (v1:MediaVariant {uid: 'hu:media-variant:elysium-basis-supplement-facts-w1946'}), (v2:MediaVariant {uid: 'hu:media-variant:elysium-basis-supplement-facts-w416'}),
+      (cap:Activity {uid: 'hu:activity:w22-capture-2026-10-04'})
+MERGE (m)-[:HAS_MEDIA_VARIANT]->(v1) MERGE (m)-[:HAS_MEDIA_VARIANT]->(v2) MERGE (v1)-[:WAS_GENERATED_BY]->(cap) MERGE (v2)-[:WAS_GENERATED_BY]->(cap);
 
 // ---- Region annotation on the ORIGINAL rendition (coordinates in IMG-PX1 on the 1946 px raster; synthetic values).
 MERGE (ann:MediaAnnotation:InformationArtifact {uid: 'hu:media-annotation:basis-supplement-facts-panel-w1946'})
@@ -165,9 +169,7 @@ SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'w22-capture-fidelity-r
     j.verdict = 'SUPPORTED', j.reviewerType = 'HUMAN', j.reviewedAt = a.recordedAt + duration('PT1M'), j.recordedAt = a.recordedAt + duration('PT1M'), j.privacyClass = 'PUBLIC'
 MERGE (j)-[:EVALUATES]->(a) MERGE (j)-[:ASSESSED_BY]->(g);
 
-// =====================================================================================================================
-// Queries
-// =====================================================================================================================
+// ==== Queries (expected rows in 06-fixtures-and-queries.md) ====
 
 // Q-MP5-1 (CQ-MD-C04, CQ-PV-02, CQ-PV-03): full provenance of the crop - the activity, the original rendition, the
 // region, the locator, the snapshot and the source, with byte equality between the original rendition and the snapshot.

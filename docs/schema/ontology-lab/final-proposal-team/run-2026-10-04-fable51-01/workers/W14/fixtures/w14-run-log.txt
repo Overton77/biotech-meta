@@ -90,3 +90,4 @@ ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/
   // V-112: derived and forbidden-implication edges cite live, matching assertions rows= 1 {"edgeType": "OWNS_STUDY", "startUid": "hu:org:chromadex-inc", "endUid": "hu:study:nct02712593", "violations": ["FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"]}
   // V-401b (informational): ACCEPTED assertions whose only locators are coarse (S rows= 1 {"acceptedAssertionsWithOnlyCoarseLocators": 13}
   // V-514b (informational): assertions without contentHash (legacy or fixture rec rows= 1 {"assertionsWithoutContentHash": 0}
+## operations.cypher: 29/29 ok on 5.26.31 Community; fixtures reloaded under constraints (core 375, MP 152, negative 34 ok); fulltext PatentClaimText returns claim nodes for 'nicotinamide'; duplicate Trademark.officeKey 'US:85932490' rejected by w14_trademark_office_key

@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1179,
+   "ms": 409,
    "sample": [],
    "header": "// W23 fixture 13: use-authorization negatives and the fail-open filter minimal pair (load 00-shared-base.cypher first).\n// Expected detector rows: 06-fixtures-and-queries.md (V-429, V-W23-07, V-W23-08, V-522; Q-FO-1..3).\n// N1: quoting under a RANKING policy (V-429 passes: some PolicyVersion with s"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 162,
+   "ms": 105,
    "sample": [],
    "header": "// N4: an answer composition that used an assertion with no authorization at all (V-429)."
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 92,
+   "ms": 43,
    "sample": [],
    "header": "// N5: a second version of the same use policy whose stated effect overlaps v1 (open end)."
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 96,
+   "ms": 64,
    "sample": [],
    "header": "// N6 (fail-open minimal pair): an unclassified draft policy and an unclassified lineage record (privacyClass never set by an old\n// pipeline), reachable from the PUBLIC assertion A2 through USED and AUTHORIZED_BY."
   }

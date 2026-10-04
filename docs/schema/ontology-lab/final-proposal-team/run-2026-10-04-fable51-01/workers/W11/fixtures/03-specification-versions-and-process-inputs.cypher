@@ -28,9 +28,9 @@ UNWIND [
   {s: 'hu:source:niagen-investors-usp-monograph-2026', uri: 'https://investors.niagenbioscience.com/news/news-details/2026/Niagen-Bioscience-Collaborates-with-USP-to-Establish-First-Ever-USP-Monograph-for-Nicotinamide-Riboside-Chloride-NRCl-the-Patented-Form-in-Niagen/default.aspx', title: 'Niagen Bioscience Collaborates with USP to Establish First-Ever USP Monograph for NRCl (press release, 2026-04-09)', kind: 'PRESS_RELEASE', ch: 'sha256:82a362c5ce4b5475ba802f4d29f35a5e9c21ccce2d1b536f7601c7f31157ff37', pub: datetime('2026-04-09T12:32:00Z')}
 ] AS row
 MERGE (s:Source:Entity {uid: row.s})
-SET s.privacyClass = coalesce(s.privacyClass, 'PUBLIC'), s.canonicalUri = row.uri, s.title = row.title, s.sourceKind = row.kind, s.entityType = 'SOURCE', s.createdAt = datetime('2026-10-04T01:05:00Z')
+SET s.privacyClass = coalesce(s.privacyClass, 'PUBLIC'), s.id = coalesce(s.id, split(s.uid, ':')[2]), s.canonicalUri = row.uri, s.title = row.title, s.sourceKind = row.kind, s.entityType = 'SOURCE', s.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (sn:SourceSnapshot:InformationArtifact {uid: replace(row.s, 'hu:source:', 'hu:snapshot:') + '-2026-10-04'})
-SET sn.privacyClass = coalesce(sn.privacyClass, 'PUBLIC'), sn.artifactType = 'SOURCE_SNAPSHOT', sn.canonicalUri = row.uri, sn.publishedAt = row.pub, sn.retrievedAt = datetime('2026-10-04T00:58:00Z'),
+SET sn.privacyClass = coalesce(sn.privacyClass, 'PUBLIC'), sn.id = coalesce(sn.id, split(sn.uid, ':')[2]), sn.artifactType = 'SOURCE_SNAPSHOT', sn.canonicalUri = row.uri, sn.publishedAt = row.pub, sn.retrievedAt = datetime('2026-10-04T00:58:00Z'),
     sn.observedAt = datetime('2026-10-04T00:58:00Z'), sn.contentHash = row.ch, sn.contentHashBasis = 'SYNTHETIC_FIXTURE',
     sn.captureCompleteness = 'PARTIAL_EXCERPT', sn.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (s)-[:HAS_SNAPSHOT]->(sn);
@@ -64,7 +64,7 @@ UNWIND [
 ] AS row
 MATCH (sn:SourceSnapshot {uid: row.sn})
 MERGE (l:SourceLocator:InformationArtifact {uid: row.l})
-SET l.privacyClass = coalesce(l.privacyClass, 'PUBLIC'), l.artifactType = 'SOURCE_LOCATOR', l.selectorKind = 'TEXT_QUOTE', l.exact = row.exact, l.quoteHash = row.qh,
+SET l.privacyClass = coalesce(l.privacyClass, 'PUBLIC'), l.id = coalesce(l.id, split(l.uid, ':')[2]), l.artifactType = 'SOURCE_LOCATOR', l.selectorKind = 'TEXT_QUOTE', l.exact = row.exact, l.quoteHash = row.qh,
     l.normalizationVersion = 'NFC-WS1', l.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (sn)-[:HAS_LOCATOR]->(l);
 
@@ -78,20 +78,20 @@ UNWIND [
   ['hu:org:united-states-pharmacopeia', 'United States Pharmacopeial Convention (USP)']
 ] AS p
 MERGE (o:Organization:Entity {uid: p[0]})
-ON CREATE SET o.privacyClass = coalesce(o.privacyClass, 'PUBLIC'), o.name = p[1], o.createdAt = datetime('2026-10-04T01:05:00Z')
+ON CREATE SET o.privacyClass = coalesce(o.privacyClass, 'PUBLIC'), o.id = coalesce(o.id, split(o.uid, ':')[2]), o.name = p[1], o.createdAt = datetime('2026-10-04T01:05:00Z')
 SET o.entityType = 'ORGANIZATION';
 
 // Same material uid as the round-0005 fixture; W02 owns the BrandedIngredientMaterial specialization label.
 // status: run
 MERGE (m:IngredientMaterial:Entity {uid: 'hu:material:niagen-nrc'})
-ON CREATE SET m.privacyClass = coalesce(m.privacyClass, 'PUBLIC'), m.name = 'Niagen nicotinamide riboside chloride (food and supplement grade)', m.createdAt = datetime('2026-10-04T01:05:00Z')
+ON CREATE SET m.privacyClass = coalesce(m.privacyClass, 'PUBLIC'), m.id = coalesce(m.id, split(m.uid, ':')[2]), m.name = 'Niagen nicotinamide riboside chloride (food and supplement grade)', m.createdAt = datetime('2026-10-04T01:05:00Z')
 SET m:BrandedIngredientMaterial, m.entityType = 'INGREDIENT_MATERIAL', m.materialKind = coalesce(m.materialKind, 'CHEMICALLY_DEFINED_MATERIAL');
 
 // Nicotinamide: a dietary-ingredient material identity; the SAME uid is a process input below and a component material
 // in a (synthetic) formulation, never a second 'Material' node.
 // status: run
 MERGE (m:IngredientMaterial:Entity {uid: 'hu:material:nicotinamide-usp-grade'})
-SET m.privacyClass = coalesce(m.privacyClass, 'PUBLIC'), m.name = 'Nicotinamide (niacinamide)', m.entityType = 'INGREDIENT_MATERIAL', m.materialKind = 'CHEMICALLY_DEFINED_MATERIAL',
+SET m.privacyClass = coalesce(m.privacyClass, 'PUBLIC'), m.id = coalesce(m.id, split(m.uid, ':')[2]), m.name = 'Nicotinamide (niacinamide)', m.entityType = 'INGREDIENT_MATERIAL', m.materialKind = 'CHEMICALLY_DEFINED_MATERIAL',
     m.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // Non-ingredient chemical inputs and the isolated intermediate: substance identities (W02 ChemicalSubstance).
@@ -107,11 +107,11 @@ UNWIND [
   ['hu:substance:acetone', 'Acetone']
 ] AS p
 MERGE (x:ChemicalSubstance:Entity {uid: p[0]})
-SET x.privacyClass = coalesce(x.privacyClass, 'PUBLIC'), x.preferredName = p[1], x.name = p[1], x.entityType = 'CHEMICAL_SUBSTANCE', x.createdAt = datetime('2026-10-04T01:05:00Z');
+SET x.privacyClass = coalesce(x.privacyClass, 'PUBLIC'), x.id = coalesce(x.id, split(x.uid, ':')[2]), x.preferredName = p[1], x.name = p[1], x.entityType = 'CHEMICAL_SUBSTANCE', x.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // status: run
 MERGE (p:ManufacturingProcess:Entity {uid: 'hu:process:nrc-two-step-synthesis-as-described-grn-000635'})
-SET p.privacyClass = coalesce(p.privacyClass, 'PUBLIC'), p.name = 'Nicotinamide riboside chloride two-step synthesis (as described in GRN 000635, 2015)', p.entityType = 'MANUFACTURING_PROCESS',
+SET p.privacyClass = coalesce(p.privacyClass, 'PUBLIC'), p.id = coalesce(p.id, split(p.uid, ':')[2]), p.name = 'Nicotinamide riboside chloride two-step synthesis (as described in GRN 000635, 2015)', p.entityType = 'MANUFACTURING_PROCESS',
     p.processKind = 'CHEMICAL_SYNTHESIS', p.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // status: run
@@ -121,7 +121,7 @@ UNWIND [
 ] AS row
 MATCH (p:ManufacturingProcess {uid: 'hu:process:nrc-two-step-synthesis-as-described-grn-000635'})
 MERGE (st:ManufacturingStep:Entity {uid: row.s})
-SET st.privacyClass = coalesce(st.privacyClass, 'PUBLIC'), st.name = row.n, st.stepKind = row.k, st.entityType = 'MANUFACTURING_STEP', st.createdAt = datetime('2026-10-04T01:05:00Z')
+SET st.privacyClass = coalesce(st.privacyClass, 'PUBLIC'), st.id = coalesce(st.id, split(st.uid, ':')[2]), st.name = row.n, st.stepKind = row.k, st.entityType = 'MANUFACTURING_STEP', st.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (p)-[h:HAS_STEP]->(st)
 SET h.orderIndex = row.o;
 
@@ -131,7 +131,7 @@ UNWIND [
   {u: 'hu:specification:usp-nicotinamide-riboside-chloride-monograph', n: 'USP Nicotinamide Riboside Chloride dietary supplement monograph', k: 'COMPENDIAL_MONOGRAPH'}
 ] AS row
 MERGE (s:ManufacturingSpecification:Entity {uid: row.u})
-SET s.privacyClass = coalesce(s.privacyClass, 'PUBLIC'), s.name = row.n, s.specificationKind = row.k, s.entityType = 'MANUFACTURING_SPECIFICATION', s.createdAt = datetime('2026-10-04T01:05:00Z');
+SET s.privacyClass = coalesce(s.privacyClass, 'PUBLIC'), s.id = coalesce(s.id, split(s.uid, ':')[2]), s.name = row.n, s.specificationKind = row.k, s.entityType = 'MANUFACTURING_SPECIFICATION', s.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // ---------------------------------------------------------------------------------------------------------------
 // Section 3: specification versions (payloadHash over canonical JSON incl. criteriaDigest) and W12 criteria
@@ -156,7 +156,7 @@ UNWIND [
 ] AS row
 MATCH (s:ManufacturingSpecification {uid: row.s})
 MERGE (v:SpecificationVersion:VersionedState {uid: row.v})
-SET v.privacyClass = coalesce(v.privacyClass, 'PUBLIC'), v.name = row.n, v.stateType = 'SPECIFICATION_VERSION', v.payloadHash = row.ph, v.criteriaCaptureCompleteness = row.cc,
+SET v.privacyClass = coalesce(v.privacyClass, 'PUBLIC'), v.id = coalesce(v.id, split(v.uid, ':')[2]), v.name = row.n, v.stateType = 'SPECIFICATION_VERSION', v.payloadHash = row.ph, v.criteriaCaptureCompleteness = row.cc,
     v.criteriaCount = row.cnt, v.criteriaDigest = row.dg, v.effectiveFrom = row.ef, v.effectiveFromPrecision = row.efp,
     v.createdAt = datetime('2026-10-04T01:10:00Z')
 MERGE (v)-[:VERSION_OF_SPECIFICATION]->(s);
@@ -175,7 +175,7 @@ UNWIND [
 ] AS row
 MATCH (v:SpecificationVersion {uid: row.v})
 MERGE (c:SpecificationCriterion:VersionedState {uid: row.c})
-SET c.privacyClass = coalesce(c.privacyClass, 'PUBLIC'), c.stateType = 'SPECIFICATION_CRITERION', c.analyte = row.a, c.comparator = row.cmp, c.threshold = row.t,
+SET c.privacyClass = coalesce(c.privacyClass, 'PUBLIC'), c.id = coalesce(c.id, split(c.uid, ':')[2]), c.stateType = 'SPECIFICATION_CRITERION', c.analyte = row.a, c.comparator = row.cmp, c.threshold = row.t,
     c.thresholdUpper = row.tu, c.unitCode = row.u, c.methodText = row.m, c.limitStage = row.ls, c.payloadHash = row.ph,
     c.createdAt = datetime('2026-10-04T01:10:00Z')
 MERGE (c)-[:CRITERION_OF_SPECIFICATION]->(v);
@@ -195,7 +195,7 @@ UNWIND [
 MATCH (m:IngredientMaterial {uid: 'hu:material:niagen-nrc'}), (v:SpecificationVersion {uid: row.v}),
       (o:Organization {uid: 'hu:org:niagen-bioscience-inc'}), (l:SourceLocator {uid: row.l})
 MERGE (a:Assertion {uid: row.a})
-SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'GOVERNED_BY_SPECIFICATION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.id = coalesce(a.id, split(a.uid, ':')[2]), a.predicate = 'GOVERNED_BY_SPECIFICATION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.validFromBasis = 'OBSERVATION_ONLY', a.validToBasis = 'UNKNOWN', a.polarity = 'POSITIVE', a.speechAct = 'STATES',
     a.assertionBasis = 'MANUFACTURER_CLAIM', a.predicateClass = 'OTHER', a.contentHash = row.ch, a.createdAt = datetime('2026-10-04T01:10:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(m)
@@ -210,7 +210,7 @@ SET g.assertionUid = a.uid, g.validFromBasis = 'OBSERVATION_ONLY', g.validToBasi
 MATCH (o:Organization {uid: 'hu:org:niagen-bioscience-inc'}), (s:ManufacturingSpecification {uid: 'hu:specification:niagen-ingredient-specification'}),
       (l:SourceLocator {uid: 'hu:locator:efsa-2019-table-2'})
 MERGE (a:Assertion {uid: 'hu:assertion:niagen-owns-niagen-ingredient-specification'})
-SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'OWNS_SPECIFICATION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.id = coalesce(a.id, split(a.uid, ':')[2]), a.predicate = 'OWNS_SPECIFICATION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.validFromBasis = 'OBSERVATION_ONLY', a.validToBasis = 'UNKNOWN', a.polarity = 'POSITIVE', a.predicateClass = 'COMMERCIAL',
     a.contentHash = 'sha256:dfc69a98a4b1d57d42692ea8667bb6559ccc51cf8a52aaead55a8fd0f3facbcf', a.createdAt = datetime('2026-10-04T01:10:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(o)
@@ -223,7 +223,7 @@ MERGE (a)-[:SUPPORTED_BY]->(l);
 MATCH (m:IngredientMaterial {uid: 'hu:material:niagen-nrc'}), (p:ManufacturingProcess {uid: 'hu:process:nrc-two-step-synthesis-as-described-grn-000635'}),
       (o:Organization {uid: 'hu:org:niagen-bioscience-inc'}), (l:SourceLocator {uid: 'hu:locator:grn-635-step-1'})
 MERGE (a:Assertion {uid: 'hu:assertion:niagen-nrc-produced-by-grn-635-synthesis'})
-SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'PRODUCED_BY_PROCESS', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.id = coalesce(a.id, split(a.uid, ':')[2]), a.predicate = 'PRODUCED_BY_PROCESS', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.validFromBasis = 'OBSERVATION_ONLY', a.validToBasis = 'UNKNOWN', a.polarity = 'POSITIVE', a.speechAct = 'STATES',
     a.assertionBasis = 'MANUFACTURER_CLAIM', a.predicateClass = 'OTHER',
     a.contentHash = 'sha256:cf1567003a8ee09eb8023e9b1d0e9354ddb0f1ec2f89b6d4269c05d17de5b6c6', a.createdAt = datetime('2026-10-04T01:10:00Z')
@@ -251,7 +251,7 @@ MATCH (st:ManufacturingStep {uid: row.st}), (x {uid: row.x}), (o:Organization {u
 WHERE x:IngredientMaterial OR x:ChemicalSubstance
 WITH row, st, x, o, l, 'hu:assertion:' + toLower(row.t) + '-' + split(row.st, ':')[2] + '-' + split(row.x, ':')[2] AS auid
 MERGE (a:Assertion {uid: auid})
-SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = row.t, a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.id = coalesce(a.id, split(a.uid, ':')[2]), a.predicate = row.t, a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.validFromBasis = 'OBSERVATION_ONLY', a.validToBasis = 'UNKNOWN', a.polarity = 'POSITIVE', a.speechAct = 'STATES',
     a.assertionBasis = 'MANUFACTURER_CLAIM', a.predicateClass = 'OTHER', a.contentHash = 'synthetic:' + auid,
     a.createdAt = datetime('2026-10-04T01:10:00Z')
@@ -276,16 +276,16 @@ CALL (row, st, x, a) {
 // INPUTS (process input) and by USES_MATERIAL (ingredient use); no live 'Material' node exists.
 // status: run
 MERGE (fv:FormulationVersion:VersionedState {uid: 'hu:formulation:synthetic-b-vitamin-blend-v1'})
-SET fv.privacyClass = coalesce(fv.privacyClass, 'PUBLIC'), fv.stateType = 'FORMULATION_VERSION', fv.payloadHash = 'sha256:77eae088cfb632719896d14eab3d29dc03a8700ef32e3aeacb0d30866e101b3b', fv.createdAt = datetime('2026-10-04T01:10:00Z')
+SET fv.privacyClass = coalesce(fv.privacyClass, 'PUBLIC'), fv.id = coalesce(fv.id, split(fv.uid, ':')[2]), fv.stateType = 'FORMULATION_VERSION', fv.payloadHash = 'sha256:77eae088cfb632719896d14eab3d29dc03a8700ef32e3aeacb0d30866e101b3b', fv.createdAt = datetime('2026-10-04T01:10:00Z')
 MERGE (ic:IngredientComponent:VersionedState {uid: 'hu:component:synthetic-b-vitamin-blend-v1-niacinamide'})
-SET ic.privacyClass = coalesce(ic.privacyClass, 'PUBLIC'), ic.stateType = 'INGREDIENT_COMPONENT', ic.payloadHash = 'sha256:74e6d1a66d4bc15aefc49c8aaadceba22fef0e38891e211d7b3ca133711b2087', ic.declaredAs = 'Niacinamide',
+SET ic.privacyClass = coalesce(ic.privacyClass, 'PUBLIC'), ic.id = coalesce(ic.id, split(ic.uid, ':')[2]), ic.stateType = 'INGREDIENT_COMPONENT', ic.payloadHash = 'sha256:74e6d1a66d4bc15aefc49c8aaadceba22fef0e38891e211d7b3ca133711b2087', ic.declaredAs = 'Niacinamide',
     ic.createdAt = datetime('2026-10-04T01:10:00Z')
 MERGE (fv)-[:HAS_INGREDIENT_COMPONENT]->(ic);
 
 // status: run
 MATCH (ic:IngredientComponent {uid: 'hu:component:synthetic-b-vitamin-blend-v1-niacinamide'}), (m:IngredientMaterial {uid: 'hu:material:nicotinamide-usp-grade'})
 MERGE (a:Assertion {uid: 'hu:assertion:synthetic-niacinamide-component-uses-material'})
-SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'USES_MATERIAL', a.status = 'PROPOSED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.id = coalesce(a.id, split(a.uid, ':')[2]), a.predicate = 'USES_MATERIAL', a.status = 'PROPOSED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.contentHash = 'sha256:6de97dddd17f317b36031141ce2495cbd35fb35b389f818d8f97d9408d69bc5a',
     a.createdAt = datetime('2026-10-04T01:10:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(ic)
@@ -300,7 +300,7 @@ SET r.assertionUid = a.uid, r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKN
 MATCH (v:SpecificationVersion {uid: 'hu:specification-version:usp-nrcl-monograph-official-2026-10'}), (o:Organization {uid: 'hu:org:niagen-bioscience-inc'}),
       (l:SourceLocator {uid: 'hu:locator:niagen-pr-usp-monograph-enforced-oct-2026'})
 MERGE (a:Assertion {uid: 'hu:assertion:niagen-pr-usp-monograph-official-oct-2026'})
-SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'SPECIFICATION_EFFECTIVE_FROM', a.status = 'PROPOSED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.id = coalesce(a.id, split(a.uid, ':')[2]), a.predicate = 'SPECIFICATION_EFFECTIVE_FROM', a.status = 'PROPOSED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.valueString = 'expected to be codified and enforced in October 2026', a.statedTense = 'FUTURE',
     a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.contentHash = 'sha256:a4c14c16571418194564065d06b369f8e2f4e92fe40783f5501aef9920778e70',
     a.createdAt = datetime('2026-10-04T01:10:00Z')
@@ -316,7 +316,7 @@ WHERE (a.uid STARTS WITH 'hu:assertion:niagen-nrc-governed' OR a.uid STARTS WITH
   AND a.status IN ['ACCEPTED', 'REJECTED', 'DISPUTED']
   AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
 MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w11-f03-capture-fidelity-policy'})
-ON CREATE SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
+ON CREATE SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.id = coalesce(j.id, split(j.uid, ':')[2]), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
     j.reviewerType = 'POLICY', j.methodVersion = 'w11-fixture-capture-policy-1', j.status = 'ACCEPTED',
     j.reviewedAt = datetime('2026-10-04T01:40:00Z'), j.recordedAt = datetime('2026-10-04T01:40:00Z'),
     j.rationale = 'Fixture capture policy: propositions match the cited spans as read by W11.', j.privacyClass = 'INTERNAL',

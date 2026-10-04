@@ -15,8 +15,8 @@ CREATE CONSTRAINT w06_uses_component_rel_uid IF NOT EXISTS FOR ()-[r:USES_COMPON
 CREATE CONSTRAINT w06_develops_treatment_rel_uid IF NOT EXISTS FOR ()-[r:DEVELOPS_TREATMENT]-() REQUIRE r.relationshipUid IS UNIQUE;
 CREATE CONSTRAINT w06_offers_treatment_rel_uid IF NOT EXISTS FOR ()-[r:OFFERS_TREATMENT]-() REQUIRE r.relationshipUid IS UNIQUE;
 CREATE CONSTRAINT w06_offers_procedure_rel_uid IF NOT EXISTS FOR ()-[r:OFFERS_PROCEDURE]-() REQUIRE r.relationshipUid IS UNIQUE;
-CREATE CONSTRAINT w06_instantiates_treatment_rel_uid IF NOT EXISTS FOR ()-[r:INSTANTIATES_TREATMENT]-() REQUIRE r.relationshipUid IS UNIQUE;
-CREATE CONSTRAINT w06_instantiates_procedure_rel_uid IF NOT EXISTS FOR ()-[r:INSTANTIATES_PROCEDURE]-() REQUIRE r.relationshipUid IS UNIQUE;
+// FOLLOWS_INTERVENTION_DEFINITION is W09's relationship type; W06 recommends the same episode constraint (W09 creates it).
+CREATE CONSTRAINT w09_follows_intervention_definition_rel_uid IF NOT EXISTS FOR ()-[r:FOLLOWS_INTERVENTION_DEFINITION]-() REQUIRE r.relationshipUid IS UNIQUE;
 
 // ---- retrieval indexes ----
 // assertion-to-edge lookups (QS-4a / V-W06-08 join on assertionUid)

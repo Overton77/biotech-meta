@@ -41,7 +41,7 @@ Conventions used on every card:
 | `usesComponents` | `USES_COMPONENT` (W06) | OUT → TreatmentComponentTarget | many | asserted | TreatmentComponentProperties |
 | `developedBy` | `DEVELOPS_TREATMENT` (W06) | IN ← Organization (W01) | many | asserted | AssertedEdgeProperties |
 | `offeredBy` | `OFFERS_TREATMENT` (W06) | IN ← Organization | many | asserted | AssertedEdgeProperties |
-| `instantiatedByStudyInterventions` | `INSTANTIATES_TREATMENT` (W06, requested) | IN ← StudyIntervention (W09) | many | asserted | AssertedEdgeProperties |
+| `instantiatedByStudyInterventions` | `FOLLOWS_INTERVENTION_DEFINITION` (W09, candidate) | IN ← StudyIntervention (W09) | many | asserted | AssertedEdgeProperties |
 | `hasSafetySignals` | `HAS_SAFETY_SIGNAL` (W17) | OUT → SafetySignal | many | asserted | SafetyEdgeProperties |
 | `supportedByDocuments` / `supportedByChunks` | W20 | OUT → Document / Chunk | many | derived (read-only) | DerivedSupportProperties |
 
@@ -69,7 +69,7 @@ Conventions used on every card:
 | `offeredBy` | `OFFERS_PROCEDURE` (W06) | IN ← Organization | many | asserted | AssertedEdgeProperties |
 | `listedIn` | `LISTS_PROCEDURE` (W15) | IN ← MerchantListing | many | asserted | ListingEdgeProperties |
 | `componentOfTreatments` | `USES_COMPONENT` (W06) | IN ← Treatment | many | asserted | TreatmentComponentProperties |
-| `instantiatedByStudyInterventions` | `INSTANTIATES_PROCEDURE` (W06, requested) | IN ← StudyIntervention | many | asserted | AssertedEdgeProperties |
+| `instantiatedByStudyInterventions` | `FOLLOWS_INTERVENTION_DEFINITION` (W09, candidate) | IN ← StudyIntervention | many | asserted | AssertedEdgeProperties |
 | `hasSafetySignals`, `supportedBy*` | as for Treatment | | | | |
 | (no field) protocol step employing it | `EMPLOYS` (W16) | ProtocolStep → Procedure (requested range extension, W06-SR-04) | many | structural (part of the immutable step payload) | W16's step property type |
 
@@ -106,15 +106,16 @@ The basis tells a reader *whose* intent is recorded. REGULATORY_LABEL_RESTATEMEN
 
 ## Union: TreatmentComponentTarget (owner W06)
 
-`ChemicalSubstance | ChemicalForm | IngredientMaterial | Product | Device | Procedure | Protocol | Lifestyle | FoodProduct`
+`ChemicalSubstance | ChemicalForm | IngredientMaterial | Product | Device | Procedure | Protocol | Lifestyle`
 
 | Member source | Note |
 |---|---|
 | live Compound | becomes ChemicalSubstance |
 | live CompoundForm | becomes ChemicalForm or IngredientMaterial (D-002) |
-| Lifestyle, FoodProduct | pending W05 successor names |
+| Lifestyle | kept (W05 defines it) |
+| live FoodProduct | dropped: W05 retires it into W04 Product (CONVENTIONAL_FOOD), already a member |
 
-Treatment is excluded as a member until a nesting CQ exists (SC-W06-03). Every member is an `@node` type in the final schema, subject to W05.
+Treatment is excluded as a member until a nesting CQ exists (SC-W06-03). Every member is an `@node` type defined by a current worker fragment.
 
 ## Relationship-property type: TreatmentComponentProperties (owner W06)
 
@@ -142,12 +143,11 @@ Live `TreatmentTargetMetadata` maps as targetRole → `intentKind`, indicationTy
 | Type | Domain → range | Class / profile | Cardinality | Meaning | Forbidden implications (premise → conclusion) |
 |---|---|---|---|---|---|
 | `TARGETS_CONDITION` | Treatment → Condition | asserted / asserted_edge | many | A source states the concept is intended for the condition. | FI-W06-01 → effective for; FI-W06-02 → approved for; FI-W06-15: an offerer's benefit claim never creates this edge. |
-| `USES_COMPONENT` | Treatment → TreatmentComponentTarget | asserted | many | The concept includes the component in the stated role. | FI-W06-09: with INSTANTIATES_TREATMENT it never yields evidence applicability to the Product. FI-W06-14: a trial co-intervention is not a concept component. |
+| `USES_COMPONENT` | Treatment → TreatmentComponentTarget | asserted | many | The concept includes the component in the stated role. | FI-W06-09: with W09's FOLLOWS_INTERVENTION_DEFINITION it never yields evidence applicability to the Product. FI-W06-14: a trial co-intervention is not a concept component. |
 | `DEVELOPS_TREATMENT` | Organization → Treatment | asserted | many (NONEXCLUSIVE) | The organization develops the concept, according to an explicit assertion. | FI-W06-08 SPONSORS_STUDY, FI-W06-10 MANUFACTURES_PRODUCT and FI-W06-11 designation SUBMITTED_BY never imply it. |
 | `OFFERS_TREATMENT` | Organization → Treatment | asserted | many | The organization states it offers the concept as a service or practice. | FI-W06-05 listing; FI-W06-07 → recommends, approved, effective. |
 | `OFFERS_PROCEDURE` | Organization → Procedure | asserted | many | The organization states it offers the procedure. | FI-W06-05 HOSTS_LISTING or LISTS_PROCEDURE → offers; FI-W06-06 offers → performs; FI-W06-07. |
-| `INSTANTIATES_TREATMENT` | StudyIntervention → Treatment | asserted | zero_or_one per StudyIntervention | The administered intervention is an instance of the concept, as reported. | FI-W06-09; FI-W06-13 (registry type → modality). |
-| `INSTANTIATES_PROCEDURE` | StudyIntervention → Procedure | asserted | zero_or_one | The administered intervention performs the defined procedure, as reported. | FI-W06-12 (shared code → same procedure). |
+| (W09) `FOLLOWS_INTERVENTION_DEFINITION` | StudyIntervention → Treatment \| Procedure (\| ProtocolEdition \| Lifestyle) | asserted | zero_or_more (W09) | The administered intervention follows the concept or procedure definition, as reported. W06 declares only the inverse views. | FI-W06-09; FI-W06-12; FI-W06-13. Proposed W06 constraints: a cited assertion is required (V-W06-08), and a study-specific step never becomes a concept component (V-W06-06). |
 
 ## CANDIDATE cards (not in the fragment)
 

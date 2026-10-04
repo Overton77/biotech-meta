@@ -320,9 +320,7 @@ SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'w22-capture-fidelity-r
     j.verdict = 'SUPPORTED', j.reviewerType = 'HUMAN', j.reviewedAt = a.recordedAt + duration('PT1M'), j.recordedAt = a.recordedAt + duration('PT1M'), j.privacyClass = 'PUBLIC'
 MERGE (j)-[:EVALUATES]->(a) MERGE (j)-[:ASSESSED_BY]->(g);
 
-// =====================================================================================================================
-// Queries
-// =====================================================================================================================
+// ==== Queries (expected rows in 06-fixtures-and-queries.md) ====
 
 // Q-MP4-1 (CQ-MD-C03 with CQ-MD-C02): rights-gated selection for the mechanism. The best-looking candidate (0.96) is
 // excluded because its rights are reserved; NO_STATEMENT_FOUND and 'never checked' are excluded too.

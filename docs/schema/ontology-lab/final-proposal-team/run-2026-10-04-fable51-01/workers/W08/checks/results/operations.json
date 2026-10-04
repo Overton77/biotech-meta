@@ -22,10 +22,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 489,
+   "ms": 187,
    "sample": [],
    "header": "// W08 operations (proposal; Neo4j 5.26 Community unless marked). Stored property names only. Idempotent (IF NOT EXISTS).\n// Executed on embedded Neo4j 5.26.31 Community with the W08 fixtures loaded (results in checks/results/operations.json).\n// Node identity: one node per uid per W08 label (Commun"
   },
@@ -44,10 +44,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 278,
+   "ms": 10,
    "sample": [],
    "header": ""
   },
@@ -66,10 +66,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 348,
+   "ms": 7,
    "sample": [],
    "header": ""
   },
@@ -88,10 +88,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 178,
+   "ms": 5,
    "sample": [],
    "header": ""
   },
@@ -110,10 +110,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 108,
+   "ms": 7,
    "sample": [],
    "header": ""
   },
@@ -132,10 +132,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 120,
+   "ms": 9,
    "sample": [],
    "header": ""
   },
@@ -154,10 +154,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 127,
+   "ms": 6,
    "sample": [],
    "header": "// Live GraphQL id (opaque segment of uid) stays unique per label (generated mutations look nodes up by id)."
   },
@@ -176,10 +176,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 6,
    "sample": [],
    "header": ""
   },
@@ -198,10 +198,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 83,
+   "ms": 9,
    "sample": [],
    "header": ""
   },
@@ -220,10 +220,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 138,
+   "ms": 4,
    "sample": [],
    "header": ""
   },
@@ -242,10 +242,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 153,
+   "ms": 4,
    "sample": [],
    "header": ""
   },
@@ -264,10 +264,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 184,
+   "ms": 3,
    "sample": [],
    "header": ""
   },
@@ -286,10 +286,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 108,
+   "ms": 8,
    "sample": [],
    "header": "// FirmwareVersion state identity: payloadHash unique (device uid + component + label)."
   },
@@ -308,10 +308,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 106,
+   "ms": 6,
    "sample": [],
    "header": "// Asserted W08 edges: one relationshipUid per episode (relationship property uniqueness constraints, Neo4j 5.7+)."
   },
@@ -330,10 +330,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 179,
+   "ms": 4,
    "sample": [],
    "header": ""
   },
@@ -352,10 +352,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 632,
+   "ms": 4,
    "sample": [],
    "header": ""
   },
@@ -374,10 +374,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 177,
+   "ms": 4,
    "sample": [],
    "header": ""
   },
@@ -396,10 +396,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 183,
+   "ms": 5,
    "sample": [],
    "header": ""
   },
@@ -418,10 +418,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 94,
+   "ms": 7,
    "sample": [],
    "header": ""
   },
@@ -440,10 +440,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 39,
+   "ms": 4,
    "sample": [],
    "header": ""
   },
@@ -462,10 +462,10 @@
     "labelsRemoved": 0,
     "indexesAdded": 0,
     "indexesRemoved": 0,
-    "constraintsAdded": 1,
+    "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 98,
+   "ms": 3,
    "sample": [],
    "header": ""
   },
@@ -482,12 +482,12 @@
     "propertiesSet": 0,
     "labelsAdded": 0,
     "labelsRemoved": 0,
-    "indexesAdded": 1,
+    "indexesAdded": 0,
     "indexesRemoved": 0,
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 97,
+   "ms": 10,
    "sample": [],
    "header": "// Retrieval: assertion-to-edge joins (V-W08-04, QS-4a) and as-of filters on recordedTo."
   },
@@ -504,12 +504,12 @@
     "propertiesSet": 0,
     "labelsAdded": 0,
     "labelsRemoved": 0,
-    "indexesAdded": 1,
+    "indexesAdded": 0,
     "indexesRemoved": 0,
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 37,
+   "ms": 5,
    "sample": [],
    "header": ""
   },
@@ -526,12 +526,12 @@
     "propertiesSet": 0,
     "labelsAdded": 0,
     "labelsRemoved": 0,
-    "indexesAdded": 1,
+    "indexesAdded": 0,
     "indexesRemoved": 0,
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 5,
    "sample": [],
    "header": ""
   },
@@ -548,12 +548,12 @@
     "propertiesSet": 0,
     "labelsAdded": 0,
     "labelsRemoved": 0,
-    "indexesAdded": 1,
+    "indexesAdded": 0,
     "indexesRemoved": 0,
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 161,
+   "ms": 5,
    "sample": [],
    "header": ""
   },
@@ -570,12 +570,12 @@
     "propertiesSet": 0,
     "labelsAdded": 0,
     "labelsRemoved": 0,
-    "indexesAdded": 1,
+    "indexesAdded": 0,
     "indexesRemoved": 0,
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 85,
+   "ms": 6,
    "sample": [],
    "header": "// Lookup by vendor version label (ingestion upsert of release notes; Q-W08-04)."
   },
@@ -592,12 +592,12 @@
     "propertiesSet": 0,
     "labelsAdded": 0,
     "labelsRemoved": 0,
-    "indexesAdded": 1,
+    "indexesAdded": 0,
     "indexesRemoved": 0,
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 395,
+   "ms": 6,
    "sample": [],
    "header": "// Live fulltext index retained with stored property names (D-015)."
   }

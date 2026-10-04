@@ -211,9 +211,7 @@ SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'w22-capture-fidelity-r
     j.verdict = 'SUPPORTED', j.reviewerType = 'HUMAN', j.reviewedAt = a.recordedAt + duration('PT1M'), j.recordedAt = a.recordedAt + duration('PT1M'), j.privacyClass = 'PUBLIC'
 MERGE (j)-[:EVALUATES]->(a) MERGE (j)-[:ASSESSED_BY]->(g);
 
-// =====================================================================================================================
-// Queries
-// =====================================================================================================================
+// ==== Queries (expected rows in 06-fixtures-and-queries.md) ====
 
 // Q-MP3-1 (CQ-MD-C05, CQ-PV-01): images that EVIDENCE assertions about the mechanism, with the full locator path, the
 // capture, the rights and the verdict on the path. The generated illustration appears only as REJECTED.

@@ -1,0 +1,12 @@
+{
+ "items": ["hu:lot:elysium-basis-p098-01", "hu:lot:elysium-basis-r110-01", "hu:lot:elysium-basis-70969", "hu:product-variant:basis-us-capsule-standard", "hu:product:elysium-basis", "hu:facility:synthetic-supplement-plant", "hu:lot:truniagen-pro-500-t25189001"],
+ "facilityUid": "hu:facility:synthetic-supplement-plant",
+ "organizationUid": "hu:org:niagen-bioscience-inc",
+ "lotUid": "hu:lot:elysium-basis-p098-01",
+ "analyteRegex": "(?i).*riboside.*",
+ "recordedAsOfEarly": "2026-10-04T02:30:00Z",
+ "recordedAsOfLate": "2026-10-04T04:00:00Z",
+ "analyte": "E. coli",
+ "lots": ["hu:lot:truniagen-pro-500-t25189001", "hu:lot:elysium-basis-p098-01", "hu:lot:elysium-basis-70579", "hu:lot:elysium-basis-70918"],
+ "listingUid": "hu:cert-listing:nsfsport-1786167"
+}

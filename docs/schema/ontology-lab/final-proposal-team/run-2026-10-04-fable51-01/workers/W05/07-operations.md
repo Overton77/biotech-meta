@@ -1,6 +1,6 @@
 # W05 operations recommendation
 
-Target as declared by the run: Neo4j **5.26.31 Community** (embedded, tested), `@neo4j/graphql` **7.6.3**, `graphql` 16.14.2, `neo4j-driver` 6.2.0, Node 22. Enterprise behaviour unverified. No runtime implementation is delivered; statements below are recommendations for Fable's operations file, written with **stored** property names.
+Target as declared by the run: Neo4j **5.26.31 Community** (embedded, tested), `@neo4j/graphql` **7.6.3**, `graphql` 16.14.2, `neo4j-driver` 6.2.0, Node 22. Enterprise behaviour unverified. No runtime implementation is delivered; statements below are recommendations for Fable's operations file, written with **stored** property names. The Community-runnable statement set is in `operations.cypher`; `fixtures/w05-09-constraint-probe.cypher` tests it.
 
 ## 1. Uniqueness and indexes
 
@@ -60,4 +60,4 @@ FDC SR Legacy carries about 100–150 nutrient rows per food; each is one Assert
 
 ## 6. Tested here (not deployment evidence)
 
-Embedded Neo4j 5.26.31 Community: fixtures 01–06 + 08 load with zero errors and zero no-op statements; W05 validation returns zero rows on the clean load and exactly the intended rows after fixture 07; the GraphQL fragment builds under 7.6.3 with stubs and round-trips Exposure/FoodItem/Lifestyle queries. Constraints above were **not** executed (no merged schema yet); Enterprise existence constraints unverified.
+Embedded Neo4j 5.26.31 Community: fixtures 01–06 + 08 load with zero errors and zero no-op statements; W05 validation returns zero rows on the clean load and exactly the intended rows after fixture 07; the GraphQL fragment builds under 7.6.3 with stubs and round-trips Exposure/FoodItem/Lifestyle queries. `operations.cypher` was executed on the same store before the fixtures and the probe file afterwards (results in `08-completion-report.md`); Enterprise existence constraints unverified.

@@ -175,9 +175,7 @@ SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'w22-capture-fidelity-r
     j.verdict = 'SUPPORTED', j.reviewerType = 'HUMAN', j.reviewedAt = a.recordedAt + duration('PT1M'), j.recordedAt = a.recordedAt + duration('PT1M'), j.privacyClass = 'PUBLIC'
 MERGE (j)-[:EVALUATES]->(a) MERGE (j)-[:ASSESSED_BY]->(g);
 
-// =====================================================================================================================
-// Queries
-// =====================================================================================================================
+// ==== Queries (expected rows in 06-fixtures-and-queries.md) ====
 
 // Q-MP6-1 (CQ-MD-C04, CQ-PV-03): lineage of the edited rendition back to the original capture. Expected 1 row.
 MATCH (e:MediaVariant {uid: 'hu:media-variant:bia-s-biad807-confocal-callouts-synthetic'})-[:WAS_GENERATED_BY]->(act:Activity)-[:USED]->(o:MediaVariant {variantKind: 'ORIGINAL'})<-[:HAS_MEDIA_VARIANT]-(m:MediaAsset)

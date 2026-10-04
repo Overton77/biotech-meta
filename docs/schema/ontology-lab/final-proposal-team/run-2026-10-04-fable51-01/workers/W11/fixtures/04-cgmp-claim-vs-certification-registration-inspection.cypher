@@ -27,9 +27,9 @@ UNWIND [
   {s: 'hu:source:fda-qa-outsourcing-facility-registration', uri: 'https://www.fda.gov/drugs/human-drug-compounding/questions-and-answers-outsourcing-facility-registration', title: 'FDA: Questions and Answers: Outsourcing Facility Registration', kind: 'REGULATORY_GUIDANCE', ch: 'sha256:6f9f0dcf74f4c03b5631efcd33801058d33fe62a22ece1af79f9468d87bb90e8', cc: 'PARTIAL_EXCERPT'}
 ] AS row
 MERGE (s:Source:Entity {uid: row.s})
-SET s.privacyClass = coalesce(s.privacyClass, 'PUBLIC'), s.canonicalUri = row.uri, s.title = row.title, s.sourceKind = row.kind, s.entityType = 'SOURCE', s.createdAt = datetime('2026-10-04T01:05:00Z')
+SET s.privacyClass = coalesce(s.privacyClass, 'PUBLIC'), s.id = coalesce(s.id, split(s.uid, ':')[2]), s.canonicalUri = row.uri, s.title = row.title, s.sourceKind = row.kind, s.entityType = 'SOURCE', s.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (sn:SourceSnapshot:InformationArtifact {uid: replace(row.s, 'hu:source:', 'hu:snapshot:') + '-2026-10-04'})
-SET sn.privacyClass = coalesce(sn.privacyClass, 'PUBLIC'), sn.artifactType = 'SOURCE_SNAPSHOT', sn.canonicalUri = row.uri, sn.retrievedAt = datetime('2026-10-04T00:58:00Z'),
+SET sn.privacyClass = coalesce(sn.privacyClass, 'PUBLIC'), sn.id = coalesce(sn.id, split(sn.uid, ':')[2]), sn.artifactType = 'SOURCE_SNAPSHOT', sn.canonicalUri = row.uri, sn.retrievedAt = datetime('2026-10-04T00:58:00Z'),
     sn.observedAt = datetime('2026-10-04T00:58:00Z'), sn.contentHash = row.ch, sn.contentHashBasis = 'SYNTHETIC_FIXTURE',
     sn.captureCompleteness = row.cc, sn.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (s)-[:HAS_SNAPSHOT]->(sn);
@@ -54,18 +54,18 @@ UNWIND [
 ] AS row
 MATCH (sn:SourceSnapshot {uid: row.sn})
 MERGE (l:SourceLocator:InformationArtifact {uid: row.l})
-SET l.privacyClass = coalesce(l.privacyClass, 'PUBLIC'), l.artifactType = 'SOURCE_LOCATOR', l.selectorKind = 'TEXT_QUOTE', l.exact = row.exact, l.quoteHash = row.qh,
+SET l.privacyClass = coalesce(l.privacyClass, 'PUBLIC'), l.id = coalesce(l.id, split(l.uid, ':')[2]), l.artifactType = 'SOURCE_LOCATOR', l.selectorKind = 'TEXT_QUOTE', l.exact = row.exact, l.quoteHash = row.qh,
     l.normalizationVersion = 'NFC-WS1', l.createdAt = datetime('2026-10-04T01:05:00Z')
 MERGE (sn)-[:HAS_LOCATOR]->(l);
 
 // status: run
 MERGE (o:Organization:LegalEntity:Entity {uid: 'hu:org:natural-alternatives-international-inc'})
-ON CREATE SET o.privacyClass = coalesce(o.privacyClass, 'PUBLIC'), o.name = 'Natural Alternatives International', o.createdAt = datetime('2026-10-04T01:05:00Z')
+ON CREATE SET o.privacyClass = coalesce(o.privacyClass, 'PUBLIC'), o.id = coalesce(o.id, split(o.uid, ':')[2]), o.name = 'Natural Alternatives International', o.createdAt = datetime('2026-10-04T01:05:00Z')
 SET o.entityType = 'ORGANIZATION';
 
 // status: run
 MERGE (f:Facility:Entity {uid: 'hu:facility:nai-carlsbad-powder-facility'})
-ON CREATE SET f.privacyClass = coalesce(f.privacyClass, 'PUBLIC'), f.name = 'NAI Carlsbad, CA powder filling, packaging, distribution and storage facility', f.createdAt = datetime('2026-10-04T01:05:00Z')
+ON CREATE SET f.privacyClass = coalesce(f.privacyClass, 'PUBLIC'), f.id = coalesce(f.id, split(f.uid, ':')[2]), f.name = 'NAI Carlsbad, CA powder filling, packaging, distribution and storage facility', f.createdAt = datetime('2026-10-04T01:05:00Z')
 SET f.entityType = 'FACILITY';
 
 // status: run
@@ -74,13 +74,13 @@ UNWIND [
   ['hu:org:us-fda', 'U.S. Food and Drug Administration', 'RegulatoryAgency']
 ] AS p
 MERGE (o:Organization:Entity {uid: p[0]})
-ON CREATE SET o.privacyClass = coalesce(o.privacyClass, 'PUBLIC'), o.name = p[1], o.createdAt = datetime('2026-10-04T01:05:00Z')
+ON CREATE SET o.privacyClass = coalesce(o.privacyClass, 'PUBLIC'), o.id = coalesce(o.id, split(o.uid, ':')[2]), o.name = p[1], o.createdAt = datetime('2026-10-04T01:05:00Z')
 SET o.entityType = 'ORGANIZATION'
 FOREACH (_ IN CASE WHEN p[2] = 'RegulatoryAgency' THEN [1] ELSE [] END | SET o:RegulatoryAgency);
 
 // status: run
 MERGE (f:Facility:Entity {uid: 'hu:facility:navinta-iii-boca-raton-503b'})
-SET f.privacyClass = coalesce(f.privacyClass, 'PUBLIC'), f.name = 'Navinta III Inc., Boca Raton, FL (503B outsourcing facility)', f.entityType = 'FACILITY', f.city = 'Boca Raton',
+SET f.privacyClass = coalesce(f.privacyClass, 'PUBLIC'), f.id = coalesce(f.id, split(f.uid, ':')[2]), f.name = 'Navinta III Inc., Boca Raton, FL (503B outsourcing facility)', f.entityType = 'FACILITY', f.city = 'Boca Raton',
     f.region = 'FL', f.country = 'US', f.createdAt = datetime('2026-10-04T01:05:00Z');
 
 // 1. The cGMP claim: literal-valued assertion (subject the organization; no object), predicate registered in catalog
@@ -94,7 +94,7 @@ UNWIND [
 ] AS row
 MATCH (o:Organization {uid: 'hu:org:natural-alternatives-international-inc'}), (l:SourceLocator {uid: row.l})
 MERGE (a:Assertion {uid: row.a})
-SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'CLAIMS_CGMP_COMPLIANCE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.id = coalesce(a.id, split(a.uid, ':')[2]), a.predicate = 'CLAIMS_CGMP_COMPLIANCE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.valueString = row.v, a.jurisdiction = 'US', a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN',
     a.polarity = 'POSITIVE', a.speechAct = 'STATES', a.assertionBasis = 'MANUFACTURER_CLAIM', a.predicateClass = 'CLAIM',
     a.contentHash = row.ch, a.createdAt = datetime('2026-10-04T01:10:00Z')
@@ -107,7 +107,7 @@ MERGE (a)-[:SUPPORTED_BY]->(l);
 // status: run
 MATCH (a:Assertion {uid: 'hu:assertion:nai-online-claims-fda-gmp-certification'}), (l:SourceLocator {uid: 'hu:locator:fda-qa-503b-registration-not-cgmp'})
 MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:nai-fda-gmp-certification-wording-2026-10-04'})
-SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'SUPPORT', j.verdict = 'INSUFFICIENT', j.reviewerType = 'AGENT',
+SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.id = coalesce(j.id, split(j.uid, ':')[2]), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'SUPPORT', j.verdict = 'INSUFFICIENT', j.reviewerType = 'AGENT',
     j.methodVersion = 'w11-cgmp-adjudication-v0', j.status = 'ACCEPTED', j.reviewedAt = datetime('2026-10-04T01:30:00Z'),
     j.recordedAt = datetime('2026-10-04T01:30:00Z'),
     j.rationale = 'No FDA record of a GMP certification exists to cite; FDA registration language states registration is not a CGMP determination; no inspection record captured. The claim stays a company claim.',
@@ -120,7 +120,7 @@ MERGE (j)-[:SUPPORTED_BY]->(l);
 MATCH (f:Facility {uid: 'hu:facility:nai-carlsbad-powder-facility'}), (o:Organization {uid: 'hu:org:natural-alternatives-international-inc'}),
       (l:SourceLocator {uid: 'hu:locator:naii-10k-fy2025-carlsbad-nsf-gmp-nov-2024'})
 MERGE (a:Assertion {uid: 'hu:assertion:naii-10k-fy2025-carlsbad-nsf-gmp-certified'})
-SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'CLAIMS_THIRD_PARTY_CERTIFICATION', a.status = 'PROPOSED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.id = coalesce(a.id, split(a.uid, ':')[2]), a.predicate = 'CLAIMS_THIRD_PARTY_CERTIFICATION', a.status = 'PROPOSED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.valueString = 'third-party GMP certified through the NSF and NSF for Sport programs', a.validFrom = datetime('2024-11-01T00:00:00Z'),
     a.validFromPrecision = 'MONTH', a.validFromBasis = 'STATED_BY_SOURCE', a.validToBasis = 'UNKNOWN', a.polarity = 'POSITIVE',
     a.speechAct = 'STATES', a.assertionBasis = 'MANUFACTURER_CLAIM', a.predicateClass = 'CLAIM',
@@ -132,7 +132,7 @@ MERGE (a)-[:SUPPORTED_BY]->(l);
 // 3. Public agency registration record -> registration status of the Facility only (W13 shapes).
 // status: run
 MERGE (st:RegulatoryStatus:VersionedState {uid: 'hu:regulatory-status:navinta-iii-503b-registration-2026'})
-SET st.privacyClass = coalesce(st.privacyClass, 'PUBLIC'), st.stateType = 'REGULATORY_STATUS', st.statusKind = 'ESTABLISHMENT_REGISTRATION', st.jurisdiction = 'US',
+SET st.privacyClass = coalesce(st.privacyClass, 'PUBLIC'), st.id = coalesce(st.id, split(st.uid, ':')[2]), st.stateType = 'REGULATORY_STATUS', st.statusKind = 'ESTABLISHMENT_REGISTRATION', st.jurisdiction = 'US',
     st.scopeText = 'Human drug compounding outsourcing facility registration under FD&C Act section 503B; initial and most recent registration 2/6/2026',
     st.effectiveFrom = datetime('2026-02-06T00:00:00Z'), st.payloadHash = 'sha256:09e793249d20f71d3915a0fb08e7fe8e4240088127ab31bfad650d8b8c1dcc73',
     st.createdAt = datetime('2026-10-04T01:10:00Z');
@@ -141,7 +141,7 @@ SET st.privacyClass = coalesce(st.privacyClass, 'PUBLIC'), st.stateType = 'REGUL
 MATCH (st:RegulatoryStatus {uid: 'hu:regulatory-status:navinta-iii-503b-registration-2026'}), (f:Facility {uid: 'hu:facility:navinta-iii-boca-raton-503b'}),
       (fda:Organization {uid: 'hu:org:us-fda'}), (l:SourceLocator {uid: 'hu:locator:fda-503b-list-navinta-iii-row'})
 MERGE (a:Assertion {uid: 'hu:assertion:fda-503b-list-navinta-iii-registration-status'})
-SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.predicate = 'STATUS_OF', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
+SET a.privacyClass = coalesce(a.privacyClass, 'PUBLIC'), a.id = coalesce(a.id, split(a.uid, ':')[2]), a.predicate = 'STATUS_OF', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T01:10:00Z'),
     a.validFrom = datetime('2026-02-06T00:00:00Z'), a.validFromPrecision = 'DAY', a.validFromBasis = 'STATED_BY_SOURCE',
     a.validToBasis = 'UNKNOWN', a.polarity = 'POSITIVE', a.predicateClass = 'REGULATORY', a.jurisdiction = 'US',
     a.contentHash = 'sha256:e1a298d2b9705d0e94a2a851e34c5f9bb1f91717e1885055c2a1bd08586fb55f', a.createdAt = datetime('2026-10-04T01:10:00Z')
@@ -159,7 +159,7 @@ MATCH (a:Assertion)
 WHERE a.uid IN ['hu:assertion:nai-online-claims-cgmp', 'hu:assertion:nai-online-claims-fda-gmp-certification', 'hu:assertion:fda-503b-list-navinta-iii-registration-status']
   AND NOT EXISTS { MATCH (:Adjudication {adjudicationKind: 'CAPTURE_FIDELITY'})-[:EVALUATES]->(a) }
 MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w11-f04-capture-fidelity-policy'})
-ON CREATE SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
+ON CREATE SET j.privacyClass = coalesce(j.privacyClass, 'PUBLIC'), j.id = coalesce(j.id, split(j.uid, ':')[2]), j.assessmentType = 'ADJUDICATION', j.adjudicationKind = 'CAPTURE_FIDELITY', j.verdict = 'SUPPORTED',
     j.reviewerType = 'POLICY', j.methodVersion = 'w11-fixture-capture-policy-1', j.status = 'ACCEPTED',
     j.reviewedAt = datetime('2026-10-04T01:40:00Z'), j.recordedAt = datetime('2026-10-04T01:40:00Z'),
     j.rationale = 'Fixture capture policy: propositions match the cited spans as read by W11.', j.privacyClass = 'INTERNAL',

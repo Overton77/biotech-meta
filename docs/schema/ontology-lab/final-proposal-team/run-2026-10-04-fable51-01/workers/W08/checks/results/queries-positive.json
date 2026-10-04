@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 125,
+   "ms": 126,
    "sample": [
     {
      "assayVersion": "hu:assay-version:synthetic-lab-c-epic-v2-iscan",
@@ -68,7 +68,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 12,
+   "ms": 18,
    "sample": [
     {
      "sameKit": true,
@@ -98,7 +98,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 7,
+   "ms": 24,
    "sample": [
     {
      "device": "WHOOP 4.0",
@@ -141,7 +141,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 9,
+   "ms": 7,
    "sample": [
     {
      "component": "Bluetooth firmware",
@@ -204,7 +204,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 8,
+   "ms": 4,
    "sample": [
     {
      "sameDevice": true,
@@ -234,7 +234,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 8,
+   "ms": 13,
    "sample": [
     {
      "device": "WHOOP MG",
@@ -342,7 +342,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 6,
+   "ms": 4,
    "sample": [
     {
      "device": "WHOOP 4.0",
@@ -371,7 +371,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 7,
+   "ms": 26,
    "sample": [
     {
      "device": "WHOOP 4.0",
@@ -408,7 +408,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 7,
    "sample": [
     {
      "organization": "Synthetic Lab C (methylation service)",

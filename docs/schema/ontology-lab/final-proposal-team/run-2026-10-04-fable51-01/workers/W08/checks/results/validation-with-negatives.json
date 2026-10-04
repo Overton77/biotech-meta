@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 115,
+   "ms": 96,
    "sample": [
     {
      "assayVersionUid": "hu:assay-version:w08-neg-platform-as-instrument",
@@ -56,7 +56,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 13,
+   "ms": 20,
    "sample": [
     {
      "nodeUid": "hu:device:w08-neg-device-with-status-props",
@@ -92,7 +92,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 8,
+   "ms": 7,
    "sample": [
     {
      "regulatoryRecordUid": "hu:reg-status:w08-neg-clearance-on-device",
@@ -124,7 +124,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 18,
+   "ms": 8,
    "sample": [
     {
      "relType": "USES_PLATFORM",
@@ -155,7 +155,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 6,
+   "ms": 4,
    "sample": [
     {
      "assayVersionUid": "hu:assay-version:w08-neg-firmware-mismatch",
@@ -189,7 +189,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 10,
+   "ms": 5,
    "sample": [
     {
      "check": "FIRMWARE_VERSION_OF",
@@ -308,7 +308,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 5,
+   "ms": 3,
    "sample": [
     {
      "label": "Device",
@@ -339,7 +339,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 3,
+   "ms": 9,
    "sample": [
     {
      "assertionUid": "hu:assertion:w08-neg-device-accuracy-claim",

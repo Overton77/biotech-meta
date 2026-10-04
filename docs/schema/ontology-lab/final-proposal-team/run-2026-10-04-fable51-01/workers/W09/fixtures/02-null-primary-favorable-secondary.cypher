@@ -246,3 +246,15 @@ MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w09-fixture-02-c
                 j.reviewerType = 'POLICY', j.methodVersion = 'w09-fixture-capture-policy-1', j.status = 'ACCEPTED',
                 j.reviewedAt = datetime('2026-10-04T01:00:00Z'), j.recordedAt = datetime('2026-10-04T01:00:00Z'), j.createdAt = datetime('2026-10-04T01:00:00Z'), j.privacyClass = 'PUBLIC'
 MERGE (j)-[:EVALUATES]->(a);
+
+// Quote hashes: NFC-WS1 normalization (catalog normalizationVersions) over the stored `exact` text, sha256 (computed by W09
+// with Python hashlib on 2026-10-04 over the quoted text only; the snapshot bytes were not hashed: SYNTHETIC_FIXTURE).
+UNWIND [
+  {uid: 'hu:locator:pmc9133463-abstract-clinically-meaningful', h: 'sha256:35b5cbe6f58f8b50224f79b5a9fd0bc3cbb5c38fb1c690149adb137f98de8e93'},
+  {uid: 'hu:locator:pmc9133463-abstract-primary-null', h: 'sha256:15185dddbee081a05c11051274191ba86fd35b8ad6a4245c45b688a546221e61'},
+  {uid: 'hu:locator:pmc9133463-methods-multiplicity', h: 'sha256:5ade4853a516f9152659c1abc4c7a7db874922134f73cad3ee323648003d4349'},
+  {uid: 'hu:locator:pmc9133463-results-hamstring', h: 'sha256:2b7331f868baaaf7a53b8191dd4fbca6bd358e00c5d7e52edc00cdded41cb536'},
+  {uid: 'hu:locator:pmc9133463-results-placebo-decline', h: 'sha256:0f7a79c646d28cd1d5320b76021a1afca8b0adff806f8b8a039de24484674ae3'}
+] AS r
+MATCH (l:SourceLocator {uid: r.uid})
+SET l.normalizationVersion = 'NFC-WS1', l.quoteHash = r.h;

@@ -1,0 +1,673 @@
+# =====================================================================================================================
+# W15 Commerce and access to products -- SDL fragment (worker packet, not the final schema)
+# Run: run-2026-10-04-fable51-01. Worker: W15 (Opus 5.5). Synthesizer: Fable 5.1.
+# Catalog module: products_and_commerce (commerce half: MerchantListing, Offer, PriceObservation, SubscriptionPlan, Bundle,
+#   BundleComponent, InventoryItem, IndividualUnit, AffiliateLink, CommerceMatch and their relationships). Product, variant
+#   and package identities are W04's; lots W12's; seller identity W01's; private purchases stay outside the graph (W23).
+# CQs: CQ-CM-01, CQ-CM-02, CQ-CM-03, CQ-CM-04, CQ-CM-05, CQ-AX-06, CQ-AX-17 (commerce leg); candidates CQ-CM-C01..C04
+#   (02-cq-coverage.md).
+# Authority digest: catalog/schema.yaml 0.2.0 sha256 8fb50ff0...84f0 (8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0).
+# Contract: 01-shared-contract.md section B; D-007 (MerchantListing replaces live Listing; ListingSnapshot retired into
+#   SourceSnapshot + Offer + PriceObservation). No `extend`, no @cypher, no @unique, no @vector.
+# Imported by name only (never redefined here): W00 Entity, SearchIndexable, EntityArchetype, VersionedStateArchetype,
+#   OccurrenceArchetype, InformationArtifactArchetype, EvidenceAssessmentArchetype, AssertedEdgeProperties,
+#   DerivedEdgeProperties, StructuralEdgeProperties, SupersessionProperties, IdentifierLinkProperties, PrivacyClass,
+#   NodeMaturity, AssessmentStatus, ReportedStatus, TimePrecision, ValidTimeBasis, Identifier, TradeItemIdentifier,
+#   SourceLocator, Activity, Agent; W01 Organization, Person, Facility; W04 Product, ProductVariant, PackageConfiguration;
+#   W06 Procedure; W07 PanelDefinition; W12 ProductLot, TestSample.
+# Inverse fields on other owners' types (Organization, Person, Product, ProductVariant, PackageConfiguration, ProductLot,
+#   Facility, PanelDefinition) are supplied verbatim in seam-requests.yaml (W15-SR-01..06); SELLS_PRODUCT has no endpoint
+#   on a W15 type, so its only SDL is the field text in W15-SR-01 / W15-SR-02.
+# Relationship class and cardinality live in field descriptions and are enforced by the operations/validation layer.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# 1. Node types
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A merchant's catalog entry for one sellable item at the most specific level the merchant identifies it: an Amazon ASIN
+detail page (B0FS82B35K), a Walmart item (1038593372), a Shopify product variant (41905353850949, "Tru Niagen 300mg - 30"),
+a clinic's procedure or test-panel page. Several sellers' offers on one catalog entry are ONE listing with several Offers
+(listing merge, OPEN-QUESTIONS quality/commerce 3). A listing is NEVER product identity (its link to a variant, package or
+bundle is the asserted LISTING_FOR, possibly only PROPOSED, or an unresolved CommerceMatch), NEVER a seller (HOSTS_LISTING is
+not SELLER_OF_RECORD_FOR, INV-306), NEVER a label (its title amount is not a label-declared amount) and NEVER the page
+capture (the captured page is a W00 SourceSnapshot of a Source with sourceKind MARKETPLACE_LISTING). Price, availability and
+`currentAsOf` on this type are read-only materialized projections of the latest PriceObservation and are answered with
+`lastObservedAt`, never as "current" (CQ-AX-06). Replaces live `Listing` (D-007) and keeps its breadth (products,
+procedures, panels, in-clinic availability). Serves CQ-CM-01, CQ-CM-02, CQ-CM-03, CQ-CM-04, CQ-AX-06, CQ-AX-17. Canonical
+module products_and_commerce. Archetype Entity.
+"""
+type MerchantListing implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["MerchantListing", "Entity"])
+  @fulltext(indexes: [{indexName: "ListingSearch", fields: ["name", "description", "searchText", "title", "listingType", "status", "canonicalUrl", "availabilityStatus", "commercialTermsSummary"], queryName: "searchListings"}]) {
+  id: ID! @id
+  "hu:listing:<opaque>; uniqueness from the operations file (w15_listing_uid). Never derived from the ASIN or URL."
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  "Presentation only; never identity (D-013 nullable)."
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'MerchantListing'."
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "The merchant's key for this catalog entry within `marketplace` (ASIN, Walmart item id, Shopify variant id). A materialized copy of the TradeItemIdentifier reached by IDENTIFIED_BY; the Identifier record is authoritative. Null = the page exposes no key (clinic page)."
+  merchantListingId: String @settable(onCreate: true, onUpdate: false)
+  "Registrable domain of the selling surface that issues merchantListingId (e.g. 'amazon.com', 'walmart.com', 'truniagen.com'). Scope of merchantListingId; (marketplace, merchantListingId) is unique (operations)."
+  marketplace: String @settable(onCreate: true, onUpdate: false)
+  "Merchant grouping key of the parent catalog record when the entry is one variation of a parent (Amazon parent ASIN, Shopify product id 7387359477829). Grouping only; never identity and never LISTING_FOR."
+  parentListingRef: String
+  "Storefront software behind the surface ('SHOPIFY', 'AMAZON', 'WALMART_MARKETPLACE'); a platform provider is not a host, seller or fulfiller (no role edge is implied)."
+  commercePlatform: String
+  "Marketplace country of the surface (ISO 3166-1 alpha-2, e.g. 'US' for amazon.com). Null = not recorded. Offer- and observation-level region facts live on PriceObservation.observationRegion."
+  marketplaceRegion: String
+  "Merchant title as last observed (display, mutable). It is a merchant statement captured by a LISTING_TITLE_AMOUNT / title Assertion when an amount is extracted; it never becomes a LabelDeclaration or QuantityDeclaration (forbidden [LISTING_TITLE_AMOUNT, LABEL_DECLARED_AMOUNT])."
+  title: String
+  "Canonical URL of the catalog entry (live Listing.url merged here). Equals the canonicalUri of the W00 Source that captures the page; a URL is never identity."
+  canonicalUrl: String
+  "Legacy free-text listing type (live, display only)."
+  listingType: String
+  "Legacy free-text status as displayed (live, display only). Not an offer end, not a product status."
+  status: String
+
+  "READ-ONLY projection (DEPRECATED compatibility for live Listing.priceAmount): amount of the PriceObservation named by projectedFromPriceObservationUid. Never written through the API; never averaged; V-329/V-W15-03 list unbacked values."
+  priceAmount: Float @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY projection: ISO 4217 currency of that PriceObservation."
+  currency: String @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY projection: ObservedAvailability value name of that PriceObservation (String kept for the ListingSearch index). A displayed status, never an offer end (CQ-CM-05)."
+  availabilityStatus: String @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY projection: priceKind of the projected PriceObservation, so a reader never mistakes a SUBSCRIPTION or COUPON_ADJUSTED price for the one-time price."
+  priceKindProjected: PriceKind @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY projection (DEPRECATED, live Listing.capturedAt): equals lastObservedAt."
+  capturedAt: DateTime @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY projection: observedAt of the latest PriceObservation of any offer on this listing (recorded by the projection run). Answers say 'last observed on', never 'current' (OPEN_END_STALE)."
+  lastObservedAt: DateTime @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY operational: when the projection job materialized the display fields (live Listing.currentAsOf). Not an observation time."
+  currentAsOf: DateTime @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY: uid of the PriceObservation the price/availability projection was taken from (required whenever priceAmount or availabilityStatus is non-null)."
+  projectedFromPriceObservationUid: String @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY legacy display (live Listing.commercialTermsSummary); terms belong to Offer.termsText and SubscriptionPlan."
+  commercialTermsSummary: String @settable(onCreate: false, onUpdate: false)
+
+  """class: asserted; cardinality: zero_or_one believed per (valid time, recorded time); catalog: HOSTS_LISTING (Organization -> MerchantListing; marketplace operator or DTC store operator). Never implies SELLS_PRODUCT ([HOSTS_LISTING, SELLS_PRODUCT], V-326c)."""
+  hostedBy: [Organization!]! @relationship(type: "HOSTS_LISTING", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_one ACCEPTED per (valid time, recorded time); catalog: LISTING_FOR (replaces live LISTS_PRODUCT whose two sides declared different property types). Range ListingTarget = ProductVariant | PackageConfiguration | Bundle (Bundle added by W15, W15-SR-07). A PROPOSED assertion means 'proposed only' in answers (CQ-CM-02); no edge at all plus an unresolved CommerceMatch means 'identity unknown'."""
+  listingFor: [ListingTarget!]! @relationship(type: "LISTING_FOR", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_OFFER. One Offer per (seller of record, item condition, purchase mode) proposition on this entry."""
+  offers: [Offer!]! @relationship(type: "HAS_OFFER", direction: OUT)
+  """class: asserted; cardinality: many; catalog: IDENTIFIED_BY (relationship type owned by W04): ASIN, Walmart item id, Shopify variant id, displayed UPC as TradeItemIdentifier records scoped by issuer."""
+  tradeItemIdentifiers: [TradeItemIdentifier!]! @relationship(type: "IDENTIFIED_BY", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog/live: LISTS_PROCEDURE (live breadth kept; W06 Procedure inverse uses ListingEdgeProperties)."""
+  listsProcedures: [Procedure!]! @relationship(type: "LISTS_PROCEDURE", direction: OUT, properties: "ListingEdgeProperties")
+  """class: asserted; cardinality: many; catalog/live: IMPLEMENTS_PANEL (a test-kit or clinic listing that implements a panel; same property type as W04 Product.implementsPanels)."""
+  implementsPanels: [PanelDefinition!]! @relationship(type: "IMPLEMENTS_PANEL", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; live AVAILABLE_IN re-ranged from PhysicalLocation to Facility (W01-SR-15a): in-clinic availability. Market-level availability is marketplaceRegion / PriceObservation.observationRegion, not this edge."""
+  availableIn: [Facility!]! @relationship(type: "AVAILABLE_IN", direction: OUT, properties: "ListingEdgeProperties")
+  """class: structural (inverse view); cardinality: many; catalog: LINKS_TO (AffiliateLink -> MerchantListing)."""
+  affiliateLinks: [AffiliateLink!]! @relationship(type: "LINKS_TO", direction: IN)
+  """class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM. Unresolved identity of this listing is a PROPOSED/UNRESOLVED CommerceMatch, never a silent LISTING_FOR."""
+  commerceMatches: [CommerceMatch!]! @relationship(type: "MATCHES_COMMERCE_ITEM", direction: IN)
+  """class: legacy read-only (live Listing.listsProducts, LISTS_PRODUCT with TemporalMetadata; W04 Product.listedIn reads the same edges without properties); cardinality: many; successor LISTING_FOR. Returned as LEGACY_UNDATED."""
+  legacyListsProducts: [Product!]! @relationship(type: "LISTS_PRODUCT", direction: OUT) @settable(onCreate: false, onUpdate: false)
+  """class: legacy read-only (live Listing.offeredBy, LISTS with ListingMetadata.listRole); cardinality: many; split into HOSTS_LISTING / LISTS_OFFER / SELLER_OF_RECORD_FOR / FULFILLS_OFFER / AFFILIATE_FOR_OFFER by the migration (migration-map.yaml). Returned as LEGACY_UNDATED; never read as seller of record."""
+  legacyListedBy: [Organization!]! @relationship(type: "LISTS", direction: IN) @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+One party's time-bounded commercial proposition for the item of one MerchantListing: who sells it (SELLER_OF_RECORD_FOR),
+who placed it (LISTS_OFFER), who fulfils it (FULFILLS_OFFER), under which terms, condition and purchase mode, with which
+subscription plans. Its immutable payload is the proposition itself (offerKind, currency, itemCondition, termsText,
+sellerOfferRef); a terms change is a new Offer state. Prices and availability are NOT payload: they are PriceObservation
+occurrences, and `availabilityStatus` / `lastObservedAt` here are read-only projections. Whether the offer still exists is
+answered by the valid time of its asserted role edges (null end = unknown) plus lastObservedAt; an offer that is no longer
+observed has NOT ended (CQ-CM-05). An Offer never establishes product identity (architecture section 5) and never implies
+that its host, lister, fulfiller or affiliate sells the product (INV-306). Serves CQ-CM-01, CQ-CM-02, CQ-CM-03, CQ-CM-05,
+CQ-AX-06, CQ-AX-17. Canonical module products_and_commerce. Archetype VersionedState.
+"""
+type Offer implements Entity & VersionedStateArchetype
+  @node(labels: ["Offer", "VersionedState"]) {
+  id: ID! @id
+  "hu:offer:<opaque>"
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Offer'."
+  stateType: String! @settable(onCreate: true, onUpdate: false)
+  "sha256:<hex> over the canonical payload (offerKind, currency, itemCondition, termsText, sellerOfferRef) (D-016). Projections are excluded."
+  payloadHash: String! @settable(onCreate: true, onUpdate: false)
+  "Source-stated start of the proposition (e.g. a dated promotion); null = not stated. Not query validity."
+  effectiveFrom: DateTime @settable(onCreate: true, onUpdate: false)
+  "Source-stated end of the proposition; null = not stated (never 'ongoing'). An unobserved offer keeps null."
+  effectiveTo: DateTime @settable(onCreate: true, onUpdate: false)
+  "Purchase mode of the proposition (closed list, candidate values)."
+  offerKind: OfferKind @settable(onCreate: true, onUpdate: false)
+  "ISO 4217 currency in which the offer is priced."
+  currency: String @settable(onCreate: true, onUpdate: false)
+  "Condition as displayed, schema.org OfferItemCondition names: NEW, USED, REFURBISHED, DAMAGED; null = not displayed."
+  itemCondition: String @settable(onCreate: true, onUpdate: false)
+  "Verbatim terms displayed for this proposition (returns, shipping, cancellation), e.g. 'Non-returnable due to Food safety reasons'. Text until a CQ needs a filter (OPEN-QUESTIONS quality/commerce 4)."
+  termsText: String @settable(onCreate: true, onUpdate: false)
+  "The merchant's own reference for this offer when exposed (Walmart offerId, Amazon merchant id + condition, Shopify variant id). Never identity across merchants."
+  sellerOfferRef: String @settable(onCreate: true, onUpdate: false)
+  "Instant at which the payload was captured (catalog Offer.observedAt): observedAt of the snapshot that first showed this proposition."
+  observedAt: DateTime @settable(onCreate: true, onUpdate: false)
+  "READ-ONLY projection: availabilityObserved of the latest PriceObservation (projectedFromPriceObservationUid). A displayed status; OUT_OF_STOCK or CURRENTLY_UNAVAILABLE is not an end."
+  availabilityStatus: ObservedAvailability @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY projection: earliest observedAt among this offer's PriceObservations."
+  firstObservedAt: DateTime @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY projection: latest observedAt among this offer's PriceObservations (OPEN_END_STALE answers cite it)."
+  lastObservedAt: DateTime @settable(onCreate: false, onUpdate: false)
+  "READ-ONLY: uid of the PriceObservation the availability projection was taken from."
+  projectedFromPriceObservationUid: String @settable(onCreate: false, onUpdate: false)
+
+  """class: structural (inverse view); cardinality: exactly_one; catalog: HAS_OFFER."""
+  listing: [MerchantListing!]! @relationship(type: "HAS_OFFER", direction: IN)
+  """class: structural; cardinality: many; catalog: HAS_PRICE_OBSERVATION. Occurrences, one per (observation, priceKind, condition); never averaged."""
+  priceObservations: [PriceObservation!]! @relationship(type: "HAS_PRICE_OBSERVATION", direction: OUT)
+  """class: asserted; cardinality: many; catalog: USES_SUBSCRIPTION_PLAN (Shopify selling plans, Amazon Subscribe & Save)."""
+  subscriptionPlans: [SubscriptionPlan!]! @relationship(type: "USES_SUBSCRIPTION_PLAN", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: at most one open (validTo null, recordedTo null) per offer (V-327); catalog: SELLER_OF_RECORD_FOR. The ONLY premise of SELLS_PRODUCT (V-326a/c)."""
+  sellerOfRecord: [Organization!]! @relationship(type: "SELLER_OF_RECORD_FOR", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: FULFILLS_OFFER ('Ships from: Amazon', 'Fulfilled by Walmart'). Never implies SELLS_PRODUCT."""
+  fulfilledBy: [Organization!]! @relationship(type: "FULFILLS_OFFER", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: LISTS_OFFER (the party that placed the offer on the listing). Never implies SELLS_PRODUCT ([LISTS_OFFER, SELLS_PRODUCT])."""
+  listedBy: [Organization!]! @relationship(type: "LISTS_OFFER", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: AFFILIATE_FOR_OFFER (Organization domain; FINANCIAL_INTEREST family). Never SELLS_PRODUCT, never ENDORSES_PRODUCT."""
+  affiliateOrganizations: [Organization!]! @relationship(type: "AFFILIATE_FOR_OFFER", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: AFFILIATE_FOR_OFFER (Person domain; FINANCIAL_INTEREST family). Public persons only."""
+  affiliatePersons: [Person!]! @relationship(type: "AFFILIATE_FOR_OFFER", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural (inverse view); cardinality: many; catalog: LINKS_TO (AffiliateLink -> Offer)."""
+  affiliateLinks: [AffiliateLink!]! @relationship(type: "LINKS_TO", direction: IN)
+  """class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM (authorized-channel and recall-scope checks are CommerceMatch candidates, never Offer properties)."""
+  commerceMatches: [CommerceMatch!]! @relationship(type: "MATCHES_COMMERCE_ITEM", direction: IN)
+}
+
+"""
+One observation of one displayed price of one offer at one instant: amount, currency, price kind, availability as displayed,
+any per-unit basis and qualifying condition, where and how it was captured. Immutable. A list price, a one-time price, a
+Subscribe & Save price, a coupon-adjusted price and a per-count price shown side by side are SEPARATE observations, never
+averaged and never collapsed into one 'price' (V-328). Two captures that disagree (the selling-plan JSON says no adjustment,
+the rendered page says 'Save 20%') are two observations with their own locators and capture methods. A price observed on a
+date says nothing about the next day: open ends are OPEN_END_STALE until a newer observation exists (CQ-AX-06). It is NOT a
+private purchase price (private purchases are external-store records, W23). Serves CQ-CM-03, CQ-CM-05, CQ-AX-06, CQ-AX-17.
+Canonical module products_and_commerce. Archetype Occurrence.
+"""
+type PriceObservation implements Entity & OccurrenceArchetype
+  @node(labels: ["PriceObservation", "Occurrence"])
+  @mutation(operations: [CREATE]) {
+  id: ID! @id
+  "hu:price-obs:<opaque>"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'PriceObservation'."
+  occurrenceType: String!
+  "Equals observedAt (the display instant)."
+  startedAt: DateTime
+  "Null: an observation is instantaneous."
+  endedAt: DateTime
+  "Displayed amount in `currency` (for PER_UNIT: per `unitQuantity` `unitCode`)."
+  amount: Float!
+  "ISO 4217 code."
+  currency: String!
+  "When the price is known to have been displayed (snapshot observedAt; archive capture time for a late source). Not retrieval time, not validity."
+  observedAt: DateTime!
+  "Kind of price displayed (catalog conventions.priceKind; property card PriceObservation.priceKind)."
+  priceKind: PriceKind!
+  "Availability as displayed with this price; null = not captured (distinct from NOT_DISPLAYED, which means the capture shows no availability statement)."
+  availabilityObserved: ObservedAvailability
+  "For PER_UNIT: the quantity the amount refers to (1 for '$1.63 per count'); null otherwise."
+  unitQuantity: Float
+  "For PER_UNIT: UCUM unit or annotation ('{count}', 'g', '[oz_av]'); null otherwise."
+  unitCode: String
+  "Verbatim displayed price text ('$41.65 with 15 percent savings'); the amount is parsed from it."
+  priceTextVerbatim: String
+  "Verbatim qualifying condition shown with the price ('First Subscribe & Save orders only'; 'Save 15% when you receive 5 or more products in one auto-delivery'). Null = none displayed or not captured."
+  conditionText: String
+  "Region whose prices were displayed (ISO 3166-1/3166-2, e.g. 'US', 'US-MD' from a delivery context). Prices and offers vary by delivery location."
+  observationRegion: String
+  "uid of the SubscriptionPlan this SUBSCRIPTION price applies to, when the page binds it to one plan; null otherwise."
+  subscriptionPlanUid: String
+  "uid of the W00 SourceLocator that shows the price in its SourceSnapshot (reproducibility; the occurrence is not an Assertion, so it carries no SUPPORTED_BY edge, see W15-SR-09)."
+  sourceLocatorUid: String
+  "How the value was captured (controlled: RAW_STRUCTURED_DATA, HTML_SELECTOR, LLM_DIRECT_QUOTE, SEARCH_SNIPPET, MANUAL_TRANSCRIPTION). Capture fidelity differs; answers show it when two observations disagree."
+  captureMethod: String
+
+  """class: structural (inverse view); cardinality: exactly_one; catalog: HAS_PRICE_OBSERVATION."""
+  offer: [Offer!]! @relationship(type: "HAS_PRICE_OBSERVATION", direction: IN)
+}
+
+"""
+A recurring-delivery plan an offer can be bought under: platform plan id, interval and count, verbatim terms and the
+platform app that administers it (Shopify selling plan 1316552773 'Delivered every month' in group 'Subscribe and Save',
+app 'ordergroove-subscribe-and-save'; Amazon Subscribe & Save '2 weeks ... 6 months'). Immutable payload; a terms change
+is a new plan state. A plan is NOT a price: the subscription price is a PriceObservation with priceKind SUBSCRIPTION, and a
+plan whose JSON carries no price adjustment does not show that the subscriber pays the one-time price (the rendered page
+may apply a discount through the subscription app). It is NOT a person's subscription (private, W23). Serves CQ-CM-02,
+CQ-CM-03 (terms). Canonical module products_and_commerce. Archetype VersionedState.
+"""
+type SubscriptionPlan implements Entity & VersionedStateArchetype
+  @node(labels: ["SubscriptionPlan", "VersionedState"]) {
+  id: ID! @id
+  "hu:subscription-plan:<opaque> (token requested, W15-SR-08)"
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'SubscriptionPlan'."
+  stateType: String! @settable(onCreate: true, onUpdate: false)
+  "sha256:<hex> over (sellingPlanId, planGroupName, planName, interval, intervalCount, intervalOptionsText, termsText, planProvider, priceAdjustmentText, minimumCommitmentCount, minimumCommitmentStatus)."
+  payloadHash: String! @settable(onCreate: true, onUpdate: false)
+  effectiveFrom: DateTime @settable(onCreate: true, onUpdate: false)
+  effectiveTo: DateTime @settable(onCreate: true, onUpdate: false)
+  "Platform plan id (catalog sellingPlanId), e.g. Shopify selling_plan id '1316552773'. Scoped by the store; never identity across stores."
+  sellingPlanId: String @settable(onCreate: true, onUpdate: false)
+  "Plan group name as displayed ('Subscribe and Save')."
+  planGroupName: String @settable(onCreate: true, onUpdate: false)
+  "Plan name as displayed ('Delivered every 2 months')."
+  planName: String @settable(onCreate: true, onUpdate: false)
+  "Delivery interval unit (catalog interval; controlled: DAY, WEEK, MONTH, YEAR); null when the plan offers a range (see intervalOptionsText)."
+  interval: String @settable(onCreate: true, onUpdate: false)
+  "Number of interval units between deliveries; null = not fixed by this plan."
+  intervalCount: Int @settable(onCreate: true, onUpdate: false)
+  "Verbatim choice range when one plan offers several intervals ('From once every 2 weeks to once every 6 months')."
+  intervalOptionsText: String @settable(onCreate: true, onUpdate: false)
+  "Verbatim plan terms (catalog terms): 'Pause, skip, or cancel anytime', 'No fees. Skip or cancel anytime'."
+  termsText: String @settable(onCreate: true, onUpdate: false)
+  "Who administers the plan as exposed by the source (Shopify app_id 'ordergroove-subscribe-and-save'; 'AMAZON_SUBSCRIBE_AND_SAVE')."
+  planProvider: String @settable(onCreate: true, onUpdate: false)
+  "Price adjustment as declared by the plan record itself (verbatim or JSON excerpt, e.g. 'price_adjustments: []'). Not a price."
+  priceAdjustmentText: String @settable(onCreate: true, onUpdate: false)
+  "Minimum number of deliveries the subscriber commits to; null with minimumCommitmentStatus NOT_REPORTED when the source is silent."
+  minimumCommitmentCount: Int @settable(onCreate: true, onUpdate: false)
+  "REPORTED when the source states a commitment (including 'none'), NOT_REPORTED when silent; keeps 'no commitment' apart from 'not stated'."
+  minimumCommitmentStatus: ReportedStatus @settable(onCreate: true, onUpdate: false)
+
+  """class: asserted (inverse view); cardinality: many; catalog: USES_SUBSCRIPTION_PLAN."""
+  usedByOffers: [Offer!]! @relationship(type: "USES_SUBSCRIPTION_PLAN", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A sellable combination of items offered as one unit: a multi-pack of one package ('180' = kit of the 90-count SKU,
+CTNUS3006090010-KIT; Amazon 'Two-bottle supply' B07Y2ZGM48) or a mixed kit ('Tru Niagen 300mg 30ct + Immune Bundle',
+CTNUSCK00000004-KIT). Its composition is BundleComponent states. It is NOT a PackageConfiguration (a package is one container
+of one variant, W04) and NOT a new formulation; identifiers attach through HAS_IDENTIFIER. Serves CQ-CM-02, CQ-AX-17
+(studied amount per serving is reached through the component's variant, never through the bundle title). Canonical module
+products_and_commerce. Archetype Entity.
+"""
+type Bundle implements Entity & EntityArchetype
+  @node(labels: ["Bundle", "Entity"]) {
+  id: ID! @id
+  "hu:bundle:<opaque> (token requested, W15-SR-08)"
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Bundle'."
+  entityType: String!
+  "Catalog bundleKind (controlled: MULTI_PACK_SAME_ITEM, MIXED_KIT, VARIETY_PACK, UNKNOWN)."
+  bundleKind: String
+
+  """class: structural; cardinality: one_or_more (zero when composition is not reported); catalog: HAS_BUNDLE_COMPONENT; orderIndex = displayed order."""
+  components: [BundleComponent!]! @relationship(type: "HAS_BUNDLE_COMPONENT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00): kit SKU, kit GTIN as TradeItemIdentifier."""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted (inverse view); cardinality: many; catalog: LISTING_FOR (W15 range extension)."""
+  listedIn: [MerchantListing!]! @relationship(type: "LISTING_FOR", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view); cardinality: many; catalog: INVENTORY_INSTANCE_OF (W15 range extension)."""
+  inventoryItems: [InventoryItem!]! @relationship(type: "INVENTORY_INSTANCE_OF", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+One component line of a Bundle: how many of which product, variant or package, in which role. Immutable payload; a
+changed kit is a new component state. `quantity` null with `quantityStatus` NOT_REPORTED when the source does not state
+the count (the '180' kit SKU suffix suggests two 90-count bottles but the record does not say so). It is NOT an
+IngredientComponent (composition of a formulation, W04). Serves CQ-CM-02, CQ-AX-17. Canonical module products_and_commerce.
+Archetype VersionedState.
+"""
+type BundleComponent implements Entity & VersionedStateArchetype
+  @node(labels: ["BundleComponent", "VersionedState"]) {
+  id: ID! @id
+  "hu:bundle-component:<opaque> (token requested, W15-SR-08)"
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'BundleComponent'."
+  stateType: String! @settable(onCreate: true, onUpdate: false)
+  "sha256:<hex> over (quantity, quantityStatus, componentRole, component uid)."
+  payloadHash: String! @settable(onCreate: true, onUpdate: false)
+  effectiveFrom: DateTime @settable(onCreate: true, onUpdate: false)
+  effectiveTo: DateTime @settable(onCreate: true, onUpdate: false)
+  "Count of the component item in one bundle; null = not stated (see quantityStatus)."
+  quantity: Int @settable(onCreate: true, onUpdate: false)
+  "REPORTED when the source states the count, NOT_REPORTED when it does not (unknown stays unknown)."
+  quantityStatus: ReportedStatus @settable(onCreate: true, onUpdate: false)
+  "Catalog componentRole (controlled: PRIMARY, ADD_ON, FREE_GIFT, SAMPLE, UNKNOWN)."
+  componentRole: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural (inverse view); cardinality: exactly_one; catalog: HAS_BUNDLE_COMPONENT."""
+  bundle: [Bundle!]! @relationship(type: "HAS_BUNDLE_COMPONENT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: exactly_one across the three component fields (service-enforced); catalog: COMPONENT_PRODUCT (-> Product, product-level 'any flavor' component)."""
+  componentProduct: [Product!]! @relationship(type: "COMPONENT_PRODUCT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: exactly_one across the three component fields; catalog: COMPONENT_PRODUCT (-> ProductVariant)."""
+  componentVariant: [ProductVariant!]! @relationship(type: "COMPONENT_PRODUCT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: exactly_one across the three component fields; catalog: COMPONENT_PRODUCT (-> PackageConfiguration, W15 range extension W15-SR-07)."""
+  componentPackage: [PackageConfiguration!]! @relationship(type: "COMPONENT_PRODUCT", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+A merchant's stock-keeping record for an item it holds or sells (merchant SKU, FBA/WFS inventory id): the unit of
+inventory reconciliation, recall exposure and authorized-channel checks. It is NOT a listing (a listing may draw on several
+inventory records), NOT a lot (W12) and NOT a person's purchase (private, W23). Recalled, expired, counterfeit-suspected
+or gray-market status is NEVER a property here: it is a CommerceMatch candidate with its supporting locators (OPEN-QUESTIONS
+quality/commerce 5). Serves CQ-CM-C03 (candidate). Canonical module products_and_commerce. Archetype Entity.
+"""
+type InventoryItem implements Entity & EntityArchetype
+  @node(labels: ["InventoryItem", "Entity"]) {
+  id: ID! @id
+  "hu:inventory-item:<opaque> (token requested, W15-SR-08)"
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'InventoryItem'."
+  entityType: String!
+  "Merchant-scoped inventory key (catalog merchantInventoryId), e.g. a seller SKU. Unique only within merchantOrganizationUid."
+  merchantInventoryId: String! @settable(onCreate: true, onUpdate: false)
+  "uid of the Organization (W01) whose inventory this is; scopes merchantInventoryId."
+  merchantOrganizationUid: String @settable(onCreate: true, onUpdate: false)
+
+  """class: asserted; cardinality: zero_or_one ACCEPTED; catalog: INVENTORY_INSTANCE_OF (-> ProductVariant | PackageConfiguration; Bundle added by W15)."""
+  instanceOf: [ListingTarget!]! @relationship(type: "INVENTORY_INSTANCE_OF", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM."""
+  commerceMatches: [CommerceMatch!]! @relationship(type: "MATCHES_COMMERCE_ITEM", direction: IN)
+}
+
+"""
+One physical retail unit known to the shared graph because a PUBLIC actor documented it: a bottle bought off the shelf by a
+testing organization ('anonymously purchased off the shelf'), a unit photographed in a recall notice. Carries the serial
+number and the lot code and expiry exactly as printed. It is NOT a lot (UNIT_FROM_LOT asserts the link to W12's ProductLot;
+a printed code alone does not establish the lot identity) and NEVER a unit a private person bought or used (private, W23;
+V-113..V-116). Recall exposure is a CommerceMatch candidate, never a property. Serves CQ-AX-19 (expansion; W12 testing),
+CQ-CM-C03. Canonical module products_and_commerce. Archetype Entity.
+"""
+type IndividualUnit implements Entity & EntityArchetype
+  @node(labels: ["IndividualUnit", "Entity"]) {
+  id: ID! @id
+  "hu:individual-unit:<opaque> (token requested, W15-SR-08)"
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'IndividualUnit'."
+  entityType: String!
+  "Serial number as printed (catalog serialNumber); null for unserialized supplement bottles."
+  serialNumber: String @settable(onCreate: true, onUpdate: false)
+  "Lot code exactly as printed on the unit (e.g. '1356-5040273-1'); not normalized, not identity."
+  lotCodeAsPrinted: String @settable(onCreate: true, onUpdate: false)
+  "Expiry text exactly as printed ('EXP 05/2027')."
+  expiryTextAsPrinted: String @settable(onCreate: true, onUpdate: false)
+  "uid of the public Offer the unit was acquired through, when the acquiring public actor states it."
+  acquiredFromOfferUid: String @settable(onCreate: true, onUpdate: false)
+  "Public context in which the unit became known (controlled: PUBLIC_TESTING_PURCHASE, RECALL_NOTICE_EXHIBIT, REGULATORY_SAMPLE, OTHER_PUBLIC)."
+  acquisitionContext: String @settable(onCreate: true, onUpdate: false)
+
+  """class: asserted; cardinality: zero_or_one ACCEPTED; catalog: UNIT_FROM_LOT (-> W12 ProductLot)."""
+  fromLot: [ProductLot!]! @relationship(type: "UNIT_FROM_LOT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view of W12 SAMPLE_FROM); cardinality: many."""
+  testSamples: [TestSample!]! @relationship(type: "SAMPLE_FROM", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM (recall-scope candidates)."""
+  commerceMatches: [CommerceMatch!]! @relationship(type: "MATCHES_COMMERCE_ITEM", direction: IN)
+}
+
+"""
+A tracked link published inside a document, page or episode description that pays its holder when a purchase follows
+(Amazon Associates tag 'partnerid1275-20' on fastlifehacks.com; Impact/Partnerize/CJ click URLs). Immutable record of the
+URL as observed, its tracking parameter and value, the anchor text and the locator where it appears. It is evidence for an
+AFFILIATE_FOR_OFFER assertion (FINANCIAL_INTEREST family); it is NOT that assertion, NOT a sale, NOT an endorsement and
+NOT the subject's own affiliation (a blog about a researcher's regimen earns the blogger's commission, not the
+researcher's). Serves CQ-CM-01 (affiliate leg), CQ-CM-04. Canonical module products_and_commerce. Archetype
+InformationArtifact.
+"""
+type AffiliateLink implements Entity & InformationArtifactArchetype
+  @node(labels: ["AffiliateLink", "InformationArtifact"])
+  @mutation(operations: [CREATE]) {
+  id: ID! @id
+  "hu:affiliate-link:<opaque> (token requested, W15-SR-08)"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'AffiliateLink'."
+  artifactType: String!
+  "Publication time of the containing page or episode when known."
+  publishedAt: DateTime
+  "When the link was observed in its container (snapshot observedAt)."
+  observedAt: DateTime
+  "sha256:<hex> of the URL string exactly as observed."
+  contentHash: String
+  "Full URL exactly as observed (catalog url)."
+  url: String!
+  "Name of the tracking parameter (catalog trackingParameter), e.g. 'tag', 'camref', 'click-<pid>'."
+  trackingParameter: String
+  "Value of the tracking parameter ('partnerid1275-20'). Identifies an affiliate account, not a person; resolution to a person or organization is a ResolutionHypothesis."
+  trackingValue: String
+  "Affiliate program or network as inferred from the URL pattern (controlled: AMAZON_ASSOCIATES, IMPACT, PARTNERIZE, CJ, SHAREASALE, BRAND_DIRECT, UNKNOWN)."
+  affiliateProgram: String
+  "Anchor text of the link as published ('Tru Niagen Pro'); naming a product in anchor text does not make the target listing that product (CommerceMatch)."
+  anchorText: String
+  "uid of the W00 SourceLocator where the link appears in its container's snapshot."
+  sourceLocatorUid: String
+
+  """class: structural; cardinality: zero_or_one across the two LINKS_TO fields; catalog: LINKS_TO (-> MerchantListing)."""
+  linksToListing: [MerchantListing!]! @relationship(type: "LINKS_TO", direction: OUT)
+  """class: structural; cardinality: zero_or_one across the two LINKS_TO fields; catalog: LINKS_TO (-> Offer, when the URL pins one offer)."""
+  linksToOffer: [Offer!]! @relationship(type: "LINKS_TO", direction: OUT)
+}
+
+"""
+A BellLabs assessment comparing a commerce record with a reference identity under a named method: listing or inventory
+to variant/package/bundle (is it the same sellable item?), unit or inventory to a recalled lot scope, offer seller to a
+brand's authorized-channel statement. It records candidates, outcome, score and rationale with supporting locators; it
+never writes a LISTING_FOR, a recall status or a gray-market flag by itself. A listing whose identity is not established
+keeps NO LISTING_FOR and an UNRESOLVED CommerceMatch; a recalled-lot or unauthorized-channel signal stays a PROPOSED
+candidate until reviewed. Serves CQ-CM-02, CQ-AX-14 (commerce), CQ-CM-C03. Canonical module products_and_commerce.
+Archetype EvidenceAssessment.
+"""
+type CommerceMatch implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["CommerceMatch", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  "hu:commerce-match:<opaque> (token requested, W15-SR-08)"
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'CommerceMatch'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  "Matching method and version (e.g. 'w15-gtin-title-match/v0')."
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  recordedAt: DateTime! @settable(onCreate: true, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String
+  overallScore: Float
+  "DEPRECATED; use score with methodVersion."
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "Catalog matchKind (controlled, enum requested W15-SR-10): LISTING_TO_ITEM, INVENTORY_TO_ITEM, RECALL_SCOPE, AUTHORIZED_CHANNEL."
+  matchKind: String! @settable(onCreate: true, onUpdate: false)
+  "Outcome (controlled): SAME_ITEM, DIFFERENT_ITEM, IN_SCOPE, OUT_OF_SCOPE, NO_AUTHORIZATION_FOUND, AUTHORIZED, NOT_DETERMINABLE, UNRESOLVED."
+  matchOutcome: String
+  "Method score in [0,1] (catalog score); null = not scored. Never a truth value."
+  score: Float @settable(onCreate: true, onUpdate: false)
+  "Why the comparison came out as it did (catalog rationale), naming what could not be established."
+  rationale: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural; cardinality: one_or_more (at least two in practice: the record assessed and its candidate references; service-enforced); catalog: MATCHES_COMMERCE_ITEM, range CommerceItemTarget."""
+  matchesItems: [CommerceItemTarget!]! @relationship(type: "MATCHES_COMMERCE_ITEM", direction: OUT)
+  """class: structural; cardinality: one_or_more for RECALL_SCOPE and AUTHORIZED_CHANNEL; catalog: SUPPORTED_BY (W00)."""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; catalog: WAS_GENERATED_BY (W00; matching Activity)."""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; catalog: SUPERSEDES (newer CommerceMatch -> older)."""
+  supersedes: [CommerceMatch!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural; catalog: ASSESSED_BY (-> Agent)."""
+  assessedByAgent: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (-> Person)."""
+  assessedByPerson: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# 2. Relationship-property type
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Successor of live ListingMetadata for listing-scoped asserted edges (LISTS_PROCEDURE, AVAILABLE_IN). Specializes
+AssertedEdgeProperties: contains every field of it, plus `appointmentRequiredOverride` (live qualifier for procedure and
+clinic listings, shares the edge's life). Live `listRole` is split into role relationship types, `localPriceAmount` /
+`localCurrency` become PriceObservations, `notes` is not carried (migration-map.yaml).
+"""
+type ListingEdgeProperties @relationshipProperties {
+  "Stable audit id hu:rel:<opaque>."
+  relationshipUid: String!
+  "uid of the one Assertion that authorizes this edge (predicate = edge type)."
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  "Service-assigned commit time of this episode."
+  recordedFrom: DateTime!
+  "Written once from null."
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  "Listing-level override: an appointment is required for this procedure/location even when the procedure does not require one generally. Null = not stated."
+  appointmentRequiredOverride: Boolean
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# 3. Enums
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Kind of displayed price (catalog conventions.priceKind, frozen). LIST = a reference/list price shown by the merchant
+('List Price: $114.99'); ONE_TIME = the price to buy once now; SUBSCRIPTION = the price under a subscription plan;
+COUPON_ADJUSTED = a price after a displayed coupon or promotion; PER_UNIT = a price per unit of quantity (with unitCode).
+One observation per kind; kinds are never averaged (V-328). Owner W15.
+"""
+enum PriceKind {
+  LIST
+  ONE_TIME
+  SUBSCRIPTION
+  COUPON_ADJUSTED
+  PER_UNIT
+}
+
+"""
+Purchase mode of an Offer (new closed list for the catalog property offerKind; CANDIDATE values, ledger request W15-SR-10).
+PURCHASE = can be bought once (subscription plans may additionally attach); SUBSCRIPTION_ONLY = requires a plan (Shopify
+requires_selling_plan true); PREORDER; SERVICE_BOOKING = a procedure or test appointment (live Listing breadth); UNKNOWN.
+Condition (new/used) is Offer.itemCondition, not a kind. Owner W15.
+"""
+enum OfferKind {
+  PURCHASE
+  SUBSCRIPTION_ONLY
+  PREORDER
+  SERVICE_BOOKING
+  UNKNOWN
+}
+
+"""
+Availability AS DISPLAYED with a price at an observation instant (CANDIDATE vocabulary aligned to schema.org ItemAvailability;
+ledger request W15-SR-10). None of these values ends an offer or a product: DISCONTINUED_AS_DISPLAYED is a merchant
+statement, OUT_OF_STOCK is a displayed state, NOT_DISPLAYED means the capture shows no availability statement (distinct
+from a null field = not captured). Owner W15.
+"""
+enum ObservedAvailability {
+  IN_STOCK
+  LIMITED_STOCK
+  OUT_OF_STOCK
+  BACKORDER
+  PREORDER
+  CURRENTLY_UNAVAILABLE
+  DISCONTINUED_AS_DISPLAYED
+  NOT_DISPLAYED
+  UNKNOWN
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# 4. Unions
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Range of LISTING_FOR and INVENTORY_INSTANCE_OF: the sellable item identity a listing or an inventory record is for.
+ProductVariant and PackageConfiguration are W04 identities; Bundle is W15's multi-item sellable unit (range extension,
+W15-SR-07). A Product is deliberately absent: a listing is always for something more specific than the enduring product.
+"""
+union ListingTarget = ProductVariant | PackageConfiguration | Bundle
+
+"""
+Range of MATCHES_COMMERCE_ITEM: the commerce record being assessed and the reference identities it is compared with
+(catalog ProductVariant | MerchantListing | InventoryItem, extended by W15 with Offer, IndividualUnit, PackageConfiguration,
+Bundle, ProductLot and Organization for recall-scope and authorized-channel checks, W15-SR-07). Parent-only rule: Organization
+covers its specializations.
+"""
+union CommerceItemTarget = MerchantListing | Offer | InventoryItem | IndividualUnit | ProductVariant | PackageConfiguration | Bundle | ProductLot | Organization

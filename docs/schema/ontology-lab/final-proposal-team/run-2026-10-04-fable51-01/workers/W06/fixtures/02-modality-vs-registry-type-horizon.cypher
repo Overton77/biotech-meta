@@ -6,7 +6,7 @@
 //   - exa-cel (fixture 01) is registry type BIOLOGICAL yet modalities [CELL_THERAPY, GENE_THERAPY]: a registry type
 //     is never mapped onto TreatmentModality.
 //   - HORIZON arm receives two StudyInterventions: the gene therapy (GENETIC) and "Plasmapheresis" (PROCEDURE). The
-//     plasmapheresis INSTANTIATES_PROCEDURE therapeutic plasma exchange (the brief title equates the two); it is NOT
+//     plasmapheresis FOLLOWS_INTERVENTION_DEFINITION therapeutic plasma exchange (the brief title equates the two); it is NOT
 //     written as USES_COMPONENT of the delandistrogene concept, because the only source is one trial (V-W06-06).
 // Requires fixtures 00 and 03 (procedure node is created here with MERGE as well, so order does not matter).
 // Rule: every statement binds its own nodes by uid; no variable crosses a ';'.
@@ -57,27 +57,27 @@ SET r.assertionUid = a.uid, r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKN
 MATCH (si:StudyIntervention {uid: 'hu:intervention:nct06597656-delandistrogene'}), (t:Treatment {uid: 'hu:treatment:delandistrogene-moxeparvovec'}),
       (l:SourceLocator {uid: 'hu:locator:ctgov-nct06597656-interventions'}), (sp:Organization {uid: 'hu:org:sarepta-therapeutics'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-nct06597656-delandistrogene-instantiates'})
-SET a.predicate = 'INSTANTIATES_TREATMENT', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
+SET a.predicate = 'FOLLOWS_INTERVENTION_DEFINITION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
     a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(si)
 MERGE (a)-[:HAS_OBJECT]->(t)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (a)-[:ASSERTED_BY]->(sp)
-MERGE (si)-[r:INSTANTIATES_TREATMENT {relationshipUid: 'hu:rel:w06-nct06597656-delandistrogene-instantiates'}]->(t)
+MERGE (si)-[r:FOLLOWS_INTERVENTION_DEFINITION {relationshipUid: 'hu:rel:w06-nct06597656-delandistrogene-instantiates'}]->(t)
 SET r.assertionUid = a.uid, r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
 
 MATCH (si:StudyIntervention {uid: 'hu:intervention:nct06597656-plasmapheresis'}), (p:Procedure {uid: 'hu:procedure:therapeutic-plasma-exchange'}),
       (l:SourceLocator {uid: 'hu:locator:ctgov-nct06597656-title'}), (sp:Organization {uid: 'hu:org:sarepta-therapeutics'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-nct06597656-plasmapheresis-instantiates-tpe'})
-SET a.predicate = 'INSTANTIATES_PROCEDURE', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
+SET a.predicate = 'FOLLOWS_INTERVENTION_DEFINITION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
     a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(si)
 MERGE (a)-[:HAS_OBJECT]->(p)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (a)-[:ASSERTED_BY]->(sp)
-MERGE (si)-[r:INSTANTIATES_PROCEDURE {relationshipUid: 'hu:rel:w06-nct06597656-plasmapheresis-instantiates-tpe'}]->(p)
+MERGE (si)-[r:FOLLOWS_INTERVENTION_DEFINITION {relationshipUid: 'hu:rel:w06-nct06597656-plasmapheresis-instantiates-tpe'}]->(p)
 SET r.assertionUid = a.uid, r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
 
 MATCH (t:Treatment {uid: 'hu:treatment:delandistrogene-moxeparvovec'}), (c:Condition {uid: 'hu:condition:duchenne-muscular-dystrophy'}),

@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 281,
+   "ms": 159,
    "sample": [],
    "header": "// Each query should return zero rows in a valid committed graph unless its comment says \"(informational)\",\n// in which case rows are expected and are for review, never a failure.\n// Status tags: every query is \"statically-checked\" (parsed with the Neo4j Cypher language-support parser and\n// read ag"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 72,
+   "ms": 52,
    "sample": [],
    "header": "// V-000b: every semantic node has exactly one base archetype."
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 47,
    "sample": [],
    "header": "// V-001: accepted assertions require exact source attribution."
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 45,
    "sample": [],
    "header": "// V-002: assertions require exactly one subject."
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 59,
+   "ms": 49,
    "sample": [],
    "header": "// V-003: assertions must have exactly one object OR one typed literal."
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 46,
    "sample": [],
    "header": "// V-004: no direct composition shortcut may masquerade as authoritative history."
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 48,
    "sample": [],
    "header": "// V-005: formulation components must identify a material."
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 54,
    "sample": [],
    "header": "// V-006: quantitative containment requires quantity, unit, and basis."
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 52,
    "sample": [],
    "header": "// V-007: accepted advisor-product endorsement cannot be inferred only from advising.\n// 0.2.0: an ENDORSES_PRODUCT edge is an asserted projection; it must cite an ENDORSES_PRODUCT assertion, never\n// an ADVISES_ORGANIZATION one, and never be unbacked."
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 78,
+   "ms": 50,
    "sample": [],
    "header": "// V-008: a Certificate of Analysis must report on a lot or execution."
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 58,
+   "ms": 63,
    "sample": [],
    "header": "// V-009: a Certification Listing must have explicit scope."
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 56,
+   "ms": 52,
    "sample": [],
    "header": "// V-010: orphan designation and drug approval may not share an identity node."
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 49,
    "sample": [],
    "header": "// V-011: label declarations must not be modeled as measured results."
   },
@@ -311,7 +311,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 48,
    "sample": [],
    "header": "// V-012: registrations, protocols, publications, and studies are distinct identities."
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 77,
+   "ms": 48,
    "sample": [],
    "header": "// V-013: show unresolved source identifier conflicts for agent review (informational)."
   },
@@ -355,11 +355,11 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 49,
    "sample": [
     {
      "relType": "MEASURES_METRIC",
-     "edgeId": "5:31e397e2-2c01-4a4a-ba20-3b24d32503f6:162",
+     "edgeId": "5:31e397e2-2c01-4a4a-ba20-3b24d32503f6:161",
      "recordedFrom": null,
      "assertionUid": null
     }
@@ -384,7 +384,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 49,
    "sample": [],
    "header": "// V-102: half-open intervals are non-empty and ordered (valid time and recorded time), on edges.\n// status: statically-checked"
   },
@@ -406,7 +406,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 46,
    "sample": [],
    "header": "// V-103: the same ordering rule on assertions (valid time only; recordedAt is a single instant).\n// status: statically-checked"
   },
@@ -428,7 +428,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 61,
+   "ms": 55,
    "sample": [],
    "header": "// V-104: no sentinel dates. Open and unknown bounds are null.\n// status: statically-checked"
   },
@@ -450,7 +450,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 56,
+   "ms": 51,
    "sample": [],
    "header": "// V-105: a non-null valid-time bound on an assertion carries its own basis and precision (per-bound, round 0007).\n// status: statically-checked, executed"
   },
@@ -472,7 +472,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 51,
    "sample": [],
    "header": "// V-106: the same rule on asserted edges that carry a valid-time bound.\n// status: statically-checked\n// params: $assertedTypes"
   },
@@ -494,7 +494,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 48,
    "sample": [],
    "header": "// V-107: ingestion time must not stand in for an unknown valid start (heuristic; rows are for review).\n// status: statically-checked"
   },
@@ -516,7 +516,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 56,
    "sample": [],
    "header": "// V-108: exclusive predicates: no two possibly-overlapping believed attachments from one subject\n// to different objects within one scope. Unknown bounds are treated as possible overlap.\n// status: illustrative (depends on predicate exclusivity metadata, catalog conventions.predicateExclusivity)\n//"
   },
@@ -538,7 +538,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 52,
    "sample": [],
    "header": "// V-109: a SUPERSEDED assertion has an incoming SUPERSEDES that was recorded no earlier than it.\n// status: statically-checked"
   },
@@ -560,7 +560,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 52,
    "sample": [],
    "header": "// V-110: a BellLabs review state (ACCEPTED, REJECTED, DISPUTED) must be backed by an Adjudication,\n// and no Adjudication may predate the assertion it reviews.\n// status: statically-checked\n// 0.2.0: only a CAPTURE_FIDELITY adjudication backs a status; a SUPPORT adjudication (truth) never does (INV"
   },
@@ -582,7 +582,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 61,
    "sample": [],
    "header": "// V-111: locators behind an ACCEPTED assertion must resolve to a reproducible snapshot.\n// status: statically-checked"
   },
@@ -604,7 +604,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 58,
+   "ms": 50,
    "sample": [],
    "header": "// V-111b (informational): snapshots cited by ACCEPTED assertions without a declared contentHashBasis. Null weakens\n// reproducibility (the hash input is unnamed); new captures must set it (service-enforced).\n// status: statically-checked, executed"
   },
@@ -626,7 +626,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 69,
+   "ms": 62,
    "sample": [],
    "header": "// V-112: derived and forbidden-implication edges cite live, matching assertions (QS-4a, zero rows = valid).\n// status: statically-checked\n// params: $derivedTypes, $implicationPairs, $ruleOnlyDerivedTypes (catalog relationships with ruleOnly: true)"
   },
@@ -648,7 +648,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 51,
+   "ms": 54,
    "sample": [
     {
      "sharedLabels": [
@@ -680,7 +680,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 48,
    "sample": [],
    "header": "// V-114: private-to-shared references use only governed reference types.\n// status: illustrative (Lane 5 owns the list of reference types)\n// params: $allowedReferenceTypes\n// 0.2.0: in production no relationship crosses the store boundary at all (references are uid properties), so\n// $allowedRefer"
   },
@@ -702,7 +702,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 62,
+   "ms": 53,
    "sample": [],
    "header": "// V-115: private nodes do not carry labels that a shared fulltext or vector index covers.\n// status: statically-checked\n// params: $sharedIndexedLabels list<string>, derive with: SHOW FULLTEXT INDEXES YIELD labelsOrTypes, plus the vector index labels"
   },
@@ -724,7 +724,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 55,
    "sample": [],
    "header": "// V-116: private nodes carry no search text or embedding unless a private index is declared (placement-dependent).\n// status: illustrative (applies only if private records share the shared database)"
   },
@@ -746,7 +746,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 45,
    "sample": [],
    "header": "// V-117: uid format and uid-to-live-id seam. For a node that has both a uid and a live id (stored under\n// the type's id property or its @alias), the uid ends with ':' + id and matches the format.\n// status: statically-checked"
   },
@@ -768,7 +768,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 64,
+   "ms": 48,
    "sample": [
     {
      "label": "Organization",
@@ -821,7 +821,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 48,
    "sample": [],
    "header": "// V-119: search surface. Embeddings declare their model and dimension, the dimension matches the vector,\n// and derived search text names the fields it was derived from.\n// status: statically-checked"
   },
@@ -843,7 +843,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 48,
    "sample": [],
    "header": "// V-120: fulltext indexes exist on the stored property names the live directives imply.\n// The Neo4j GraphQL library does not create them, and aliased fields are stored under other names.\n// status: statically-checked (index metadata only; expected names come from the live schema)"
   },
@@ -865,7 +865,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 51,
    "sample": [],
    "header": "// Expected by hand from lines 502, 738, 2660 to 2745 of current_biotech_schema.graphql:\n//   DocumentSearch -> Document   [title, url, searchText]      (GraphQL fields name, sourceUrl are aliased)\n//   ChunkSearch    -> Chunk      [text, searchText]\n//   ClaimSearch    -> Claim      [name, descript"
   },
@@ -887,7 +887,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 49,
    "sample": [],
    "header": "// V-123 (INV-406): status is never read from a truth verdict. Rows are assertions whose status is REJECTED or DISPUTED while\n// their only adjudications are SUPPORT adjudications (truth) and no CAPTURE_FIDELITY adjudication exists, or whose status\n// mirrors a SUPPORT verdict exactly when the captu"
   },
@@ -909,7 +909,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 47,
    "sample": [],
    "header": "// V-124 (INV-007): distinct states are never normalized to one. Rows are quantitative records with a null value and no\n// qualifier saying which state applies (unknown, unmeasured, not reported, below detection, absent), or an applicability\n// dimension whose verdict is UNKNOWN without missing fact"
   },
@@ -931,7 +931,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 73,
+   "ms": 45,
    "sample": [],
    "header": "// =====================================================================================\n// Lane 2, rounds 0002 and 0003: evidence applicability and mechanisms (V-2xx)\n// Source: ontology-lab round files; merged by the integration owner on 2026-10-03.\n// Every query below is statically checked (synt"
   },
@@ -953,7 +953,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 47,
    "sample": [],
    "header": "// V-202 (R1): a ProductVariant used as intervention material must carry asReportedName.\n// status: statically-checked"
   },
@@ -975,7 +975,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 44,
    "sample": [],
    "header": "// V-203 (INV-202): exactly one evidence target and exactly one use target.\n// status: statically-checked"
   },
@@ -997,7 +997,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 44,
    "sample": [],
    "header": "// V-204 (INV-202): required dimensions present for the evidence-target kind.\n// status: statically-checked"
   },
@@ -1019,7 +1019,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 64,
+   "ms": 48,
    "sample": [],
    "header": "// V-205 (INV-202): at most one dimension node per dimension per assessment.\n// status: statically-checked"
   },
@@ -1041,7 +1041,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 59,
+   "ms": 49,
    "sample": [],
    "header": "// V-206 (INV-203): ratios only with matching bases; otherwise ratio null and verdict not MATCH.\n// status: statically-checked"
   },
@@ -1063,7 +1063,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 47,
    "sample": [],
    "header": "// V-207 (INV-204): explanation-only dimensions are NOT_SCORED with rationale; composites need all required dimensions.\n// status: statically-checked"
   },
@@ -1085,7 +1085,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 51,
+   "ms": 48,
    "sample": [],
    "header": "// V-207b: a composite score requires a method version and no NOT_ASSESSED MATERIAL_IDENTITY.\n// status: statically-checked"
   },
@@ -1107,7 +1107,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 51,
+   "ms": 48,
    "sample": [],
    "header": "// V-208 (INV-008): MATERIAL_IDENTITY at branded-material level or higher requires the same material on both sides.\n// status: statically-checked"
   },
@@ -1129,7 +1129,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 74,
+   "ms": 44,
    "sample": [],
    "header": "// V-208b: MATERIAL_IDENTITY verdict must agree with identityLevel mapping (method applicability-v0.1).\n// status: statically-checked"
   },
@@ -1151,7 +1151,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 58,
+   "ms": 44,
    "sample": [],
    "header": "// V-209 (provenance rule): an assessed dimension cites a locator or an assertion; UNKNOWN lists missing facts.\n// status: statically-checked"
   },
@@ -1173,7 +1173,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 61,
+   "ms": 44,
    "sample": [],
    "header": "// V-210 (INV-208, R10): Study identity nodes carry no registry status, publication ids, or assessment labels\n// unless explicitly a derived projection naming its RegistrationVersion.\n// status: statically-checked"
   },
@@ -1195,7 +1195,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 73,
+   "ms": 66,
    "sample": [],
    "header": "// V-211: every RegistrationVersion belongs to exactly one TrialRegistration and has observedAt.\n// status: statically-checked"
   },
@@ -1217,7 +1217,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 89,
+   "ms": 49,
    "sample": [],
    "header": "// V-212 (FI-203): informational. Rows are expected; each row is a study whose registry shows no posted\n// results while a results article exists. Answers must not report these as unpublished.\n// status: statically-checked (informational)"
   },
@@ -1239,7 +1239,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 75,
+   "ms": 45,
    "sample": [],
    "header": "// V-213 (INV-209): assessment labels on results and edges must name an assessment.\n// status: statically-checked"
   },
@@ -1261,7 +1261,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 72,
+   "ms": 44,
    "sample": [],
    "header": "// V-213b: EvidenceStrength values on edges must name an EvidenceStrengthAssessment.\n// status: statically-checked"
   },
@@ -1283,7 +1283,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 77,
+   "ms": 44,
    "sample": [],
    "header": "// V-214 (INV-205): SURROGATE_ENDPOINT classifications carry a validation level and full context of use and a source.\n// status: statically-checked"
   },
@@ -1305,7 +1305,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 56,
+   "ms": 78,
    "sample": [],
    "header": "// V-214b (INV-205): no surrogate status as a Biomarker property.\n// status: statically-checked"
   },
@@ -1327,7 +1327,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 98,
+   "ms": 46,
    "sample": [],
    "header": "// V-215 (INV-206): no secondary/subgroup/post hoc/within-arm result enters as CONFIRMATORY when the same\n// study's primary prespecified result is NOT_SIGNIFICANT.\n// status: statically-checked"
   },
@@ -1349,7 +1349,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 59,
+   "ms": 44,
    "sample": [],
    "header": "// V-216 (FI-207): within-arm changes are never CONFIRMATORY or INDEPENDENT_REPLICATION inputs.\n// status: statically-checked"
   },
@@ -1371,7 +1371,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 45,
    "sample": [],
    "header": "// V-217 (INV-207): adverse-event results state a collection method; zeros need one.\n// status: statically-checked"
   },
@@ -1393,7 +1393,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 65,
+   "ms": 44,
    "sample": [],
    "header": "// V-218 (CQ-ST-07): two INDEPENDENT_REPLICATION inputs of one synthesis may not share a study or dataset.\n// status: statically-checked"
   },
@@ -1437,7 +1437,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 44,
    "sample": [],
    "header": "// V-219b\n// status: statically-checked"
   },
@@ -1459,7 +1459,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 44,
    "sample": [],
    "header": "// V-219c: a synthesis version with a TRIGGERED_BY must supersede an earlier version.\n// status: statically-checked"
   },
@@ -1481,7 +1481,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 44,
    "sample": [],
    "header": "// V-220 (FI-202): no unprojected SUPPLIES_INGREDIENT_MATERIAL edge (asserted predicate needs its assertion).\n// status: statically-checked"
   },
@@ -1503,7 +1503,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 44,
    "sample": [],
    "header": "// V-221 (R1): non-placebo study interventions have components with quantity, unit, quantityBasis, and massBasis\n// (massBasis may be UNSPECIFIED; quantity may be absent only with quantityStatus NOT_REPORTED).\n// status: statically-checked"
   },
@@ -1525,7 +1525,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 44,
    "sample": [],
    "header": "// V-222 (R11): ChemicalForm has exactly one substance; substances, forms, and materials stay distinct identities;\n// dosage form never sits on a material.\n// status: statically-checked"
   },
@@ -1569,7 +1569,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 44,
    "sample": [],
    "header": "// V-223 (CQ-ST-04): informational. Outcomes whose declared priority differs between sources (outcome switching\n// candidates). Rows expected for NCT02678611 whole-blood NAD+.\n// status: statically-checked (informational)"
   },
@@ -1591,7 +1591,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 44,
    "sample": [],
    "header": "// ---------------------------------------------------------------------------\n// Mechanisms (round 0003)\n// ---------------------------------------------------------------------------\n// V-230 (INV-210): mechanism-class assertions carry basisKind.\n// status: statically-checked"
   },
@@ -1635,7 +1635,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 53,
    "sample": [],
    "header": "// V-232: exposure amounts carry unit and basis; unknown exposure is null with exposureStatus, never zero.\n// status: statically-checked"
   },
@@ -1657,7 +1657,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 66,
+   "ms": 47,
    "sample": [],
    "header": "// V-233 (INV-211, FI-304): mechanism projections only from ACCEPTED DIRECT_MEASUREMENT assertions.\n// ACCEPTED here is capture fidelity (the measurement was accurately recorded), not a truth verdict; truth gating\n// of projections is a SUPPORT adjudication question handled by the recommendation lay"
   },
@@ -1701,7 +1701,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 49,
    "sample": [],
    "header": "// V-235 (M6): ACCEPTED assertions whose every supporting locator belongs to a source whose publication is retracted.\n// Publication-to-Source alignment is Lane 4's (round 0006); this query joins on DOI URI.\n// status: illustrative"
   },
@@ -1723,7 +1723,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 47,
    "sample": [],
    "header": "// V-236 (INV-213): HED is derived, never asserted.\n// status: statically-checked"
   },
@@ -1745,7 +1745,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 48,
    "sample": [],
    "header": "// V-237 (INV-212, FI-303): applicability of a mechanism assertion needs an EXPOSURE dimension; MATCH/PARTIAL needs\n// linked human exposure evidence (a StudyResult considered by the assessment).\n// status: statically-checked"
   },
@@ -1767,7 +1767,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 66,
+   "ms": 44,
    "sample": [],
    "header": "// V-238 (M3): a context tied to a StudyArm does not duplicate exposure fields (dose truth lives on the arm).\n// status: statically-checked"
   },
@@ -1789,7 +1789,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 69,
    "sample": [],
    "header": "// V-239 (M1, FI-301): a level-change step's measured compartment equals its measurand's matrix.\n// status: statically-checked"
   },
@@ -1811,7 +1811,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 51,
    "sample": [],
    "header": "// ---------------------------------------------------------------------------\n// Constraints Neo4j 5 can enforce (separate from the queries above)\n// ---------------------------------------------------------------------------\n// Uniqueness of uid for every new label is already covered by the archet"
   },
@@ -1833,7 +1833,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 48,
    "sample": [
     {
      "assayVersionUid": "hu:assay-version:w08-neg-platform-as-instrument",
@@ -1864,7 +1864,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 44,
    "sample": [],
    "header": "// V-302: measured results compared across different assay versions need a COMPARABLE or COMPARABLE_WITH_CONVERSION assessment.\n// status: statically-checked"
   },
@@ -1886,7 +1886,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 44,
    "sample": [],
    "header": "// V-303: result kind must match its producing record. Measured results need an assay version;\n// calculated and inferred results need an algorithm version, unless the link is still an UNRESOLVED\n// assertion under review (competing proposals), which is the only allowed pending state.\n// status: sta"
   },
@@ -1908,7 +1908,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 49,
    "sample": [],
    "header": "// V-304: inferred or calculated results compared across different algorithm versions need an assessment.\n// status: statically-checked"
   },
@@ -1930,7 +1930,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 92,
+   "ms": 49,
    "sample": [],
    "header": "// V-305b: every reference interval version belongs to an assay version.\n// status: statically-checked"
   },
@@ -1974,7 +1974,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 44,
    "sample": [],
    "header": "// V-307: no \"same test\" identity merge without an accepted resolution projection.\n// status: statically-checked"
   },
@@ -1996,7 +1996,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 59,
+   "ms": 44,
    "sample": [],
    "header": "// V-308: every algorithm version states its version basis.\n// status: statically-checked"
   },
@@ -2018,7 +2018,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 44,
    "sample": [],
    "header": "// V-312: results from an unversioned service endpoint never enter a comparison.\n// status: statically-checked"
   },
@@ -2040,7 +2040,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 47,
    "sample": [],
    "header": "// V-305a: live HAS_REFERENCE_RANGE edges from Biomarker or Metric are projections only (migration check;\n// expected to list every live edge until each is regenerated from a ReferenceIntervalVersion).\n// status: statically-checked"
   },
@@ -2062,7 +2062,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 70,
+   "ms": 50,
    "sample": [],
    "header": "// V-309: a result does not indicate a condition without an assertion (outside a reference interval is not a condition).\n// status: statically-checked"
   },
@@ -2084,7 +2084,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 43,
    "sample": [],
    "header": "// V-310a: materialized LOINC codes are well formed (digits, hyphen, check digit).\n// status: statically-checked"
   },
@@ -2106,7 +2106,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 44,
    "sample": [],
    "header": "// V-310b: one Metric per LOINC code (also enforced by constraint metric_loinc_code below).\n// status: statically-checked"
   },
@@ -2128,7 +2128,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 46,
    "sample": [],
    "header": "// V-311: a ComparabilityAssessment compares exactly two versions of the same kind.\n// status: statically-checked"
   },
@@ -2150,7 +2150,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 46,
    "sample": [],
    "header": "// V-313: every DiagnosticResult declares a privacy class (placement is Lane 5's decision).\n// status: statically-checked"
   },
@@ -2172,7 +2172,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 70,
    "sample": [
     {
      "statusUid": "hu:reg-status:w08-neg-510k-read-as-approval",
@@ -2200,7 +2200,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 58,
+   "ms": 46,
    "sample": [],
    "header": "// V-320b: an approval status may not sit under a non-approval legal basis.\n// status: statically-checked"
   },
@@ -2222,7 +2222,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 50,
    "sample": [],
    "header": "// V-322: live projection Product.status = 'APPROVED' requires an APPROVAL status of that product.\n// status: statically-checked"
   },
@@ -2244,7 +2244,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 48,
    "sample": [],
    "header": "// V-323: establishment or facility registration is a status of a Facility only.\n// status: statically-checked"
   },
@@ -2288,7 +2288,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 44,
    "sample": [],
    "header": "// V-325: capability state edges are bitemporal and assertion-backed.\n// status: statically-checked"
   },
@@ -2310,7 +2310,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 44,
    "sample": [],
    "header": "// V-326a: SELLS_PRODUCT is derived only from seller-of-record assertions.\n// status: statically-checked"
   },
@@ -2332,7 +2332,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 69,
+   "ms": 44,
    "sample": [],
    "header": "// V-326c: every derivation input of SELLS_PRODUCT is a SELLER_OF_RECORD_FOR assertion (closes the derivationRule bypass\n// found in review: a HOSTS_LISTING input returned zero rows from V-326a and V-112).\n// status: statically-checked, executed"
   },
@@ -2354,7 +2354,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 44,
    "sample": [
     {
      "approvalStatusWithoutApprovingResponse": "hu:reg-status:w08-neg-510k-read-as-approval"
@@ -2380,7 +2380,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 46,
    "sample": [],
    "header": "// V-326b: seller-of-record edges must be assertion-backed (hosting or fulfilling never implies it).\n// status: statically-checked"
   },
@@ -2402,7 +2402,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 100,
+   "ms": 48,
    "sample": [],
    "header": "// V-328: price observations carry amount, currency, observation time, and price kind.\n// status: statically-checked"
   },
@@ -2424,7 +2424,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 50,
    "sample": [],
    "header": "// V-330: label declarations never carry calculated referents (active moiety, nutrient equivalent).\n// status: statically-checked"
   },
@@ -2446,7 +2446,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 44,
    "sample": [],
    "header": "// V-335: an accepted company characterization of an agency action requires a BellLabs adjudication.\n// status: statically-checked"
   },
@@ -2468,7 +2468,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 83,
+   "ms": 48,
    "sample": [],
    "header": "// V-321: regulatory record kinds never share one node.\n// status: statically-checked"
   },
@@ -2490,7 +2490,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 56,
+   "ms": 44,
    "sample": [],
    "header": "// V-327: an offer has at most one current open seller of record.\n// status: statically-checked"
   },
@@ -2512,7 +2512,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 50,
+   "ms": 44,
    "sample": [],
    "header": "// V-329: live Listing price fields without a PriceObservation (migration check; informational).\n// status: statically-checked"
   },
@@ -2534,7 +2534,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 45,
    "sample": [],
    "header": "// V-331: NDI and GRAS responses keep the agency's conditions of use (informational; null means not captured).\n// status: statically-checked"
   },
@@ -2556,7 +2556,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 49,
    "sample": [],
    "header": "// V-332: a derived product-level certification must be covered by the listing's scope.\n// status: statically-checked"
   },
@@ -2578,7 +2578,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 49,
    "sample": [
     {
      "statusUid": "hu:reg-status:w08-neg-510k-read-as-approval",
@@ -2606,7 +2606,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 50,
    "sample": [],
    "header": "// V-334: a status cannot outlive the legal basis it depends on (for example the 2024 LDT rule, vacated 2025-03-31).\n// status: statically-checked"
   },
@@ -2628,7 +2628,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 51,
    "sample": [],
    "header": "// ---------------------------------------------------------------------------\n// Rules Neo4j cannot enforce: -- service-enforced\n// ---------------------------------------------------------------------------\n// -- service-enforced: closed enums (resultKind, versionBasis, statusKind, responseKind pe"
   },
@@ -2650,7 +2650,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 48,
    "sample": [
     {
      "acceptedAssertionsWithOnlyCoarseLocators": 0
@@ -2698,7 +2698,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 50,
    "sample": [],
    "header": "// V-403: character offsets are meaningless without the text version they count in.\n// status: statically-checked"
   },
@@ -2720,7 +2720,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 52,
    "sample": [],
    "header": "// V-404: a locator's text version must derive from the same snapshot the locator hangs from.\n// status: statically-checked"
   },
@@ -2742,7 +2742,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 46,
    "sample": [],
    "header": "// V-405: every DocumentTextVersion derives from exactly one SourceSnapshot.\n// status: statically-checked"
   },
@@ -2764,7 +2764,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 46,
    "sample": [],
    "header": "// V-406: a Chunk is a retrieval unit, never a SourceLocator implementation.\n// status: statically-checked"
   },
@@ -2786,7 +2786,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 48,
    "sample": [],
    "header": "// V-407: an Assertion may point SUPPORTED_BY at a Chunk only as a derived\n// shortcut naming the locator it projects, and that locator must also be linked.\n// status: statically-checked"
   },
@@ -2808,7 +2808,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 47,
    "sample": [],
    "header": "// V-408: RESOLVES_TO_CHUNK is derived; it must name its derivation rule and segmentation.\n// status: statically-checked"
   },
@@ -2830,7 +2830,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 47,
    "sample": [],
    "header": "// V-409: REANCHORS links locators on two snapshots of the same Source, newer to older.\n// status: statically-checked"
   },
@@ -2852,7 +2852,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 63,
    "sample": [],
    "header": "// ---------------------------------------------------------------------\n// B. Claim occurrences, attribution, retellings (CQ-CL-01..04, CQ-CL-06)\n// ---------------------------------------------------------------------\n// V-410: a ClaimOccurrence has exactly one container and exactly one asserter.\n"
   },
@@ -2874,7 +2874,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 45,
    "sample": [],
    "header": "// V-411: a ClaimOccurrence's locators are in its container or a rendition of it.\n// status: statically-checked"
   },
@@ -2918,7 +2918,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 47,
    "sample": [],
    "header": "// V-413: RETELLS must state its mode and its basis; a BellLabs match needs a hypothesis,\n// an explicit citation needs the citing locator.\n// status: statically-checked"
   },
@@ -2940,7 +2940,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 45,
    "sample": [],
    "header": "// V-414: qualification loss is an assessment, never a field on an assertion.\n// status: statically-checked"
   },
@@ -2962,7 +2962,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 51,
    "sample": [],
    "header": "// V-415: a RetellingFidelityAssessment compares exactly one retelling with exactly one\n// original that the retelling RETELLS (directly or through a chain).\n// status: statically-checked"
   },
@@ -2984,7 +2984,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 48,
    "sample": [],
    "header": "// V-416: QUALIFIED_BY names its kind and stays inside one container.\n// status: statically-checked"
   },
@@ -3006,7 +3006,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 50,
    "sample": [],
    "header": "// V-417: INSTANCE_OF (occurrence -> proposition) is a resolution result: it names\n// a derivation rule or an accepted hypothesis.\n// status: statically-checked"
   },
@@ -3028,7 +3028,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 52,
+   "ms": 49,
    "sample": [],
    "header": "// V-418: evidence strength is an assessment, not a Claim property (migration check).\n// status: statically-checked"
   },
@@ -3050,7 +3050,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 54,
+   "ms": 45,
    "sample": [],
    "header": "// V-419: a structured RelationshipAssertion and a ClaimOccurrence must not record the\n// same proposition from the same span (double counting one act of saying).\n// status: statically-checked"
   },
@@ -3072,7 +3072,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 59,
+   "ms": 45,
    "sample": [],
    "header": "// V-420: live RelationshipAssertion SUBJECT/OBJECT lists collapse more than one\n// proposition (catalog INV-003 needs exactly one subject).\n// status: statically-checked"
   },
@@ -3094,7 +3094,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 60,
    "sample": [],
    "header": "// ---------------------------------------------------------------------\n// C. Financial relationships and forbidden implications (CQ-CL-05, CQ-CL-08, CQ-EC-03)\n// ---------------------------------------------------------------------\n// V-421: financial-interest role edges are projections of asserti"
   },
@@ -3116,7 +3116,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 111,
    "sample": [],
    "header": "// V-422: ENDORSES_PRODUCT exists only as the projection of an accepted\n// ENDORSES_PRODUCT assertion; sponsorship, mention, advising or use never create it.\n// status: statically-checked"
   },
@@ -3138,7 +3138,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 51,
+   "ms": 64,
    "sample": [],
    "header": "// V-423: live Person-[:RECOMMENDS]-> is a projection of an assertion whose own\n// speech act is RECOMMENDS (a practice report or a third party's attribution does not count).\n// status: statically-checked"
   },
@@ -3160,7 +3160,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 48,
    "sample": [],
    "header": "// V-424: a truth verdict may not rest only on a financial relationship (disclosed\n// sponsorship does not make a claim false; absence of a conflict does not make it true).\n// status: statically-checked"
   },
@@ -3182,7 +3182,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 46,
    "sample": [],
    "header": "// V-425: a ConflictRelevanceAssessment names its method, level, the occurrence and\n// at least one interest assertion.\n// status: statically-checked"
   },
@@ -3204,7 +3204,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 54,
    "sample": [],
    "header": "// V-426: 'NOT_DISCLOSED' cannot be concluded when any capture of the container is partial.\n// status: statically-checked"
   },
@@ -3226,7 +3226,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 48,
    "sample": [],
    "header": "// V-427: DIRECT relevance needs a role interval that can overlap the utterance.\n// Rows when the role's known validTo precedes the container's publication.\n// status: statically-checked"
   },
@@ -3248,7 +3248,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 44,
    "sample": [],
    "header": "// ---------------------------------------------------------------------\n// D. Lineage and the five provenance states (CQ-PV-01, CQ-PV-03, CQ-PV-06)\n// ---------------------------------------------------------------------\n// V-428: an extraction confidence without the activity that produced it is un"
   },
@@ -3292,7 +3292,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 47,
    "sample": [],
    "header": "// V-430: mongoResearchRunId is a projection seam; every committed assertion carrying it\n// must also have the Activity it names (migration completeness).\n// status: statically-checked"
   },
@@ -3314,7 +3314,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 47,
    "sample": [],
    "header": "// V-431: Agent identity is not a run: runUid belongs on Activity (catalog CHANGE).\n// status: statically-checked"
   },
@@ -3336,7 +3336,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 50,
    "sample": [],
    "header": "// ---------------------------------------------------------------------\n// E. Ecosystem identity (CQ-EC-02)\n// ---------------------------------------------------------------------\n// V-432: an EquivalenceAssessment compares exactly two distinct nodes and never\n// coexists with a merged node carryi"
   },
@@ -3358,7 +3358,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 48,
    "sample": [],
    "header": "// V-433: a consumer brand and a legal entity are never one node.\n// status: statically-checked"
   },
@@ -3380,7 +3380,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 50,
    "sample": [],
    "header": "// V-434: equity or board roles stated for a corporate group are not pushed down to\n// a member company without an assertion naming that company.\n// status: statically-checked"
   },
@@ -3402,7 +3402,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 47,
    "sample": [],
    "header": "// Service-enforced (Neo4j cannot express): exactly-one container/asserter per\n// ClaimOccurrence (V-410), locator/container agreement (V-411), RETELLS acyclicity\n// (V-412), selector minimum fields by selectorKind (V-401), verdict independence\n// from financial ties (V-424), partial-capture disclos"
   },
@@ -3424,7 +3424,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 44,
    "sample": [],
    "header": "// V-502: no sentinel maximum dates on assertions or episodes (open bounds are null).\n// status: statically-checked"
   },
@@ -3446,7 +3446,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 63,
    "sample": [],
    "header": "// V-503: bound, precision, and basis agree. OBSERVATION_ONLY or UNKNOWN basis forces a null bound; a non-null bound\n// needs a precision; INFERRED needs a derivation rule.\n// status: statically-checked\n// 0.2.0 integration: a basis is required when its bound is non-null; a null bound with a null ba"
   },
@@ -3468,7 +3468,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 48,
+   "ms": 45,
    "sample": [],
    "header": "// V-504: no backdating. An episode is not recorded before its authorizing assertion; an assertion is not recorded\n// before the snapshot that supports it was retrieved.\n// status: statically-checked"
   },
@@ -3490,7 +3490,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 47,
    "sample": [],
    "header": "// V-505: projection fidelity. Episode valid time equals its authorizing assertion's valid time. A correction that\n// edited valid time in place on either side shows up here.\n// status: statically-checked"
   },
@@ -3512,7 +3512,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 46,
    "sample": [],
    "header": "// V-506: supersession closes the older assertion exactly at the newer one's recordedAt; status projection agrees.\n// status: statically-checked"
   },
@@ -3534,7 +3534,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 61,
+   "ms": 46,
    "sample": [],
    "header": "// V-507: SUPERSEDES links like to like, points from newer to older, and has no cycles.\n// status: statically-checked"
   },
@@ -3556,7 +3556,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 53,
+   "ms": 48,
    "sample": [],
    "header": "// V-507b: a VALIDITY_BOUNDED supersession keeps object and start and only closes an open end.\n// status: statically-checked"
   },
@@ -3578,7 +3578,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 44,
    "sample": [],
    "header": "// V-508: DEFINITE overlap of mutually exclusive attachments in both valid and recorded time.\n// Bounds are shrunk by their precision before comparison; null bounds never produce a definite overlap.\n// status: statically-checked"
   },
@@ -3600,7 +3600,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 49,
    "sample": [],
    "header": "// V-509 (informational, review queue): POSSIBLE overlap of exclusive attachments caused by a null or imprecise bound,\n// among currently recorded episodes.\n// status: statically-checked"
   },
@@ -3622,7 +3622,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 71,
+   "ms": 51,
    "sample": [],
    "header": "// V-510: accepted literal assertions of an exclusive predicate do not definitely overlap with different values.\n// $exclusivePredicates is the catalog list (for example ['REGISTRATION_RECRUITMENT_STATUS']).\n// status: illustrative"
   },
@@ -3688,7 +3688,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 49,
+   "ms": 62,
    "sample": [],
    "header": "// V-513: live TemporalSnapshot projection nodes are frozen after commit except for the single recordedTo write.\n// Uses live GraphQL labels and their @timestamp fields.\n// status: illustrative"
   },
@@ -3710,7 +3710,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 50,
    "sample": [],
    "header": "// V-514: assertion kernel fields present (KCR-0007-1).\n// status: statically-checked\n// 0.2.0 integration: recordedAt is required everywhere; contentHash and the per-bound bases are required for new writes\n// by the ingestion service (service-enforced) and reported here informationally when absent."
   },
@@ -3732,7 +3732,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 52,
    "sample": [
     {
      "assertionsWithoutContentHash": 0
@@ -3758,7 +3758,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 78,
+   "ms": 48,
    "sample": [],
    "header": "// V-520: no private-store labels in the shared graph (production form of fixture F-V6).\n// status: statically-checked\n// Nodes labelled :PrivateRecord are excluded: that label exists only in single-file two-store fixtures (recommendation-snapshot),\n// whose own F-V6 queries cover them. In productio"
   },
@@ -3780,7 +3780,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 51,
+   "ms": 55,
    "sample": [],
    "header": "// V-521: no private uid values or private-personal class on shared nodes or relationships.\n// status: statically-checked"
   },
@@ -3802,7 +3802,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 46,
    "sample": [],
    "header": "// V-522 (informational): semantic nodes without a privacyClass. Null must never be read as public.\n// status: statically-checked"
   },
@@ -3824,7 +3824,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 54,
    "sample": [],
    "header": "// V-523: no timeless recommendation edges; a source's RECOMMENDS is a projection of an assertion.\n// status: statically-checked"
   },
@@ -3846,7 +3846,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 68,
+   "ms": 55,
    "sample": [],
    "header": "// V-524: shared applicability never targets a personal context; private measurements never collapse into Observation.\n// status: statically-checked"
   },
@@ -3868,7 +3868,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 46,
    "sample": [],
    "header": "// V-525: protocol editions: stepKey unique within an edition; CONDITIONAL steps name an APPLIES_WHEN constraint.\n// status: statically-checked"
   },
@@ -3890,7 +3890,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 45,
+   "ms": 49,
    "sample": [],
    "header": "// V-526: protocol steps are immutable payload: a step shared by two editions keeps one payloadHash by construction;\n// two different step nodes with the same stepKey and payloadHash inside one protocol lineage are duplicates (informational).\n// status: statically-checked"
   },
@@ -3912,7 +3912,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 47,
+   "ms": 48,
    "sample": [],
    "header": "// Q-505 (CQ-TM-06): impact of a source revision: assertions supported by the prior snapshot, their latest\n// adjudication, and whether a newer adjudication or a superseding assertion exists.\n// status: statically-checked"
   }

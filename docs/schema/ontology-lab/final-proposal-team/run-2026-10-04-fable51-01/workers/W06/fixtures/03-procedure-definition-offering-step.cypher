@@ -5,7 +5,7 @@
 //   OFFERS_PROCEDURE Next Health -> TPE (asserted from the Next Health page; offerer's own statement)       [W06 rel]
 //   MerchantListing / Offer / PriceObservation ($10,000 single session; bundle pages are W15's)           [W15]
 //   ProtocolStep (SYNTHETIC public practice protocol) -[:EMPLOYS]-> TPE (requested W16 range extension)    [W16]
-//   StudyIntervention HORIZON "Plasmapheresis" -[:INSTANTIATES_PROCEDURE]-> TPE (fixture 02)               [W09]
+//   StudyIntervention HORIZON "Plasmapheresis" -[:FOLLOWS_INTERVENTION_DEFINITION]-> TPE (fixture 02)               [W09]
 //   Procedure  hu:procedure:plasma-donation-plasmapheresis  a DIFFERENT definition sharing ICD-10-PCS 6A550Z3/6A551Z3
 //   Circulate Health: offer statement captured only as a search extract -> Assertion status EXTRACTED, no edge.
 //   GeekWire "more than 1,000 treatments": a literal about Circulate; no performance occurrences are created.

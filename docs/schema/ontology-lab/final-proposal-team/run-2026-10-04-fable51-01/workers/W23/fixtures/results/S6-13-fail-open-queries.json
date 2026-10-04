@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 302,
+   "ms": 365,
    "sample": [
     {
      "leaksUnclassifiedPolicy": true,
@@ -53,7 +53,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 129,
+   "ms": 324,
    "sample": [
     {
      "leaksUnclassifiedPolicy": false,
@@ -81,7 +81,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 116,
+   "ms": 313,
    "sample": [
     {
      "leaksUnclassifiedPolicy": false,

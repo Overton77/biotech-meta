@@ -40,14 +40,14 @@ WHERE t.orphanDrugDesignation IS NOT NULL AND t.developmentStage IS NOT NULL
 RETURN 'V-W06-03' AS check, t.uid AS treatmentUid, t.orphanDrugDesignation AS designationText, t.developmentStage AS stageText;
 
 // V-W06-04: INV-201 through the concept: any edge from a study-side record to a commercial identity, or any edge whose
-// derivation cites INSTANTIATES_TREATMENT / USES_COMPONENT assertions and ends at a Product.
+// derivation cites FOLLOWS_INTERVENTION_DEFINITION / USES_COMPONENT assertions and ends at a Product.
 MATCH (x)-[r]->(p)
 WHERE (x:Study OR x:StudyArm OR x:StudyIntervention OR x:StudyResult OR x:Publication)
   AND (p:Product OR p:ProductVariant OR p:FormulationVersion)
 OPTIONAL MATCH (cited:Assertion) WHERE cited.uid IN coalesce(r.derivedFromAssertionUids, [])
 WITH x, r, p, collect(cited.predicate) AS citedPredicates
 RETURN 'V-W06-04' AS check, x.uid AS fromUid, type(r) AS edgeType, p.uid AS productUid, citedPredicates,
-       any(c IN citedPredicates WHERE c IN ['INSTANTIATES_TREATMENT', 'USES_COMPONENT']) AS viaTreatmentConcept;
+       any(c IN citedPredicates WHERE c IN ['FOLLOWS_INTERVENTION_DEFINITION', 'USES_COMPONENT']) AS viaTreatmentConcept;
 
 // V-W06-05: COMBINATION requires at least two USES_COMPONENT edges.
 MATCH (t:Treatment)
@@ -79,7 +79,7 @@ RETURN 'V-W06-07i' AS check, i.scheme AS scheme, i.value AS code, procedures
 ORDER BY code;
 
 // V-W06-08: W06 asserted edges must cite a live assertion of the same predicate, subject and object (INV-101, QS-4a core).
-MATCH (x)-[r:TARGETS_CONDITION|USES_COMPONENT|DEVELOPS_TREATMENT|OFFERS_TREATMENT|OFFERS_PROCEDURE|INSTANTIATES_TREATMENT|INSTANTIATES_PROCEDURE]->(y)
+MATCH (x)-[r:TARGETS_CONDITION|USES_COMPONENT|DEVELOPS_TREATMENT|OFFERS_TREATMENT|OFFERS_PROCEDURE|FOLLOWS_INTERVENTION_DEFINITION]->(y)
 OPTIONAL MATCH (a:Assertion {uid: r.assertionUid})
 WITH x, r, y, a,
      [v IN [

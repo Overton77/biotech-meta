@@ -315,9 +315,7 @@ SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'w22-capture-fidelity-r
     j.verdict = 'SUPPORTED', j.reviewerType = 'HUMAN', j.reviewedAt = a.recordedAt + duration('PT1M'), j.recordedAt = a.recordedAt + duration('PT1M'), j.privacyClass = 'PUBLIC'
 MERGE (j)-[:EVALUATES]->(a) MERGE (j)-[:ASSESSED_BY]->(g);
 
-// =====================================================================================================================
-// Queries
-// =====================================================================================================================
+// ==== Queries (expected rows in 06-fixtures-and-queries.md) ====
 
 // Q-MP2-1 (CQ-MD-C02): explanatory-asset selection for Mechanism mTOR signaling in a MECHANISM_DIAGRAM slot.
 MATCH (k:Mechanism {uid: 'hu:mechanism:mtor-signaling'})<-[d:EXPLAINS|DEPICTS]-(m:MediaAsset)

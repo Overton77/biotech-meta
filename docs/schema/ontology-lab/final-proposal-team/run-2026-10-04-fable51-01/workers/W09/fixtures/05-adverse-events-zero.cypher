@@ -110,3 +110,16 @@ MERGE (ae:AdverseEventResult:StudyResult:InformationArtifact {uid: 'hu:study-res
                 ae.collectionMethodText = 'SYNTHETIC: structured AE checklist administered at every scheduled visit', ae.relatednessAssessor = 'INVESTIGATOR',
                 ae.createdAt = datetime('2026-10-04T01:10:00Z'), ae.privacyClass = 'PUBLIC'
 MERGE (ae)-[:RESULT_FOR_ARM {armRole: 'INTERVENTION'}]->(arm);
+
+// Quote hashes: NFC-WS1 normalization (catalog normalizationVersions) over the stored `exact` text, sha256 (computed by W09
+// with Python hashlib on 2026-10-04 over the quoted text only; the snapshot bytes were not hashed: SYNTHETIC_FIXTURE).
+UNWIND [
+  {uid: 'hu:locator:pmc5701244-methods-safety-parameters', h: 'sha256:286009f08376947742036e9e9820978888f55a85a62d3e66c5d551c077474c99'},
+  {uid: 'hu:locator:pmc5701244-results-adverse-events', h: 'sha256:6961319fcc06c27b5d2f834b8fa153e1437ceef6284c26d80aadaa60a40f2943'},
+  {uid: 'hu:locator:pmc5701244-results-ae-counts', h: 'sha256:1801c1dc34f6ebd0cb16ce686d8a62c242adfbfed6e4e1b48ec6aee83ef3c2eb'},
+  {uid: 'hu:locator:pmc5701244-results-itt', h: 'sha256:2982576dcf2ab6d7540385511dc327fe39c2ddebd721402089ba5e14054f924d'},
+  {uid: 'hu:locator:pmc8777576-adverse-events', h: 'sha256:86f4df854d63b4a915d182220c01fa7e9ec8ad7fc9e129e00c8ce6e4e45f2d00'},
+  {uid: 'hu:locator:pmc8777576-methods-ae-recording', h: 'sha256:aacdcca9e6c4129be77003769a1747226348716c3e8f258961e55307e1be199f'}
+] AS r
+MATCH (l:SourceLocator {uid: r.uid})
+SET l.normalizationVersion = 'NFC-WS1', l.quoteHash = r.h;

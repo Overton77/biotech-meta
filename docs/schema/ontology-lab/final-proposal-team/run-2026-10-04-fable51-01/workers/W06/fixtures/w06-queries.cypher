@@ -11,7 +11,7 @@ RETURN [l IN labels(n) WHERE l IN ['Treatment', 'StudyIntervention', 'Product']]
 ORDER BY identityKind;
 
 // Q-02 (CQ-ST-01 via CQ-IV-C01): which study interventions instantiate treatment T, and what exactly was administered.
-MATCH (t:Treatment {uid: 'hu:treatment:exagamglogene-autotemcel'})<-[:INSTANTIATES_TREATMENT]-(si:StudyIntervention)<-[:ASSIGNS_INTERVENTION]-(arm:StudyArm)<-[:HAS_ARM]-(s:Study)
+MATCH (t:Treatment {uid: 'hu:treatment:exagamglogene-autotemcel'})<-[:FOLLOWS_INTERVENTION_DEFINITION]-(si:StudyIntervention)<-[:ASSIGNS_INTERVENTION]-(arm:StudyArm)<-[:HAS_ARM]-(s:Study)
 OPTIONAL MATCH (si)-[:HAS_INTERVENTION_COMPONENT]->(ic:InterventionComponent)
 RETURN s.uid AS study, arm.name AS arm, si.name AS administered, si.registryInterventionType AS registryType, si.schedule AS schedule,
        CASE WHEN ic IS NULL THEN 'NO_COMPONENT_RECORDED'
@@ -41,7 +41,7 @@ RETURN p.name AS procedureDefinition,
        [(ml:MerchantListing)-[:LISTS_PROCEDURE]->(p) | ml.canonicalUrl] AS listings,
        [(ml:MerchantListing)-[:LISTS_PROCEDURE]->(p) | [(ml)-[:HAS_OFFER]->(of)-[:HAS_PRICE_OBSERVATION]->(po) | po.amount + ' ' + po.currency + ' @ ' + toString(po.observedAt)]] AS priceObservations,
        [(st:ProtocolStep)-[:EMPLOYS]->(p) | st.uid] AS employedByProtocolSteps,
-       [(si:StudyIntervention)-[:INSTANTIATES_PROCEDURE]->(p) | si.uid + ' [' + si.registryInterventionType + ']'] AS instantiatedByStudyInterventions,
+       [(si:StudyIntervention)-[:FOLLOWS_INTERVENTION_DEFINITION]->(p) | si.uid + ' [' + si.registryInterventionType + ']'] AS instantiatedByStudyInterventions,
        [(t:Treatment)-[u:USES_COMPONENT]->(p) | t.uid + ' as ' + u.componentRole] AS componentOfTreatments;
 
 // Q-05 (CQ-IV-C04, QS-7 shape): who develops treatment T? Unknown stays unknown; other roles are reported as other roles.
@@ -49,7 +49,7 @@ MATCH (t:Treatment {uid: 'hu:treatment:exagamglogene-autotemcel'})
 OPTIONAL MATCH (a:Assertion {predicate: 'DEVELOPS_TREATMENT'})-[:HAS_OBJECT]->(t)
 WITH t, collect(a) AS dev
 OPTIONAL MATCH (t)-[:USES_COMPONENT {componentRole: 'ADMINISTERED_PRODUCT'}]->(p:Product)<-[:HAS_OBJECT]-(m:Assertion {predicate: 'MANUFACTURES_PRODUCT'})-[:HAS_SUBJECT]->(mo:Organization)
-OPTIONAL MATCH (t)<-[:INSTANTIATES_TREATMENT]-(:StudyIntervention)<-[:ASSIGNS_INTERVENTION]-(:StudyArm)<-[:HAS_ARM]-(s:Study)<-[:HAS_OBJECT]-(sp:Assertion {predicate: 'SPONSORS_STUDY'})-[:HAS_SUBJECT]->(so:Organization)
+OPTIONAL MATCH (t)<-[:FOLLOWS_INTERVENTION_DEFINITION]-(:StudyIntervention)<-[:ASSIGNS_INTERVENTION]-(:StudyArm)<-[:HAS_ARM]-(s:Study)<-[:HAS_OBJECT]-(sp:Assertion {predicate: 'SPONSORS_STUDY'})-[:HAS_SUBJECT]->(so:Organization)
 RETURN CASE WHEN size(dev) = 0 THEN 'NOT_RECORDED' ELSE 'ASSERTED_PRESENT' END AS developerState,
        collect(DISTINCT mo.name + ' manufactures ' + p.name) AS otherRolesManufacturer,
        collect(DISTINCT so.name + ' sponsors ' + s.uid) AS otherRolesSponsor;
@@ -58,7 +58,7 @@ RETURN CASE WHEN size(dev) = 0 THEN 'NOT_RECORDED' ELSE 'ASSERTED_PRESENT' END A
 // interventions? (Registry type is reported, never mapped onto modality.)
 MATCH (t:Treatment)
 WHERE 'GENE_THERAPY' IN coalesce(t.modalities, [])
-OPTIONAL MATCH (t)<-[:INSTANTIATES_TREATMENT]-(si:StudyIntervention)
+OPTIONAL MATCH (t)<-[:FOLLOWS_INTERVENTION_DEFINITION]-(si:StudyIntervention)
 RETURN t.uid AS treatmentUid, t.modalities AS modalities, t.modality AS legacyModality, collect(si.registryInterventionType) AS registryInterventionTypes
 ORDER BY treatmentUid;
 
@@ -71,7 +71,7 @@ ORDER BY code;
 
 // Q-08 (CQ-EV-04 guard): from an administered intervention, the concept leads to a product for navigation only; evidence
 // applicability to that product is read solely from EvidenceApplicability (none exists here -> NOT_ASSESSED).
-MATCH (si:StudyIntervention {uid: 'hu:intervention:nct03745287-exa-cel'})-[:INSTANTIATES_TREATMENT]->(t:Treatment)-[:USES_COMPONENT {componentRole: 'ADMINISTERED_PRODUCT'}]->(p:Product)
+MATCH (si:StudyIntervention {uid: 'hu:intervention:nct03745287-exa-cel'})-[:FOLLOWS_INTERVENTION_DEFINITION]->(t:Treatment)-[:USES_COMPONENT {componentRole: 'ADMINISTERED_PRODUCT'}]->(p:Product)
 OPTIONAL MATCH (ea:EvidenceApplicability)-[:HAS_EVIDENCE_TARGET]->(si)
 OPTIONAL MATCH (ea)-[:ASSESSES_APPLICABILITY_TO]->(p)
 RETURN si.uid AS evidenceTarget, t.uid AS viaConcept, p.name AS navigatedProduct,

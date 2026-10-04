@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 112,
+   "ms": 73,
    "sample": [],
    "header": "// W08 fixture 4: negative cases (load AFTER fixtures 1-3; each block is expected to fail a named validator)\n// Run run-2026-10-04-fable51-01, worker W08. Neo4j 5.x Cypher. Every statement binds its own nodes by uid.\n// All uids contain 'w08-neg-' so they can be removed with one DETACH DELETE. Expec"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 23,
+   "ms": 12,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 22,
+   "ms": 9,
    "sample": [],
    "header": "// N2"
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 32,
+   "ms": 17,
    "sample": [],
    "header": "// N3"
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 23,
+   "ms": 17,
    "sample": [],
    "header": ""
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 23,
+   "ms": 18,
    "sample": [],
    "header": "// N4"
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 13,
+   "ms": 9,
    "sample": [],
    "header": ""
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 8,
+   "ms": 14,
    "sample": [],
    "header": "// N5"
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 16,
+   "ms": 18,
    "sample": [],
    "header": ""
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 9,
+   "ms": 25,
    "sample": [],
    "header": ""
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 15,
+   "ms": 14,
    "sample": [],
    "header": "// N6"
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 11,
+   "ms": 9,
    "sample": [],
    "header": ""
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 9,
+   "ms": 16,
    "sample": [],
    "header": ""
   },
@@ -311,7 +311,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 11,
+   "ms": 14,
    "sample": [],
    "header": "// N7"
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 5,
+   "ms": 4,
    "sample": [],
    "header": "// N8 (fixture device: :PrivateRecord marks a private-store record that must never be in the shared graph)"
   },
@@ -355,7 +355,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 11,
+   "ms": 9,
    "sample": [],
    "header": ""
   },
@@ -377,7 +377,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 20,
+   "ms": 5,
    "sample": [],
    "header": ""
   },
@@ -399,7 +399,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 18,
+   "ms": 6,
    "sample": [],
    "header": "// N9"
   },
@@ -421,7 +421,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 23,
+   "ms": 9,
    "sample": [],
    "header": ""
   },
@@ -443,7 +443,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 11,
+   "ms": 6,
    "sample": [],
    "header": "// N10"
   },
@@ -465,7 +465,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 13,
+   "ms": 4,
    "sample": [],
    "header": ""
   },
@@ -487,7 +487,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 122,
+   "ms": 3,
    "sample": [],
    "header": "// N11 performance claim written about a device model, with no asserter and no basis (V-W08-11)"
   },
@@ -509,7 +509,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 43,
+   "ms": 5,
    "sample": [],
    "header": ""
   }

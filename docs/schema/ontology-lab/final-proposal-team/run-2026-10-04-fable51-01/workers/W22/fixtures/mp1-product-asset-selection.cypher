@@ -328,9 +328,7 @@ SET j.assessmentType = 'ADJUDICATION', j.methodVersion = 'w22-capture-fidelity-r
     j.verdict = 'SUPPORTED', j.reviewerType = 'HUMAN', j.reviewedAt = a.recordedAt + duration('PT1M'), j.recordedAt = a.recordedAt + duration('PT1M'), j.privacyClass = 'PUBLIC'
 MERGE (j)-[:EVALUATES]->(a) MERGE (j)-[:ASSESSED_BY]->(g);
 
-// =====================================================================================================================
-// Queries (expected rows in 06-fixtures-and-queries.md)
-// =====================================================================================================================
+// ==== Queries (expected rows in 06-fixtures-and-queries.md) ====
 
 // Q-MP1-1 (CQ-MD-C01): primary-image selection for Product Basis. Allowed rights statuses are the contents of
 // PolicyVersion hu:policy-version:media-display-v0 (W23; inlined here as a literal list). An asset is ELIGIBLE only if

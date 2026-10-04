@@ -8,7 +8,7 @@ Capture: PARTIAL_EXCERPT (quoted passages only; page numbers are the PDF page in
 [p4] The WHOOP ECG Feature is a software-only mobile medical application intended for use with the WHOOP Strap to create, record, store, transfer, and display a single-channel electrocardiogram (ECG) qualitatively similar to a Lead I ECG.
 [p5] 510(k) Summary – K243236 ... Date Prepared March 3, 2025 ... Predicate K201525 Apple Inc. ECG App (2.0) QDA
 [p5] The WHOOP ECG Feature is a software-only medical mobile application integrated into the consumer (non-device) WHOOP System. It consists of three medical device modules: ECG Strap Module, ECG Phone Module, and ECG Cloud Module.
-[p5] The ECG Strap Module firmware is integrated within the WHOOP Strap's firmware. The ECG Strap Module firmware contains the FDA-cleared B-Secur HeartKey Software Library (K200884)
+[p5] The ECG Strap Module firmware is integrated within the WHOOP Strap’s firmware. The ECG Strap Module firmware contains the FDA-cleared B-Secur HeartKey Software Library (K200884)
 [p8] Compatibility with Intended Platform | WHOOP Strap version - WHOOP MG Apple iPhone with minimum iOS version 18.0 Android Phones compatible with minimum Android version 12.0
 [p9] The ECG feature demonstrated 96.2% sensitivity in classifying AFib (HR 50-150 bpm) and 99.4% specificity in classifying sinus rhythm (HR 50-150 bpm) in classifiable recordings.
 [p9] During this study, the WHOOP ECG Feature determined 11% of recordings were inconclusive.

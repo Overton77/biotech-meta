@@ -196,3 +196,13 @@ MERGE (j:Adjudication:EvidenceAssessment {uid: 'hu:adjudication:w09-fixture-03-c
                 j.reviewerType = 'POLICY', j.methodVersion = 'w09-fixture-capture-policy-1', j.status = 'ACCEPTED',
                 j.reviewedAt = datetime('2026-10-04T01:00:00Z'), j.recordedAt = datetime('2026-10-04T01:00:00Z'), j.createdAt = datetime('2026-10-04T01:00:00Z'), j.privacyClass = 'PUBLIC'
 MERGE (j)-[:EVALUATES]->(a);
+
+// Quote hashes: NFC-WS1 normalization (catalog normalizationVersions) over the stored `exact` text, sha256 (computed by W09
+// with Python hashlib on 2026-10-04 over the quoted text only; the snapshot bytes were not hashed: SYNTHETIC_FIXTURE).
+UNWIND [
+  {uid: 'hu:locator:pmc8777576-results-endurance', h: 'sha256:6bf4a45b8705a7bf1191729639384c66e33dd7377f9fc6355d5a458e855df103'},
+  {uid: 'hu:locator:pubmed-21871057-abstract', h: 'sha256:907677a5c5f12ab14ad9b63ffbb0914e38324b414362080bee47f323a7f43cd5'},
+  {uid: 'hu:locator:pubmed-23616506-abstract', h: 'sha256:b367c601f5011f53d4b108ea8899bce24c9733023ea04cd122bf21497a96b28a'}
+] AS r
+MATCH (l:SourceLocator {uid: r.uid})
+SET l.normalizationVersion = 'NFC-WS1', l.quoteHash = r.h;

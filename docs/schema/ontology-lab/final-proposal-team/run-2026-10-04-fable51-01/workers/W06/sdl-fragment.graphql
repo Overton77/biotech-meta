@@ -21,13 +21,15 @@
 #   TARGETS_CONDITION, USES_COMPONENT, DEVELOPS_TREATMENT, OFFERS_TREATMENT, OFFERS_PROCEDURE.
 # Requested additions to the W06 row (seam request W06-SR-01; included so the fragment is complete, Fable rules):
 #   enums TreatmentComponentRole, TreatmentIntentKind, TreatmentIntentBasis; relationship-property type
-#   TreatmentTargetProperties (successor of live TreatmentTargetMetadata, used only by TARGETS_CONDITION);
-#   relationship types INSTANTIATES_TREATMENT, INSTANTIATES_PROCEDURE (outbound fields belong on W09 StudyIntervention).
+#   TreatmentTargetProperties (successor of live TreatmentTargetMetadata, used only by TARGETS_CONDITION).
+# The study-side concept link is W09's candidate relationship FOLLOWS_INTERVENTION_DEFINITION (StudyIntervention ->
+#   InterventionDefinitionTarget = Procedure | Treatment | ProtocolEdition | Lifestyle); W06 declares only inverse views
+#   of it on Treatment and Procedure (W06 withdrew its own earlier proposal of two separate relationship types).
 #
 # Referenced by name only (other owners): W00 Entity, EntityArchetype, SearchIndexable, PrivacyClass, NodeMaturity,
 #   TimePrecision, ValidTimeBasis, Identifier, IdentifierLinkProperties, AssertedEdgeProperties (fields embedded below
 #   are copied verbatim as contract B4 requires); W01 Organization; W02 ChemicalSubstance, ChemicalForm,
-#   IngredientMaterial; W03 Condition; W04 Product; W05 Lifestyle, FoodProduct; W08 Device; W09 StudyIntervention;
+#   IngredientMaterial; W03 Condition; W04 Product; W05 Lifestyle; W08 Device; W09 StudyIntervention;
 #   W10 EvidenceStrength; W15 MerchantListing, ListingEdgeProperties; W16 Protocol; W17 SafetySignal,
 #   SafetyEdgeProperties; W20 Document, Chunk, DerivedSupportProperties.
 # Relationship class and cardinality are stated in each field description and enforced by the operations/validation
@@ -122,12 +124,12 @@ enum TreatmentIntentBasis {
 
 """
 Range of USES_COMPONENT (successor of live union TreatmentComponent). Live Compound -> ChemicalSubstance and live
-CompoundForm -> ChemicalForm or IngredientMaterial (D-002); Product, Device, Procedure, Protocol kept; Lifestyle and
-FoodProduct kept pending W05's dispositions (W06-SR-07: if W05 merges or renames them, Fable substitutes the successor
-here). Treatment is deliberately not a member: a regimen of named treatments is modeled with each treatment's own
+CompoundForm -> ChemicalForm or IngredientMaterial (D-002); Product, Device, Procedure, Protocol, Lifestyle kept; live
+FoodProduct is dropped because W05 retires it into W04 Product (productKind CONVENTIONAL_FOOD), which is already a
+member (W06-SR-07). Treatment is deliberately not a member: a regimen of named treatments is modeled with each treatment's own
 components until a CQ needs nesting (scope candidate SC-W06-03).
 """
-union TreatmentComponentTarget = ChemicalSubstance | ChemicalForm | IngredientMaterial | Product | Device | Procedure | Protocol | Lifestyle | FoodProduct
+union TreatmentComponentTarget = ChemicalSubstance | ChemicalForm | IngredientMaterial | Product | Device | Procedure | Protocol | Lifestyle
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Relationship-property types
@@ -204,7 +206,7 @@ therapeutic plasma exchange with albumin replacement as a longevity offering; a 
 albumin and IVIG) whose modality, components, stated intent (targeted conditions) and developer or offerer roles are
 recorded. Identity is the concept, keyed by uid; nonproprietary names, development codes and other names are Identifier
 records or display text, never identity. It is NOT: the intervention administered in a study arm (W09
-StudyIntervention, linked by INSTANTIATES_TREATMENT), a marketed or investigational product (W04 Product such as
+StudyIntervention, linked by W09's FOLLOWS_INTERVENTION_DEFINITION), a marketed or investigational product (W04 Product such as
 CASGEVY, linked by USES_COMPONENT{ADMINISTERED_PRODUCT}), a chemical substance or material (W02; a single small
 molecule needs a Treatment node only when a concept-level fact such as a regimen, a developer program or an offering is
 recorded), a regulatory standing (W13: approval, designation and indication are per product, sponsor, jurisdiction and
@@ -273,8 +275,8 @@ type Treatment implements Entity & EntityArchetype & SearchIndexable
   developedBy: [Organization!]! @relationship(type: "DEVELOPS_TREATMENT", direction: IN, properties: "AssertedEdgeProperties")
   """class: asserted; cardinality: many; W06 OFFERS_TREATMENT (live kept). An offer is what the offerer says it provides; it is not performance, approval, recommendation or evidence."""
   offeredBy: [Organization!]! @relationship(type: "OFFERS_TREATMENT", direction: IN, properties: "AssertedEdgeProperties")
-  """class: asserted; cardinality: many (inverse view); INSTANTIATES_TREATMENT (requested, W06-SR-01/W09-side field W06-SR-03). The administered StudyIntervention is the evidence target; this link never licenses evidence transfer to any Product (INV-201, V-W06-04)."""
-  instantiatedByStudyInterventions: [StudyIntervention!]! @relationship(type: "INSTANTIATES_TREATMENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many (inverse view of W09 StudyIntervention.definitions); W09 FOLLOWS_INTERVENTION_DEFINITION (candidate, CQ-ST-C02 / CQ-IV-C01). The administered StudyIntervention is the evidence target; this link never licenses evidence transfer to any Product (INV-201, V-W06-04)."""
+  instantiatedByStudyInterventions: [StudyIntervention!]! @relationship(type: "FOLLOWS_INTERVENTION_DEFINITION", direction: IN, properties: "AssertedEdgeProperties")
   """class: asserted (W17 owns the relationship type); cardinality: many; catalog: HAS_SAFETY_SIGNAL (live kept)."""
   hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyEdgeProperties")
   """class: derived (W20 shortcut naming a locator; read-only); catalog: SUPPORTED_BY_DOCUMENT."""
@@ -292,7 +294,7 @@ plasmapheresis and therapeutic plasma exchange and encodes Single versus Multipl
 that never establish identity (V-W06-07). It is NOT: a performance, session or encounter (occurrences are not modeled;
 a reported count such as "more than 1,000 treatments" is an assertion literal about the reporting organization), an
 offering (W01-role OFFERS_PROCEDURE, W15 MerchantListing/Offer/price), a protocol step that employs it (W16
-ProtocolStep), a study arm's administered intervention (W09 StudyIntervention, linked by INSTANTIATES_PROCEDURE), a
+ProtocolStep), a study arm's administered intervention (W09 StudyIntervention, linked by W09's FOLLOWS_INTERVENTION_DEFINITION), a
 device (W08), or a claim about benefits (W21 ClaimOccurrence). Display summaries are definition-level and
 source-attributed through assertions; they are not performance records. CQs: CQ-IV-C02, CQ-IV-C03, CQ-ST-01 (concept
 link). Canonical module: none (live seam; candidate `interventions`). Archetype Entity.
@@ -333,8 +335,8 @@ type Procedure implements Entity & EntityArchetype & SearchIndexable
   listedIn: [MerchantListing!]! @relationship(type: "LISTS_PROCEDURE", direction: IN, properties: "ListingEdgeProperties")
   """class: asserted; cardinality: many (inverse view); W06 USES_COMPONENT from Treatment."""
   componentOfTreatments: [Treatment!]! @relationship(type: "USES_COMPONENT", direction: IN, properties: "TreatmentComponentProperties")
-  """class: asserted; cardinality: many (inverse view); INSTANTIATES_PROCEDURE (requested W06-SR-01/W06-SR-03): a study arm's administered intervention that is a performance plan of this definition."""
-  instantiatedByStudyInterventions: [StudyIntervention!]! @relationship(type: "INSTANTIATES_PROCEDURE", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many (inverse view of W09 StudyIntervention.definitions); W09 FOLLOWS_INTERVENTION_DEFINITION: a study arm's administered intervention that follows this procedure definition."""
+  instantiatedByStudyInterventions: [StudyIntervention!]! @relationship(type: "FOLLOWS_INTERVENTION_DEFINITION", direction: IN, properties: "AssertedEdgeProperties")
   """class: asserted (W17 owns the relationship type); cardinality: many; catalog: HAS_SAFETY_SIGNAL (live kept)."""
   hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyEdgeProperties")
   """class: derived (W20 shortcut naming a locator; read-only); catalog: SUPPORTED_BY_DOCUMENT."""

@@ -114,3 +114,11 @@ MERGE (a)-[:HAS_OBJECT]->(mat)
 MERGE (ic)-[u:USES_INTERVENTION_MATERIAL]->(mat)
   ON CREATE SET u.relationshipUid = 'hu:rel:uses-material-' + split(r.ic, ':')[2], u.assertionUid = a.uid, u.recordedFrom = a.recordedAt,
                 u.validFromBasis = 'UNKNOWN', u.validToBasis = 'UNKNOWN', u.asReportedName = 'NRPT';
+
+// Quote hashes: NFC-WS1 normalization (catalog normalizationVersions) over the stored `exact` text, sha256 (computed by W09
+// with Python hashlib on 2026-10-04 over the quoted text only; the snapshot bytes were not hashed: SYNTHETIC_FIXTURE).
+UNWIND [
+  {uid: 'hu:locator:pubmed-29184669-abstract-commercially-known', h: 'sha256:800ede2405436510169f02cc462e174380443e50ef4add6435db83ad89e1e6c2'}
+] AS r
+MATCH (l:SourceLocator {uid: r.uid})
+SET l.normalizationVersion = 'NFC-WS1', l.quoteHash = r.h;

@@ -253,12 +253,13 @@ WHERE (l.selectorKind = 'IMAGE_REGION' AND (l.mediaAnnotationUid IS NULL OR size
    OR (coalesce(l.selectorKind, '-') <> 'IMAGE_REGION' AND size(ms) > 0)
 RETURN 'V-W00-03' AS check, l.uid AS locatorUid, l.selectorKind AS selectorKind, size(ms) AS regionEdges;
 
-// V-409: REANCHORS links locators on two snapshots of the same Source, newer to older.
+// V-409 (W00 ruling on W19-SR-09): REANCHORS links locators on two snapshots of the same Source, newer CONTENT to older
+// content: ordered by the content clock coalesce(observedAt, retrievedAt), so an archive capture fetched late is still older.
 MATCH (newL:SourceLocator)-[x:REANCHORS]->(oldL:SourceLocator)
 MATCH (sNew:SourceSnapshot)-[:HAS_LOCATOR]->(newL), (sOld:SourceSnapshot)-[:HAS_LOCATOR]->(oldL)
 WHERE x.anchorMatch IS NULL OR sNew = sOld
    OR NOT EXISTS { MATCH (sNew)<-[:HAS_SNAPSHOT]-(:Source)-[:HAS_SNAPSHOT]->(sOld) }
-   OR sNew.retrievedAt <= sOld.retrievedAt
+   OR coalesce(sNew.observedAt, sNew.retrievedAt) <= coalesce(sOld.observedAt, sOld.retrievedAt)
 RETURN 'V-409' AS check, newL.uid AS newLocator, oldL.uid AS oldLocator;
 
 // V-511: adjudications have recordedAt and cite only snapshots retrieved before they were recorded.
@@ -270,7 +271,7 @@ MATCH (adj:Adjudication)-[:SUPPORTED_BY|CONTRADICTED_BY]->(:SourceLocator)<-[:HA
 WHERE sn.retrievedAt > adj.recordedAt
 RETURN 'V-511' AS check, 'ADJUDICATION_CITES_LATER_SNAPSHOT' AS violation, adj.uid AS item;
 
-// V-512: source revision events are well formed.
+// V-512: source revision events are well formed (REVISION_ORDER on the content clock, W00 ruling on W19-SR-09).
 MATCH (ev:SourceRevisionEvent)
 OPTIONAL MATCH (ev)-[:REVISES_SOURCE]->(src:Source)
 WITH ev, collect(src) AS sources
@@ -282,7 +283,7 @@ WHERE NOT (src)-[:HAS_SNAPSHOT]->(sn)
 RETURN 'V-512' AS check, 'REVISION_SNAPSHOT_FOREIGN' AS violation, ev.uid AS item
 UNION
 MATCH (prior:SourceSnapshot)<-[:PRIOR_SNAPSHOT]-(ev:SourceRevisionEvent)-[:RESULTING_SNAPSHOT]->(res:SourceSnapshot)
-WHERE res.retrievedAt <= prior.retrievedAt
+WHERE coalesce(res.observedAt, res.retrievedAt) <= coalesce(prior.observedAt, prior.retrievedAt)
 RETURN 'V-512' AS check, 'REVISION_ORDER' AS violation, ev.uid AS item;
 
 // V-112: derived and forbidden-implication edges cite live, matching assertions (catalog V-112 with params inlined;

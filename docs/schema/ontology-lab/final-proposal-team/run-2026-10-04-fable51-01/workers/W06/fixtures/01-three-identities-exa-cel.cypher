@@ -151,7 +151,7 @@ SET r.assertionUid = a.uid, r.intentKind = 'TREATMENT', r.intentBasis = 'REGULAT
     r.indicationTextVerbatim = x.txt, r.patientSubsetText = 'patients aged 2 years and older',
     r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
 
-// ---- W09 side: ASSIGNS_INTERVENTION (asserted) and the requested INSTANTIATES_TREATMENT ----
+// ---- W09 side: ASSIGNS_INTERVENTION (asserted) and W09's candidate FOLLOWS_INTERVENTION_DEFINITION ----
 MATCH (arm:StudyArm {uid: 'hu:arm:nct03745287-exa-cel'}), (si:StudyIntervention {uid: 'hu:intervention:nct03745287-exa-cel'}),
       (l:SourceLocator {uid: 'hu:locator:ctgov-nct03745287-interventions'}), (v:Organization {uid: 'hu:org:vertex-pharmaceuticals'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-nct03745287-assigns-exa-cel'})
@@ -168,14 +168,14 @@ SET r.assertionUid = a.uid, r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKN
 MATCH (si:StudyIntervention {uid: 'hu:intervention:nct03745287-exa-cel'}), (t:Treatment {uid: 'hu:treatment:exagamglogene-autotemcel'}),
       (l:SourceLocator {uid: 'hu:locator:ctgov-nct03745287-interventions'}), (v:Organization {uid: 'hu:org:vertex-pharmaceuticals'})
 MERGE (a:Assertion {uid: 'hu:assertion:w06-nct03745287-exa-cel-instantiates-treatment'})
-SET a.predicate = 'INSTANTIATES_TREATMENT', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
+SET a.predicate = 'FOLLOWS_INTERVENTION_DEFINITION', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'),
     a.polarity = 'POSITIVE', a.predicateClass = 'IDENTITY', a.speechAct = 'STATES', a.assertionBasis = 'UNSTATED',
     a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z')
 MERGE (a)-[:HAS_SUBJECT]->(si)
 MERGE (a)-[:HAS_OBJECT]->(t)
 MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (a)-[:ASSERTED_BY]->(v)
-MERGE (si)-[r:INSTANTIATES_TREATMENT {relationshipUid: 'hu:rel:w06-nct03745287-exa-cel-instantiates'}]->(t)
+MERGE (si)-[r:FOLLOWS_INTERVENTION_DEFINITION {relationshipUid: 'hu:rel:w06-nct03745287-exa-cel-instantiates'}]->(t)
 SET r.assertionUid = a.uid, r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
 
 // ---- Roles that are NOT developer assertions (kept as assertions only, no DEVELOPS_TREATMENT edge) ----
