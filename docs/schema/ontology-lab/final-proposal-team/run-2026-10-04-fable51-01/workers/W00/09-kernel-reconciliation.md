@@ -4,8 +4,8 @@ Run `run-2026-10-04-fable51-01`, worker W00. This pass rules on every seam reque
 
 ## 1. Scope and method
 
-- Requests ruled: **148** = 132 W00-targeted entries of the consolidated inventory (337 total), 1 ledger-only entry found in W09 (W09-CR-01..04 counted with the inventory), 7 W15 requests published after the inventory was built, and 8 W00-SR items Fable named in the brief (W00-SR-01, -02, -05, -07, -10, -11, -12, -14).
-- Rulings: ACCEPTED 135, ACCEPTED_AS_CANDIDATE 11, REJECTED 2, DEFERRED 0 (whole requests). Parts of accepted requests that lacked their own failing case are deferred inside the entry (CHARACTERIZES_EXPOSURE_IN_POPULATION, FORECASTS_COMMERCIAL_OPPORTUNITY, REPORTS_LIFESPAN_EFFECT, DERIVE_MEDIA, USED -> MediaRightsRecord).
+- Requests ruled: **164** = 132 W00-targeted entries of the consolidated inventory (337 total), 1 ledger-only entry found in W09 (W09-CR-01..04 counted with the inventory), 7 W15 requests published after the inventory was built, and 8 W00-SR items Fable named in the brief (W00-SR-01, -02, -05, -07, -10, -11, -12, -14).
+- Rulings: ACCEPTED 145, ACCEPTED_AS_CANDIDATE 14, REJECTED 2, DEFERRED 3 (whole requests). Parts of accepted requests that lacked their own failing case are deferred inside the entry (CHARACTERIZES_EXPOSURE_IN_POPULATION, FORECASTS_COMMERCIAL_OPPORTUNITY, REPORTS_LIFESPAN_EFFECT, DERIVE_MEDIA, USED -> MediaRightsRecord).
 - Re-scan: W10, W15, W17, W18 had no seam file at 01:50Z; W15 published one during the pass (7 W00-targeted requests, ruled here); W10, W17, W18 still had none at the final re-scan (section 6). W21 had published its packet; its 12 requests are ruled.
 - Evidence: every ruling cites the requester's source or failing case. Validator rulings were executed (section 5). The SDL fragment was rebuilt with stubs and inside the full merge (section 5).
 
@@ -145,7 +145,7 @@ Artifacts: sdl-fragment.graphql.
 
 ### W00-R-23 ruleOnly derived types and V-112
 
-ruleOnly: RESOLVES_TO_CHUNK, HAS_CHUNK, OCCURS_IN_SEGMENT, ABOUT, MENTIONS_ENTITY (W20-SR-01), HAS_CURRENT_PROTOCOL_STEP (W16-SR-06), COMPARED_TO for the same-version clause only (W07-SR-10). SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT need inputs. V-112r reads the hypothesis citation from derivedFromAssessmentUids and flags RULE_ONLY_ACROSS_VERSIONS.
+ruleOnly: RESOLVES_TO_CHUNK, HAS_CHUNK, CHUNK_IN_SEGMENT, ABOUT, MENTIONS_ENTITY (W20-SR-01; the chunk use of OCCURS_IN_SEGMENT is renamed CHUNK_IN_SEGMENT because W21 OCCURS_IN_SEGMENT is structural, executed failing case: 7 V-112r NO_CITATION rows on W21 fixtures), HAS_CURRENT_PROTOCOL_STEP (W16-SR-06), COMPARED_TO for the same-version clause only (W07-SR-10). SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT need inputs. V-112r reads the hypothesis citation from derivedFromAssessmentUids and flags RULE_ONLY_ACROSS_VERSIONS.
 
 Artifacts: V-112r; validation-params-w00.json.
 
@@ -299,6 +299,18 @@ PublicationRevisionProperties must contain every AssertedEdgeProperties field; L
 
 Artifacts: none.
 
+### W00-R-49 V-231 scope and W17/W18 archetype checks
+
+V-231r restricts the INV-210 context check to mechanism-class assertions (null class read as mechanism), as INV-210 is worded (W17-SR-09). SafetySignal, NarrativeArc and EventImpactAssessment are EvidenceAssessment types; Event an Occurrence; Conference and Community Entities: no kernel conflict.
+
+Artifacts: V-231r.
+
+### W00-R-50 CONSIDERS_ASSESSMENT domain
+
+CONSIDERS_ASSESSMENT may start at any EvidenceAssessment (W10 fixture w10-01: ApplicabilityDimension -> ResolutionHypothesis/EndpointClassification); a NarrativeArc is never its target and never a provenance-state-3 warrant (W18-SR-10, W18-V03). V-504 generalization to assessments (W10-SR-05) DEFERRED for lack of a visible failing case.
+
+Artifacts: sdl-fragment.graphql doc.
+
 ## 3. Conflicts ruled (winner, loser, loser fallback)
 
 | Conflict | Winner | Loser fallback | Ruling |
@@ -315,6 +327,7 @@ Artifacts: none.
 | W09-SR-12 qualifiers: key/value lists on Assertion vs edge carrier | typed properties stored on both sides | none needed | W00-R-03 |
 | W15-SR-09(b): string sourceLocatorUid vs SUPPORTED_BY edge | SUPPORTED_BY edge | sourceLocatorUid may stay as a denormalized cache (V-W15-08) | W00-R-22 |
 | W16-SR-02: STEP_OCCURRENCES_PER_WEEK vs STEP_SCHEDULE_REPORTED | generic STEP_SCHEDULE_REPORTED (UCUM rate unit) | none | W00-R-07 |
+| OCCURS_IN_SEGMENT: W21 structural ClaimOccurrence -> EpisodeSegment vs W20 derived chunk overlap | W21 keeps OCCURS_IN_SEGMENT | W20 renames its chunk edge CHUNK_IN_SEGMENT, field name kept | W00-R-23 |
 | W04-SR-04: literal ACTIVE_MOIETY_AMOUNT vs QUANTITY object form | QUANTITY object form preferred | literal-only form still valid under V-003r | W00-R-02 |
 
 ## 4. Changes Fable carries (frozen contract and catalog text untouched here)
@@ -326,7 +339,7 @@ Artifacts: none.
 - Contract A2 / catalog identity_resolution: redirect = EquivalenceAssessment SAME_IDENTITY_MERGED with survivingUid/retiredUid (W00-R-11).
 - INV-003: QUANTITY-class exception (W00-R-02); Assertion.statedAsOf/statedAsOfPrecision (W00-R-13).
 - Catalog conventions: uidTypeTokens (uid-token-registry.yaml), predicateExclusivity and implication pairs (predicate-registry.yaml), normalizationVersions IMG-PX1 and LIG-HY1 (CANDIDATE), jurisdictionCode (CANDIDATE), liveIdProjection allows content-derived digests for DocumentTextVersion/Segmentation/Chunk.
-- Catalog relationships: HAS_SNAPSHOT narrowed, HAS_STATE for state caches, LEGACY_EVALUATES, MENTIONS_ENTITY, IDENTIFIED_BY retired, ruleOnly flags, WAS_GENERATED_BY / USED / SUPPORTED_BY range extensions.
+- Catalog relationships: HAS_SNAPSHOT narrowed, HAS_STATE for state caches, LEGACY_EVALUATES, MENTIONS_ENTITY, CHUNK_IN_SEGMENT, IDENTIFIED_BY retired, ruleOnly flags, WAS_GENERATED_BY / USED / SUPPORTED_BY range extensions.
 - validation.cypher: the 42 blocks of validation-corrections.cypher (replacements keep the frozen id with suffix r; new ids V-W00-13/15/16/17/19 need final numbers).
 
 ## 5. Evidence produced in this pass
@@ -402,6 +415,12 @@ RESCAN_PLACEHOLDER
 | W09-SR-13 | W09 | ACCEPTED | W00-R-17 | Stored legacy type renamed LEGACY_EVALUATES at migration; Study.evaluates keeps its GraphQL name with type LEGACY_EVALUATES; EVALUATES is Adjudication -> Assertion only (fragment doc); V-W00-15 reports USE_LEGACY_EVALUATES. |
 | W09-SR-14 | W09 | ACCEPTED | W00-R-08 | TRIAL_REGISTRY_RECORD and BIBLIOGRAPHIC_RECORD added (W19 spelling wins: one value covers PubMed, Crossref, OpenAlex records). W09 fallback: use BIBLIOGRAPHIC_RECORD wherever BIBLIOGRAPHIC_DATABASE_RECORD was planned. |
 | W09-SR-16 | W09 | ACCEPTED_AS_CANDIDATE | W00-R-07 | CITES_AS_REFERENCE, EVALUATES_RISK_FACTOR CANDIDATE; [REGISTRY_RESULTS_NOT_POSTED, RESULTS_UNPUBLISHED] added to implicationPairs. |
+| W10-SR-01 | W10 | ACCEPTED | W00-R-01 | UseContextProfile use-profile, EndpointClassification endpoint-classification, EvidenceSynthesis synthesis keyed by label. |
+| W10-SR-04 | W10 | ACCEPTED | W00-R-50 | CONSIDERS_ASSESSMENT domain = any EvidenceAssessment (fragment doc on Adjudication.considersAssessments; W10 declares the field on its types); NarrativeArc never a target (W18-SR-10). |
+| W10-SR-05 | W10 | DEFERRED | W00-R-50 | None now. Candidate W10-V16b to be ruled when W10 publishes its failing case; V-511 already covers Adjudications. |
+| W10-SR-06 | W10 | ACCEPTED_AS_CANDIDATE | W00-R-07 | REPORTS_POOLED_ESTIMATE CANDIDATE (QUANTITY literal); INV-206 scope left to W09/W10. |
+| W10-SR-07 | W10 | ACCEPTED | W00-R-05 | uid/id on EvidenceAssessmentArchetype (done). |
+| W10-SR-11 | W10 | DEFERRED | W00-R-07 | None now; [PATENT_CLAIMS, SYNTHESIS_INPUT] and the composite pair await W10 failing cases. |
 | W11-SR-04 | W11 | ACCEPTED | W00-R-07 | predicateExclusivity HAS_CAPABILITY_STATE and GOVERNED_BY_SPECIFICATION with partitionByPath; enforced in the ingestion write transaction, audited by V-W11-02/07; excluded from the generic $exclusiveTypes checks. |
 | W11-SR-08 | W11 | ACCEPTED | W00-R-01 | Tokens specification, specification-version, process, process-step, capability; SpecificationCriterion -> spec-criterion (owner wins; W11 fallback: migrate any hu:specification-criterion: uid). |
 | W11-SR-09 | W11 | ACCEPTED_AS_CANDIDATE | W00-R-07 | CLAIMS_THIRD_PARTY_CERTIFICATION and SPECIFICATION_EFFECTIVE_FROM CANDIDATE (literal; never project to COVERS/CERTIFIED_UNDER or to a bound). |
@@ -439,6 +458,16 @@ RESCAN_PLACEHOLDER
 | W16-SR-06 | W16 | ACCEPTED | W00-R-23 | HAS_CURRENT_PROTOCOL_STEP ruleOnly (rule protocol-current-steps-v1) in $ruleOnlyDerivedTypes and $derivedTypes; V-542p stays W16-owned. |
 | W16-SR-09 | W16 | REJECTED | W00-R-45 | No kernel change. W16 fallback: W09 owns one shared route enum (or EDQM Standard Terms code string) and W16 switches to it; Fable rules ownership. |
 | W16-SR-18 | W16 | ACCEPTED | W00-R-19 | ProtocolResult.mentions uses MENTIONS_ENTITY with RetrievalEdgeProperties (derived). W16 fallback for a curated link: an asserted Assertion, never a structural MENTIONS. |
+| W17-SR-02 | W17 | ACCEPTED | W00-R-01 | AdverseEffect adverse-effect, SafetySignal safety-signal, UseConstraint use-constraint; ContraindicationAssertion and InteractionAssertion use assertion (RelationshipAssertion precedent). |
+| W17-SR-03 | W17 | ACCEPTED | W00-R-07 | Four predicates REGISTERED; FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md section 3. |
+| W17-SR-05 | W17 | ACCEPTED | W00-R-21 / W00-R-22 | SafetySignal removed from AssertionSubjectTarget and added to SupportedRecordTarget; AdverseEffect kept. |
+| W17-SR-06 | W17 | ACCEPTED_AS_CANDIDATE | W00-R-49 | Part (a) confirmed: SafetySignal is its own EvidenceAssessment type beside EvidenceSynthesis; remaining parts DEFERRED to W10/W17 packets. |
+| W17-SR-09 | W17 | ACCEPTED | W00-R-49 | V-231 replaced by V-231r (mechanism class only; null class read as mechanism); V-W17-01..13 adopted by reference. |
+| W18-SR-01 | W18 | ACCEPTED | W00-R-01 | Event event, Conference conference, Community community, NarrativeArc narrative-arc, EventImpactAssessment event-impact. |
+| W18-SR-02 | W18 | ACCEPTED | W00-R-49 | Promotion is Fable registry business; union membership follows the archetypes (W00-R-21/22). |
+| W18-SR-04 | W18 | ACCEPTED | W00-R-09 / W00-R-13 | ActivityKind CURATION added; statedTense documents FUTURE (controlled string). |
+| W18-SR-10 | W18 | ACCEPTED_AS_CANDIDATE | W00-R-50 | NarrativeArc excluded from provenance state 3 and from CONSIDERS_ASSESSMENT targets; W18-V03 adopted by reference (final V-4xx id by Fable). |
+| W18-SR-11 | W18 | DEFERRED | W00-R-29 | None now; Event.announcementAs... (as W18 proposes) stays a W18 field until a failing case shows the need for a structural pointer. |
 | W19-SR-01 | W19 | ACCEPTED | W00-R-08 | Eight values added (TRIAL_REGISTRY_RECORD, BIBLIOGRAPHIC_RECORD, NEWS_ARTICLE, LEGISLATION_OR_REGULATION, PRESENTATION_SLIDES, PERSONAL_WEBPAGE, TECHNICAL_DOCUMENTATION, OTHER) plus Source.sourceKindNote; V-W00-17. |
 | W19-SR-02 | W19 | ACCEPTED | W00-R-15 | Source.renditionCoverage (CANDIDATE enum RenditionCoverage) kept; FI [NOT_FOUND_IN_PARTIAL_CAPTURE, NOT_DISCLOSED] extended to complete captures of PARTIAL renditions. |
 | W19-SR-03 | W19 | ACCEPTED | W00-R-09 | ActivityKind DISCOVERY added; SourceDiscoveryRecord shares the Activity label (read through Activity, MR-01); discovery-only fields stay on the specialization. |
@@ -448,7 +477,7 @@ RESCAN_PLACEHOLDER
 | W19-SR-10 | W19 | ACCEPTED | W00-R-15 | canonicalUri rule adopted (post-redirect endpoint, never a resolver); V-235r joins by RENDITION_OF; V-W00-19 promotes Q-02. |
 | W19-SR-13 | W19 | ACCEPTED | W00-R-15 | QS-7 NOT_DECLARED_IN_COVERING_SOURCE requires a COMPLETE capture of a FULL rendition, else NOT_FOUND_IN_PARTIAL_CAPTURE. |
 | W19-SR-15 | W19 | ACCEPTED | W00-R-31 | Ingestion rule: observedAt = the service cache time, retrievedAt = request time; the CAPTURE Activity methodVersion records cache state. No schema change. |
-| W20-SR-01 | W20 | ACCEPTED | W00-R-23 | RESOLVES_TO_CHUNK, HAS_CHUNK, OCCURS_IN_SEGMENT, ABOUT, MENTIONS_ENTITY are ruleOnly; SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT are not. |
+| W20-SR-01 | W20 | ACCEPTED | W00-R-23 | RESOLVES_TO_CHUNK, HAS_CHUNK, ABOUT, MENTIONS_ENTITY are ruleOnly; the chunk-overlap use of OCCURS_IN_SEGMENT is renamed CHUNK_IN_SEGMENT (ruleOnly) because W21 already uses OCCURS_IN_SEGMENT as a structural ClaimOccurrence -> ... |
 | W20-SR-02 | W20 | ACCEPTED | W00-R-01 | Token segmentation. |
 | W20-SR-04 | W20 | ACCEPTED_AS_CANDIDATE | W00-R-19 | RetrievalEdgeProperties admitted as CANDIDATE (W20 sole writer; W21, W16, W22 reuse); maturity CANDIDATE until a retrieval evaluation exists. |
 | W20-SR-05 | W20 | ACCEPTED | W00-R-18 | WAS_GENERATED_BY domain adds Segmentation; Activity.generatedSegmentations inverse field. |

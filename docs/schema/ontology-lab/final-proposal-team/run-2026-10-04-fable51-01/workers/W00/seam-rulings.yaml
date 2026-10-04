@@ -5,10 +5,11 @@ inputs: validation/inventories/seam-requests-consolidated.json (132 W00-targeted
 rule: A request without a failing case or a primary source is DEFERRED; when two requests conflict the ruling names the loser and its fallback. The frozen
   contract text is unchanged; Fable carries accepted contract changes into the decision report.
 counts:
-  ACCEPTED: 135
+  ACCEPTED: 145
   REJECTED: 2
-  ACCEPTED_AS_CANDIDATE: 11
-total: 148
+  ACCEPTED_AS_CANDIDATE: 14
+  DEFERRED: 3
+total: 164
 themes:
 - rulingId: W00-R-01
   theme: uid tokens
@@ -154,9 +155,10 @@ themes:
   artifacts: sdl-fragment.graphql
 - rulingId: W00-R-23
   theme: ruleOnly derived types and V-112
-  ruling: 'ruleOnly: RESOLVES_TO_CHUNK, HAS_CHUNK, OCCURS_IN_SEGMENT, ABOUT, MENTIONS_ENTITY (W20-SR-01), HAS_CURRENT_PROTOCOL_STEP (W16-SR-06), COMPARED_TO
-    for the same-version clause only (W07-SR-10). SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT need inputs. V-112r reads the hypothesis citation from derivedFromAssessmentUids
-    and flags RULE_ONLY_ACROSS_VERSIONS.'
+  ruling: 'ruleOnly: RESOLVES_TO_CHUNK, HAS_CHUNK, CHUNK_IN_SEGMENT, ABOUT, MENTIONS_ENTITY (W20-SR-01; the chunk use of OCCURS_IN_SEGMENT is renamed CHUNK_IN_SEGMENT
+    because W21 OCCURS_IN_SEGMENT is structural, executed failing case: 7 V-112r NO_CITATION rows on W21 fixtures), HAS_CURRENT_PROTOCOL_STEP (W16-SR-06),
+    COMPARED_TO for the same-version clause only (W07-SR-10). SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT need inputs. V-112r reads the hypothesis citation
+    from derivedFromAssessmentUids and flags RULE_ONLY_ACROSS_VERSIONS.'
   artifacts: V-112r; validation-params-w00.json
 - rulingId: W00-R-24
   theme: Normalization versions and offsets
@@ -268,6 +270,17 @@ themes:
   theme: W09 relationship-property types
   ruling: PublicationRevisionProperties must contain every AssertedEdgeProperties field; LegacyInterventionArmProperties is legacy read-only.
   artifacts: none
+- rulingId: W00-R-49
+  theme: V-231 scope and W17/W18 archetype checks
+  ruling: 'V-231r restricts the INV-210 context check to mechanism-class assertions (null class read as mechanism), as INV-210 is worded (W17-SR-09). SafetySignal,
+    NarrativeArc and EventImpactAssessment are EvidenceAssessment types; Event an Occurrence; Conference and Community Entities: no kernel conflict.'
+  artifacts: V-231r
+- rulingId: W00-R-50
+  theme: CONSIDERS_ASSESSMENT domain
+  ruling: 'CONSIDERS_ASSESSMENT may start at any EvidenceAssessment (W10 fixture w10-01: ApplicabilityDimension -> ResolutionHypothesis/EndpointClassification);
+    a NarrativeArc is never its target and never a provenance-state-3 warrant (W18-SR-10, W18-V03). V-504 generalization to assessments (W10-SR-05) DEFERRED
+    for lack of a visible failing case.'
+  artifacts: sdl-fragment.graphql doc
 requests:
 - id: W00-SR-01
   requester: W00
@@ -671,6 +684,44 @@ requests:
   rulingId: W00-R-07
   rationale: Fixtures/06 statement 6 and fixtures/90 N16.
   change: CITES_AS_REFERENCE, EVALUATES_RISK_FACTOR CANDIDATE; [REGISTRY_RESULTS_NOT_POSTED, RESULTS_UNPUBLISHED] added to implicationPairs.
+- id: W10-SR-01
+  requester: W10
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'W10 fixtures write 36 hu:use-profile:, 28 hu:endpoint-classification:, 47 hu:synthesis: uids; the tokens existed only as 0.2.0 alias keys.'
+  change: UseContextProfile use-profile, EndpointClassification endpoint-classification, EvidenceSynthesis synthesis keyed by label.
+- id: W10-SR-04
+  requester: W10
+  ruling: ACCEPTED
+  rulingId: W00-R-50
+  rationale: 'Failing case read from W10 fixture w10-01 lines 160-167: ApplicabilityDimension -[:CONSIDERS_ASSESSMENT]-> ResolutionHypothesis / EndpointClassification,
+    outside the catalog domain (Adjudication only).'
+  change: CONSIDERS_ASSESSMENT domain = any EvidenceAssessment (fragment doc on Adjudication.considersAssessments; W10 declares the field on its types);
+    NarrativeArc never a target (W18-SR-10).
+- id: W10-SR-05
+  requester: W10
+  ruling: DEFERRED
+  rulingId: W00-R-50
+  rationale: 'No failing case or source visible: W10 has published no seam-requests.yaml and the inventory row carries only the request text.'
+  change: None now. Candidate W10-V16b to be ruled when W10 publishes its failing case; V-511 already covers Adjudications.
+- id: W10-SR-06
+  requester: W10
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-07
+  rationale: W10 fixtures use REPORTS_POOLED_ESTIMATE in 4 assertions (unregistered predicate).
+  change: REPORTS_POOLED_ESTIMATE CANDIDATE (QUANTITY literal); INV-206 scope left to W09/W10.
+- id: W10-SR-07
+  requester: W10
+  ruling: ACCEPTED
+  rulingId: W00-R-05
+  rationale: Same failing case as W23-SR-03 (interface-typed CONSIDERS_ASSESSMENT targets cannot filter or return uid).
+  change: uid/id on EvidenceAssessmentArchetype (done).
+- id: W10-SR-11
+  requester: W10
+  ruling: DEFERRED
+  rulingId: W00-R-07
+  rationale: No failing case visible (inventory text only; W10 seam file absent at the re-scan). The W14 pair it answers is accepted separately.
+  change: None now; [PATENT_CLAIMS, SYNTHESIS_INPUT] and the composite pair await W10 failing cases.
 - id: W11-SR-04
   requester: W11
   ruling: ACCEPTED
@@ -911,6 +962,72 @@ requests:
   rationale: 'One relationship type, one meaning: kernel MENTIONS is SourceLocator -> Mention (identity_resolution).'
   change: 'ProtocolResult.mentions uses MENTIONS_ENTITY with RetrievalEdgeProperties (derived). W16 fallback for a curated link: an asserted Assertion,
     never a structural MENTIONS.'
+- id: W17-SR-02
+  requester: W17
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'W17 fixtures write 74 hu:adverse-effect:, 89 hu:safety-signal:, 124 hu:use-constraint: uids with no registered token.'
+  change: AdverseEffect adverse-effect, SafetySignal safety-signal, UseConstraint use-constraint; ContraindicationAssertion and InteractionAssertion use
+    assertion (RelationshipAssertion precedent).
+- id: W17-SR-03
+  requester: W17
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: W17 fixtures 03/04 carry USE_CONSTRAINED_IN (8), USE_CONSTRAINED_WITH (9), INTERACTS_WITH (8), IDENTIFIES_POTENTIAL_SAFETY_SIGNAL (2) assertions
+    on unregistered predicates. The forbidden implications FI-W17-01..09 are listed in a file not on disk at the re-scan.
+  change: Four predicates REGISTERED; FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md section 3.
+- id: W17-SR-05
+  requester: W17
+  ruling: ACCEPTED
+  rulingId: W00-R-21 / W00-R-22
+  rationale: 'The W17 fragment labels SafetySignal [SafetySignal, EvidenceAssessment]: outside the HAS_SUBJECT range (catalog Entity|VersionedState|Occurrence|InformationArtifact).'
+  change: SafetySignal removed from AssertionSubjectTarget and added to SupportedRecordTarget; AdverseEffect kept.
+- id: W17-SR-06
+  requester: W17
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-49
+  rationale: 'Kernel archetype check on the W17 fragment: SafetySignal returns a lifecycle state for a subject-effect pair, EvidenceSynthesis a claim verdict;
+    both may be EvidenceAssessment types without conflict. The rest of the request is truncated in the inventory.'
+  change: 'Part (a) confirmed: SafetySignal is its own EvidenceAssessment type beside EvidenceSynthesis; remaining parts DEFERRED to W10/W17 packets.'
+- id: W17-SR-09
+  requester: W17
+  ruling: ACCEPTED
+  rulingId: W00-R-49
+  rationale: 'Primary source: INV-210 text ("Every mechanism-class Assertion ..."). V-231 tests every assertion with a basisKind (row counts in fixtures/results/validation-corrections-runs.md).'
+  change: V-231 replaced by V-231r (mechanism class only; null class read as mechanism); V-W17-01..13 adopted by reference.
+- id: W18-SR-01
+  requester: W18
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'W18 fixtures write 202 hu:event:, 23 hu:conference:, 4 hu:community:, 34 hu:narrative-arc:, 15 hu:event-impact: uids with no registered token.'
+  change: Event event, Conference conference, Community community, NarrativeArc narrative-arc, EventImpactAssessment event-impact.
+- id: W18-SR-02
+  requester: W18
+  ruling: ACCEPTED
+  rulingId: W00-R-49
+  rationale: 'Kernel check of the W18 fragment: Event (Occurrence), Conference (Entity), Community (Entity), NarrativeArc and EventImpactAssessment (EvidenceAssessment)
+    each carry exactly one archetype label; no kernel conflict.'
+  change: Promotion is Fable registry business; union membership follows the archetypes (W00-R-21/22).
+- id: W18-SR-04
+  requester: W18
+  ruling: ACCEPTED
+  rulingId: W00-R-09 / W00-R-13
+  rationale: W18 fixtures w18-01/w18-03 write FUTURE statements for scheduled events and two Activities with activityKind CURATION (unreadable through the
+    frozen ActivityKind enum).
+  change: ActivityKind CURATION added; statedTense documents FUTURE (controlled string).
+- id: W18-SR-10
+  requester: W18
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-50
+  rationale: W18/operations.cypher W18-V03 ("a NarrativeArc is never a source, a warrant or a derivation input, and carries no score"); a narrative arc
+    is a curation, not evidence.
+  change: NarrativeArc excluded from provenance state 3 and from CONSIDERS_ASSESSMENT targets; W18-V03 adopted by reference (final V-4xx id by Fable).
+- id: W18-SR-11
+  requester: W18
+  ruling: DEFERRED
+  rulingId: W00-R-29
+  rationale: 'No failing case visible: W18 fixtures contain no ANNOUNCED_IN edge and the inventory text is truncated.'
+  change: None now; Event.announcementAs... (as W18 proposes) stays a W18 field until a failing case shows the need for a structural pointer.
 - id: W19-SR-01
   requester: W19
   ruling: ACCEPTED
@@ -975,7 +1092,10 @@ requests:
   ruling: ACCEPTED
   rulingId: W00-R-23
   rationale: 'Failing case fixture 01: offset-overlap-v1 RESOLVES_TO_CHUNK edges reported by V-112 as DERIVATION_WITHOUT_SOURCE_ASSERTIONS.'
-  change: RESOLVES_TO_CHUNK, HAS_CHUNK, OCCURS_IN_SEGMENT, ABOUT, MENTIONS_ENTITY are ruleOnly; SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT are not.
+  change: 'RESOLVES_TO_CHUNK, HAS_CHUNK, ABOUT, MENTIONS_ENTITY are ruleOnly; the chunk-overlap use of OCCURS_IN_SEGMENT is renamed CHUNK_IN_SEGMENT (ruleOnly)
+    because W21 already uses OCCURS_IN_SEGMENT as a structural ClaimOccurrence -> EpisodeSegment edge: with OCCURS_IN_SEGMENT listed as derived, V-112r
+    reported 7 correct W21 edges as NO_CITATION (run of this pass). W20 fallback: Chunk.inEpisodeSegments keeps its field name with type CHUNK_IN_SEGMENT.
+    SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT are not ruleOnly.'
 - id: W20-SR-02
   requester: W20
   ruling: ACCEPTED

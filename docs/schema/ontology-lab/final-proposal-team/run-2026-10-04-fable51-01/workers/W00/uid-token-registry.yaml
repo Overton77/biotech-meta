@@ -21,6 +21,11 @@ labels:
     token: adjudication
     status: CATALOG_0.2.0
     owner: W00
+  AdverseEffect:
+    token: adverse-effect
+    status: ACCEPTED
+    requestedBy: W17-SR-02
+    owner: W17
   AdverseEventResult:
     token: adverse-event-result
     status: ACCEPTED
@@ -155,6 +160,11 @@ labels:
     status: ACCEPTED
     requestedBy: W15-SR-08
     owner: W15
+  Community:
+    token: community
+    status: ACCEPTED
+    requestedBy: W18-SR-01
+    owner: W18
   ComparabilityAssessment:
     token: comparability
     status: ACCEPTED
@@ -165,6 +175,11 @@ labels:
     status: ACCEPTED
     requestedBy: W03-SR-04, W16-SR-01
     owner: W03
+  Conference:
+    token: conference
+    status: ACCEPTED
+    requestedBy: W18-SR-01
+    owner: W18
   Constituent:
     token: constituent
     status: ACCEPTED
@@ -179,6 +194,12 @@ labels:
     token: brand
     status: CATALOG_0.2.0
     owner: W01
+  ContraindicationAssertion:
+    token: assertion
+    status: ACCEPTED
+    requestedBy: W17-SR-02
+    owner: W17
+    note: shares the Assertion token like RelationshipAssertion (catalog precedent)
   Dataset:
     token: dataset
     status: ACCEPTED
@@ -211,7 +232,7 @@ labels:
   EndpointClassification:
     token: endpoint-classification
     status: ACCEPTED
-    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias), W10-SR-01
     owner: W10
   Episode:
     token: episode
@@ -227,6 +248,16 @@ labels:
     requestedBy: W00-SR-09
     owner: W00
     note: shares the registered EvidenceAssessment token (no equivalence-assessment token)
+  Event:
+    token: event
+    status: ACCEPTED
+    requestedBy: W18-SR-01
+    owner: W18
+  EventImpactAssessment:
+    token: event-impact
+    status: ACCEPTED
+    requestedBy: W18-SR-01
+    owner: W18
   EvidenceApplicability:
     token: applicability
     status: CATALOG_0.2.0
@@ -238,7 +269,7 @@ labels:
   EvidenceSynthesis:
     token: synthesis
     status: ACCEPTED
-    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias), W10-SR-01
     owner: W10
   Exposure:
     token: exposure
@@ -301,6 +332,12 @@ labels:
     token: material
     status: CATALOG_0.2.0
     owner: W02
+  InteractionAssertion:
+    token: assertion
+    status: ACCEPTED
+    requestedBy: W17-SR-02
+    owner: W17
+    note: shares the Assertion token like RelationshipAssertion (catalog precedent)
   InterventionComponent:
     token: intervention-component
     status: ACCEPTED
@@ -464,6 +501,11 @@ labels:
     status: ACCEPTED
     requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
     owner: W03
+  NarrativeArc:
+    token: narrative-arc
+    status: ACCEPTED
+    requestedBy: W18-SR-01
+    owner: W18
   Nutrient:
     token: nutrient
     status: ACCEPTED
@@ -712,6 +754,11 @@ labels:
     status: ACCEPTED
     requestedBy: W03-SR-04
     owner: W03
+  SafetySignal:
+    token: safety-signal
+    status: ACCEPTED
+    requestedBy: W17-SR-02
+    owner: W17
   Segmentation:
     token: segmentation
     status: ACCEPTED
@@ -843,6 +890,11 @@ labels:
     requestedBy: W12-SR-01
     owner: W12
     note: refinement specialization of Organization (rule T2)
+  ToolOrInstrument:
+    token: instrument
+    status: ACCEPTED
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    owner: W08
   TradeItemIdentifier:
     token: trade-id
     status: ACCEPTED
@@ -863,10 +915,15 @@ labels:
     status: ACCEPTED
     requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
     owner: W09
+  UseConstraint:
+    token: use-constraint
+    status: ACCEPTED
+    requestedBy: W17-SR-02
+    owner: W17
   UseContextProfile:
     token: use-profile
     status: ACCEPTED
-    requestedBy: W00-R-01 (promote 0.2.0 fixture alias)
+    requestedBy: W00-R-01 (promote 0.2.0 fixture alias), W10-SR-01
     owner: W10
 aliasKeysKept:
   algorithm: algorithm
@@ -947,53 +1004,20 @@ rejectedOrResolved:
   ruling: see W00-R-24
   why: IMG-PX1 registered; IMG-REL-XYWH-1 withdrawn
 labelsInMergedFragmentsWithoutToken:
-- label: AdverseEffect
-  owner: W17
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 - label: ClaimEvidenceAssessment
   owner: W21
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: Community
-  owner: W18
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: Conference
-  owner: W18
   action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 - label: ConflictRelevanceAssessment
   owner: W21
   action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: ContraindicationAssertion
-  owner: W17
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: Event
-  owner: W18
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: EventImpactAssessment
-  owner: W18
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 - label: EvidenceStrengthAssessment
   owner: W10
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: InteractionAssertion
-  owner: W17
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: NarrativeArc
-  owner: W18
   action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 - label: ResultInterpretation
   owner: W10
   action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 - label: RetellingFidelityAssessment
   owner: W21
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: SafetySignal
-  owner: W17
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: ToolOrInstrument
-  owner: W08
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: UseConstraint
-  owner: W17
   action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 collisionCheck:
   unrelatedLabelsSharingAToken: none

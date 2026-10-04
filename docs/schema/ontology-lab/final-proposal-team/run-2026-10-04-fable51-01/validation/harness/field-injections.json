@@ -155,7 +155,6 @@
  {
   "type": "AssayVersion",
   "fields": [
-   "\"\"\"class: structural; cardinality: zero_or_one (with runsOnInstrument: exactly one equipment model); catalog: RUNS_ON_INSTRUMENT (registry: W07); request: W08-SR-01; injected at merge (reports/04-seam-closure-ledger.md). Device-run assay versions (D-W08-14); companion of runsOnInstrument until it is retyped to EquipmentModelTarget.\"\"\"\nrunsOnDevices: [Device!]! @relationship(type: \"RUNS_ON_INSTRUMENT\", direction: OUT, properties: \"StructuralEdgeProperties\")",
    "\"\"\"class: asserted (inverse view); cardinality: many; catalog: PERFORMED_WITH_ASSAY_VERSION (registry: W07); request: W08-SR-01; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Device.performedWithAssayVersions (domain widened LabTest|Device).\"\"\"\nusedByDevices: [Device!]! @relationship(type: \"PERFORMED_WITH_ASSAY_VERSION\", direction: IN, properties: \"AssertedEdgeProperties\")",
    "\"\"\"class: structural (candidate); cardinality: zero_or_one; catalog: RUNS_FIRMWARE_VERSION (registry: W08); request: W08-SR-05; injected at merge (reports/04-seam-closure-ledger.md). softwareVersion = FirmwareVersion.versionLabel when the edge exists (V-W08-05); softwareVersion stays identity-defining.\"\"\"\nrunsFirmwareVersion: [FirmwareVersion!]! @relationship(type: \"RUNS_FIRMWARE_VERSION\", direction: OUT, properties: \"StructuralEdgeProperties\")"
   ]
@@ -177,6 +176,18 @@
   "fields": [
    "\"\"\"class: asserted (inverse view); cardinality: many; catalog: UNIT_FROM_LOT (registry: W15); request: W15-SR-03; injected at merge (reports/04-seam-closure-ledger.md). A printed code is not lot identity.\"\"\"\nunits: [IndividualUnit!]! @relationship(type: \"UNIT_FROM_LOT\", direction: IN, properties: \"AssertedEdgeProperties\")",
    "\"\"\"class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM (registry: W15); request: W15-SR-03; injected at merge (reports/04-seam-closure-ledger.md). RECALL_SCOPE candidates (V-W15-07); no recall property on ProductLot.\"\"\"\ncommerceMatches: [CommerceMatch!]! @relationship(type: \"MATCHES_COMMERCE_ITEM\", direction: IN)"
+  ]
+ },
+ {
+  "type": "PriceObservation",
+  "fields": [
+   "\"\"\"class: structural; cardinality: zero_or_one; catalog: SUPPORTED_BY (registry: W00); request: W15-SR-09(b) (ruling W00-R-22); injected at merge (reports/04-seam-closure-ledger.md). The span that showed the price; sourceLocatorUid stays only as a denormalized cache checked by V-W15-08 (W15 fallback).\"\"\"\nsupportedBy: [SourceLocator!]! @relationship(type: \"SUPPORTED_BY\", direction: OUT)"
+  ]
+ },
+ {
+  "type": "AffiliateLink",
+  "fields": [
+   "\"\"\"class: structural; cardinality: zero_or_one; catalog: SUPPORTED_BY (registry: W00); request: W15-SR-09(b) (ruling W00-R-22); injected at merge (reports/04-seam-closure-ledger.md). The span that carried the link; sourceLocatorUid stays only as a denormalized cache checked by V-W15-08 (W15 fallback).\"\"\"\nsupportedBy: [SourceLocator!]! @relationship(type: \"SUPPORTED_BY\", direction: OUT)"
   ]
  },
  {
@@ -228,6 +239,19 @@
   "fields": [
    "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\nmassBasis: MassBasis @settable(onCreate: false, onUpdate: false)",
    "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\namountReferent: AmountReferent @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "Observation",
+  "fields": [
+   "\"\"\"class: derived; cardinality: many; catalog: COMPARED_TO (W07 D-W07 projection rule; DiagnosticResult -> DiagnosticResult; rule-only when same AssayVersion, else licensed by a ComparabilityAssessment via derivedFromAssessmentUids; V-302r, V-304r, V-312). Fable injection at Wave 5: W16 omitted the field W07's model card places on Observation.\"\"\"\ncomparedTo: [Observation!]! @relationship(type: \"COMPARED_TO\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "Biomarker",
+  "fields": [
+   "\"\"\"class: structural (candidate); cardinality: zero_or_one; catalog: HAS_ANALYTE (registry: W07, admitted by Fable ruling F-W5-01); request: W03-SR-03, W02-SR-08.\"\"\"\nanalyteSubstances: [ChemicalSubstance!]! @relationship(type: \"HAS_ANALYTE\", direction: OUT, properties: \"StructuralEdgeProperties\")",
+   "\"\"\"class: structural (candidate); cardinality: zero_or_one; catalog: HAS_ANALYTE (registry: W07, admitted by Fable ruling F-W5-01); request: W03-SR-03, W02-SR-08.\"\"\"\nanalyteMolecularEntities: [MolecularEntity!]! @relationship(type: \"HAS_ANALYTE\", direction: OUT, properties: \"StructuralEdgeProperties\")"
   ]
  }
 ]

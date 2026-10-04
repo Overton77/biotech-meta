@@ -565,6 +565,56 @@ assertedPredicates:
   status: DEFERRED
   requestedBy: W21-SR-15
   note: fixture placeholders; no owner and no failing case of their own
+- predicate: REPORTS_POOLED_ESTIMATE
+  predicateClass: QUANTITY
+  ownerModule: evidence_assessment
+  ownerWorker: W10 (with W09)
+  form: literal valueNumber + unitCode (pooled effect as stated)
+  subject: Publication
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W10-SR-06
+  note: W10 fixtures use it 4 times; whether INV-206 applies to pooled estimates is W09/W10 business
+- predicate: USE_CONSTRAINED_IN
+  predicateClass: REGULATORY
+  ownerModule: safety_and_constraints
+  ownerWorker: W17
+  form: as W17 registers (asserted)
+  subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
+  object: Condition|Population|ChemicalSubstance|AdverseEffect
+  status: REGISTERED
+  requestedBy: W17-SR-03
+  note: W17 fixtures 03/04 use them (8, 9, 8, 2 assertions); FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md
+- predicate: USE_CONSTRAINED_WITH
+  predicateClass: REGULATORY
+  ownerModule: safety_and_constraints
+  ownerWorker: W17
+  form: as W17 registers (asserted)
+  subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
+  object: Condition|Population|ChemicalSubstance|AdverseEffect
+  status: REGISTERED
+  requestedBy: W17-SR-03
+  note: W17 fixtures 03/04 use them (8, 9, 8, 2 assertions); FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md
+- predicate: INTERACTS_WITH
+  predicateClass: CLAIM
+  ownerModule: safety_and_constraints
+  ownerWorker: W17
+  form: as W17 registers (asserted)
+  subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
+  object: Condition|Population|ChemicalSubstance|AdverseEffect
+  status: REGISTERED
+  requestedBy: W17-SR-03
+  note: W17 fixtures 03/04 use them (8, 9, 8, 2 assertions); FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md
+- predicate: IDENTIFIES_POTENTIAL_SAFETY_SIGNAL
+  predicateClass: CLAIM
+  ownerModule: safety_and_constraints
+  ownerWorker: W17
+  form: as W17 registers (asserted)
+  subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
+  object: Condition|Population|ChemicalSubstance|AdverseEffect
+  status: REGISTERED
+  requestedBy: W17-SR-03
+  note: W17 fixtures 03/04 use them (8, 9, 8, 2 assertions); FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md
 relationshipClassUpdates:
 - type: HAS_SNAPSHOT
   class: structural
@@ -608,8 +658,12 @@ relationshipClassUpdates:
   domainRange: (W20)
   ruling: W00-R-23
 - type: OCCURS_IN_SEGMENT
-  class: derived, ruleOnly (chunk form)
-  domainRange: (W20)
+  class: structural (W21)
+  domainRange: ClaimOccurrence|Assertion -> EpisodeSegment ONLY
+  ruling: W00-R-23
+- type: CHUNK_IN_SEGMENT
+  class: derived, ruleOnly (W20; rename of the chunk use of OCCURS_IN_SEGMENT)
+  domainRange: Chunk -> EpisodeSegment
   ruling: W00-R-23
 - type: ABOUT
   class: derived, ruleOnly (RetrievalEdgeProperties)

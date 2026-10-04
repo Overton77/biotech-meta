@@ -186,7 +186,7 @@ RETURN 'V-509r' AS check, s.uid AS subjectUid, type(r1) AS relType, t1.uid AS st
 // ===================================================================================================
 // V-112r -- replaces V-112; ruling W00-R-23
 // (1) the hypothesis citation is read from derivedFromAssessmentUids (W00-SR-06: no relationship-property type has hypothesisUid);
-// (2) $ruleOnlyDerivedTypes adds RESOLVES_TO_CHUNK, HAS_CHUNK, OCCURS_IN_SEGMENT, ABOUT, MENTIONS_ENTITY (W20-SR-01), HAS_CURRENT_PROTOCOL_STEP
+// (2) $ruleOnlyDerivedTypes adds RESOLVES_TO_CHUNK, HAS_CHUNK, CHUNK_IN_SEGMENT, ABOUT, MENTIONS_ENTITY (W20-SR-01), HAS_CURRENT_PROTOCOL_STEP
 // (W16-SR-06) and COMPARED_TO (W07-SR-10); (3) a rule-only COMPARED_TO is legal only between results of the same assay or algorithm
 // version (RULE_ONLY_ACROSS_VERSIONS). Failing cases: W20 fixture 01 (offset-overlap-v1 edges), W07 positive fixture (2 rows).
 // ORIGINAL (kept for comparison; not executed):
@@ -364,6 +364,35 @@ WHERE (ic IS NULL AND NOT hasDefinition)
    OR (ic IS NOT NULL AND NOT isDevice AND coalesce(ic.quantityStatus, 'REPORTED') = 'REPORTED'
        AND (ic.quantity IS NULL OR ic.unitCode IS NULL OR ic.quantityBasis IS NULL OR ic.massBasis IS NULL))
 RETURN 'V-221r' AS check, si.uid AS intervention, ic.uid AS incompleteComponent;
+
+// ===================================================================================================
+// V-231r -- replaces V-231; ruling W00-R-49
+// INV-210 binds mechanism-class assertions ("Every mechanism-class Assertion ..."); V-231 tests every assertion with a basisKind, so a
+// non-mechanism DIRECT_MEASUREMENT (an adverse-event count, a lab value) without a MechanismEvidenceContext is reported although
+// INV-210 does not apply to it (W17-SR-09). A null predicateClass is read as MECHANISM (conservative).
+// ORIGINAL (kept for comparison; not executed):
+// | // V-231 (INV-210): DIRECT_MEASUREMENT has exactly one context with setting and species (except cell-free / in silico);
+// | // non-measured assertions have no context.
+// | // status: statically-checked
+// | MATCH (a:Assertion)
+// | WHERE a.basisKind IS NOT NULL
+// | OPTIONAL MATCH (a)-[:OBSERVED_IN_CONTEXT]->(c:MechanismEvidenceContext)
+// | WITH a, collect(c) AS ctxs
+// | WHERE (a.basisKind = 'DIRECT_MEASUREMENT' AND size(ctxs) <> 1)
+// |    OR (a.basisKind <> 'DIRECT_MEASUREMENT' AND size(ctxs) > 0)
+// |    OR (size(ctxs) = 1 AND (ctxs[0].setting IS NULL
+// |         OR (NOT ctxs[0].setting IN ['IN_VITRO_CELL_FREE', 'IN_SILICO'] AND NOT EXISTS { MATCH (ctx:MechanismEvidenceContext {uid: ctxs[0].uid})-[:IN_SPECIES]->(:Species) })))
+// | RETURN a.uid AS assertion, a.basisKind AS basisKind, size(ctxs) AS contexts;
+// REVISED:
+MATCH (a:Assertion)
+WHERE a.basisKind IS NOT NULL AND coalesce(a.predicateClass, 'MECHANISM') = 'MECHANISM'
+OPTIONAL MATCH (a)-[:OBSERVED_IN_CONTEXT]->(c:MechanismEvidenceContext)
+WITH a, collect(c) AS ctxs
+WHERE (a.basisKind = 'DIRECT_MEASUREMENT' AND size(ctxs) <> 1)
+   OR (a.basisKind <> 'DIRECT_MEASUREMENT' AND size(ctxs) > 0)
+   OR (size(ctxs) = 1 AND (ctxs[0].setting IS NULL
+        OR (NOT ctxs[0].setting IN ['IN_VITRO_CELL_FREE', 'IN_SILICO'] AND NOT EXISTS { MATCH (ctx:MechanismEvidenceContext {uid: ctxs[0].uid})-[:IN_SPECIES]->(:Species) })))
+RETURN 'V-231r' AS check, a.uid AS assertion, a.basisKind AS basisKind, a.predicateClass AS predicateClass, size(ctxs) AS contexts;
 
 // ===================================================================================================
 // V-233r -- replaces V-233; ruling W00-R-26
@@ -1037,13 +1066,15 @@ RETURN 'V-W00-13' AS check, e.uid AS redirect, e.retiredUid AS retiredUid, old.m
 // V-W00-15 -- replaces (new); ruling W00-R-16 / -17 / -19 / -20
 // One relationship type, one meaning (CL-014): HAS_SNAPSHOT only Source -> SourceSnapshot (state caches use HAS_STATE); EVALUATES only
 // Adjudication -> Assertion (legacy study edge is LEGACY_EVALUATES); MENTIONS only SourceLocator -> Mention (retrieval uses
-// MENTIONS_ENTITY); IDENTIFIED_BY is relabelled HAS_IDENTIFIER. Rows are migration items until the relabel runs.
+// MENTIONS_ENTITY); IDENTIFIED_BY is relabelled HAS_IDENTIFIER; OCCURS_IN_SEGMENT is the W21 structural ClaimOccurrence ->
+// EpisodeSegment edge and a chunk overlap is CHUNK_IN_SEGMENT (W00-R-23). Rows are migration items until the relabel runs.
 // REVISED:
-MATCH (x)-[r:HAS_SNAPSHOT|EVALUATES|MENTIONS|IDENTIFIED_BY]->(y)
+MATCH (x)-[r:HAS_SNAPSHOT|EVALUATES|MENTIONS|IDENTIFIED_BY|OCCURS_IN_SEGMENT]->(y)
 WITH x, r, y, CASE type(r)
     WHEN 'HAS_SNAPSHOT' THEN CASE WHEN x:Source AND y:SourceSnapshot THEN null ELSE 'USE_HAS_STATE' END
     WHEN 'EVALUATES' THEN CASE WHEN x:Adjudication AND y:Assertion THEN null ELSE 'USE_LEGACY_EVALUATES' END
     WHEN 'MENTIONS' THEN CASE WHEN x:SourceLocator AND y:Mention THEN null ELSE 'USE_MENTIONS_ENTITY' END
+    WHEN 'OCCURS_IN_SEGMENT' THEN CASE WHEN x:Chunk THEN 'USE_CHUNK_IN_SEGMENT' ELSE null END
     ELSE 'USE_HAS_IDENTIFIER' END AS fix
 WHERE fix IS NOT NULL
 RETURN 'V-W00-15' AS check, type(r) AS relType, labels(x)[0] AS fromLabel, labels(y)[0] AS toLabel, count(*) AS edges, fix;
@@ -1051,15 +1082,18 @@ RETURN 'V-W00-15' AS check, type(r) AS relType, labels(x)[0] AS fromLabel, label
 // ===================================================================================================
 // V-W00-16 -- replaces (new; INV-106 token half); ruling W00-R-01
 // The uid token is the registered token of one of the node's labels (uid-token-registry.yaml, passed as $uidTypeTokens).
-// A node none of whose labels has a token reports LABEL_HAS_NO_TOKEN.
+// Violations: TOKEN_NOT_REGISTERED_FOR_LABEL, LABEL_HAS_NO_TOKEN. FIXTURE_ALIAS_TOKEN rows (0.2.0 lower-case alias tokens, rule T4) are
+// migration items, not violations.
 // REVISED:
 MATCH (n)
 WHERE n.uid IS NOT NULL AND n.uid STARTS WITH 'hu:' AND NOT n.uid STARTS WITH 'hu:private-'
 WITH n, split(n.uid, ':')[1] AS token,
-     [l IN labels(n) WHERE $uidTypeTokens[l] IS NOT NULL | $uidTypeTokens[l]] AS registered
+     [l IN labels(n) WHERE $uidTypeTokens[l] IS NOT NULL | $uidTypeTokens[l]] AS registered,
+     coalesce(head([l IN labels(n) WHERE NOT l IN ['Entity', 'VersionedState', 'Occurrence', 'InformationArtifact', 'Assertion', 'EvidenceAssessment']]), labels(n)[0]) AS primaryLabel
 WHERE size(registered) = 0 OR NOT token IN registered
-RETURN 'V-W00-16' AS check, labels(n)[0] AS primaryLabel, token, registered, count(*) AS nodes,
-       CASE WHEN size(registered) = 0 THEN 'LABEL_HAS_NO_TOKEN' ELSE 'TOKEN_NOT_REGISTERED_FOR_LABEL' END AS violation;
+RETURN 'V-W00-16' AS check, primaryLabel, token, registered, count(*) AS nodes,
+       CASE WHEN token IN $uidAliasTokens THEN 'FIXTURE_ALIAS_TOKEN'
+            WHEN size(registered) = 0 THEN 'LABEL_HAS_NO_TOKEN' ELSE 'TOKEN_NOT_REGISTERED_FOR_LABEL' END AS violation;
 
 // ===================================================================================================
 // V-W00-17 -- replaces (new); ruling W00-R-08

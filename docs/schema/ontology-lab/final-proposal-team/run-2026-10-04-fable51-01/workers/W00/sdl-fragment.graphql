@@ -712,6 +712,8 @@ enum ActivityKind {
   MEDIA_TRANSFORMATION
   "W00-R-09 (W22-SR-04): a media suitability assessment run."
   MEDIA_ASSESSMENT
+  "W00-R-09 (W18-SR-04): curation of a narrative arc or event-impact record (W18 fixtures use it)."
+  CURATION
 }
 
 "Kind of agent (aligned to Biolink AgentTypeEnum)."
@@ -1185,7 +1187,7 @@ type Assertion implements Entity & AssertionArchetype
   roleTitleVerbatim: String @settable(onCreate: true, onUpdate: false)
   "Role code exactly as printed (e.g. 'B', 'I,A,IP')."
   roleCodeVerbatim: String @settable(onCreate: true, onUpdate: false)
-  "Tense in which a speaker stated it (PAST, PRESENT; controlled string)."
+  "Tense in which a speaker stated it (PAST, PRESENT, FUTURE for scheduled or announced events, W00-R-13 on W18-SR-04; controlled string)."
   statedTense: String @settable(onCreate: true, onUpdate: false)
   "Kind of segment the assertion was read from (e.g. SPONSOR_READ, EDITORIAL; controlled string)."
   segmentKind: String @settable(onCreate: true, onUpdate: false)
@@ -1276,7 +1278,7 @@ type Adjudication implements Entity & EvidenceAssessmentArchetype
   humanReviewPending: Boolean
   """class: structural; cardinality: one_or_more; catalog: EVALUATES."""
   evaluates: [Assertion!]! @relationship(type: "EVALUATES", direction: OUT) @settable(onCreate: true, onUpdate: false)
-  """class: structural; cardinality: many; catalog: CONSIDERS_ASSESSMENT (→ any EvidenceAssessment, resolved through the archetype interface)."""
+  """class: structural; cardinality: many; catalog: CONSIDERS_ASSESSMENT (→ any EvidenceAssessment, resolved through the archetype interface). Domain extended to every EvidenceAssessment, e.g. ApplicabilityDimension (W00-R-50 on W10-SR-04); NarrativeArc is never a target (W18-SR-10)."""
   considersAssessments: [EvidenceAssessmentArchetype!]! @relationship(type: "CONSIDERS_ASSESSMENT", direction: OUT)
   """class: structural; cardinality: many; catalog: SUPPORTED_BY (locators in snapshots retrieved before recordedAt)."""
   supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
