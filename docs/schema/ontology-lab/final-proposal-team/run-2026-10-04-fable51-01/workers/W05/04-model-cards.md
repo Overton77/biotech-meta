@@ -27,7 +27,7 @@ Conventions: privacy class PUBLIC unless stated; "kind" = asserted / observed / 
 | Edge (field) | Type | Direction / range | Class | Cardinality | Properties |
 |---|---|---|---|---|---|
 | `variantOf` / `hasVariants` | `VARIANT_OF` | FoodItem → FoodItem | asserted | variant: zero_or_one base per recorded episode; base: many | `FoodVariantProperties` |
-| `quantifiedSubstances` / `quantifiedNutrients` | `QUANTITATIVELY_CONTAINS` (W02) | FoodItem → ChemicalSubstance / Nutrient | asserted | many (one per source assertion; NONEXCLUSIVE) | W02 `QuantitativeContentProperties` + W05-SR-04 qualifiers |
+| `quantifiedSubstances` / `quantifiedNutrients` | `QUANTITATIVELY_CONTAINS` (W02) | FoodItem → ChemicalSubstance / Nutrient | asserted | many (one per source assertion; NONEXCLUSIVE) | W02 `QuantitativeContentProperties` (`basis AMOUNT_PER_MASS_OF_MATERIAL`, unit `ug/hg`, `contentStatementKind TYPICAL_COMPOSITION_REPORTED`) + W05-SR-04 qualifiers |
 | `identifiers` | `HAS_IDENTIFIER` (W00) | → Identifier | asserted | many | `IdentifierLinkProperties` |
 | `hasSafetySignals` | `HAS_SAFETY_SIGNAL` (W17) | → SafetySignal | asserted | many | `SafetyEdgeProperties` |
 | `characterizedExposures` | `HAS_EXPOSURE_AGENT` (inverse) | ← Exposure | structural | many | `StructuralEdgeProperties` |
@@ -85,7 +85,7 @@ Conventions: privacy class PUBLIC unless stated; "kind" = asserted / observed / 
 | `affectsMechanisms`, `associatedWithConditions`, `associatedWithOutcomes` | W03 `AFFECTS_MECHANISM`, `ASSOCIATED_WITH_CONDITION`, `ASSOCIATED_WITH_OUTCOME` | Mechanism / Condition / Outcome | derived, read-only | `AssociationProjectionProperties`; domain extension W05-SR-05 |
 | `hasSafetySignals` | W17 | SafetySignal | asserted | |
 | `supportedByDocuments`, `supportedByChunks` | W20 | Document / Chunk | derived, read-only | `DerivedSupportProperties` |
-| (incoming) | W21 `RECOMMENDS` (derived from a RECOMMENDS speech act only), W16 step practice target (W05-SR-08), W09 `USES_PRACTICE_DEFINITION` (W05-SR-06) | | | |
+| (incoming) | W21 `RECOMMENDS` (derived from a RECOMMENDS speech act only), W16 step practice target (W05-SR-08), W09 `FOLLOWS_INTERVENTION_DEFINITION` (already ranges over Lifestyle) | | | |
 
 ## Relationship: VARIANT_OF
 
@@ -127,7 +127,7 @@ Enums reused, not owned: `ExposureBasis` (W03), `QuantityBasis`, `MassBasis`, `T
 
 | Candidate | Why it is not admitted | Admission criterion |
 |---|---|---|
-| `FoodCompositionProperties` (W05-owned property type for food rows of `QUANTITATIVELY_CONTAINS`: all W02 fields + `referenceAmount`, `referenceUnitCode`, `portionBasis`, `valueDerivation`, `sourceDerivationCode`, `dataPoints`, `minValue`, `maxValue`) | Two property types on one relationship type split one fact | Only if W02 refuses W05-SR-04 |
+| `FoodCompositionProperties` (W05-owned property type for food rows of `QUANTITATIVELY_CONTAINS`: all W02 fields + `portionBasis`, `valueDerivation`, `sourceDerivationCode`, `dataPoints`, `minValue`, `maxValue`) | Two property types on one relationship type split one fact | Only if W02 refuses W05-SR-04 |
 | `PhysicalAgent` (UV radiation, noise, heat as agents) | No retrieved source in this run; `Lifestyle` covers practice-based physical exposures | CQ-FL-C05 with a fetched record and a failing fixture |
 | Source-defined food group concept (IARC "processed meat") | IARC not retrieved; risk of inventing a taxonomy | CQ-FL-C05 with the IARC record |
 | Composite-practice edge (`Lifestyle` → components) | Diet definitions are source-specific; W16 `Protocol` carries them | A practice concept whose component list is stated identically across sources |

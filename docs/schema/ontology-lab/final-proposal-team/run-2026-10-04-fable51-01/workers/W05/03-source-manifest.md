@@ -17,10 +17,10 @@ Retrieval date for every NEW_RETRIEVAL row: 2026-10-04 (UTC, between 01:00 and 0
 
 | Question | Result | Consequence |
 |---|---|---|
-| Does an FDC record carry its mass basis? | No; the basis is in documentation (S2). | `QUANTITATIVELY_CONTAINS` for foods needs explicit `referenceAmount`/`referenceUnitCode`/`portionBasis` (W05-SR-04); V-W05-07. |
+| Does an FDC record carry its mass basis? | No; the basis is in documentation (S2). | Food `QUANTITATIVELY_CONTAINS` carries the reference mass in the UCUM unit (`ug/hg`) under W02's `AMOUNT_PER_MASS_OF_MATERIAL`, plus an explicit `portionBasis` (W05-SR-04); V-W05-07. |
 | Does FDC distinguish measured, calculated and assumed values, and zeros? | Yes: derivation codes A, NC, JA, Z; zeros with no derivation; LOQ zeros (S1, S2). | `valueDerivation` and `sourceDerivationCode` qualifiers; underived zeros stay UNRESOLVED assertions without an edge. |
 | Is preparation part of a reference food's identity? | Yes: description "dried, unblanched"; FoodOn "brazilnut (shell off, dried)" (S1). | `FoodItem` per preparation + `VARIANT_OF`. |
-| How do registries characterize a diet arm? | As free text: a named prescription plus food amounts per day; type DIETARY_SUPPLEMENT for both diet and nuts (S3, S4). | Practice-definition components (W05-SR-06); registry type kept verbatim; no Product inferred. |
+| How do registries characterize a diet arm? | As free text: a named prescription plus food amounts per day; type DIETARY_SUPPLEMENT for both diet and nuts (S3, S4). | W09 `FOLLOWS_INTERVENTION_DEFINITION` to the diet Protocol (W05-SR-06); registry type kept verbatim; no Product inferred. |
 | How does an agency characterize an exposure? | Route (oral) + duration class (chronic; intakes "based on lifetime exposure") + intensity with basis (mg/kg/day from µg/day at 55 kg) + medium (diet) (S5, S6). | `Exposure` fields; the RfD is an Assertion about the Exposure. |
 
 ## Not retrieved (research gaps)

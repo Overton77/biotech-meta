@@ -23,10 +23,10 @@
 
 - id: W05-SR-04
   targetOwner: W02
-  request: "QuantitativeContentProperties (QUANTITATIVELY_CONTAINS) must carry, besides relationshipUid/assertionUid/asserted-edge fields and quantity/unitCode/basis (V-006): referenceAmount: Float, referenceUnitCode: String (UCUM), portionBasis (EDIBLE_PORTION | AS_PURCHASED | DRY_WEIGHT | AS_PREPARED | NOT_STATED), valueDerivation (ANALYTICAL | CALCULATED | IMPUTED | ASSUMED_ZERO | BELOW_LOQ | NOT_STATED), sourceDerivationCode: String, dataPoints: Int, minValue: Float, maxValue: Float; and a basis value PER_100_G (W02 composition-basis enum, not the kernel QuantityBasis, which is dose-oriented). Also register a uid token for Nutrient."
+  request: "W02's QuantitativeContentProperties (basis ContentBasis, comparator, contentStatementKind, unitCode) fits food composition with basis AMOUNT_PER_MASS_OF_MATERIAL, contentStatementKind TYPICAL_COMPOSITION_REPORTED and the reference mass in the UCUM unit (FDC per 100 g -> 'ug/hg', 'g/hg'). Add the qualifiers food composition needs and the type lacks: portionBasis (EDIBLE_PORTION | AS_PURCHASED | DRY_WEIGHT | AS_PREPARED | NOT_STATED), valueDerivation (ANALYTICAL | CALCULATED | IMPUTED | ASSUMED_ZERO | BELOW_LOQ | NOT_STATED), sourceDerivationCode: String, dataPoints: Int, minValue: Float, maxValue: Float (sample spread; distinct from quantityLow/quantityHigh of a stated range). Register a uid token for Nutrient. Accept FoodItem (an IngredientMaterial) as subject."
   cq: [CQ-FL-C01, CQ-EV-04, CQ-AX-04]
-  failingCase: "FDC 170569: selenium 1917 ug, n 15, min 136, max 2740, derivation A; folic acid 0 derivation Z (assumed zero); DHA 0 with dataPoints 0 and no derivation; the record itself states no mass basis (documentation: 100 g edible portion; dry beans on 0% moisture basis). Without these fields a zero reads as measured absence and a per-100 g value as a dose."
-  proposedRuling: "Accept the fields on W02's type; W05 does not define FoodCompositionProperties (kept CANDIDATE as fallback)."
+  failingCase: "FDC 170569: selenium 1917 ug per 100 g, n 15, min 136, max 2740, derivation A; folic acid 0 derivation Z (assumed zero); DHA 0 with dataPoints 0 and no derivation; the record states no mass basis (documentation: 100 g edible portion; dry beans on 0% moisture basis). Without portionBasis/valueDerivation a zero reads as measured absence and an edible-portion value cannot be told from a dry-weight one (V-W05-07)."
+  proposedRuling: "Add the six fields to QuantitativeContentProperties; W05 defines no FoodCompositionProperties (kept CANDIDATE as fallback)."
 
 - id: W05-SR-05
   targetOwner: W03
@@ -37,10 +37,10 @@
 
 - id: W05-SR-06
   targetOwner: W09
-  request: "Add asserted relationship USES_PRACTICE_DEFINITION (InterventionComponent -> Lifestyle | Protocol, qualifier asReportedName) for diet prescriptions and other non-material components; refine V-221 so components with USES_PRACTICE_DEFINITION are exempt from quantity/quantityBasis/massBasis (or carry quantityStatus NOT_APPLICABLE). Keep the registry intervention type verbatim (registryInterventionType) and never infer a Product from DIETARY_SUPPLEMENT. Confirm USES_INTERVENTION_MATERIAL to an IngredientMaterial accepts FoodItem nodes (no FoodItem union member: W05-SR-09). Accept dosageForm WHOLE_FOOD and UCUM count annotations ('{nut}')."
+  request: "(a) Admit Protocol in InterventionDefinitionTarget (FOLLOWS_INTERVENTION_DEFINITION) for a named regimen whose edition content is unknown. (b) Refine V-221: a non-placebo intervention that FOLLOWS_INTERVENTION_DEFINITION and has no material component is complete. (c) Keep the registry intervention type verbatim (registryInterventionType) and never infer a Product from DIETARY_SUPPLEMENT. (d) Confirm USES_INTERVENTION_MATERIAL to IngredientMaterial accepts FoodItem nodes (no FoodItem union member needed, W05-SR-09); remove FoodItem from LegacyEvaluatedIntervention (IngredientMaterial is already a member) and FoodProduct (retired). (e) Accept dosageForm WHOLE_FOOD and UCUM count annotations ('{nut}')."
   cq: [CQ-ST-01, CQ-FL-C04]
-  failingCase: "DICA-NUTS (NCT03728127): both arms share 'Brazilian cardioprotective diet prescription'; only DCBN adds 10 g/day each of peanuts, cashew nuts and Brazil nuts; registry type DIETARY_SUPPLEMENT for both. Baseline V-221 reports the two practice components."
-  proposedRuling: "Accept the edge and the V-221 exemption."
+  failingCase: "DICA-NUTS (NCT03728127): both arms follow 'Brazilian cardioprotective diet prescription' (no content in the registry, so no ProtocolEdition can be built); only DCBN adds 10 g/day each of peanuts, cashew nuts and Brazil nuts; registry type DIETARY_SUPPLEMENT for both. Baseline V-221 reports the diet-only intervention (no component)."
+  proposedRuling: "Accept (a)-(e)."
 
 - id: W05-SR-07
   targetOwner: W03
@@ -60,7 +60,7 @@
   targetOwner: W00
   request: "Contract rule for unions: a union never lists a specialization type together with its parent label type."
   cq: [CQ-FL-C02]
-  failingCase: "Tested 2026-10-04, @neo4j/graphql 7.6.3 on Neo4j 5.26.31 Community: ExposureAgentTarget = FoodItem | IngredientMaterial | ... returned the node hu:material:food-brazil-nut twice (once as FoodItem, once as IngredientMaterial) for one HAS_EXPOSURE_AGENT edge."
+  failingCase: "Tested 2026-10-04, @neo4j/graphql 7.6.3 on Neo4j 5.26.31 Community: ExposureAgentTarget = FoodItem | IngredientMaterial | ... returned the node hu:material:food-brazil-nut twice (once as FoodItem, once as IngredientMaterial) for one HAS_EXPOSURE_AGENT edge (run-evidence/graphql-union-overlap-before-fix.json). Current fragments with the same overlap: W00 union at sdl line ~1576 (lists FoodItem beside W02 IngredientMaterial, and the retired FoodProduct), W09 LegacyEvaluatedIntervention (IngredientMaterial and FoodItem), W16 StepSubstanceTarget (IngredientMaterial and FoodItem), W22 union at line ~530 (FoodItem, FoodProduct)."
   proposedRuling: "Add to contract B6; Fable checks every union at merge (Organization/TestingLaboratory/RegulatoryAgency, Source/Document, IngredientMaterial/BotanicalPreparation/FoodItem, Assertion/ClaimOccurrence)."
 
 - id: W05-SR-10
