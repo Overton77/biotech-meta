@@ -16,7 +16,7 @@
 #   SourceLocator, Activity, Agent; W01 Organization, Person, Facility; W04 Product, ProductVariant, PackageConfiguration;
 #   W06 Procedure; W07 PanelDefinition; W12 ProductLot, TestSample.
 # Inverse fields on other owners' types (Organization, Person, Product, ProductVariant, PackageConfiguration, ProductLot,
-#   Facility, PanelDefinition) are supplied verbatim in seam-requests.yaml (W15-SR-01..06); SELLS_PRODUCT has no endpoint
+#   Facility, PanelDefinition) are supplied verbatim in seam-requests.yaml (W15-SR-01..04); SELLS_PRODUCT has no endpoint
 #   on a W15 type, so its only SDL is the field text in W15-SR-01 / W15-SR-02.
 # Relationship class and cardinality live in field descriptions and are enforced by the operations/validation layer.
 # =====================================================================================================================
@@ -99,7 +99,7 @@ type MerchantListing implements Entity & EntityArchetype & SearchIndexable
 
   """class: asserted; cardinality: zero_or_one believed per (valid time, recorded time); catalog: HOSTS_LISTING (Organization -> MerchantListing; marketplace operator or DTC store operator). Never implies SELLS_PRODUCT ([HOSTS_LISTING, SELLS_PRODUCT], V-326c)."""
   hostedBy: [Organization!]! @relationship(type: "HOSTS_LISTING", direction: IN, properties: "AssertedEdgeProperties")
-  """class: asserted; cardinality: zero_or_one ACCEPTED per (valid time, recorded time); catalog: LISTING_FOR (replaces live LISTS_PRODUCT whose two sides declared different property types). Range ListingTarget = ProductVariant | PackageConfiguration | Bundle (Bundle added by W15, W15-SR-07). A PROPOSED assertion means 'proposed only' in answers (CQ-CM-02); no edge at all plus an unresolved CommerceMatch means 'identity unknown'."""
+  """class: asserted; cardinality: zero_or_one ACCEPTED per (valid time, recorded time); catalog: LISTING_FOR (replaces live LISTS_PRODUCT whose two sides declared different property types). Range ListingTarget = ProductVariant | PackageConfiguration | Bundle (Bundle added by W15, W15-SR-07). 'Resolved' additionally needs an ACCEPTED SAME_ITEM CommerceMatch on the pair; otherwise answers say 'asserted only' (CQ-CM-02, Q-W15-04); no edge plus an UNRESOLVED CommerceMatch means 'identity unknown'."""
   listingFor: [ListingTarget!]! @relationship(type: "LISTING_FOR", direction: OUT, properties: "AssertedEdgeProperties")
   """class: structural; cardinality: many; catalog: HAS_OFFER. One Offer per (seller of record, item condition, purchase mode) proposition on this entry."""
   offers: [Offer!]! @relationship(type: "HAS_OFFER", direction: OUT)

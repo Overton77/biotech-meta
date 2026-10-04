@@ -1,0 +1,17 @@
+# W18 build stubs for types not yet delivered by their owners (test only)
+enum EvidenceStrength { UNKNOWN }
+enum AssociationPolarity { UNKNOWN }
+type Association @node { id: ID! @id uid: String }
+type FoodProduct @node { id: ID! @id uid: String }
+type UseContextProfile @node { id: ID! @id uid: String }
+type SafetySignal @node { id: ID! @id uid: String }
+type AdverseEffect @node { id: ID! @id uid: String }
+type ExperienceReport @node { id: ID! @id uid: String }
+type MediaSource @node { id: ID! @id uid: String }
+type EvidenceApplicability @node { id: ID! @id uid: String }
+type ApplicabilityDimension @node { id: ID! @id uid: String }
+type EndpointClassification @node { id: ID! @id uid: String }
+type ResultInterpretation @node { id: ID! @id uid: String }
+type EvidenceSynthesis @node { id: ID! @id uid: String }
+type EvidenceStrengthAssessment @node { id: ID! @id uid: String }
+type SafetyEdgeProperties @relationshipProperties { relationshipUid: String }

@@ -5,7 +5,7 @@ import os
 from w18lib import Fx, DT, known, shash
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RET = "2026-10-04T02:00:00Z"          # retrieval time of the research captures
+RET = "2026-10-04T01:30:00Z"          # retrieval window of the research captures was 01:20-01:50Z; one value used
 R_PR = "2026-10-04T03:00:00Z"         # recorded: company releases, filings, PubMed, registry
 R_RET = "2026-10-04T04:00:00Z"        # recorded: the causal retelling
 R_ADJ = "2026-10-04T04:10:00Z"        # capture-fidelity review of the retelling

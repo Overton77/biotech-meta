@@ -1,0 +1,579 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/w17-cq-queries.cypher",
+ "uri": "bolt://127.0.0.1:39337/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 10,
+ "ok": 10,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 4,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 184,
+   "sample": [
+    {
+     "arm": "NRPT 1X",
+     "term": "Adverse event assessed as possibly or probably related to the product",
+     "seriousness": "ANY",
+     "affected": 1,
+     "atRisk": 40,
+     "method": "NOT_DESCRIBED",
+     "methodWording": "self-reported AEs",
+     "reading": "COUNT_REPORTED"
+    },
+    {
+     "arm": "NRPT 2X",
+     "term": "Adverse event assessed as possibly or probably related to the product",
+     "seriousness": "ANY",
+     "affected": 5,
+     "atRisk": 38,
+     "method": "NOT_DESCRIBED",
+     "methodWording": "self-reported AEs",
+     "reading": "COUNT_REPORTED"
+    },
+    {
+     "arm": "NRPT 2X",
+     "term": "Serious adverse event",
+     "seriousness": "SERIOUS",
+     "affected": 0,
+     "atRisk": 38,
+     "method": "NOT_DESCRIBED",
+     "methodWording": "self-reported AEs",
+     "reading": "ZERO_REPORTED_COLLECTION_NOT_DESCRIBED"
+    },
+    {
+     "arm": "Placebo",
+     "term": "Adverse event assessed as possibly or probably related to the product",
+     "seriousness": "ANY",
+     "affected": 1,
+     "atRisk": 40,
+     "method": "NOT_DESCRIBED",
+     "methodWording": "self-reported AEs",
+     "reading": "COUNT_REPORTED"
+    }
+   ],
+   "header": "// W17 competency-question queries (read-only). Parameters are inlined as literals so each statement runs standalone.\n// Expected rows are in 06-fixtures-and-queries.md section 2. Run on fixtures 00-05 (without 90).\n// Q-W17-01 (CQ-ST-06): AE rows per arm with collection method and the reading each "
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 5,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 218,
+   "sample": [
+    {
+     "study": "hu:study:nct02678611-basis-nrpt",
+     "role": "COMPARATOR_ARM",
+     "aeReportedStatus": "REPORTED",
+     "reading": "COUNT 1/40"
+    },
+    {
+     "study": "hu:study:nct02678611-basis-nrpt",
+     "role": "INDEX_ARM",
+     "aeReportedStatus": "REPORTED",
+     "reading": "COUNT 1/40"
+    },
+    {
+     "study": "hu:study:nct02678611-basis-nrpt",
+     "role": "INDEX_ARM",
+     "aeReportedStatus": "REPORTED",
+     "reading": "COUNT 5/38"
+    },
+    {
+     "study": "hu:study:synthetic-w17-no-ae-report",
+     "role": "NOT_REPORTED_STUDY",
+     "aeReportedStatus": "NOT_REPORTED",
+     "reading": "NOT_REPORTED (no AE data; not zero)"
+    },
+    {
+     "study": "hu:study:synthetic-w17-systematic-checklist",
+     "role": "INDEX_ARM",
+     "aeReportedStatus": "REPORTED",
+     "reading": "ZERO_SYSTEMATIC (absent within this study)"
+    }
+   ],
+   "header": "// Q-W17-02 (CQ-ST-06, INV-207): for the current NRPT signal, each considered study and how its AE evidence reads\n// (a NOT_REPORTED study is listed, never counted as zero)."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 318,
+   "sample": [
+    {
+     "signal": "hu:safety-signal:w17-nrpt-gi-tolerability-v1",
+     "effect": "gastrointestinal intolerance (nausea, dyspepsia, abdominal discomfort, diarrhea)",
+     "method": "bl-safety-signal/0.1",
+     "signalStatus": "POTENTIAL",
+     "recordStatus": "SUPERSEDED",
+     "superseded": true,
+     "inputs": 3,
+     "dose": "NRPT 2X: 500 mg NR + 100 mg PT daily (4 capsules)",
+     "recordedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 2,
+      "minute": 30,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    },
+    {
+     "signal": "hu:safety-signal:w17-nrpt-gi-tolerability-v2",
+     "effect": "gastrointestinal intolerance (nausea, dyspepsia, abdominal discomfort, diarrhea)",
+     "method": "bl-safety-signal/0.2",
+     "signalStatus": "INSUFFICIENT_DATA",
+     "recordStatus": "PROPOSED",
+     "superseded": false,
+     "inputs": 5,
+     "dose": "NRPT 1X and 2X: 250-500 mg NR + 50-100 mg PT daily",
+     "recordedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 2,
+      "minute": 40,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    }
+   ],
+   "header": "// Q-W17-03 (CQ-SF-C01, CQ-AX-24): current signal for subject+effect with method, status, inputs; and its superseded history."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 7,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 2007,
+   "sample": [
+    {
+     "case": "A kava + warfarin",
+     "applicableConstraints": [
+      "hu:use-constraint:kava-with-warfarin"
+     ],
+     "notInScope": [],
+     "facets": [
+      "DIRECTIVE:MONITOR",
+      "INTERACTION:UNKNOWN"
+     ],
+     "illustrativePolicyV3": "BLOCK",
+     "evidenceAssertionUids": [
+      "hu:assertion:w17-afp-kava-warfarin-monitor",
+      "hu:assertion:w17-afp-kava-warfarin-interaction"
+     ]
+    },
+    {
+     "case": "B simvastatin 20 mg + verapamil",
+     "applicableConstraints": [
+      "hu:use-constraint:simvastatin-above-10mg-with-verapamil"
+     ],
+     "notInScope": [],
+     "facets": [
+      "DIRECTIVE:DO_NOT_EXCEED_DOSE"
+     ],
+     "illustrativePolicyV3": "BLOCK",
+     "evidenceAssertionUids": [
+      "hu:assertion:w17-zocor-dose-verapamil"
+     ]
+    },
+    {
+     "case": "C simvastatin 10 mg + verapamil",
+     "applicableConstraints": [],
+     "notInScope": [
+      "hu:use-constraint:simvastatin-above-10mg-with-verapamil"
+     ],
+     "facets": [],
+     "illustrativePolicyV3": "NO_APPLICABLE_CONSTRAINT",
+     "evidenceAssertionUids": []
+    },
+    {
+     "case": "D simvastatin 20 mg + niacin 1500 mg, Chinese",
+     "applicableConstraints": [
+      "hu:use-constraint:simvastatin-with-niacin-1g",
+      "hu:use-constraint:simvastatin-with-niacin-1g-chinese"
+     ],
+     "notInScope": [
+      "hu:use-constraint:simvastatin-with-niacin-1g-non-chinese"
+     ],
+     "facets": [
+      "INTERACTION:POSITIVE",
+      "DIRECTIVE:NOT_RECOMMENDED"
+     ],
+     "illustrativePolicyV3": "BLOCK",
+     "evidenceAssertionUids": [
+      "hu:assertion:w17-zocor-ia-niacin",
+      "hu:assertion:w17-zocor-niacin-chinese"
+     ]
+    },
+    {
+     "case": "E simvastatin 20 mg + niacin 1500 mg, non-Chinese",
+     "applicableConstraints": [
+      "hu:use-constraint:simvastatin-with-niacin-1g",
+      "hu:use-constraint:simvastatin-with-niacin-1g-non-chinese"
+     ],
+     "notInScope": [
+      "hu:use-constraint:simvastatin-with-niacin-1g-chinese"
+     ],
+     "facets": [
+      "INTERACTION:POSITIVE",
+      "DIRECTIVE:USE_WITH_CAUTION"
+     ],
+     "illustrativePolicyV3": "PENALIZE",
+     "evidenceAssertionUids": [
+      "hu:assertion:w17-zocor-ia-niacin",
+      "hu:assertion:w17-zocor-niacin-non-chinese"
+     ]
+    }
+   ],
+   "header": "// Q-W17-04 (CQ-RC-06): constraint state for an option given a declared, non-personal context (public uids only).\n// Each case is one option + declared co-exposures (with daily dose in mg) + populations + conditions + option dose.\n// Viewpoint R = V = 2026-10-05. `facets` is the shared answer; `illu"
+  },
+  {
+   "n": 5,
+   "id": "QS-7",
+   "status": "ok",
+   "rows": 5,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 748,
+   "sample": [
+    {
+     "subject": "hu:material:american-ginseng-preparation-unspecified",
+     "object": "hu:substance:indinavir",
+     "state": "ASSERTED_ABSENT",
+     "assertions": [
+      "hu:assertion:w17-afp-american-ginseng-indinavir"
+     ],
+     "silentCoveringSnapshots": []
+    },
+    {
+     "subject": "hu:material:green-tea-extract-unspecified",
+     "object": "hu:substance:simvastatin",
+     "state": "ASSERTED_PRESENT",
+     "assertions": [
+      "hu:assertion:w17-afp-green-tea-simvastatin"
+     ],
+     "silentCoveringSnapshots": [
+      "hu:snapshot:dailymed-zocor-8f55d5de-2026-10-04"
+     ]
+    },
+    {
+     "subject": "hu:material:kava-preparation-unspecified",
+     "object": "hu:substance:warfarin",
+     "state": "ASSERTED_UNKNOWN",
+     "assertions": [
+      "hu:assertion:w17-afp-kava-warfarin-interaction"
+     ],
+     "silentCoveringSnapshots": [
+      "hu:snapshot:ods-vitamin-k-hp-2026-10-04"
+     ]
+    },
+    {
+     "subject": "hu:substance:nicotinamide-riboside",
+     "object": "hu:substance:simvastatin",
+     "state": "NOT_DECLARED_IN_COVERING_SOURCE",
+     "assertions": [],
+     "silentCoveringSnapshots": [
+      "hu:snapshot:dailymed-zocor-8f55d5de-2026-10-04",
+      "hu:snapshot:aafp-afp-2017-0715-p101-2026-10-04"
+     ]
+    },
+    {
+     "subject": "hu:substance:nicotinamide-riboside",
+     "object": "hu:substance:lenvatinib",
+     "state": "NOT_RECORDED",
+     "assertions": [],
+     "silentCoveringSnapshots": []
+    }
+   ],
+   "header": "// Q-W17-05 (CQ-AX-04 via QS-7, INV-007): interaction state for a pair, with \"covering sources\" that discuss the object's\n// interactions without mentioning the subject. Empty evidence = NOT_RECORDED, never \"no interaction\"."
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 3,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 207,
+   "sample": [
+    {
+     "recordedAsOf": "2021-03-01T00:00:00Z",
+     "validAt": "2021-03-01T00:00:00Z",
+     "levels": [
+      "POSITIVE:CONTRAINDICATED"
+     ],
+     "assertions": [
+      "hu:assertion:w17-synthetic-statin-pregnancy-contraindicated-2020"
+     ]
+    },
+    {
+     "recordedAsOf": "2026-10-05T00:00:00Z",
+     "validAt": "2021-03-01T00:00:00Z",
+     "levels": [
+      "POSITIVE:CONTRAINDICATED"
+     ],
+     "assertions": [
+      "hu:assertion:w17-synthetic-statin-pregnancy-contraindicated-2020-bounded"
+     ]
+    },
+    {
+     "recordedAsOf": "2026-10-05T00:00:00Z",
+     "validAt": "2026-10-01T00:00:00Z",
+     "levels": [
+      "POSITIVE:AVOID",
+      "NEGATIVE:CONTRAINDICATED"
+     ],
+     "assertions": [
+      "hu:assertion:w17-fda-dsc-2021-pregnancy-stop",
+      "hu:assertion:w17-fda-dsc-2021-pregnancy-contraindication-removed"
+     ]
+    }
+   ],
+   "header": "// Q-W17-06 (CQ-TM-01 style as-of, CQ-RC-07): statin-in-pregnancy constraint at three viewpoints."
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 5,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 71,
+   "sample": [
+    {
+     "signal": "hu:safety-signal:w17-fda-aems-daptomycin-hyperkalemia",
+     "method": "agency-signal-import/0.1",
+     "signalStatus": "CONFIRMED_ASSOCIATION",
+     "legacyHint": null,
+     "inputs": 1,
+     "displayedState": "CONFIRMED_ASSOCIATION"
+    },
+    {
+     "signal": "hu:safety-signal:w17-fda-aems-lenvatinib-tls",
+     "method": "agency-signal-import/0.1",
+     "signalStatus": "CLOSED_NO_ACTION",
+     "legacyHint": null,
+     "inputs": 1,
+     "displayedState": "CLOSED_NO_ACTION"
+    },
+    {
+     "signal": "hu:safety-signal:w17-legacy-live-row-0001",
+     "method": "live-migration/0",
+     "signalStatus": "NOT_EVALUATED",
+     "legacyHint": "HIGH",
+     "inputs": 0,
+     "displayedState": "NO VERDICT (hint shown as extraction-time hint only)"
+    },
+    {
+     "signal": "hu:safety-signal:w17-nrpt-gi-tolerability-v1",
+     "method": "bl-safety-signal/0.1",
+     "signalStatus": "POTENTIAL",
+     "legacyHint": null,
+     "inputs": 3,
+     "displayedState": "POTENTIAL"
+    },
+    {
+     "signal": "hu:safety-signal:w17-nrpt-gi-tolerability-v2",
+     "method": "bl-safety-signal/0.2",
+     "signalStatus": "INSUFFICIENT_DATA",
+     "legacyHint": null,
+     "inputs": 5,
+     "displayedState": "INSUFFICIENT_DATA"
+    }
+   ],
+   "header": "// Q-W17-07 (CQ-AX-24): signals whose only strength is a legacy hint vs evaluated signals (hint never a verdict)."
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 252,
+   "sample": [
+    {
+     "subject": "daptomycin",
+     "effect": "hyperkalemia",
+     "asserter": "U.S. Food and Drug Administration",
+     "agencyPredicate": "IDENTIFIES_POTENTIAL_SAFETY_SIGNAL",
+     "signalStatus": "CONFIRMED_ASSOCIATION",
+     "reading": "agency added the risk to labeling; still not a personal conclusion"
+    },
+    {
+     "subject": "lenvatinib",
+     "effect": "tumor lysis syndrome",
+     "asserter": "U.S. Food and Drug Administration",
+     "agencyPredicate": "IDENTIFIES_POTENTIAL_SAFETY_SIGNAL",
+     "signalStatus": "CLOSED_NO_ACTION",
+     "reading": "no regulatory action at the time; not a no-risk finding"
+    }
+   ],
+   "header": "// Q-W17-08 (CQ-SF-C02): agency signal listings are not causal findings; show FDA's own statement and the imported status."
+  },
+  {
+   "n": 9,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 318,
+   "sample": [
+    {
+     "useConstraint": "hu:use-constraint:statin-therapy-in-pregnancy",
+     "atR1": [
+      "hu:assertion:w17-synthetic-statin-pregnancy-contraindicated-2020"
+     ],
+     "atR2": [
+      "hu:assertion:w17-fda-dsc-2021-pregnancy-stop",
+      "hu:assertion:w17-fda-dsc-2021-pregnancy-contraindication-removed"
+     ]
+    }
+   ],
+   "header": "// Q-W17-09 (CQ-RC-07): UseConstraints whose live assertion set differs between two recorded viewpoints at valid time V\n// (private snapshots citing them need review)."
+  },
+  {
+   "n": 10,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 126,
+   "sample": [
+    {
+     "substance": "nicotinamide riboside",
+     "constraints": 0
+    }
+   ],
+   "header": "// Q-W17-10 (forbidden implication SHARED_SUBSTANCE_FAMILY -> USE_CONSTRAINT_APPLIES): constraints reachable from\n// nicotinamide riboside as the constrained subject or as a co-exposure. Expected: none."
+  }
+ ]
+}
