@@ -323,3 +323,331 @@ WHERE NOT o:PrivateRecord AND o.privacyClass = 'PUBLIC'
   AND NOT EXISTS { MATCH (a:Assertion)-[:HAS_SUBJECT|HAS_OBJECT]->(o)
                    WHERE EXISTS { MATCH (a)-[:SUPPORTED_BY]->(:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot) } }
 RETURN 'V-F5-28' AS check, o.uid AS observation, 'OBSERVATION_WITHOUT_OWN_SOURCE_ATTRIBUTION' AS violation;
+
+// ------------------------------------------------- protocols (W16) ----------------------------------------------------
+
+// V-F5-29 -- resolves CH-R-01; replaces the deny-list of V-534p (edge and property halves); rule: an adherence-, adoption- or follows-like edge (type =~ (?i).*(ADHER|ADOPT|FOLLOW).*) from a Person to a Protocol, ProtocolEdition or ProtocolStep exists only as the projection of the person's own source-supported REPORTS_PRACTICE Assertion of the same predicate (never derived), and no adherence/adoption/deviation-like property sits on a public protocol record.
+MATCH (p:Person)-[r]->(x)
+WHERE (x:Protocol OR x:ProtocolEdition OR x:ProtocolStep) AND type(r) =~ '(?i).*(ADHER|ADOPT|FOLLOW).*'
+OPTIONAL MATCH (a:Assertion {uid: r.assertionUid})
+WITH p, r, x, a
+WHERE a IS NULL OR r.derivationRule IS NOT NULL OR r.projectionOfAssertionUid IS NOT NULL OR a.predicate <> type(r)
+   OR NOT EXISTS { (a)-[:HAS_SUBJECT]->(p) } OR NOT EXISTS { (a)-[:HAS_OBJECT]->(x) } OR NOT EXISTS { (a)-[:ASSERTED_BY]->(p) }
+   OR NOT EXISTS { (a)-[:SUPPORTED_BY]->(:SourceLocator) } OR coalesce(a.speechAct, '-') <> 'REPORTS_PRACTICE'
+RETURN 'V-F5-29' AS check, 'ADHERENCE_LIKE_EDGE_WITHOUT_LICENSING_ASSERTION' AS violation, p.uid AS item, type(r) + ' -> ' + x.uid AS detail
+UNION
+MATCH (n)
+WHERE n:Protocol OR n:ProtocolEdition OR n:ProtocolStep
+WITH n, [k IN keys(n) WHERE k =~ '(?i).*(adher|adopt|follow|deviat|omit).*'] AS ks
+WHERE size(ks) > 0
+RETURN 'V-F5-29' AS check, 'ADHERENCE_LIKE_PROPERTY_ON_PUBLIC_PROTOCOL' AS violation, n.uid AS item, reduce(s = '', k IN ks | s + k + ' ') AS detail;
+
+// V-F5-30 -- resolves CH-R-02; replaces V-528p and extends V-531p; rule: DEPENDS_ON fails closed: a loop through any dependency that is not symmetric (null or unknown kind counts as ordering) is a cycle; every dependency names a StepDependencyKind; a pair is never both CONCURRENT_WITH and ordered.
+MATCH (e:ProtocolEdition)-[:HAS_PROTOCOL_STEP]->(s:ProtocolStep)
+MATCH p = (s)-[:DEPENDS_ON*1..25]->(s)
+WHERE any(r IN relationships(p) WHERE NOT coalesce(r.dependencyKind, '-') IN ['CONCURRENT_WITH', 'MUTUALLY_EXCLUSIVE_WITH'])
+RETURN DISTINCT 'V-F5-30' AS check, 'DEPENDENCY_CYCLE' AS violation, e.uid AS item, s.stepKey AS detail
+UNION
+MATCH (a:ProtocolStep)-[d:DEPENDS_ON]->(b)
+WHERE d.dependencyKind IS NULL OR NOT d.dependencyKind IN ['REQUIRES_PRIOR_COMPLETION', 'REQUIRES_RESULT_OF', 'CONCURRENT_WITH', 'MUTUALLY_EXCLUSIVE_WITH']
+RETURN 'V-F5-30' AS check, 'DEPENDENCY_KIND_MISSING_OR_UNKNOWN' AS violation, a.uid AS item, coalesce(d.dependencyKind, 'null') + ' -> ' + b.uid AS detail
+UNION
+MATCH (a:ProtocolStep)-[c:DEPENDS_ON {dependencyKind: 'CONCURRENT_WITH'}]-(b:ProtocolStep), (a)-[o:DEPENDS_ON]-(b)
+WHERE o <> c AND NOT coalesce(o.dependencyKind, '-') IN ['CONCURRENT_WITH', 'MUTUALLY_EXCLUSIVE_WITH'] AND elementId(a) < elementId(b)
+RETURN DISTINCT 'V-F5-30' AS check, 'CONCURRENT_AND_ORDERED' AS violation, a.uid AS item, b.uid AS detail;
+
+// V-F5-31 -- (review) resolves CH-R-03; extends V-529b; rule: when a verbatim schedule field (scheduleText, frequencyText, timingText) states a range ("3-6 months", "three to six months", "q3-6 mo"), the stored bounds are not collapsed (min = max) and, for source-unit bounds, both stored bounds appear as that range (digits or number words).
+MATCH (n)
+WHERE n:ProtocolStep OR n:MeasurementPlan
+UNWIND [k IN ['scheduleText', 'frequencyText', 'timingText'] WHERE n[k] IS :: STRING] AS k
+WITH n, k, n[k] AS txt, '(\\d+|' + reduce(acc = '', w IN $numberWords | acc + CASE WHEN acc = '' THEN '' ELSE '|' END + w) + ')' AS num
+WHERE txt =~ ('(?is).*\\b(q\\s*)?' + num + '\\s*(-|–|to)\\s*' + num + '\\s*(days?|d|weeks?|wks?|months?|mos?|years?|yrs?)\\b.*')
+WITH n, k, txt, toInteger(coalesce(n.cadenceIntervalMin, n.cadenceMinDays)) AS mn, toInteger(coalesce(n.cadenceIntervalMax, n.cadenceMaxDays)) AS mx
+WHERE mn IS NOT NULL AND mx IS NOT NULL
+  AND (mn = mx
+       OR (n.cadenceIntervalMin IS NOT NULL
+           AND NOT txt =~ ('(?is).*\\b(q\\s*)?(' + toString(mn) + CASE WHEN mn >= 0 AND mn < size($numberWords) THEN '|' + $numberWords[mn] ELSE '' END
+                           + ')\\s*(-|–|to)\\s*(' + toString(mx) + CASE WHEN mx >= 0 AND mx < size($numberWords) THEN '|' + $numberWords[mx] ELSE '' END + ')\\b.*')))
+RETURN 'V-F5-31' AS check, n.uid AS item, k AS textField, txt AS text, mn AS storedMin, mx AS storedMax,
+       CASE WHEN mn = mx THEN 'RANGE_COLLAPSED' ELSE 'RANGE_NARROWED_OR_ALTERED' END AS violation;
+
+// V-F5-32 -- resolves CH-R-05 (validator half; DERIVED_FROM_PROTOCOL is Fable's SDL fix); extends V-530p (V-530q); rule: an edition attached to a Protocol is never asserted on a THIRD_PARTY_* basis, never asserted by anyone other than the protocol's author, and (when authorship is sourced) its support comes from the author's own Source or an archived copy of it.
+MATCH (p:Protocol)-[h:HAS_PROTOCOL_EDITION]->(e)
+OPTIONAL MATCH (a:Assertion {uid: h.assertionUid})
+WITH p, h, e, a,
+     [(au:Assertion)-[:HAS_SUBJECT]->(p) WHERE au.predicate IN ['AUTHORED_PROTOCOL', 'AUTHORED_PROTOCOL_EDITION'] AND NOT coalesce(au.status, '-') IN ['REJECTED', 'SUPERSEDED'] | au] AS auths
+WITH p, h, e, a,
+     reduce(acc = [], l IN [au IN auths | [(au)-[:HAS_OBJECT]->(o) | o.uid]] | acc + l) AS authors,
+     reduce(acc = [], l IN [au IN auths | [(au)-[:SUPPORTED_BY]->(:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot)<-[:HAS_SNAPSHOT]-(s:Source) | s]] | acc + l) AS ownSources,
+     CASE WHEN a IS NULL THEN [] ELSE [(a)-[:ASSERTED_BY]->(w) | w.uid] END AS asserters,
+     CASE WHEN a IS NULL THEN [] ELSE [(a)-[:SUPPORTED_BY]->(:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot)<-[:HAS_SNAPSHOT]-(s:Source) | s] END AS editionSources
+WITH p, e, [v IN [
+        CASE WHEN a IS NOT NULL AND coalesce(a.assertionBasis, '') STARTS WITH 'THIRD_PARTY' THEN 'EDITION_ASSERTED_ON_THIRD_PARTY_BASIS' END,
+        CASE WHEN size(authors) > 0 AND any(w IN asserters WHERE NOT w IN authors) THEN 'EDITION_ASSERTED_BY_NON_AUTHOR' END,
+        CASE WHEN size(ownSources) > 0 AND size(editionSources) > 0
+                  AND none(s IN editionSources WHERE any(o IN ownSources WHERE s = o OR EXISTS { (s)-[:ARCHIVED_COPY_OF]->(o) }
+                                                       OR (s.canonicalUri IS NOT NULL AND o.canonicalUri IS NOT NULL AND s.canonicalUri CONTAINS o.canonicalUri)))
+             THEN 'EDITION_NOT_FROM_PROTOCOL_OWN_SOURCE' END,
+        CASE WHEN coalesce(e.changeProvenance, '') = 'THIRD_PARTY_REPORTED' THEN 'EDITION_FROM_THIRD_PARTY_REPORT' END
+     ] WHERE v IS NOT NULL] AS violations
+WHERE size(violations) > 0
+RETURN 'V-F5-32' AS check, p.uid AS protocol, e.uid AS edition, violations;
+
+// V-F5-33 -- resolves CH-R-08; replaces V-536p (V-536q); rule: ABOUT_CONDITION is the projection of a matching ABOUT_CONDITION Assertion (same subject and object) that is not CALCULATED, names no derivationRule, and has no DERIVED_FROM_ASSERTION input (transitively) whose predicate is a premise of a forbidden implication concluding CONDITION_PRESENT, INDICATES_CONDITION or ABOUT_CONDITION.
+MATCH (o)-[r:ABOUT_CONDITION]->(c)
+OPTIONAL MATCH (a:Assertion {uid: r.assertionUid})
+WITH o, r, c, a, [pr IN $implicationPairs WHERE pr[1] IN ['CONDITION_PRESENT', 'INDICATES_CONDITION', 'ABOUT_CONDITION'] | pr[0]] AS premises
+WITH o, c, [v IN [
+        CASE WHEN a IS NULL OR r.derivationRule IS NOT NULL THEN 'CONDITION_NOT_ASSERTED' END,
+        CASE WHEN a IS NOT NULL AND (a.predicate <> 'ABOUT_CONDITION' OR NOT EXISTS { (a)-[:HAS_SUBJECT]->(o) } OR NOT EXISTS { (a)-[:HAS_OBJECT]->(c) })
+             THEN 'ASSERTION_DOES_NOT_MATCH_EDGE' END,
+        CASE WHEN a IS NOT NULL AND (a.basisKind = 'CALCULATED' OR a.derivationRule IS NOT NULL) THEN 'LICENSED_BY_CALCULATED_ASSERTION' END,
+        CASE WHEN a IS NOT NULL AND EXISTS { MATCH (a)-[:DERIVED_FROM_ASSERTION*1..5]->(inp:Assertion) WHERE inp.predicate IN premises }
+             THEN 'THRESHOLD_TRIGGER_AMONG_INPUTS' END
+     ] WHERE v IS NOT NULL] AS violations
+WHERE size(violations) > 0
+RETURN 'V-F5-33' AS check, o.uid AS observation, c.uid AS condition, violations;
+
+// V-F5-34 -- resolves CH-R-09; extends V-534p and V-112 (V-534q); rule: a deviation/non-adherence-like edge or Assertion about a protocol record is only the person's own source-supported REPORTS_PRACTICE statement (never CALCULATED, never asserted by an Agent or another party), and is never derived from a statement about an OPTIONAL step; every step attached to an edition states requirementLevel and requirementBasis from their enums.
+MATCH (p)-[r]->(x)
+WHERE (x:Protocol OR x:ProtocolEdition OR x:ProtocolStep) AND type(r) =~ '(?i).*(DEVIAT|NON_?ADHER|OMIT|SKIP).*'
+WITH p, r, x, coalesce(r.derivedFromAssertionUids, []) + [u IN [r.projectionOfAssertionUid, r.assertionUid] WHERE u IS NOT NULL] AS cited
+OPTIONAL MATCH (a:Assertion) WHERE a.uid IN cited
+WITH p, r, x, collect(a) AS licences
+WITH p, r, x, [v IN [
+        CASE WHEN any(a IN licences WHERE EXISTS { MATCH (a)-[:HAS_SUBJECT|HAS_OBJECT]->(:ProtocolStep {requirementLevel: 'OPTIONAL'}) }
+                                      OR EXISTS { MATCH (a)-[:DERIVED_FROM_ASSERTION*1..5]->(:Assertion)-[:HAS_SUBJECT|HAS_OBJECT]->(:ProtocolStep {requirementLevel: 'OPTIONAL'}) })
+             THEN 'DEVIATION_DERIVED_FROM_OPTIONAL_STEP' END,
+        CASE WHEN size(licences) = 0 OR r.derivationRule IS NOT NULL
+                  OR any(a IN licences WHERE a.basisKind = 'CALCULATED' OR a.derivationRule IS NOT NULL OR coalesce(a.speechAct, '-') <> 'REPORTS_PRACTICE'
+                                         OR NOT EXISTS { (a)-[:ASSERTED_BY]->(p) })
+             THEN 'NOT_A_SELF_REPORTED_PRACTICE' END
+     ] WHERE v IS NOT NULL] AS violations
+WHERE size(violations) > 0
+RETURN 'V-F5-34' AS check, type(r) AS kind, p.uid AS item, x.uid AS target, violations
+UNION
+MATCH (a:Assertion)-[:HAS_OBJECT]->(x)
+WHERE (x:Protocol OR x:ProtocolEdition OR x:ProtocolStep) AND a.predicate =~ '(?i)(.*DEVIAT.*|(NON_)?ADHER.*|.*OMIT.*|.*SKIP.*)'
+  AND (a.basisKind = 'CALCULATED' OR a.derivationRule IS NOT NULL OR coalesce(a.speechAct, '-') <> 'REPORTS_PRACTICE'
+       OR NOT EXISTS { MATCH (a)-[:ASSERTED_BY]->(w)<-[:HAS_SUBJECT]-(a) } OR EXISTS { (a)-[:ASSERTED_BY]->(:Agent) })
+RETURN 'V-F5-34' AS check, a.predicate AS kind, a.uid AS item, x.uid AS target, ['CALCULATED_OR_THIRD_PARTY_ADHERENCE_VERDICT'] AS violations
+UNION
+MATCH (e:ProtocolEdition)-[:HAS_PROTOCOL_STEP]->(s:ProtocolStep)
+WHERE s.requirementLevel IS NULL OR s.requirementBasis IS NULL
+   OR NOT s.requirementLevel IN ['ESSENTIAL', 'RECOMMENDED', 'OPTIONAL', 'CONDITIONAL', 'NOT_STATED']
+   OR NOT s.requirementBasis IN ['STATED_BY_SOURCE', 'EDITORIAL_INFERENCE', 'NOT_STATED']
+RETURN 'V-F5-34' AS check, 'STEP_REQUIREMENT' AS kind, s.uid AS item, e.uid AS target, ['REQUIREMENT_LEVEL_OR_BASIS_MISSING'] AS violations;
+
+// V-F5-35 -- resolves CH-R-10; new (V-543p + V-543b); rule: two editions of one Protocol never share a payloadHash under one canonicalization version, and two editions with an identical ordered list of (stepKey, step payloadHash) are a cosmetic split (review).
+MATCH (p:Protocol)-[:HAS_PROTOCOL_EDITION]->(e1:ProtocolEdition), (p)-[:HAS_PROTOCOL_EDITION]->(e2:ProtocolEdition)
+WHERE elementId(e1) < elementId(e2) AND e1.payloadHash = e2.payloadHash
+  AND coalesce(e1.payloadCanonicalizationVersion, '-') = coalesce(e2.payloadCanonicalizationVersion, '-')
+RETURN 'V-F5-35' AS check, 'EDITIONS_SHARE_PAYLOAD_HASH' AS violation, p.uid AS item, [e1.uid, e2.uid] AS editions
+UNION
+MATCH (p:Protocol)-[:HAS_PROTOCOL_EDITION]->(e:ProtocolEdition)
+WITH p, e, COLLECT { MATCH (e)-[o:HAS_PROTOCOL_STEP]->(s:ProtocolStep) WITH o, s ORDER BY o.orderIndex, s.stepKey RETURN s.stepKey + '|' + coalesce(s.payloadHash, '-') } AS signature
+WHERE size(signature) > 0
+WITH p, signature, collect(e.uid) AS editions
+WHERE size(editions) > 1
+RETURN 'V-F5-35' AS check, 'IDENTICAL_STEP_LIST_COSMETIC_SPLIT' AS violation, p.uid AS item, editions;
+
+// V-F5-36 -- resolves CH-R-11; new (V-525q); rule: every HAS_PROTOCOL_STEP carries an orderIndex, unique within the edition unless the two steps are linked by CONCURRENT_WITH.
+MATCH (e:ProtocolEdition)-[o:HAS_PROTOCOL_STEP]->(s:ProtocolStep)
+WHERE o.orderIndex IS NULL
+RETURN 'V-F5-36' AS check, 'ORDER_INDEX_MISSING' AS violation, e.uid AS item, s.stepKey AS detail
+UNION
+MATCH (e:ProtocolEdition)-[o1:HAS_PROTOCOL_STEP]->(s1:ProtocolStep), (e)-[o2:HAS_PROTOCOL_STEP]->(s2:ProtocolStep)
+WHERE elementId(o1) < elementId(o2) AND o1.orderIndex = o2.orderIndex
+  AND NOT EXISTS { (s1)-[:DEPENDS_ON {dependencyKind: 'CONCURRENT_WITH'}]-(s2) }
+RETURN 'V-F5-36' AS check, 'DUPLICATE_ORDER_INDEX' AS violation, e.uid AS item, s1.stepKey + ' = ' + s2.stepKey AS detail;
+
+// V-F5-37 -- resolves CH-R-12d (the DiagnosticResult label half is Fable's); extends V-112r (licence half of V-302r); rule: a COMPARED_TO citing derivedFromAssessmentUids cites live ComparabilityAssessments with verdict COMPARABLE or COMPARABLE_WITH_CONVERSION that compare exactly the two producing versions of its endpoints.
+MATCH (x)-[r:COMPARED_TO]->(y)
+WHERE size(coalesce(r.derivedFromAssessmentUids, [])) > 0
+UNWIND r.derivedFromAssessmentUids AS au
+OPTIONAL MATCH (ca:EvidenceAssessment {uid: au})
+WITH x, y, au, ca,
+     [(x)-[:PRODUCED_BY_ASSAY_VERSION|COMPUTED_BY_ALGORITHM_VERSION]->(v) | v] + [(y)-[:PRODUCED_BY_ASSAY_VERSION|COMPUTED_BY_ALGORITHM_VERSION]->(v) | v] AS versions
+WITH x, y, au, [v IN [
+        CASE WHEN ca IS NULL OR NOT ca:ComparabilityAssessment THEN 'LICENCE_IS_NOT_A_COMPARABILITY_ASSESSMENT' END,
+        CASE WHEN ca IS NOT NULL AND NOT coalesce(ca.verdict, '-') IN ['COMPARABLE', 'COMPARABLE_WITH_CONVERSION'] THEN 'LICENCE_VERDICT_DOES_NOT_PERMIT_COMPARISON' END,
+        CASE WHEN ca IS NOT NULL AND (coalesce(ca.status, '-') IN ['REJECTED', 'SUPERSEDED'] OR ca.recordedTo IS NOT NULL) THEN 'LICENCE_NOT_CURRENT' END,
+        CASE WHEN ca IS NOT NULL AND size(versions) > 0
+                  AND (any(v IN versions WHERE NOT EXISTS { (ca)-[:COMPARES]->(v) }) OR COUNT { (ca)-[:COMPARES]->() } <> 2)
+             THEN 'LICENCE_COMPARES_OTHER_VERSIONS' END
+     ] WHERE v IS NOT NULL] AS violations
+WHERE size(violations) > 0
+RETURN 'V-F5-37' AS check, x.uid AS fromUid, y.uid AS toUid, au AS licence, violations;
+
+// V-F5-38 -- resolves CH-R-13 (validator half; migration and fixture are Fable's), CH-K-18b detection; new (V-544p); rule: HAS_STEP starts only at a ManufacturingProcess, and HAS_PROTOCOL_STEP is only ProtocolEdition -> ProtocolStep.
+MATCH (a)-[r:HAS_STEP]->(b)
+WHERE NOT a:ManufacturingProcess
+RETURN 'V-F5-38' AS check, 'HAS_STEP_OUTSIDE_MANUFACTURING' AS violation, a.uid AS fromUid, b.uid AS toUid
+UNION
+MATCH (a)-[r:HAS_PROTOCOL_STEP]->(b)
+WHERE NOT (a:ProtocolEdition AND b:ProtocolStep)
+RETURN 'V-F5-38' AS check, 'HAS_PROTOCOL_STEP_WRONG_DOMAIN' AS violation, a.uid AS fromUid, b.uid AS toUid;
+
+// V-F5-39 -- resolves CH-R-14; replaces V-542p (V-542q); rule: Protocol.currentSteps (HAS_CURRENT_PROTOCOL_STEP) are the steps of ONE edition of the protocol and their stepKeys are unique.
+MATCH (p:Protocol)-[:HAS_CURRENT_PROTOCOL_STEP]->(s:ProtocolStep)
+WITH p, collect(s) AS steps
+WITH p, steps, [x IN steps | x.stepKey] AS keys
+WITH p, steps, [k IN keys WHERE size([y IN keys WHERE y = k]) > 1] AS duplicated
+WHERE size(duplicated) > 0
+   OR NOT EXISTS { MATCH (p)-[:HAS_PROTOCOL_EDITION]->(e:ProtocolEdition) WHERE all(s IN steps WHERE EXISTS { (e)-[:HAS_PROTOCOL_STEP]->(s) }) }
+RETURN 'V-F5-39' AS check, p.uid AS protocol, size(steps) AS currentSteps,
+       reduce(acc = [], k IN duplicated | CASE WHEN k IN acc THEN acc ELSE acc + k END) AS duplicatedStepKeys;
+
+// V-F5-40 -- resolves CH-R-15; extends V-539p and V-012 (V-545p); rule: HAS_PROTOCOL_EDITION goes from a Protocol to a ProtocolEdition that is not also a ProtocolVersion, and no node is both ProtocolEdition and ProtocolVersion.
+MATCH (p)-[h:HAS_PROTOCOL_EDITION]->(e)
+WHERE NOT p:Protocol OR NOT e:ProtocolEdition OR e:ProtocolVersion
+RETURN 'V-F5-40' AS check, 'EDITION_TARGET_NOT_A_PROTOCOL_EDITION' AS violation, e.uid AS item, labels(e) AS labels
+UNION
+MATCH (n:ProtocolEdition:ProtocolVersion)
+RETURN 'V-F5-40' AS check, 'PROTOCOL_EDITION_COLLAPSED_WITH_PROTOCOL_VERSION' AS violation, n.uid AS item, labels(n) AS labels;
+
+// ------------------------------------------------- media and claims (W21/W22) -----------------------------------------
+
+// V-F5-41 -- resolves CH-M-01, CH-M-02; replaces V-605 (allow-list form) and constrains MEDIA-EV-1; rule: EVIDENCES starts only at a MediaAsset whose generationMode is CAPTURED or EXTRACTED, that is neither synthetic nor edited, whose ORIGINAL rendition (and the asset itself) is not the output of a MEDIA_TRANSFORMATION (a BellLabs edit), and whose supporting snapshot is not on an operator store.
+MATCH (m)-[e:EVIDENCES]->(x)
+OPTIONAL MATCH (m)-[:HAS_MEDIA_VARIANT]->(o:MediaVariant {variantKind: 'ORIGINAL'})
+WITH m, x, collect(o) AS originals
+WITH m, x, [v IN [
+        CASE WHEN NOT m:MediaAsset THEN 'EVIDENCING_NODE_IS_NOT_A_MEDIA_ASSET' END,
+        CASE WHEN NOT coalesce(m.generationMode, 'UNKNOWN') IN ['CAPTURED', 'EXTRACTED'] THEN 'GENERATION_MODE_NOT_CAPTURED_OR_EXTRACTED' END,
+        CASE WHEN coalesce(m.isSynthetic, false) OR coalesce(m.isEdited, false) THEN 'SYNTHETIC_OR_EDITED_ASSET' END,
+        CASE WHEN EXISTS { (m)-[:WAS_GENERATED_BY]->(:Activity {activityKind: 'MEDIA_TRANSFORMATION'}) }
+                  OR any(o IN originals WHERE EXISTS { (o)-[:WAS_GENERATED_BY]->(:Activity {activityKind: 'MEDIA_TRANSFORMATION'}) })
+             THEN 'ORIGINAL_IS_A_BELLLABS_EDIT' END,
+        CASE WHEN EXISTS { MATCH (x)-[:SUPPORTED_BY]->(:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot)<-[:HAS_SNAPSHOT]-(src:Source)
+                           WHERE any(pat IN $privateSourceUriPatterns WHERE coalesce(src.canonicalUri, '') =~ pat) }
+             THEN 'SUPPORT_SNAPSHOT_ON_OPERATOR_STORE' END
+     ] WHERE v IS NOT NULL] AS violations
+WHERE size(violations) > 0
+RETURN 'V-F5-41' AS check, m.uid AS evidencingAsset, x.uid AS evidenced, violations;
+
+// V-F5-42 -- resolves CH-M-03; replaces V-605 branch 2 (keys on bytes, not edge names) and adds V-617; rule: no MediaAsset keeps the pre-CL-014 HAS_VARIANT edge, and no snapshot whose bytes equal a rendition of a GENERATED or synthetic asset backs a non-media assertion.
+MATCH (m:MediaAsset)-[r:HAS_VARIANT]->(v)
+RETURN 'V-F5-42' AS check, 'LEGACY_HAS_VARIANT_ON_MEDIA_ASSET' AS violation, m.uid AS item, v.uid AS detail
+UNION
+MATCH (m:MediaAsset)-[:HAS_VARIANT|HAS_MEDIA_VARIANT]->(v:MediaVariant)
+WHERE (m.generationMode = 'GENERATED' OR coalesce(m.isSynthetic, false)) AND v.contentHash IS NOT NULL
+MATCH (ss:SourceSnapshot {contentHash: v.contentHash})-[:HAS_LOCATOR]->(:SourceLocator)<-[:SUPPORTED_BY]-(x:Assertion)
+WHERE NOT x.predicate IN ['DEPICTS', 'EXPLAINS', 'VISUALIZES', 'ANNOTATES_SUBJECT', 'HAS_RIGHTS_RECORD']
+RETURN DISTINCT 'V-F5-42' AS check, 'GENERATED_BYTES_SUPPORT_NON_MEDIA_ASSERTION' AS violation, m.uid AS item, x.uid AS detail;
+
+// V-F5-43 -- resolves CH-M-04; replaces V-604 (V-604r); rule: an EVIDENCES edge names MEDIA-EV-1 and its input assertion, and the full MEDIA-EV-1 path exists: assertion -> IMAGE_REGION locator hanging from a SourceSnapshot whose bytes equal the ORIGINAL rendition of the evidencing asset that carries the annotated region (or the panel's own region).
+MATCH (m)-[e:EVIDENCES]->(x)
+WHERE e.derivationRule IS NULL OR NOT x.uid IN coalesce(e.derivedFromAssertionUids, [])
+   OR NOT (
+     EXISTS { MATCH (x)-[:SUPPORTED_BY]->(l:SourceLocator {selectorKind: 'IMAGE_REGION'})-[:LOCATES_REGION]->(ann:MediaAnnotation)<-[:HAS_ANNOTATION]-(v:MediaVariant {variantKind: 'ORIGINAL'})<-[:HAS_MEDIA_VARIANT]-(m)
+              MATCH (ss:SourceSnapshot)-[:HAS_LOCATOR]->(l)
+              WHERE l.mediaAnnotationUid = ann.uid AND v.contentHash = ss.contentHash }
+     OR EXISTS { MATCH (x)-[:SUPPORTED_BY]->(l:SourceLocator {selectorKind: 'IMAGE_REGION'})-[:LOCATES_REGION]->(:MediaAnnotation)<-[:FROM_ANNOTATION]-(m)
+                 MATCH (:SourceSnapshot)-[:HAS_LOCATOR]->(l) })
+RETURN 'V-F5-43' AS check, m.uid AS evidencingAsset, x.uid AS evidenced, e.derivationRule AS rule;
+
+// V-F5-44 -- resolves CH-M-06; extends V-W21-01 (V-W21-01b); rule: two locators on snapshots of DIFFERENT renditions of one Episode never carry the same media start, end and time basis (a rendition's timecode is never copied to another rendition).
+MATCH (ep:Episode)<-[:RENDITION_OF]-(s1:Source)-[:HAS_SNAPSHOT]->(:SourceSnapshot)-[:HAS_LOCATOR]->(l1:SourceLocator),
+      (ep)<-[:RENDITION_OF]-(s2:Source)-[:HAS_SNAPSHOT]->(:SourceSnapshot)-[:HAS_LOCATOR]->(l2:SourceLocator)
+WHERE s1 <> s2 AND elementId(l1) < elementId(l2) AND l1.mediaStartSeconds IS NOT NULL
+  AND l1.mediaStartSeconds = l2.mediaStartSeconds AND coalesce(l1.mediaEndSeconds, -1.0) = coalesce(l2.mediaEndSeconds, -1.0)
+  AND coalesce(l1.mediaTimeBasis, '-') = coalesce(l2.mediaTimeBasis, '-')
+RETURN 'V-F5-44' AS check, ep.uid AS episode, l1.uid AS locator1, s1.sourceKind AS rendition1, l2.uid AS locator2, s2.sourceKind AS rendition2,
+       l1.mediaStartSeconds AS mediaStartSeconds, l1.mediaTimeBasis AS basis;
+
+// V-F5-45 -- (review) resolves CH-M-07; new (V-W21-13); rule: an assertion that is INSTANCE_OF a Claim and reports someone else's speech act (reportedSpeechAct set, or ATTRIBUTES_TO someone other than its asserter) is a retelling and must carry RETELLS, or it is counted as first-hand.
+MATCH (a:Assertion)-[:INSTANCE_OF]->(c:Claim)
+WHERE NOT EXISTS { (a)-[:RETELLS]->() } AND coalesce(a.speechAct, '-') <> 'QUESTIONS'
+  AND (a.reportedSpeechAct IS NOT NULL OR EXISTS { MATCH (a)-[:ATTRIBUTES_TO]->(w) WHERE NOT EXISTS { (a)-[:ASSERTED_BY]->(w) } })
+RETURN 'V-F5-45' AS check, a.uid AS assertion, c.uid AS claim, a.reportedSpeechAct AS reportedSpeechAct, 'UNLINKED_RETELLING' AS violation;
+
+// V-F5-46 -- resolves CH-M-08; new (V-W21-14); rule: two live (not SUPERSEDED/REJECTED) instances of one Claim with the same asserter and container that share a locator, an equal quoteHash, or an overlapping media span on one snapshot are one utterance captured twice.
+MATCH (a1:Assertion)-[:INSTANCE_OF]->(c:Claim)<-[:INSTANCE_OF]-(a2:Assertion)
+WHERE elementId(a1) < elementId(a2)
+  AND NOT coalesce(a1.status, '-') IN ['SUPERSEDED', 'REJECTED'] AND NOT coalesce(a2.status, '-') IN ['SUPERSEDED', 'REJECTED']
+  AND EXISTS { MATCH (a1)-[:ASSERTED_BY]->(w)<-[:ASSERTED_BY]-(a2) }
+  AND EXISTS { MATCH (a1)-[:OCCURS_IN]->(k)<-[:OCCURS_IN]-(a2) }
+  AND (EXISTS { MATCH (a1)-[:SUPPORTED_BY]->(:SourceLocator)<-[:SUPPORTED_BY]-(a2) }
+       OR (a1.quoteHash IS NOT NULL AND a1.quoteHash = a2.quoteHash)
+       OR EXISTS { MATCH (a1)-[:SUPPORTED_BY]->(l1:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot)-[:HAS_LOCATOR]->(l2:SourceLocator)<-[:SUPPORTED_BY]-(a2)
+                   WHERE l1.mediaStartSeconds IS NOT NULL AND l2.mediaStartSeconds IS NOT NULL
+                     AND l1.mediaStartSeconds < coalesce(l2.mediaEndSeconds, l2.mediaStartSeconds + 0.001)
+                     AND l2.mediaStartSeconds < coalesce(l1.mediaEndSeconds, l1.mediaStartSeconds + 0.001) })
+RETURN 'V-F5-46' AS check, c.uid AS claim, a1.uid AS occurrence1, a2.uid AS occurrence2, 'DUPLICATE_CAPTURE_OF_ONE_UTTERANCE' AS violation;
+
+// V-F5-47 -- resolves CH-M-09, CH-M-10, CH-M-17; replaces kernel V-423 (RETIRED: it fires on the valid fx07 projection; CL-016) and V-W21-06/V-423r; rule: a RECOMMENDS edge derives from exactly one live Assertion asserted by the start node whose own speechAct is RECOMMENDS with polarity POSITIVE, that is not a sponsor read (segmentKind/assertionBasis SPONSOR_READ or OCCURS_IN_SEGMENT a SPONSOR_READ segment), and whose subject or object is the end node; the legacy assertionUid is accepted only as the migration fallback V-W00-02r reports.
+MATCH (p)-[rec:RECOMMENDS]->(x)
+WITH p, x, rec, coalesce(rec.derivedFromAssertionUids, CASE WHEN rec.assertionUid IS NULL THEN [] ELSE [rec.assertionUid] END) AS cited
+WHERE size(cited) <> 1
+   OR (rec.assertionUid IS NULL AND rec.derivationRule IS NULL)
+   OR NOT EXISTS {
+     MATCH (a:Assertion)-[:ASSERTED_BY]->(p)
+     WHERE a.uid = cited[0] AND a.speechAct = 'RECOMMENDS' AND NOT coalesce(a.status, '-') IN ['REJECTED', 'SUPERSEDED']
+       AND coalesce(a.polarity, 'UNKNOWN') = 'POSITIVE'
+       AND coalesce(a.segmentKind, '-') <> 'SPONSOR_READ' AND coalesce(a.assertionBasis, '-') <> 'SPONSOR_READ'
+       AND NOT EXISTS { (a)-[:OCCURS_IN_SEGMENT]->(:EpisodeSegment {segmentType: 'SPONSOR_READ'}) }
+       AND (EXISTS { (a)-[:HAS_SUBJECT]->(x) } OR EXISTS { (a)-[:HAS_OBJECT]->(x) })
+   }
+RETURN 'V-F5-47' AS check, p.uid AS recommenderUid, x.uid AS recommendedUid, cited;
+
+// V-F5-48 -- resolves CH-M-11; extends V-W21-02 (V-W21-02b); rule: an occurrence whose media-time locator lies inside the delimiting interval of a SPONSOR_READ segment on the same rendition carries segmentKind SPONSOR_READ and OCCURS_IN_SEGMENT that segment.
+MATCH (a:ClaimOccurrence)-[:SUPPORTED_BY]->(l:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot)<-[:HAS_SNAPSHOT]-(src:Source)
+WHERE l.mediaStartSeconds IS NOT NULL
+MATCH (g:EpisodeSegment {segmentType: 'SPONSOR_READ'})-[:DELIMITED_BY]->(d:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot)<-[:HAS_SNAPSHOT]-(src)
+WITH a, l, g, min(d.mediaStartSeconds) AS segStart, max(coalesce(d.mediaEndSeconds, d.mediaStartSeconds)) AS segEnd
+WHERE l.mediaStartSeconds >= segStart AND l.mediaStartSeconds < segEnd
+  AND (coalesce(a.segmentKind, '-') <> 'SPONSOR_READ' OR NOT EXISTS { (a)-[:OCCURS_IN_SEGMENT]->(g) })
+RETURN 'V-F5-48' AS check, a.uid AS occurrence, l.mediaStartSeconds AS at, g.uid AS sponsorSegment, segStart, segEnd;
+
+// V-F5-49 -- resolves CH-M-12; extends V-W21-08 (V-W21-08b interim form); rule: when a span cited by a live quantitative assertion is re-anchored non-exactly (FUZZY, or textChange SUBSTANTIVE) and the numbers or quantity words differ between the cited and the re-anchored text, the assertion has a SUPERSEDES {SOURCE_CORRECTION} successor.
+MATCH (cur:SourceLocator)-[ra:REANCHORS]->(old:SourceLocator)<-[:SUPPORTED_BY]-(a:Assertion)
+WHERE (coalesce(ra.anchorMatch, '-') <> 'EXACT' OR ra.textChange = 'SUBSTANTIVE')
+  AND NOT coalesce(a.status, '-') IN ['SUPERSEDED', 'REJECTED']
+  AND (a.valueNumber IS NOT NULL OR a.quantity IS NOT NULL OR a.valueString IS NOT NULL)
+  AND NOT EXISTS { MATCH (:Assertion)-[s:SUPERSEDES]->(a) WHERE s.supersessionKind = 'SOURCE_CORRECTION' }
+WITH a, old, cur, ra,
+     [t IN split(reduce(x = toLower(coalesce(old.exact, '')), c IN [',', '.', ';', ':', '!', '?', '(', ')', '"', '\'', '-', '/', '–'] | replace(x, c, ' ')), ' ')
+        WHERE t =~ '\\d+' OR t IN $numberWords OR t IN $quantityWords] AS oldNums,
+     [t IN split(reduce(x = toLower(coalesce(cur.exact, '')), c IN [',', '.', ';', ':', '!', '?', '(', ')', '"', '\'', '-', '/', '–'] | replace(x, c, ' ')), ' ')
+        WHERE t =~ '\\d+' OR t IN $numberWords OR t IN $quantityWords] AS newNums
+WHERE ra.textChange = 'SUBSTANTIVE' OR any(t IN oldNums WHERE NOT t IN newNums) OR any(t IN newNums WHERE NOT t IN oldNums)
+RETURN 'V-F5-49' AS check, a.uid AS assertion, old.uid AS citedLocator, cur.uid AS reanchoredLocator, oldNums, newNums,
+       'SUBSTANTIVE_CHANGE_WITHOUT_SOURCE_CORRECTION' AS violation;
+
+// V-F5-50 -- resolves CH-M-13; new (V-W19-xx); rule: a bibliographic record is never a rendition of a work, and an abstract-only rendition (BIBLIOGRAPHIC_RECORD kind or $abstractOnlyUriPatterns) never claims renditionCoverage FULL.
+MATCH (s:Source)-[:RENDITION_OF]->(w)
+WITH s, w, [v IN [
+        CASE WHEN s.sourceKind = 'BIBLIOGRAPHIC_RECORD' THEN 'BIBLIOGRAPHIC_RECORD_AS_RENDITION' END,
+        CASE WHEN s.renditionCoverage = 'FULL' AND (s.sourceKind = 'BIBLIOGRAPHIC_RECORD' OR any(pat IN $abstractOnlyUriPatterns WHERE coalesce(s.canonicalUri, '') =~ pat))
+             THEN 'FULL_COVERAGE_ON_ABSTRACT_ONLY_RENDITION' END
+     ] WHERE v IS NOT NULL] AS violations
+WHERE size(violations) > 0
+RETURN 'V-F5-50' AS check, s.uid AS rendition, w.uid AS work, violations;
+
+// V-F5-51 -- resolves CH-M-14; new (V-618, Community form of media_rights_record_*_exists); rule: every MediaRightsRecord states rightsStatus, statementKind and statementScope (unknown rights are never permission).
+MATCH (r:MediaRightsRecord)
+WHERE r.rightsStatus IS NULL OR r.statementKind IS NULL OR r.statementScope IS NULL
+RETURN 'V-F5-51' AS check, r.uid AS rightsRecord, r.rightsStatus AS rightsStatus, r.statementKind AS statementKind, r.statementScope AS statementScope;
+
+// V-F5-52 -- resolves CH-M-15; extends V-608b; rule: a DISPLAY_MEDIA use never displays an asset whose current rights record forbids commercial use (unless the PolicyVersion's useClass is NON_COMMERCIAL), and a non-ORIGINAL rendition is displayed only when a current record allows derivatives (or the status is PUBLIC_DOMAIN / HELD_BY_OPERATOR).
+MATCH (act:Activity)-[u:AUTHORIZED_BY]->(pv:PolicyVersion)
+WHERE u.useKind = 'DISPLAY_MEDIA'
+MATCH (act)-[:USED]->(v:MediaVariant)<-[:HAS_MEDIA_VARIANT]-(m:MediaAsset)
+OPTIONAL MATCH (m)-[h:HAS_RIGHTS_RECORD]->(r:MediaRightsRecord)
+WHERE h.recordedTo IS NULL AND h.validTo IS NULL
+WITH act, pv, v, m, collect(r) AS records
+WITH act, v, m, [x IN [
+        CASE WHEN any(r IN records WHERE r.commercialUseAllowed = false) AND coalesce(pv.useClass, 'COMMERCIAL') = 'COMMERCIAL' THEN 'COMMERCIAL_USE_NOT_PERMITTED' END,
+        CASE WHEN coalesce(v.variantKind, '-') <> 'ORIGINAL'
+                  AND NOT any(r IN records WHERE r.derivativesAllowed = true OR r.rightsStatus IN ['PUBLIC_DOMAIN', 'HELD_BY_OPERATOR'])
+             THEN 'DERIVATIVE_DISPLAY_NOT_PERMITTED' END
+     ] WHERE x IS NOT NULL] AS violations
+WHERE size(violations) > 0
+RETURN 'V-F5-52' AS check, act.uid AS activity, m.uid AS asset, v.variantKind AS displayedRendition, violations;
+
+// V-F5-53 -- resolves CH-M-16; promotes W19 Q-03 (CL-003 R3); rule: a Source renders at most one work, and RENDITION_OF ends on an Episode or Publication (never another Source).
+MATCH (s:Source)-[:RENDITION_OF]->(w)
+WITH s, collect(DISTINCT w) AS works
+WHERE size(works) > 1 OR any(w IN works WHERE w:Source OR NOT (w:Episode OR w:Publication))
+RETURN 'V-F5-53' AS check, s.uid AS rendition, [w IN works | w.uid] AS works;
