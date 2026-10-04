@@ -1,0 +1,40 @@
+# W12 decision and seam ledger
+
+Status values: ACCEPTED-FOR-PROPOSAL (W12 recommends it to Fable and the fixtures depend on it), UNRESOLVED (needs another owner or Fable), DEFERRED (candidate). No decision below claims agreement from another worker.
+
+## Decisions
+
+| Id | Decision | Evidence (03-source-manifest.md) | Alternatives rejected (why) | Failing case / fixture | Status |
+|---|---|---|---|---|---|
+| D-W12-01 | COA classification rule V-W12-01 (issuer, lot, certified executions with method and judged outcome, report number or date, signature evidence recorded); title and visible signature not required. Proposed closure of OPEN-QUESTIONS P2 quality 1. | S1 (real COA without captured signature, 1 value of 11 rows), S3 (summary), S10 §19.1 ("usually contains", includes signature) | (a) title-based classification: S3 has no such title but other brands title summaries "COA"; (b) require signature: S1 would be demoted although it names lab, methods, limits, report number; (c) require all rows quantified: S1 would fail although it is a lab certificate | N06 (lot page promoted to COA → V-W12-01), N13 (orphan → V-008), Q-QA-C01 | ACCEPTED-FOR-PROPOSAL |
+| D-W12-02 | "Pass"/"Conforms" is a `PassFailInterpretation{verdictBasis: SOURCE_STATED}` backed by an `Assertion{predicate: CONFORMS_TO_SPECIFICATION}` (subject lot or execution, object criterion, no literal); it creates no `MeasuredResult`, lab, method, uncertainty or COA. | architecture §8; S1 rows; S3 rows | MeasuredResult with qualifier PASS; Assertion only | N05, N18 → V-W12-12, V-W12-05; Q-QA-C02 shows NOT_REPORTED | ACCEPTED-FOR-PROPOSAL (predicate registration W12-SR-04) |
+| D-W12-03 | Specification criteria carry `criterionPurpose` and `criterionBasis`; uncertainty lives on the result; its use lives on the interpretation's `decisionRule`. Proposed closure of OPEN-QUESTIONS P2 quality 2. | S11 §2.2, S12, S10 §18.9 | release/shelf-life as two properties on one criterion; uncertainty on the criterion; storing one "true" verdict | fixture 40 (CONFORMS vs INDETERMINATE under two rules); N10 → V-W12-11 | ACCEPTED-FOR-PROPOSAL |
+| D-W12-04 | NSF Certified for Sport scopes are lot-level: `COVERS ProductLot`; printed values kept in `coveredIdentifierValues`; facility grouping is `facilityQualifierText`. Corrects round 0005's reading of "Product ID" as a trade-item id. | S4 "Product ID" = S5/S6 "Lot #" = S3 lot list; S8 "Lots tested will be listed" | COVERS TradeItemIdentifier for NSF 306; COVERS Facility for the grouping | V-W12-13 (R1110-01), Q-PF-03a/b, N03, N04 | ACCEPTED-FOR-PROPOSAL; Fable to note against round 0005 C6 |
+| D-W12-05 | Four new relationship types: `APPLIES_CRITERION`, `INTERPRETS_TESTING_OF`, `CRITERION_OF_SPECIFICATION` (structural) and `COA_ISSUED_BY` (asserted). | S1 (issuer ≠ performer of subcontracted rows), S3 (verdict without result) | reuse `EVALUATED_AGAINST` from the interpretation (mixes asserted and structural classes on one type); reuse W13 `ISSUED_BY` (W13 range is RegulatoryAgency; one type, one meaning); read issuer from `PERFORMED_BY_LAB` (wrong for subcontracted rows) | V-W12-01/05/09 | ACCEPTED-FOR-PROPOSAL (Fable registers in catalog) |
+| D-W12-06 | `HAS_CERTIFICATION_SCOPE` uses `StateEpisodeProperties` (bitemporal attachment); a scope change is a new scope state; absence in a later capture closes nothing in valid time. | S4 "current as of" statement | edit scope in place; set `validTo` at the capture where a lot disappeared | Q-QA-C04 (P120-01 late arrival); N11 → V-W12-10 | ACCEPTED-FOR-PROPOSAL |
+| D-W12-07 | `CERTIFIED_UNDER` rule `w12-certified-under/v1`: direct COVERS only; never from FACILITY/LABORATORY programmes, never lot→variant→product inheritance. | round 0005 C6; S13 | name-level projection | N02, N03 → V-332, V-W12-07, V-112 | ACCEPTED-FOR-PROPOSAL |
+| D-W12-08 | One `CertificateOfAnalysis` and one `MeasuredResult` per report revision; "current" = supporting snapshot not replaced by a recorded `SourceRevisionEvent`; dependent interpretations superseded with `SUPERSEDES {SOURCE_CORRECTION}`. | S1 revision history field | edit the value; COA as snapshot specialization | fixture 20; Q-AX-19-early vs -late | ACCEPTED-FOR-PROPOSAL |
+| D-W12-09 | Enum values without a fixture node are kept (source vocabulary). | 04-model-cards.md | trim to fixture-backed values | — | UNRESOLVED (Fable may trim) |
+| D-W12-10 | `TestingLaboratory.accreditation` is a verbatim self-statement; verified accreditation = LABORATORY programme listing COVERS lab; independence is derived from W01 affiliation, never stored. | S1 ("is an ISO/IEC 17025:2017 accredited…", "is an affiliate of Niagen Bioscience, Inc."), S9 (competitor survey) | `independent: Boolean`; accreditation as verified string | Q-AX-19 (labAffiliations, labAccreditationListed) | ACCEPTED-FOR-PROPOSAL |
+| D-W12-11 | Recalled / expired / counterfeit / gray-market inventory is W15/W13/W18; "expired" is computed; a counterfeit unit with a real lot code is a unit whose `UNIT_FROM_LOT` is absent or contradicted. Boundary for OPEN-QUESTIONS P2 quality 5 (not a closure). | S9 counterfeit indicators ("outdated and out-of-market lot numbers") | lot status enum {RECALLED, COUNTERFEIT …} on ProductLot | N14 shows only the leak case; no recall fixture (owner W13/W18) | UNRESOLVED (W12-SR-06) |
+| D-W12-12 | A lot-unknown measurement (sample from an IndividualUnit with no `UNIT_FROM_LOT`) is reported beside, never as, a result for a lot. | S9 | attach to "the current lot" | Q-AX-19-unattributed; N16, N17 → V-W12-09, V-W12-08 | ACCEPTED-FOR-PROPOSAL |
+| D-W12-13 | A PERFORMED_BY_LAB inferred from the absence of a subcontract mark is written PROPOSED with `extractionMethod: INFERRED_FROM_ABSENT_SUBCONTRACT_FOOTNOTE`. | S1 footnotes | ACCEPTED (not stated by the source) | fixture 10 | ACCEPTED-FOR-PROPOSAL |
+
+## Kernel-change and kernel-adjacent requests (target W00)
+
+1. **W12-SR-02 (domain extension of SUPPORTED_BY).** Primary source S1; failing case: the value 555 mg/capsule (`MeasuredResult`) must cite the PDF page row; the catalog domain of `SUPPORTED_BY` is Assertion|Adjudication|EvidenceAssessment, so an artifact has no locator. Without it a value is unprovenanced (the exact failure V-W12-03/12 prevent). Fallback if refused: one `Assertion{predicate: REPORTS_RESULT}` per result (heavier, same meaning).
+2. **W12-SR-04 (predicate).** Register `CONFORMS_TO_SPECIFICATION` (assertion-only, no edge projection). Failing case: S3 rows.
+3. **W12-SR-01 (uid tokens).** Register lot, test-sample, test-execution, test-method, measured-result, spec-criterion, pass-fail, lot-test-summary, coa, cert-program, cert-listing, cert-scope.
+4. **W12-SR-03 (SourceKind value).** Add `LABORATORY_REPORT` (S1, S9 are neither marketing pages nor audit reports); fixtures use ORGANIZATION_WEBPAGE meanwhile.
+5. **W12-SR-09 (validator scope).** V-503/V-505 check bound/basis agreement only on Assertions and named episode types; `HAS_CERTIFICATION_SCOPE` (and every StateEpisodeProperties edge) should be included. Failing case N11 is caught only by V-W12-10.
+
+## Unresolved dependencies (owner, closure criterion)
+
+| Item | Owner | Closure |
+|---|---|---|
+| `SpecificationVersion` SDL, token, and whether W11 exposes an inverse field for `CRITERION_OF_SPECIFICATION` | W11 | W11 fragment defines SpecificationVersion; no second payload type |
+| `certifiedUnder` fields on Product and ProductVariant (inverse of derived CERTIFIED_UNDER) | W04 | W04 adds read-only fields or Fable leaves the edge lot-only in SDL |
+| `IndividualUnit`, `UNIT_FROM_LOT`, counterfeit/recall states | W15 (W13/W18 recall) | W15 states the unit-lot contradiction pattern |
+| Organization predicates used: AFFILIATED_WITH, OPERATES_CERTIFICATION_PROGRAM, OWNS_SPECIFICATION, CLAIMS_CGMP_COMPLIANCE | W01 | already catalog predicates; W01 confirms edge vs assertion-only projection |
+| QuantityDeclaration token and `LABEL_FOR` | W04 | fixtures use `quantity-declaration` placeholder |
+| Facility migration of `GMP_FACILITY` | W01 | CL-015 ruling |
