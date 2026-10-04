@@ -12,7 +12,7 @@
 // 1. Study conduct period as an assertion (registry dates; STATED_BY_SOURCE at MONTH precision).
 MATCH (st:Study {uid: 'hu:study:nct02678611-basis-nrpt'}), (loc:SourceLocator {uid: 'hu:locator:ctgov-nct02678611-2026-10-04-record'})
 MERGE (a:Assertion {uid: 'hu:assertion:nct02678611-conducted-during'})
-  ON CREATE SET a.id = 'nct02678611-conducted-during', a.predicate = 'STUDY_CONDUCTED_DURING', a.status = 'ACCEPTED', a.polarity = 'POSITIVE',
+  ON CREATE SET a.id = 'nct02678611-conducted-during', a.predicate = 'STUDY_CONDUCTED_DURING', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.valueString = '2016-01/2016-07',
                 a.validFrom = datetime('2016-01-01T00:00:00Z'), a.validFromPrecision = 'MONTH', a.validFromBasis = 'STATED_BY_SOURCE',
                 a.validTo = datetime('2016-07-01T00:00:00Z'), a.validToPrecision = 'MONTH', a.validToBasis = 'STATED_BY_SOURCE',
                 a.recordedAt = datetime('2026-10-04T01:20:00Z'), a.contentHash = 'sha256:synthetic-nct02678611-conducted-during', a.createdAt = datetime('2026-10-04T01:20:00Z'), a.privacyClass = 'PUBLIC'
