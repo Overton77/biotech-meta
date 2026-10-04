@@ -3,7 +3,7 @@
   "worker": "W00",
   "id": "W00-SR-01",
   "targetOwner": "Fable (contract B3, AssertionArchetype)",
-  "request": "Add massBasis: MassBasis and amountReferent: AmountReferent to the AssertionArchetype interface (contract A11 already makes them mandatory qualifiers). Under th",
+  "request": "Add massBasis: MassBasis and amountReferent: AmountReferent to the AssertionArchetype interface (contract A11 already makes them mandatory qualifiers). Under the frozen text they exist only on the gen",
   "cq": "['CQ-PV-04', 'CQ-EV-01']",
   "kind": "KCR"
  },
@@ -11,7 +11,7 @@
   "worker": "W00",
   "id": "W00-SR-02",
   "targetOwner": "Fable (contract B2 skeleton `id: ID! @id`)",
-  "request": "Keep `id: ID! @id` for API-created nodes but make uid assignment a service responsibility: the GraphQL API cannot satisfy INV-106 (uid ends with ':' + id) on cr",
+  "request": "Keep `id: ID! @id` for API-created nodes but make uid assignment a service responsibility: the GraphQL API cannot satisfy INV-106 (uid ends with ':' + id) on create because @id removes `id` from the c",
   "cq": "['CQ-AX-09', 'CQ-ID-04']",
   "kind": "KCR"
  },
@@ -19,7 +19,7 @@
   "worker": "W00",
   "id": "W00-SR-03",
   "targetOwner": "W20 (Document) with Fable",
-  "request": "Document nodes carry the labels Document, Source, Entity (D-005) and are therefore also read by the Source type, whose `id: ID!` reads stored property `id`. Doc",
+  "request": "Document nodes carry the labels Document, Source, Entity (D-005) and are therefore also read by the Source type, whose `id: ID!` reads stored property `id`. Document stores its live id as `documentId`",
   "cq": "['CQ-EV-01', 'CQ-PV-02']",
   "kind": "SEAM"
  },
@@ -27,7 +27,7 @@
   "worker": "W00",
   "id": "W00-SR-04",
   "targetOwner": "Fable (contract B5 enums)",
-  "request": "Add a kernel enum ResolutionStatus {PROPOSED ACCEPTED REJECTED UNRESOLVED} for ResolutionHypothesis.resolutionStatus (the OUTCOME of the hypothesis), distinct f",
+  "request": "Add a kernel enum ResolutionStatus {PROPOSED ACCEPTED REJECTED UNRESOLVED} for ResolutionHypothesis.resolutionStatus (the OUTCOME of the hypothesis), distinct from AssessmentStatus (the workflow state",
   "cq": "['CQ-AX-14', 'CQ-AX-15', 'CQ-ID-04']",
   "kind": "KCR"
  },
@@ -35,7 +35,7 @@
   "worker": "W00",
   "id": "W00-SR-05",
   "targetOwner": "Fable (contract A2 merge redirect)",
-  "request": "Contract A2 says merges publish a redirect through an EquivalenceAssessment; the catalog says an EquivalenceAssessment never merges and EquivalenceKind has no v",
+  "request": "Contract A2 says merges publish a redirect through an EquivalenceAssessment; the catalog says an EquivalenceAssessment never merges and EquivalenceKind has no value meaning 'same identity, merged'. Na",
   "cq": "['CQ-ID-04', 'CQ-AX-14']",
   "kind": "KCR"
  },
@@ -43,7 +43,7 @@
   "worker": "W00",
   "id": "W00-SR-06",
   "targetOwner": "Fable (validation.cypher V-112)",
-  "request": "V-112 tests r.hypothesisUid, a property no frozen relationship-property type has. Read the hypothesis citation of INSTANCE_OF from DerivedEdgeProperties.derived",
+  "request": "V-112 tests r.hypothesisUid, a property no frozen relationship-property type has. Read the hypothesis citation of INSTANCE_OF from DerivedEdgeProperties.derivedFromAssessmentUids (a ResolutionHypothes",
   "cq": "['CQ-AX-08', 'CQ-EV-02']",
   "kind": "FIX"
  },
@@ -51,7 +51,7 @@
   "worker": "W00",
   "id": "W00-SR-07",
   "targetOwner": "W04 (IDENTIFIED_BY) and W07 (Metric identifiers)",
-  "request": "IDENTIFIED_BY (ProductVariant|PackageConfiguration|MerchantListing -> TradeItemIdentifier, asserted) and HAS_IDENTIFIER (Entity|VersionedState|InformationArtifa",
+  "request": "IDENTIFIED_BY (ProductVariant|PackageConfiguration|MerchantListing -> TradeItemIdentifier, asserted) and HAS_IDENTIFIER (Entity|VersionedState|InformationArtifact -> Identifier, asserted) carry one me",
   "cq": "['CQ-ID-04']",
   "kind": "SEAM"
  },
@@ -59,7 +59,7 @@
   "worker": "W00",
   "id": "W00-SR-08",
   "targetOwner": "W01 (OrganizationSnapshot), W04 (ProductSnapshot), Fable",
-  "request": "Live HAS_SNAPSHOT is used for Organization -> OrganizationSnapshot and Product -> ProductSnapshot (state caches, round 0007 \u00a712: semantically HAS_STATE) and by ",
+  "request": "Live HAS_SNAPSHOT is used for Organization -> OrganizationSnapshot and Product -> ProductSnapshot (state caches, round 0007 \u00a712: semantically HAS_STATE) and by the catalog for Source -> SourceSnapshot",
   "cq": "['CQ-TM-01', 'CQ-PV-02']",
   "kind": "SEAM"
  },
@@ -67,7 +67,7 @@
   "worker": "W00",
   "id": "W00-SR-09",
   "targetOwner": "Fable (conventions.uidTypeTokens)",
-  "request": "Register uid tokens: mention (Mention), equivalence-assessment is NOT needed (use the registered 'assessment' token for EquivalenceAssessment), media-annotation",
+  "request": "Register uid tokens: mention (Mention), equivalence-assessment is NOT needed (use the registered 'assessment' token for EquivalenceAssessment), media-annotation (MediaAnnotation, W22), policy-version ",
   "cq": "['CQ-AX-14']",
   "kind": "KCR"
  },
@@ -75,7 +75,7 @@
   "worker": "W00",
   "id": "W00-SR-10",
   "targetOwner": "Fable (conventions.normalizationVersions)",
-  "request": "IMAGE_REGION requires normalizationVersion (catalog requiredBySelectorKind) but the registry defines only NFC-WS1 (a text normalization). Register a region-coor",
+  "request": "IMAGE_REGION requires normalizationVersion (catalog requiredBySelectorKind) but the registry defines only NFC-WS1 (a text normalization). Register a region-coordinate convention, e.g. IMG-REL-XYWH-1 =",
   "cq": "['CQ-PV-02', 'CQ-EV-01']",
   "kind": "KCR"
  },
@@ -83,7 +83,7 @@
   "worker": "W00",
   "id": "W00-SR-11",
   "targetOwner": "Fable (merge rule for unions and interfaces, contract B6)",
-  "request": "Add to B6: a union (and any interface used as a relationship target) never lists both a type and a specialization whose @node labels are a superset of its label",
+  "request": "Add to B6: a union (and any interface used as a relationship target) never lists both a type and a specialization whose @node labels are a superset of its labels; the specialization is read through th",
   "cq": "['CQ-EV-01', 'CQ-AX-14']",
   "kind": "SEAM"
  },
@@ -91,7 +91,7 @@
   "worker": "W00",
   "id": "W00-SR-12",
   "targetOwner": "Fable (validation.cypher V-432)",
-  "request": "V-432 matches (e)-[:COMPARES]->(n) for EquivalenceAssessment; the catalog relationship is COMPARES_IDENTITIES (COMPARES belongs to W07 ComparabilityAssessment).",
+  "request": "V-432 matches (e)-[:COMPARES]->(n) for EquivalenceAssessment; the catalog relationship is COMPARES_IDENTITIES (COMPARES belongs to W07 ComparabilityAssessment). Replace with fixtures/validation-w00.cy",
   "cq": "['CQ-ID-04']",
   "kind": "FIX"
  },
@@ -99,7 +99,7 @@
   "worker": "W00",
   "id": "W00-SR-13",
   "targetOwner": "every domain owner with asserted relationship types; Fable",
-  "request": "Enum-typed and non-null GraphQL fields must exist in storage with the exact contract spelling for Cypher-ingested records: privacyClass PUBLIC|INTERNAL (catalog",
+  "request": "Enum-typed and non-null GraphQL fields must exist in storage with the exact contract spelling for Cypher-ingested records: privacyClass PUBLIC|INTERNAL (catalog lowercase values are migrated), Assessm",
   "cq": "['CQ-AX-07', 'CQ-AX-12']",
   "kind": "SEAM"
  },
@@ -107,7 +107,7 @@
   "worker": "W00",
   "id": "W00-SR-14",
   "targetOwner": "Fable (runtime prerequisites)",
-  "request": "Record APOC Core as a runtime prerequisite of @neo4j/graphql 7.6.3 for any schema with DateTime fields (the generated Cypher calls apoc.date.convertFormat). The",
+  "request": "Record APOC Core as a runtime prerequisite of @neo4j/graphql 7.6.3 for any schema with DateTime fields (the generated Cypher calls apoc.date.convertFormat). The run harness must load apoc-core and apo",
   "cq": "['CQ-TM-01', 'CQ-TM-03']",
   "kind": "SEAM"
  },
@@ -115,7 +115,7 @@
   "worker": "W00",
   "id": "W00-SR-15",
   "targetOwner": "W03 (OBSERVED_IN_CONTEXT), W21 (INSTANCE_OF), W20 (RESOLVES_TO_CHUNK, ChunkResolutionProperties), W22 (LOCATES_REGION)",
-  "request": "The W00 fragment places fields for these relationship types on W00-owned types (Assertion.observedInContext, Assertion.instanceOf with DerivedEdgeProperties, So",
+  "request": "The W00 fragment places fields for these relationship types on W00-owned types (Assertion.observedInContext, Assertion.instanceOf with DerivedEdgeProperties, SourceLocator.resolvesToChunks with ChunkR",
   "cq": "['CQ-EV-02', 'CQ-PV-02']",
   "kind": "SEAM"
  },
@@ -123,7 +123,7 @@
   "worker": "W00",
   "id": "W00-SR-16",
   "targetOwner": "W19 responses (see 05-decision-seam-ledger.md \u00a72)",
-  "request": "W00 rulings on W19-SR-01..15: accept SR-02 (renditionCoverage, candidate field on Source), SR-09 (content-clock ordering, applied in validation-w00.cypher V-409",
+  "request": "W00 rulings on W19-SR-01..15: accept SR-02 (renditionCoverage, candidate field on Source), SR-09 (content-clock ordering, applied in validation-w00.cypher V-409/V-512), SR-10 (canonicalUri rule, V-235",
   "cq": "['CQ-PV-02', 'CQ-EV-05', 'CQ-AX-04']",
   "kind": "SEAM"
  },
@@ -147,7 +147,7 @@
   "worker": "W01",
   "id": "W01-SR-03",
   "targetOwner": "W00",
-  "request": "Retire live HAS_SNAPSHOT for Organization->OrganizationSnapshot (and, by the same rule, Product->ProductSnapshot W04 and Listing->ListingSnapshot W15); attach l",
+  "request": "Retire live HAS_SNAPSHOT for Organization->OrganizationSnapshot (and, by the same rule, Product->ProductSnapshot W04 and Listing->ListingSnapshot W15); attach live *Snapshot states by HAS_STATE with S",
   "cq": "['CQ-TM-01', 'CQ-TM-07', 'CQ-EC-C01']",
   "kind": ""
  },
@@ -155,7 +155,7 @@
   "worker": "W01",
   "id": "W01-SR-04",
   "targetOwner": "W00",
-  "request": "Make QS-2a/QS-2b validity classes precision-aware (round 0007 section 9 rule) instead of comparing raw bounds; add POSSIBLE_START_PRECISION and POSSIBLE_END_PRE",
+  "request": "Make QS-2a/QS-2b validity classes precision-aware (round 0007 section 9 rule) instead of comparing raw bounds; add POSSIBLE_START_PRECISION and POSSIBLE_END_PRECISION.",
   "cq": "['CQ-TM-04', 'CQ-AX-18', 'CQ-CL-05']",
   "kind": ""
  },
@@ -163,7 +163,7 @@
   "worker": "W01",
   "id": "W01-SR-05",
   "targetOwner": "Fable (example fixture claim-retelling-provenance.cypher; W21 informed)",
-  "request": "Correct the 0.2.0 example's role fixture. (a) \"B (2011-2017)\" is stored as validTo 2018-01-01 YEAR, which under the frozen bound rule (contract A6, round 0007 s",
+  "request": "Correct the 0.2.0 example's role fixture. (a) \"B (2011-2017)\" is stored as validTo 2018-01-01 YEAR, which under the frozen bound rule (contract A6, round 0007 section 9) means \"ended during 2018\"; it ",
   "cq": "['CQ-CL-05', 'CQ-EC-01', 'CQ-EC-02']",
   "kind": ""
  },
@@ -171,7 +171,7 @@
   "worker": "W01",
   "id": "W01-SR-06",
   "targetOwner": "W00 (validation) and Fable (catalog)",
-  "request": "Add an organizations `relationships:` block to the catalog (domain, range, class asserted, temporalProfile asserted_edge, temporalCardinality) for every W01 edg",
+  "request": "Add an organizations `relationships:` block to the catalog (domain, range, class asserted, temporalProfile asserted_edge, temporalCardinality) for every W01 edge type so that validation-params.json $a",
   "cq": "['CQ-CL-05', 'CQ-EC-01', 'CQ-MF-01']",
   "kind": ""
  },
@@ -179,7 +179,7 @@
   "worker": "W01",
   "id": "W01-SR-07",
   "targetOwner": "W00",
-  "request": "KERNEL CHANGE REQUEST. A point-in-time statement (\"beneficially owned ... as of April 25, 2025\"; \"based on Schedule 13D/A filed August 20, 2024\") states a witne",
+  "request": "KERNEL CHANGE REQUEST. A point-in-time statement (\"beneficially owned ... as of April 25, 2025\"; \"based on Schedule 13D/A filed August 20, 2024\") states a witness instant, not an interval bound. The k",
   "cq": "['CQ-EC-01', 'CQ-EC-C02', 'CQ-TM-03']",
   "kind": ""
  },
@@ -187,7 +187,7 @@
   "worker": "W01",
   "id": "W01-SR-08",
   "targetOwner": "W00",
-  "request": "For present-tense statements the open-end witness is the statement's publication instant (SourceSnapshot.publishedAt), not the capture instant (observedAt). QS-",
+  "request": "For present-tense statements the open-end witness is the statement's publication instant (SourceSnapshot.publishedAt), not the capture instant (observedAt). QS-2 uses max(observedAt).",
   "cq": "['CQ-AX-18', 'CQ-TM-04']",
   "kind": ""
  },
@@ -203,7 +203,7 @@
   "worker": "W01",
   "id": "W01-SR-10",
   "targetOwner": "Fable (catalog organizations module)",
-  "request": "(1) Register candidate forbidden implications [HOLDS_EQUITY_IN, PARENT_OF] and [BOARD_MEMBER_OF, EMPLOYED_BY]. (2) Canonicalize SUBSIDIARY_OF assertions to PARE",
+  "request": "(1) Register candidate forbidden implications [HOLDS_EQUITY_IN, PARENT_OF] and [BOARD_MEMBER_OF, EMPLOYED_BY]. (2) Canonicalize SUBSIDIARY_OF assertions to PARENT_OF (subject = parent) with the source",
   "cq": "['CQ-EC-C02', 'CQ-EC-01', 'CQ-MF-01']",
   "kind": ""
  },
@@ -211,7 +211,7 @@
   "worker": "W01",
   "id": "W01-SR-11",
   "targetOwner": "W23",
-  "request": "Confirm the public-person-only rule for Person (no birth date/place, death date) and the CohortParticipant rules: only tokens printed by a public source; explic",
+  "request": "Confirm the public-person-only rule for Person (no birth date/place, death date) and the CohortParticipant rules: only tokens printed by a public source; explicit privacyClass; no relationship of any ",
   "cq": "['CQ-PC-08', 'CQ-CL-09']",
   "kind": ""
  },
@@ -219,7 +219,7 @@
   "worker": "W01",
   "id": "W01-SR-12",
   "targetOwner": "W06 (with W03)",
-  "request": "Live Organization.worksOnConditions (WORKS_ON_CONDITION) has no catalog counterpart and no owner. W01 retires it; values become DEVELOPS_PRODUCT_CLASS literal a",
+  "request": "Live Organization.worksOnConditions (WORKS_ON_CONDITION) has no catalog counterpart and no owner. W01 retires it; values become DEVELOPS_PRODUCT_CLASS literal assertions or, when a treatment is named,",
   "cq": "['CQ-EC-01']",
   "kind": ""
  },
@@ -227,7 +227,7 @@
   "worker": "W01",
   "id": "W01-SR-13",
   "targetOwner": "W11",
-  "request": "(a) Live CONTRACTS_MANUFACTURING edges whose target is a CompoundForm (material) map to W11 ManufacturingCapability/PERFORMS_PROCESS review, not to a W01 edge. ",
+  "request": "(a) Live CONTRACTS_MANUFACTURING edges whose target is a CompoundForm (material) map to W11 ManufacturingCapability/PERFORMS_PROCESS review, not to a W01 edge. (b) Field slots on Facility for HOSTS_PR",
   "cq": "['CQ-MF-01', 'CQ-MF-04']",
   "kind": ""
  },
@@ -235,7 +235,7 @@
   "worker": "W01",
   "id": "W01-SR-14",
   "targetOwner": "W11 and W15",
-  "request": "Live PhysicalLocation.hostsProducts (HOSTS_PRODUCT, RoleMetadata) is ambiguous (made at, sold at, stored at). W01 retires it; each live edge becomes a PROPOSED ",
+  "request": "Live PhysicalLocation.hostsProducts (HOSTS_PRODUCT, RoleMetadata) is ambiguous (made at, sold at, stored at). W01 retires it; each live edge becomes a PROPOSED review assertion routed to W11 (manufact",
   "cq": "['CQ-MF-01', 'CQ-CM-01']",
   "kind": ""
  },
@@ -243,7 +243,7 @@
   "worker": "W01",
   "id": "W01-SR-15",
   "targetOwner": "W15",
-  "request": "(a) Listing.availableIn (AVAILABLE_IN -> PhysicalLocation): range becomes Facility for in-clinic availability or a jurisdiction string for market availability. ",
+  "request": "(a) Listing.availableIn (AVAILABLE_IN -> PhysicalLocation): range becomes Facility for in-clinic availability or a jurisdiction string for market availability. (b) Seller display accounts (filing-vs-c",
   "cq": "['CQ-CM-01', 'CQ-EC-02']",
   "kind": ""
  },
@@ -259,7 +259,7 @@
   "worker": "W01",
   "id": "W01-SR-17",
   "targetOwner": "W09",
-  "request": "Writer of the study-role predicates SPONSORS_STUDY, FUNDS_STUDY, SERVES_AS_CRO_FOR, HOSTS_STUDY_SITE, PROVIDES_INVESTIGATIONAL_PRODUCT (catalog organizations.as",
+  "request": "Writer of the study-role predicates SPONSORS_STUDY, FUNDS_STUDY, SERVES_AS_CRO_FOR, HOSTS_STUDY_SITE, PROVIDES_INVESTIGATIONAL_PRODUCT (catalog organizations.assertedPredicates) and of live SPONSORED_",
   "cq": "['CQ-EC-04', 'CQ-ST-02', 'CQ-EC-01']",
   "kind": ""
  },
@@ -267,7 +267,7 @@
   "worker": "W01",
   "id": "W01-SR-18",
   "targetOwner": "W12",
-  "request": "TestingLaboratory granularity = the certified laboratory unit (one CLIA certificate or one accreditation scope), an Organization specialization; its physical si",
+  "request": "TestingLaboratory granularity = the certified laboratory unit (one CLIA certificate or one accreditation scope), an Organization specialization; its physical sites are Facility nodes reached by OPERAT",
   "cq": "['CQ-DX-01', 'CQ-MF-01']",
   "kind": ""
  },
@@ -275,7 +275,7 @@
   "worker": "W01",
   "id": "W01-SR-19",
   "targetOwner": "W14",
-  "request": "Brand, trademark and legal entity are three identities. OWNS_TRADEMARK (W14) never implies OWNS_BRAND or MARKETS_PRODUCT (INV-009); W14's Trademark links to Con",
+  "request": "Brand, trademark and legal entity are three identities. OWNS_TRADEMARK (W14) never implies OWNS_BRAND or MARKETS_PRODUCT (INV-009); W14's Trademark links to ConsumerBrand only through an explicit asse",
   "cq": "['CQ-EC-02']",
   "kind": ""
  },
@@ -283,7 +283,7 @@
   "worker": "W01",
   "id": "W01-SR-20",
   "targetOwner": "W08, W11, W12, W13, W15, W16, W18, W20, W21, W09",
-  "request": "Field slots reserved on W01 types for relationships owned elsewhere; owners send the exact field text and Fable inserts it. Organization: developsPlatforms, use",
+  "request": "Field slots reserved on W01 types for relationships owned elsewhere; owners send the exact field text and Fable inserts it. Organization: developsPlatforms, usesPlatforms, usesTools (W08); performsPro",
   "cq": "['CQ-AX-14']",
   "kind": ""
  },
@@ -291,7 +291,7 @@
   "worker": "W01",
   "id": "W01-SR-21",
   "targetOwner": "W21",
-  "request": "SPONSORS_CONTENT (FINANCIAL_INTEREST member, W21 writer) uses an asserted_edge properties type; W01 offers RoleEdgeProperties (compensationKind usable for paid ",
+  "request": "SPONSORS_CONTENT (FINANCIAL_INTEREST member, W21 writer) uses an asserted_edge properties type; W01 offers RoleEdgeProperties (compensationKind usable for paid placements). ConflictRelevanceAssessment",
   "cq": "['CQ-CL-05', 'CQ-EC-03', 'CQ-CL-08']",
   "kind": ""
  },
@@ -299,7 +299,7 @@
   "worker": "W01",
   "id": "W01-SR-22",
   "targetOwner": "W00",
-  "request": "KERNEL QUESTION (no change requested now). A quantity that qualifies an object assertion (share count of an equity stake) has no kernel home because INV-003 mak",
+  "request": "KERNEL QUESTION (no change requested now). A quantity that qualifies an object assertion (share count of an equity stake) has no kernel home because INV-003 makes object and literal exclusive and HAS_",
   "cq": "['CQ-EC-C02']",
   "kind": ""
  },
@@ -307,7 +307,7 @@
   "worker": "W02",
   "id": "W02-SR-01",
   "targetOwner": "W00",
-  "request": "Kernel change: allow an object assertion whose predicateClass is QUANTITY to carry valueNumber/unitCode/quantityBasis as qualifiers of the object (amend INV-003",
+  "request": "Kernel change: allow an object assertion whose predicateClass is QUANTITY to carry valueNumber/unitCode/quantityBasis as qualifiers of the object (amend INV-003 and V-003: objects = 1 and literals <= ",
   "cq": "['CQ-PF-01', 'CQ-ID-03', 'CQ-ID-C02']",
   "kind": ""
  },
@@ -315,7 +315,7 @@
   "worker": "W02",
   "id": "W02-SR-02",
   "targetOwner": "W00",
-  "request": "Validator change V-006 -> V-006r: QUANTITATIVELY_CONTAINS requires unitCode, basis, comparator, contentStatementKind; quantity for EQ/APPROX/GE/GT/LE/LT; quanti",
+  "request": "Validator change V-006 -> V-006r: QUANTITATIVELY_CONTAINS requires unitCode, basis, comparator, contentStatementKind; quantity for EQ/APPROX/GE/GT/LE/LT; quantityLow < quantityHigh (and quantity null)",
   "cq": "['CQ-ID-C02', 'CQ-ID-03']",
   "kind": ""
  },
@@ -323,7 +323,7 @@
   "worker": "W02",
   "id": "W02-SR-03",
   "targetOwner": "W00",
-  "request": "Register uid tokens: BrandedIngredientMaterial, BotanicalPreparation, MicrobialPreparation, MaterialMixture -> material (same token as IngredientMaterial); Bota",
+  "request": "Register uid tokens: BrandedIngredientMaterial, BotanicalPreparation, MicrobialPreparation, MaterialMixture -> material (same token as IngredientMaterial); BotanicalTaxon -> botanical-taxon; Microbial",
   "cq": "['CQ-ID-03', 'CQ-ID-C02', 'CQ-ID-C03']",
   "kind": ""
  },
@@ -331,7 +331,7 @@
   "worker": "W02",
   "id": "W02-SR-04",
   "targetOwner": "W00",
-  "request": "Register asserted predicates: HAS_MOLECULAR_WEIGHT (predicateClass QUANTITY, literal valueNumber + unitCode g/mol, subject ChemicalSubstance); confirm QUANTITAT",
+  "request": "Register asserted predicates: HAS_MOLECULAR_WEIGHT (predicateClass QUANTITY, literal valueNumber + unitCode g/mol, subject ChemicalSubstance); confirm QUANTITATIVELY_CONTAINS with basisKind CALCULATED",
   "cq": "['CQ-PF-01']",
   "kind": ""
  },
@@ -347,7 +347,7 @@
   "worker": "W02",
   "id": "W02-SR-06",
   "targetOwner": "W03",
-  "request": "Shared taxon identity: a taxon that is both a mechanism Species and a BotanicalTaxon/MicrobialTaxon is one node carrying both labels (archetype Entity, one uid)",
+  "request": "Shared taxon identity: a taxon that is both a mechanism Species and a BotanicalTaxon/MicrobialTaxon is one node carrying both labels (archetype Entity, one uid); NCBI taxonomy id is the shared key (no",
   "cq": "['CQ-ID-C03', 'CQ-MX-01']",
   "kind": ""
  },
@@ -355,7 +355,7 @@
   "worker": "W02",
   "id": "W02-SR-07",
   "targetOwner": "W03",
-  "request": "Accept the CL-002 rule: MolecularEntity is the gene/protein-authority identity (genes, transcripts, proteins, enzymes, receptors) and carries no chemical keys; ",
+  "request": "Accept the CL-002 rule: MolecularEntity is the gene/protein-authority identity (genes, transcripts, proteins, enzymes, receptors) and carries no chemical keys; metabolites and other structure-authorit",
   "cq": "['CQ-ID-C04', 'CQ-MX-01', 'CQ-ID-06']",
   "kind": ""
  },
@@ -363,7 +363,7 @@
   "worker": "W02",
   "id": "W02-SR-08",
   "targetOwner": "W07",
-  "request": "The analyte link of a Biomarker/Metric (QUANTIFIES or the W07 equivalent) accepts ChemicalSubstance as target, so 'whole-blood NAD+' quantifies the same NAD+ su",
+  "request": "The analyte link of a Biomarker/Metric (QUANTIFIES or the W07 equivalent) accepts ChemicalSubstance as target, so 'whole-blood NAD+' quantifies the same NAD+ substance that is an ingredient or mechani",
   "cq": "['CQ-ID-C04', 'CQ-ST-03']",
   "kind": ""
  },
@@ -371,7 +371,7 @@
   "worker": "W02",
   "id": "W02-SR-09",
   "targetOwner": "W10",
-  "request": "Use the W02 identity facts (Q-04: sameExact, sameMoiety, sameForm, moietyOnly) as inputs to MATERIAL_IDENTITY; when one side is stated only at active-moiety lev",
+  "request": "Use the W02 identity facts (Q-04: sameExact, sameMoiety, sameForm, moietyOnly) as inputs to MATERIAL_IDENTITY; when one side is stated only at active-moiety level, the level is SAME_SUBSTANCE_MATERIAL",
   "cq": "['CQ-ID-06', 'CQ-ST-02', 'CQ-EV-04']",
   "kind": ""
  },
@@ -379,7 +379,7 @@
   "worker": "W02",
   "id": "W02-SR-10",
   "targetOwner": "W11",
-  "request": "CL-005: produce a process-input case IngredientMaterial cannot carry or accept retirement of live Material (D-008). Retarget INPUTS/OUTPUTS/PRODUCES/HAS_INPUT/H",
+  "request": "CL-005: produce a process-input case IngredientMaterial cannot carry or accept retirement of live Material (D-008). Retarget INPUTS/OUTPUTS/PRODUCES/HAS_INPUT/HAS_OUTPUT to IngredientMaterial with pro",
   "cq": "['CQ-ID-05', 'CQ-MF-01']",
   "kind": ""
  },
@@ -387,7 +387,7 @@
   "worker": "W02",
   "id": "W02-SR-11",
   "targetOwner": "W04",
-  "request": "USES_MATERIAL / DECLARATION_IDENTIFIES_MATERIAL target IngredientMaterial (all specializations carry the label). QuantityDeclaration.amountReferentUid may point",
+  "request": "USES_MATERIAL / DECLARATION_IDENTIFIES_MATERIAL target IngredientMaterial (all specializations carry the label). QuantityDeclaration.amountReferentUid may point at Nutrient/Constituent/ChemicalSubstan",
   "cq": "['CQ-PF-01', 'CQ-ID-03']",
   "kind": ""
  },
@@ -395,7 +395,7 @@
   "worker": "W02",
   "id": "W02-SR-12",
   "targetOwner": "W05",
-  "request": "ExposureAgentTarget replaces Ingredient and Compound members with IngredientMaterial and ChemicalSubstance; FoodItem CONTAINS_COMPOUND and FoodProduct HAS_INGRE",
+  "request": "ExposureAgentTarget replaces Ingredient and Compound members with IngredientMaterial and ChemicalSubstance; FoodItem CONTAINS_COMPOUND and FoodProduct HAS_INGREDIENT dispositions retarget to ChemicalS",
   "cq": "['CQ-ST-01']",
   "kind": ""
  },
@@ -411,7 +411,7 @@
   "worker": "W02",
   "id": "W02-SR-20",
   "targetOwner": "W09",
-  "request": "LegacyEvaluatedIntervention (read-only) members: Compound -> ChemicalSubstance; CompoundForm -> ChemicalForm and IngredientMaterial. USES_INTERVENTION_MATERIAL ",
+  "request": "LegacyEvaluatedIntervention (read-only) members: Compound -> ChemicalSubstance; CompoundForm -> ChemicalForm and IngredientMaterial. USES_INTERVENTION_MATERIAL target IngredientMaterial (incl. Microbi",
   "cq": "['CQ-ST-01', 'CQ-ST-02']",
   "kind": ""
  },
@@ -443,7 +443,7 @@
   "worker": "W02",
   "id": "W02-SR-24",
   "targetOwner": "W00",
-  "request": "AssertionSubjectTarget (successor of EvidenceSubject/ClaimSubject) includes ChemicalSubstance, ChemicalForm, IngredientMaterial (specializations covered by labe",
+  "request": "AssertionSubjectTarget (successor of EvidenceSubject/ClaimSubject) includes ChemicalSubstance, ChemicalForm, IngredientMaterial (specializations covered by label), BotanicalTaxon, MicrobialTaxon, Micr",
   "cq": "['CQ-ID-03', 'CQ-ID-04']",
   "kind": ""
  },
@@ -467,7 +467,7 @@
   "worker": "W02",
   "id": "W02-SR-14",
   "targetOwner": "W17",
-  "request": "State HAS_SAFETY_SIGNAL property type and SafetySubjectTarget members (ChemicalSubstance, IngredientMaterial) so the live Compound.hasSafetySignals/Ingredient.h",
+  "request": "State HAS_SAFETY_SIGNAL property type and SafetySubjectTarget members (ChemicalSubstance, IngredientMaterial) so the live Compound.hasSafetySignals/Ingredient.hasSafetySignals fields can be re-added o",
   "cq": "['CQ-ST-06']",
   "kind": ""
  },
@@ -483,7 +483,7 @@
   "worker": "W02",
   "id": "W02-SR-16",
   "targetOwner": "W19",
-  "request": "Add registry entries for GSRS substance records, PubChem PUG REST, ChEBI, BacDive, EMA HMPC monographs, EFSA opinions and FDA GRAS notices with authorityFor/not",
+  "request": "Add registry entries for GSRS substance records, PubChem PUG REST, ChEBI, BacDive, EMA HMPC monographs, EFSA opinions and FDA GRAS notices with authorityFor/notAuthorityFor as in 03-source-manifest.md",
   "cq": "['CQ-ID-04']",
   "kind": ""
  },
@@ -491,7 +491,7 @@
   "worker": "W02",
   "id": "W02-SR-17",
   "targetOwner": "W00",
-  "request": "Repo fixture docs/schema/examples/elysium-basis.cypher sets assertion recordedAt = datetime() while its CAPTURE_FIDELITY adjudication has reviewedAt 2026-10-04T",
+  "request": "Repo fixture docs/schema/examples/elysium-basis.cypher sets assertion recordedAt = datetime() while its CAPTURE_FIDELITY adjudication has reviewedAt 2026-10-04T00:00Z; on any load after that instant V",
   "cq": "['CQ-TM-01']",
   "kind": ""
  },
@@ -499,7 +499,7 @@
   "worker": "W02",
   "id": "W02-SR-18",
   "targetOwner": "W12",
-  "request": "Model the NIAGEN 2015 (GRN 635 Table 2) and 2019 (EFSA Table 2) acceptance limits as SpecificationCriterion records under the two W11 SpecificationVersions used",
+  "request": "Model the NIAGEN 2015 (GRN 635 Table 2) and 2019 (EFSA Table 2) acceptance limits as SpecificationCriterion records under the two W11 SpecificationVersions used in fx-03; specification limits are not ",
   "cq": "['CQ-ID-05']",
   "kind": ""
  },
@@ -507,7 +507,7 @@
   "worker": "W03",
   "id": "W03-SR-01",
   "targetOwner": "W00",
-  "request": "Amend V-233 and V-234 (and INV-211 wording) so mechanism projections may cite inputs through derivationRule 'mx-proj/v1' + derivedFromAssertionUids, as catalog ",
+  "request": "Amend V-233 and V-234 (and INV-211 wording) so mechanism projections may cite inputs through derivationRule 'mx-proj/v1' + derivedFromAssertionUids, as catalog relationshipClasses.derived already allo",
   "cq": "['CQ-MX-05', 'CQ-MX-03']",
   "kind": ""
  },
@@ -515,7 +515,7 @@
   "worker": "W03",
   "id": "W03-SR-02",
   "targetOwner": "W00",
-  "request": "Add to the W00 Assertion types the outgoing field observedInContext: [MechanismEvidenceContext!]! @relationship(type: \"OBSERVED_IN_CONTEXT\", direction: OUT) (st",
+  "request": "Add to the W00 Assertion types the outgoing field observedInContext: [MechanismEvidenceContext!]! @relationship(type: \"OBSERVED_IN_CONTEXT\", direction: OUT) (structural, zero_or_one) and widen the cat",
   "cq": "['CQ-MX-01', 'CQ-MX-02']",
   "kind": ""
  },
@@ -523,7 +523,7 @@
   "worker": "W03",
   "id": "W03-SR-03",
   "targetOwner": "W07",
-  "request": "Add a candidate structural edge Biomarker -HAS_ANALYTE-> ChemicalSubstance | MolecularEntity (zero_or_one) so that compartment-specific measurands of one analyt",
+  "request": "Add a candidate structural edge Biomarker -HAS_ANALYTE-> ChemicalSubstance | MolecularEntity (zero_or_one) so that compartment-specific measurands of one analyte are joinable (NAD+ in whole blood, liv",
   "cq": "['CQ-MX-03', 'CQ-MX-C04']",
   "kind": ""
  },
@@ -531,7 +531,7 @@
   "worker": "W03",
   "id": "W03-SR-04",
   "targetOwner": "W00",
-  "request": "Register uid tokens: Pathway -> 'pathway', Condition -> 'condition', RiskFactor -> 'risk-factor', and Organ -> 'anatomical-context' (specialization shares the p",
+  "request": "Register uid tokens: Pathway -> 'pathway', Condition -> 'condition', RiskFactor -> 'risk-factor', and Organ -> 'anatomical-context' (specialization shares the parent identity space, as LegalEntity sha",
   "cq": "['CQ-MX-C01', 'CQ-MX-C03']",
   "kind": ""
  },
@@ -539,7 +539,7 @@
   "worker": "W03",
   "id": "W03-SR-05",
   "targetOwner": "W02",
-  "request": "CL-002 boundary: MolecularEntity = genome-encoded actors (gene, transcript, protein, complex, family, ncRNA); every small molecule including endogenous metaboli",
+  "request": "CL-002 boundary: MolecularEntity = genome-encoded actors (gene, transcript, protein, complex, family, ncRNA); every small molecule including endogenous metabolites (NAD+, NAAD, NMN) is ChemicalSubstan",
   "cq": "['CQ-MX-01', 'CQ-MX-05']",
   "kind": ""
  },
@@ -547,7 +547,7 @@
   "worker": "W03",
   "id": "W03-SR-06",
   "targetOwner": "W07",
-  "request": "Rulings for W07-SR-07: retire Biomarker.inPathways (IN_PATHWAY) in favour of analyte PARTICIPATES_IN (after W03-SR-03); merge Biomarker.expressedInOrgans (EXPRE",
+  "request": "Rulings for W07-SR-07: retire Biomarker.inPathways (IN_PATHWAY) in favour of analyte PARTICIPATES_IN (after W03-SR-03); merge Biomarker.expressedInOrgans (EXPRESSED_IN) into EXPRESSED_IN_CONTEXT (Orga",
   "cq": "['CQ-MX-02']",
   "kind": ""
  },
@@ -555,7 +555,7 @@
   "worker": "W03",
   "id": "W03-SR-07",
   "targetOwner": "W16",
-  "request": "OPERATIONALIZED_BY is used by W03 Outcome -> Metric (structural, StructuralEdgeProperties: an outcome concept is measured by a metric) and by W16 for Target/goa",
+  "request": "OPERATIONALIZED_BY is used by W03 Outcome -> Metric (structural, StructuralEdgeProperties: an outcome concept is measured by a metric) and by W16 for Target/goal links. Confirm one meaning (\"a concept",
   "cq": "['CQ-ST-03']",
   "kind": ""
  },
@@ -563,7 +563,7 @@
   "worker": "W03",
   "id": "W03-SR-08",
   "targetOwner": "W17",
-  "request": "AFFECTS_ORGAN is used by Condition (W03: curated anatomical involvement, MechanismLinkProperties) and by AdverseEffect/SafetySignal (W17). Confirm a shared mean",
+  "request": "AFFECTS_ORGAN is used by Condition (W03: curated anatomical involvement, MechanismLinkProperties) and by AdverseEffect/SafetySignal (W17). Confirm a shared meaning and property type, or W17 renames it",
   "cq": "['CQ-ST-03']",
   "kind": ""
  },
@@ -571,7 +571,7 @@
   "worker": "W03",
   "id": "W03-SR-09",
   "targetOwner": "W09",
-  "request": "Keep Study.studiedInSpecies (STUDIED_IN) for human studies only; preclinical species come from MechanismEvidenceContext IN_SPECIES; OutcomeDefinition -> Outcome",
+  "request": "Keep Study.studiedInSpecies (STUDIED_IN) for human studies only; preclinical species come from MechanismEvidenceContext IN_SPECIES; OutcomeDefinition -> Outcome (live REFERS_TO_OUTCOME) points at the ",
   "cq": "['CQ-MX-02', 'CQ-ST-03']",
   "kind": ""
  },
@@ -579,7 +579,7 @@
   "worker": "W03",
   "id": "W03-SR-10",
   "targetOwner": "W05",
-  "request": "Ruling on W05-SR-05: Lifestyle is accepted as an AFFECTS_MECHANISM subject under mx-proj/v1 (assertion subject a Lifestyle, same gates); ASSOCIATED_WITH_CONDITI",
+  "request": "Ruling on W05-SR-05: Lifestyle is accepted as an AFFECTS_MECHANISM subject under mx-proj/v1 (assertion subject a Lifestyle, same gates); ASSOCIATED_WITH_CONDITION and ASSOCIATED_WITH_OUTCOME on Lifest",
   "cq": "['CQ-MX-05']",
   "kind": ""
  },
@@ -587,7 +587,7 @@
   "worker": "W03",
   "id": "W03-SR-11",
   "targetOwner": "W10",
-  "request": "EXPOSURE dimension consumes MechanismEvidenceContext exposure fields. Basis mapping for ratio eligibility (INV-203): ABSOLUTE_PER_DAY <-> QuantityBasis PER_DAY;",
+  "request": "EXPOSURE dimension consumes MechanismEvidenceContext exposure fields. Basis mapping for ratio eligibility (INV-203): ABSOLUTE_PER_DAY <-> QuantityBasis PER_DAY; PER_KG_BODY_WEIGHT_PER_DAY <-> PER_KG_B",
   "cq": "['CQ-MX-04', 'CQ-EV-04', 'CQ-AX-20']",
   "kind": ""
  },
@@ -595,7 +595,7 @@
   "worker": "W03",
   "id": "W03-SR-12",
   "targetOwner": "W00",
-  "request": "Registry and catalog updates for Fable: (a) add to W03's row the relationship types ACTS_IN, REFLECTS_MECHANISM, ASSOCIATED_WITH_CONDITION, ASSOCIATED_WITH_OUTC",
+  "request": "Registry and catalog updates for Fable: (a) add to W03's row the relationship types ACTS_IN, REFLECTS_MECHANISM, ASSOCIATED_WITH_CONDITION, ASSOCIATED_WITH_OUTCOME, and Condition AFFECTS_ORGAN; (b) re",
   "cq": "['CQ-MX-05', 'CQ-MX-02']",
   "kind": ""
  },
@@ -611,7 +611,7 @@
   "worker": "W04",
   "id": "W04-SR-01",
   "targetOwner": "W00",
-  "request": "Register uid type tokens package-configuration (PackageConfiguration), serving-definition (ServingDefinition), quantity-declaration (QuantityDeclaration), produ",
+  "request": "Register uid type tokens package-configuration (PackageConfiguration), serving-definition (ServingDefinition), quantity-declaration (QuantityDeclaration), product-snapshot (ProductSnapshot); map Label",
   "cq": "['CQ-ID-05', 'CQ-PF-01', 'CQ-AX-17']",
   "kind": ""
  },
@@ -627,7 +627,7 @@
   "worker": "W04",
   "id": "W04-SR-03",
   "targetOwner": "W00",
-  "request": "V-108 (illustrative) flags POSSIBLE overlaps of exclusive attachments that round 0007 sends to the review queue (V-509); keep V-508 (DEFINITE, error) and V-509 ",
+  "request": "V-108 (illustrative) flags POSSIBLE overlaps of exclusive attachments that round 0007 sends to the review queue (V-509); keep V-508 (DEFINITE, error) and V-509 (POSSIBLE, informational) and retire V-1",
   "cq": "['CQ-TM-05', 'CQ-ID-05']",
   "kind": ""
  },
@@ -635,7 +635,7 @@
   "worker": "W04",
   "id": "W04-SR-04",
   "targetOwner": "W00",
-  "request": "Register asserted predicate ACTIVE_MOIETY_AMOUNT (and NUTRIENT_EQUIVALENT_AMOUNT) as a CALCULATED literal predicate whose subject is an IngredientComponent and ",
+  "request": "Register asserted predicate ACTIVE_MOIETY_AMOUNT (and NUTRIENT_EQUIVALENT_AMOUNT) as a CALCULATED literal predicate whose subject is an IngredientComponent and whose moiety identity is carried by a DE",
   "cq": "['CQ-PF-01', 'CQ-AX-25']",
   "kind": ""
  },
@@ -643,7 +643,7 @@
   "worker": "W04",
   "id": "W04-SR-05",
   "targetOwner": "W22",
-  "request": "ProductLabelRegion.aboutProduct (ABOUT_PRODUCT) should target ProductVariant or PackageConfiguration (labels belong to variants/packages), and a region that sho",
+  "request": "ProductLabelRegion.aboutProduct (ABOUT_PRODUCT) should target ProductVariant or PackageConfiguration (labels belong to variants/packages), and a region that shows a declaration should back that declar",
   "cq": "['CQ-PF-01', 'CQ-ID-03']",
   "kind": ""
  },
@@ -651,7 +651,7 @@
   "worker": "W04",
   "id": "W04-SR-06",
   "targetOwner": "W00",
-  "request": "HAS_SNAPSHOT carries two meanings (Source -> SourceSnapshot capture; Product/Organization/Listing -> *Snapshot state cache). Confirm the live state-cache use st",
+  "request": "HAS_SNAPSHOT carries two meanings (Source -> SourceSnapshot capture; Product/Organization/Listing -> *Snapshot state cache). Confirm the live state-cache use stays read-only under the same type name, ",
   "cq": "['CQ-TM-01']",
   "kind": ""
  },
@@ -659,7 +659,7 @@
   "worker": "W04",
   "id": "W04-SR-07",
   "targetOwner": "W01",
-  "request": "Name the asserted successors of live MANUFACTURES / CONTRACTS_MANUFACTURING (Organization -> Product) and decide their endpoint (Product, ProductVariant or Prod",
+  "request": "Name the asserted successors of live MANUFACTURES / CONTRACTS_MANUFACTURING (Organization -> Product) and decide their endpoint (Product, ProductVariant or ProductLot); retire PhysicalLocation.HOSTS_P",
   "cq": "['CQ-MF-01', 'CQ-PF-03']",
   "kind": ""
  },
@@ -667,7 +667,7 @@
   "worker": "W04",
   "id": "W04-SR-08",
   "targetOwner": "W08",
-  "request": "Dispose live Product.CLASSIFIED_AS -> union ProductClassification (ToolOrInstrument | Device). W04 exposes it read-only as two fields because no union owner exi",
+  "request": "Dispose live Product.CLASSIFIED_AS -> union ProductClassification (ToolOrInstrument | Device). W04 exposes it read-only as two fields because no union owner exists.",
   "cq": "['CQ-DX-01']",
   "kind": ""
  },
@@ -683,7 +683,7 @@
   "worker": "W04",
   "id": "W04-SR-10",
   "targetOwner": "W06, W16, W17, W18, W21, W22 (union owners)",
-  "request": "Where a live union lists Product and the use depends on dose or composition (TreatmentComponent, StepSubstance, ProtocolResultMention, SafetySubject), add Produ",
+  "request": "Where a live union lists Product and the use depends on dose or composition (TreatmentComponent, StepSubstance, ProtocolResultMention, SafetySubject), add ProductVariant (and, for steps, allow Formula",
   "cq": "['CQ-PR-03', 'CQ-ID-01']",
   "kind": ""
  },
@@ -699,7 +699,7 @@
   "worker": "W04",
   "id": "W04-SR-12",
   "targetOwner": "W00",
-  "request": "Baseline fixture elysium-basis.cypher writes Assertion.recordedAt = datetime() but its capture-fidelity Adjudication has a fixed reviewedAt 2026-10-04T00:00:00Z",
+  "request": "Baseline fixture elysium-basis.cypher writes Assertion.recordedAt = datetime() but its capture-fidelity Adjudication has a fixed reviewedAt 2026-10-04T00:00:00Z, so V-110 fails whenever the fixture is",
   "cq": "['CQ-TM-01']",
   "kind": ""
  },
@@ -707,7 +707,7 @@
   "worker": "W04",
   "id": "W04-SR-13",
   "targetOwner": "Fable",
-  "request": "Neo4j 5.26.31 Community returns a wrong result for `NOT any(x IN l WHERE x IN [..]) OR NOT any(x IN l WHERE x IN [..])` when both list predicates reuse one iter",
+  "request": "Neo4j 5.26.31 Community returns a wrong result for `NOT any(x IN l WHERE x IN [..]) OR NOT any(x IN l WHERE x IN [..])` when both list predicates reuse one iteration variable name: `WITH ['A','B'] AS ",
   "cq": "['all validators']",
   "kind": ""
  },
@@ -715,7 +715,7 @@
   "worker": "W05",
   "id": "W05-SR-01",
   "targetOwner": "W00",
-  "request": "Register uid tokens `exposure` (Exposure) and `lifestyle` (Lifestyle). Confirm the rule that a parent-label specialization uses its parent's token (FoodItem -> ",
+  "request": "Register uid tokens `exposure` (Exposure) and `lifestyle` (Lifestyle). Confirm the rule that a parent-label specialization uses its parent's token (FoodItem -> `material`, as LegalEntity -> `org`).",
   "cq": "['CQ-FL-C02', 'CQ-RC-05']",
   "kind": ""
  },
@@ -723,7 +723,7 @@
   "worker": "W05",
   "id": "W05-SR-02",
   "targetOwner": "W02",
-  "request": "Admit FoodItem as a parent-label specialization of IngredientMaterial (labels FoodItem, IngredientMaterial, Entity; catalog `FoodItem: {archetype: Entity, paren",
+  "request": "Admit FoodItem as a parent-label specialization of IngredientMaterial (labels FoodItem, IngredientMaterial, Entity; catalog `FoodItem: {archetype: Entity, parentLabel: IngredientMaterial}` in candidat",
   "cq": "['CQ-ST-01', 'CQ-ST-02', 'CQ-FL-C01', 'CQ-FL-C03']",
   "kind": ""
  },
@@ -731,7 +731,7 @@
   "worker": "W05",
   "id": "W05-SR-03",
   "targetOwner": "W02",
-  "request": "Allow DERIVED_FROM_TAXON from FoodItem (or from any IngredientMaterial) to BotanicalTaxon, so a reference food can name its taxon (FDC 170569: Bertholletia exce",
+  "request": "Allow DERIVED_FROM_TAXON from FoodItem (or from any IngredientMaterial) to BotanicalTaxon, so a reference food can name its taxon (FDC 170569: Bertholletia excelsa, NCBITaxon_3645).",
   "cq": "['CQ-FL-C01']",
   "kind": ""
  },
@@ -739,7 +739,7 @@
   "worker": "W05",
   "id": "W05-SR-04",
   "targetOwner": "W02",
-  "request": "W02's QuantitativeContentProperties (basis ContentBasis, comparator, contentStatementKind, unitCode) fits food composition with basis AMOUNT_PER_MASS_OF_MATERIA",
+  "request": "W02's QuantitativeContentProperties (basis ContentBasis, comparator, contentStatementKind, unitCode) fits food composition with basis AMOUNT_PER_MASS_OF_MATERIAL, contentStatementKind TYPICAL_COMPOSIT",
   "cq": "['CQ-FL-C01', 'CQ-EV-04', 'CQ-AX-04']",
   "kind": ""
  },
@@ -747,7 +747,7 @@
   "worker": "W05",
   "id": "W05-SR-05",
   "targetOwner": "W03",
-  "request": "(a) Extend the domain of derived AFFECTS_MECHANISM, ASSOCIATED_WITH_CONDITION and ASSOCIATED_WITH_OUTCOME to Lifestyle (live Lifestyle fields). (b) Route values",
+  "request": "(a) Extend the domain of derived AFFECTS_MECHANISM, ASSOCIATED_WITH_CONDITION and ASSOCIATED_WITH_OUTCOME to Lifestyle (live Lifestyle fields). (b) Route values: W05 owns enum ExposureRoute; Mechanism",
   "cq": "['CQ-MX-01', 'CQ-FL-C02', 'CQ-FL-C01']",
   "kind": ""
  },
@@ -755,7 +755,7 @@
   "worker": "W05",
   "id": "W05-SR-06",
   "targetOwner": "W09",
-  "request": "(a) Admit Protocol in InterventionDefinitionTarget (FOLLOWS_INTERVENTION_DEFINITION) for a named regimen whose edition content is unknown. (b) Refine V-221: a n",
+  "request": "(a) Admit Protocol in InterventionDefinitionTarget (FOLLOWS_INTERVENTION_DEFINITION) for a named regimen whose edition content is unknown. (b) Refine V-221: a non-placebo intervention that FOLLOWS_INT",
   "cq": "['CQ-ST-01', 'CQ-FL-C04']",
   "kind": ""
  },
@@ -763,7 +763,7 @@
   "worker": "W05",
   "id": "W05-SR-07",
   "targetOwner": "W03",
-  "request": "ExposureBasis has no value for an ambient physical level (temperature, light intensity, sound level). Decide whether to add AMBIENT_LEVEL or keep such intensiti",
+  "request": "ExposureBasis has no value for an ambient physical level (temperature, light intensity, sound level). Decide whether to add AMBIENT_LEVEL or keep such intensities as text.",
   "cq": "['CQ-FL-C02']",
   "kind": ""
  },
@@ -771,7 +771,7 @@
   "worker": "W05",
   "id": "W05-SR-08",
   "targetOwner": "W16",
-  "request": "StepSubstanceTarget: replace live FoodItem | FoodProduct with IngredientMaterial | ProductVariant (FoodItem resolves through IngredientMaterial). Remove Exposur",
+  "request": "StepSubstanceTarget: replace live FoodItem | FoodProduct with IngredientMaterial | ProductVariant (FoodItem resolves through IngredientMaterial). Remove Exposure from StepInstrumentTarget. Provide a s",
   "cq": "['CQ-PR-02', 'CQ-FL-C02', 'CQ-FL-C04']",
   "kind": ""
  },
@@ -795,7 +795,7 @@
   "worker": "W05",
   "id": "W05-SR-11",
   "targetOwner": "W21",
-  "request": "(a) Register candidate predicate SELF_REPORTED_PRACTICE (subject Lifestyle, asserter Person, speechAct REPORTS_PRACTICE) beside SELF_REPORTED_DAILY_INTAKE. (b) ",
+  "request": "(a) Register candidate predicate SELF_REPORTED_PRACTICE (subject Lifestyle, asserter Person, speechAct REPORTS_PRACTICE) beside SELF_REPORTED_DAILY_INTAKE. (b) RECOMMENDS range (successor of Recommend",
   "cq": "['CQ-RC-05', 'CQ-CL-02']",
   "kind": ""
  },
@@ -803,7 +803,7 @@
   "worker": "W05",
   "id": "W05-SR-12",
   "targetOwner": "W17",
-  "request": "SafetySubjectTarget: replace FoodItem | FoodProduct | Ingredient with IngredientMaterial | Product, keep Lifestyle, add Exposure. Own candidate predicate HAS_RE",
+  "request": "SafetySubjectTarget: replace FoodItem | FoodProduct | Ingredient with IngredientMaterial | Product, keep Lifestyle, add Exposure. Own candidate predicate HAS_REFERENCE_DOSE (subject Exposure, literal ",
   "cq": "['CQ-FL-C02', 'CQ-RC-06']",
   "kind": ""
  },
@@ -811,7 +811,7 @@
   "worker": "W05",
   "id": "W05-SR-13",
   "targetOwner": "W00",
-  "request": "AssertionSubjectTarget (and the object range) include Exposure and Lifestyle; register candidate predicate CHARACTERIZES_EXPOSURE_IN_POPULATION (literal populat",
+  "request": "AssertionSubjectTarget (and the object range) include Exposure and Lifestyle; register candidate predicate CHARACTERIZES_EXPOSURE_IN_POPULATION (literal population descriptor) or route it to W10 UseCo",
   "cq": "['CQ-FL-C02', 'CQ-RC-05']",
   "kind": ""
  },
@@ -835,7 +835,7 @@
   "worker": "W05",
   "id": "W05-SR-16",
   "targetOwner": "W04",
-  "request": "Confirm productKind CONVENTIONAL_FOOD for migrated FoodProducts; accept FoodItem nodes as USES_MATERIAL targets and as CONTAINS targets; the migrated legacy HAS",
+  "request": "Confirm productKind CONVENTIONAL_FOOD for migrated FoodProducts; accept FoodItem nodes as USES_MATERIAL targets and as CONTAINS targets; the migrated legacy HAS_INGREDIENT dose is reviewed into Packag",
   "cq": "['CQ-FL-C03', 'CQ-ST-02']",
   "kind": ""
  },
@@ -843,7 +843,7 @@
   "worker": "W05",
   "id": "W05-SR-17",
   "targetOwner": "W22",
-  "request": "MediaSubject successor (and W10/W20/W21 EvidenceSubject, ClaimSubject successors, W03 AssociationParticipant, W18 EventSubject, W16 ProtocolResultMention): drop",
+  "request": "MediaSubject successor (and W10/W20/W21 EvidenceSubject, ClaimSubject successors, W03 AssociationParticipant, W18 EventSubject, W16 ProtocolResultMention): drop FoodProduct and Ingredient; keep Exposu",
   "cq": "['CQ-FL-C03']",
   "kind": ""
  },
@@ -851,7 +851,7 @@
   "worker": "W05",
   "id": "W05-SR-18",
   "targetOwner": "W10",
-  "request": "For the EXPOSURE applicability dimension, allow an ApplicabilityDimension to cite the Exposure characterizations it compared (evidence-side and target-side) and",
+  "request": "For the EXPOSURE applicability dimension, allow an ApplicabilityDimension to cite the Exposure characterizations it compared (evidence-side and target-side) and record per-unit composition calculation",
   "cq": "['CQ-EV-04', 'CQ-FL-C02']",
   "kind": ""
  },
@@ -859,7 +859,7 @@
   "worker": "W06",
   "id": "W06-SR-01",
   "targetOwner": "Fable (ownership registry)",
-  "request": "Add to the W06 row: enums TreatmentComponentRole, TreatmentIntentKind, TreatmentIntentBasis; relationship-property type TreatmentTargetProperties (successor of ",
+  "request": "Add to the W06 row: enums TreatmentComponentRole, TreatmentIntentKind, TreatmentIntentBasis; relationship-property type TreatmentTargetProperties (successor of live TreatmentTargetMetadata, used only ",
   "cq": "['CQ-ST-01', 'CQ-IV-C01', 'CQ-IV-C02', 'CQ-IV-C04']",
   "kind": ""
  },
@@ -875,7 +875,7 @@
   "worker": "W06",
   "id": "W06-SR-03",
   "targetOwner": "W09",
-  "request": "Promote the candidate FOLLOWS_INTERVENTION_DEFINITION (StudyIntervention.definitions -> InterventionDefinitionTarget incl. Treatment and Procedure, AssertedEdge",
+  "request": "Promote the candidate FOLLOWS_INTERVENTION_DEFINITION (StudyIntervention.definitions -> InterventionDefinitionTarget incl. Treatment and Procedure, AssertedEdgeProperties); W06 adopts it and declares ",
   "cq": "['CQ-ST-01', 'CQ-IV-C01', 'CQ-IV-C03']",
   "kind": ""
  },
@@ -883,7 +883,7 @@
   "worker": "W06",
   "id": "W06-SR-04",
   "targetOwner": "W16",
-  "request": "Extend the ProtocolStep EMPLOYS range (StepInstrumentTarget, live StepInstrument = Device | LabTest | Exposure) to include Procedure, so a public protocol step ",
+  "request": "Extend the ProtocolStep EMPLOYS range (StepInstrumentTarget, live StepInstrument = Device | LabTest | Exposure) to include Procedure, so a public protocol step can employ a procedure definition; the s",
   "cq": "['CQ-IV-C02', 'CQ-PR-02']",
   "kind": ""
  },
@@ -891,7 +891,7 @@
   "worker": "W06",
   "id": "W06-SR-05",
   "targetOwner": "W13",
-  "request": "(a) Confirm that Treatment is NOT added to STATUS_OF / DESIGNATION_FOR / APPROVAL_FOR ranges (concepts reach regulatory states only through their Products). (b)",
+  "request": "(a) Confirm that Treatment is NOT added to STATUS_OF / DESIGNATION_FOR / APPROVAL_FOR ranges (concepts reach regulatory states only through their Products). (b) RegulatoryStatusKind cannot express 'wi",
   "cq": "['CQ-MF-02', 'CQ-AX-23']",
   "kind": ""
  },
@@ -899,7 +899,7 @@
   "worker": "W06",
   "id": "W06-SR-06",
   "targetOwner": "W01",
-  "request": "Register asserted predicates DEVELOPS_TREATMENT, OFFERS_TREATMENT, OFFERS_PROCEDURE under organizations.assertedPredicates (relationship types remain W06's beca",
+  "request": "Register asserted predicates DEVELOPS_TREATMENT, OFFERS_TREATMENT, OFFERS_PROCEDURE under organizations.assertedPredicates (relationship types remain W06's because their range and meaning are W06 iden",
   "cq": "['CQ-IV-C02', 'CQ-IV-C04', 'CQ-EC-01']",
   "kind": ""
  },
@@ -907,7 +907,7 @@
   "worker": "W06",
   "id": "W06-SR-07",
   "targetOwner": "W05",
-  "request": "Confirm the FoodProduct disposition used by W06: live FoodProduct members of TreatmentComponentTarget re-point to the W04 Product W05 creates (productKind CONVE",
+  "request": "Confirm the FoodProduct disposition used by W06: live FoodProduct members of TreatmentComponentTarget re-point to the W04 Product W05 creates (productKind CONVENTIONAL_FOOD); Lifestyle stays a member ",
   "cq": "['CQ-IV-C03']",
   "kind": ""
  },
@@ -915,7 +915,7 @@
   "worker": "W06",
   "id": "W06-SR-08",
   "targetOwner": "W15",
-  "request": "Keep LISTS_PROCEDURE (MerchantListing -> Procedure, asserted) with ListingEdgeProperties; note that procedure session bundles ('3 Sessions: Therapeutic Plasma E",
+  "request": "Keep LISTS_PROCEDURE (MerchantListing -> Procedure, asserted) with ListingEdgeProperties; note that procedure session bundles ('3 Sessions: Therapeutic Plasma Exchange Bundle $24,000') do not fit Bund",
   "cq": "['CQ-IV-C02', 'CQ-CM-02']",
   "kind": ""
  },
@@ -931,7 +931,7 @@
   "worker": "W06",
   "id": "W06-SR-10",
   "targetOwner": "W10",
-  "request": "Live TreatmentTargetMetadata.evidenceStrength migrates to TreatmentTargetProperties.legacyEvidenceStrengthHint (hint, INV-209). If an assessment is wanted, ASSE",
+  "request": "Live TreatmentTargetMetadata.evidenceStrength migrates to TreatmentTargetProperties.legacyEvidenceStrengthHint (hint, INV-209). If an assessment is wanted, ASSESSES_STRENGTH_OF must accept an Assertio",
   "cq": "['CQ-EV-04', 'CQ-AX-24']",
   "kind": ""
  },
@@ -939,7 +939,7 @@
   "worker": "W06",
   "id": "W06-SR-11",
   "targetOwner": "W03",
-  "request": "Optionally keep Condition.treatedBy as a read-only inverse of TARGETS_CONDITION (properties TreatmentTargetProperties); TARGETS_CONDITION range stays Condition ",
+  "request": "Optionally keep Condition.treatedBy as a read-only inverse of TARGETS_CONDITION (properties TreatmentTargetProperties); TARGETS_CONDITION range stays Condition only (no Outcome).",
   "cq": "['CQ-IV-C04']",
   "kind": ""
  },
@@ -947,7 +947,7 @@
   "worker": "W06",
   "id": "W06-SR-12",
   "targetOwner": "W00",
-  "request": "Register asserted predicates TARGETS_CONDITION, USES_COMPONENT (relationship names; FOLLOWS_INTERVENTION_DEFINITION is W09's) and candidate literal predicates D",
+  "request": "Register asserted predicates TARGETS_CONDITION, USES_COMPONENT (relationship names; FOLLOWS_INTERVENTION_DEFINITION is W09's) and candidate literal predicates DECLARES_DEVELOPMENT_STAGE (valueString +",
   "cq": "['CQ-MF-02', 'CQ-IV-C02', 'CQ-IV-C03']",
   "kind": ""
  },
@@ -955,7 +955,7 @@
   "worker": "W06",
   "id": "W06-SR-13",
   "targetOwner": "W02 (with W03)",
-  "request": "Informational scope candidate: no material identity exists for cell- and gene-therapy actives (autologous CRISPR-edited CD34+ cells; AAVrh74 vector). No current",
+  "request": "Informational scope candidate: no material identity exists for cell- and gene-therapy actives (autologous CRISPR-edited CD34+ cells; AAVrh74 vector). No current CQ fails; a dedicated round is needed b",
   "cq": "",
   "kind": ""
  },
@@ -963,7 +963,7 @@
   "worker": "W06",
   "id": "W06-SR-14",
   "targetOwner": "W21 / W23",
-  "request": "Recommendable union (live line 1070) includes Treatment and Procedure: under INV-508 no timeless recommendation edge; a practice offerer's benefit wording ('rem",
+  "request": "Recommendable union (live line 1070) includes Treatment and Procedure: under INV-508 no timeless recommendation edge; a practice offerer's benefit wording ('remove particles that are known contributor",
   "cq": "['CQ-RC-05', 'CQ-AX-26']",
   "kind": ""
  },
@@ -979,7 +979,7 @@
   "worker": "W07",
   "id": "W07-SR-02",
   "targetOwner": "W16",
-  "request": "Observation implements Entity & InformationArtifactArchetype & DiagnosticResult with @node(labels: [\"Observation\", \"DiagnosticResult\", \"InformationArtifact\"]) a",
+  "request": "Observation implements Entity & InformationArtifactArchetype & DiagnosticResult with @node(labels: [\"Observation\", \"DiagnosticResult\", \"InformationArtifact\"]) and the three @relationship fields named ",
   "cq": "['CQ-DX-02', 'CQ-DX-03', 'CQ-DX-08']",
   "kind": ""
  },
@@ -987,7 +987,7 @@
   "worker": "W07",
   "id": "W07-SR-03",
   "targetOwner": "W00",
-  "request": "Register enum ResultQualifier (catalog private_context.resultQualifier values) as a W07-owned shared enum used by DiagnosticResult.valueStatus; consider adding ",
+  "request": "Register enum ResultQualifier (catalog private_context.resultQualifier values) as a W07-owned shared enum used by DiagnosticResult.valueStatus; consider adding NOT_REPORTED for source-attributed publi",
   "cq": "['CQ-DX-02', 'CQ-DX-08']",
   "kind": ""
  },
@@ -995,7 +995,7 @@
   "worker": "W07",
   "id": "W07-SR-04",
   "targetOwner": "W16",
-  "request": "Confirm Observation.measuresMetrics (MEASURES_METRIC) uses StructuralEdgeProperties (payload of the result), not MeasurementEdgeProperties (asserted). Optionall",
+  "request": "Confirm Observation.measuresMetrics (MEASURES_METRIC) uses StructuralEdgeProperties (payload of the result), not MeasurementEdgeProperties (asserted). Optionally add measuresMetric to the DiagnosticRe",
   "cq": "['CQ-DX-01', 'CQ-DX-02']",
   "kind": ""
  },
@@ -1003,7 +1003,7 @@
   "worker": "W07",
   "id": "W07-SR-05",
   "targetOwner": "W16",
-  "request": "FOR_METRIC is one structural relationship type owned by W07 (catalog: ReferenceIntervalVersion -> Metric); W16's Target.forMetric reuses the same type and meani",
+  "request": "FOR_METRIC is one structural relationship type owned by W07 (catalog: ReferenceIntervalVersion -> Metric); W16's Target.forMetric reuses the same type and meaning ('is defined for metric'), with Struc",
   "cq": "['CQ-DX-06', 'CQ-PR-03']",
   "kind": ""
  },
@@ -1019,7 +1019,7 @@
   "worker": "W07",
   "id": "W07-SR-07",
   "targetOwner": "W03",
-  "request": "Rule the class and property type of Biomarker IN_PATHWAY, EXPRESSED_IN (to Organ), EXPRESSED_IN_CONTEXT and INDICATES (to Condition). W07 wrote IN_PATHWAY/EXPRE",
+  "request": "Rule the class and property type of Biomarker IN_PATHWAY, EXPRESSED_IN (to Organ), EXPRESSED_IN_CONTEXT and INDICATES (to Condition). W07 wrote IN_PATHWAY/EXPRESSED_IN*/ENCODES/REFLECTS_MECHANISM with",
   "cq": "['CQ-MX-02', 'CQ-ST-03']",
   "kind": ""
  },
@@ -1027,7 +1027,7 @@
   "worker": "W07",
   "id": "W07-SR-08",
   "targetOwner": "W08",
-  "request": "Confirm RUNS_ON_PLATFORM (MeasurementMethod -> TechnologyPlatform) is structural with StructuralEdgeProperties, and that MEASURES_METRIC on Device/Sensor uses W",
+  "request": "Confirm RUNS_ON_PLATFORM (MeasurementMethod -> TechnologyPlatform) is structural with StructuralEdgeProperties, and that MEASURES_METRIC on Device/Sensor uses W07's MeasurementEdgeProperties.",
   "cq": "['CQ-DX-01', 'CQ-DX-09']",
   "kind": ""
  },
@@ -1043,7 +1043,7 @@
   "worker": "W07",
   "id": "W07-SR-10",
   "targetOwner": "W00",
-  "request": "Mark COMPARED_TO ruleOnly: true for the INV-301 same-version clause (derivationRule 'INV-301 same AssayVersion' or 'INV-301 same AlgorithmVersion'); cross-versi",
+  "request": "Mark COMPARED_TO ruleOnly: true for the INV-301 same-version clause (derivationRule 'INV-301 same AssayVersion' or 'INV-301 same AlgorithmVersion'); cross-version COMPARED_TO still requires derivedFro",
   "cq": "['CQ-DX-03']",
   "kind": ""
  },
@@ -1051,7 +1051,7 @@
   "worker": "W07",
   "id": "W07-SR-11",
   "targetOwner": "W00",
-  "request": "Add proposed validators V-302r, V-304r (well-formed current licence), V-305c (INV-302 exactly one AssayVersion), V-314..V-318; record that INV-302 is checked by",
+  "request": "Add proposed validators V-302r, V-304r (well-formed current licence), V-305c (INV-302 exactly one AssayVersion), V-314..V-318; record that INV-302 is checked by V-305b/V-305c/V-306, not V-302.",
   "cq": "['CQ-DX-03', 'CQ-DX-05', 'CQ-DX-06', 'CQ-DX-07', 'CQ-DX-C01'",
   "kind": ""
  },
@@ -1059,7 +1059,7 @@
   "worker": "W07",
   "id": "W07-SR-12",
   "targetOwner": "W00",
-  "request": "Register uid tokens panel-definition (PanelDefinition) and reference-range (ReferenceRange); register label-keyed entries for the W07 primary labels using the e",
+  "request": "Register uid tokens panel-definition (PanelDefinition) and reference-range (ReferenceRange); register label-keyed entries for the W07 primary labels using the existing fixture tokens (Biomarker: bioma",
   "cq": "['CQ-DX-03']",
   "kind": ""
  },
@@ -1091,7 +1091,7 @@
   "worker": "W07",
   "id": "W07-SR-16",
   "targetOwner": "W12",
-  "request": "Include AssayVersion (and the performing Organization) in CertificationCoverageTarget so NGSP certification is a time-bounded CertificationListing on the assay ",
+  "request": "Include AssayVersion (and the performing Organization) in CertificationCoverageTarget so NGSP certification is a time-bounded CertificationListing on the assay version.",
   "cq": "['CQ-DX-03']",
   "kind": ""
  },
@@ -1099,7 +1099,7 @@
   "worker": "W07",
   "id": "W07-SR-17",
   "targetOwner": "W13",
-  "request": "Allow RegulatoryStatus to scope to an AlgorithmVersion when the regulatory record names a build; otherwise scope to the device and link the version by Resolutio",
+  "request": "Allow RegulatoryStatus to scope to an AlgorithmVersion when the regulatory record names a build; otherwise scope to the device and link the version by ResolutionHypothesis.",
   "cq": "['CQ-DX-04', 'CQ-MF-02']",
   "kind": ""
  },
@@ -1107,7 +1107,7 @@
   "worker": "W07",
   "id": "W07-SR-18",
   "targetOwner": "W01",
-  "request": "ASSAY_OPERATED_BY targets Organization (the performing laboratory legal/organizational identity); a performing site (Mayo 'Rochester Main Campus', Labcorp site ",
+  "request": "ASSAY_OPERATED_BY targets Organization (the performing laboratory legal/organizational identity); a performing site (Mayo 'Rochester Main Campus', Labcorp site '01 Burlington NC') is a W01 Facility re",
   "cq": "['CQ-DX-01']",
   "kind": ""
  },
@@ -1115,7 +1115,7 @@
   "worker": "W08",
   "id": "W08-SR-01",
   "targetOwner": "W07",
-  "request": "Widen RUNS_ON_INSTRUMENT range from ToolOrInstrument to union EquipmentModelTarget (ToolOrInstrument | Device; defined by W08 as the B6 rename of live ProductCl",
+  "request": "Widen RUNS_ON_INSTRUMENT range from ToolOrInstrument to union EquipmentModelTarget (ToolOrInstrument | Device; defined by W08 as the B6 rename of live ProductClassification), and widen PERFORMED_WITH_",
   "cq": "['CQ-DX-01', 'CQ-DX-03', 'CQ-DX-09']",
   "kind": ""
  },
@@ -1123,7 +1123,7 @@
   "worker": "W08",
   "id": "W08-SR-02",
   "targetOwner": "W07",
-  "request": "MEASURES_METRIC from Device stays asserted with MeasurementEdgeProperties (as W07 already states). Remove Sensor from the MeasurementEdgeProperties description:",
+  "request": "MEASURES_METRIC from Device stays asserted with MeasurementEdgeProperties (as W07 already states). Remove Sensor from the MeasurementEdgeProperties description: Sensor MEASURES_METRIC is retired (a se",
   "cq": "['CQ-DX-02']",
   "kind": ""
  },
@@ -1131,7 +1131,7 @@
   "worker": "W08",
   "id": "W08-SR-03",
   "targetOwner": "W04",
-  "request": "Answer to W04-SR-08: add Product.embodiesModels: [EquipmentModelTarget!]! @relationship(type: \"EMBODIES_MODEL\", direction: OUT, properties: \"AssertedEdgePropert",
+  "request": "Answer to W04-SR-08: add Product.embodiesModels: [EquipmentModelTarget!]! @relationship(type: \"EMBODIES_MODEL\", direction: OUT, properties: \"AssertedEdgeProperties\") (asserted, candidate) as the succe",
   "cq": "['CQ-DX-C02', 'CQ-MF-02']",
   "kind": ""
  },
@@ -1139,7 +1139,7 @@
   "worker": "W08",
   "id": "W08-SR-04",
   "targetOwner": "W04",
-  "request": "Add candidate Product.runsOnDevices: [Device!]! @relationship(type: \"RUNS_ON_DEVICE\", direction: OUT, properties: \"AssertedEdgeProperties\") for software product",
+  "request": "Add candidate Product.runsOnDevices: [Device!]! @relationship(type: \"RUNS_ON_DEVICE\", direction: OUT, properties: \"AssertedEdgeProperties\") for software products (apps, SaMD features) that run on a de",
   "cq": "['CQ-DX-C02', 'CQ-MF-02', 'CQ-MF-03']",
   "kind": ""
  },
@@ -1147,7 +1147,7 @@
   "worker": "W08",
   "id": "W08-SR-05",
   "targetOwner": "W07",
-  "request": "If FirmwareVersion (W08 CANDIDATE) is admitted, add AssayVersion.runsFirmwareVersion: [FirmwareVersion!]! @relationship(type: \"RUNS_FIRMWARE_VERSION\", direction",
+  "request": "If FirmwareVersion (W08 CANDIDATE) is admitted, add AssayVersion.runsFirmwareVersion: [FirmwareVersion!]! @relationship(type: \"RUNS_FIRMWARE_VERSION\", direction: OUT, properties: \"StructuralEdgeProper",
   "cq": "['CQ-DX-09', 'CQ-DX-C01']",
   "kind": ""
  },
@@ -1155,7 +1155,7 @@
   "worker": "W08",
   "id": "W08-SR-06",
   "targetOwner": "W00",
-  "request": "Register uid tokens device (Device), technology-platform (TechnologyPlatform; 'platform' is left for W21 Platform), sensor (Sensor), modality (Modality), firmwa",
+  "request": "Register uid tokens device (Device), technology-platform (TechnologyPlatform; 'platform' is left for W21 Platform), sensor (Sensor), modality (Modality), firmware-version (FirmwareVersion). Register p",
   "cq": "['CQ-DX-09', 'CQ-DX-C01', 'CQ-MF-03']",
   "kind": ""
  },
@@ -1163,7 +1163,7 @@
   "worker": "W08",
   "id": "W08-SR-07",
   "targetOwner": "W01",
-  "request": "Organization OUT fields: developsPlatforms (DEVELOPS_PLATFORM, AssertedEdgeProperties), usesPlatforms (USES_PLATFORM, UsageEdgeProperties), usesEquipment (USES_",
+  "request": "Organization OUT fields: developsPlatforms (DEVELOPS_PLATFORM, AssertedEdgeProperties), usesPlatforms (USES_PLATFORM, UsageEdgeProperties), usesEquipment (USES_EQUIPMENT, UsageEdgeProperties). Live us",
   "cq": "['CQ-MF-04', 'CQ-DX-C03']",
   "kind": ""
  },
@@ -1171,7 +1171,7 @@
   "worker": "W08",
   "id": "W08-SR-08",
   "targetOwner": "Fable (registry)",
-  "request": "Register W08 as sole writer of union EquipmentModelTarget (rename of live ProductClassification) and of candidate relationship types FIRMWARE_VERSION_OF, RUNS_F",
+  "request": "Register W08 as sole writer of union EquipmentModelTarget (rename of live ProductClassification) and of candidate relationship types FIRMWARE_VERSION_OF, RUNS_FIRMWARE_VERSION, EMBODIES_MODEL, RUNS_ON",
   "cq": "['CQ-DX-01', 'CQ-DX-09', 'CQ-DX-C01', 'CQ-DX-C02', 'CQ-DX-C0",
   "kind": ""
  },
@@ -1179,7 +1179,7 @@
   "worker": "W08",
   "id": "W08-SR-09",
   "targetOwner": "W13",
-  "request": "Keep Device, ToolOrInstrument, TechnologyPlatform, Sensor, Modality and FirmwareVersion out of RegulatorySubjectTarget (as W13's fragment already does) and adop",
+  "request": "Keep Device, ToolOrInstrument, TechnologyPlatform, Sensor, Modality and FirmwareVersion out of RegulatorySubjectTarget (as W13's fragment already does) and adopt V-W08-03. Decide whether a version-sco",
   "cq": "['CQ-MF-02', 'CQ-DX-C02']",
   "kind": ""
  },
@@ -1187,7 +1187,7 @@
   "worker": "W08",
   "id": "W08-SR-10",
   "targetOwner": "W21",
-  "request": "Allow QUALIFIED_BY (QualificationProperties) on generic Assertions, so performance-claim qualifiers (heart-rate range, 'classifiable recordings only', populatio",
+  "request": "Allow QUALIFIED_BY (QualificationProperties) on generic Assertions, so performance-claim qualifiers (heart-rate range, 'classifiable recordings only', population) are structured instead of description",
   "cq": "['CQ-MF-03']",
   "kind": ""
  },
@@ -1195,7 +1195,7 @@
   "worker": "W08",
   "id": "W08-SR-11",
   "targetOwner": "W16",
-  "request": "Confirm StepInstrumentTarget members Device and ToolOrInstrument are model-level references (a step never references a unit), and that a step employing a device",
+  "request": "Confirm StepInstrumentTarget members Device and ToolOrInstrument are model-level references (a step never references a unit), and that a step employing a device without a stated firmware/assay version",
   "cq": "['CQ-PR-02', 'CQ-PR-03']",
   "kind": ""
  },
@@ -1203,7 +1203,7 @@
   "worker": "W08",
   "id": "W08-SR-12",
   "targetOwner": "W07",
-  "request": "Optional: record an instrument operating mode as AssayVersion configuration text (e.g. 'NextSeq 550Dx in Research Mode'), so that the Dx and research uses of on",
+  "request": "Optional: record an instrument operating mode as AssayVersion configuration text (e.g. 'NextSeq 550Dx in Research Mode'), so that the Dx and research uses of one hardware model are two AssayVersions o",
   "cq": "['CQ-DX-01', 'CQ-DX-03']",
   "kind": ""
  },
@@ -1211,7 +1211,7 @@
   "worker": "W08",
   "id": "W08-SR-13",
   "targetOwner": "W11",
-  "request": "Confirm USES_EQUIPMENT and USES_PLATFORM from ManufacturingStep are asserted with UsageEdgeProperties (W11's fragment already does) and that a step's equipment ",
+  "request": "Confirm USES_EQUIPMENT and USES_PLATFORM from ManufacturingStep are asserted with UsageEdgeProperties (W11's fragment already does) and that a step's equipment statement never creates a ManufacturingC",
   "cq": "['CQ-MF-04']",
   "kind": ""
  },
@@ -1219,7 +1219,7 @@
   "worker": "W09",
   "id": "W09-SR-01",
   "targetOwner": "Fable (registry)",
-  "request": "Register under W09 the enums ArmType, ArmRole, AeSeriousness, RelatednessAssessor, DatasetAccessLevel, StudyPopulationKind, AnalysisSetKind, StudyResultKind, Es",
+  "request": "Register under W09 the enums ArmType, ArmRole, AeSeriousness, RelatednessAssessor, DatasetAccessLevel, StudyPopulationKind, AnalysisSetKind, StudyResultKind, EstimateQualifier, StudyKind and the CANDI",
   "cq": "['CQ-ST-01', 'CQ-ST-05', 'CQ-ST-06', 'CQ-ST-07', 'CQ-EV-03',",
   "kind": ""
  },
@@ -1227,7 +1227,7 @@
   "worker": "W09",
   "id": "W09-SR-02",
   "targetOwner": "Fable (registry) / W00",
-  "request": "Register PublicationRevisionProperties (AssertedEdgeProperties + sourceRevisionEventUid!) and LegacyInterventionArmProperties (read-only legacy stored names of ",
+  "request": "Register PublicationRevisionProperties (AssertedEdgeProperties + sourceRevisionEventUid!) and LegacyInterventionArmProperties (read-only legacy stored names of InterventionArmMetadata) as W09 relation",
   "cq": "['CQ-EV-05', 'INV-201']",
   "kind": ""
  },
@@ -1235,7 +1235,7 @@
   "worker": "W09",
   "id": "W09-SR-03",
   "targetOwner": "W00",
-  "request": "Extend SUPPORTED_BY domain (and SupportedRecordTarget) to StudyResult (covers AdverseEventResult by parent label), RegistrationVersion and ProtocolVersion: capt",
+  "request": "Extend SUPPORTED_BY domain (and SupportedRecordTarget) to StudyResult (covers AdverseEventResult by parent label), RegistrationVersion and ProtocolVersion: captured study records need their own locato",
   "cq": "['CQ-ST-05', 'CQ-ST-06', 'CQ-ST-08', 'INV-002']",
   "kind": ""
  },
@@ -1243,7 +1243,7 @@
   "worker": "W09",
   "id": "W09-SR-04",
   "targetOwner": "W00",
-  "request": "Register uid tokens: protocol-version (ProtocolVersion), study-population (StudyPopulation), outcome-definition (OutcomeDefinition; 'outcome' stays W03's), adve",
+  "request": "Register uid tokens: protocol-version (ProtocolVersion), study-population (StudyPopulation), outcome-definition (OutcomeDefinition; 'outcome' stays W03's), adverse-event-result (AdverseEventResult); a",
   "cq": "['INV-106']",
   "kind": ""
  },
@@ -1251,7 +1251,7 @@
   "worker": "W09",
   "id": "W09-SR-05",
   "targetOwner": "W01",
-  "request": "(a) Register an investigator-role predicate Person -> Study (e.g. HOLDS_STUDY_ROLE {roleType: PRINCIPAL_INVESTIGATOR}) as the input of derived INVESTIGATED_BY; ",
+  "request": "(a) Register an investigator-role predicate Person -> Study (e.g. HOLDS_STUDY_ROLE {roleType: PRINCIPAL_INVESTIGATOR}) as the input of derived INVESTIGATED_BY; (b) register COLLABORATES_ON_STUDY (regi",
   "cq": "['CQ-AX-05', 'CQ-ST-01']",
   "kind": ""
  },
@@ -1259,7 +1259,7 @@
   "worker": "W09",
   "id": "W09-SR-06",
   "targetOwner": "W04 (with W02)",
-  "request": "Own a shared DosageForm enum used by ProductVariant and StudyIntervention (incl. WHOLE_FOOD, FOOD_FRACTION, BEVERAGE, SOFTGEL, CAPSULE, DEVICE_SESSION, OTHER). ",
+  "request": "Own a shared DosageForm enum used by ProductVariant and StudyIntervention (incl. WHOLE_FOOD, FOOD_FRACTION, BEVERAGE, SOFTGEL, CAPSULE, DEVICE_SESSION, OTHER). AdministrationRoute (ORAL, TRANSCRANIAL,",
   "cq": "['CQ-ST-01', 'CQ-EV-04']",
   "kind": ""
  },
@@ -1267,7 +1267,7 @@
   "worker": "W09",
   "id": "W09-SR-07",
   "targetOwner": "W02 (with W05)",
-  "request": "Confirm that a food or food fraction administered in a study (whole walnut kernels 85 g, separated skins 5.6 g, de-fatted nutmeat 34 g, walnut oil 51 g, pomegra",
+  "request": "Confirm that a food or food fraction administered in a study (whole walnut kernels 85 g, separated skins 5.6 g, de-fatted nutmeat 34 g, walnut oil 51 g, pomegranate juice) is an IngredientMaterial (ma",
   "cq": "['CQ-ST-01', 'CQ-ST-02']",
   "kind": ""
  },
@@ -1275,7 +1275,7 @@
   "worker": "W09",
   "id": "W09-SR-08",
   "targetOwner": "W08",
-  "request": "Accept Device as the range of the CANDIDATE relationship USES_INTERVENTION_DEVICE; decide whether the target is a device model (MedX 1116 Rehab Console) or a un",
+  "request": "Accept Device as the range of the CANDIDATE relationship USES_INTERVENTION_DEVICE; decide whether the target is a device model (MedX 1116 Rehab Console) or a unit (DeviceModel candidate), and where de",
   "cq": "['CQ-ST-C01']",
   "kind": ""
  },
@@ -1283,7 +1283,7 @@
   "worker": "W09",
   "id": "W09-SR-09",
   "targetOwner": "W06, W16, W05, W02",
-  "request": "(a) Keep Procedure, Treatment (W06), ProtocolEdition and Protocol (W16), Lifestyle (W05) as node types so InterventionDefinitionTarget resolves; (b) W06 makes T",
+  "request": "(a) Keep Procedure, Treatment (W06), ProtocolEdition and Protocol (W16), Lifestyle (W05) as node types so InterventionDefinitionTarget resolves; (b) W06 makes Treatment.evaluatedInStudies read-only (@",
   "cq": "['CQ-ST-C02', 'INV-201']",
   "kind": ""
  },
@@ -1299,7 +1299,7 @@
   "worker": "W09",
   "id": "W09-SR-11",
   "targetOwner": "W10",
-  "request": "(a) INCLUDES_RESULT/BASED_ON_EVIDENCE/INTERPRETS_RESULT_OF target StudyResult (AdverseEventResult included by label); (b) adopt V-215r (INV-206 complete); (c) H",
+  "request": "(a) INCLUDES_RESULT/BASED_ON_EVIDENCE/INTERPRETS_RESULT_OF target StudyResult (AdverseEventResult included by label); (b) adopt V-215r (INV-206 complete); (c) HAS_EVIDENCE_TARGET -> StudyIntervention ",
   "cq": "['CQ-ST-05', 'CQ-EV-04', 'CQ-ST-09']",
   "kind": ""
  },
@@ -1307,7 +1307,7 @@
   "worker": "W09",
   "id": "W09-SR-12",
   "targetOwner": "W00",
-  "request": "Define where an asserted edge's qualifiers (ANALYZES_DATASET.analysisRole, USES_INTERVENTION_MATERIAL.asReportedName, RESULT_FOR_ARM.armRole when asserted) are ",
+  "request": "Define where an asserted edge's qualifiers (ANALYZES_DATASET.analysisRole, USES_INTERVENTION_MATERIAL.asReportedName, RESULT_FOR_ARM.armRole when asserted) are carried on the authorizing Assertion.",
   "cq": "['INV-003', 'INV-503']",
   "kind": ""
  },
@@ -1315,7 +1315,7 @@
   "worker": "W09",
   "id": "W09-SR-13",
   "targetOwner": "W00 / Fable",
-  "request": "Relationship type EVALUATES has two meanings: Adjudication -> Assertion (W00) and legacy Study -> intervention (W09). Rename the legacy stored type to LEGACY_EV",
+  "request": "Relationship type EVALUATES has two meanings: Adjudication -> Assertion (W00) and legacy Study -> intervention (W09). Rename the legacy stored type to LEGACY_EVALUATES by migration, keeping the GraphQ",
   "cq": "['INV-201', 'CL-017']",
   "kind": ""
  },
@@ -1331,7 +1331,7 @@
   "worker": "W09",
   "id": "W09-SR-15",
   "targetOwner": "W13",
-  "request": "Model the sponsor's registry phrase 'FDA-approved as a nonsignificant risk' as a characterization (CHARACTERIZES_REGULATORY_STATUS, PROPOSED until adjudicated, ",
+  "request": "Model the sponsor's registry phrase 'FDA-approved as a nonsignificant risk' as a characterization (CHARACTERIZES_REGULATORY_STATUS, PROPOSED until adjudicated, V-335) and decide whether an IDE nonsign",
   "cq": "['CQ-AX-06', 'INV-010']",
   "kind": ""
  },
@@ -1339,7 +1339,7 @@
   "worker": "W09",
   "id": "W09-SR-16",
   "targetOwner": "W00 (predicate registry)",
-  "request": "Register candidate asserted predicates CITES_AS_REFERENCE (publication -> literal citation; used for SOURCE_CORRECTION) and EVALUATES_RISK_FACTOR (migration tar",
+  "request": "Register candidate asserted predicates CITES_AS_REFERENCE (publication -> literal citation; used for SOURCE_CORRECTION) and EVALUATES_RISK_FACTOR (migration target of the retired live edge); list RESU",
   "cq": "['CQ-EV-05', 'CQ-ST-08']",
   "kind": ""
  },
@@ -1363,7 +1363,7 @@
   "worker": "W09",
   "id": "W09-CR-02",
   "targetOwner": "W00 / Fable",
-  "request": "Replace V-221 with V-221r: null armType is checked; SHAM_COMPARATOR and NO_INTERVENTION exempt; bases required only when quantityStatus is REPORTED; device comp",
+  "request": "Replace V-221 with V-221r: null armType is checked; SHAM_COMPARATOR and NO_INTERVENTION exempt; bases required only when quantityStatus is REPORTED; device components need quantityStatus NOT_APPLICABL",
   "cq": "['CQ-ST-01', 'CQ-ST-C01', 'CQ-ST-C02']",
   "kind": ""
  },
@@ -1384,10 +1384,98 @@
   "kind": ""
  },
  {
+  "worker": "W10",
+  "id": "W10-SR-01",
+  "targetOwner": "W00",
+  "request": "Register primary-label uid tokens in conventions.uidTypeTokens: UseContextProfile: use-profile, EndpointClassification: endpoint-classification, EvidenceSynthesis: synthesis (today registered only as ",
+  "cq": "['CQ-EV-02', 'CQ-ST-10', 'CQ-AX-24']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-02",
+  "targetOwner": "W21",
+  "request": "ClaimEvidenceAssessment follows the W10 method contract (04-model-cards.md, D-W10-12): uses ASSESSES_CLAIM_EVIDENCE / CLAIM_EVIDENCE_BASED_ON only (ASSESSES_CLAIM is EvidenceSynthesis's), evidenceStre",
+  "cq": "['CQ-AX-24', 'CQ-EV-03']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-03",
+  "targetOwner": "Fable (registry)",
+  "request": "Register enum ContextOfUseMatch {FULL PARTIAL NONE} (property card EndpointClassification.contextMatch) and confirm MeaningfulnessVerdict {MEANINGFUL NOT_MEANINGFUL UNDETERMINED} with sole writer W10;",
+  "cq": "['CQ-ST-03', 'CQ-ST-10', 'CQ-EV-C02']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-04",
+  "targetOwner": "W00",
+  "request": "Kernel change: extend CONSIDERS_ASSESSMENT domain from Adjudication to EvidenceAssessment (at least ApplicabilityDimension).",
+  "cq": "['CQ-EV-04', 'CQ-RC-03']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-05",
+  "targetOwner": "W00",
+  "request": "Generalize V-504 (no backdating) to EvidenceAssessments: an assessment's recordedAt is never earlier than the retrievedAt of a snapshot whose locator it cites (candidate W10-V16b).",
+  "cq": "['CQ-ST-09', 'CQ-TM-01']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-06",
+  "targetOwner": "W00 (predicate registry) with W09",
+  "request": "Register candidate predicate REPORTS_POOLED_ESTIMATE (subject Publication; literal valueNumber with unitCode; meta-analytic pooled effect as stated). Decide with W09 whether INV-206 applies to pooled ",
+  "cq": "['CQ-ST-09', 'CQ-ST-05']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-07",
+  "targetOwner": "W00",
+  "request": "Expose uid on EvidenceAssessmentArchetype (or document '... on Entity { uid }') so interface-typed relationship targets (CONSIDERS_ASSESSMENT) can return uids.",
+  "cq": "['CQ-RC-03']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-08",
+  "targetOwner": "Fable (Wave 6 fixture repair)",
+  "request": "Repair docs/schema/examples/study-vs-product-mismatch.cypher or record as known defects: (a) ApplicabilityDimension uids use token 'applicability' instead of 'applicability-dimension'; (b) EvidenceSyn",
+  "cq": "['CQ-ST-09', 'CQ-EV-04']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-09",
+  "targetOwner": "W04",
+  "request": "Expose label directions (servings per day) as a source-attributed literal assertion on the ProductVariant or LabelSnapshot (e.g. LABEL_DIRECTS_SERVINGS_PER_DAY, range allowed for '1-3') so a UseContex",
+  "cq": "['CQ-EV-C01', 'CQ-EV-04']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-10",
+  "targetOwner": "W23",
+  "request": "Private-store contract for PersonalApplicabilityAssessment: references one shared EvidenceApplicability uid plus its recordedAt viewpoint; may re-judge POPULATION/DOSE for a person privately; never wr",
+  "cq": "['CQ-AX-12', 'CQ-RC-05']",
+  "kind": ""
+ },
+ {
+  "worker": "W10",
+  "id": "W10-SR-11",
+  "targetOwner": "W00 (forbidden implications)",
+  "request": "Register forbidden implications [PATENT_CLAIMS, SYNTHESIS_INPUT] (answer to W14-SR-04) and [INSTANTIATES_TREATMENT + USES_COMPONENT(ADMINISTERED_PRODUCT), EVIDENCE_APPLIES_TO_PRODUCT] (answer to W06-S",
+  "cq": "['CQ-EV-04', 'CQ-IP-C01']",
+  "kind": ""
+ },
+ {
   "worker": "W11",
   "id": "W11-SR-01",
   "targetOwner": "Fable (catalog conventions; enum owner W11)",
-  "request": "Register ProcessKind values CHEMICAL_SYNTHESIS, FERMENTATION, BIOCATALYSIS, CULTIVATION, EXTRACTION, PURIFICATION, BLENDING, DOSAGE_FORM_MANUFACTURING, PACKAGIN",
+  "request": "Register ProcessKind values CHEMICAL_SYNTHESIS, FERMENTATION, BIOCATALYSIS, CULTIVATION, EXTRACTION, PURIFICATION, BLENDING, DOSAGE_FORM_MANUFACTURING, PACKAGING, OTHER, UNKNOWN as conventions.process",
   "cq": "['CQ-MF-C04', 'CQ-MF-04']",
   "kind": ""
  },
@@ -1395,7 +1483,7 @@
   "worker": "W11",
   "id": "W11-SR-02",
   "targetOwner": "Fable (catalog forbiddenImplications; V-112 implicationPairs)",
-  "request": "Add forbidden implications [OWNS_SPECIFICATION, PERFORMS_PROCESS], [SHARES_SPECIFICATION, SAME_MATERIAL_IDENTITY], [SPECIFICATION_VERSION_CHANGE, MATERIAL_IDENT",
+  "request": "Add forbidden implications [OWNS_SPECIFICATION, PERFORMS_PROCESS], [SHARES_SPECIFICATION, SAME_MATERIAL_IDENTITY], [SPECIFICATION_VERSION_CHANGE, MATERIAL_IDENTITY_CHANGE], [INPUTS, CONTAINS] to produ",
   "cq": "['CQ-MF-01', 'CQ-MF-C03', 'CQ-MF-C05']",
   "kind": ""
  },
@@ -1403,7 +1491,7 @@
   "worker": "W11",
   "id": "W11-SR-03",
   "targetOwner": "W12",
-  "request": "Define the SpecificationCriterion -> SpecificationVersion relationship (proposed name CRITERION_OF_SPECIFICATION, structural, exactly_one) and add Specification",
+  "request": "Define the SpecificationCriterion -> SpecificationVersion relationship (proposed name CRITERION_OF_SPECIFICATION, structural, exactly_one) and add SpecificationCriterion.thresholdUpper (Float, for ran",
   "cq": "['CQ-MF-C02', 'CQ-PF-03']",
   "kind": ""
  },
@@ -1411,7 +1499,7 @@
   "worker": "W11",
   "id": "W11-SR-04",
   "targetOwner": "W00 (conventions.predicateExclusivity)",
-  "request": "Add HAS_CAPABILITY_STATE {mode: EXCLUSIVE, scope: subject, partitionBy: [CAPABILITY_FOR_PROCESS target, CAPABILITY_FOR_MATERIAL target]} and GOVERNED_BY_SPECIFI",
+  "request": "Add HAS_CAPABILITY_STATE {mode: EXCLUSIVE, scope: subject, partitionBy: [CAPABILITY_FOR_PROCESS target, CAPABILITY_FOR_MATERIAL target]} and GOVERNED_BY_SPECIFICATION {mode: EXCLUSIVE, scope: subject,",
   "cq": "['CQ-MF-04', 'CQ-MF-C02']",
   "kind": ""
  },
@@ -1419,7 +1507,7 @@
   "worker": "W11",
   "id": "W11-SR-05",
   "targetOwner": "W02",
-  "request": "Insert on IngredientMaterial: governedBySpecificationVersions: [SpecificationVersion!]! @relationship(type: \"GOVERNED_BY_SPECIFICATION\", direction: OUT, propert",
+  "request": "Insert on IngredientMaterial: governedBySpecificationVersions: [SpecificationVersion!]! @relationship(type: \"GOVERNED_BY_SPECIFICATION\", direction: OUT, properties: \"AssertedEdgeProperties\"); produced",
   "cq": "['CQ-MF-01', 'CQ-MF-C02', 'CQ-MF-C05']",
   "kind": ""
  },
@@ -1427,7 +1515,7 @@
   "worker": "W11",
   "id": "W11-SR-06",
   "targetOwner": "W01",
-  "request": "Field slots (W01-SR-20 pattern) on Organization: performsProcesses: [ManufacturingProcess!]! @relationship(type: \"PERFORMS_PROCESS\", direction: OUT, properties:",
+  "request": "Field slots (W01-SR-20 pattern) on Organization: performsProcesses: [ManufacturingProcess!]! @relationship(type: \"PERFORMS_PROCESS\", direction: OUT, properties: \"AssertedEdgeProperties\"); capabilitySt",
   "cq": "['CQ-MF-01', 'CQ-MF-04']",
   "kind": ""
  },
@@ -1435,7 +1523,7 @@
   "worker": "W11",
   "id": "W11-SR-07",
   "targetOwner": "W01",
-  "request": "Deprecate LocationType values GMP_FACILITY and PILOT_PLANT for Facility.facilityKind; migrate to MANUFACTURING_SITE plus a PROPOSED CLAIMS_CGMP_COMPLIANCE asser",
+  "request": "Deprecate LocationType values GMP_FACILITY and PILOT_PLANT for Facility.facilityKind; migrate to MANUFACTURING_SITE plus a PROPOSED CLAIMS_CGMP_COMPLIANCE assertion (GMP) or a ManufacturingCapability{",
   "cq": "['CQ-MF-06', 'CQ-MF-04']",
   "kind": ""
  },
@@ -1443,7 +1531,7 @@
   "worker": "W11",
   "id": "W11-SR-08",
   "targetOwner": "W00",
-  "request": "Register uid type tokens: ManufacturingSpecification: specification; SpecificationVersion: specification-version; ManufacturingProcess: process; ManufacturingSt",
+  "request": "Register uid type tokens: ManufacturingSpecification: specification; SpecificationVersion: specification-version; ManufacturingProcess: process; ManufacturingStep: process-step; ManufacturingCapabilit",
   "cq": "['CQ-MF-C02', 'CQ-MF-04']",
   "kind": ""
  },
@@ -1451,7 +1539,7 @@
   "worker": "W11",
   "id": "W11-SR-09",
   "targetOwner": "W00 / W01 (assertedPredicates)",
-  "request": "Register candidate predicates CLAIMS_THIRD_PARTY_CERTIFICATION (organizations; subject Organization|Facility; literal valueString; never projects to COVERS or C",
+  "request": "Register candidate predicates CLAIMS_THIRD_PARTY_CERTIFICATION (organizations; subject Organization|Facility; literal valueString; never projects to COVERS or CERTIFIED_UNDER) and SPECIFICATION_EFFECT",
   "cq": "['CQ-MF-06', 'CQ-MF-C02']",
   "kind": ""
  },
@@ -1459,7 +1547,7 @@
   "worker": "W11",
   "id": "W11-SR-10",
   "targetOwner": "W13",
-  "request": "Support the candidate RegulatoryInspection occurrence (inspection end date, classification NAI/VAI/OAI, Form 483 issued, follow-up action) with this failing cas",
+  "request": "Support the candidate RegulatoryInspection occurrence (inspection end date, classification NAI/VAI/OAI, Form 483 issued, follow-up action) with this failing case.",
   "cq": "['CQ-MF-06']",
   "kind": ""
  },
@@ -1467,7 +1555,7 @@
   "worker": "W11",
   "id": "W11-SR-11",
   "targetOwner": "Fable (catalog validation) with W00/W19 (SourceKind guidance)",
-  "request": "Replace V-324 by V-324r (allowlist SECURITIES_FILING, REGULATORY_RECORD, AUDIT_REPORT, CERTIFICATION_LISTING, LEGAL_RECORD + current SUPPORTED SUPPORT adjudicat",
+  "request": "Replace V-324 by V-324r (allowlist SECURITIES_FILING, REGULATORY_RECORD, AUDIT_REPORT, CERTIFICATION_LISTING, LEGAL_RECORD + current SUPPORTED SUPPORT adjudication); state in SourceKind guidance that ",
   "cq": "['CQ-MF-04', 'CQ-MF-05']",
   "kind": ""
  },
@@ -1475,7 +1563,7 @@
   "worker": "W11",
   "id": "W11-SR-12",
   "targetOwner": "Fable (validation-params.json)",
-  "request": "Add PERFORMS_PROCESS, HOSTS_PROCESS, INPUTS, OUTPUTS to assertedTypes; add HAS_CAPABILITY_STATE and GOVERNED_BY_SPECIFICATION to the V-504/V-505 relationship li",
+  "request": "Add PERFORMS_PROCESS, HOSTS_PROCESS, INPUTS, OUTPUTS to assertedTypes; add HAS_CAPABILITY_STATE and GOVERNED_BY_SPECIFICATION to the V-504/V-505 relationship lists (or adopt V-W11-01).",
   "cq": "['CQ-MF-01', 'CQ-MF-04']",
   "kind": ""
  },
@@ -1483,7 +1571,7 @@
   "worker": "W11",
   "id": "W11-SR-13",
   "targetOwner": "W12",
-  "request": "Receive live Material.traceabilityCode as ProductLot.lotCode or an Identifier on a material lot; confirm MANUFACTURED_UNDER -> SpecificationVersion semantics (l",
+  "request": "Receive live Material.traceabilityCode as ProductLot.lotCode or an Identifier on a material lot; confirm MANUFACTURED_UNDER -> SpecificationVersion semantics (lot released against a version).",
   "cq": "['CQ-PF-03']",
   "kind": ""
  },
@@ -1491,7 +1579,7 @@
   "worker": "W12",
   "id": "W12-SR-01",
   "targetOwner": "W00",
-  "request": "Register uid type tokens lot, test-sample, test-execution, test-method, measured-result, spec-criterion, pass-fail, lot-test-summary, coa, cert-program, cert-li",
+  "request": "Register uid type tokens lot, test-sample, test-execution, test-method, measured-result, spec-criterion, pass-fail, lot-test-summary, coa, cert-program, cert-listing, cert-scope (TestingLaboratory kee",
   "cq": "['CQ-PF-03', 'CQ-AX-19', 'CQ-QA-C01', 'CQ-QA-C02', 'CQ-QA-C0",
   "kind": ""
  },
@@ -1499,7 +1587,7 @@
   "worker": "W12",
   "id": "W12-SR-02",
   "targetOwner": "W00",
-  "request": "Extend the SUPPORTED_BY domain (SupportedRecordTarget) to MeasuredResult, LotTestSummary and CertificateOfAnalysis (InformationArtifacts that record what a sour",
+  "request": "Extend the SUPPORTED_BY domain (SupportedRecordTarget) to MeasuredResult, LotTestSummary and CertificateOfAnalysis (InformationArtifacts that record what a source reported).",
   "cq": "['CQ-AX-19', 'CQ-QA-C01', 'CQ-QA-C02']",
   "kind": ""
  },
@@ -1515,7 +1603,7 @@
   "worker": "W12",
   "id": "W12-SR-04",
   "targetOwner": "W00",
-  "request": "Register asserted predicate CONFORMS_TO_SPECIFICATION (subject ProductLot|TestExecution, object SpecificationCriterion; assertion-only, no edge projection; pola",
+  "request": "Register asserted predicate CONFORMS_TO_SPECIFICATION (subject ProductLot|TestExecution, object SpecificationCriterion; assertion-only, no edge projection; polarity NEGATIVE for \"does not conform\").",
   "cq": "['CQ-QA-C02', 'CQ-QA-C03', 'CQ-PF-03']",
   "kind": ""
  },
@@ -1523,7 +1611,7 @@
   "worker": "W12",
   "id": "W12-SR-05",
   "targetOwner": "W04",
-  "request": "Add read-only `certifiedUnder` fields (CERTIFIED_UNDER, DerivedEdgeProperties, @settable false) on Product and ProductVariant, or confirm the edge stays lot-onl",
+  "request": "Add read-only `certifiedUnder` fields (CERTIFIED_UNDER, DerivedEdgeProperties, @settable false) on Product and ProductVariant, or confirm the edge stays lot-only in SDL.",
   "cq": "['CQ-PF-03']",
   "kind": ""
  },
@@ -1531,7 +1619,7 @@
   "worker": "W12",
   "id": "W12-SR-06",
   "targetOwner": "W15",
-  "request": "State how recalled, expired, counterfeit-suspected and gray-market inventory is represented on InventoryItem / IndividualUnit / Offer, using ProductLot only as ",
+  "request": "State how recalled, expired, counterfeit-suspected and gray-market inventory is represented on InventoryItem / IndividualUnit / Offer, using ProductLot only as an identity (no lot status property); W1",
   "cq": "['CQ-AX-19', 'CQ-CM-02']",
   "kind": ""
  },
@@ -1539,7 +1627,7 @@
   "worker": "W12",
   "id": "W12-SR-07",
   "targetOwner": "W00",
-  "request": "Add quality-module forbiddenImplications [FACILITY_GMP_CERTIFIED, CERTIFIED_UNDER], [LOT_COVERED, PRODUCT_CERTIFIED], [CONFORMS_TO_SPECIFICATION, MEASURED_VALUE",
+  "request": "Add quality-module forbiddenImplications [FACILITY_GMP_CERTIFIED, CERTIFIED_UNDER], [LOT_COVERED, PRODUCT_CERTIFIED], [CONFORMS_TO_SPECIFICATION, MEASURED_VALUE], [LOT_TEST_SUMMARY, CERTIFICATE_OF_ANA",
   "cq": "['CQ-PF-03', 'CQ-MF-06', 'CQ-QA-C01']",
   "kind": ""
  },
@@ -1547,7 +1635,7 @@
   "worker": "W12",
   "id": "W12-SR-08",
   "targetOwner": "W01",
-  "request": "Migrate LocationType.GMP_FACILITY and (with W11) ManufacturingProcess.qualitySystemKind to a CLAIMS_CGMP_COMPLIANCE assertion or a FACILITY-programme Certificat",
+  "request": "Migrate LocationType.GMP_FACILITY and (with W11) ManufacturingProcess.qualitySystemKind to a CLAIMS_CGMP_COMPLIANCE assertion or a FACILITY-programme CertificationListing COVERS Facility; never a loca",
   "cq": "['CQ-MF-06']",
   "kind": ""
  },
@@ -1563,7 +1651,7 @@
   "worker": "W12",
   "id": "W12-SR-10",
   "targetOwner": "W11",
-  "request": "Define SpecificationVersion (D-009) and accept CRITERION_OF_SPECIFICATION (SpecificationCriterion -> SpecificationVersion, structural, exactly_one) as the only ",
+  "request": "Define SpecificationVersion (D-009) and accept CRITERION_OF_SPECIFICATION (SpecificationCriterion -> SpecificationVersion, structural, exactly_one) as the only criterion link; expose an inverse field ",
   "cq": "['CQ-QA-C03']",
   "kind": ""
  },
@@ -1571,7 +1659,7 @@
   "worker": "W12",
   "id": "W12-SR-11",
   "targetOwner": "W00",
-  "request": "Decide how API-created nodes satisfy INV-106 (uid ends with ':' + id) when the id field (ID! @id) is autogenerated and absent from the create input under @neo4j",
+  "request": "Decide how API-created nodes satisfy INV-106 (uid ends with ':' + id) when the id field (ID! @id) is autogenerated and absent from the create input under @neo4j/graphql 7.6.3; and record that DateTime",
   "cq": "['CQ-AX-03']",
   "kind": ""
  },
@@ -1579,7 +1667,7 @@
   "worker": "W12",
   "id": "W12-SR-12",
   "targetOwner": "W07",
-  "request": "Add BELOW_REPORTING_LIMIT, QUALITATIVE_ABSENT and QUALITATIVE_PRESENT to the shared ResultQualifier (catalog private_context.resultQualifier; W07 writes it per ",
+  "request": "Add BELOW_REPORTING_LIMIT, QUALITATIVE_ABSENT and QUALITATIVE_PRESENT to the shared ResultQualifier (catalog private_context.resultQualifier; W07 writes it per W07-SR-03; W00 owns kernel enum policy).",
   "cq": "['CQ-QA-C02', 'CQ-AX-04', 'CQ-AX-19']",
   "kind": ""
  },
@@ -1587,7 +1675,7 @@
   "worker": "W13",
   "id": "W13-SR-01",
   "targetOwner": "W00",
-  "request": "Fix the value convention for every `jurisdiction` String (Assertion, RegulatoryStatus, Identifier, LabelSnapshot, FormulationVersion partitions): ISO 3166-1 alp",
+  "request": "Fix the value convention for every `jurisdiction` String (Assertion, RegulatoryStatus, Identifier, LabelSnapshot, FormulationVersion partitions): ISO 3166-1 alpha-2 for countries; ISO 3166-2 subdivisi",
   "cq": "['CQ-MF-C03', 'CQ-MF-02', 'CQ-AX-23']",
   "kind": ""
  },
@@ -1595,7 +1683,7 @@
   "worker": "W13",
   "id": "W13-SR-02",
   "targetOwner": "W00",
-  "request": "Register uid tokens: RegulatoryAgency -> org (as LegalEntity); OrphanDesignation and DrugApproval -> regulatory-status; register the existing fixture aliases as",
+  "request": "Register uid tokens: RegulatoryAgency -> org (as LegalEntity); OrphanDesignation and DrugApproval -> regulatory-status; register the existing fixture aliases as primary-label tokens: RegulatoryPathway",
   "cq": "['CQ-MF-02']",
   "kind": ""
  },
@@ -1603,7 +1691,7 @@
   "worker": "W13",
   "id": "W13-SR-03",
   "targetOwner": "W00",
-  "request": "Enum coordination for non-US premarket authorisations: add PathwayKind NOVEL_FOOD_AUTHORISATION and RegulatoryResponseKind NOVEL_FOOD_AUTHORISED (per-pathway li",
+  "request": "Enum coordination for non-US premarket authorisations: add PathwayKind NOVEL_FOOD_AUTHORISATION and RegulatoryResponseKind NOVEL_FOOD_AUTHORISED (per-pathway list NOVEL_FOOD_AUTHORISATION -> [NOVEL_FO",
   "cq": "['CQ-MF-C03', 'CQ-MF-02', 'CQ-AX-23']",
   "kind": ""
  },
@@ -1611,7 +1699,7 @@
   "worker": "W13",
   "id": "W13-SR-04",
   "targetOwner": "W00",
-  "request": "Register new uid tokens: reg-pathway-version (RegulatoryPathwayVersion), reg-step (RegulatoryStep), regulatory-inspection (RegulatoryInspection, candidate). W02",
+  "request": "Register new uid tokens: reg-pathway-version (RegulatoryPathwayVersion), reg-step (RegulatoryStep), regulatory-inspection (RegulatoryInspection, candidate). W02 is asked separately for the MaterialMix",
   "cq": "['CQ-MF-C02', 'CQ-MF-C01']",
   "kind": ""
  },
@@ -1619,7 +1707,7 @@
   "worker": "W13",
   "id": "W13-SR-05",
   "targetOwner": "W00",
-  "request": "Add predicateExclusivity HAS_PATHWAY_VERSION: {mode: EXCLUSIVE, scope: subject} (TM-R5 declaration list) and the bitemporal_attachment profile for HAS_PATHWAY_V",
+  "request": "Add predicateExclusivity HAS_PATHWAY_VERSION: {mode: EXCLUSIVE, scope: subject} (TM-R5 declaration list) and the bitemporal_attachment profile for HAS_PATHWAY_VERSION (StateEpisodeProperties; assertio",
   "cq": "['CQ-MF-C02']",
   "kind": ""
  },
@@ -1627,7 +1715,7 @@
   "worker": "W13",
   "id": "W13-SR-06",
   "targetOwner": "W00",
-  "request": "Add RegulatoryResponseKind NDI_FILING_ACKNOWLEDGED to the NDI_NOTIFICATION list (procedural acknowledgment that sets or resets the filing date); add it to the V",
+  "request": "Add RegulatoryResponseKind NDI_FILING_ACKNOWLEDGED to the NDI_NOTIFICATION list (procedural acknowledgment that sets or resets the filing date); add it to the V-320a non-approval list; a status may ne",
   "cq": "['CQ-MF-03', 'CQ-MF-02']",
   "kind": ""
  },
@@ -1635,7 +1723,7 @@
   "worker": "W13",
   "id": "W13-SR-07",
   "targetOwner": "W00",
-  "request": "Register candidate assertedPredicates INSPECTION_PERIOD, INSPECTION_FOUND_VIOLATION, INSPECTION_CLASSIFIED_AS (valueString = NAI|VAI|OAI plus project area), and",
+  "request": "Register candidate assertedPredicates INSPECTION_PERIOD, INSPECTION_FOUND_VIOLATION, INSPECTION_CLASSIFIED_AS (valueString = NAI|VAI|OAI plus project area), and candidate forbidden implications [INSPE",
   "cq": "['CQ-MF-C01', 'CQ-MF-06', 'CQ-MF-C02']",
   "kind": ""
  },
@@ -1643,7 +1731,7 @@
   "worker": "W13",
   "id": "W13-SR-08",
   "targetOwner": "W04",
-  "request": "Declare on Product: hasRegulatoryStatuses: [RegulatoryStatus!]! @relationship(type: \"HAS_REGULATORY_STATUS\", direction: OUT, properties: \"DerivedEdgeProperties\"",
+  "request": "Declare on Product: hasRegulatoryStatuses: [RegulatoryStatus!]! @relationship(type: \"HAS_REGULATORY_STATUS\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: f",
   "cq": "['CQ-MF-02', 'CQ-AX-23']",
   "kind": ""
  },
@@ -1651,7 +1739,7 @@
   "worker": "W13",
   "id": "W13-SR-09",
   "targetOwner": "W06",
-  "request": "Treatment.orphanDrugDesignation becomes a read-only text projection of an OrphanDesignation (indication, jurisdiction) and must not be read as approval; fulltex",
+  "request": "Treatment.orphanDrugDesignation becomes a read-only text projection of an OrphanDesignation (indication, jurisdiction) and must not be read as approval; fulltext index keeps it as a lookup hint.",
   "cq": "['CQ-MF-02', 'CQ-AX-23']",
   "kind": ""
  },
@@ -1659,7 +1747,7 @@
   "worker": "W13",
   "id": "W13-SR-10",
   "targetOwner": "W01",
-  "request": "PhysicalLocation.establishmentIdentifier moves to an Identifier on the Facility plus a RegulatoryStatus{ESTABLISHMENT_REGISTRATION} STATUS_OF the Facility when ",
+  "request": "PhysicalLocation.establishmentIdentifier moves to an Identifier on the Facility plus a RegulatoryStatus{ESTABLISHMENT_REGISTRATION} STATUS_OF the Facility when a registration source exists; W01's Orga",
   "cq": "['CQ-MF-06', 'CQ-PF-03']",
   "kind": ""
  },
@@ -1667,7 +1755,7 @@
   "worker": "W13",
   "id": "W13-SR-11",
   "targetOwner": "W02",
-  "request": "Confirm MaterialMixture as the identity of a designated drug combination (e.g. 'nicotinamide riboside and pterostilbene', OOPD 628218) and register its uid toke",
+  "request": "Confirm MaterialMixture as the identity of a designated drug combination (e.g. 'nicotinamide riboside and pterostilbene', OOPD 628218) and register its uid token; Material.regulatoryCategoryHint becom",
   "cq": "['CQ-MF-02', 'CQ-PF-03']",
   "kind": ""
  },
@@ -1683,7 +1771,7 @@
   "worker": "W13",
   "id": "W13-SR-13",
   "targetOwner": "W12",
-  "request": "Consume RegulatoryInspection (candidate) and the inspection assertions; never derive CertificationListing or a quality pass from registration, inspection classi",
+  "request": "Consume RegulatoryInspection (candidate) and the inspection assertions; never derive CertificationListing or a quality pass from registration, inspection classification or a CLAIMS_CGMP_COMPLIANCE ass",
   "cq": "['CQ-MF-06']",
   "kind": ""
  },
@@ -1691,7 +1779,7 @@
   "worker": "W13",
   "id": "W13-SR-14",
   "targetOwner": "W10",
-  "request": "Own CQ-PF-04 coverage matching: whether RegulatoryResponse.conditionsOfUseText (verbatim) covers a formulation's material form and dose is an EvidenceApplicabil",
+  "request": "Own CQ-PF-04 coverage matching: whether RegulatoryResponse.conditionsOfUseText (verbatim) covers a formulation's material form and dose is an EvidenceApplicability/UseContextProfile assessment, not a ",
   "cq": "['CQ-PF-04']",
   "kind": ""
  },
@@ -1699,7 +1787,7 @@
   "worker": "W13",
   "id": "W13-SR-15",
   "targetOwner": "W00",
-  "request": "Revise catalog validators: V-322 -> V-322r (approving response and current episode), V-333 -> V-333r (count DISTINCT subjects; at most one current STATUS_OF epi",
+  "request": "Revise catalog validators: V-322 -> V-322r (approving response and current episode), V-333 -> V-333r (count DISTINCT subjects; at most one current STATUS_OF episode), V-334 -> V-334r (compare current ",
   "cq": "['CQ-MF-02', 'CQ-AX-23', 'CQ-MF-C02']",
   "kind": ""
  },
@@ -1707,7 +1795,7 @@
   "worker": "W13",
   "id": "W13-SR-16",
   "targetOwner": "W00",
-  "request": "Record the runtime fact that @neo4j/graphql 7.6.3 reads DateTime fields through apoc.date.convertFormat; the embedded 5.26.31 Community harness has no APOC, so ",
+  "request": "Record the runtime fact that @neo4j/graphql 7.6.3 reads DateTime fields through apoc.date.convertFormat; the embedded 5.26.31 Community harness has no APOC, so every GraphQL read selecting a DateTime ",
   "cq": "['CQ-TM-03']",
   "kind": ""
  },
@@ -1723,7 +1811,7 @@
   "worker": "W13",
   "id": "W13-SR-18",
   "targetOwner": "W09",
-  "request": "StudyIntervention is a permitted OrphanDesignation/DrugApproval subject (catalog DESIGNATION_FOR/APPROVAL_FOR range); Study.fdaRegulatedDrug/fdaRegulatedDevice ",
+  "request": "StudyIntervention is a permitted OrphanDesignation/DrugApproval subject (catalog DESIGNATION_FOR/APPROVAL_FOR range); Study.fdaRegulatedDrug/fdaRegulatedDevice (RegistrationVersion) are registry flags",
   "cq": "['CQ-MF-02']",
   "kind": ""
  },
@@ -1731,7 +1819,7 @@
   "worker": "W14",
   "id": "W14-SR-01",
   "targetOwner": "W00",
-  "request": "Register uid type tokens for W14 primary labels in conventions.uidTypeTokens: PatentFamily: patent-family, PatentApplication: patent-application, GrantedPatent:",
+  "request": "Register uid type tokens for W14 primary labels in conventions.uidTypeTokens: PatentFamily: patent-family, PatentApplication: patent-application, GrantedPatent: granted-patent, PatentClaim: patent-cla",
   "cq": "['CQ-IP-C01', 'CQ-IP-C02', 'CQ-IP-C04', 'CQ-IP-C05']",
   "kind": ""
  },
@@ -1739,7 +1827,7 @@
   "worker": "W14",
   "id": "W14-SR-02",
   "targetOwner": "Fable 5.1 (registry) with W00 (kernel check) and W13 (INV-010 neighbour)",
-  "request": "Admit the CANDIDATE VersionedState IpRightStatus, its relationship IP_STATUS_OF (IpRightStatus -> PatentApplication | GrantedPatent | PatentClaim | Trademark, a",
+  "request": "Admit the CANDIDATE VersionedState IpRightStatus, its relationship IP_STATUS_OF (IpRightStatus -> PatentApplication | GrantedPatent | PatentClaim | Trademark, asserted, exactly_one, asserted_edge prof",
   "cq": "['CQ-IP-C01', 'CQ-IP-C04', 'CQ-IP-C05']",
   "kind": ""
  },
@@ -1747,7 +1835,7 @@
   "worker": "W14",
   "id": "W14-SR-03",
   "targetOwner": "W01",
-  "request": "(a) Register the asserted predicate GRANTS_PATENT_LICENSE (Organization licensor -> PatentLicense) in the organizations assertedPredicates. (b) Confirm the proj",
+  "request": "(a) Register the asserted predicate GRANTS_PATENT_LICENSE (Organization licensor -> PatentLicense) in the organizations assertedPredicates. (b) Confirm the projections W14 writes on its side: OWNS_TRA",
   "cq": "['CQ-IP-C02', 'CQ-IP-C04', 'CQ-EC-01', 'CQ-MF-01']",
   "kind": ""
  },
@@ -1755,7 +1843,7 @@
   "worker": "W14",
   "id": "W14-SR-04",
   "targetOwner": "W00 (predicate registry) with W10 (efficacy predicates)",
-  "request": "Register PATENT_CLAIMS as an asserted predicate of regulatory_and_ip (subject PatentClaim | GrantedPatent | PatentApplication | PatentFamily; object IngredientM",
+  "request": "Register PATENT_CLAIMS as an asserted predicate of regulatory_and_ip (subject PatentClaim | GrantedPatent | PatentApplication | PatentFamily; object IngredientMaterial | ChemicalSubstance | ChemicalFo",
   "cq": "['CQ-IP-C01', 'CQ-IP-C03']",
   "kind": ""
  },
@@ -1763,7 +1851,7 @@
   "worker": "W14",
   "id": "W14-SR-05",
   "targetOwner": "W02",
-  "request": "Add the outgoing field on BrandedIngredientMaterial: marks: [Trademark!]! @relationship(type: \"MARKETED_UNDER_MARK\", direction: OUT, properties: \"AssertedEdgePr",
+  "request": "Add the outgoing field on BrandedIngredientMaterial: marks: [Trademark!]! @relationship(type: \"MARKETED_UNDER_MARK\", direction: OUT, properties: \"AssertedEdgeProperties\") with description \"class: asse",
   "cq": "['CQ-IP-C04', 'CQ-EC-02']",
   "kind": ""
  },
@@ -1771,7 +1859,7 @@
   "worker": "W14",
   "id": "W14-SR-06",
   "targetOwner": "W01 (with W21 for CQ-CL-05)",
-  "request": "Decide whether a NAMED_INVENTOR role (Person -> PatentApplication | GrantedPatent) is needed for CQ-CL-05. W14 keeps inventorNamesVerbatim on the artifacts and ",
+  "request": "Decide whether a NAMED_INVENTOR role (Person -> PatentApplication | GrantedPatent) is needed for CQ-CL-05. W14 keeps inventorNamesVerbatim on the artifacts and proposes the forbidden implications [NAM",
   "cq": "['CQ-CL-05', 'CQ-EC-01']",
   "kind": ""
  },
@@ -1779,7 +1867,7 @@
   "worker": "W14",
   "id": "W14-SR-07",
   "targetOwner": "W20 (and W19)",
-  "request": "A patent publication captured as a Document (DocumentType PATENT or PATENT_APPLICATION, DocumentDomain PATENT_IP) is a rendition Source of the W14 artifact. Con",
+  "request": "A patent publication captured as a Document (DocumentType PATENT or PATENT_APPLICATION, DocumentDomain PATENT_IP) is a rendition Source of the W14 artifact. Confirm the linking edge (W19/W20 RENDITION",
   "cq": "['CQ-IP-C01', 'CQ-PV-01']",
   "kind": ""
  },
@@ -1787,15 +1875,135 @@
   "worker": "W14",
   "id": "W14-SR-08",
   "targetOwner": "W00",
-  "request": "Confirm that the PredicateClass for IP predicates is COMMERCIAL (OWNS_TRADEMARK, ASSIGNED_PATENT, LICENSES_PATENT, GRANTS_PATENT_LICENSE, LICENSE_COVERS, MARKET",
+  "request": "Confirm that the PredicateClass for IP predicates is COMMERCIAL (OWNS_TRADEMARK, ASSIGNED_PATENT, LICENSES_PATENT, GRANTS_PATENT_LICENSE, LICENSE_COVERS, MARKETED_UNDER_MARK), REGULATORY (APPLICATION_",
   "cq": "['CQ-IP-C02']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-01",
+  "targetOwner": "W01",
+  "request": "(a) Ruling on W01-SR-15b: seller display accounts are W01 Organizations WITHOUT the LegalEntity label (organizationType\nRETAILER, MARKETPLACE or UNKNOWN), carrying the marketplace merchant id as an Id",
+  "cq": "['CQ-CM-01', 'CQ-EC-02', 'CQ-AX-14']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-02",
+  "targetOwner": "W04",
+  "request": "Insert into ProductVariant:\n  \"\"\"class: asserted (inverse view); cardinality: many; catalog: LISTING_FOR (W15). A listing is never the variant's identity.\"\"\"\n  listedIn: [MerchantListing!]! @relations",
+  "cq": "['CQ-CM-02', 'CQ-AX-17']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-03",
+  "targetOwner": "W12",
+  "request": "Insert into ProductLot:\n  \"\"\"class: asserted (inverse view); cardinality: many; catalog: UNIT_FROM_LOT (W15). A printed code is not lot identity.\"\"\"\n  units: [IndividualUnit!]! @relationship(type: \"UN",
+  "cq": "['CQ-AX-19', 'CQ-CM-C03']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-04",
+  "targetOwner": "W07",
+  "request": "Insert into PanelDefinition:\n  \"\"\"class: asserted (inverse view); cardinality: many; live IMPLEMENTS_PANEL (W15) from MerchantListing.\"\"\"\n  implementedByListings: [MerchantListing!]! @relationship(typ",
+  "cq": "['CQ-DX-01']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-05",
+  "targetOwner": "W06, W22",
+  "request": "Informational. W06 Procedure.listedIn already references MerchantListing with ListingEdgeProperties: kept unchanged. W22 MediaSource.sourceListing (SOURCE_LISTING) and MediaSubjectTarget must name Mer",
+  "cq": "['CQ-CM-01']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-07",
+  "targetOwner": "W00 (catalog), Fable",
+  "request": "Catalog range extensions for W15-owned relationships: LISTING_FOR and INVENTORY_INSTANCE_OF also -> Bundle; COMPONENT_PRODUCT also -> PackageConfiguration; MATCHES_COMMERCE_ITEM also -> Offer, Individ",
+  "cq": "['CQ-CM-02', 'CQ-CM-C02', 'CQ-CM-C03']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-08",
+  "targetOwner": "W00",
+  "request": "Register uid type tokens for primary labels: MerchantListing -> listing, Offer -> offer, PriceObservation -> price-obs (already fixture tokens), SubscriptionPlan -> subscription-plan, Bundle -> bundle",
+  "cq": "['CQ-AX-14']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-09",
+  "targetOwner": "W00",
+  "request": "Kernel provenance for commerce occurrences and artifacts: (a) extend the catalog domain of WAS_GENERATED_BY to PriceObservation, Offer and AffiliateLink (PROV-O wasGeneratedBy applies to any entity); ",
+  "cq": "['CQ-CM-03', 'CQ-AX-06', 'CQ-AX-07']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-10",
+  "targetOwner": "W00 (enum registry), Fable",
+  "request": "Register W15 enums and vocabularies: OfferKind {PURCHASE, SUBSCRIPTION_ONLY, PREORDER, SERVICE_BOOKING, UNKNOWN}; ObservedAvailability {IN_STOCK, LIMITED_STOCK, OUT_OF_STOCK, BACKORDER, PREORDER, CURR",
+  "cq": "['CQ-CM-03', 'CQ-CM-05', 'CQ-CM-C03']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-11",
+  "targetOwner": "W00",
+  "request": "(a) Register predicate LISTING_TITLE_AMOUNT (predicateClass QUANTITY; subject MerchantListing; literal valueNumber + unitCode) in products_and_commerce.assertedPredicates; the catalog uses the name on",
+  "cq": "['CQ-AX-16', 'CQ-AX-17']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-12",
+  "targetOwner": "W23",
+  "request": "Private-store purchase and subscription records (P-15 PurchaseEvent and any private subscription) reference shared uids only: offerUid, listingUid, priceObservationUid (the observed price at decision ",
+  "cq": "['CQ-AX-12', 'CQ-AX-19']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-13",
+  "targetOwner": "W13",
+  "request": "Recall events: CommerceMatch RECALL_SCOPE currently cites the recall notice locator (FDA company announcement, S11). If W13 introduces a recall record (event or status), RECALL_SCOPE matches will add ",
+  "cq": "['CQ-CM-C03', 'CQ-MF-02']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-14",
+  "targetOwner": "W21",
+  "request": "AffiliateLink is found in a container by its sourceLocatorUid (Document/Episode snapshots); W21 owns the speaker attribution of claims made next to the link (e.g. 'Tru Niagen Pro which is 500 mg per c",
+  "cq": "['CQ-CM-04', 'CQ-CL-05']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-15",
+  "targetOwner": "W19, W00 (SourceKind owner)",
+  "request": "SourceKind has no value for a third-party blog/review page with affiliate links or for a storefront's structured-data endpoint (Shopify products/*.js, products.json). Fixtures used THIRD_PARTY_PROFILE",
+  "cq": "['CQ-CM-04', 'CQ-CM-03']",
+  "kind": ""
+ },
+ {
+  "worker": "W15",
+  "id": "W15-SR-16",
+  "targetOwner": "W00 (runtime), Fable",
+  "request": "Runtime fact for the operations/deployment notes: with @neo4j/graphql 7.6.3 on Neo4j 5.26.31 Community WITHOUT APOC, any GraphQL read that selects a DateTime field fails with \"Unknown function 'apoc.d",
+  "cq": "['CQ-AX-06']",
   "kind": ""
  },
  {
   "worker": "W16",
   "id": "W16-SR-01",
   "targetOwner": "W00",
-  "request": "Register uid type tokens measurement-plan (MeasurementPlan), target (Target), observation (Observation), protocol-result (ProtocolResult); bind the existing fix",
+  "request": "Register uid type tokens measurement-plan (MeasurementPlan), target (Target), observation (Observation), protocol-result (ProtocolResult); bind the existing fixture token protocol-rule to ProtocolAdju",
   "cq": "['CQ-PR-03', 'CQ-PR-04', 'CQ-PC-08']",
   "kind": ""
  },
@@ -1803,7 +2011,7 @@
   "worker": "W16",
   "id": "W16-SR-02",
   "targetOwner": "W00",
-  "request": "Register assertedPredicates AUTHORED_PROTOCOL, AUTHORED_PROTOCOL_EDITION, REQUIRES_PERFORMER_ROLE, CITES_EVIDENCE_FOR_STEP, PROTOCOL_INCLUDES_SUBSTANCE, REPORTS",
+  "request": "Register assertedPredicates AUTHORED_PROTOCOL, AUTHORED_PROTOCOL_EDITION, REQUIRES_PERFORMER_ROLE, CITES_EVIDENCE_FOR_STEP, PROTOCOL_INCLUDES_SUBSTANCE, REPORTS_PRACTICE_OF_STEP, PROTOCOL_EFFECTIVE_FO",
   "cq": "['CQ-PR-01', 'CQ-PR-06']",
   "kind": ""
  },
@@ -1811,7 +2019,7 @@
   "worker": "W16",
   "id": "W16-SR-03",
   "targetOwner": "W07",
-  "request": "Publish the exact GraphQL field types of interface DiagnosticResult. W16 Observation assumes resultKind: DiagnosticResultKind, valueNumber: Float, valueString: ",
+  "request": "Publish the exact GraphQL field types of interface DiagnosticResult. W16 Observation assumes resultKind: DiagnosticResultKind, valueNumber: Float, valueString: String, unitCode: String, valueStatus: R",
   "cq": "['CQ-PC-08', 'CQ-AX-22']",
   "kind": ""
  },
@@ -1819,7 +2027,7 @@
   "worker": "W16",
   "id": "W16-SR-04",
   "targetOwner": "W00",
-  "request": "Rule the stored casing of privacyClass: GraphQL enum PrivacyClass {PUBLIC INTERNAL} vs catalog/validator literals 'public'/'internal'/'private-personal'. W16 fi",
+  "request": "Rule the stored casing of privacyClass: GraphQL enum PrivacyClass {PUBLIC INTERNAL} vs catalog/validator literals 'public'/'internal'/'private-personal'. W16 fixtures store 'PUBLIC'/'INTERNAL'; V-521/",
   "cq": "['CQ-PC-08']",
   "kind": ""
  },
@@ -1827,7 +2035,7 @@
   "worker": "W16",
   "id": "W16-SR-05",
   "targetOwner": "W01",
-  "request": "Person.recordsObservations: [Observation!]! @relationship(type: RECORDS, direction: OUT, properties: AssertedEdgeProperties) and Person.postsResults: [ProtocolR",
+  "request": "Person.recordsObservations: [Observation!]! @relationship(type: RECORDS, direction: OUT, properties: AssertedEdgeProperties) and Person.postsResults: [ProtocolResult!]! @relationship(type: POSTS_RESUL",
   "cq": "['CQ-PC-08']",
   "kind": ""
  },
@@ -1835,7 +2043,7 @@
   "worker": "W16",
   "id": "W16-SR-06",
   "targetOwner": "W00",
-  "request": "Register derived relationship HAS_CURRENT_PROTOCOL_STEP (Protocol -> ProtocolStep) with ruleOnly: true and rule protocol-current-steps-v1 (D-004 implementation ",
+  "request": "Register derived relationship HAS_CURRENT_PROTOCOL_STEP (Protocol -> ProtocolStep) with ruleOnly: true and rule protocol-current-steps-v1 (D-004 implementation of Protocol.currentSteps without @cypher",
   "cq": "['CQ-PR-01']",
   "kind": ""
  },
@@ -1867,7 +2075,7 @@
   "worker": "W16",
   "id": "W16-SR-10",
   "targetOwner": "W09",
-  "request": "Confirm CL-007: ProtocolVersion stays study-scoped (InformationArtifact). No 'same PDF is both' case was found; the nearest pair is the FMD regimen of NCT021588",
+  "request": "Confirm CL-007: ProtocolVersion stays study-scoped (InformationArtifact). No 'same PDF is both' case was found; the nearest pair is the FMD regimen of NCT02158897/PMID 28202779 (StudyIntervention) ver",
   "cq": "['CQ-PR-06']",
   "kind": ""
  },
@@ -1875,7 +2083,7 @@
   "worker": "W16",
   "id": "W16-SR-11",
   "targetOwner": "W23",
-  "request": "Private-store contract: ProtocolAdoptionVersion.adoptedEditionUid (exactly one ProtocolEdition uid), ProtocolDeviation.stepKey must exist in the adopted edition",
+  "request": "Private-store contract: ProtocolAdoptionVersion.adoptedEditionUid (exactly one ProtocolEdition uid), ProtocolDeviation.stepKey must exist in the adopted edition, deviations never written to the shared",
   "cq": "['CQ-PR-03', 'CQ-PR-04', 'CQ-PR-05', 'CQ-AX-22']",
   "kind": ""
  },
@@ -1891,7 +2099,7 @@
   "worker": "W16",
   "id": "W16-SR-13",
   "targetOwner": "W10",
-  "request": "Allow EvidenceApplicability with evidence target a step-citation Assertion and use target ProtocolStep or ProtocolEdition (ApplicabilityUseTarget); register for",
+  "request": "Allow EvidenceApplicability with evidence target a step-citation Assertion and use target ProtocolStep or ProtocolEdition (ApplicabilityUseTarget); register forbidden implication [STEP_COMPONENT_EVIDE",
   "cq": "['CQ-PR-06']",
   "kind": ""
  },
@@ -1899,7 +2107,7 @@
   "worker": "W16",
   "id": "W16-SR-14",
   "targetOwner": "Fable (validators)",
-  "request": "Adopt V-525p/V-526p (catalog V-525/V-526 restated on HAS_PROTOCOL_STEP) and new V-527p..V-542p; register forbidden implication [PRACTICE_REPORT_STEP, RECOMMENDE",
+  "request": "Adopt V-525p/V-526p (catalog V-525/V-526 restated on HAS_PROTOCOL_STEP) and new V-527p..V-542p; register forbidden implication [PRACTICE_REPORT_STEP, RECOMMENDED_STEP] (contract A10 'a practice report",
   "cq": "['CQ-PR-01', 'CQ-PR-02', 'CQ-PR-04', 'CQ-PR-06', 'CQ-PC-08']",
   "kind": ""
  },
@@ -1915,7 +2123,7 @@
   "worker": "W16",
   "id": "W16-SR-16",
   "targetOwner": "W05",
-  "request": "Confirm FoodItem, FoodProduct, Exposure and Lifestyle survive in the final schema (members of StepSubstanceTarget, StepInstrumentTarget, ProtocolResultMentionTa",
+  "request": "Confirm FoodItem, FoodProduct, Exposure and Lifestyle survive in the final schema (members of StepSubstanceTarget, StepInstrumentTarget, ProtocolResultMentionTarget).",
   "cq": "['CQ-PR-02']",
   "kind": ""
  },
@@ -1923,7 +2131,7 @@
   "worker": "W16",
   "id": "W16-SR-17",
   "targetOwner": "W04",
-  "request": "Confirm USES may target FormulationVersion (pinned) and ProductVariant/Product (floating, resolved as-of through HAS_FORMULATION_VERSION); protocols are not stu",
+  "request": "Confirm USES may target FormulationVersion (pinned) and ProductVariant/Product (floating, resolved as-of through HAS_FORMULATION_VERSION); protocols are not studies so INV-201 does not apply.",
   "cq": "['CQ-PR-C05']",
   "kind": ""
  },
@@ -1939,7 +2147,7 @@
   "worker": "W16",
   "id": "W16-SR-19",
   "targetOwner": "W17",
-  "request": "Boundary between protocol-stated contraindications (Constraint with CONTRAINDICATED_WHEN on a step) and safety-module ContraindicationAssertion/UseConstraint; a",
+  "request": "Boundary between protocol-stated contraindications (Constraint with CONTRAINDICATED_WHEN on a step) and safety-module ContraindicationAssertion/UseConstraint; a link if both exist for the same fact.",
   "cq": "['CQ-RC-06']",
   "kind": ""
  },
@@ -1952,10 +2160,210 @@
   "kind": ""
  },
  {
+  "worker": "W17",
+  "id": "W17-SR-01",
+  "targetOwner": "Fable (ownership registry)",
+  "request": "Register under W17 (module safety_and_constraints) the elements beyond the registry row that the fragment defines: relationship types SIGNAL_BASED_ON, CONSTRAINS_USE_OF, CONSTRAINT_SCOPE, RESOLVES_TO_",
+  "cq": "['CQ-ST-06', 'CQ-RC-06', 'CQ-RC-07', 'CQ-SF-C01', 'CQ-SF-C03",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-02",
+  "targetOwner": "W00",
+  "request": "Register uid tokens AdverseEffect: adverse-effect, SafetySignal: safety-signal, UseConstraint: use-constraint; ContraindicationAssertion and InteractionAssertion use the existing token `assertion` (as",
+  "cq": "['CQ-SF-C01', 'CQ-RC-06']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-03",
+  "targetOwner": "W00 (catalog conventions and safety_and_constraints module)",
+  "request": "Register asserted predicates USE_CONSTRAINED_IN, USE_CONSTRAINED_WITH, INTERACTS_WITH, IDENTIFIES_POTENTIAL_SAFETY_SIGNAL; add forbiddenImplications FI-W17-01..09 (02-cq-coverage.md section 3) to safe",
+  "cq": "['CQ-RC-06', 'CQ-SF-C02', 'CQ-SF-C03', 'CQ-SF-C04', 'CQ-AX-0",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-04",
+  "targetOwner": "W02, W04, W05, W06 (writers of hasSafetySignals) and Fable",
+  "request": "Keep the field form already written (`hasSafetySignals: [SafetySignal!]! @relationship(type: \"HAS_SAFETY_SIGNAL\", direction: OUT, properties: \"SafetyEdgeProperties\")`) but change the description class",
+  "cq": "['CQ-ST-06', 'CQ-SF-C01']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-05",
+  "targetOwner": "W00",
+  "request": "AssertionSubjectTarget: remove SafetySignal (no source asserts about a BellLabs assessment); keep AdverseEffect (object of agency listings). SupportedRecordTarget: add SafetySignal (agency-import sign",
+  "cq": "['CQ-SF-C02']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-06",
+  "targetOwner": "W10 (W00 resolves an archetype-subtype dispute)",
+  "request": "(a) Confirm SafetySignal as a distinct EvidenceAssessment subtype beside EvidenceSynthesis (a signal returns a lifecycle state for a subject-effect pair; a synthesis returns a claim verdict); an Evide",
+  "cq": "['CQ-SF-C01', 'CQ-ST-06', 'CQ-EV-04']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-07",
+  "targetOwner": "W23",
+  "request": "Private-store contract: RecommendationOption.blockingConstraintUids accepts hu:use-constraint: uids (and W16 hu:constraint: uids for protocol-sourced blocks); evidenceAssertionUids carries the Contrai",
+  "cq": "['CQ-RC-06', 'CQ-RC-07']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-08",
+  "targetOwner": "W09",
+  "request": "(a) Optional structural edge AdverseEventResult -> AdverseEffect (e.g. CODED_AS_EFFECT, zero_or_one, from eventTerm/eventTermCode mapping) so cross-study AE comparison groups by concept, not by term s",
+  "cq": "['CQ-ST-06']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-09",
+  "targetOwner": "Fable (merged validation) with W00",
+  "request": "Adopt V-W17-01..V-W17-13 (fixtures/w17-validation.cypher). Restrict baseline V-231 to predicateClass = 'MECHANISM' assertions, as INV-210 states ('Every mechanism-class Assertion ... DIRECT_MEASUREMEN",
+  "cq": "['CQ-SF-C04', 'CQ-AX-04']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-10",
+  "targetOwner": "W03",
+  "request": "Ruling on W03-SR-08: AFFECTS_ORGAN keeps one meaning (curated anatomical involvement of a reference concept), class structural, property type MechanismLinkProperties, domain AdverseEffect | Condition,",
+  "cq": "['CQ-SF-C05', 'CQ-ST-03']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-11",
+  "targetOwner": "W20",
+  "request": "FDA Drug Safety Communications and AEMS quarterly pages are Documents with type SAFETY_COMMUNICATION; AEMS pages are edited in place (status column 'as of <date>'), so each observation needs its own S",
+  "cq": "['CQ-SF-C02']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-12",
+  "targetOwner": "W16",
+  "request": "W17 imports ThresholdComparator for dose bands. Protocol CONTRAINDICATED_WHEN constraints stay W16 Constraints (a condition a step tests); a step that uses a substance may surface that substance's Use",
+  "cq": "['CQ-RC-06', 'CQ-PR-03']",
+  "kind": ""
+ },
+ {
+  "worker": "W17",
+  "id": "W17-SR-13",
+  "targetOwner": "W16, W18, W10/W20/W21, W03, W22 (owners of ProtocolResultMention, EventSubject, EvidenceSubject, ClaimSubject, AssociationParticipant, EpisodeMentionable, MediaSubject successors)",
+  "request": "Members SafetySignal and AdverseEffect may stay; note that SafetySignal is now an EvidenceAssessment (a mention of a signal is a mention of an evaluation record, not of a harm fact). Prefer AdverseEff",
+  "cq": "['CQ-SF-C01']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-01",
+  "targetOwner": "W00 / Fable (conventions.uidTypeTokens)",
+  "request": "Register uid tokens: event (Event), conference (Conference), community (Community), narrative-arc (NarrativeArc), event-impact (EventImpactAssessment).",
+  "cq": "['CQ-EN-C01', 'CQ-EN-C04', 'CQ-EN-C05', 'CQ-EN-C06']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-02",
+  "targetOwner": "W00 / Fable (catalog events_and_narrative module)",
+  "request": "Promote events_and_narrative from future to provisional with: nodes Event (Occurrence), Conference (Entity), Community (Entity, candidate), NarrativeArc (EvidenceAssessment, candidate), EventImpactAss",
+  "cq": "['CQ-EN-C01', 'CQ-EN-C02', 'CQ-EN-C03', 'CQ-EN-C04', 'CQ-EN-",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-03",
+  "targetOwner": "Fable (registry)",
+  "request": "Admit W18 as sole writer of union EventRecordTarget, relationship-property types EventRoleEdgeProperties, CausalEdgeProperties, RecordingEdgeProperties, node type EventImpactAssessment (candidate), an",
+  "cq": "['CQ-EN-C02', 'CQ-EN-C03', 'CQ-EN-C04', 'CQ-EN-C05', 'CQ-EN-",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-04",
+  "targetOwner": "W00",
+  "request": "Add 'FUTURE' to the controlled values of Assertion.statedTense (currently PAST, PRESENT) and add ActivityKind.CURATION (arc and impact curation activities).",
+  "cq": "['CQ-EN-C01', 'CQ-EN-C05']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-05",
+  "targetOwner": "W01",
+  "request": "Insert these fields into the reserved slots. Organization: hostsEvents: [Event!]! @relationship(type: \"HOSTS_EVENT\", direction: OUT, properties: \"AssertedEdgeProperties\"); hostsConferences: [Conferenc",
+  "cq": "['CQ-EC-01', 'CQ-CL-01', 'CQ-EN-C04']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-06",
+  "targetOwner": "W21",
+  "request": "(a) Add Episode.recordingOf: [Event!]! @relationship(type: \"RECORDING_OF\", direction: OUT, properties: \"RecordingEdgeProperties\") (W18 owns the type). (b) Use SponsorableTarget (W18) for Organization.",
+  "cq": "['CQ-EN-C04', 'CQ-CL-01', 'CQ-PV-05']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-07",
+  "targetOwner": "W20",
+  "request": "Add Document.presentedAt: [Event!]! @relationship(type: \"PRESENTED_AT\", direction: OUT, properties: \"AssertedEdgeProperties\") and confirm that W18 may reuse DerivedSupportProperties for REPORTED_IN (E",
+  "cq": "['CQ-EN-C04', 'CQ-EV-01']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-08",
+  "targetOwner": "W21",
+  "request": "Decide whether SPONSORS_CONTENT needs a program-level target (an award, symposium or session inside a conference) or whether Conference + roleTitleVerbatim suffices.",
+  "cq": "['CQ-EN-C04', 'CQ-EC-03']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-09",
+  "targetOwner": "W13",
+  "request": "Confirm that a company's 'approval was based on <study> data' is a W13 regulatory-basis statement (e.g. predicate APPROVAL_BASED_ON, RegulatoryResponse/DrugApproval -> Study|StudyResult) and never an ",
+  "cq": "['CQ-EN-C02', 'CQ-EN-C03']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-10",
+  "targetOwner": "W00",
+  "request": "Exclude assessmentType NARRATIVE_ARC from provenance state 3 (evidence warrants a broader conclusion) and from CONSIDERS_ASSESSMENT targets; adopt W18-V03 as a V-4xx validator.",
+  "cq": "['CQ-PV-01', 'CQ-EN-C05']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-11",
+  "targetOwner": "W00",
+  "request": "Broaden ANNOUNCED_IN (catalog: SourceRevisionEvent -> SourceSnapshot) to allow Event -> SourceSnapshot as an optional structural pointer to the announcing capture, or confirm that Event.announcementAs",
+  "cq": "['CQ-EN-C02', 'CQ-TM-03']",
+  "kind": ""
+ },
+ {
+  "worker": "W18",
+  "id": "W18-SR-12",
+  "targetOwner": "W17, Fable",
+  "request": "Deliver SafetySignal and AdverseEffect node types (members of EventSubjectTarget) or tell W18 to drop them from the union before merge.",
+  "cq": "['CQ-EN-C01']",
+  "kind": ""
+ },
+ {
   "worker": "W19",
   "id": "W19-SR-01",
   "targetOwner": "W00",
-  "request": "Add SourceKind values TRIAL_REGISTRY_RECORD, BIBLIOGRAPHIC_RECORD, NEWS_ARTICLE, LEGISLATION_OR_REGULATION, PRESENTATION_SLIDES, PERSONAL_WEBPAGE, TECHNICAL_DOC",
+  "request": "Add SourceKind values TRIAL_REGISTRY_RECORD, BIBLIOGRAPHIC_RECORD, NEWS_ARTICLE, LEGISLATION_OR_REGULATION, PRESENTATION_SLIDES, PERSONAL_WEBPAGE, TECHNICAL_DOCUMENTATION, OTHER (with Source.sourceKin",
   "cq": "['CQ-PV-C01', 'CQ-ST-08', 'CQ-EV-05', 'CQ-PV-05']",
   "kind": ""
  },
@@ -1979,7 +2387,7 @@
   "worker": "W19",
   "id": "W19-SR-04",
   "targetOwner": "W00",
-  "request": "Admit the AuthorityScope enum (W19-owned, 12 values) and a catalog convention predicateAuthorityScopes mapping predicates to required scopes (initial rows in 04",
+  "request": "Admit the AuthorityScope enum (W19-owned, 12 values) and a catalog convention predicateAuthorityScopes mapping predicates to required scopes (initial rows in 04-model-cards.md).",
   "cq": "['CQ-PV-C01']",
   "kind": ""
  },
@@ -2003,7 +2411,7 @@
   "worker": "W19",
   "id": "W19-SR-07",
   "targetOwner": "W21",
-  "request": "A slide deck Document is never RENDITION_OF a talk Episode; provide an asserted link predicate between a presentation document and the talk it accompanies (name",
+  "request": "A slide deck Document is never RENDITION_OF a talk Episode; provide an asserted link predicate between a presentation document and the talk it accompanies (name for W21, e.g. ACCOMPANIES_PRESENTATION)",
   "cq": "['CQ-CL-01', 'CQ-PV-05']",
   "kind": ""
  },
@@ -2011,7 +2419,7 @@
   "worker": "W19",
   "id": "W19-SR-08",
   "targetOwner": "W21",
-  "request": "State the asserter rule for statements in multi-author publications (first or corresponding author, author group as an actor, or the publication's AnonymousActo",
+  "request": "State the asserter rule for statements in multi-author publications (first or corresponding author, author group as an actor, or the publication's AnonymousActor).",
   "cq": "['CQ-CL-01', 'INV-402']",
   "kind": ""
  },
@@ -2027,7 +2435,7 @@
   "worker": "W19",
   "id": "W19-SR-10",
   "targetOwner": "W00",
-  "request": "Adopt the canonicalUri rule (post-redirect endpoint, never an identifier resolver, per-kind canonical forms) and rewrite V-235 to join via RENDITION_OF instead ",
+  "request": "Adopt the canonicalUri rule (post-redirect endpoint, never an identifier resolver, per-kind canonical forms) and rewrite V-235 to join via RENDITION_OF instead of 'https://doi.org/' + doi.",
   "cq": "['CQ-EV-05', 'CQ-PV-02']",
   "kind": ""
  },
@@ -2035,7 +2443,7 @@
   "worker": "W19",
   "id": "W19-SR-11",
   "targetOwner": "W09",
-  "request": "Publication identity: DOI, PMID, PMCID as Identifier nodes on Publication; a correction notice is its own Publication (publicationKind AUTHOR_CORRECTION/ERRATUM",
+  "request": "Publication identity: DOI, PMID, PMCID as Identifier nodes on Publication; a correction notice is its own Publication (publicationKind AUTHOR_CORRECTION/ERRATUM) that CORRECTS the article; registry ro",
   "cq": "['CQ-EV-05', 'CQ-ST-08']",
   "kind": ""
  },
@@ -2043,7 +2451,7 @@
   "worker": "W19",
   "id": "W19-SR-12",
   "targetOwner": "W20",
-  "request": "Keep DocumentType as genre and derive SourceKind with the migration-map table; caption tracks are DocumentTextVersions of the video snapshot generated by a TRAN",
+  "request": "Keep DocumentType as genre and derive SourceKind with the migration-map table; caption tracks are DocumentTextVersions of the video snapshot generated by a TRANSCRIPTION activity attributed to the pla",
   "cq": "['CQ-PV-05', 'CQ-PV-04']",
   "kind": ""
  },
@@ -2059,7 +2467,7 @@
   "worker": "W19",
   "id": "W19-SR-14",
   "targetOwner": "W23",
-  "request": "SourceAuthorityAssessment, SourceCoverageRequirement and SourceDiscoveryRecord are INTERNAL and excluded from PUBLIC projections; answers may cite their derived",
+  "request": "SourceAuthorityAssessment, SourceCoverageRequirement and SourceDiscoveryRecord are INTERNAL and excluded from PUBLIC projections; answers may cite their derived outputs (stale, blocked) as qualificati",
   "cq": "['CQ-AX-06', 'CQ-PV-C02', 'CQ-PV-C03']",
   "kind": ""
  },
@@ -2067,7 +2475,7 @@
   "worker": "W19",
   "id": "W19-SR-15",
   "targetOwner": "W00",
-  "request": "Rule: when a capture service serves a cached copy, SourceSnapshot.observedAt is the service's cache time and retrievedAt the request time; the CAPTURE Activity ",
+  "request": "Rule: when a capture service serves a cached copy, SourceSnapshot.observedAt is the service's cache time and retrievedAt the request time; the CAPTURE Activity methodVersion records the cache state.",
   "cq": "['CQ-AX-06', 'CQ-PV-02']",
   "kind": ""
  },
@@ -2075,7 +2483,7 @@
   "worker": "W19",
   "id": "W19-SR-16",
   "targetOwner": "W09",
-  "request": "RegistrationVersion history ingestion must record its retrieval outcome (SourceDiscoveryRecord discoveryTarget RECORD_HISTORY) so CQ-ST-08 answers 'history not ",
+  "request": "RegistrationVersion history ingestion must record its retrieval outcome (SourceDiscoveryRecord discoveryTarget RECORD_HISTORY) so CQ-ST-08 answers 'history not retrieved' rather than 'no prior version",
   "cq": "['CQ-ST-08', 'CQ-ST-04']",
   "kind": ""
  },
@@ -2083,7 +2491,7 @@
   "worker": "W20",
   "id": "W20-SR-01",
   "targetOwner": "W00",
-  "request": "Mark RESOLVES_TO_CHUNK ruleOnly: true in the catalog (and declare HAS_CHUNK, OCCURS_IN_SEGMENT (chunk), ABOUT, MENTIONS (chunk) as ruleOnly derived types), so V",
+  "request": "Mark RESOLVES_TO_CHUNK ruleOnly: true in the catalog (and declare HAS_CHUNK, OCCURS_IN_SEGMENT (chunk), ABOUT, MENTIONS (chunk) as ruleOnly derived types), so V-112 accepts derivationRule without deri",
   "cq": "CQ-PV-02",
   "kind": ""
  },
@@ -2107,7 +2515,7 @@
   "worker": "W20",
   "id": "W20-SR-04",
   "targetOwner": "Fable (registry) with W00",
-  "request": "Register relationship-property type RetrievalEdgeProperties (DerivedEdgeProperties fields + salience, aboutness, segmentationHash, activityUid) with sole writer",
+  "request": "Register relationship-property type RetrievalEdgeProperties (DerivedEdgeProperties fields + salience, aboutness, segmentationHash, activityUid) with sole writer W20, for derived retrieval ABOUT/MENTIO",
   "cq": "CQ-AX-14",
   "kind": ""
  },
@@ -2123,7 +2531,7 @@
   "worker": "W20",
   "id": "W20-SR-06",
   "targetOwner": "W00",
-  "request": "State whether a re-anchored locator (REANCHORS) joins the cited assertion's SUPPORTED_BY. W20 assumes NO automatic join: chunk shortcuts into a corrected text v",
+  "request": "State whether a re-anchored locator (REANCHORS) joins the cited assertion's SUPPORTED_BY. W20 assumes NO automatic join: chunk shortcuts into a corrected text version are derived only from locators an",
   "cq": "CQ-PV-02",
   "kind": ""
  },
@@ -2131,7 +2539,7 @@
   "worker": "W20",
   "id": "W20-SR-07",
   "targetOwner": "W00",
-  "request": "Add a range index on SourceLocator.quoteHash; keep REANCHORS within one Source (V-409) and answer cross-rendition span agreement by a computed quoteHash join (c",
+  "request": "Add a range index on SourceLocator.quoteHash; keep REANCHORS within one Source (V-409) and answer cross-rendition span agreement by a computed quoteHash join (candidate CQ-PV-C03); no stored cross-ren",
   "cq": "CQ-PV-C03",
   "kind": ""
  },
@@ -2139,7 +2547,7 @@
   "worker": "W20",
   "id": "W20-SR-08",
   "targetOwner": "W00",
-  "request": "Make W00's Source type read the same stored properties Document writes on shared :Document:Source nodes: Source.name @alias(property: \"title\") (or Source expose",
+  "request": "Make W00's Source type read the same stored properties Document writes on shared :Document:Source nodes: Source.name @alias(property: \"title\") (or Source exposes title only), Source.canonicalUri store",
   "cq": "CQ-PV-02",
   "kind": ""
  },
@@ -2147,7 +2555,7 @@
   "worker": "W20",
   "id": "W20-SR-09",
   "targetOwner": "W00",
-  "request": "Allow content-derived opaque uid segments (hex sha256 of the identity tuple) for regenerable InformationArtifacts: DocumentTextVersion (snapshot uid, methodVers",
+  "request": "Allow content-derived opaque uid segments (hex sha256 of the identity tuple) for regenerable InformationArtifacts: DocumentTextVersion (snapshot uid, methodVersion, textVersionHash), Segmentation (tex",
   "cq": "CQ-PV-C02",
   "kind": ""
  },
@@ -2163,7 +2571,7 @@
   "worker": "W20",
   "id": "W20-SR-11",
   "targetOwner": "W00 with W01, W04",
-  "request": "HAS_SNAPSHOT names two meanings: live Organization -> OrganizationSnapshot and Product -> ProductSnapshot (VersionedState) versus catalog Source -> SourceSnapsh",
+  "request": "HAS_SNAPSHOT names two meanings: live Organization -> OrganizationSnapshot and Product -> ProductSnapshot (VersionedState) versus catalog Source -> SourceSnapshot (InformationArtifact capture).",
   "cq": "CQ-PV-02",
   "kind": ""
  },
@@ -2171,7 +2579,7 @@
   "worker": "W20",
   "id": "W20-SR-12",
   "targetOwner": "W18 with Fable",
-  "request": "ABOUT has one meaning: derived retrieval aboutness with RetrievalEdgeProperties. Event/NarrativeArc ABOUT, if authoritative, should use an asserted predicate (I",
+  "request": "ABOUT has one meaning: derived retrieval aboutness with RetrievalEdgeProperties. Event/NarrativeArc ABOUT, if authoritative, should use an asserted predicate (INVOLVES or a W18 type).",
   "cq": "CQ-AX-14",
   "kind": ""
  },
@@ -2187,7 +2595,7 @@
   "worker": "W20",
   "id": "W20-SR-14",
   "targetOwner": "W21",
-  "request": "Claim.supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only; derivedFromAssertionUids = instantiating assertions); ClaimOccurrence.supporte",
+  "request": "Claim.supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only; derivedFromAssertionUids = instantiating assertions); ClaimOccurrence.supportedBy targets SourceLocator (kernel) and s",
   "cq": "CQ-EV-01",
   "kind": ""
  },
@@ -2195,7 +2603,7 @@
   "worker": "W20",
   "id": "W20-SR-15",
   "targetOwner": "W21",
-  "request": "Remove Episode.hasTranscriptVersions (HAS_TRANSCRIPT). A transcript is a DocumentTextVersion TEXT_OF_SNAPSHOT a snapshot of a rendition Source RENDITION_OF the ",
+  "request": "Remove Episode.hasTranscriptVersions (HAS_TRANSCRIPT). A transcript is a DocumentTextVersion TEXT_OF_SNAPSHOT a snapshot of a rendition Source RENDITION_OF the Episode.",
   "cq": "CQ-CL-08",
   "kind": ""
  },
@@ -2203,7 +2611,7 @@
   "worker": "W20",
   "id": "W20-SR-16",
   "targetOwner": "W16",
-  "request": "ProtocolResult.supportedBy (SUPPORTED_BY -> union ProvenanceSource = Chunk|Document|Organization|Study) mixes evidence endpoints and actors; split into SUPPORTE",
+  "request": "ProtocolResult.supportedBy (SUPPORTED_BY -> union ProvenanceSource = Chunk|Document|Organization|Study) mixes evidence endpoints and actors; split into SUPPORTED_BY_CHUNK/SUPPORTED_BY_DOCUMENT shortcu",
   "cq": "CQ-EV-01",
   "kind": ""
  },
@@ -2211,7 +2619,7 @@
   "worker": "W20",
   "id": "W20-SR-17",
   "targetOwner": "W01, W02, W03, W04, W05, W06, W07, W09, W11, W17, W18, W22",
-  "request": "On your types, write supportedByChunks / supportedByDocuments as @relationship(type: \"SUPPORTED_BY_CHUNK\" | \"SUPPORTED_BY_DOCUMENT\", direction: OUT, properties:",
+  "request": "On your types, write supportedByChunks / supportedByDocuments as @relationship(type: \"SUPPORTED_BY_CHUNK\" | \"SUPPORTED_BY_DOCUMENT\", direction: OUT, properties: \"DerivedSupportProperties\") with @setta",
   "cq": "CQ-EV-01",
   "kind": ""
  },
@@ -2227,7 +2635,7 @@
   "worker": "W20",
   "id": "W20-SR-19",
   "targetOwner": "W00",
-  "request": "Clarify the offset unit. property-cards.md says 'Unicode code points after normalizationVersion'. W20 proposes: offsets count code points in DocumentTextVersion",
+  "request": "Clarify the offset unit. property-cards.md says 'Unicode code points after normalizationVersion'. W20 proposes: offsets count code points in DocumentTextVersion.text as stored; DocumentTextVersion.nor",
   "cq": "CQ-PV-C01",
   "kind": ""
  },
@@ -2235,7 +2643,7 @@
   "worker": "W20",
   "id": "W20-SR-20",
   "targetOwner": "W00",
-  "request": "Register a matching-only normalization for FUZZY re-anchoring and cross-rendition search (e.g. LIG-HY1 = NFC-WS1 + expand U+FB00..U+FB06 ligatures + remove U+00",
+  "request": "Register a matching-only normalization for FUZZY re-anchoring and cross-rendition search (e.g. LIG-HY1 = NFC-WS1 + expand U+FB00..U+FB06 ligatures + remove U+00AD soft hyphen), never used for quoteHas",
   "cq": "CQ-PV-02",
   "kind": ""
  },
@@ -2259,7 +2667,7 @@
   "worker": "W20",
   "id": "W20-SR-23",
   "targetOwner": "Fable with W00 (examples)",
-  "request": "Repair docs/schema/examples/claim-retelling-provenance.cypher Document nodes: they set documentType (GraphQL name) instead of stored type, no documentId, no url",
+  "request": "Repair docs/schema/examples/claim-retelling-provenance.cypher Document nodes: they set documentType (GraphQL name) instead of stored type, no documentId, no url, entityType 'Source'.",
   "cq": "CQ-AX-14",
   "kind": ""
  },
@@ -2283,7 +2691,7 @@
   "worker": "W21",
   "id": "W21-SR-02",
   "targetOwner": "Fable (enum admission)",
-  "request": "Admit controlled vocabularies as enums or keep them as documented strings - PlatformType, ChannelType, SeriesType, EpisodeType, EpisodeSegmentType (values in 04",
+  "request": "Admit controlled vocabularies as enums or keep them as documented strings - PlatformType, ChannelType, SeriesType, EpisodeType, EpisodeSegmentType (values in 04-model-cards.md).",
   "cq": "CQ-CL-08, CQ-CL-C01, CQ-CL-C02",
   "kind": ""
  },
@@ -2323,7 +2731,7 @@
   "worker": "W21",
   "id": "W21-SR-07",
   "targetOwner": "W00 (validation suite) with W01",
-  "request": "Amend V-423 for the derived RECOMMENDS projection (CL-016, D-011) - accept derivationRule + exactly one derivedFromAssertionUids whose assertion has speechAct R",
+  "request": "Amend V-423 for the derived RECOMMENDS projection (CL-016, D-011) - accept derivationRule + exactly one derivedFromAssertionUids whose assertion has speechAct RECOMMENDS, is asserted by the edge start",
   "cq": "CQ-CL-02, CQ-RC-05",
   "kind": ""
  },
@@ -2331,7 +2739,7 @@
   "worker": "W21",
   "id": "W21-SR-08",
   "targetOwner": "W01, W20, W18",
-  "request": "Write the domain-side SPONSORS_CONTENT fields - Organization.sponsorsContent and ConsumerBrand.sponsorsContent as `[SponsorableTarget!]! @relationship(type: \"SP",
+  "request": "Write the domain-side SPONSORS_CONTENT fields - Organization.sponsorsContent and ConsumerBrand.sponsorsContent as `[SponsorableTarget!]! @relationship(type: \"SPONSORS_CONTENT\", direction: OUT, propert",
   "cq": "CQ-CL-05, CQ-CL-08",
   "kind": ""
  },
@@ -2347,7 +2755,7 @@
   "worker": "W21",
   "id": "W21-SR-10",
   "targetOwner": "W00 with W20",
-  "request": "Resolve the MENTIONS name collision - catalog MENTIONS is SourceLocator -> Mention (structural); live Episode.mentions/Chunk.mentions are entity-level retrieval",
+  "request": "Resolve the MENTIONS name collision - catalog MENTIONS is SourceLocator -> Mention (structural); live Episode.mentions/Chunk.mentions are entity-level retrieval projections.",
   "cq": "CQ-PV-03",
   "kind": ""
  },
@@ -2355,7 +2763,7 @@
   "worker": "W21",
   "id": "W21-SR-11",
   "targetOwner": "Fable (enum ownership)",
-  "request": "RESOLVED by W03-SR-13: Claim.claimPolarity is retyped to W00 Polarity and the live enum AssociationPolarity is retired (no owner needed). Remaining ask: confirm",
+  "request": "RESOLVED by W03-SR-13: Claim.claimPolarity is retyped to W00 Polarity and the live enum AssociationPolarity is retired (no owner needed). Remaining ask: confirm the NEUTRAL -> UNKNOWN (+ review) migra",
   "cq": "CQ-CL-06",
   "kind": ""
  },
@@ -2363,7 +2771,7 @@
   "worker": "W21",
   "id": "W21-SR-12",
   "targetOwner": "Fable (registry)",
-  "request": "WITHDRAWN after reading W00's packet: INSTANCE_OF uses W00 DerivedEdgeProperties with derivationRule always set and the accepted ResolutionHypothesis uid in der",
+  "request": "WITHDRAWN after reading W00's packet: INSTANCE_OF uses W00 DerivedEdgeProperties with derivationRule always set and the accepted ResolutionHypothesis uid in derivedFromAssessmentUids (W00 D-W00-18). R",
   "cq": "CQ-CL-06",
   "kind": ""
  },
@@ -2371,7 +2779,7 @@
   "worker": "W21",
   "id": "W21-SR-13",
   "targetOwner": "W19 (sourceKind proposals) / W00 (enum) / W20 (DocumentType)",
-  "request": "Add sourceKind values for a podcast feed document (PODCAST_FEED), an event or talk transcript (EVENT_TRANSCRIPT), a slide deck (PRESENTATION_SLIDES) and a news ",
+  "request": "Add sourceKind values for a podcast feed document (PODCAST_FEED), an event or talk transcript (EVENT_TRANSCRIPT), a slide deck (PRESENTATION_SLIDES) and a news article (NEWS_ARTICLE); add DocumentType",
   "cq": "CQ-CL-01, CQ-CL-C02, CQ-PV-05",
   "kind": ""
  },
@@ -2387,7 +2795,7 @@
   "worker": "W21",
   "id": "W21-SR-15",
   "targetOwner": "W00 (predicate registry) with W01, W03, W09",
-  "request": "Register asserted predicates SELF_REPORTED_PRACTICE (W05-SR-11 form: subject = the practice entity, e.g. Lifestyle, when resolved; else the asserter Person with",
+  "request": "Register asserted predicates SELF_REPORTED_PRACTICE (W05-SR-11 form: subject = the practice entity, e.g. Lifestyle, when resolved; else the asserter Person with a literal practice description, as in f",
   "cq": "CQ-CL-02, CQ-CL-01",
   "kind": ""
  },
@@ -2395,7 +2803,7 @@
   "worker": "W21",
   "id": "W21-SR-16",
   "targetOwner": "W00 (validation suite) / Fable",
-  "request": "Add V-W21-01..V-W21-12 (fixtures/w21-validation.cypher) to the shared validation suite with final V-4xx numbers (V-W21-06 replaces V-423; V-W21-12 replaces V-41",
+  "request": "Add V-W21-01..V-W21-12 (fixtures/w21-validation.cypher) to the shared validation suite with final V-4xx numbers (V-W21-06 replaces V-423; V-W21-12 replaces V-416); add SPONSORS_CONTENT, OPERATES_CHANN",
   "cq": "CQ-CL-01..08, CQ-PV-02",
   "kind": ""
  },
@@ -2403,7 +2811,7 @@
   "worker": "W21",
   "id": "W21-SR-17",
   "targetOwner": "Fable (examples) / W00",
-  "request": "Upgrade examples/claim-retelling-provenance.cypher - add a SPONSOR_READ EpisodeSegment (IN_RENDITION YouTube, DELIMITED_BY the [3:30] chapter locator) for A6 an",
+  "request": "Upgrade examples/claim-retelling-provenance.cypher - add a SPONSOR_READ EpisodeSegment (IN_RENDITION YouTube, DELIMITED_BY the [3:30] chapter locator) for A6 and SUPPORTED_BY disclosure spans on the t",
   "cq": "CQ-CL-05, CQ-CL-08",
   "kind": ""
  },
@@ -2411,7 +2819,7 @@
   "worker": "W21",
   "id": "W21-SR-18",
   "targetOwner": "Fable (union ownership) with W01",
-  "request": "Assign the live union Recommendable (line 1070) - proposed final name RecommendableTarget = Protocol | ChemicalSubstance | IngredientMaterial | Organization | C",
+  "request": "Assign the live union Recommendable (line 1070) - proposed final name RecommendableTarget = Protocol | ChemicalSubstance | IngredientMaterial | Organization | ConsumerBrand | Product | ProductVariant ",
   "cq": "CQ-RC-05, CQ-CM-04",
   "kind": ""
  },
@@ -2419,7 +2827,7 @@
   "worker": "W21",
   "id": "W21-SR-19",
   "targetOwner": "Fable (candidate)",
-  "request": "Candidate structural relationship EXCERPTS_FROM (Episode -> Episode) for re-edits such as \"Huberman Lab Essentials\", plus a rule for whether re-released utteran",
+  "request": "Candidate structural relationship EXCERPTS_FROM (Episode -> Episode) for re-edits such as \"Huberman Lab Essentials\", plus a rule for whether re-released utterances are new occurrences or RETELLS {VERB",
   "cq": "CQ-CL-C04 (candidate)",
   "kind": ""
  },
@@ -2435,7 +2843,7 @@
   "worker": "W21",
   "id": "W21-SR-21",
   "targetOwner": "W00",
-  "request": "Document the routing of cross-rendition caption discrepancies to CAPTURE_FIDELITY adjudication (verdict PARTIALLY_SUPPORTED when renditions disagree on a hedge ",
+  "request": "Document the routing of cross-rendition caption discrepancies to CAPTURE_FIDELITY adjudication (verdict PARTIALLY_SUPPORTED when renditions disagree on a hedge or amount) and expose them in QS-1a trac",
   "cq": "CQ-PV-04, CQ-CL-C03",
   "kind": ""
  },
@@ -2443,7 +2851,7 @@
   "worker": "W21",
   "id": "W21-SR-22",
   "targetOwner": "Fable (registry) with W19, W20",
-  "request": "Register asserted relationship ACCOMPANIES_TALK (Document -> Episode, AssertedEdgeProperties): a slide deck or handout that accompanied a recorded talk, as asse",
+  "request": "Register asserted relationship ACCOMPANIES_TALK (Document -> Episode, AssertedEdgeProperties): a slide deck or handout that accompanied a recorded talk, as asserted by a source; answers W19-SR-07. The",
   "cq": "CQ-CL-C02",
   "kind": ""
  },
@@ -2451,7 +2859,7 @@
   "worker": "W21",
   "id": "W21-SR-23",
   "targetOwner": "W00 (generic Assertion field; validation suite)",
-  "request": "Add to W00's generic Assertion the field `qualifiedBy: [Assertion!]! @relationship(type: \"QUALIFIED_BY\", direction: OUT, properties: \"QualificationProperties\")`",
+  "request": "Add to W00's generic Assertion the field `qualifiedBy: [Assertion!]! @relationship(type: \"QUALIFIED_BY\", direction: OUT, properties: \"QualificationProperties\")` (W08-SR-10), and replace V-416 by V-W21",
   "cq": "CQ-CL-03",
   "kind": ""
  },
@@ -2459,15 +2867,23 @@
   "worker": "W21",
   "id": "W21-SR-24",
   "targetOwner": "W01 with W09, W19",
-  "request": "Asserter rule for statements in multi-author publications (answer to W19-SR-08): ASSERTED_BY stays exactly one; recommended actor = one AnonymousActor per Publi",
+  "request": "Asserter rule for statements in multi-author publications (answer to W19-SR-08): ASSERTED_BY stays exactly one; recommended actor = one AnonymousActor per Publication with anonymityClass AUTHOR_GROUP ",
   "cq": "CQ-CL-01, CQ-CL-06, CQ-AX-05",
+  "kind": ""
+ },
+ {
+  "worker": "W21",
+  "id": "W21-SR-25",
+  "targetOwner": "W00 (AssertionSubjectTarget) and W22 (MediaSubjectTarget)",
+  "request": "Remove ExperienceReport from your unions: W21 retires the type and folds it into ClaimOccurrence (assertionBasis PERSONAL_EXPERIENCE). Where a union needs to reach experience reports, list nothing ext",
+  "cq": "CQ-CL-09",
   "kind": ""
  },
  {
   "worker": "W22",
   "id": "W22-SR-01",
   "targetOwner": "W00",
-  "request": "Register uid type tokens: MediaAsset media-asset, MediaVariant media-variant, MediaAnnotation media-annotation, GraphView graph-view, FigurePanel figure-panel, ",
+  "request": "Register uid type tokens: MediaAsset media-asset, MediaVariant media-variant, MediaAnnotation media-annotation, GraphView graph-view, FigurePanel figure-panel, ProductLabelRegion label-region, MediaSu",
   "cq": "['CQ-MD-C01', 'CQ-MD-C03', 'CQ-MD-C04']",
   "kind": ""
  },
@@ -2475,7 +2891,7 @@
   "worker": "W22",
   "id": "W22-SR-02",
   "targetOwner": "W00",
-  "request": "Add useKind DISPLAY_MEDIA (\"show a rendition of a media asset in an answer, page or export\") to the frozen UseKind enum. Optionally add DERIVE_MEDIA (\"create a ",
+  "request": "Add useKind DISPLAY_MEDIA (\"show a rendition of a media asset in an answer, page or export\") to the frozen UseKind enum. Optionally add DERIVE_MEDIA (\"create a crop, overlay or other derivative rendit",
   "cq": "['CQ-PV-06', 'CQ-PV-01', 'CQ-MD-C03']",
   "kind": ""
  },
@@ -2483,7 +2899,7 @@
   "worker": "W22",
   "id": "W22-SR-03",
   "targetOwner": "W00",
-  "request": "Extend the domains and ranges of PROV relationships to media nodes: WAS_GENERATED_BY from MediaAsset, MediaVariant, MediaAnnotation, MediaSuitabilityAssessment ",
+  "request": "Extend the domains and ranges of PROV relationships to media nodes: WAS_GENERATED_BY from MediaAsset, MediaVariant, MediaAnnotation, MediaSuitabilityAssessment (already EvidenceAssessment) to Activity",
   "cq": "['CQ-PV-03', 'CQ-MD-C04']",
   "kind": ""
  },
@@ -2491,7 +2907,7 @@
   "worker": "W22",
   "id": "W22-SR-04",
   "targetOwner": "W00",
-  "request": "Add activityKind values MEDIA_GENERATION (a model or renderer produced media bytes), MEDIA_TRANSFORMATION (crop, resize, overlay, transcode of existing bytes by",
+  "request": "Add activityKind values MEDIA_GENERATION (a model or renderer produced media bytes), MEDIA_TRANSFORMATION (crop, resize, overlay, transcode of existing bytes by BellLabs) and MEDIA_ASSESSMENT (a suita",
   "cq": "['CQ-PV-03', 'CQ-MD-C04', 'CQ-MD-C05']",
   "kind": ""
  },
@@ -2499,7 +2915,7 @@
   "worker": "W22",
   "id": "W22-SR-05",
   "targetOwner": "W00",
-  "request": "Register an image-coordinate normalization version for IMAGE_REGION locators and MediaAnnotation coordinates: IMG-PX1 = \"x, y, width, height in pixels on the de",
+  "request": "Register an image-coordinate normalization version for IMAGE_REGION locators and MediaAnnotation coordinates: IMG-PX1 = \"x, y, width, height in pixels on the decoded raster of the rendition's raw byte",
   "cq": "['CQ-PV-02']",
   "kind": ""
  },
@@ -2507,7 +2923,7 @@
   "worker": "W22",
   "id": "W22-SR-06",
   "targetOwner": "W00",
-  "request": "Add sourceKind values MEDIA_FILE (a retrievable media file endpoint such as a CDN or repository file URL) and MEDIA_REPOSITORY_RECORD (a media repository's desc",
+  "request": "Add sourceKind values MEDIA_FILE (a retrievable media file endpoint such as a CDN or repository file URL) and MEDIA_REPOSITORY_RECORD (a media repository's description record such as a Wikimedia Commo",
   "cq": "['CQ-MD-C03', 'CQ-MD-C04', 'CQ-PV-05']",
   "kind": ""
  },
@@ -2515,7 +2931,7 @@
   "worker": "W22",
   "id": "W22-SR-07",
   "targetOwner": "W04",
-  "request": "Confirm the label seam: (a) a label IMAGE capture is a LabelSnapshot (SourceSnapshot specialisation) like the HTML Supplement Facts page; (b) LabelDeclarations ",
+  "request": "Confirm the label seam: (a) a label IMAGE capture is a LabelSnapshot (SourceSnapshot specialisation) like the HTML Supplement Facts page; (b) LabelDeclarations read from an image are HAS_DECLARATION o",
   "cq": "['CQ-MD-C04', 'CQ-PF family']",
   "kind": ""
  },
@@ -2523,7 +2939,7 @@
   "worker": "W22",
   "id": "W22-SR-08",
   "targetOwner": "W00",
-  "request": "Admit the media validation family V-601..V-615 (fixtures/v-media-validation.cypher) into docs/schema/neo4j/ validation.cypher (ids are candidates; renumber if n",
+  "request": "Admit the media validation family V-601..V-615 (fixtures/v-media-validation.cypher) into docs/schema/neo4j/ validation.cypher (ids are candidates; renumber if needed), and add to the provenance module",
   "cq": "['CQ-MD-C05', 'CQ-PV-01', 'CQ-PV-06']",
   "kind": ""
  },
@@ -2531,7 +2947,7 @@
   "worker": "W22",
   "id": "W22-SR-09",
   "targetOwner": "W07",
-  "request": "Retire live Metric.mediaUrl and Metric.mediaType (live line 1291) in favour of MediaAsset -EXPLAINS|DEPICTS-> Metric with rights and suitability (live-schema-al",
+  "request": "Retire live Metric.mediaUrl and Metric.mediaType (live line 1291) in favour of MediaAsset -EXPLAINS|DEPICTS-> Metric with rights and suitability (live-schema-alignment line 233 deferred them to the me",
   "cq": "['CQ-MD-C02']",
   "kind": ""
  },
@@ -2539,7 +2955,7 @@
   "worker": "W22",
   "id": "W22-SR-10",
   "targetOwner": "W23",
-  "request": "Own the PolicyVersion contents that decide media display: which MediaRightsStatus values permit DISPLAY_MEDIA, how attribution / share-alike / indicate-changes ",
+  "request": "Own the PolicyVersion contents that decide media display: which MediaRightsStatus values permit DISPLAY_MEDIA, how attribution / share-alike / indicate-changes duties are honoured, whether DERIVE_MEDI",
   "cq": "['CQ-PV-06', 'CQ-MD-C03']",
   "kind": ""
  },
@@ -2547,7 +2963,7 @@
   "worker": "W22",
   "id": "W22-SR-11",
   "targetOwner": "W21",
-  "request": "Confirm that W21 Source renditions (video, audio feed, transcript page) and W22 MediaAssets share bytes only via contentHash equality and DERIVED_FROM_SOURCE{ca",
+  "request": "Confirm that W21 Source renditions (video, audio feed, transcript page) and W22 MediaAssets share bytes only via contentHash equality and DERIVED_FROM_SOURCE{captureRelation}; a thumbnail or frame fro",
   "cq": "['CQ-CL-08', 'CQ-PV-02']",
   "kind": ""
  },
@@ -2555,7 +2971,7 @@
   "worker": "W22",
   "id": "W22-SR-12",
   "targetOwner": "W03",
-  "request": "Keep the live Association type or tell W22 to drop it from MediaVisualizableRelationshipTarget; confirm Pathway token and that Mechanism/Pathway/MolecularEntity",
+  "request": "Keep the live Association type or tell W22 to drop it from MediaVisualizableRelationshipTarget; confirm Pathway token and that Mechanism/Pathway/MolecularEntity/Species/AnatomicalContext/Organ/Outcome",
   "cq": "['CQ-MD-C02', 'CQ-MD-C05']",
   "kind": ""
  },
@@ -2563,7 +2979,7 @@
   "worker": "W22",
   "id": "W22-SR-13",
   "targetOwner": "W00",
-  "request": "In W00's AssertionSubjectTarget (sdl-fragment line ~1623, \"# W22\" members) remove MediaSource (retired by W22-D01; otherwise the merged schema has an undefined ",
+  "request": "In W00's AssertionSubjectTarget (sdl-fragment line ~1623, \"# W22\" members) remove MediaSource (retired by W22-D01; otherwise the merged schema has an undefined union member) and add MediaRightsRecord ",
   "cq": "['CQ-MD-C03', 'CQ-PV-06']",
   "kind": ""
  },
@@ -2571,7 +2987,7 @@
   "worker": "W23",
   "id": "W23-SR-01",
   "targetOwner": "W00",
-  "request": "Register uid type tokens keyed by primary label: PolicyVersion: policy-version (only the alias key 'policy-version' exists today), DecisionCriterion: decision-c",
+  "request": "Register uid type tokens keyed by primary label: PolicyVersion: policy-version (only the alias key 'policy-version' exists today), DecisionCriterion: decision-criterion (absent), and confirm AnswerRec",
   "cq": "['CQ-RC-02', 'CQ-AX-03']",
   "kind": ""
  },
@@ -2579,7 +2995,7 @@
   "worker": "W23",
   "id": "W23-SR-02",
   "targetOwner": "W00",
-  "request": "Extend the catalog domain of WAS_GENERATED_BY (provenance) with AnswerRecord, so a published answer names its ANSWER_COMPOSITION Activity and through it the AUT",
+  "request": "Extend the catalog domain of WAS_GENERATED_BY (provenance) with AnswerRecord, so a published answer names its ANSWER_COMPOSITION Activity and through it the AUTHORIZED_BY {useKind} PolicyVersion.",
   "cq": "['CQ-AX-01', 'CQ-AX-C01']",
   "kind": ""
  },
@@ -2595,7 +3011,7 @@
   "worker": "W23",
   "id": "W23-SR-04",
   "targetOwner": "Fable",
-  "request": "Register candidate structural relationship DECLARES_CRITERION (PolicyVersion -> DecisionCriterion, StructuralEdgeProperties.orderIndex) in recommendation_decisi",
+  "request": "Register candidate structural relationship DECLARES_CRITERION (PolicyVersion -> DecisionCriterion, StructuralEdgeProperties.orderIndex) in recommendation_decisions.",
   "cq": "['CQ-RC-02', 'CQ-RC-03']",
   "kind": ""
  },
@@ -2611,7 +3027,7 @@
   "worker": "W23",
   "id": "W23-SR-06",
   "targetOwner": "W00",
-  "request": "Define the identity-merge redirect record (OPEN-QUESTIONS P0 item 8): a directed record naming the surviving and the retired uid with recordedAt, resolvable as ",
+  "request": "Define the identity-merge redirect record (OPEN-QUESTIONS P0 item 8): a directed record naming the surviving and the retired uid with recordedAt, resolvable as of a recorded viewpoint, and an equivale",
   "cq": "['CQ-RC-04', 'CQ-ID-01']",
   "kind": ""
  },
@@ -2627,7 +3043,7 @@
   "worker": "W23",
   "id": "W23-SR-08",
   "targetOwner": "W00",
-  "request": "Rule the stored casing of PrivacyClass ('PUBLIC'/'INTERNAL', the enum names @neo4j/graphql writes) and amend the validators and shapes that compare with catalog",
+  "request": "Rule the stored casing of PrivacyClass ('PUBLIC'/'INTERNAL', the enum names @neo4j/graphql writes) and amend the validators and shapes that compare with catalog lower-case spellings: V-313 (accepts ['",
   "cq": "['CQ-PC-08', 'CQ-AX-12']",
   "kind": ""
  },
@@ -2635,7 +3051,7 @@
   "worker": "W23",
   "id": "W23-SR-09",
   "targetOwner": "Fable",
-  "request": "Number and adopt V-W23-01a/01b (successors of V-121), V-W23-02, V-W23-03 (+03b informational until SR-02), V-W23-04, V-W23-05, V-W23-06, V-W23-07, V-W23-08, V-W",
+  "request": "Number and adopt V-W23-01a/01b (successors of V-121), V-W23-02, V-W23-03 (+03b informational until SR-02), V-W23-04, V-W23-05, V-W23-06, V-W23-07, V-W23-08, V-W23-09, V-W23-10 (fixtures/validation-w23",
   "cq": "['CQ-AX-03', 'CQ-AX-12', 'CQ-PC-08', 'CQ-AX-C01', 'CQ-AX-C02",
   "kind": ""
  },
@@ -2643,7 +3059,7 @@
   "worker": "W23",
   "id": "W23-SR-10",
   "targetOwner": "W00",
-  "request": "Field-level privacy classes on kernel types for the tier closure (04 section 6): Activity instances INTERNAL; Agent identity (uid, name, agentKind) PUBLIC with ",
+  "request": "Field-level privacy classes on kernel types for the tier closure (04 section 6): Activity instances INTERNAL; Agent identity (uid, name, agentKind) PUBLIC with model, promptVersion, toolVersion INTERN",
   "cq": "['CQ-AX-01', 'CQ-AX-09', 'CQ-AX-13', 'CQ-AX-15']",
   "kind": ""
  },
@@ -2651,7 +3067,7 @@
   "worker": "W23",
   "id": "W23-SR-11",
   "targetOwner": "W16",
-  "request": "V-533p: when ruleBasis = BELLLABS_SAFETY_POLICY, the referenced PolicyVersion (policyVersionUid) must exist, be INTERNAL and have policyKind SAFETY_REVIEW. RECO",
+  "request": "V-533p: when ruleBasis = BELLLABS_SAFETY_POLICY, the referenced PolicyVersion (policyVersionUid) must exist, be INTERNAL and have policyKind SAFETY_REVIEW. RECORDS/POSTS_RESULT public-person rule is s",
   "cq": "['CQ-PR-04', 'CQ-PC-08']",
   "kind": ""
  },
@@ -2659,7 +3075,7 @@
   "worker": "W23",
   "id": "W23-SR-12",
   "targetOwner": "W01",
-  "request": "Confirm: HAS_PARTICIPANT_TOKEN live edges are deleted with a logged count, NOT exported to the private store (no consenting owner exists for a third-party link)",
+  "request": "Confirm: HAS_PARTICIPANT_TOKEN live edges are deleted with a logged count, NOT exported to the private store (no consenting owner exists for a third-party link); CohortParticipant nodes derived from B",
   "cq": "['CQ-PC-08', 'CQ-PC-05']",
   "kind": ""
  },
@@ -2667,7 +3083,7 @@
   "worker": "W23",
   "id": "W23-SR-13",
   "targetOwner": "W21",
-  "request": "With ExperienceReport and REPORTS retired, define the shared record shape for a consented de-identified contribution (private-store-interface 8.3): ClaimOccurre",
+  "request": "With ExperienceReport and REPORTS retired, define the shared record shape for a consented de-identified contribution (private-store-interface 8.3): ClaimOccurrence asserted by an AnonymousActor in a c",
   "cq": "['CQ-PC-05', 'CQ-AX-28']",
   "kind": ""
  },
@@ -2675,7 +3091,7 @@
   "worker": "W23",
   "id": "W23-SR-14",
   "targetOwner": "W07",
-  "request": "Keep DiagnosticResult implementable by a non-graph record (private-store-interface section 3 maps every field; relationship fields become uid columns). Amend V-",
+  "request": "Keep DiagnosticResult implementable by a non-graph record (private-store-interface section 3 maps every field; relationship fields become uid columns). Amend V-313's accepted list to the final privacy",
   "cq": "['CQ-DX-08', 'CQ-AX-21', 'CQ-PC-06']",
   "kind": ""
  },
@@ -2683,7 +3099,7 @@
   "worker": "W23",
   "id": "W23-SR-15",
   "targetOwner": "W00",
-  "request": "UseKind has no value for displaying or reproducing a media asset in an answer (W22 MediaRightsRecord feeds a BellLabs use decision). Add a candidate value (for ",
+  "request": "UseKind has no value for displaying or reproducing a media asset in an answer (W22 MediaRightsRecord feeds a BellLabs use decision). Add a candidate value (for example DISPLAY_MEDIA_IN_ANSWER) or rule",
   "cq": "['CQ-AX-C01', 'CQ-PV-06']",
   "kind": ""
  },
@@ -2691,7 +3107,7 @@
   "worker": "W23",
   "id": "W23-SR-16",
   "targetOwner": "Fable",
-  "request": "Runtime findings for the final build: (1) DateTime reads through @neo4j/graphql 7.6.3 call apoc.date.convertFormat (APOC required; Community test instance witho",
+  "request": "Runtime findings for the final build: (1) DateTime reads through @neo4j/graphql 7.6.3 call apoc.date.convertFormat (APOC required; Community test instance without APOC fails reads); (2) relationship t",
   "cq": "['CQ-AX-13', 'CQ-AX-12']",
   "kind": ""
  }

@@ -6181,6 +6181,167 @@
   "note": ""
  },
  {
+  "worker": "W10",
+  "live": "enum EvidenceStrength {LOW MODERATE HIGH}",
+  "final": "enum EvidenceStrength (W10, legacy hint enum)",
+  "action": "keep",
+  "note": "values unchanged; used only by other owners' hint fields; never an assessment (INV-209)"
+ },
+ {
+  "worker": "W10",
+  "live": "Claim.evidenceStrength",
+  "final": "W21 ClaimEvidenceAssessment.evidenceStrength (+ criteriaVersion) or EvidenceStrengthAssessment over the EvidenceSynthesis that ASSESSES_CLAIM the Claim",
+  "action": "move",
+  "note": "migrated values: methodVersion legacy-unspecified, status PROPOSED (W21 owns the Claim side)"
+ },
+ {
+  "worker": "W10",
+  "live": "AssociationMetadata.evidenceStrength",
+  "final": "EvidenceStrengthAssessment {scheme: LEGACY_UNSPECIFIED}; edge copy keeps value only with assessmentUid (V-213b)",
+  "action": "derive",
+  "note": "edge owner W03 (AssociationProjectionProperties)"
+ },
+ {
+  "worker": "W10",
+  "live": "SafetyMetadata.evidenceStrength",
+  "final": "EvidenceStrengthAssessment {scheme: LEGACY_UNSPECIFIED}; hint on W17 SafetyEdgeProperties",
+  "action": "derive",
+  "note": "edge owner W17"
+ },
+ {
+  "worker": "W10",
+  "live": "TreatmentTargetMetadata.evidenceStrength",
+  "final": "W06 TreatmentTargetProperties.legacyEvidenceStrengthHint: EvidenceStrength",
+  "action": "derive",
+  "note": "hint only; ASSESSES_STRENGTH_OF does not accept Assertion (D-W10-11)"
+ },
+ {
+  "worker": "W10",
+  "live": "SafetySignal.evidenceStrength",
+  "final": "EvidenceStrengthAssessment (LEGACY_UNSPECIFIED) ASSESSES_STRENGTH_OF the synthesis behind the signal; hint on W17 SafetySignal",
+  "action": "derive",
+  "note": "owner W17"
+ },
+ {
+  "worker": "W10",
+  "live": "Study.evidenceLevel",
+  "final": "EvidenceStrengthAssessment {scheme, level, criteria, methodVersion} -[:ASSESSES_STRENGTH_OF]-> Study",
+  "action": "move",
+  "note": "free-text values -> scheme LEGACY_UNSPECIFIED, status PROPOSED; W09 retires the field (V-210)"
+ },
+ {
+  "worker": "W10",
+  "live": "OutcomeResult.isClinicallyMeaningful",
+  "final": "Assertion RESULT_CLINICALLY_MEANINGFUL (author claim) + ResultInterpretation.meaningfulnessVerdict (BellLabs)",
+  "action": "split",
+  "note": "a live true with no source becomes a PROPOSED author-claim Assertion only if a locator exists; otherwise dropped to a review queue; never a BellLabs verdict (V-213)"
+ },
+ {
+  "worker": "W10",
+  "live": "Biomarker.clinicalSignificance",
+  "final": "EndpointClassification (biomarkerCategory, endpointClass) in a context of use",
+  "action": "move",
+  "note": "W07 keeps a read-only display copy"
+ },
+ {
+  "worker": "W10",
+  "live": "Biomarker.biomarkerType",
+  "final": "EndpointClassification.biomarkerCategory (BEST)",
+  "action": "move",
+  "note": "W07 keeps display; no surrogate status on Biomarker (V-214b)"
+ },
+ {
+  "worker": "W10",
+  "live": "Study.evaluates / EVALUATES (InterventionArmMetadata) to a current Product",
+  "final": "EvidenceApplicability -[:HAS_EVIDENCE_TARGET]-> StudyIntervention; -[:ASSESSES_APPLICABILITY_TO]-> FormulationVersion|ProductVariant|Product",
+  "action": "retire",
+  "note": "W09 keeps Study.evaluates read-only (CL-017); each legacy edge becomes a PROPOSED EvidenceApplicability with all dimensions NOT_ASSESSED, never a MATCH"
+ },
+ {
+  "worker": "W10",
+  "live": "InterventionArmMetadata.confidence",
+  "final": "",
+  "action": "retire",
+  "note": "single confidence forbidden (INV-407)"
+ },
+ {
+  "worker": "W10",
+  "live": "ASSESSES_APPLICABILITY_TO -> UserContext (0.1.0 range)",
+  "final": "private PersonalApplicabilityAssessment referencing the EvidenceApplicability uid (W23 store)",
+  "action": "move",
+  "note": "removed from the shared graph (round 0008, V-524)"
+ },
+ {
+  "worker": "W10",
+  "live": "proposed-delta EvidenceApplicability (status: String, evidenceTarget: [ArmIntervention], useTargetProduct: [Product])",
+  "final": "EvidenceApplicability (status: AssessmentStatus!, evidenceTarget: [EvidenceTargetTarget!]!, useTarget: [ApplicabilityUseTarget!]!, forUseContext, basedOn* , flat derived *Match fields)",
+  "action": "keep",
+  "note": "ArmIntervention is renamed StudyIntervention (D-003); use target widened to the catalog range"
+ },
+ {
+  "worker": "W10",
+  "live": "proposed-delta ApplicabilityDimension (supportedByChunks: [Chunk])",
+  "final": "ApplicabilityDimension (supportedBy: [SourceLocator]; considers; considersAssessments)",
+  "action": "keep",
+  "note": "a Chunk is never a locator (INV-404); SUPPORTED_BY targets SourceLocator"
+ },
+ {
+  "worker": "W10",
+  "live": "proposed-delta EndpointClassification.biomarkerCategory: String, contextMatch: String, outcomes: [OutcomeMeasure]",
+  "final": "biomarkerCategory: BiomarkerCategory, contextMatch: ContextOfUseMatch, classifiesOutcome: [OutcomeDefinition]",
+  "action": "rename",
+  "note": "OutcomeMeasure -> OutcomeDefinition (D-007); string values map 1:1"
+ },
+ {
+  "worker": "W10",
+  "live": "proposed-delta EvidenceSynthesis.verdict: String; triggeredByResults/includesResults: [OutcomeResult]",
+  "final": "verdict: AdjudicationVerdict!; triggeredBy{Results,Publications,RegistrationVersions,Assertions}; includes: [SynthesisInputTarget]",
+  "action": "rename",
+  "note": "OutcomeResult -> StudyResult (D-007)"
+ },
+ {
+  "worker": "W10",
+  "live": "proposed-delta EvidenceChangeMetadata {criterionCode, effectOnVerdict: String, evidencePublishedAt}",
+  "final": "EvidenceChangeProperties {criterionCode, effectOnVerdict: EvidenceChangeEffect!, evidencePublishedAt}",
+  "action": "rename",
+  "note": "values unchanged"
+ },
+ {
+  "worker": "W10",
+  "live": "proposed-delta SynthesisInputMetadata {inputRole: String}",
+  "final": "SynthesisInputProperties {inputRole: SynthesisInputRole!}",
+  "action": "rename",
+  "note": "values unchanged"
+ },
+ {
+  "worker": "W10",
+  "live": "proposed-delta ClaimEvidenceAssessment.assessesClaim @relationship(ASSESSES_CLAIM)",
+  "final": "W21 ClaimEvidenceAssessment.claim @relationship(ASSESSES_CLAIM_EVIDENCE)",
+  "action": "rename",
+  "note": "ASSESSES_CLAIM is EvidenceSynthesis only (W10-SR-02)"
+ },
+ {
+  "worker": "W10",
+  "live": "catalog EvidenceApplicability derivedProperties identityMatch..outcomeMatch",
+  "final": "EvidenceApplicability.*Match: ApplicabilityVerdict (read-only derived)",
+  "action": "derive",
+  "note": "regenerated from dimension nodes in the same transaction"
+ },
+ {
+  "worker": "W10",
+  "live": "catalog UseContextProfile {name, populationDescriptor, doseDescriptor, durationDescriptor}",
+  "final": "UseContextProfile (+ CANDIDATE servingsPerDay, intendedDurationIso)",
+  "action": "keep",
+  "note": "archetype Entity"
+ },
+ {
+  "worker": "W10",
+  "live": "examples/study-vs-product-mismatch.cypher ApplicabilityDimension uids hu:applicability:<ea>-<dim_name>",
+  "final": "hu:applicability-dimension:<ea-opaque>-<dim-name>",
+  "action": "rename",
+  "note": "fixture-only defect (W10-SR-08); production uids are opaque"
+ },
+ {
   "worker": "W11",
   "live": "ManufacturingProcess",
   "final": "ManufacturingProcess",
@@ -8566,6 +8727,426 @@
   "final": "same",
   "action": "keep",
   "note": "+ ConstraintRole and ProtocolChangeProvenance from catalog"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect",
+  "final": "AdverseEffect",
+  "action": "keep",
+  "note": "labels AdverseEffect:Entity (add archetype label Entity, D-001); add uid hu:adverse-effect:<id> (INV-106; token W17-SR-02), entityType ADVERSE_EFFECT; implements EntityArchetype"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.id",
+  "final": "AdverseEffect.id",
+  "action": "keep",
+  "note": "opaque segment of uid"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.name",
+  "final": "AdverseEffect.name",
+  "action": "keep",
+  "note": "nullable String (D-013); display only"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.description",
+  "final": "AdverseEffect.description",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.mongoResearchRunId",
+  "final": "AdverseEffect.mongoResearchRunId",
+  "action": "keep",
+  "note": "operational; maps to Activity.externalRunId"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.createdAt",
+  "final": "AdverseEffect.createdAt",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.updatedAt",
+  "final": "AdverseEffect.updatedAt",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.searchText|searchFields|embeddingModel|embeddingDimensions",
+  "final": "AdverseEffect.(same)",
+  "action": "keep",
+  "note": "derived retrieval fields (INV-107)"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.effectCategory",
+  "final": "AdverseEffect.effectCategory",
+  "action": "keep",
+  "note": "controlled string candidates SYMPTOM, LAB_ABNORMALITY, DIAGNOSIS, INJURY, MEDICATION_ERROR, OTHER; unmapped values kept and flagged"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.organSystem",
+  "final": "AdverseEffect.organSystem",
+  "action": "keep",
+  "note": "display text; organ links are AFFECTS_ORGAN"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.severitySummary",
+  "final": "AdverseEffect.severitySummary",
+  "action": "keep",
+  "note": "read-only deprecated (@settable false); severity belongs to SafetySignal assessments"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.affectsOrgans (AFFECTS_ORGAN, AssociationMetadata)",
+  "final": "AdverseEffect.affectsOrgans (AFFECTS_ORGAN, MechanismLinkProperties)",
+  "action": "keep",
+  "note": "class structural curated (W03-SR-08 ruling W17-SR-10); AssociationMetadata.evidenceStrength/confidence dropped (hint retained in notes only if present)"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.associatedWithConditions (ASSOCIATED_WITH_CONDITION)",
+  "final": "AdverseEffect.associatedWithConditions",
+  "action": "derive",
+  "note": "W03 one-to-one projection of an ASSOCIATED_WITH_CONDITION assertion (AssociationProjectionProperties), read-only; rows without a backing assertion get one with basis UNKNOWN and a MIGRATION adjudicati"
+ },
+ {
+  "worker": "W17",
+  "live": "AdverseEffect.supportedByDocuments|supportedByChunks",
+  "final": "AdverseEffect.supportedByDocuments|supportedByChunks (DerivedSupportProperties)",
+  "action": "derive",
+  "note": "W20-SR-17; read-only; a chunk is never a locator (INV-404)"
+ },
+ {
+  "worker": "W17",
+  "live": "fulltext AdverseEffectSearch / searchAdverseEffects",
+  "final": "same (operations.cypher E)",
+  "action": "keep",
+  "note": "D-015"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal",
+  "final": "SafetySignal",
+  "action": "split",
+  "note": "re-archetyped: labels SafetySignal:EvidenceAssessment (D-W17-01). Data step per live node: SET n:EvidenceAssessment, n.uid='hu:safety-signal:'+n.id, n.assessmentType='SafetySignal', n.methodVersion='l"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.id|name|description|mongoResearchRunId|createdAt|updatedAt|searchText|searchFields|embeddingModel|embeddingDimensions",
+  "final": "SafetySignal.(same)",
+  "action": "keep",
+  "note": "name nullable (D-013)"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.signalType",
+  "final": "SafetySignal.signalType",
+  "action": "keep",
+  "note": "controlled string candidates NEW_EFFECT, INCREASED_FREQUENCY, DOSE_RELATED_TOLERABILITY, LAB_ABNORMALITY, INTERACTION"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.severity",
+  "final": "SafetySignal.severity",
+  "action": "keep",
+  "note": "SafetySeverity unchanged; SERIOUS readable on migrated rows only (V-W17-10)"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.evidenceStrength",
+  "final": "SafetySignal.legacyEvidenceStrengthHint",
+  "action": "rename",
+  "note": "extraction-time hint (INV-209); never a verdict; V-W17-02"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.frequencyText|latencyText|reversibility|mechanismSummary|populationSummary",
+  "final": "SafetySignal.(same)",
+  "action": "keep",
+  "note": "immutable display content of the (migrated) assessment"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.interactionSummary",
+  "final": "SafetySignal.interactionSummary",
+  "action": "keep",
+  "note": "legacy display; interactions are InteractionAssertions extracted from locators"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.subjects (HAS_SAFETY_SIGNAL IN, SafetyMetadata)",
+  "final": "SafetySignal.subjects (HAS_SAFETY_SIGNAL IN, SafetyEdgeProperties)",
+  "action": "keep",
+  "note": "class structural (D-W17-02); data step: SET r.relationshipUid='hu:rel:'+randomUUID(), r.subjectRole='PRIMARY' when one subject, else first PRIMARY and the rest CO_EXPOSURE with a MIGRATION review; REM"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.relatesToEffects (RELATES_TO_EFFECT, AssociationMetadata)",
+  "final": "SafetySignal.relatesToEffects (StructuralEdgeProperties)",
+  "action": "keep",
+  "note": "exactly one effect; signals with several effects split into one signal per effect at migration (each NOT_EVALUATED)"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.relatesToConditions (RELATES_TO_CONDITION, AssociationMetadata)",
+  "final": "SafetySignal.relatesToConditions (StructuralEdgeProperties)",
+  "action": "keep",
+  "note": "meaning narrowed to risk-modifying pre-existing condition; rows that encode the effect as a Condition are re-pointed to an AdverseEffect after review"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.affectsOrgans (AFFECTS_ORGAN)",
+  "final": "",
+  "action": "retire",
+  "note": "organ read through relatesToEffects.affectsOrgans; data step copies the organ to the effect's AFFECTS_ORGAN if absent, then deletes the signal edge (V-W17-09)"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.reportedInStudies (REPORTS_SAFETY_SIGNAL IN)",
+  "final": "SafetySignal.reportedInStudies (DerivedEdgeProperties, read-only)",
+  "action": "derive",
+  "note": "rule ss-study/v1; live edges without AE inputs are kept as LEGACY_UNDATED read-only rows until a signal with inputs exists"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal.supportedByDocuments|supportedByChunks",
+  "final": "same (DerivedSupportProperties)",
+  "action": "derive",
+  "note": "W20-SR-17"
+ },
+ {
+  "worker": "W17",
+  "live": "fulltext SafetySignalSearch / searchSafetySignals",
+  "final": "same (operations.cypher E)",
+  "action": "keep",
+  "note": "D-015"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata",
+  "final": "SafetyEdgeProperties",
+  "action": "split",
+  "note": "successor type specializing StructuralEdgeProperties"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata.exposureContext",
+  "final": "SafetyEdgeProperties.exposureContext",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata.doseText",
+  "final": "SafetyEdgeProperties.doseText",
+  "action": "keep",
+  "note": "verbatim; normalized bands live on UseConstraint/ContraindicationAssertion"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata.route",
+  "final": "SafetyEdgeProperties.route",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata.frequency",
+  "final": "SafetyEdgeProperties.frequency",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata.populationSubset",
+  "final": "SafetyEdgeProperties.populationSubset",
+  "action": "keep",
+  "note": "non-personal descriptor only"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata.evidenceStrength",
+  "final": "SafetySignal.legacyEvidenceStrengthHint",
+  "action": "move",
+  "note": "V-213b / V-W17-07: never on the edge"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata.confidence",
+  "final": "",
+  "action": "retire",
+  "note": "INV-407 generic confidence; no method; dropped (value preserved in the migration log)"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata.notes",
+  "final": "SafetyEdgeProperties.notes",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "SafetyMetadata.mongoResearchRunId",
+  "final": "SafetyEdgeProperties.mongoResearchRunId",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySubject",
+  "final": "SafetySubjectTarget",
+  "action": "rename",
+  "note": "members Compound->ChemicalSubstance (D-002), Ingredient/FoodItem->IngredientMaterial, FoodProduct->Product, + ProductVariant, + Exposure; Lifestyle, Treatment, Procedure kept; Product kept"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySeverity",
+  "final": "SafetySeverity",
+  "action": "keep",
+  "note": "values unchanged; meaning = intensity, not seriousness"
+ },
+ {
+  "worker": "W17",
+  "live": "Compound.hasSafetySignals",
+  "final": "ChemicalSubstance.hasSafetySignals (W02 writes)",
+  "action": "move",
+  "note": "SafetyEdgeProperties; structural (W17-SR-04)"
+ },
+ {
+  "worker": "W17",
+  "live": "Ingredient.hasSafetySignals",
+  "final": "IngredientMaterial.hasSafetySignals (W02 writes)",
+  "action": "move",
+  "note": "W02-SR-14"
+ },
+ {
+  "worker": "W17",
+  "live": "Product.hasSafetySignals",
+  "final": "Product.hasSafetySignals (W04 writes)",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "Procedure.hasSafetySignals",
+  "final": "Procedure.hasSafetySignals (W06 writes)",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "Treatment.hasSafetySignals",
+  "final": "Treatment.hasSafetySignals (W06 writes)",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "FoodItem.hasSafetySignals",
+  "final": "FoodItem.hasSafetySignals / IngredientMaterial (W05 writes)",
+  "action": "keep",
+  "note": "FoodItem is an IngredientMaterial specialization (W05)"
+ },
+ {
+  "worker": "W17",
+  "live": "FoodProduct.hasSafetySignals",
+  "final": "Product.hasSafetySignals",
+  "action": "move",
+  "note": "W05: FoodProduct -> Product"
+ },
+ {
+  "worker": "W17",
+  "live": "Lifestyle.hasSafetySignals",
+  "final": "Lifestyle.hasSafetySignals (W05 writes)",
+  "action": "keep",
+  "note": ""
+ },
+ {
+  "worker": "W17",
+  "live": "Condition.relatedSafetySignals (RELATES_TO_CONDITION IN)",
+  "final": "Condition inverse field (W03 decides) ",
+  "action": "keep",
+  "note": "StructuralEdgeProperties (W17-SR-10)"
+ },
+ {
+  "worker": "W17",
+  "live": "Study.reportsSafetySignals (REPORTS_SAFETY_SIGNAL OUT)",
+  "final": "derived REPORTS_SAFETY_SIGNAL (W09 decides whether Study keeps the field)",
+  "action": "derive",
+  "note": "W17-SR-08 (b)"
+ },
+ {
+  "worker": "W17",
+  "live": "relationship HAS_SAFETY_SIGNAL",
+  "final": "HAS_SAFETY_SIGNAL",
+  "action": "keep",
+  "note": "structural; relationshipUid unique (operations C)"
+ },
+ {
+  "worker": "W17",
+  "live": "relationship RELATES_TO_EFFECT",
+  "final": "RELATES_TO_EFFECT",
+  "action": "keep",
+  "note": "domain widened to ContraindicationAssertion, InteractionAssertion"
+ },
+ {
+  "worker": "W17",
+  "live": "relationship RELATES_TO_CONDITION",
+  "final": "RELATES_TO_CONDITION",
+  "action": "keep",
+  "note": "structural"
+ },
+ {
+  "worker": "W17",
+  "live": "relationship AFFECTS_ORGAN",
+  "final": "AFFECTS_ORGAN",
+  "action": "keep",
+  "note": "one meaning with W03 (AdverseEffect|Condition -> Organ); SafetySignal start retired"
+ },
+ {
+  "worker": "W17",
+  "live": "relationship REPORTS_SAFETY_SIGNAL",
+  "final": "REPORTS_SAFETY_SIGNAL",
+  "action": "derive",
+  "note": "ss-study/v1"
+ },
+ {
+  "worker": "W17",
+  "live": "SafetySignal/AdverseEffect members of ProtocolResultMention, EventSubject, EvidenceSubject, ClaimSubject, AssociationParticipant, EpisodeMentionable, MediaSubject",
+  "final": "owners' successor unions",
+  "action": "keep",
+  "note": "W17-SR-13"
+ },
+ {
+  "worker": "W17",
+  "live": "",
+  "final": "ContraindicationAssertion",
+  "action": "keep",
+  "note": "catalog candidate promoted to the fragment (no live predecessor); free-text contraindication content in live SafetySignal.interactionSummary/populationSummary is re-extracted from locators, never pars"
+ },
+ {
+  "worker": "W17",
+  "live": "",
+  "final": "InteractionAssertion",
+  "action": "keep",
+  "note": "catalog candidate promoted (no live predecessor)"
+ },
+ {
+  "worker": "W17",
+  "live": "",
+  "final": "UseConstraint",
+  "action": "keep",
+  "note": "catalog candidate promoted (no live predecessor)"
  },
  {
   "worker": "W18",

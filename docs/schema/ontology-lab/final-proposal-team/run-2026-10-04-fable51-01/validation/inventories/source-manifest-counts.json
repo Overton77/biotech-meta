@@ -6,7 +6,7 @@
   "BLOCKED": 1,
   "SEARCH_EXTRACT": 4,
   "PARTIAL_EXCERPT": 5,
-  "rows": 16
+  "COMPLETE": 3
  },
  "W01": {
   "NEW_RETRIEVAL": 7,
@@ -15,7 +15,7 @@
   "BLOCKED": 5,
   "SEARCH_EXTRACT": 3,
   "PARTIAL_EXCERPT": 2,
-  "rows": 12
+  "COMPLETE": 3
  },
  "W02": {
   "NEW_RETRIEVAL": 28,
@@ -24,7 +24,7 @@
   "BLOCKED": 3,
   "SEARCH_EXTRACT": 13,
   "PARTIAL_EXCERPT": 9,
-  "rows": 36
+  "COMPLETE": 5
  },
  "W03": {
   "NEW_RETRIEVAL": 16,
@@ -33,7 +33,7 @@
   "BLOCKED": 3,
   "SEARCH_EXTRACT": 0,
   "PARTIAL_EXCERPT": 4,
-  "rows": 20
+  "COMPLETE": 10
  },
  "W04": {
   "NEW_RETRIEVAL": 14,
@@ -42,7 +42,7 @@
   "BLOCKED": 4,
   "SEARCH_EXTRACT": 0,
   "PARTIAL_EXCERPT": 9,
-  "rows": 19
+  "COMPLETE": 4
  },
  "W05": {
   "NEW_RETRIEVAL": 7,
@@ -51,7 +51,7 @@
   "BLOCKED": 1,
   "SEARCH_EXTRACT": 0,
   "PARTIAL_EXCERPT": 5,
-  "rows": 15
+  "COMPLETE": 1
  },
  "W06": {
   "NEW_RETRIEVAL": 12,
@@ -60,7 +60,7 @@
   "BLOCKED": 3,
   "SEARCH_EXTRACT": 3,
   "PARTIAL_EXCERPT": 10,
-  "rows": 23
+  "COMPLETE": 2
  },
  "W07": {
   "NEW_RETRIEVAL": 13,
@@ -69,7 +69,7 @@
   "BLOCKED": 2,
   "SEARCH_EXTRACT": 1,
   "PARTIAL_EXCERPT": 3,
-  "rows": 18
+  "COMPLETE": 9
  },
  "W08": {
   "NEW_RETRIEVAL": 9,
@@ -78,7 +78,7 @@
   "BLOCKED": 2,
   "SEARCH_EXTRACT": 4,
   "PARTIAL_EXCERPT": 5,
-  "rows": 20
+  "COMPLETE": 1
  },
  "W09": {
   "NEW_RETRIEVAL": 20,
@@ -87,7 +87,7 @@
   "BLOCKED": 9,
   "SEARCH_EXTRACT": 3,
   "PARTIAL_EXCERPT": 15,
-  "rows": 33
+  "COMPLETE": 1
  },
  "W10": {
   "NEW_RETRIEVAL": 13,
@@ -96,7 +96,7 @@
   "BLOCKED": 9,
   "SEARCH_EXTRACT": 2,
   "PARTIAL_EXCERPT": 6,
-  "rows": 17
+  "COMPLETE": 6
  },
  "W11": {
   "NEW_RETRIEVAL": 15,
@@ -105,7 +105,7 @@
   "BLOCKED": 3,
   "SEARCH_EXTRACT": 9,
   "PARTIAL_EXCERPT": 6,
-  "rows": 11
+  "COMPLETE": 1
  },
  "W12": {
   "NEW_RETRIEVAL": 2,
@@ -114,7 +114,7 @@
   "BLOCKED": 0,
   "SEARCH_EXTRACT": 1,
   "PARTIAL_EXCERPT": 7,
-  "rows": 17
+  "COMPLETE": 2
  },
  "W13": {
   "NEW_RETRIEVAL": 1,
@@ -123,7 +123,7 @@
   "BLOCKED": 0,
   "SEARCH_EXTRACT": 3,
   "PARTIAL_EXCERPT": 12,
-  "rows": 35
+  "COMPLETE": 6
  },
  "W14": {
   "NEW_RETRIEVAL": 12,
@@ -132,7 +132,7 @@
   "BLOCKED": 3,
   "SEARCH_EXTRACT": 3,
   "PARTIAL_EXCERPT": 5,
-  "rows": 16
+  "COMPLETE": 4
  },
  "W15": {
   "NEW_RETRIEVAL": 14,
@@ -141,7 +141,7 @@
   "BLOCKED": 2,
   "SEARCH_EXTRACT": 7,
   "PARTIAL_EXCERPT": 8,
-  "rows": 27
+  "COMPLETE": 3
  },
  "W16": {
   "NEW_RETRIEVAL": 12,
@@ -150,7 +150,7 @@
   "BLOCKED": 1,
   "SEARCH_EXTRACT": 2,
   "PARTIAL_EXCERPT": 6,
-  "rows": 32
+  "COMPLETE": 3
  },
  "W17": {
   "NEW_RETRIEVAL": 9,
@@ -159,7 +159,7 @@
   "BLOCKED": 4,
   "SEARCH_EXTRACT": 3,
   "PARTIAL_EXCERPT": 6,
-  "rows": 12
+  "COMPLETE": 1
  },
  "W18": {
   "NEW_RETRIEVAL": 18,
@@ -168,7 +168,7 @@
   "BLOCKED": 1,
   "SEARCH_EXTRACT": 8,
   "PARTIAL_EXCERPT": 6,
-  "rows": 24
+  "COMPLETE": 2
  },
  "W19": {
   "NEW_RETRIEVAL": 1,
@@ -177,7 +177,7 @@
   "BLOCKED": 6,
   "SEARCH_EXTRACT": 6,
   "PARTIAL_EXCERPT": 10,
-  "rows": 31
+  "COMPLETE": 2
  },
  "W20": {
   "NEW_RETRIEVAL": 13,
@@ -186,7 +186,7 @@
   "BLOCKED": 3,
   "SEARCH_EXTRACT": 0,
   "PARTIAL_EXCERPT": 7,
-  "rows": 16
+  "COMPLETE": 4
  },
  "W21": {
   "NEW_RETRIEVAL": 2,
@@ -195,7 +195,7 @@
   "BLOCKED": 5,
   "SEARCH_EXTRACT": 3,
   "PARTIAL_EXCERPT": 4,
-  "rows": 26
+  "COMPLETE": 0
  },
  "W22": {
   "NEW_RETRIEVAL": 15,
@@ -204,7 +204,7 @@
   "BLOCKED": 3,
   "SEARCH_EXTRACT": 3,
   "PARTIAL_EXCERPT": 5,
-  "rows": 32
+  "COMPLETE": 7
  },
  "W23": {
   "NEW_RETRIEVAL": 2,
@@ -213,6 +213,6 @@
   "BLOCKED": 0,
   "SEARCH_EXTRACT": 1,
   "PARTIAL_EXCERPT": 0,
-  "rows": 22
+  "COMPLETE": 1
  }
 }
