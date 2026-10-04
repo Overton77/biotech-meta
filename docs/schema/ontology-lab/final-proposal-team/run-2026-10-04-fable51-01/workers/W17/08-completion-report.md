@@ -50,6 +50,10 @@ W17-SR-01 registry additions (Fable); SR-02 uid tokens, SR-03 predicates / forbi
 
 Self-checked only: fragment parsed and built; fixtures, validators, CQ queries and the baseline 174-query suite executed on a fresh Community instance; composition with W09 fixtures 01 and 05 executed. No cross-worker review has happened; every seam above is a request, not an agreement. What remains qualified: synthetic cases (systematic zero, not-reported study, pre-2021 contraindication, BellLabs methods, the illustrative policy v3 rule) are illustrative; the policy mapping from levels to BLOCK/PENALIZE is W23 content, shown only to prove that a shared uid can carry a block.
 
+## 6a. Late check against W10
+
+W10's packet was committed after W17 read the registry. Checked at 02:08Z: W10 defines `EvidenceStrength` as the legacy hint enum and `UseContextProfile` (labels `UseContextProfile, Entity`, `populationDescriptor`, `entityType 'UseContextProfile'`) exactly as W17's fragment and fixtures reference them; W10's `SynthesisInputTarget = StudyResult | Assertion` parallels W17's `SafetySignalInputTarget` (W17 adds `Study` for NOT_REPORTED inputs). No conflict found; W17-SR-06 stands as filed.
+
 ## 7. Artifact digests (SHA-256, computed 2026-10-04T02:06Z; this report excluded)
 
 ```

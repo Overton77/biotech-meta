@@ -1,0 +1,750 @@
+{
+ "assertedTypes": [
+  "AFFILIATE_FOR_OFFER",
+  "ANALYZES_DATASET",
+  "APPEARS_IN",
+  "APPLICATION_GRANTED_AS",
+  "APPROVAL_FOR",
+  "ASSIGNS_INTERVENTION",
+  "CERTIFIES_RESULTS_FOR",
+  "COMPATIBLE_WITH_ASSAY_VERSION",
+  "COMPONENT_PRODUCT",
+  "CORRECTS",
+  "COVERS",
+  "DECLARATION_IDENTIFIES_MATERIAL",
+  "DECLARES_FORMULATION",
+  "DERIVED_FROM_ALGORITHM_VERSION",
+  "DERIVED_FROM_TAXON",
+  "DESIGNATION_FOR",
+  "EVALUATED_AGAINST",
+  "FORM_OF_SUBSTANCE",
+  "FOR_PROTOCOL",
+  "FULFILLS_OFFER",
+  "GOVERNED_BY_SPECIFICATION",
+  "HAS_ACTIVE_MOIETY",
+  "HAS_CAPABILITY_STATE",
+  "HAS_CHEMICAL_FORM",
+  "HAS_FORMULATION_VERSION",
+  "HAS_FUNCTIONAL_GOAL",
+  "HAS_IDENTIFIER",
+  "HAS_MIXTURE_COMPONENT",
+  "HAS_PACKAGE_CONFIGURATION",
+  "HAS_PROTOCOL_EDITION",
+  "HAS_STATE",
+  "HAS_STRAIN",
+  "HAS_VARIANT",
+  "HOSTS_LISTING",
+  "INVENTORY_INSTANCE_OF",
+  "LABEL_FOR",
+  "LICENSE_COVERS",
+  "LISTING_FOR",
+  "LISTS_OFFER",
+  "LOT_OF",
+  "MANUFACTURED_UNDER",
+  "MARKETED_UNDER_MARK",
+  "MEASURES_METRIC",
+  "PERFORMED_BY_LAB",
+  "PERFORMED_WITH_ASSAY_VERSION",
+  "PRODUCED_BY_PROCESS",
+  "PRODUCED_DATASET",
+  "PROVIDES_CONSTITUENT",
+  "QUANTITATIVELY_CONTAINS",
+  "REALIZES_SUBSTANCE",
+  "REGISTERED_AS",
+  "REPORTS_ON",
+  "REQUIRES_INPUT_METRIC",
+  "RETRACTS",
+  "SAMPLE_FROM",
+  "SELLER_OF_RECORD_FOR",
+  "STATUS_OF",
+  "STRAIN_OF",
+  "SUBMISSION_ABOUT",
+  "SUBMITTED_BY",
+  "SUMMARIZES_TESTING",
+  "SUPERSEDES_SUBMISSION",
+  "UNIT_FROM_LOT",
+  "USED_METHOD",
+  "USES_INTERVENTION_MATERIAL",
+  "USES_MATERIAL",
+  "USES_SUBSCRIPTION_PLAN",
+  "BOARD_MEMBER_OF",
+  "EMPLOYED_BY",
+  "ADVISES_ORGANIZATION",
+  "INVESTED_IN",
+  "HOLDS_EQUITY_IN",
+  "PARENT_OF",
+  "OWNS_BRAND",
+  "OPERATES_FACILITY",
+  "MARKETS_PRODUCT",
+  "MANUFACTURES_PRODUCT",
+  "DISTRIBUTES_PRODUCT",
+  "ENDORSES_PRODUCT",
+  "SPONSORS_CONTENT",
+  "OPERATES_CHANNEL",
+  "SERVES_ON_CHANNEL",
+  "ACCOMPANIES_TALK",
+  "LISTS_PROCEDURE",
+  "IMPLEMENTS_PANEL",
+  "AVAILABLE_IN",
+  "HAS_PATHWAY_VERSION",
+  "UNDER_LEGAL_BASIS_VERSION",
+  "DEVELOPS_PLATFORM",
+  "USES_PLATFORM",
+  "USES_EQUIPMENT",
+  "IMPLEMENTS_PLATFORM",
+  "USES_MODALITY",
+  "HAS_SENSOR",
+  "EMBODIES_MODEL",
+  "RUNS_ON_DEVICE",
+  "TARGETS_CONDITION",
+  "USES_COMPONENT",
+  "EVALUATES_RISK_FACTOR"
+ ],
+ "derivedTypes": [
+  "AFFECTS_MECHANISM",
+  "APPLIES_TO_SPECIES",
+  "CERTIFIED_UNDER",
+  "COMPARED_TO",
+  "CONTAINS",
+  "CONTAINS_COMPOUND_FORM",
+  "HAS_REFERENCE_RANGE",
+  "INFLUENCES_OUTCOME",
+  "INSTANCE_OF",
+  "MODULATES",
+  "RESOLVES_TO_CHUNK",
+  "SAME_TEST_AS",
+  "SELLS_PRODUCT",
+  "SUPPORTED_BY_CHUNK",
+  "RECOMMENDS",
+  "HAS_CHUNK",
+  "OCCURS_IN_SEGMENT",
+  "ABOUT",
+  "MENTIONS_ENTITY",
+  "SUPPORTED_BY_DOCUMENT",
+  "HAS_CURRENT_PROTOCOL_STEP",
+  "ACTS_IN"
+ ],
+ "ruleOnlyDerivedTypes": [
+  "INSTANCE_OF",
+  "RESOLVES_TO_CHUNK",
+  "HAS_CHUNK",
+  "OCCURS_IN_SEGMENT",
+  "ABOUT",
+  "MENTIONS_ENTITY",
+  "HAS_CURRENT_PROTOCOL_STEP",
+  "COMPARED_TO"
+ ],
+ "exclusiveTypes": [
+  "HAS_ADOPTION_VERSION",
+  "HAS_CONTEXT_VERSION",
+  "HAS_FORMULATION_VERSION",
+  "HAS_PROTOCOL_EDITION",
+  "HAS_REGISTRATION_VERSION",
+  "STRAIN_OF",
+  "HAS_PATHWAY_VERSION"
+ ],
+ "implicationPairs": [
+  [
+   "ASSERTION_STATUS_ACCEPTED",
+   "PROPOSITION_TRUE"
+  ],
+  [
+   "CORRECTS_SOURCE",
+   "FACT_CEASED"
+  ],
+  [
+   "NOT_FOUND_IN_PARTIAL_CAPTURE",
+   "NOT_DISCLOSED"
+  ],
+  [
+   "SIMILAR_NAME",
+   "SAME_IDENTITY"
+  ],
+  [
+   "SHARED_IDENTIFIER_SCHEME_VALUE_ACROSS_ISSUERS",
+   "SAME_IDENTITY"
+  ],
+  [
+   "ADVISES_ORGANIZATION",
+   "ENDORSES_PRODUCT"
+  ],
+  [
+   "DISTRIBUTES_PRODUCT",
+   "MANUFACTURES_PRODUCT"
+  ],
+  [
+   "SPONSORS_STUDY",
+   "EXECUTES_STUDY"
+  ],
+  [
+   "LICENSES_PATENT",
+   "OWNS_STUDY"
+  ],
+  [
+   "LISTS_OFFER",
+   "SELLS_PRODUCT"
+  ],
+  [
+   "SPONSORS_CONTENT",
+   "ENDORSES_PRODUCT"
+  ],
+  [
+   "HAS_FINANCIAL_INTEREST",
+   "ENDORSES_PRODUCT"
+  ],
+  [
+   "INVESTED_IN",
+   "HOLDS_EQUITY_IN"
+  ],
+  [
+   "GROUP_LEVEL_ROLE",
+   "MEMBER_COMPANY_ROLE"
+  ],
+  [
+   "AUTHOR_AFFILIATED_WITH",
+   "FUNDS_STUDY"
+  ],
+  [
+   "PROVIDES_INVESTIGATIONAL_PRODUCT",
+   "SUPPLIES_INGREDIENT_MATERIAL"
+  ],
+  [
+   "SUPPLIES_INGREDIENT_MATERIAL",
+   "MANUFACTURES_PRODUCT"
+  ],
+  [
+   "RECOMMENDS",
+   "BELLLABS_RECOMMENDS"
+  ],
+  [
+   "HOSTS_LISTING",
+   "SELLS_PRODUCT"
+  ],
+  [
+   "FULFILLS_OFFER",
+   "SELLS_PRODUCT"
+  ],
+  [
+   "AFFILIATE_FOR_OFFER",
+   "SELLS_PRODUCT"
+  ],
+  [
+   "LISTING_TITLE_AMOUNT",
+   "LABEL_DECLARED_AMOUNT"
+  ],
+  [
+   "PROVIDES_CONSTITUENT",
+   "QUANTITATIVELY_CONTAINS"
+  ],
+  [
+   "LISTED_INGREDIENT_AMOUNT",
+   "ACTIVE_MOIETY_AMOUNT"
+  ],
+  [
+   "MARKER_CONSTITUENT_AMOUNT",
+   "TOTAL_CONSTITUENT_AMOUNT"
+  ],
+  [
+   "USES_INTERVENTION_MATERIAL",
+   "EVALUATES_PRODUCT"
+  ],
+  [
+   "REGISTRY_RESULTS_NOT_POSTED",
+   "RESULTS_UNPUBLISHED"
+  ],
+  [
+   "SURROGATE_IN_CONTEXT",
+   "SURROGATE_IN_OTHER_CONTEXT"
+  ],
+  [
+   "NOT_STATISTICALLY_SIGNIFICANT",
+   "NO_EFFECT"
+  ],
+  [
+   "STATISTICALLY_SIGNIFICANT",
+   "CLINICALLY_MEANINGFUL"
+  ],
+  [
+   "WITHIN_ARM_CHANGE_SIGNIFICANT",
+   "BETWEEN_ARM_EFFECT"
+  ],
+  [
+   "SHARED_INGREDIENT_NAME",
+   "EVIDENCE_APPLIES"
+  ],
+  [
+   "CHANGES_LEVEL_IN_COMPARTMENT",
+   "CHANGES_LEVEL_IN_OTHER_COMPARTMENT"
+  ],
+  [
+   "MEASURED_IN_SPECIES",
+   "APPLIES_IN_OTHER_SPECIES"
+  ],
+  [
+   "INGREDIENT_MECHANISM_EFFECT",
+   "FORMULATION_DELIVERS_EXPOSURE"
+  ],
+  [
+   "HYPOTHESIZED_STEP",
+   "MEASURED_STEP"
+  ],
+  [
+   "PROXY_MARKER_CHANGED",
+   "PROCESS_FLUX_CHANGED"
+  ],
+  [
+   "SHARES_LOINC_CODE",
+   "SAME_ASSAY_VERSION"
+  ],
+  [
+   "SIMILAR_TEST_NAME",
+   "SAME_METRIC"
+  ],
+  [
+   "SAME_ALGORITHM_FAMILY",
+   "SAME_ALGORITHM_VERSION"
+  ],
+  [
+   "OUTSIDE_REFERENCE_INTERVAL",
+   "INDICATES_CONDITION"
+  ],
+  [
+   "INFERRED_RESULT",
+   "MEASURED_RESULT"
+  ],
+  [
+   "WITHIN_VERSION_SCORE_DIFFERENCE",
+   "MEASURED_BIOLOGICAL_CHANGE"
+  ],
+  [
+   "HAS_ORPHAN_DESIGNATION",
+   "IS_APPROVED"
+  ],
+  [
+   "NDI_NOTIFICATION_RECEIVED",
+   "FDA_APPROVED"
+  ],
+  [
+   "PATENT_CLAIMS",
+   "PROVES_EFFICACY"
+  ],
+  [
+   "ESTABLISHMENT_REGISTERED",
+   "FDA_APPROVED"
+  ],
+  [
+   "ESTABLISHMENT_REGISTERED",
+   "CGMP_COMPLIANT"
+  ],
+  [
+   "DEVICE_LISTED",
+   "FDA_CLEARED"
+  ],
+  [
+   "CLEARED_510K",
+   "FDA_APPROVED"
+  ],
+  [
+   "DE_NOVO_AUTHORIZATION",
+   "PMA_APPROVAL"
+  ],
+  [
+   "GRAS_NO_QUESTIONS",
+   "FDA_APPROVED"
+  ],
+  [
+   "GRAS_NO_QUESTIONS",
+   "FDA_GRAS_DETERMINATION"
+  ],
+  [
+   "ENFORCEMENT_DISCRETION",
+   "AUTHORIZATION"
+  ],
+  [
+   "CLAIMS_CGMP_COMPLIANCE",
+   "CGMP_COMPLIANT"
+  ],
+  [
+   "PROMOTES_CAPABILITY",
+   "OPERATES_CAPABILITY"
+  ],
+  [
+   "PLANNED_CAPABILITY",
+   "OPERATING_CAPABILITY"
+  ],
+  [
+   "REPORTS_PRACTICE",
+   "RECOMMENDS"
+  ],
+  [
+   "MENTIONS_PRODUCT",
+   "ENDORSES_PRODUCT"
+  ],
+  [
+   "RETELLS",
+   "SAME_ASSERTION"
+  ],
+  [
+   "HAS_FINANCIAL_INTEREST",
+   "ADJUDICATED_CONTRADICTED"
+  ],
+  [
+   "NO_FINANCIAL_INTEREST_FOUND",
+   "ADJUDICATED_SUPPORTED"
+  ],
+  [
+   "ROLE_OPEN_AT_OBSERVATION",
+   "ROLE_CONTINUES_AFTER_OBSERVATION"
+  ],
+  [
+   "CHUNK_MATCH",
+   "SOURCE_SUPPORT"
+  ],
+  [
+   "ADOPTED_PROTOCOL_EDITION",
+   "FOLLOWS_ALL_STEPS"
+  ],
+  [
+   "THIRD_PARTY_REPORTS_PROTOCOL_CHANGE",
+   "PROTOCOL_EDITION_EXISTS"
+  ],
+  [
+   "OUTSIDE_REFERENCE_RANGE_TRIGGER",
+   "CONDITION_PRESENT"
+  ],
+  [
+   "SELECTED_IN_SNAPSHOT",
+   "USER_CHOSE"
+  ],
+  [
+   "RECOMMENDED_FOR",
+   "ANY"
+  ],
+  [
+   "SHARED_WITH_GRANTEE",
+   "PUBLISHED"
+  ],
+  [
+   "PERSONAL_MEASUREMENT_OUTSIDE_REFERENCE_RANGE",
+   "CONDITION_PRESENT"
+  ],
+  [
+   "PERSONAL_MEASUREMENT",
+   "OBSERVATION"
+  ],
+  [
+   "AFFILIATE_FOR_OFFER",
+   "ENDORSES_PRODUCT"
+  ],
+  [
+   "PATENT_CLAIMS",
+   "IMPROVES_OUTCOME"
+  ],
+  [
+   "PATENT_CLAIMS",
+   "HAS_EFFECT_ON"
+  ],
+  [
+   "PATENT_CLAIMS",
+   "SUPPORTS_EFFICACY"
+  ],
+  [
+   "PATENT_CLAIMS",
+   "AFFECTS_MECHANISM"
+  ],
+  [
+   "PATENT_CLAIMS",
+   "INFLUENCES_OUTCOME"
+  ],
+  [
+   "FACILITY_GMP_CERTIFIED",
+   "CERTIFIED_UNDER"
+  ],
+  [
+   "LOT_COVERED",
+   "PRODUCT_CERTIFIED"
+  ],
+  [
+   "CONFORMS_TO_SPECIFICATION",
+   "MEASURED_VALUE"
+  ],
+  [
+   "LOT_TEST_SUMMARY",
+   "CERTIFICATE_OF_ANALYSIS"
+  ],
+  [
+   "CLAIMS_THIRD_PARTY_TESTING",
+   "INDEPENDENT_LABORATORY"
+  ],
+  [
+   "LISTING_ABSENT_IN_LATER_CAPTURE",
+   "LISTING_WITHDRAWN"
+  ],
+  [
+   "DEPICTS",
+   "SUPPORTED_BY"
+  ],
+  [
+   "MEDIA_PURPOSE_EVIDENCE",
+   "EVIDENCES"
+  ],
+  [
+   "GENERATED_ILLUSTRATION",
+   "SOURCE_SUPPORT"
+  ],
+  [
+   "PUBLICLY_ACCESSIBLE",
+   "REUSE_PERMITTED"
+  ],
+  [
+   "NO_STATEMENT_FOUND",
+   "PERMISSION"
+  ],
+  [
+   "PERCEPTUAL_HASH_MATCH",
+   "SAME_BYTES"
+  ],
+  [
+   "INSPECTION_CLASSIFIED_NAI",
+   "CGMP_COMPLIANT"
+  ],
+  [
+   "NO_INSPECTION_RECORD",
+   "NOT_INSPECTED"
+  ]
+ ],
+ "allowedReferenceTypes": [],
+ "privateRelTypes": [
+  "HAS_CONTEXT_VERSION",
+  "HAS_GOAL",
+  "HAS_GOAL_VERSION",
+  "HAS_PROTOCOL_IN_USE",
+  "HAS_ADOPTION_VERSION",
+  "HAS_DEVIATION",
+  "HAS_SHARING_GRANT",
+  "HAS_OPTION",
+  "FOR_REQUEST",
+  "USED_CONTEXT_VERSION",
+  "HAS_CRITERION_VALUE",
+  "RESPONDS_TO"
+ ],
+ "sharedIndexedLabels": [
+  "Product",
+  "ProductVariant",
+  "IngredientMaterial",
+  "ChemicalSubstance",
+  "Organization",
+  "ConsumerBrand",
+  "Study",
+  "Publication"
+ ],
+ "recordedAsOf": "2026-10-04T00:00:00Z",
+ "validAt": "2026-10-04T00:00:00Z",
+ "exclusivePredicates": [
+  "HAS_ADOPTION_VERSION",
+  "HAS_CONTEXT_VERSION",
+  "HAS_FORMULATION_VERSION",
+  "HAS_PROTOCOL_EDITION",
+  "HAS_REGISTRATION_VERSION"
+ ],
+ "catalogV020CutoverAt": "2026-10-03T00:00:00Z",
+ "revisionEventUid": "hu:source-revision:none",
+ "episodeTypes": [
+  "HAS_STATE",
+  "HAS_FORMULATION_VERSION",
+  "HAS_PACKAGE_CONFIGURATION",
+  "HAS_REGISTRATION_VERSION",
+  "HAS_PROTOCOL_EDITION",
+  "HAS_PATHWAY_VERSION",
+  "HAS_CERTIFICATION_SCOPE",
+  "HAS_CAPABILITY_STATE",
+  "STATUS_OF",
+  "HAS_CONTEXT_VERSION",
+  "HAS_ADOPTION_VERSION",
+  "IP_STATUS_OF"
+ ],
+ "quantityPredicateClass": "QUANTITY",
+ "uidTypeTokens": {
+  "Organization": "org",
+  "LegalEntity": "org",
+  "ConsumerBrand": "brand",
+  "Facility": "facility",
+  "Person": "person",
+  "PseudonymousActor": "pseudonymous-actor",
+  "AnonymousActor": "anonymous-actor",
+  "Agent": "agent",
+  "Activity": "activity",
+  "Product": "product",
+  "ProductVariant": "product-variant",
+  "FormulationVersion": "formulation",
+  "IngredientComponent": "component",
+  "IngredientMaterial": "material",
+  "ChemicalSubstance": "substance",
+  "ChemicalForm": "form",
+  "Source": "source",
+  "SourceSnapshot": "snapshot",
+  "SourceLocator": "locator",
+  "SourceRevisionEvent": "source-revision",
+  "Document": "document",
+  "DocumentTextVersion": "text-version",
+  "Chunk": "chunk",
+  "Claim": "claim",
+  "ClaimOccurrence": "claim-occurrence",
+  "RelationshipAssertion": "assertion",
+  "Assertion": "assertion",
+  "Adjudication": "adjudication",
+  "EvidenceApplicability": "applicability",
+  "ApplicabilityDimension": "applicability-dimension",
+  "EvidenceAssessment": "assessment",
+  "ResolutionHypothesis": "resolution",
+  "Identifier": "identifier",
+  "Study": "study",
+  "StudyArm": "arm",
+  "StudyIntervention": "intervention",
+  "Publication": "publication",
+  "AssayVersion": "assay-version",
+  "AlgorithmVersion": "algorithm-version",
+  "RegulatoryStatus": "regulatory-status",
+  "Protocol": "protocol",
+  "ProtocolEdition": "protocol-edition",
+  "AnswerRecord": "answer-record",
+  "Episode": "episode",
+  "EpisodeSegment": "episode-segment",
+  "Channel": "channel",
+  "Series": "series",
+  "OrganizationSnapshot": "org-snapshot",
+  "CohortParticipant": "cohort-participant",
+  "BrandedIngredientMaterial": "material",
+  "BotanicalPreparation": "material",
+  "MicrobialPreparation": "material",
+  "MaterialMixture": "material",
+  "BotanicalTaxon": "botanical-taxon",
+  "MicrobialTaxon": "microbial-taxon",
+  "MicrobialStrain": "microbial-strain",
+  "Constituent": "constituent",
+  "Nutrient": "nutrient",
+  "Pathway": "pathway",
+  "Condition": "condition",
+  "RiskFactor": "risk-factor",
+  "Organ": "anatomical-context",
+  "Mechanism": "mechanism",
+  "MolecularEntity": "molecular-entity",
+  "Species": "species",
+  "AnatomicalContext": "anatomical-context",
+  "MechanismEvidenceContext": "mech-context",
+  "Outcome": "outcome",
+  "PackageConfiguration": "package-configuration",
+  "ServingDefinition": "serving-definition",
+  "QuantityDeclaration": "quantity-declaration",
+  "ProductSnapshot": "product-snapshot",
+  "LabelSnapshot": "snapshot",
+  "LabelDeclaration": "label-declaration",
+  "Exposure": "exposure",
+  "Lifestyle": "lifestyle",
+  "FoodItem": "material",
+  "Treatment": "treatment",
+  "Procedure": "procedure",
+  "PanelDefinition": "panel-definition",
+  "ReferenceRange": "reference-range",
+  "Biomarker": "biomarker",
+  "Metric": "metric",
+  "LabTest": "lab-test",
+  "MeasurementMethod": "method",
+  "Specimen": "specimen-type",
+  "ReferenceSystem": "reference-system",
+  "Algorithm": "algorithm",
+  "ReferenceIntervalVersion": "ri-version",
+  "ComparabilityAssessment": "comparability",
+  "Device": "device",
+  "TechnologyPlatform": "technology-platform",
+  "Sensor": "sensor",
+  "Modality": "modality",
+  "FirmwareVersion": "firmware-version",
+  "ProtocolVersion": "protocol-version",
+  "StudyPopulation": "study-population",
+  "OutcomeDefinition": "outcome-definition",
+  "AdverseEventResult": "adverse-event-result",
+  "TrialRegistration": "trial-registration",
+  "RegistrationVersion": "registration-version",
+  "StudyResult": "study-result",
+  "InterventionComponent": "intervention-component",
+  "Dataset": "dataset",
+  "EndpointClassification": "endpoint-classification",
+  "EvidenceSynthesis": "synthesis",
+  "ManufacturingSpecification": "specification",
+  "SpecificationVersion": "specification-version",
+  "ManufacturingProcess": "process",
+  "ManufacturingStep": "process-step",
+  "ManufacturingCapability": "capability",
+  "ProductLot": "lot",
+  "TestSample": "test-sample",
+  "TestExecution": "test-execution",
+  "TestMethod": "test-method",
+  "MeasuredResult": "measured-result",
+  "SpecificationCriterion": "spec-criterion",
+  "PassFailInterpretation": "pass-fail",
+  "LotTestSummary": "lot-test-summary",
+  "CertificateOfAnalysis": "coa",
+  "CertificationProgram": "cert-program",
+  "CertificationListing": "cert-listing",
+  "CertificationScope": "cert-scope",
+  "TestingLaboratory": "org",
+  "RegulatoryAgency": "org",
+  "OrphanDesignation": "regulatory-status",
+  "DrugApproval": "regulatory-status",
+  "RegulatoryPathway": "reg-pathway",
+  "RegulatorySubmission": "reg-submission",
+  "RegulatoryResponse": "reg-response",
+  "RegulatoryPathwayVersion": "reg-pathway-version",
+  "RegulatoryStep": "reg-step",
+  "RegulatoryInspection": "regulatory-inspection",
+  "PatentFamily": "patent-family",
+  "PatentApplication": "patent-application",
+  "GrantedPatent": "granted-patent",
+  "PatentClaim": "patent-claim",
+  "PatentLicense": "patent-license",
+  "Trademark": "trademark",
+  "IpRightStatus": "ip-status",
+  "MerchantListing": "listing",
+  "Offer": "offer",
+  "PriceObservation": "price-obs",
+  "SubscriptionPlan": "subscription-plan",
+  "Bundle": "bundle",
+  "BundleComponent": "bundle-component",
+  "InventoryItem": "inventory-item",
+  "IndividualUnit": "individual-unit",
+  "AffiliateLink": "affiliate-link",
+  "CommerceMatch": "commerce-match",
+  "MeasurementPlan": "measurement-plan",
+  "Target": "target",
+  "Observation": "observation",
+  "ProtocolResult": "protocol-result",
+  "ProtocolAdjustmentRule": "protocol-rule",
+  "ProtocolStep": "protocol-step",
+  "Constraint": "constraint",
+  "FunctionalGoal": "functional-goal",
+  "SourceAuthorityAssessment": "source-authority",
+  "SourceCoverageRequirement": "coverage-requirement",
+  "SourceDiscoveryRecord": "source-discovery",
+  "Segmentation": "segmentation",
+  "Platform": "platform",
+  "MediaAsset": "media-asset",
+  "MediaVariant": "media-variant",
+  "MediaAnnotation": "media-annotation",
+  "GraphView": "graph-view",
+  "FigurePanel": "figure-panel",
+  "ProductLabelRegion": "label-region",
+  "MediaSuitabilityAssessment": "media-assessment",
+  "MediaRightsRecord": "media-rights",
+  "Mention": "mention",
+  "PolicyVersion": "policy-version",
+  "DecisionCriterion": "decision-criterion",
+  "TradeItemIdentifier": "trade-id",
+  "UseContextProfile": "use-profile",
+  "EquivalenceAssessment": "assessment"
+ },
+ "_provenance": {
+  "base": "validation/validation-params.json (Fable, generated from catalog 0.2.0)",
+  "delta": "W00 reconciliation rulings W00-R-01, -07, -20, -23, -25, -37, -41 (see 09-kernel-reconciliation.md)"
+ }
+}
