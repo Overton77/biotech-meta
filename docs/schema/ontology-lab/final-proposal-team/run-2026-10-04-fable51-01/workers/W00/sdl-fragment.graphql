@@ -16,6 +16,12 @@
 # Union membership is a CANDIDATE list taken from 02-ownership-registry.md; Fable prunes members that
 #   do not survive the merge. Parent-only rule (executed probe, see 05-decision-seam-ledger.md D-W00-05):
 #   a union never lists a type whose labels are a superset of another member's labels.
+# Reconciliation pass (Wave 4, 2026-10-04): every edit carries a ruling id W00-R-nn; see
+#   fragment-changelog.md, seam-rulings.yaml and 09-kernel-reconciliation.md. Enum values and interface fields
+#   added here are contract B3/B5 changes that Fable carries into the decision report; the frozen text is unchanged.
+#   Field privacy (W00-R-27): Activity, ResolutionHypothesis and the fields mongoResearchRunId, agentRunUid,
+#   extractionConfidence, extractionMethod, Agent.model/promptVersion/toolVersion and Adjudication.humanReviewPending
+#   are INTERNAL in the public projection; all other kernel fields are PUBLIC unless the node's privacyClass says INTERNAL.
 # =====================================================================================================
 
 # -----------------------------------------------------------------------------------------------------
@@ -168,6 +174,10 @@ backdated; `recordedTo` is written once on supersession. `confidence` is depreca
 CQs: CQ-EV-01, CQ-EV-02, CQ-TM-01, CQ-PV-04.
 """
 interface AssertionArchetype {
+  "Canonical identity hu:<token>:<opaque> (W00-R-05, W23-SR-03: lets interface-typed relationship filters and connects address an assertion by uid)."
+  uid: String!
+  "Opaque segment of uid (INV-106)."
+  id: ID!
   "Controlled predicate registered in the catalog (relationship names and assertedPredicates)."
   predicate: String!
   "Capture-fidelity status (current projection; never truth)."
@@ -200,6 +210,10 @@ interface AssertionArchetype {
   unitCode: String
   "Per-day / per-dose / per-serving basis of a quantity literal (catalog quantityBasis)."
   quantityBasis: QuantityBasis
+  "Mass basis of a quantity literal (contract A11; W00-R-12 on W00-SR-01). Every implementer carries it."
+  massBasis: MassBasis
+  "What a quantity literal refers to (contract A11; W00-R-12 on W00-SR-01). Every implementer carries it."
+  amountReferent: AmountReferent
   "Valid-time start (half-open, first instant of its precision period; null = unknown)."
   validFrom: DateTime
   "Valid-time end (exclusive; null = unknown, never 'ongoing'; no sentinel dates)."
@@ -234,6 +248,10 @@ record (AssessmentStatus), never the verdict and never an Assertion status. Modu
 CQs: CQ-EV-02, CQ-AX-09.
 """
 interface EvidenceAssessmentArchetype {
+  "Canonical identity hu:<token>:<opaque> (W00-R-05, W23-SR-03: AnswerRecord.citesAssessments connects by uid)."
+  uid: String!
+  "Opaque segment of uid (INV-106)."
+  id: ID!
   "Catalog node name of this assessment."
   assessmentType: String!
   "Identifier and version of the method or policy that produced it."
@@ -637,6 +655,40 @@ enum SourceKind {
   NEWSLETTER
   MODEL_SERVICE
   LEGAL_RECORD
+  "W00-R-08 (W09-SR-14, W19-SR-01): a trial registry record (ClinicalTrials.gov, EUCTR, ISRCTN); registry status is never an agency action."
+  TRIAL_REGISTRY_RECORD
+  "W00-R-08 (W19-SR-01; W09-SR-14 name BIBLIOGRAPHIC_DATABASE_RECORD folded in): a bibliographic database record (PubMed, Crossref, OpenAlex); not a publication rendition."
+  BIBLIOGRAPHIC_RECORD
+  "W00-R-08 (W19-SR-01, W21-SR-13, W06-SR-12): a news or trade-press article."
+  NEWS_ARTICLE
+  "W00-R-08 (W19-SR-01): statute, regulation or official journal text."
+  LEGISLATION_OR_REGULATION
+  "W00-R-08 (W19-SR-01, W21-SR-13): a slide deck; its own container, never a rendition of a talk."
+  PRESENTATION_SLIDES
+  "W00-R-08 (W19-SR-01): a personal website or blog of an individual."
+  PERSONAL_WEBPAGE
+  "W00-R-08 (W19-SR-01): technical or product documentation (manuals, API docs, IFUs)."
+  TECHNICAL_DOCUMENTATION
+  "W00-R-08 (W12-SR-03): a laboratory report or certificate of analysis document."
+  LABORATORY_REPORT
+  "W00-R-08 (W20-SR-10): a reinstatement notice (pairs with SourceRevisionKind REINSTATEMENT)."
+  REINSTATEMENT_NOTICE
+  "W00-R-08 (W21-SR-13): a podcast RSS/Atom feed document (not one feed item)."
+  PODCAST_FEED
+  "W00-R-08 (W21-SR-13): a transcript of an event or talk that is not a podcast episode page."
+  EVENT_TRANSCRIPT
+  "W00-R-08 (W22-SR-06): a retrievable media file endpoint (CDN or repository file URL)."
+  MEDIA_FILE
+  "W00-R-08 (W22-SR-06): a media repository description record (e.g. a Wikimedia Commons file page or API record)."
+  MEDIA_REPOSITORY_RECORD
+  "W00-R-08 (W22-SR-06): a research data repository record (BioStudies, BioImage Archive, Reactome ContentService)."
+  DATA_REPOSITORY_RECORD
+  "W00-R-08 CANDIDATE (W15-SR-15): a third-party blog or review page (often with affiliate links)."
+  BLOG_OR_REVIEW_PAGE
+  "W00-R-08 CANDIDATE (W15-SR-15): a storefront's machine-readable product endpoint (e.g. Shopify products/*.js)."
+  STOREFRONT_STRUCTURED_DATA
+  "W00-R-08 (W19-SR-01): none of the above; Source.sourceKindNote is required (V-W00-17)."
+  OTHER
 }
 
 "Kind of process an Activity was (PROV-O prov:Activity)."
@@ -650,6 +702,16 @@ enum ActivityKind {
   REANCHORING
   ADJUDICATION
   ANSWER_COMPOSITION
+  "W00-R-09 (W02-SR-04): a calculation producing CALCULATED assertions (e.g. salt-to-moiety conversion)."
+  CALCULATION
+  "W00-R-09 (W19-SR-03): a source discovery attempt (SourceDiscoveryRecord specialization)."
+  DISCOVERY
+  "W00-R-09 (W22-SR-04): a model or renderer produced new media bytes."
+  MEDIA_GENERATION
+  "W00-R-09 (W22-SR-04): crop, resize, overlay or transcode of existing media bytes."
+  MEDIA_TRANSFORMATION
+  "W00-R-09 (W22-SR-04): a media suitability assessment run."
+  MEDIA_ASSESSMENT
 }
 
 "Kind of agent (aligned to Biolink AgentTypeEnum)."
@@ -668,14 +730,18 @@ enum UseKind {
   SUMMARIZE_IN_ANSWER
   USE_AS_RECOMMENDATION_EVIDENCE
   SHARE_EXTERNALLY
+  "W00-R-10 (W22-SR-02, W23-SR-15): show a rendition of a media asset in an answer, page or export. QUOTE_IN_ANSWER never covers images."
+  DISPLAY_MEDIA
 }
 
-"How two distinct identities relate; an EquivalenceAssessment never merges them."
+"How two identities relate. Only SAME_IDENTITY_MERGED publishes a merge redirect (W00-R-11); every other value compares two distinct identities and never merges them."
 enum EquivalenceKind {
   SAME_WORK_DIFFERENT_NAME
   OVERLAPPING_SCOPE
   RELATED_NOT_EQUIVALENT
   NOT_EQUIVALENT
+  "W00-R-11 (W00-SR-05, W23-SR-06): two records of ONE identity; the retired record is kept (maturity DEPRECATED) and resolves to survivingUid as of this assessment's recordedAt."
+  SAME_IDENTITY_MERGED
 }
 
 "Kind of caveat a qualifying occurrence attaches (QUALIFIED_BY; relationship owned by W21)."
@@ -723,6 +789,8 @@ enum RelevanceBasis {
   SAME_SUBSTANCE_CLASS_VIA_GROUP
   SPONSOR_OF_CONTAINER
   NO_PATH_FOUND
+  "W00-R-10 (W21-SR-14): the statement concerns the category of service the tied organization sells, not the organization itself."
+  SAME_SERVICE_CATEGORY
 }
 
 "Disclosure state; NOT_FOUND_IN_PARTIAL_CAPTURE is never NOT_DISCLOSED."
@@ -808,8 +876,8 @@ type Source implements Entity & EntityArchetype
   @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
   uid: String! @settable(onCreate: true, onUpdate: false)
-  "Presentation label (often equal to title); never identity."
-  name: String
+  "Title as displayed by the endpoint, stored as `title` (W00-R-14 on W20-SR-08: the same stored property Document.name reads, so a :Document:Source node shows one title through both types). Presentation only; never identity."
+  name: String @alias(property: "title")
   description: String
   mongoResearchRunId: String
   createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
@@ -819,17 +887,17 @@ type Source implements Entity & EntityArchetype
   schemaVersion: String
   "Always 'Source' (or 'Document' on the specialization)."
   entityType: String!
-  "Normalized retrieval URI; unique (constraint source_canonical_uri); identity key with uid."
+  "Normalized post-redirect retrieval endpoint, never an identifier resolver (W00-R-15, W19-SR-10); unique (constraint source_canonical_uri); identity key with uid. A Document writes it together with url (W20-V05)."
   canonicalUri: String!
-  "Title as displayed by the endpoint."
-  title: String
   "Kind of endpoint (classification only)."
   sourceKind: SourceKind
+  "Required when sourceKind is OTHER (W00-R-08, V-W00-17): what the endpoint is."
+  sourceKindNote: String
   "CANDIDATE (W19-SR-02, ruled by W00): how much of its work this rendition carries (FULL, PARTIAL, UNKNOWN); null when the Source is not RENDITION_OF a work. Distinct from SourceSnapshot.captureCompleteness (how much of the endpoint was captured)."
   renditionCoverage: RenditionCoverage
   "uid of the publishing Organization when known (reference by uid; no asserted edge in 0.2.0)."
   publisherUid: String
-  """class: structural; cardinality: many; catalog: HAS_SNAPSHOT (Source → SourceSnapshot). One per capture."""
+  """class: structural; cardinality: many; catalog: HAS_SNAPSHOT (Source → SourceSnapshot). One per capture. HAS_SNAPSHOT has this meaning only; entity state caches (Organization/Product/Listing → *Snapshot) use HAS_STATE (W00-R-16)."""
   snapshots: [SourceSnapshot!]! @relationship(type: "HAS_SNAPSHOT", direction: OUT)
   """class: structural; cardinality: many; catalog: HAS_TEXT_VERSION (Source → DocumentTextVersion, W20)."""
   textVersions: [DocumentTextVersion!]! @relationship(type: "HAS_TEXT_VERSION", direction: OUT)
@@ -990,7 +1058,7 @@ type SourceLocator implements Entity & InformationArtifactArchetype
   reanchors: [SourceLocator!]! @relationship(type: "REANCHORS", direction: OUT, properties: "ReanchorProperties")
   """class: structural (inverse); catalog: REANCHORS."""
   reanchoredBy: [SourceLocator!]! @relationship(type: "REANCHORS", direction: IN, properties: "ReanchorProperties")
-  """class: structural; cardinality: many; catalog: MENTIONS (SourceLocator → Mention)."""
+  """class: structural; cardinality: many; catalog: MENTIONS (SourceLocator → Mention only; entity-level retrieval links are MENTIONS_ENTITY, W00-R-19)."""
   mentions: [Mention!]! @relationship(type: "MENTIONS", direction: OUT)
   """class: derived; cardinality: many; catalog: RESOLVES_TO_CHUNK (relationship and ChunkResolutionProperties owned by W20)."""
   resolvesToChunks: [Chunk!]! @relationship(type: "RESOLVES_TO_CHUNK", direction: OUT, properties: "ChunkResolutionProperties")
@@ -1121,6 +1189,10 @@ type Assertion implements Entity & AssertionArchetype
   statedTense: String @settable(onCreate: true, onUpdate: false)
   "Kind of segment the assertion was read from (e.g. SPONSOR_READ, EDITORIAL; controlled string)."
   segmentKind: String @settable(onCreate: true, onUpdate: false)
+  "W00-R-13 (W01-SR-07): witness instant a point-in-time statement names ('as of April 25, 2025'); never a valid-time bound. The as-of ladder reads V inside its precision period as KNOWN_AT_WITNESS; bounds stay null/UNKNOWN."
+  statedAsOf: DateTime @settable(onCreate: true, onUpdate: false)
+  "Precision of statedAsOf; required when statedAsOf is set (V-503r)."
+  statedAsOfPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_one; catalog: HAS_SUBJECT."""
   subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: zero_or_one (exclusive with the typed literals); catalog: HAS_OBJECT."""
@@ -1135,7 +1207,7 @@ type Assertion implements Entity & AssertionArchetype
   supersedes: [Assertion!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
   """class: structural (inverse); catalog: SUPERSEDES."""
   supersededBy: [Assertion!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties")
-  """class: structural; cardinality: one_or_more for CALCULATED; catalog: DERIVED_FROM_ASSERTION (inputs of a CALCULATED assertion)."""
+  """class: structural; cardinality: one_or_more for CALCULATED; catalog: DERIVED_FROM_ASSERTION (inputs of a CALCULATED assertion or premises of an INFERRED_FROM_MEASUREMENT assertion, W00-R-30 on W03-SR-02)."""
   derivedFromAssertions: [Assertion!]! @relationship(type: "DERIVED_FROM_ASSERTION", direction: OUT)
   """class: structural (inverse); catalog: DERIVED_FROM_ASSERTION."""
   inputToAssertions: [Assertion!]! @relationship(type: "DERIVED_FROM_ASSERTION", direction: IN)
@@ -1143,7 +1215,7 @@ type Assertion implements Entity & AssertionArchetype
   generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
   """class: structural (inverse); catalog: USED."""
   usedBy: [Activity!]! @relationship(type: "USED", direction: IN)
-  """class: structural (inverse); cardinality: many; catalog: EVALUATES (Adjudication → Assertion)."""
+  """class: structural (inverse); cardinality: many; catalog: EVALUATES (Adjudication → Assertion only; the legacy Study → intervention edge is stored as LEGACY_EVALUATES, W00-R-17)."""
   evaluatedBy: [Adjudication!]! @relationship(type: "EVALUATES", direction: IN)
   """class: structural (inverse); catalog: PROPOSES_MATCH (ResolutionHypothesis → Assertion, e.g. retelling-source match)."""
   proposedInHypotheses: [ResolutionHypothesis!]! @relationship(type: "PROPOSES_MATCH", direction: IN)
@@ -1360,6 +1432,12 @@ type Activity implements Entity & OccurrenceArchetype
   usedAssertions: [Assertion!]! @relationship(type: "USED", direction: OUT)
   """class: structural; catalog: USED (→ DocumentTextVersion, W20)."""
   usedTextVersions: [DocumentTextVersion!]! @relationship(type: "USED", direction: OUT)
+  """class: structural; catalog: USED (→ MediaAsset, W22; W00-R-18 on W22-SR-03)."""
+  usedMediaAssets: [MediaAsset!]! @relationship(type: "USED", direction: OUT)
+  """class: structural; catalog: USED (→ MediaVariant, W22; W00-R-18)."""
+  usedMediaVariants: [MediaVariant!]! @relationship(type: "USED", direction: OUT)
+  """class: structural; catalog: USED (→ MediaAnnotation, W22; W00-R-18)."""
+  usedMediaAnnotations: [MediaAnnotation!]! @relationship(type: "USED", direction: OUT)
   """class: structural; cardinality: many; catalog: AUTHORIZED_BY (→ PolicyVersion, W23; INTERNAL)."""
   authorizedBy: [PolicyVersion!]! @relationship(type: "AUTHORIZED_BY", direction: OUT, properties: "AuthorizationProperties")
   """class: structural (inverse); catalog: WAS_GENERATED_BY (Assertion)."""
@@ -1372,6 +1450,22 @@ type Activity implements Entity & OccurrenceArchetype
   generatedTextVersions: [DocumentTextVersion!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
   """class: structural (inverse); catalog: WAS_GENERATED_BY (Adjudication)."""
   generatedAdjudications: [Adjudication!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (Segmentation, W20; W00-R-18 on W20-SR-05)."""
+  generatedSegmentations: [Segmentation!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (AnswerRecord, W23; W00-R-18 on W23-SR-02)."""
+  generatedAnswerRecords: [AnswerRecord!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (MediaAsset, W22; W00-R-18 on W22-SR-03)."""
+  generatedMediaAssets: [MediaAsset!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (MediaVariant, W22)."""
+  generatedMediaVariants: [MediaVariant!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (MediaAnnotation, W22)."""
+  generatedMediaAnnotations: [MediaAnnotation!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (PriceObservation, W15; W00-R-18 on W15-SR-09)."""
+  generatedPriceObservations: [PriceObservation!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (Offer, W15)."""
+  generatedOffers: [Offer!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (AffiliateLink, W15)."""
+  generatedAffiliateLinks: [AffiliateLink!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
 }
 
 # -----------------------------------------------------------------------------------------------------
@@ -1432,8 +1526,9 @@ type Identifier implements Entity & EntityArchetype
 """
 Trade-item specialization of Identifier (GTIN, UPC, EAN, ASIN, SKU) with labels TradeItemIdentifier,
 Identifier, Entity: every TradeItemIdentifier is read by the Identifier type too and the (scheme, issuer,
-value) uniqueness constraint on Identifier covers it. Commerce attachment edges (IDENTIFIED_BY, W04;
-COVERS, W12) target it; see seam W00-SR-07 (IDENTIFIED_BY vs HAS_IDENTIFIER). Archetype: Entity.
+value) uniqueness constraint on Identifier covers it. It is attached by HAS_IDENTIFIER like every Identifier;
+the live IDENTIFIED_BY type is relabelled HAS_IDENTIFIER at migration (W00-R-20); COVERS (W12) also targets it.
+Archetype: Entity.
 Module: identity_resolution. CQs: CQ-ID-04, CQ-AX-14.
 """
 type TradeItemIdentifier implements Entity & EntityArchetype
@@ -1495,7 +1590,7 @@ type Mention implements Entity & InformationArtifactArchetype
   surfaceForm: String!
   "Kind of mention (e.g. SUBSTANCE_NAME, PERSON_NAME, PRODUCT_NAME; controlled string)."
   mentionKind: String
-  """class: structural (inverse); cardinality: exactly_one; catalog: MENTIONS (SourceLocator → Mention)."""
+  """class: structural (inverse); cardinality: exactly_one; catalog: MENTIONS (SourceLocator → Mention; the kernel meaning of MENTIONS, W00-R-19)."""
   locatedAt: [SourceLocator!]! @relationship(type: "MENTIONS", direction: IN)
   """class: structural (inverse); catalog: RESOLVES_MENTION."""
   resolutionHypotheses: [ResolutionHypothesis!]! @relationship(type: "RESOLVES_MENTION", direction: IN)
@@ -1505,8 +1600,11 @@ type Mention implements Entity & InformationArtifactArchetype
 Assessment of how two DISTINCT identities relate when they look alike (same work under different names,
 overlapping scope, related, not equivalent). It never merges them (round 0006, CQ-EC-02); identity claims
 are ResolutionHypotheses. COMPARES_IDENTITIES has exactly two distinct targets (V-432 as corrected in
-fixtures/validation-w00.cypher). The merge-redirect record named in contract A2 has no EquivalenceKind value
-yet (W00-SR-05). Archetype: EvidenceAssessment. Module: identity_resolution. CQs: CQ-ID-04, CQ-AX-14.
+fixtures/validation-w00.cypher). The merge-redirect record of contract A2 is an EquivalenceAssessment with
+equivalenceKind SAME_IDENTITY_MERGED plus survivingUid and retiredUid (W00-R-11): both uids are its two
+COMPARES_IDENTITIES targets, the retired node is kept with maturity DEPRECATED, and a held uid resolves through
+the latest ACCEPTED redirect recorded at or before the viewpoint (V-W00-13). Private records are never rewritten.
+Archetype: EvidenceAssessment. Module: identity_resolution. CQs: CQ-ID-04, CQ-AX-14.
 """
 type EquivalenceAssessment implements Entity & EvidenceAssessmentArchetype
   @node(labels: ["EquivalenceAssessment", "EvidenceAssessment"])
@@ -1534,6 +1632,10 @@ type EquivalenceAssessment implements Entity & EvidenceAssessmentArchetype
   equivalenceKind: EquivalenceKind! @settable(onCreate: true, onUpdate: false)
   "Why."
   rationale: String @settable(onCreate: true, onUpdate: false)
+  "W00-R-11: uid that survives a SAME_IDENTITY_MERGED merge (required for that kind only)."
+  survivingUid: String @settable(onCreate: true, onUpdate: false)
+  "W00-R-11: uid retired by a SAME_IDENTITY_MERGED merge; its node stays, maturity DEPRECATED (required for that kind only)."
+  retiredUid: String @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_two_distinct; catalog: COMPARES_IDENTITIES (→ Entity|VersionedState)."""
   comparesIdentities: [AssertionSubjectTarget!]! @relationship(type: "COMPARES_IDENTITIES", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; catalog: SUPPORTED_BY."""
@@ -1560,12 +1662,18 @@ the range of HAS_IDENTIFIER (inverse), PROPOSES_MATCH and COMPARES_IDENTITIES (v
 Members: every registry node type of those four archetypes, except (a) Assertion- and EvidenceAssessment-
 archetype types (out of the catalog range; an assertion about an assertion is a SUPERSEDES/RETELLS/
 QUALIFIED_BY structure, an assertion about an assessment is a new assessment), (b) specializations covered
-by their parent (Document by Source; LegalEntity, RegulatoryAgency, TestingLaboratory by Organization;
-BrandedIngredientMaterial, BotanicalPreparation, MicrobialPreparation, MaterialMixture by IngredientMaterial;
-DrugApproval, OrphanDesignation by RegulatoryStatus; AdverseEventResult by StudyResult; TradeItemIdentifier
-by Identifier), (c) regenerable retrieval records (Chunk, Segmentation), (d) W23 internal records
+by their parent (MR-01: Document by Source; LegalEntity, RegulatoryAgency, TestingLaboratory by Organization;
+BrandedIngredientMaterial, BotanicalPreparation, MicrobialPreparation, MaterialMixture, FoodItem by
+IngredientMaterial; Organ by AnatomicalContext; LabelSnapshot by SourceSnapshot; DrugApproval,
+OrphanDesignation by RegulatoryStatus; AdverseEventResult by StudyResult; TradeItemIdentifier by Identifier;
+CohortParticipant by PseudonymousActor; SourceDiscoveryRecord by Activity), (c) regenerable retrieval records
+(Chunk, Segmentation), (d) W23 internal records
 (AnswerRecord, PolicyVersion, DecisionCriterion) so no INTERNAL type is reachable through a public assertion,
-(e) CohortParticipant (private-data seam CL-018), the DiagnosticResult interface and every CANDIDATE type.
+(e) the DiagnosticResult interface and CANDIDATE types nobody asked to assert about (SourceCoverageRequirement),
+(f) retired types (MR-02: Association, ExperienceReport, FoodProduct, MediaSource). Reconciliation W00-R-21 adds
+FirmwareVersion (W08-SR-06), IpRightStatus (W14-SR-01/02), MediaRightsRecord (W22-SR-13), RegulatoryPathwayVersion
+and RegulatoryInspection (W13-SR-05/07), UseConstraint (completeness); SafetySignal and NarrativeArc now carry the
+EvidenceAssessment archetype and moved to SupportedRecordTarget.
 """
 union AssertionSubjectTarget =
   # W00
@@ -1576,20 +1684,20 @@ union AssertionSubjectTarget =
   | IngredientMaterial | ChemicalSubstance | ChemicalForm | BotanicalTaxon | MicrobialTaxon | MicrobialStrain
   | Constituent | Nutrient
   # W03
-  | Mechanism | Pathway | MolecularEntity | Species | AnatomicalContext | Organ | Outcome | Condition
-  | RiskFactor | MechanismEvidenceContext | Association
+  | Mechanism | Pathway | MolecularEntity | Species | AnatomicalContext | Outcome | Condition
+  | RiskFactor | MechanismEvidenceContext
   # W04
   | Product | ProductVariant | PackageConfiguration | ProductSnapshot | FormulationVersion | IngredientComponent
-  | LabelSnapshot | LabelDeclaration | ServingDefinition | QuantityDeclaration
+  | LabelDeclaration | ServingDefinition | QuantityDeclaration
   # W05
-  | FoodItem | FoodProduct | Exposure | Lifestyle
+  | Exposure | Lifestyle
   # W06
   | Treatment | Procedure
   # W07
   | Biomarker | Metric | LabTest | PanelDefinition | MeasurementMethod | Specimen | ReferenceSystem
   | AssayVersion | Algorithm | AlgorithmVersion | ReferenceIntervalVersion | ReferenceRange
   # W08
-  | TechnologyPlatform | ToolOrInstrument | Device | Sensor | Modality
+  | TechnologyPlatform | ToolOrInstrument | Device | Sensor | Modality | FirmwareVersion
   # W09
   | Study | TrialRegistration | RegistrationVersion | ProtocolVersion | StudyArm | StudyIntervention
   | InterventionComponent | StudyPopulation | OutcomeDefinition | StudyResult | Publication | Dataset
@@ -1602,9 +1710,10 @@ union AssertionSubjectTarget =
   | ProductLot | TestSample | TestExecution | TestMethod | MeasuredResult | SpecificationCriterion
   | LotTestSummary | CertificateOfAnalysis | CertificationProgram | CertificationListing | CertificationScope
   # W13
-  | RegulatoryPathway | RegulatoryStep | RegulatorySubmission | RegulatoryResponse | RegulatoryStatus
+  | RegulatoryPathway | RegulatoryPathwayVersion | RegulatoryStep | RegulatorySubmission | RegulatoryResponse
+  | RegulatoryStatus | RegulatoryInspection
   # W14
-  | PatentFamily | PatentApplication | GrantedPatent | PatentClaim | PatentLicense | Trademark
+  | PatentFamily | PatentApplication | GrantedPatent | PatentClaim | PatentLicense | Trademark | IpRightStatus
   # W15
   | MerchantListing | Offer | PriceObservation | SubscriptionPlan | Bundle | BundleComponent | InventoryItem
   | IndividualUnit | AffiliateLink
@@ -1612,15 +1721,15 @@ union AssertionSubjectTarget =
   | Protocol | ProtocolEdition | ProtocolStep | Constraint | MeasurementPlan | ProtocolAdjustmentRule | Target
   | FunctionalGoal | Observation | ProtocolResult
   # W17
-  | SafetySignal | AdverseEffect
+  | AdverseEffect | UseConstraint
   # W18
-  | Community | Conference | Event | NarrativeArc
+  | Community | Conference | Event
   # W20
   | DocumentTextVersion
   # W21
-  | Platform | Channel | Series | Episode | EpisodeSegment | Claim | ExperienceReport
+  | Platform | Channel | Series | Episode | EpisodeSegment | Claim
   # W22
-  | MediaAsset | MediaVariant | MediaAnnotation | MediaSource | GraphView | FigurePanel | ProductLabelRegion
+  | MediaAsset | MediaVariant | MediaAnnotation | GraphView | FigurePanel | ProductLabelRegion | MediaRightsRecord
 
 """
 Range of ASSERTED_BY (catalog: Person|Organization|Agent|PseudonymousActor|AnonymousActor; KCR-4.3). At most
@@ -1632,8 +1741,11 @@ union AsserterTarget = Person | Organization | Agent | PseudonymousActor | Anony
 
 """
 Domain of SUPPORTED_BY / CONTRADICTED_BY seen from the SourceLocator (catalog: Assertion|Adjudication|
-EvidenceAssessment). `Assertion` covers ClaimOccurrence and RelationshipAssertion (parent-only rule); the
-EvidenceAssessment members are the catalog EvidenceAssessment-archetype types (CANDIDATE list; pruned by Fable).
+EvidenceAssessment, extended by W00-R-22 to captured-record types that report what a source said: StudyResult,
+RegistrationVersion, ProtocolVersion (W09-SR-03), MeasuredResult, LotTestSummary, CertificateOfAnalysis
+(W12-SR-02), PriceObservation, AffiliateLink (W15-SR-09)). `Assertion` covers ClaimOccurrence,
+RelationshipAssertion, ContraindicationAssertion and InteractionAssertion (MR-01); StudyResult covers
+AdverseEventResult. The EvidenceAssessment members are every EvidenceAssessment-archetype type in the merge.
 """
 union SupportedRecordTarget =
     Assertion | Adjudication | ResolutionHypothesis | EquivalenceAssessment
@@ -1641,3 +1753,7 @@ union SupportedRecordTarget =
   | EvidenceSynthesis | EvidenceStrengthAssessment
   | ClaimEvidenceAssessment | RetellingFidelityAssessment | ConflictRelevanceAssessment
   | ComparabilityAssessment | PassFailInterpretation | CommerceMatch
+  | SafetySignal | NarrativeArc | EventImpactAssessment | MediaSuitabilityAssessment | SourceAuthorityAssessment
+  | StudyResult | RegistrationVersion | ProtocolVersion
+  | MeasuredResult | LotTestSummary | CertificateOfAnalysis
+  | PriceObservation | AffiliateLink
