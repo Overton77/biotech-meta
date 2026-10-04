@@ -1,5 +1,5 @@
 // Final validation suite compiled by compile-suite.mjs (Wave 6). Base: docs/schema/neo4j/validation.cypher (0.2.0, unchanged on disk)
-// minus 42 statements replaced by corrections (V-003, V-006, V-101, V-104, V-108, V-112, V-113, V-117, V-121, V-201, V-203, V-211, V-215, V-217, V-218, V-221, V-231, V-233, V-234, V-235, V-302, V-303, V-304, V-313, V-322, V-324, V-333, V-334, V-407, V-409, V-416, V-423, V-432, V-503, V-504, V-505, V-508, V-509, V-512, V-521, V-525, V-526) and the retired V-423 (CL-016),
+// minus 44 statements replaced by corrections (V-003, V-006, V-101, V-104, V-108, V-112, V-113, V-115, V-116, V-117, V-121, V-201, V-203, V-211, V-215, V-217, V-218, V-221, V-231, V-233, V-234, V-235, V-302, V-303, V-304, V-313, V-322, V-324, V-333, V-334, V-407, V-409, V-416, V-423, V-432, V-503, V-504, V-505, V-508, V-509, V-512, V-521, V-525, V-526) and the retired V-423 (CL-016),
 // plus 3 correction/extension files appended verbatim. Params: validation/validation-params.json (+ fable-w5-params.json).
 
 // Each query should return zero rows in a valid committed graph unless its comment says "(informational)",
@@ -174,21 +174,6 @@ WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR
   AND NOT (s.uid STARTS WITH 'hu:private-' OR s.privacyClass = 'private-personal' OR s:PrivateRecord)
   AND NOT type(r) IN $allowedReferenceTypes
 RETURN p.uid AS privateUid, type(r) AS relType, s.uid AS sharedUid;
-
-// V-115: private nodes do not carry labels that a shared fulltext or vector index covers.
-// status: statically-checked
-// params: $sharedIndexedLabels list<string>, derive with: SHOW FULLTEXT INDEXES YIELD labelsOrTypes, plus the vector index labels
-MATCH (p)
-WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR p:PrivateRecord)
-  AND any(l IN labels(p) WHERE l IN $sharedIndexedLabels)
-RETURN p.uid AS privateUid, labels(p) AS labels;
-
-// V-116: private nodes carry no search text or embedding unless a private index is declared (placement-dependent).
-// status: illustrative (applies only if private records share the shared database)
-MATCH (p)
-WHERE (p.uid STARTS WITH 'hu:private-' OR p.privacyClass = 'private-personal' OR p:PrivateRecord)
-  AND (p.searchText IS NOT NULL OR p.searchEmbedding IS NOT NULL)
-RETURN p.uid AS privateUid, labels(p) AS labels;
 
 // V-118: uid backfill progress over live GraphQL nodes (informational; counts per label).
 // status: statically-checked
@@ -1994,35 +1979,6 @@ WHERE q.qualificationKind IS NULL
 RETURN 'V-416r' AS check, a.uid AS qualifiedUid, b.uid AS qualifierUid;
 
 // ===================================================================================================
-// V-423r -- replaces V-423; ruling W00-R-25
-// Derived RECOMMENDS: derivationRule + exactly one derivedFromAssertionUids whose assertion has speechAct RECOMMENDS, is asserted by
-// the start node and names the end node (W21-SR-07; D-011 forbids assertionUid on derived edges; legacy assertionUid accepted only
-// as a migration fallback and reported by V-W00-02r). Failing case W21 fx07: verbatim V-423 1 row on a correct edge.
-// Revised text source: W21/fixtures/w21-validation.cypher V-W21-06
-// ORIGINAL (kept for comparison; not executed):
-// | // V-423: live Person-[:RECOMMENDS]-> is a projection of an assertion whose own
-// | // speech act is RECOMMENDS (a practice report or a third party's attribution does not count).
-// | // status: statically-checked
-// | MATCH (p:Person)-[rec:RECOMMENDS]->(x)
-// | WHERE rec.assertionUid IS NULL
-// |    OR NOT EXISTS {
-// |      MATCH (a:Assertion)-[:ASSERTED_BY]->(p)
-// |      WHERE a.uid = rec.assertionUid AND a.speechAct = 'RECOMMENDS'
-// |    }
-// | RETURN p.uid AS recommenderUid, x.uid AS recommendedUid;
-// REVISED:
-MATCH (p)-[rec:RECOMMENDS]->(x)
-WITH p, x, rec, coalesce(rec.derivedFromAssertionUids, CASE WHEN rec.assertionUid IS NULL THEN [] ELSE [rec.assertionUid] END) AS cited
-WHERE size(cited) <> 1
-   OR (rec.assertionUid IS NULL AND rec.derivationRule IS NULL)
-   OR NOT EXISTS {
-     MATCH (a:Assertion)-[:ASSERTED_BY]->(p)
-     WHERE a.uid = cited[0] AND a.speechAct = 'RECOMMENDS' AND NOT a.status IN ['REJECTED', 'SUPERSEDED']
-       AND (EXISTS { (a)-[:HAS_SUBJECT]->(x) } OR EXISTS { (a)-[:HAS_OBJECT]->(x) })
-   }
-RETURN 'V-423r' AS check, p.uid AS recommenderUid, x.uid AS recommendedUid, cited;
-
-// ===================================================================================================
 // V-432r -- replaces V-432; ruling W00-R-32
 // COMPARES_IDENTITIES (not COMPARES, which is W07 ComparabilityAssessment) plus the SAME_IDENTITY_MERGED redirect fields
 // (W23-SR-07, W00-SR-12, W00-R-11). Failing case W23 fixture 04 and W00 fixture 08: comparedCount 0 on well-formed assessments.
@@ -2320,37 +2276,6 @@ WHERE s.canonicalUri =~ '(?i)https?://(dx\\.)?doi\\.org/.*' OR s.canonicalUri =~
 RETURN 'V-W00-19' AS check, s.uid AS sourceWithResolverUri, s.canonicalUri AS canonicalUri;
 
 // ======== validation/fable-w5-validators.cypher ========
-// =====================================================================================================================
-// fable-w5-validators.cypher -- Wave 5 validator corrections compiled from the Challenger reports
-// (validation/challengers/CH-W09W10-study-transfer, CH-W23-privacy, CH-W16-protocols, CH-W21W22-media, CH-W00-kernel; dispositions in
-// reports/08-challenger-resolution-matrix.md), run-2026-10-04-fable51-01, Opus 5.5 worker, 2026-10-04.
-//
-// Contract: one statement per correction; each statement returns rows ONLY on violations (zero rows = valid). Statements
-// marked "(review)" return review-queue rows that are violations of a method rule that cannot be checked as a hard
-// structural rule (they still return zero rows on the valid fixtures). Every statement binds its own variables; nothing
-// crosses ';'. Every row carries `check` = its V-F5 id.
-// Parameters: validation/validation-params.json merged with validation/fable-w5-params.json (list keys unioned).
-// Not covered here, because Fable fixes them in the SDL / operations / fixtures (cross-reference only): CH-P-02, CH-P-04
-// (vector indexes), CH-P-12 (operations section 7), CH-P-16, CH-P-17/CH-R-12 (DiagnosticResult label), CH-P-18, CH-R-04,
-// CH-R-05 (DERIVED_FROM_PROTOCOL field), CH-R-13 (HAS_STEP migration and fixture), CH-S-18, and the kernel items CH-K-08a/09 (gen-params),
-// CH-K-10b/13 (generated-label-checks.cypher), CH-K-16a/b (operations 5b), CH-K-18a-d (operations 6a/7), CH-K-19 (99-normalize).
-// Retired by this file: kernel V-423 (superseded by V-W21-06 and now by V-F5-47, CL-016), V-201 (-> V-F5-01),
-// V-218 (-> V-F5-08), V-215r (-> V-F5-07), V-203 (-> V-F5-05, in addition to the count check), W10-V08 (-> V-F5-06),
-// W10-V14 (-> V-F5-18 + V-F5-20), V-604 (-> V-F5-43), V-605 (-> V-F5-41 + V-F5-42), V-W21-06 (-> V-F5-47).
-// Tested on embedded Neo4j 5.26.31 Community instances c3, c4, c5; results in reports/08-challenger-resolution-matrix.md.
-// =====================================================================================================================
-
-// ------------------------------------------------- study transfer (W09/W10) -------------------------------------------
-
-// V-F5-01 -- resolves CH-S-01, CH-S-02; replaces V-201; rule: no relationship in either direction between a study-side record and a commercial identity, except InterventionComponent -USES_INTERVENTION_MATERIAL-> ProductVariant|ProductLot.
-// (V-201r verbatim as tested by the study-transfer Challenger.)
-MATCH (s)-[r]-(p)
-WHERE (s:Study OR s:StudyArm OR s:StudyIntervention OR s:InterventionComponent OR s:StudyResult OR s:Publication OR s:Dataset
-       OR s:OutcomeDefinition OR s:StudyPopulation OR s:RegistrationVersion OR s:TrialRegistration OR s:ProtocolVersion)
-  AND (p:Product OR p:ProductVariant OR p:FormulationVersion OR p:PackageConfiguration OR p:ProductLot OR p:MerchantListing
-       OR p:Offer OR p:ConsumerBrand OR p:Bundle)
-  AND NOT (s:InterventionComponent AND type(r) = 'USES_INTERVENTION_MATERIAL' AND startNode(r) = s AND (p:ProductVariant OR p:ProductLot))
-RETURN DISTINCT 'V-F5-01' AS check, s.uid AS studySide, type(r) AS rel, p.uid AS commercial;
 
 // V-F5-02 -- resolves CH-S-02a; extends V-W09-03; rule: USES_INTERVENTION_MATERIAL goes from an InterventionComponent to IngredientMaterial, ProductVariant or ProductLot only (catalog range).
 MATCH (ic)-[u:USES_INTERVENTION_MATERIAL]->(m)
