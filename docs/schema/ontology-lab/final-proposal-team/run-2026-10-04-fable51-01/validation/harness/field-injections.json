@@ -253,5 +253,19 @@
    "\"\"\"class: structural (candidate); cardinality: zero_or_one; catalog: HAS_ANALYTE (registry: W07, admitted by Fable ruling F-W5-01); request: W03-SR-03, W02-SR-08.\"\"\"\nanalyteSubstances: [ChemicalSubstance!]! @relationship(type: \"HAS_ANALYTE\", direction: OUT, properties: \"StructuralEdgeProperties\")",
    "\"\"\"class: structural (candidate); cardinality: zero_or_one; catalog: HAS_ANALYTE (registry: W07, admitted by Fable ruling F-W5-01); request: W03-SR-03, W02-SR-08.\"\"\"\nanalyteMolecularEntities: [MolecularEntity!]! @relationship(type: \"HAS_ANALYTE\", direction: OUT, properties: \"StructuralEdgeProperties\")"
   ]
+ },
+ {
+  "type": "MeasurementPlan",
+  "fields": [
+   "\"Anchor instant of the cadence window as the source states it (first dose, enrolment, previous draw); windows are [anchor + cadenceMinDays, anchor + cadenceMaxDays], never a midpoint. Null when the source states only a frequency (F-W5-13, CH-R-04).\"\ncadenceAnchorAt: DateTime",
+   "\"What the anchor is measured from, as stated: FIRST_DOSE, ENROLMENT, PREVIOUS_MEASUREMENT, CALENDAR (controlled string; F-W5-13).\"\ncadenceAnchorBasis: String"
+  ]
+ },
+ {
+  "type": "Protocol",
+  "fields": [
+   "\"\"\"class: asserted; cardinality: many; catalog: DERIVED_FROM_PROTOCOL (W16; admitted F-W5-14, CH-R-05). A protocol another party built from this one is its own Protocol linked here; it is NEVER an edition of the original (editions are the original author's versions or snapshot diffs of the original source; a third-party description of someone else's protocol is a THIRD_PARTY_REPORTED edition only when it reports the original, not a variant).\"\"\"\nderivedFromProtocols: [Protocol!]! @relationship(type: \"DERIVED_FROM_PROTOCOL\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (inverse); catalog: DERIVED_FROM_PROTOCOL\"\"\"\nderivedProtocols: [Protocol!]! @relationship(type: \"DERIVED_FROM_PROTOCOL\", direction: IN, properties: \"AssertedEdgeProperties\")"
+  ]
  }
 ]

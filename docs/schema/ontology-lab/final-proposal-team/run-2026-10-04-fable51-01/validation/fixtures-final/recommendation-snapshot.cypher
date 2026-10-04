@@ -351,7 +351,7 @@ MERGE (dim)-[:CONSIDERS]->(ev);
 
 // 1.11 Policy version (shared, internal; contains no personal data)
 MERGE (pv:VersionedState:PolicyVersion {uid: 'hu:policy-version:sleep-support-ranking-v3'})
-SET pv.name = 'Sleep support ranking and safety policy v3 (synthetic)', pv.payloadHash = 'sha256:fixture-policy-v3',
+SET pv.name = 'Sleep support ranking and safety policy v3 (synthetic)', pv.payloadHash = 'sha256:fixture-policy-v3', pv.stateType = 'PolicyVersion', pv.policyKey = 'sleep-support-ranking', pv.versionLabel = 'v3', pv.policyKind = 'RECOMMENDATION_RANKING',
     pv.privacyClass = 'INTERNAL', pv.createdAt = datetime('2026-03-20T00:00:00Z');
 
 // 1.12 Public protocol with two editions (round 0008 section 6)
@@ -387,7 +387,7 @@ UNWIND [
   {e: 'hu:protocol-edition:synthetic-evening-wind-down-e2', s: 'hu:protocol-step:synthetic-wind-down-fixed-bedtime', o: 3}
 ] AS row
 MATCH (e:ProtocolEdition {uid: row.e}), (s:ProtocolStep {uid: row.s})
-MERGE (e)-[r:HAS_STEP]->(s)
+MERGE (e)-[r:HAS_PROTOCOL_STEP]->(s)
 SET r.orderIndex = row.o;
 
 // Edition 2: the magnesium step depends on the result of the baseline measurement and applies only when it is within range.
@@ -688,9 +688,9 @@ RETURN rs.uid AS snapshotUid, o.disposition AS disposition, aUid AS supersededEv
 // Expected: added baseline-serum-magnesium; removed screen-free-hour; modified magnesium-evening; unchanged fixed-bedtime.
 // status: statically-checked
 MATCH (old:ProtocolEdition {uid: 'hu:protocol-edition:synthetic-evening-wind-down-e1'}), (new:ProtocolEdition {uid: 'hu:protocol-edition:synthetic-evening-wind-down-e2'})
-OPTIONAL MATCH (old)-[:HAS_STEP]->(os:ProtocolStep)
+OPTIONAL MATCH (old)-[:HAS_PROTOCOL_STEP]->(os:ProtocolStep)
 WITH old, new, collect(os) AS oldSteps
-OPTIONAL MATCH (new)-[:HAS_STEP]->(ns:ProtocolStep)
+OPTIONAL MATCH (new)-[:HAS_PROTOCOL_STEP]->(ns:ProtocolStep)
 WITH oldSteps, collect(ns) AS newSteps
 WITH oldSteps, newSteps, [s IN oldSteps | s.stepKey] AS oldKeys, [s IN newSteps | s.stepKey] AS newKeys
 RETURN [s IN newSteps WHERE NOT s.stepKey IN oldKeys | s.stepKey] AS addedSteps,

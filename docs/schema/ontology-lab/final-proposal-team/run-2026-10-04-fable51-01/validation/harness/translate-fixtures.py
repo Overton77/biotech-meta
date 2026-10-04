@@ -29,5 +29,19 @@ for f in sorted(src.glob('*.cypher')):
             return block.rstrip(';') + f", n.documentId = '{seg}', n.url = n.canonicalUri;"
         t, n = re.subn(r"(MERGE \(n:Entity:Source:Document \{uid: '([^']+)'\}\)\nSET [^;]*;)", fix_doc, t)
         if n: log.append(f"{name}: {n}x Document stored-name fix (type, documentId, url)")
+    if name == 'recommendation-snapshot.cypher':
+        # D-004 / CL-013 (CH-R-13): edition -> step edges are HAS_PROTOCOL_STEP (orderIndex kept); diff queries follow.
+        t = sub(name, t, r'\bHAS_STEP\b', 'HAS_PROTOCOL_STEP')
+        # CH-P-16: the ranking policy version gets its required keys.
+        t = sub(name, t, r"pv\.payloadHash = 'sha256:fixture-policy-v3',", "pv.payloadHash = 'sha256:fixture-policy-v3', pv.stateType = 'PolicyVersion', pv.policyKey = 'sleep-support-ranking', pv.versionLabel = 'v3', pv.policyKind = 'RECOMMENDATION_RANKING',")
+    if name == 'claim-retelling-provenance.cypher':
+        # CH-P-16: the quoting policy placeholder is a VersionedState with the policy-version token and required keys, INTERNAL.
+        t = sub(name, t, r"MERGE \(pv:Entity:PolicyVersion \{uid: 'hu:policy:answer-quoting-policy-v0'\}\)\nSET pv\.entityType = 'PolicyVersion',",
+                "MERGE (pv:VersionedState:PolicyVersion {uid: 'hu:policy-version:answer-quoting-policy-v0'})\nSET pv.stateType = 'PolicyVersion', pv.policyKey = 'answer-quoting', pv.versionLabel = 'v0', pv.policyKind = 'USE_AUTHORIZATION', pv.privacyClass = 'INTERNAL', pv.payloadHash = 'sha256:fixture-answer-quoting-v0',")
+        t = sub(name, t, r"hu:policy:answer-quoting-policy-v0", "hu:policy-version:answer-quoting-policy-v0")
+    if name == 'study-vs-product-mismatch.cypher':
+        # CH-S-18: uid tokens follow the W00 registry (arm, intervention) so W09/W10 fixtures attach to the same identities.
+        t = sub(name, t, r"hu:study-arm:", "hu:arm:")
+        t = sub(name, t, r"hu:study-intervention:", "hu:intervention:")
     (dst / name).write_text(t)
 print("\n".join(log) if log else "no substitutions")

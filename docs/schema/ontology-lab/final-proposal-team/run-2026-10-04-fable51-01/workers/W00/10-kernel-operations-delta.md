@@ -8,7 +8,7 @@ Community syntax, idempotent). Everything not listed here is unchanged.
 
 | Part | Statements | Why (ruling) |
 |---|---|---|
-| A | `<label>_uid` and `<label>_live_id` uniqueness for the 125 labels registered in this pass that are neither W00-owned nor refinement specializations (rule T2: a specialization is covered by its parent label's constraints). Live id property: `id`, or `documentId` / `documentTextVersionId` / `segmentationId` / `chunkId` per catalog liveIdProjection. | W00-R-01 (uid-token-registry.yaml). Global uniqueness across labels stays with the six archetype constraints of operations.cypher (V-000a). Owners may move these lines into their own files; the statement shape is fixed. |
+| A | `<label>_uid` and `<label>_live_id` uniqueness for the 127 labels registered in this pass that are neither W00-owned nor refinement specializations (rule T2: a specialization is covered by its parent label's constraints). Live id property: `id`, or `documentId` / `documentTextVersionId` / `segmentationId` / `chunkId` per catalog liveIdProjection. | W00-R-01 (uid-token-registry.yaml). Global uniqueness across labels stays with the six archetype constraints of operations.cypher (V-000a). Owners may move these lines into their own files; the statement shape is fixed. |
 | B | `relationshipUid` uniqueness plus `assertionUid` and `recordedFrom` indexes on HAS_PATHWAY_VERSION, HAS_CERTIFICATION_SCOPE, HAS_CAPABILITY_STATE, STATUS_OF, IP_STATUS_OF, STRAIN_OF, GOVERNED_BY_SPECIFICATION | W00-R-07, W00-R-37: these are episode or exclusive asserted types now in `$episodeTypes` / `$exclusiveTypes`; the write guard looks up the open episode by assertionUid. |
 | B | `has_state_valid_from`, `has_state_valid_to` | W00-R-16: HAS_STATE now also carries Organization/Product/Listing state caches, read as of a valid time. The existing `has_state_relationship_uid`, `has_state_recorded_from`, `has_state_assertion_uid` stay. |
 | B | none for LEGACY_EVALUATES | W00-R-17: legacy, read-only, no relationshipUid; nothing queries it by property. |
@@ -37,7 +37,7 @@ SAME_IDENTITY_MERGED, so not expressible as an existence constraint; stays V-432
 
 ## 3. Validation parameters (fixtures/validation-params-w00.json)
 
-Base: `validation/validation-params.json` (catalog 0.2.0). Deltas:
+Base: `validation/validation-params.json` as committed in b3636fb (catalog 0.2.0; Fable replaced the file at 02:40Z with an earlier copy of the W00 file). Deltas:
 
 - `$assertedTypes` + BOARD_MEMBER_OF, EMPLOYED_BY, ADVISES_ORGANIZATION, INVESTED_IN, HOLDS_EQUITY_IN, PARENT_OF, OWNS_BRAND,
   OPERATES_FACILITY, MARKETS_PRODUCT, MANUFACTURES_PRODUCT, DISTRIBUTES_PRODUCT, ENDORSES_PRODUCT (W01-SR-06); SPONSORS_CONTENT,
@@ -49,7 +49,7 @@ Base: `validation/validation-params.json` (catalog 0.2.0). Deltas:
 - `$derivedTypes` + RECOMMENDS, HAS_CHUNK, CHUNK_IN_SEGMENT, ABOUT, MENTIONS_ENTITY, SUPPORTED_BY_DOCUMENT, HAS_CURRENT_PROTOCOL_STEP, ACTS_IN.
 - `$ruleOnlyDerivedTypes` + RESOLVES_TO_CHUNK, HAS_CHUNK, CHUNK_IN_SEGMENT, ABOUT, MENTIONS_ENTITY, HAS_CURRENT_PROTOCOL_STEP, COMPARED_TO.
 - `$exclusiveTypes` + STRAIN_OF, HAS_PATHWAY_VERSION (HAS_CAPABILITY_STATE and GOVERNED_BY_SPECIFICATION are path-partitioned and stay out).
-- `$implicationPairs` + 19 pairs (W12, W13, W14, W15, W22). Rule learned in this pass: a pair whose conclusion is a structural
+- `$implicationPairs` + 32 pairs (W09, W10, W12, W13, W14, W15, W17 FI-W17-01..09, W22). Rule learned in this pass: a pair whose conclusion is a structural
   relationship type (`[DEPICTS, SUPPORTED_BY]`) is NOT a V-112 parameter; with it, V-112r reported every SUPPORTED_BY edge as
   NO_CITATION (first run). Such pairs stay in predicate-registry.yaml and are checked by their owner's validators (V-60x).
 - New: `$episodeTypes` (V-503r), `$quantityPredicateClass` (V-003r), `$uidTypeTokens` and `$uidAliasTokens` (V-W00-16).
@@ -93,4 +93,9 @@ named in seam-rulings.yaml. W20 renames its chunk-overlap edge CHUNK_IN_SEGMENT 
 
 ## 7. Execution evidence
 
-OPS_EVIDENCE_PLACEHOLDER
+Executed 2026-10-04T02:58Z on a fresh embedded Neo4j 5.26.31 Community + APOC 5.26.31 (`fixtures/results/operations-delta-run.txt`):
+`operations.cypher` (53 statements) then fixtures 00, 12 and 13 (legacy shapes: one state cache on HAS_SNAPSHOT, one retrieval MENTIONS,
+one IDENTIFIED_BY; privacy classes `public` x2, `internal`, `PRIVATE_PERSONAL`), then `operations-delta.cypher`: 290 statements, 0 errors;
+constraints 35 -> 296, indexes 335. D1, D3, D4 each moved one edge (HAS_STATE 1, MENTIONS_ENTITY 1, HAS_IDENTIFIER 3 after the run);
+D5 rewrote three privacy values; the `PRIVATE_PERSONAL` node is left for the privacy owner, as ruled. Legacy-shape query after the
+run: zero rows. A second run of the whole file performed no write and no schema change (idempotent).

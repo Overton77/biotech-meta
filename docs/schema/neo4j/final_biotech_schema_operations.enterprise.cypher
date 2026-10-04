@@ -1,7 +1,7 @@
-// Enterprise-only companion to final_biotech_schema_operations.cypher: property existence constraints for archetype-required
-// and required edge properties. Every statement here was REJECTED by Neo4j 5.26.31 Community (edition limit) in the Wave 6 run and is
-// UNVERIFIED on Enterprise; run only on Enterprise or an Aura tier that supports existence constraints, AFTER the baseline file.
-// On Community these semantics are service-enforced and checked by the validators (validation report 07).
+// Enterprise-only companion to final_biotech_schema_operations.cypher: property existence and type constraints for archetype-required
+// and required edge properties, plus packet-declared existence/type constraints. Every statement here was REJECTED by Neo4j 5.26.31
+// Community (edition limit) in the Wave 6 run and is UNVERIFIED on Enterprise; run only on Enterprise or an Aura tier that supports
+// them, AFTER the baseline file. On Community these semantics are service-enforced and checked by the validators (report 07).
 
 CREATE CONSTRAINT source_uid_exists IF NOT EXISTS FOR (n:Source) REQUIRE n.uid IS NOT NULL;
 CREATE CONSTRAINT source_entity_type_exists IF NOT EXISTS FOR (n:Source) REQUIRE n.entityType IS NOT NULL;
@@ -773,6 +773,11 @@ CREATE CONSTRAINT rel_derived_from_algorithm_version_assertion_uid_exists IF NOT
 CREATE CONSTRAINT rel_derived_from_algorithm_version_valid_from_basis_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_ALGORITHM_VERSION]-() REQUIRE r.validFromBasis IS NOT NULL;
 CREATE CONSTRAINT rel_derived_from_algorithm_version_valid_to_basis_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_ALGORITHM_VERSION]-() REQUIRE r.validToBasis IS NOT NULL;
 CREATE CONSTRAINT rel_derived_from_algorithm_version_recorded_from_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_ALGORITHM_VERSION]-() REQUIRE r.recordedFrom IS NOT NULL;
+CREATE CONSTRAINT rel_derived_from_protocol_relationship_uid_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_PROTOCOL]-() REQUIRE r.relationshipUid IS NOT NULL;
+CREATE CONSTRAINT rel_derived_from_protocol_assertion_uid_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_PROTOCOL]-() REQUIRE r.assertionUid IS NOT NULL;
+CREATE CONSTRAINT rel_derived_from_protocol_valid_from_basis_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_PROTOCOL]-() REQUIRE r.validFromBasis IS NOT NULL;
+CREATE CONSTRAINT rel_derived_from_protocol_valid_to_basis_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_PROTOCOL]-() REQUIRE r.validToBasis IS NOT NULL;
+CREATE CONSTRAINT rel_derived_from_protocol_recorded_from_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_PROTOCOL]-() REQUIRE r.recordedFrom IS NOT NULL;
 CREATE CONSTRAINT rel_derived_from_taxon_relationship_uid_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_TAXON]-() REQUIRE r.relationshipUid IS NOT NULL;
 CREATE CONSTRAINT rel_derived_from_taxon_assertion_uid_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_TAXON]-() REQUIRE r.assertionUid IS NOT NULL;
 CREATE CONSTRAINT rel_derived_from_taxon_valid_from_basis_exists IF NOT EXISTS FOR ()-[r:DERIVED_FROM_TAXON]-() REQUIRE r.validFromBasis IS NOT NULL;
@@ -1347,3 +1352,73 @@ CREATE CONSTRAINT rel_visualizes_assertion_uid_exists IF NOT EXISTS FOR ()-[r:VI
 CREATE CONSTRAINT rel_visualizes_valid_from_basis_exists IF NOT EXISTS FOR ()-[r:VISUALIZES]-() REQUIRE r.validFromBasis IS NOT NULL;
 CREATE CONSTRAINT rel_visualizes_valid_to_basis_exists IF NOT EXISTS FOR ()-[r:VISUALIZES]-() REQUIRE r.validToBasis IS NOT NULL;
 CREATE CONSTRAINT rel_visualizes_recorded_from_exists IF NOT EXISTS FOR ()-[r:VISUALIZES]-() REQUIRE r.recordedFrom IS NOT NULL;
+
+// ---- Packet-declared existence/type constraints ----
+// W07/operations.cypher
+CREATE CONSTRAINT diagnostic_result_kind_exists IF NOT EXISTS FOR (n:DiagnosticResult) REQUIRE n.resultKind IS NOT NULL;
+// W07/operations.cypher
+CREATE CONSTRAINT w07_algorithm_version_basis_exists IF NOT EXISTS FOR (n:AlgorithmVersion) REQUIRE n.versionBasis IS NOT NULL;
+// W07/operations.cypher
+CREATE CONSTRAINT w07_assay_software_status_exists IF NOT EXISTS FOR (n:AssayVersion) REQUIRE n.softwareVersionStatus IS NOT NULL;
+// W07/operations.cypher
+CREATE CONSTRAINT w07_ri_kind_exists IF NOT EXISTS FOR (n:ReferenceIntervalVersion) REQUIRE n.intervalKind IS NOT NULL;
+// W07/operations.cypher
+CREATE CONSTRAINT w07_ri_derivation_exists IF NOT EXISTS FOR (n:ReferenceIntervalVersion) REQUIRE n.derivationKind IS NOT NULL;
+// W07/operations.cypher
+CREATE CONSTRAINT w07_comparability_verdict_exists IF NOT EXISTS FOR (n:ComparabilityAssessment) REQUIRE n.verdict IS NOT NULL;
+// W07/operations.cypher
+CREATE CONSTRAINT w07_ri_lower_bound_type IF NOT EXISTS FOR (n:ReferenceIntervalVersion) REQUIRE n.lowerBound IS :: FLOAT;
+// W07/operations.cypher
+CREATE CONSTRAINT w07_ri_upper_bound_type IF NOT EXISTS FOR (n:ReferenceIntervalVersion) REQUIRE n.upperBound IS :: FLOAT;
+// W07/operations.cypher
+CREATE CONSTRAINT w07_performed_with_assertion_exists IF NOT EXISTS FOR ()-[r:PERFORMED_WITH_ASSAY_VERSION]-() REQUIRE r.assertionUid IS NOT NULL;
+// W13/operations.cypher
+CREATE CONSTRAINT w13_status_kind_exists IF NOT EXISTS FOR (n:RegulatoryStatus) REQUIRE n.statusKind IS NOT NULL;
+// W13/operations.cypher
+CREATE CONSTRAINT w13_status_jurisdiction_exists IF NOT EXISTS FOR (n:RegulatoryStatus) REQUIRE n.jurisdiction IS NOT NULL;
+// W13/operations.cypher
+CREATE CONSTRAINT w13_response_kind_exists IF NOT EXISTS FOR (n:RegulatoryResponse) REQUIRE n.responseKind IS NOT NULL;
+// W13/operations.cypher
+CREATE CONSTRAINT w13_status_kind_type IF NOT EXISTS FOR (n:RegulatoryStatus) REQUIRE n.statusKind IS :: STRING;
+// W13/operations.cypher
+CREATE CONSTRAINT w13_status_of_assertion_exists IF NOT EXISTS FOR ()-[r:STATUS_OF]-() REQUIRE r.assertionUid IS NOT NULL;
+// W13/operations.cypher
+CREATE CONSTRAINT w13_status_of_recorded_from_exists IF NOT EXISTS FOR ()-[r:STATUS_OF]-() REQUIRE r.recordedFrom IS NOT NULL;
+// W21/operations.cypher
+CREATE CONSTRAINT w21_claim_occurrence_predicate_exists IF NOT EXISTS FOR (n:ClaimOccurrence) REQUIRE n.predicate IS NOT NULL;
+// W21/operations.cypher
+CREATE CONSTRAINT w21_episode_segment_type_exists IF NOT EXISTS FOR (n:EpisodeSegment) REQUIRE n.segmentType IS NOT NULL;
+// W21/operations.cypher
+CREATE CONSTRAINT w21_conflict_relevance_method_exists IF NOT EXISTS FOR (n:ConflictRelevanceAssessment) REQUIRE n.methodVersion IS NOT NULL;
+// W21/operations.cypher
+CREATE CONSTRAINT w21_qualified_by_kind_exists IF NOT EXISTS FOR ()-[r:QUALIFIED_BY]-() REQUIRE r.qualificationKind IS NOT NULL;
+// W21/operations.cypher
+CREATE CONSTRAINT w21_retells_mode_exists IF NOT EXISTS FOR ()-[r:RETELLS]-() REQUIRE r.retellingMode IS NOT NULL;
+// W21/operations.cypher
+CREATE CONSTRAINT w21_appears_in_role_exists IF NOT EXISTS FOR ()-[r:APPEARS_IN]-() REQUIRE r.roleType IS NOT NULL;
+// W21/operations.cypher
+CREATE CONSTRAINT w21_media_end_type IF NOT EXISTS FOR (n:SourceLocator) REQUIRE n.mediaEndSeconds IS :: FLOAT;
+// W22/operations.cypher
+CREATE CONSTRAINT media_variant_kind_exists IF NOT EXISTS FOR (n:MediaVariant) REQUIRE n.variantKind IS NOT NULL;
+// W22/operations.cypher
+CREATE CONSTRAINT media_asset_type_exists IF NOT EXISTS FOR (n:MediaAsset) REQUIRE n.assetType IS NOT NULL;
+// W22/operations.cypher
+CREATE CONSTRAINT media_annotation_type_exists IF NOT EXISTS FOR (n:MediaAnnotation) REQUIRE n.annotationType IS NOT NULL;
+// W22/operations.cypher
+CREATE CONSTRAINT media_assessment_method_exists IF NOT EXISTS FOR (n:MediaSuitabilityAssessment) REQUIRE n.methodVersion IS NOT NULL;
+// W22/operations.cypher
+CREATE CONSTRAINT media_assessment_dimension_exists IF NOT EXISTS FOR (n:MediaSuitabilityAssessment) REQUIRE n.dimension IS NOT NULL;
+// W22/operations.cypher
+CREATE CONSTRAINT media_rights_status_exists IF NOT EXISTS FOR (n:MediaRightsRecord) REQUIRE n.rightsStatus IS NOT NULL;
+// W22/operations.cypher
+CREATE CONSTRAINT media_rights_payload_hash_exists IF NOT EXISTS FOR (n:MediaRightsRecord) REQUIRE n.payloadHash IS NOT NULL;
+// W22/operations.cypher
+CREATE CONSTRAINT media_variant_width_type IF NOT EXISTS FOR (n:MediaVariant) REQUIRE n.widthPx IS :: INTEGER;
+// W22/operations.cypher
+CREATE CONSTRAINT media_annotation_x_type IF NOT EXISTS FOR (n:MediaAnnotation) REQUIRE n.x IS :: FLOAT;
+// W22/operations.cypher
+CREATE CONSTRAINT depicts_assertion_uid_exists IF NOT EXISTS FOR ()-[r:DEPICTS]-() REQUIRE r.assertionUid IS NOT NULL;
+// W22/operations.cypher
+CREATE CONSTRAINT explains_assertion_uid_exists IF NOT EXISTS FOR ()-[r:EXPLAINS]-() REQUIRE r.assertionUid IS NOT NULL;
+// W22/operations.cypher
+CREATE CONSTRAINT has_rights_record_assertion_uid_exists IF NOT EXISTS FOR ()-[r:HAS_RIGHTS_RECORD]-() REQUIRE r.assertionUid IS NOT NULL;

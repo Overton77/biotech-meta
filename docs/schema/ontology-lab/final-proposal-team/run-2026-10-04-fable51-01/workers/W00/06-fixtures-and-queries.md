@@ -136,3 +136,16 @@ node run-cypher.mjs <bolt> workers/W00/fixtures/validation-w00.cypher
 node workers/W00/fixtures/11-write-guard-harness.mjs <bolt-uri-file> workers/W00/fixtures/11-write-guards.cypher
 node workers/W00/fixtures/graphql-read-test.mjs <bolt-uri-file> <fragment+stubs.graphql> workers/W00/fixtures/graphql-ops-T1.json
 ```
+
+## Reconciliation pass additions (2026-10-04, Wave 4)
+
+| Fixture / test | Exercises | Observed (embedded 5.26.31 + APOC) |
+|---|---|---|
+| `fixtures/13-reconciliation-rulings.cypher` (load after 00) | W00-R-01, -02, -03, -06, -08, -11, -13, -16, -17, -19, -20 | 24/24 statements ok. Revised validators: V-003r 1 (N2), V-432r 1 (N1), V-W00-13 1 (N1), V-503r 1 (N3), V-505r 1 (N5 QUALIFIER_DIFFERS:isPrimary), V-W00-15 3 (N4), V-W00-17 1 (N6), V-W00-16 1 (N7), V-W00-19 1 (N8), V-521r 1 (N9); valid P1-P6 records report nothing |
+| `fixtures/13-queries.cypher` Q13-a | held uid hu:org:w00-acme-b as of 2026-04-10 -> itself; as of 2026-10-04 -> hu:org:w00-acme-a via hu:assessment:w00-merge-acme | as expected (`results/F13.queries.json`) |
+| `fixtures/13-queries.cypher` Q13-b | statedAsOf ladder: 2024-08-20 KNOWN_AT_WITNESS, 2024-09-01 POSSIBLE_START_UNKNOWN, record without precision NOT_EVALUABLE | as expected |
+| `fixtures/graphql-ops-T6.json` | Source.name via stored title, sourceKindNote, redirect fields, QUANTITY object + literal, statedAsOf, uid on EvidenceAssessmentArchetype | no GraphQL errors (`results/graphql-T6.txt`) |
+| T1-T5 rerun on the reconciled fragment | regression | same data as the first pass except list order, generated ids/timestamps and "did you mean" suggestions |
+| fixture 10 | normalizationVersion now IMG-PX1 (W00-R-24) | unchanged rows |
+
+Original-vs-revised validator runs over W00 and worker fixtures: `results/validation-corrections-runs.md`.

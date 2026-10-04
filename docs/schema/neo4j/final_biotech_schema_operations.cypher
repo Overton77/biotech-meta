@@ -454,6 +454,8 @@ CREATE CONSTRAINT rel_depicts_relationship_uid IF NOT EXISTS FOR ()-[r:DEPICTS]-
 CREATE INDEX rel_depicts_recorded_from IF NOT EXISTS FOR ()-[r:DEPICTS]-() ON (r.recordedFrom);
 CREATE CONSTRAINT rel_derived_from_algorithm_version_relationship_uid IF NOT EXISTS FOR ()-[r:DERIVED_FROM_ALGORITHM_VERSION]-() REQUIRE r.relationshipUid IS UNIQUE;
 CREATE INDEX rel_derived_from_algorithm_version_recorded_from IF NOT EXISTS FOR ()-[r:DERIVED_FROM_ALGORITHM_VERSION]-() ON (r.recordedFrom);
+CREATE CONSTRAINT rel_derived_from_protocol_relationship_uid IF NOT EXISTS FOR ()-[r:DERIVED_FROM_PROTOCOL]-() REQUIRE r.relationshipUid IS UNIQUE;
+CREATE INDEX rel_derived_from_protocol_recorded_from IF NOT EXISTS FOR ()-[r:DERIVED_FROM_PROTOCOL]-() ON (r.recordedFrom);
 CREATE CONSTRAINT rel_derived_from_taxon_relationship_uid IF NOT EXISTS FOR ()-[r:DERIVED_FROM_TAXON]-() REQUIRE r.relationshipUid IS UNIQUE;
 CREATE INDEX rel_derived_from_taxon_recorded_from IF NOT EXISTS FOR ()-[r:DERIVED_FROM_TAXON]-() ON (r.recordedFrom);
 CREATE CONSTRAINT rel_develops_platform_relationship_uid IF NOT EXISTS FOR ()-[r:DEVELOPS_PLATFORM]-() REQUIRE r.relationshipUid IS UNIQUE;
@@ -715,6 +717,265 @@ CREATE FULLTEXT INDEX MediaAssetSearch IF NOT EXISTS FOR (n:MediaAsset) ON EACH 
 CREATE FULLTEXT INDEX GraphViewSearch IF NOT EXISTS FOR (n:GraphView) ON EACH [n.name, n.description, n.searchText, n.queryText];
 
 // ---- 5. vector indexes declared by @vector (D-014); dimensions and similarity are deployment parameters: edit before running ----
+CREATE VECTOR INDEX OrganizationSearchVector IF NOT EXISTS FOR (n:Organization) ON (n.searchEmbedding) OPTIONS {indexConfig: {`vector.dimensions`: 1536, `vector.similarity_function`: 'cosine'}};
+CREATE VECTOR INDEX TreatmentSearchVector IF NOT EXISTS FOR (n:Treatment) ON (n.searchEmbedding) OPTIONS {indexConfig: {`vector.dimensions`: 1536, `vector.similarity_function`: 'cosine'}};
+CREATE VECTOR INDEX TechnologyPlatformSearchVector IF NOT EXISTS FOR (n:TechnologyPlatform) ON (n.searchEmbedding) OPTIONS {indexConfig: {`vector.dimensions`: 1536, `vector.similarity_function`: 'cosine'}};
+
+// ---- 5b. Packet-specific constraints and indexes collected from workers/W*/operations.cypher and W00 operations-delta.cypher
+//          (deduplicated against sections 1-5 by name and body; existence/type constraints moved to the Enterprise companion) ----
+// -- W00 (operations.cypher) --
+CREATE CONSTRAINT source_canonical_uri IF NOT EXISTS FOR (n:Source) REQUIRE n.canonicalUri IS UNIQUE;
+CREATE CONSTRAINT identifier_scheme_issuer_value IF NOT EXISTS FOR (n:Identifier) REQUIRE (n.scheme, n.issuer, n.value) IS UNIQUE;
+CREATE CONSTRAINT trade_item_identifier_identity IF NOT EXISTS FOR (n:TradeItemIdentifier) REQUIRE (n.scheme, n.issuer, n.value) IS UNIQUE;
+CREATE CONSTRAINT activity_external_run_unique IF NOT EXISTS FOR (n:Activity) REQUIRE (n.externalRunSystem, n.externalRunId) IS UNIQUE;
+CREATE INDEX assertion_recorded_at IF NOT EXISTS FOR (n:Assertion) ON (n.recordedAt);
+CREATE INDEX assertion_recorded_to IF NOT EXISTS FOR (a:Assertion) ON (a.recordedTo);
+CREATE INDEX assertion_predicate_recorded IF NOT EXISTS FOR (n:Assertion) ON (n.predicate, n.recordedAt);
+CREATE INDEX assertion_status IF NOT EXISTS FOR (n:Assertion) ON (n.status);
+CREATE INDEX adjudication_recorded_at IF NOT EXISTS FOR (n:Adjudication) ON (n.recordedAt);
+CREATE INDEX adjudication_reviewed_at IF NOT EXISTS FOR (n:Adjudication) ON (n.reviewedAt);
+CREATE INDEX snapshot_retrieved_at IF NOT EXISTS FOR (n:SourceSnapshot) ON (n.retrievedAt);
+CREATE INDEX snapshot_observed_at IF NOT EXISTS FOR (n:SourceSnapshot) ON (n.observedAt);
+CREATE INDEX source_snapshot_content_hash IF NOT EXISTS FOR (n:SourceSnapshot) ON (n.contentHash);
+CREATE INDEX source_locator_quote_hash IF NOT EXISTS FOR (n:SourceLocator) ON (n.quoteHash);
+CREATE INDEX source_revision_event_recorded_at IF NOT EXISTS FOR (n:SourceRevisionEvent) ON (n.recordedAt);
+CREATE INDEX identifier_value IF NOT EXISTS FOR (n:Identifier) ON (n.value);
+CREATE INDEX has_state_assertion_uid IF NOT EXISTS FOR ()-[r:HAS_STATE]-() ON (r.assertionUid);
+CREATE INDEX has_identifier_assertion_uid IF NOT EXISTS FOR ()-[r:HAS_IDENTIFIER]-() ON (r.assertionUid);
+CREATE INDEX supersedes_recorded_at IF NOT EXISTS FOR ()-[r:SUPERSEDES]-() ON (r.recordedAt);
+CREATE FULLTEXT INDEX mention_surface_form IF NOT EXISTS FOR (n:Mention) ON EACH [n.surfaceForm];
+// -- W00 (operations-delta.cypher) --
+CREATE INDEX has_pathway_version_assertion_uid IF NOT EXISTS FOR ()-[r:HAS_PATHWAY_VERSION]-() ON (r.assertionUid);
+CREATE INDEX has_certification_scope_assertion_uid IF NOT EXISTS FOR ()-[r:HAS_CERTIFICATION_SCOPE]-() ON (r.assertionUid);
+CREATE INDEX has_capability_state_assertion_uid IF NOT EXISTS FOR ()-[r:HAS_CAPABILITY_STATE]-() ON (r.assertionUid);
+CREATE INDEX status_of_assertion_uid IF NOT EXISTS FOR ()-[r:STATUS_OF]-() ON (r.assertionUid);
+CREATE INDEX ip_status_of_assertion_uid IF NOT EXISTS FOR ()-[r:IP_STATUS_OF]-() ON (r.assertionUid);
+CREATE INDEX strain_of_assertion_uid IF NOT EXISTS FOR ()-[r:STRAIN_OF]-() ON (r.assertionUid);
+CREATE INDEX governed_by_specification_assertion_uid IF NOT EXISTS FOR ()-[r:GOVERNED_BY_SPECIFICATION]-() ON (r.assertionUid);
+CREATE INDEX has_state_valid_from IF NOT EXISTS FOR ()-[r:HAS_STATE]-() ON (r.validFrom);
+CREATE INDEX has_state_valid_to IF NOT EXISTS FOR ()-[r:HAS_STATE]-() ON (r.validTo);
+CREATE INDEX equivalence_retired_uid IF NOT EXISTS FOR (n:EquivalenceAssessment) ON (n.retiredUid);   // W00-R-11 redirect lookup by held uid
+CREATE INDEX equivalence_kind_recorded IF NOT EXISTS FOR (n:EquivalenceAssessment) ON (n.equivalenceKind, n.recordedAt);
+CREATE INDEX assertion_stated_as_of IF NOT EXISTS FOR (n:Assertion) ON (n.statedAsOf);   // W00-R-13 point-in-time reads
+CREATE INDEX assertion_predicate_class IF NOT EXISTS FOR (n:Assertion) ON (n.predicateClass);   // W00-R-02 V-003r partition
+CREATE INDEX source_source_kind IF NOT EXISTS FOR (n:Source) ON (n.sourceKind);   // W00-R-08 V-W00-17, V-324r kind filters
+// -- W01 (operations.cypher) --
+CREATE INDEX w01_board_member_of_asof IF NOT EXISTS FOR ()-[r:BOARD_MEMBER_OF]-() ON (r.recordedFrom, r.validFrom);
+CREATE INDEX w01_employed_by_asof IF NOT EXISTS FOR ()-[r:EMPLOYED_BY]-() ON (r.recordedFrom, r.validFrom);
+CREATE INDEX w01_advises_asof IF NOT EXISTS FOR ()-[r:ADVISES_ORGANIZATION]-() ON (r.recordedFrom, r.validFrom);
+CREATE INDEX w01_holds_equity_asof IF NOT EXISTS FOR ()-[r:HOLDS_EQUITY_IN]-() ON (r.recordedFrom, r.validFrom);
+CREATE INDEX w01_affiliated_with_assertion IF NOT EXISTS FOR ()-[r:AFFILIATED_WITH]-() ON (r.assertionUid);
+CREATE INDEX w01_parent_of_assertion IF NOT EXISTS FOR ()-[r:PARENT_OF]-() ON (r.assertionUid);
+CREATE INDEX w01_org_type IF NOT EXISTS FOR (n:Organization) ON (n.organizationType);
+CREATE INDEX w01_facility_kind IF NOT EXISTS FOR (n:Facility) ON (n.facilityKind);
+// -- W02 (operations.cypher) --
+CREATE INDEX chemical_substance_inchikey IF NOT EXISTS FOR (n:ChemicalSubstance) ON (n.inchikey);
+CREATE INDEX chemical_substance_pubchem_cid IF NOT EXISTS FOR (n:ChemicalSubstance) ON (n.pubchemCid);
+CREATE INDEX chemical_substance_cas_legacy IF NOT EXISTS FOR (n:ChemicalSubstance) ON (n.casNumber);
+CREATE INDEX ingredient_material_kind IF NOT EXISTS FOR (n:IngredientMaterial) ON (n.materialKind);
+CREATE INDEX branded_material_brand IF NOT EXISTS FOR (n:BrandedIngredientMaterial) ON (n.brandName);
+CREATE INDEX botanical_taxon_taxonomy_id IF NOT EXISTS FOR (n:BotanicalTaxon) ON (n.taxonomyId);
+CREATE INDEX microbial_taxon_taxonomy_id IF NOT EXISTS FOR (n:MicrobialTaxon) ON (n.taxonomyId);
+CREATE INDEX microbial_strain_deposit IF NOT EXISTS FOR (n:MicrobialStrain) ON (n.depositIdentifier);
+CREATE INDEX quantitatively_contains_assertion IF NOT EXISTS FOR ()-[r:QUANTITATIVELY_CONTAINS]-() ON (r.assertionUid);
+// -- W03 (operations.cypher) --
+CREATE CONSTRAINT species_ncbi_taxonomy_id IF NOT EXISTS FOR (s:Species) REQUIRE s.ncbiTaxonomyId IS UNIQUE;
+CREATE CONSTRAINT pathway_external_id IF NOT EXISTS FOR (p:Pathway) REQUIRE (p.sourceDatabase, p.externalId) IS UNIQUE;
+CREATE CONSTRAINT condition_mondo_id IF NOT EXISTS FOR (c:Condition) REQUIRE c.mondoId IS UNIQUE;
+CREATE CONSTRAINT molecular_entity_hgnc_id IF NOT EXISTS FOR (m:MolecularEntity) REQUIRE m.hgncId IS UNIQUE;
+CREATE CONSTRAINT anatomical_context_uberon_id IF NOT EXISTS FOR (a:AnatomicalContext) REQUIRE a.uberonId IS UNIQUE;
+CREATE INDEX mechanism_context_setting IF NOT EXISTS FOR (c:MechanismEvidenceContext) ON (c.setting);
+CREATE INDEX assertion_mechanism_gate IF NOT EXISTS FOR (a:Assertion) ON (a.predicateClass, a.basisKind, a.status);
+CREATE INDEX affects_mechanism_rule IF NOT EXISTS FOR ()-[r:AFFECTS_MECHANISM]-() ON (r.derivationRule);
+CREATE INDEX modulates_rule IF NOT EXISTS FOR ()-[r:MODULATES]-() ON (r.derivationRule);
+CREATE INDEX applies_to_species_rule IF NOT EXISTS FOR ()-[r:APPLIES_TO_SPECIES]-() ON (r.derivationRule);
+CREATE INDEX influences_outcome_rule IF NOT EXISTS FOR ()-[r:INFLUENCES_OUTCOME]-() ON (r.derivationRule);
+CREATE INDEX acts_in_rule IF NOT EXISTS FOR ()-[r:ACTS_IN]-() ON (r.derivationRule);
+// -- W05 (operations.cypher) --
+CREATE CONSTRAINT exposure_characterization_hash IF NOT EXISTS FOR (n:Exposure) REQUIRE n.characterizationHash IS UNIQUE;
+CREATE INDEX exposure_route_duration IF NOT EXISTS FOR (n:Exposure) ON (n.route, n.durationCategory);
+CREATE INDEX qc_relationship_uid IF NOT EXISTS FOR ()-[r:QUANTITATIVELY_CONTAINS]-() ON (r.relationshipUid);
+CREATE INDEX variant_of_relationship_uid IF NOT EXISTS FOR ()-[r:VARIANT_OF]-() ON (r.relationshipUid);
+// -- W06 (operations.cypher) --
+CREATE INDEX w06_uses_component_assertion IF NOT EXISTS FOR ()-[r:USES_COMPONENT]-() ON (r.assertionUid);
+CREATE INDEX w06_targets_condition_assertion IF NOT EXISTS FOR ()-[r:TARGETS_CONDITION]-() ON (r.assertionUid);
+CREATE INDEX w06_uses_component_role IF NOT EXISTS FOR ()-[r:USES_COMPONENT]-() ON (r.componentRole);
+// -- W07 (operations.cypher) --
+CREATE CONSTRAINT metric_loinc_code IF NOT EXISTS FOR (n:Metric) REQUIRE n.loincCode IS UNIQUE;
+CREATE CONSTRAINT lab_test_local_code IF NOT EXISTS FOR (n:LabTest) REQUIRE (n.issuerUid, n.localTestCode) IS UNIQUE;
+CREATE CONSTRAINT w07_assay_version_payload IF NOT EXISTS FOR (n:AssayVersion) REQUIRE n.payloadHash IS UNIQUE;
+CREATE CONSTRAINT w07_algorithm_version_payload IF NOT EXISTS FOR (n:AlgorithmVersion) REQUIRE n.payloadHash IS UNIQUE;
+CREATE CONSTRAINT w07_ri_version_payload IF NOT EXISTS FOR (n:ReferenceIntervalVersion) REQUIRE n.payloadHash IS UNIQUE;
+CREATE CONSTRAINT w07_panel_definition_payload IF NOT EXISTS FOR (n:PanelDefinition) REQUIRE n.payloadHash IS UNIQUE;
+CREATE CONSTRAINT w07_measures_metric_rel_uid IF NOT EXISTS FOR ()-[r:MEASURES_METRIC]-() REQUIRE r.relationshipUid IS UNIQUE;
+CREATE INDEX algorithm_version_basis IF NOT EXISTS FOR (n:AlgorithmVersion) ON (n.versionBasis);
+CREATE INDEX w07_ri_version_kind IF NOT EXISTS FOR (n:ReferenceIntervalVersion) ON (n.intervalKind);
+CREATE INDEX w07_comparability_verdict IF NOT EXISTS FOR (n:ComparabilityAssessment) ON (n.verdict);
+CREATE INDEX w07_metric_system IF NOT EXISTS FOR (n:Metric) ON (n.systemKind);
+CREATE INDEX w07_performed_with_recorded_to IF NOT EXISTS FOR ()-[r:PERFORMED_WITH_ASSAY_VERSION]-() ON (r.recordedTo);
+// -- W08 (operations.cypher) --
+CREATE CONSTRAINT firmware_version_payload_hash IF NOT EXISTS FOR (n:FirmwareVersion) REQUIRE n.payloadHash IS UNIQUE;
+CREATE INDEX rel_uses_platform_assertion IF NOT EXISTS FOR ()-[r:USES_PLATFORM]-() ON (r.assertionUid);
+CREATE INDEX rel_uses_equipment_assertion IF NOT EXISTS FOR ()-[r:USES_EQUIPMENT]-() ON (r.assertionUid);
+CREATE INDEX rel_implements_platform_assertion IF NOT EXISTS FOR ()-[r:IMPLEMENTS_PLATFORM]-() ON (r.assertionUid);
+CREATE INDEX rel_runs_on_device_assertion IF NOT EXISTS FOR ()-[r:RUNS_ON_DEVICE]-() ON (r.assertionUid);
+CREATE INDEX firmware_version_label IF NOT EXISTS FOR (n:FirmwareVersion) ON (n.versionLabel);
+// -- W09 (operations.cypher) --
+CREATE CONSTRAINT trial_registration_identity IF NOT EXISTS FOR (n:TrialRegistration) REQUIRE (n.registry, n.registrationId) IS UNIQUE;
+CREATE CONSTRAINT publication_doi IF NOT EXISTS FOR (n:Publication) REQUIRE n.doi IS UNIQUE;
+CREATE CONSTRAINT publication_pmid IF NOT EXISTS FOR (n:Publication) REQUIRE n.pmid IS UNIQUE;
+CREATE INDEX registration_version_observed_at IF NOT EXISTS FOR (n:RegistrationVersion) ON (n.observedAt);
+CREATE INDEX registration_version_status IF NOT EXISTS FOR (n:RegistrationVersion) ON (n.overallStatus, n.resultsPosted);
+CREATE INDEX study_result_analysis IF NOT EXISTS FOR (r:StudyResult) ON (r.analysisKind, r.statisticalConclusion);
+CREATE INDEX ae_result_seriousness_method IF NOT EXISTS FOR (n:AdverseEventResult) ON (n.seriousness, n.collectionMethod);
+CREATE INDEX study_arm_type IF NOT EXISTS FOR (n:StudyArm) ON (n.armType);
+CREATE INDEX publication_kind IF NOT EXISTS FOR (n:Publication) ON (n.publicationKind);
+CREATE INDEX outcome_definition_measure_kind IF NOT EXISTS FOR (n:OutcomeDefinition) ON (n.measureKind);
+CREATE INDEX study_kind IF NOT EXISTS FOR (n:Study) ON (n.studyKind);
+CREATE INDEX registered_as_assertion IF NOT EXISTS FOR ()-[r:REGISTERED_AS]-() ON (r.assertionUid);
+CREATE INDEX uses_intervention_material_assertion IF NOT EXISTS FOR ()-[r:USES_INTERVENTION_MATERIAL]-() ON (r.assertionUid);
+CREATE INDEX reports_on_assertion IF NOT EXISTS FOR ()-[r:REPORTS_ON]-() ON (r.assertionUid);
+CREATE INDEX corrects_revision_event IF NOT EXISTS FOR ()-[r:CORRECTS]-() ON (r.sourceRevisionEventUid);
+CREATE INDEX retracts_revision_event IF NOT EXISTS FOR ()-[r:RETRACTS]-() ON (r.sourceRevisionEventUid);
+CREATE INDEX has_registration_version_recorded IF NOT EXISTS FOR ()-[r:HAS_REGISTRATION_VERSION]-() ON (r.recordedFrom, r.recordedTo);
+// -- W10 (operations.cypher) --
+CREATE INDEX applicability_dimension_kind IF NOT EXISTS FOR (d:ApplicabilityDimension) ON (d.dimension, d.verdict);
+CREATE INDEX synthesis_recorded_at IF NOT EXISTS FOR (s:EvidenceSynthesis) ON (s.recordedAt);
+CREATE INDEX w10_triggered_by_published_at IF NOT EXISTS FOR ()-[t:TRIGGERED_BY]-() ON (t.evidencePublishedAt);
+CREATE INDEX w10_includes_result_role IF NOT EXISTS FOR ()-[i:INCLUDES_RESULT]-() ON (i.inputRole);
+CREATE INDEX w10_endpoint_classification_class IF NOT EXISTS FOR (e:EndpointClassification) ON (e.endpointClass, e.surrogateValidationLevel);
+CREATE INDEX w10_applicability_method IF NOT EXISTS FOR (e:EvidenceApplicability) ON (e.methodVersion, e.status);
+// -- W12 (operations.cypher) --
+CREATE INDEX w12_productlot_lotcode IF NOT EXISTS FOR (n:ProductLot) ON (n.lotCode);
+CREATE INDEX w12_measuredresult_analyte IF NOT EXISTS FOR (n:MeasuredResult) ON (n.analyte);
+CREATE INDEX w12_measuredresult_analyteuid IF NOT EXISTS FOR (n:MeasuredResult) ON (n.analyteUid);
+CREATE INDEX w12_specificationcriterion_analyte IF NOT EXISTS FOR (n:SpecificationCriterion) ON (n.analyte);
+CREATE INDEX w12_certificationlisting_listingid IF NOT EXISTS FOR (n:CertificationListing) ON (n.listingId);
+CREATE INDEX w12_certificateofanalysis_number IF NOT EXISTS FOR (n:CertificateOfAnalysis) ON (n.certificateNumber);
+CREATE INDEX w12_passfail_basis_verdict IF NOT EXISTS FOR (n:PassFailInterpretation) ON (n.verdictBasis, n.verdict);
+CREATE INDEX w12_testexecution_purpose IF NOT EXISTS FOR (n:TestExecution) ON (n.testPurpose);
+CREATE INDEX w12_covers_assertionuid IF NOT EXISTS FOR ()-[r:COVERS]-() ON (r.assertionUid);
+CREATE INDEX w12_has_certification_scope_reluid IF NOT EXISTS FOR ()-[r:HAS_CERTIFICATION_SCOPE]-() ON (r.relationshipUid);
+CREATE INDEX w12_lot_of_assertionuid IF NOT EXISTS FOR ()-[r:LOT_OF]-() ON (r.assertionUid);
+// -- W13 (operations.cypher) --
+CREATE INDEX w13_status_kind_jurisdiction IF NOT EXISTS FOR (n:RegulatoryStatus) ON (n.statusKind, n.jurisdiction);
+CREATE INDEX w13_response_kind IF NOT EXISTS FOR (n:RegulatoryResponse) ON (n.responseKind);
+CREATE INDEX w13_submission_identifier IF NOT EXISTS FOR (n:RegulatorySubmission) ON (n.identifier);
+CREATE INDEX w13_submission_kind_jurisdiction IF NOT EXISTS FOR (n:RegulatorySubmission) ON (n.submissionKind, n.jurisdiction);
+CREATE INDEX w13_pathway_kind_jurisdiction IF NOT EXISTS FOR (n:RegulatoryPathway) ON (n.pathwayKind, n.jurisdiction);
+CREATE INDEX w13_status_of_recorded IF NOT EXISTS FOR ()-[r:STATUS_OF]-() ON (r.recordedTo, r.validTo);
+CREATE INDEX w13_has_pathway_version_recorded IF NOT EXISTS FOR ()-[r:HAS_PATHWAY_VERSION]-() ON (r.recordedTo, r.validTo);
+CREATE INDEX w13_inspection_started IF NOT EXISTS FOR (n:RegulatoryInspection) ON (n.startedAt);
+// -- W14 (operations.cypher) --
+CREATE CONSTRAINT w14_patent_application_office_key IF NOT EXISTS FOR (n:PatentApplication) REQUIRE n.officeKey IS UNIQUE;
+CREATE CONSTRAINT w14_granted_patent_office_key IF NOT EXISTS FOR (n:GrantedPatent) REQUIRE n.officeKey IS UNIQUE;
+CREATE CONSTRAINT w14_trademark_office_key IF NOT EXISTS FOR (n:Trademark) REQUIRE n.officeKey IS UNIQUE;
+CREATE CONSTRAINT w14_patent_family_key IF NOT EXISTS FOR (n:PatentFamily) REQUIRE (n.familyDefinition, n.familyIdentifier) IS UNIQUE;
+CREATE INDEX w14_patent_application_jurisdiction IF NOT EXISTS FOR (n:PatentApplication) ON (n.jurisdiction, n.filingDate);
+CREATE INDEX w14_granted_patent_jurisdiction IF NOT EXISTS FOR (n:GrantedPatent) ON (n.jurisdiction, n.grantDate);
+CREATE INDEX w14_patent_claim_hash IF NOT EXISTS FOR (n:PatentClaim) ON (n.claimTextHash);
+CREATE INDEX w14_trademark_mark_text IF NOT EXISTS FOR (n:Trademark) ON (n.markText, n.jurisdiction);
+CREATE INDEX w14_ip_right_status_kind IF NOT EXISTS FOR (n:IpRightStatus) ON (n.statusKind, n.jurisdiction);
+CREATE INDEX w14_ip_status_of_rel_uid IF NOT EXISTS FOR ()-[r:IP_STATUS_OF]-() ON (r.relationshipUid);
+CREATE INDEX w14_license_covers_rel_uid IF NOT EXISTS FOR ()-[r:LICENSE_COVERS]-() ON (r.relationshipUid);
+CREATE INDEX w14_licenses_patent_rel_uid IF NOT EXISTS FOR ()-[r:LICENSES_PATENT]-() ON (r.relationshipUid);
+CREATE INDEX w14_owns_trademark_rel_uid IF NOT EXISTS FOR ()-[r:OWNS_TRADEMARK]-() ON (r.relationshipUid);
+CREATE INDEX w14_ip_status_of_valid IF NOT EXISTS FOR ()-[r:IP_STATUS_OF]-() ON (r.validFrom, r.validTo);
+// -- W15 (operations.cypher) --
+CREATE CONSTRAINT w15_listing_marketplace_key IF NOT EXISTS FOR (n:MerchantListing) REQUIRE (n.marketplace, n.merchantListingId) IS UNIQUE;
+CREATE CONSTRAINT w15_inventory_merchant_key IF NOT EXISTS FOR (n:InventoryItem) REQUIRE (n.merchantOrganizationUid, n.merchantInventoryId) IS UNIQUE;
+CREATE INDEX w15_listing_canonical_url IF NOT EXISTS FOR (n:MerchantListing) ON (n.canonicalUrl);
+CREATE INDEX w15_listing_parent_ref IF NOT EXISTS FOR (n:MerchantListing) ON (n.marketplace, n.parentListingRef);
+CREATE INDEX w15_price_observed_at IF NOT EXISTS FOR (n:PriceObservation) ON (n.observedAt);
+CREATE INDEX w15_price_kind IF NOT EXISTS FOR (n:PriceObservation) ON (n.priceKind);
+CREATE INDEX w15_price_locator IF NOT EXISTS FOR (n:PriceObservation) ON (n.sourceLocatorUid);
+CREATE INDEX w15_offer_last_observed IF NOT EXISTS FOR (n:Offer) ON (n.lastObservedAt);
+CREATE INDEX w15_plan_selling_plan_id IF NOT EXISTS FOR (n:SubscriptionPlan) ON (n.sellingPlanId);
+CREATE INDEX w15_affiliate_tracking IF NOT EXISTS FOR (n:AffiliateLink) ON (n.affiliateProgram, n.trackingValue);
+CREATE INDEX w15_affiliate_locator IF NOT EXISTS FOR (n:AffiliateLink) ON (n.sourceLocatorUid);
+CREATE INDEX w15_commerce_match_kind IF NOT EXISTS FOR (n:CommerceMatch) ON (n.matchKind, n.status);
+CREATE INDEX w15_unit_lot_code IF NOT EXISTS FOR (n:IndividualUnit) ON (n.lotCodeAsPrinted);
+CREATE INDEX w15_rel_seller_of_record_uid IF NOT EXISTS FOR ()-[r:SELLER_OF_RECORD_FOR]-() ON (r.relationshipUid);
+CREATE INDEX w15_rel_seller_of_record_assertion IF NOT EXISTS FOR ()-[r:SELLER_OF_RECORD_FOR]-() ON (r.assertionUid);
+CREATE INDEX w15_rel_listing_for_assertion IF NOT EXISTS FOR ()-[r:LISTING_FOR]-() ON (r.assertionUid);
+CREATE INDEX w15_rel_hosts_listing_assertion IF NOT EXISTS FOR ()-[r:HOSTS_LISTING]-() ON (r.assertionUid);
+CREATE INDEX w15_rel_fulfills_offer_assertion IF NOT EXISTS FOR ()-[r:FULFILLS_OFFER]-() ON (r.assertionUid);
+// -- W16 (operations.cypher) --
+CREATE INDEX protocol_step_key IF NOT EXISTS FOR (n:ProtocolStep) ON (n.stepKey);
+CREATE INDEX protocol_step_payload_hash IF NOT EXISTS FOR (n:ProtocolStep) ON (n.payloadHash);
+CREATE INDEX protocol_edition_payload_hash IF NOT EXISTS FOR (n:ProtocolEdition) ON (n.payloadHash);
+CREATE INDEX protocol_step_requirement IF NOT EXISTS FOR (n:ProtocolStep) ON (n.requirementLevel);
+CREATE INDEX has_protocol_edition_recorded_to IF NOT EXISTS FOR ()-[r:HAS_PROTOCOL_EDITION]-() ON (r.recordedTo);
+CREATE INDEX has_protocol_edition_assertion IF NOT EXISTS FOR ()-[r:HAS_PROTOCOL_EDITION]-() ON (r.assertionUid);
+CREATE INDEX depends_on_kind IF NOT EXISTS FOR ()-[r:DEPENDS_ON]-() ON (r.dependencyKind);
+CREATE INDEX has_constraint_role IF NOT EXISTS FOR ()-[r:HAS_CONSTRAINT]-() ON (r.constraintRole);
+// -- W17 (operations.cypher) --
+CREATE CONSTRAINT use_constraint_identity_key IF NOT EXISTS FOR (n:UseConstraint) REQUIRE (n.identityKeyHash) IS UNIQUE;
+CREATE CONSTRAINT has_safety_signal_relationship_uid IF NOT EXISTS FOR ()-[r:HAS_SAFETY_SIGNAL]-() REQUIRE r.relationshipUid IS UNIQUE;
+CREATE INDEX safety_signal_status IF NOT EXISTS FOR (n:SafetySignal) ON (n.signalStatus);
+CREATE INDEX safety_signal_method IF NOT EXISTS FOR (n:SafetySignal) ON (n.methodVersion);
+CREATE INDEX safety_signal_recorded_at IF NOT EXISTS FOR (n:SafetySignal) ON (n.recordedAt);
+CREATE INDEX contraindication_level IF NOT EXISTS FOR (n:ContraindicationAssertion) ON (n.constraintLevel);
+CREATE INDEX contraindication_recorded IF NOT EXISTS FOR (n:ContraindicationAssertion) ON (n.recordedAt, n.recordedTo);
+CREATE INDEX interaction_polarity IF NOT EXISTS FOR (n:InteractionAssertion) ON (n.polarity);
+CREATE INDEX interaction_recorded IF NOT EXISTS FOR (n:InteractionAssertion) ON (n.recordedAt, n.recordedTo);
+CREATE INDEX signal_input_status IF NOT EXISTS FOR ()-[r:SIGNAL_BASED_ON]-() ON (r.aeReportedStatus);
+CREATE INDEX constraint_scope_role IF NOT EXISTS FOR ()-[r:CONSTRAINT_SCOPE]-() ON (r.scopeRole);
+// -- W18 (operations.cypher) --
+CREATE INDEX w18_event_started IF NOT EXISTS FOR (n:Event) ON (n.startedAt);
+CREATE INDEX w18_event_announced IF NOT EXISTS FOR (n:Event) ON (n.announcedAt);
+CREATE INDEX w18_event_effective IF NOT EXISTS FOR (n:Event) ON (n.effectiveFrom);
+CREATE INDEX w18_event_category IF NOT EXISTS FOR (n:Event) ON (n.eventCategory, n.eventType);
+CREATE INDEX w18_conference_start IF NOT EXISTS FOR (n:Conference) ON (n.startDate);
+CREATE INDEX w18_arc_recorded IF NOT EXISTS FOR (n:NarrativeArc) ON (n.recordedAt);
+CREATE INDEX w18_caused_by_assertion IF NOT EXISTS FOR ()-[r:CAUSED_BY]-() ON (r.assertionUid);
+CREATE INDEX w18_assertion_predicate_recorded IF NOT EXISTS FOR (a:Assertion) ON (a.predicate, a.recordedAt);
+// -- W19 (operations.cypher) --
+CREATE CONSTRAINT source_coverage_requirement_key_version IF NOT EXISTS FOR (n:SourceCoverageRequirement) REQUIRE (n.requirementKey, n.versionLabel) IS UNIQUE;
+CREATE INDEX source_discovery_subject IF NOT EXISTS FOR (n:SourceDiscoveryRecord) ON (n.subjectUid, n.startedAt);
+CREATE INDEX source_discovery_outcome IF NOT EXISTS FOR (n:SourceDiscoveryRecord) ON (n.discoveryOutcome);
+CREATE INDEX source_coverage_subject_label IF NOT EXISTS FOR (n:SourceCoverageRequirement) ON (n.subjectLabel);
+CREATE INDEX source_authority_recorded_to IF NOT EXISTS FOR (n:SourceAuthorityAssessment) ON (n.recordedTo);
+// -- W20 (operations.cypher) --
+CREATE INDEX w20_chunk_segmentation_hash IF NOT EXISTS FOR (n:Chunk) ON (n.segmentationHash);
+CREATE INDEX w20_segmentation_hash IF NOT EXISTS FOR (n:Segmentation) ON (n.segmentationHash);
+CREATE INDEX w20_text_version_hash IF NOT EXISTS FOR (n:DocumentTextVersion) ON (n.textVersionHash);
+CREATE INDEX w20_document_type IF NOT EXISTS FOR (n:Document) ON (n.type);
+// -- W21 (operations.cypher) --
+CREATE INDEX w21_claim_occurrence_segment_kind IF NOT EXISTS FOR (n:ClaimOccurrence) ON (n.segmentKind);
+CREATE INDEX w21_episode_segment_type IF NOT EXISTS FOR (n:EpisodeSegment) ON (n.segmentType);
+CREATE INDEX w21_episode_published_at IF NOT EXISTS FOR (n:Episode) ON (n.publishedAt);
+CREATE INDEX w21_claim_type IF NOT EXISTS FOR (n:Claim) ON (n.claimType);
+CREATE INDEX w21_conflict_relevance_level IF NOT EXISTS FOR (n:ConflictRelevanceAssessment) ON (n.relevanceLevel, n.disclosureFinding);
+CREATE INDEX w21_appears_in_role IF NOT EXISTS FOR ()-[r:APPEARS_IN]-() ON (r.roleType);
+CREATE INDEX w21_appears_in_assertion IF NOT EXISTS FOR ()-[r:APPEARS_IN]-() ON (r.assertionUid);
+CREATE INDEX w21_sponsors_content_assertion IF NOT EXISTS FOR ()-[r:SPONSORS_CONTENT]-() ON (r.assertionUid);
+CREATE INDEX w21_retells_relationship_uid IF NOT EXISTS FOR ()-[r:RETELLS]-() ON (r.relationshipUid);
+CREATE INDEX w21_qualified_by_relationship_uid IF NOT EXISTS FOR ()-[r:QUALIFIED_BY]-() ON (r.relationshipUid);
+CREATE INDEX w21_accompanies_talk_assertion IF NOT EXISTS FOR ()-[r:ACCOMPANIES_TALK]-() ON (r.assertionUid);
+// -- W22 (operations.cypher) --
+CREATE INDEX media_variant_content_hash IF NOT EXISTS FOR (n:MediaVariant) ON (n.contentHash);
+CREATE INDEX media_asset_content_hash IF NOT EXISTS FOR (n:MediaAsset) ON (n.contentHash);
+CREATE INDEX media_variant_perceptual_hash IF NOT EXISTS FOR (n:MediaVariant) ON (n.perceptualHashAlgorithm, n.perceptualHash);
+CREATE INDEX media_variant_kind IF NOT EXISTS FOR (n:MediaVariant) ON (n.variantKind);
+CREATE INDEX media_asset_generation_mode IF NOT EXISTS FOR (n:MediaAsset) ON (n.generationMode);
+CREATE INDEX source_locator_media_annotation_uid IF NOT EXISTS FOR (n:SourceLocator) ON (n.mediaAnnotationUid);
+CREATE INDEX media_assessment_dimension_role IF NOT EXISTS FOR (n:MediaSuitabilityAssessment) ON (n.dimension, n.intendedRole, n.status);
+CREATE INDEX media_assessment_method IF NOT EXISTS FOR (n:MediaSuitabilityAssessment) ON (n.methodVersion);
+CREATE INDEX media_rights_status IF NOT EXISTS FOR (n:MediaRightsRecord) ON (n.rightsStatus);
+CREATE INDEX depicts_assertion_uid IF NOT EXISTS FOR ()-[r:DEPICTS]-() ON (r.assertionUid);
+CREATE INDEX explains_assertion_uid IF NOT EXISTS FOR ()-[r:EXPLAINS]-() ON (r.assertionUid);
+CREATE INDEX visualizes_assertion_uid IF NOT EXISTS FOR ()-[r:VISUALIZES]-() ON (r.assertionUid);
+CREATE INDEX annotates_subject_assertion_uid IF NOT EXISTS FOR ()-[r:ANNOTATES_SUBJECT]-() ON (r.assertionUid);
+CREATE INDEX has_rights_record_assertion_uid IF NOT EXISTS FOR ()-[r:HAS_RIGHTS_RECORD]-() ON (r.assertionUid);
+CREATE INDEX depicts_relationship_uid IF NOT EXISTS FOR ()-[r:DEPICTS]-() ON (r.relationshipUid);
+CREATE INDEX evidences_rule IF NOT EXISTS FOR ()-[r:EVIDENCES]-() ON (r.derivationRule);
+// -- W23 (operations.cypher) --
+CREATE CONSTRAINT policy_version_key_label IF NOT EXISTS FOR (n:PolicyVersion) REQUIRE (n.policyKey, n.versionLabel) IS UNIQUE;
+CREATE CONSTRAINT decision_criterion_key_method IF NOT EXISTS FOR (n:DecisionCriterion) REQUIRE (n.criterionKey, n.methodVersion) IS UNIQUE;
+CREATE INDEX answer_record_recorded_as_of IF NOT EXISTS FOR (n:AnswerRecord) ON (n.recordedAsOf);
+CREATE INDEX answer_record_query_shape IF NOT EXISTS FOR (n:AnswerRecord) ON (n.queryShapeId, n.queryShapeVersion);
+CREATE INDEX policy_version_policy_key IF NOT EXISTS FOR (n:PolicyVersion) ON (n.policyKey);
 
 // =====================================================================================================================
 // Hand-written sections (Fable, Wave 5). Everything below is idempotent and a no-op on a fresh database.
@@ -745,8 +1006,16 @@ MATCH (n:ListingSnapshot) WHERE NOT n:LegacyListingSnapshot SET n:LegacyListingS
 MATCH (a:Study)-[r:EVALUATES]->(b) CREATE (a)-[n:LEGACY_EVALUATES]->(b) SET n = properties(r) DELETE r;
 MATCH (a:ClaimOccurrence)-[r:UTTERED_BY]->(b) CREATE (a)-[n:ASSERTED_BY]->(b) SET n = properties(r) DELETE r;
 MATCH (a:MediaAsset)-[r:HAS_VARIANT]->(b) CREATE (a)-[n:HAS_MEDIA_VARIANT]->(b) SET n = properties(r) DELETE r;
-MATCH (a:Protocol)-[r:HAS_STEP]->(b:ProtocolStep) WHERE NOT EXISTS { (a)-[:HAS_PROTOCOL_STEP]->(b) }
-CREATE (a)-[n:HAS_PROTOCOL_STEP]->(b) SET n = properties(r), n.orderIndex = coalesce(r.orderIndex, r.position, r.order) DELETE r;
+// Live Protocol -[:HAS_STEP]-> ProtocolStep becomes one legacy ProtocolEdition per protocol (D-004, CL-013; CH-R-13): steps hang
+// from the edition, never from the Protocol. The edition is SNAPSHOT_DIFF of the live record; its HAS_PROTOCOL_EDITION episode is
+// LEGACY_UNDATED until the ingestion service back-fills the authorizing assertion (QS-2b).
+MATCH (a:Protocol)-[r:HAS_STEP]->(b:ProtocolStep)
+MERGE (ed:ProtocolEdition:VersionedState {uid: 'hu:protocol-edition:' + split(a.uid, ':')[-1] + '-legacy'})
+  ON CREATE SET ed.id = split(a.uid, ':')[-1] + '-legacy', ed.stateType = 'ProtocolEdition', ed.editionLabel = 'legacy',
+    ed.changeProvenance = 'SNAPSHOT_DIFF', ed.payloadHash = 'sha256:legacy-migration-' + split(a.uid, ':')[-1],
+    ed.privacyClass = coalesce(a.privacyClass, 'INTERNAL'), ed.createdAt = coalesce(a.createdAt, datetime()), ed.updatedAt = coalesce(a.updatedAt, datetime())
+MERGE (a)-[he:HAS_PROTOCOL_EDITION]->(ed) ON CREATE SET he.relationshipUid = 'hu:rel:' + ed.id + ':has-protocol-edition', he.status = 'LEGACY_UNDATED'
+CREATE (ed)-[n:HAS_PROTOCOL_STEP]->(b) SET n = properties(r), n.orderIndex = coalesce(r.orderIndex, r.position, r.order) DELETE r;
 // Person-[:LINKS_TO]->PseudonymousActor and HAS_PARTICIPANT_TOKEN are identity claims: exported to ResolutionHypothesis
 // records by the ingestion service, then deleted; not rewritten here (W01, W23).
 
@@ -901,7 +1170,7 @@ MATCH (n:MeasurementPlan) WHERE NOT (n:Entity) SET n:Entity;
 MATCH (n:ProtocolAdjustmentRule) WHERE NOT (n:Entity) SET n:Entity;
 MATCH (n:Target) WHERE NOT (n:Entity) SET n:Entity;
 MATCH (n:FunctionalGoal) WHERE NOT (n:Entity) SET n:Entity;
-MATCH (n:Observation) WHERE NOT (n:InformationArtifact) SET n:InformationArtifact;
+MATCH (n:Observation) WHERE NOT (n:DiagnosticResult AND n:InformationArtifact) SET n:DiagnosticResult:InformationArtifact;
 MATCH (n:ProtocolResult) WHERE NOT (n:InformationArtifact) SET n:InformationArtifact;
 MATCH (n:AdverseEffect) WHERE NOT (n:Entity) SET n:Entity;
 MATCH (n:SafetySignal) WHERE NOT (n:EvidenceAssessment) SET n:EvidenceAssessment;
@@ -944,7 +1213,9 @@ MATCH (n:PolicyVersion) WHERE NOT (n:VersionedState) SET n:VersionedState;
 MATCH (n:DecisionCriterion) WHERE NOT (n:Entity) SET n:Entity;
 
 // ---- 7. Stored-value normalization (MR-10, INV-106 companions; see validation/fixtures-final/99-normalize-live-ids.cypher) ----
-MATCH (n) WHERE n.privacyClass IS NOT NULL AND n.privacyClass <> toUpper(n.privacyClass) SET n.privacyClass = toUpper(n.privacyClass);
+// Only the two shared-graph classes are respelled. Any other value (e.g. a private-store class that leaked in) is left as is so
+// that V-115/V-116/V-521 and V-W23-09 keep reporting it (CH-P-12; W00 D5: reported, never rewritten).
+MATCH (n) WHERE toLower(n.privacyClass) IN ['public','internal'] AND n.privacyClass <> toUpper(n.privacyClass) SET n.privacyClass = toUpper(n.privacyClass);
 MATCH (n:Entity) WHERE n.id IS NULL AND n.uid IS NOT NULL SET n.id = split(n.uid, ':')[-1];
 MATCH (n:Entity) WHERE n.createdAt IS NULL SET n.createdAt = coalesce(n.updatedAt, datetime({epochMillis: 0}));
 MATCH (n:Entity) WHERE n.updatedAt IS NULL SET n.updatedAt = n.createdAt;

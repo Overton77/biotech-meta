@@ -1049,6 +1049,16 @@ WHERE elementId(s1) < elementId(s2) AND s1.stepKey = s2.stepKey AND s1.payloadHa
 RETURN DISTINCT 'V-526r' AS check, 'DUPLICATE_STEP_PAYLOAD' AS violation, p.uid AS item, s1.stepKey AS detail;
 
 // ===================================================================================================
+// V-504a -- replaces (new; V-504 generalized to EvidenceAssessments); ruling W00-R-51
+// No backdating for assessments (INV-502): an EvidenceAssessment is never recorded before the retrieval of a snapshot whose locator it
+// is SUPPORTED_BY (W10-SR-05; failing case: inherited hu:synthesis:nr-muscle-mito-function-older-humans-v2 recorded 2019-09-15, supported by
+// a 2026-10-03 snapshot; V-504 silent). W10-V16b adopted under this id.
+// REVISED:
+MATCH (e:EvidenceAssessment)-[:SUPPORTED_BY]->(:SourceLocator)<-[:HAS_LOCATOR]-(s:SourceSnapshot)
+WHERE e.recordedAt IS NOT NULL AND s.retrievedAt IS NOT NULL AND e.recordedAt < s.retrievedAt
+RETURN DISTINCT 'V-504a' AS check, e.uid AS assessmentUid, s.uid AS laterSnapshot, e.recordedAt AS recordedAt, s.retrievedAt AS retrievedAt;
+
+// ===================================================================================================
 // V-W00-13 -- replaces (new); ruling W00-R-11
 // Merge redirect hygiene: a SAME_IDENTITY_MERGED retired node is kept with maturity DEPRECATED, never a private uid, and redirects do
 // not form a two-step cycle. Fixture 13 exercises it.

@@ -581,40 +581,44 @@ assertedPredicates:
   ownerWorker: W17
   form: as W17 registers (asserted)
   subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
-  object: Condition|Population|ChemicalSubstance|AdverseEffect
-  status: REGISTERED
+  object: Condition|ChemicalSubstance|AdverseEffect|UseContextProfile
+  status: CANDIDATE
   requestedBy: W17-SR-03
-  note: W17 fixtures 03/04 use them (8, 9, 8, 2 assertions); FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md
+  note: 'fixtures 03-05: 23 assertions; candidate while the safety_and_constraints module is candidate (W17 proposal); predicateClass OTHER/REGULATORY/CLAIM
+    as listed, candidate value SAFETY not added (no failing case)'
 - predicate: USE_CONSTRAINED_WITH
   predicateClass: REGULATORY
   ownerModule: safety_and_constraints
   ownerWorker: W17
   form: as W17 registers (asserted)
   subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
-  object: Condition|Population|ChemicalSubstance|AdverseEffect
-  status: REGISTERED
+  object: Condition|ChemicalSubstance|AdverseEffect|UseContextProfile
+  status: CANDIDATE
   requestedBy: W17-SR-03
-  note: W17 fixtures 03/04 use them (8, 9, 8, 2 assertions); FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md
+  note: 'fixtures 03-05: 23 assertions; candidate while the safety_and_constraints module is candidate (W17 proposal); predicateClass OTHER/REGULATORY/CLAIM
+    as listed, candidate value SAFETY not added (no failing case)'
 - predicate: INTERACTS_WITH
   predicateClass: CLAIM
   ownerModule: safety_and_constraints
   ownerWorker: W17
   form: as W17 registers (asserted)
   subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
-  object: Condition|Population|ChemicalSubstance|AdverseEffect
-  status: REGISTERED
+  object: Condition|ChemicalSubstance|AdverseEffect|UseContextProfile
+  status: CANDIDATE
   requestedBy: W17-SR-03
-  note: W17 fixtures 03/04 use them (8, 9, 8, 2 assertions); FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md
+  note: 'fixtures 03-05: 23 assertions; candidate while the safety_and_constraints module is candidate (W17 proposal); predicateClass OTHER/REGULATORY/CLAIM
+    as listed, candidate value SAFETY not added (no failing case)'
 - predicate: IDENTIFIES_POTENTIAL_SAFETY_SIGNAL
   predicateClass: CLAIM
   ownerModule: safety_and_constraints
   ownerWorker: W17
   form: as W17 registers (asserted)
   subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
-  object: Condition|Population|ChemicalSubstance|AdverseEffect
-  status: REGISTERED
+  object: Condition|ChemicalSubstance|AdverseEffect|UseContextProfile
+  status: CANDIDATE
   requestedBy: W17-SR-03
-  note: W17 fixtures 03/04 use them (8, 9, 8, 2 assertions); FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md
+  note: 'fixtures 03-05: 23 assertions; candidate while the safety_and_constraints module is candidate (W17 proposal); predicateClass OTHER/REGULATORY/CLAIM
+    as listed, candidate value SAFETY not added (no failing case)'
 relationshipClassUpdates:
 - type: HAS_SNAPSHOT
   class: structural
@@ -825,6 +829,49 @@ forbiddenImplications:
   ruling: W00-R-07
   addToImplicationPairs: true
   note: registry-only inference (V-W09-05); premise name as in W09 fixtures/80-queries.cypher V-W09-05
+- pairs:
+  - - PATENT_CLAIMS
+    - SYNTHESIS_INPUT
+  requestedBy: W10-SR-11
+  ruling: W00-R-07
+  addToImplicationPairs: true
+  note: W14 N-2
+- pairs:
+  - - INSTANTIATES_TREATMENT + USES_COMPONENT(ADMINISTERED_PRODUCT)
+    - EVIDENCE_APPLIES_TO_PRODUCT
+  requestedBy: W10-SR-11
+  ruling: W00-R-07
+  addToImplicationPairs: false
+  note: composite premise (W06 N3); enforced by V-201, not by the pairwise V-112 parameter
+- pairs:
+  - - NO_INTERACTION_RECORD
+    - NO_INTERACTION
+  - - NO_AE_REPORT
+    - NO_EVENTS
+  - - USE_WITH_CAUTION
+    - CONTRAINDICATED
+  - - CONTRAINDICATED
+    - USE_WITH_CAUTION
+  - - CONTRAINDICATION_REMOVED
+    - SAFE_IN_POPULATION
+  - - POTENTIAL_SIGNAL_LISTED
+    - CAUSAL_ASSOCIATION
+  - - POTENTIAL_SIGNAL_LISTED
+    - STOP_USE_ADVICE
+  - - SIGNAL_CLOSED_NO_ACTION
+    - NO_RISK
+  - - REPORTED_EVIDENCE_GRADE
+    - EVIDENCE_STRENGTH_ASSESSMENT
+  - - SHARED_SUBSTANCE_FAMILY
+    - USE_CONSTRAINT_APPLIES
+  - - LEGACY_EVIDENCE_STRENGTH_HINT
+    - SIGNAL_VERDICT
+  - - STUDY_EXCLUDED_CO_EXPOSURE
+    - NO_INTERACTION_WITH_CO_EXPOSURE
+  requestedBy: W17-SR-03 (FI-W17-01..09, 02-cq-coverage.md section 3)
+  ruling: W00-R-07
+  addToImplicationPairs: true
+  note: safety_and_constraints; validators V-W17-*
 - pairs:
   - - NOT_FOUND_IN_PARTIAL_CAPTURE
     - NOT_DISCLOSED

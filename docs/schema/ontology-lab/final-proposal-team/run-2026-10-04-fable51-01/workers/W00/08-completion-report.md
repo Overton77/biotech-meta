@@ -128,3 +128,35 @@ The 2009 prior PubMed snapshot and all pre-2026 BellLabs records in F09 are synt
     6bec8976eee8ed26653626d1aee74fd262ac210a03ed040fdd6fbe85317b823a  ./sdl-fragment.graphql
     f8783f4038fa051874631393bab2b930584c546175e6dfe9a310bf74c899f8c1  ./seam-requests.yaml
 ```
+
+## Reconciliation pass
+
+Window: 2026-10-04T01:50:08Z to 2026-10-04T02:59:41Z (Wave 4, Fable reconciliation request). Rulings on 164 W00-targeted requests (149 ACCEPTED, 13 ACCEPTED_AS_CANDIDATE, 2 REJECTED, 0 DEFERRED as whole requests); 51 theme rulings W00-R-01..W00-R-51. Frozen contract text unchanged.
+
+New or changed files (sha256):
+
+```
+1963e2cad04745ad9ac709ce47d87322913ef2ba04010ff218c2c5881bef2dc9  ./09-kernel-reconciliation.md
+49f825514d96c373a351a8854195e28f88933100c4c4283950b6f354a8e2c2a2  ./seam-rulings.yaml
+e47c586715c28a139929d4f2dcb9890663be5ef0d91847f82fff470adb41de1a  ./uid-token-registry.yaml
+c47ace895ed2a5a8ca238ce33d6d0dc1f55a44d8080f0e5b386f790d5ccf904e  ./predicate-registry.yaml
+e37bfc94b0cdf2f751684d4ef8a78ca889587537fff3c0b06938034a60c38d7f  ./sdl-fragment.graphql
+d83e23a81b0f3656ec0024a0983179bc4737a1119e401e652c3d6ff173c47c65  ./fragment-changelog.md
+af2a239baecbec70d5945e23eb5980a5646db032cc520f77d84f3ed0fcd1b1fa  ./validation-corrections.cypher
+d127000a14b94a8dc5f70a5dcb18e87cac834a1fb94a6941871c04450ee72c58  ./10-kernel-operations-delta.md
+a81e63650d5e6444a21df556851db1c3f207c677eae79a8cc965917ff0ff74a1  ./operations-delta.cypher
+54c1ecf43ab4716b712795f582fb34430bfca8ce2ebcd3ed29cd286b5a0d5c18  ./06-fixtures-and-queries.md
+d9d90160d7736896aa25eab35c8a62adeca7c69755e72752bfdb3dfcc19488de  ./fixtures/10-locator-kinds.cypher
+3aec4c4ab66477078ed544b4b1e71ef12fa7d91cd09f79a268bb90446e2a6e75  ./fixtures/13-reconciliation-rulings.cypher
+04f75ff032db3f2e44d31d19c84e4de003aa3a84f2e54864e69392cec1f94b3a  ./fixtures/13-queries.cypher
+5948870f4bdb0201a5a306f715dc3d8f73298e290be772653455526091a914ce  ./fixtures/graphql-ops-T6.json
+c2d99e5c15162cb5f38f63b80aef9812463a06fd9894e909534c37f7fa42c794  ./fixtures/validation-params-w00.json
+04fe5020483019d98bef8bce6ad9bab878258b4e0e7b801e62127ac81ae750bc  ./fixtures/results/validation-corrections-runs.md
+510ef81f79c5f8f680c0fa0939a5c47caec74c5f0ac445254af135b985104de7  ./fixtures/results/validation-corrections-runs.json
+88ef07f97a0b25be58e7ddc5db12e3e36a54d4f1f960cf081021276168152e18  ./fixtures/results/operations-delta-run.txt
+ed2eb044d1dfb572eb19a858846beb42d3beffb61d913480439e5f1c0a56f12d  ./fixtures/results/F13.queries.json
+bcf6659e122f574eb5a1d7411a21bdb4ecf78957195a650b0845cf78f07e58f9  ./fixtures/results/graphql-T6.txt
+d6440371ce29713657043fa685b7b9d5e8ef4c9c1cea44acfab4636e1ae0bfdc  ./fixtures/results/build-reconciliation.txt
+```
+
+Digest of 08-completion-report.md itself is not listed (it changes when this section is appended).

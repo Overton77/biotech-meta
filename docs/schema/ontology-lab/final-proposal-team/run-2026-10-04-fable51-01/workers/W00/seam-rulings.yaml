@@ -5,21 +5,21 @@ inputs: validation/inventories/seam-requests-consolidated.json (132 W00-targeted
 rule: A request without a failing case or a primary source is DEFERRED; when two requests conflict the ruling names the loser and its fallback. The frozen
   contract text is unchanged; Fable carries accepted contract changes into the decision report.
 counts:
-  ACCEPTED: 145
+  ACCEPTED: 149
   REJECTED: 2
-  ACCEPTED_AS_CANDIDATE: 14
-  DEFERRED: 3
+  ACCEPTED_AS_CANDIDATE: 13
 total: 164
 themes:
 - rulingId: W00-R-01
   theme: uid tokens
-  ruling: 'One token per primary label, collected in uid-token-registry.yaml (177 labels: 47 catalog 0.2.0 label keys kept unchanged, 130 added or confirmed).
+  ruling: 'One token per primary label, collected in uid-token-registry.yaml (190 labels: 47 catalog 0.2.0 label keys kept unchanged, 143 added or confirmed).
     Refinement specializations (a node may gain the label later) use the parent token (T2: LegalEntity, RegulatoryAgency, TestingLaboratory -> org; IngredientMaterial
     subtypes and FoodItem -> material; Organ -> anatomical-context; LabelSnapshot -> snapshot; DrugApproval, OrphanDesignation -> regulatory-status). Creation-time
     kinds may carry their own token (T3: Document, ClaimOccurrence, AdverseEventResult, CohortParticipant, SourceDiscoveryRecord, TradeItemIdentifier).
     Collisions: platform = W21 Platform, TechnologyPlatform = technology-platform (W08 yields, as W08 proposed); outcome = W03 Outcome, OutcomeDefinition
     = outcome-definition; SpecificationCriterion = spec-criterion (owner W12 over W11 suggestion; W11 fallback: migrate). experience-report rejected (type
-    retired). 16 merged-fragment labels still have no token (owners W10, W17, W18, W21 assessments, W08 ToolOrInstrument); V-W00-16 reports them as LABEL_HAS_NO_TOKEN.'
+    retired). 3 merged-fragment labels still have no token (W21 ClaimEvidenceAssessment, ConflictRelevanceAssessment, RetellingFidelityAssessment; their
+    nodes pass through the EvidenceAssessment token assessment); V-W00-16 reports unregistered tokens.'
   artifacts: uid-token-registry.yaml; V-W00-16; fixtures/validation-params-w00.json uidTypeTokens
 - rulingId: W00-R-02
   theme: 'QUANTITY assertions: object plus quantity'
@@ -59,7 +59,8 @@ themes:
   ruling: 'Collected in predicate-registry.yaml with predicateClass and owner module: REGISTERED when a failing case exists, CANDIDATE otherwise usable,
     DEFERRED without failing case or owner. predicateExclusivity gains STRAIN_OF, HAS_PATHWAY_VERSION (EXCLUSIVE per subject) and HAS_CAPABILITY_STATE,
     GOVERNED_BY_SPECIFICATION (EXCLUSIVE with partitionByPath, enforced by the ingestion service and audited by W11 validators); IP_STATUS_OF stays NONEXCLUSIVE.
-    Twenty implication pairs added (W12, W13, W14, W15, W22, W09).'
+    32 implication pairs added (W09, W10, W12, W13, W14, W15, W17, W22); pairs whose conclusion is a structural type ([DEPICTS, SUPPORTED_BY]) stay out
+    of the V-112 parameter.'
   artifacts: predicate-registry.yaml; validation-params-w00.json
 - rulingId: W00-R-08
   theme: SourceKind values
@@ -278,9 +279,12 @@ themes:
 - rulingId: W00-R-50
   theme: CONSIDERS_ASSESSMENT domain
   ruling: 'CONSIDERS_ASSESSMENT may start at any EvidenceAssessment (W10 fixture w10-01: ApplicabilityDimension -> ResolutionHypothesis/EndpointClassification);
-    a NarrativeArc is never its target and never a provenance-state-3 warrant (W18-SR-10, W18-V03). V-504 generalization to assessments (W10-SR-05) DEFERRED
-    for lack of a visible failing case.'
+    a NarrativeArc is never its target and never a provenance-state-3 warrant (W18-SR-10, W18-V03). V-504 is generalized to assessments by V-504a (W00-R-51).'
   artifacts: sdl-fragment.graphql doc
+- rulingId: W00-R-51
+  theme: No backdating for assessments
+  ruling: 'V-504a: an EvidenceAssessment is never recorded before the retrieval of a snapshot whose locator supports it (W10-SR-05, INV-502).'
+  artifacts: V-504a
 requests:
 - id: W00-SR-01
   requester: W00
@@ -688,40 +692,49 @@ requests:
   requester: W10
   ruling: ACCEPTED
   rulingId: W00-R-01
-  rationale: 'W10 fixtures write 36 hu:use-profile:, 28 hu:endpoint-classification:, 47 hu:synthesis: uids; the tokens existed only as 0.2.0 alias keys.'
-  change: UseContextProfile use-profile, EndpointClassification endpoint-classification, EvidenceSynthesis synthesis keyed by label.
+  rationale: 'Failing case: fixtures 04/05 mint hu:assessment:w10-ri-* and hu:assessment:w10-strength-* because no dedicated token exists, so the label
+    cannot be recovered from the uid; fixtures also write 36 hu:use-profile:, 28 hu:endpoint-classification:, 47 hu:synthesis: uids.'
+  change: 'UseContextProfile use-profile, EndpointClassification endpoint-classification, EvidenceSynthesis synthesis, ResultInterpretation result-interpretation,
+    EvidenceStrengthAssessment strength-assessment; existing hu:assessment: uids stay valid through the EvidenceAssessment label token (V-W00-16 accepts
+    them).'
 - id: W10-SR-04
   requester: W10
   ruling: ACCEPTED
   rulingId: W00-R-50
-  rationale: 'Failing case read from W10 fixture w10-01 lines 160-167: ApplicabilityDimension -[:CONSIDERS_ASSESSMENT]-> ResolutionHypothesis / EndpointClassification,
-    outside the catalog domain (Adjudication only).'
-  change: CONSIDERS_ASSESSMENT domain = any EvidenceAssessment (fragment doc on Adjudication.considersAssessments; W10 declares the field on its types);
-    NarrativeArc never a target (W18-SR-10).
+  rationale: 'Source: round 0002 section B R4 table; failing case fixture 01: MATERIAL_IDENTITY cites two ResolutionHypothesis records and OUTCOME_RELEVANCE
+    an EndpointClassification (w10-01 lines 160-167); without the edge the copy is unverifiable (W10-V16 rows).'
+  change: CONSIDERS_ASSESSMENT domain = any EvidenceAssessment, class structural (fragment doc on Adjudication.considersAssessments; W10 declares the field
+    on its types); NarrativeArc never a target (W18-SR-10).
 - id: W10-SR-05
   requester: W10
-  ruling: DEFERRED
-  rulingId: W00-R-50
-  rationale: 'No failing case or source visible: W10 has published no seam-requests.yaml and the inventory row carries only the request text.'
-  change: None now. Candidate W10-V16b to be ruled when W10 publishes its failing case; V-511 already covers Adjudications.
+  ruling: ACCEPTED
+  rulingId: W00-R-51
+  rationale: 'Source INV-502; failing case: inherited hu:synthesis:nr-muscle-mito-function-older-humans-v2 recorded 2019-09-15 is SUPPORTED_BY a locator
+    on hu:snapshot:pmc6702140-2026-10-03; V-504 is silent.'
+  change: W10-V16b adopted as V-504a (validation-corrections.cypher).
 - id: W10-SR-06
   requester: W10
   ruling: ACCEPTED_AS_CANDIDATE
   rulingId: W00-R-07
-  rationale: W10 fixtures use REPORTS_POOLED_ESTIMATE in 4 assertions (unregistered predicate).
-  change: REPORTS_POOLED_ESTIMATE CANDIDATE (QUANTITY literal); INV-206 scope left to W09/W10.
+  rationale: 'Failing case fixture 05: the 2025 vitamin D review reports OR 0.94 (CI 0.88-1.00) and a significant subgroup that are not StudyResults of
+    a Study.'
+  change: REPORTS_POOLED_ESTIMATE CANDIDATE (QUANTITY literal); the INV-206 extension to pooled analyses stays a W10 method rule (synthesis-v0.1) until
+    a validator exists.
 - id: W10-SR-07
   requester: W10
   ruling: ACCEPTED
   rulingId: W00-R-05
-  rationale: Same failing case as W23-SR-03 (interface-typed CONSIDERS_ASSESSMENT targets cannot filter or return uid).
-  change: uid/id on EvidenceAssessmentArchetype (done).
+  rationale: 'Failing case: GraphQL R1 "Cannot query field uid on type EvidenceAssessmentArchetype". W10 proposed documenting the inline-fragment pattern
+    because B3 is frozen; W23-SR-03 asked for the interface change with the same failing case. The interface change wins (Fable carries B3); the inline
+    fragment `... on Entity { uid }` remains a valid fallback.'
+  change: uid/id on EvidenceAssessmentArchetype (done; GraphQL check T6d).
 - id: W10-SR-11
   requester: W10
-  ruling: DEFERRED
+  ruling: ACCEPTED
   rulingId: W00-R-07
-  rationale: No failing case visible (inventory text only; W10 seam file absent at the re-scan). The W14 pair it answers is accepted separately.
-  change: None now; [PATENT_CLAIMS, SYNTHESIS_INPUT] and the composite pair await W10 failing cases.
+  rationale: Failing cases W14 N-2 (CALCULATED PROVES_EFFICACY from a patent claim) and W06 N3 (StudyIntervention -[:EVIDENCE_APPLIES_TO]-> CASGEVY).
+  change: '[PATENT_CLAIMS, SYNTHESIS_INPUT] registered and added to implicationPairs; the composite [INSTANTIATES_TREATMENT + USES_COMPONENT(ADMINISTERED_PRODUCT),
+    EVIDENCE_APPLIES_TO_PRODUCT] registered as enforced by V-201 (not a pairwise V-112 parameter).'
 - id: W11-SR-04
   requester: W11
   ruling: ACCEPTED
@@ -966,68 +979,77 @@ requests:
   requester: W17
   ruling: ACCEPTED
   rulingId: W00-R-01
-  rationale: 'W17 fixtures write 74 hu:adverse-effect:, 89 hu:safety-signal:, 124 hu:use-constraint: uids with no registered token.'
+  rationale: 'Failing case: INV-106 / V-106 cannot check hu:safety-signal:, hu:use-constraint:, hu:adverse-effect: uids written by fixtures 00-05 (89, 124,
+    74 uids observed).'
   change: AdverseEffect adverse-effect, SafetySignal safety-signal, UseConstraint use-constraint; ContraindicationAssertion and InteractionAssertion use
     assertion (RelationshipAssertion precedent).
 - id: W17-SR-03
   requester: W17
-  ruling: ACCEPTED
+  ruling: ACCEPTED_AS_CANDIDATE
   rulingId: W00-R-07
-  rationale: W17 fixtures 03/04 carry USE_CONSTRAINED_IN (8), USE_CONSTRAINED_WITH (9), INTERACTS_WITH (8), IDENTIFIES_POTENTIAL_SAFETY_SIGNAL (2) assertions
-    on unregistered predicates. The forbidden implications FI-W17-01..09 are listed in a file not on disk at the re-scan.
-  change: Four predicates REGISTERED; FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md section 3.
+  rationale: 'Failing case: fixtures 03-05 write 23 assertions with these predicates (V-W17-04/05 check them by name); QS-4a needs the pairs [NO_INTERACTION_RECORD,
+    NO_INTERACTION] and [POTENTIAL_SIGNAL_LISTED, CAUSAL_ASSOCIATION]. The PredicateClass value SAFETY has no failing case (fixtures work with OTHER).'
+  change: Four predicates CANDIDATE while the module is candidate (W17 proposal); FI-W17-01..09 registered and their 12 pairs added to implicationPairs;
+    PredicateClass SAFETY DEFERRED.
 - id: W17-SR-05
   requester: W17
   ruling: ACCEPTED
   rulingId: W00-R-21 / W00-R-22
-  rationale: 'The W17 fragment labels SafetySignal [SafetySignal, EvidenceAssessment]: outside the HAS_SUBJECT range (catalog Entity|VersionedState|Occurrence|InformationArtifact).'
+  rationale: 'Failing case: fixture 02 writes SafetySignal -SUPPORTED_BY-> SourceLocator for the AEMS rows; with the old union SourceLocator.supports cannot
+    return them. SafetySignal carries the EvidenceAssessment archetype, outside the HAS_SUBJECT range.'
   change: SafetySignal removed from AssertionSubjectTarget and added to SupportedRecordTarget; AdverseEffect kept.
 - id: W17-SR-06
   requester: W17
-  ruling: ACCEPTED_AS_CANDIDATE
+  ruling: ACCEPTED
   rulingId: W00-R-49
-  rationale: 'Kernel archetype check on the W17 fragment: SafetySignal returns a lifecycle state for a subject-effect pair, EvidenceSynthesis a claim verdict;
-    both may be EvidenceAssessment types without conflict. The rest of the request is truncated in the inventory.'
-  change: 'Part (a) confirmed: SafetySignal is its own EvidenceAssessment type beside EvidenceSynthesis; remaining parts DEFERRED to W10/W17 packets.'
+  rationale: 'Failing case: the AEMS lenvatinib row "no action was necessary at the time" has no claim-verdict equivalent; fixture 02 needs CLOSED_NO_ACTION.
+    Kernel check of (a)-(c): no archetype or kernel enum conflict.'
+  change: (a) SafetySignal is its own EvidenceAssessment type beside EvidenceSynthesis; (b) a UseContextProfile may be a POPULATION scope member of a UseConstraint;
+    (c) EvidenceStrength stays the legacy hint enum; (d) wording is W10's.
 - id: W17-SR-09
   requester: W17
   ruling: ACCEPTED
   rulingId: W00-R-49
-  rationale: 'Primary source: INV-210 text ("Every mechanism-class Assertion ..."). V-231 tests every assertion with a basisKind (row counts in fixtures/results/validation-corrections-runs.md).'
+  rationale: 'Source INV-210 ("Every mechanism-class Assertion ..."); failing case: a primary PK study INTERACTS_WITH assertion with basisKind DIRECT_MEASUREMENT
+    is flagged by V-231 (first version of W17 fixture 04, 2 rows); reproduced in this pass on W07 fx-90 (frozen V-231 1 row on a non-mechanism DIRECT_MEASUREMENT,
+    V-231r 0).'
   change: V-231 replaced by V-231r (mechanism class only; null class read as mechanism); V-W17-01..13 adopted by reference.
 - id: W18-SR-01
   requester: W18
   ruling: ACCEPTED
   rulingId: W00-R-01
-  rationale: 'W18 fixtures write 202 hu:event:, 23 hu:conference:, 4 hu:community:, 34 hu:narrative-arc:, 15 hu:event-impact: uids with no registered token.'
+  rationale: 'Failing case: catalog 0.2.0 lists no token for the events_and_narrative types; fixtures 01-04 write 202 hu:event:, 23 hu:conference:, 4 hu:community:,
+    34 hu:narrative-arc:, 15 hu:event-impact: uids.'
   change: Event event, Conference conference, Community community, NarrativeArc narrative-arc, EventImpactAssessment event-impact.
 - id: W18-SR-02
   requester: W18
   ruling: ACCEPTED
   rulingId: W00-R-49
-  rationale: 'Kernel check of the W18 fragment: Event (Occurrence), Conference (Entity), Community (Entity), NarrativeArc and EventImpactAssessment (EvidenceAssessment)
-    each carry exactly one archetype label; no kernel conflict.'
-  change: Promotion is Fable registry business; union membership follows the archetypes (W00-R-21/22).
+  rationale: 'Failing case: without registered predicates and pairs V-112 cannot see N2/N4 and V-101 cannot list the W18 asserted types (W18 06 shows both
+    fire with fixtures/w18-validation-params.json). Kernel check: each W18 type carries exactly one archetype label; no kernel conflict.'
+  change: Promotion is Fable registry business; once the catalog carries the module, the validation parameters regenerate from it (W18 params file is the
+    input). Union membership follows the archetypes (W00-R-21/22).
 - id: W18-SR-04
   requester: W18
   ruling: ACCEPTED
   rulingId: W00-R-09 / W00-R-13
-  rationale: W18 fixtures w18-01/w18-03 write FUTURE statements for scheduled events and two Activities with activityKind CURATION (unreadable through the
-    frozen ActivityKind enum).
+  rationale: 'Failing cases: fixture 01 E3 (Madrigal "expected to be available ... in April") is an EVENT_SCHEDULED statement in the future tense, which
+    without FUTURE reads as a past occurrence (N16 shape); fixture 04 writes activityKind CURATION, unreadable through the frozen enum.'
   change: ActivityKind CURATION added; statedTense documents FUTURE (controlled string).
 - id: W18-SR-10
   requester: W18
-  ruling: ACCEPTED_AS_CANDIDATE
+  ruling: ACCEPTED
   rulingId: W00-R-50
-  rationale: W18/operations.cypher W18-V03 ("a NarrativeArc is never a source, a warrant or a derivation input, and carries no score"); a narrative arc
-    is a curation, not evidence.
+  rationale: 'Failing case fixture 90 N6: an Adjudication CONSIDERS_ASSESSMENT a NarrativeArc and an Assertion SUPPORTED_BY an arc; eleven baseline validators
+    return zero rows, only W18-V03 reports them.'
   change: NarrativeArc excluded from provenance state 3 and from CONSIDERS_ASSESSMENT targets; W18-V03 adopted by reference (final V-4xx id by Fable).
 - id: W18-SR-11
   requester: W18
-  ruling: DEFERRED
+  ruling: ACCEPTED
   rulingId: W00-R-29
-  rationale: 'No failing case visible: W18 fixtures contain no ANNOUNCED_IN edge and the inventory text is truncated.'
-  change: None now; Event.announcementAs... (as W18 proposes) stays a W18 field until a failing case shows the need for a structural pointer.
+  rationale: W18 offers two options and recommends the property; the failing case (re-materialization cannot tell which capture set announcedAt) is met
+    by Event.announcementAssertionUid, whose assertion is SUPPORTED_BY the announcing locator.
+  change: No new edge; ANNOUNCED_IN keeps its catalog domain (SourceRevisionEvent -> SourceSnapshot); revisit only if the derivation proves ambiguous.
 - id: W19-SR-01
   requester: W19
   ruling: ACCEPTED

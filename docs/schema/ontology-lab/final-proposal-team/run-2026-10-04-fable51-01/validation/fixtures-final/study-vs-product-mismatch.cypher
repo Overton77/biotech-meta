@@ -193,9 +193,9 @@ MERGE (pub)-[:ANALYZES_DATASET {analysisRole: 'PRIMARY_REPORT'}]->(ds);
 // status: statically-checked
 MATCH (study:Study {uid: 'hu:study:nct02678611-basis-nrpt'})
 UNWIND [
-  {arm: 'hu:study-arm:nct02678611-placebo', armName: 'Placebo', armType: 'PLACEBO_COMPARATOR', si: 'hu:study-intervention:nct02678611-placebo', siName: 'Placebo capsules x4 daily'},
-  {arm: 'hu:study-arm:nct02678611-nrpt-1x', armName: 'NRPT 1X', armType: 'EXPERIMENTAL', si: 'hu:study-intervention:nct02678611-nrpt-1x', siName: 'NRPT 1X: 2 NRPT capsules + 2 placebo capsules daily'},
-  {arm: 'hu:study-arm:nct02678611-nrpt-2x', armName: 'NRPT 2X', armType: 'EXPERIMENTAL', si: 'hu:study-intervention:nct02678611-nrpt-2x', siName: 'NRPT 2X: 4 NRPT capsules daily'}
+  {arm: 'hu:arm:nct02678611-placebo', armName: 'Placebo', armType: 'PLACEBO_COMPARATOR', si: 'hu:intervention:nct02678611-placebo', siName: 'Placebo capsules x4 daily'},
+  {arm: 'hu:arm:nct02678611-nrpt-1x', armName: 'NRPT 1X', armType: 'EXPERIMENTAL', si: 'hu:intervention:nct02678611-nrpt-1x', siName: 'NRPT 1X: 2 NRPT capsules + 2 placebo capsules daily'},
+  {arm: 'hu:arm:nct02678611-nrpt-2x', armName: 'NRPT 2X', armType: 'EXPERIMENTAL', si: 'hu:intervention:nct02678611-nrpt-2x', siName: 'NRPT 2X: 4 NRPT capsules daily'}
 ] AS r
 MERGE (arm:VersionedState:StudyArm {uid: r.arm})
 ON CREATE SET arm.name = r.armName, arm.armType = r.armType, arm.plannedSize = 40, arm.stateType = 'StudyArm', arm.createdAt = datetime()
@@ -214,10 +214,10 @@ ON CREATE SET asg.assertionUid = ai.uid, asg.recordedFrom = ai.recordedAt, asg.r
 
 // status: statically-checked
 UNWIND [
-  {si: 'hu:study-intervention:nct02678611-nrpt-1x', ic: 'hu:intervention-component:nct02678611-1x-nr', mat: 'hu:material:nct02678611-nr-as-supplied', qty: 250.0, txt: '250 mg of NR (2 capsules x 125 mg)'},
-  {si: 'hu:study-intervention:nct02678611-nrpt-1x', ic: 'hu:intervention-component:nct02678611-1x-pt', mat: 'hu:material:nct02678611-pt-as-supplied', qty: 50.0, txt: '50 mg of PT (2 capsules x 25 mg)'},
-  {si: 'hu:study-intervention:nct02678611-nrpt-2x', ic: 'hu:intervention-component:nct02678611-2x-nr', mat: 'hu:material:nct02678611-nr-as-supplied', qty: 500.0, txt: '500 mg of NR (4 capsules x 125 mg)'},
-  {si: 'hu:study-intervention:nct02678611-nrpt-2x', ic: 'hu:intervention-component:nct02678611-2x-pt', mat: 'hu:material:nct02678611-pt-as-supplied', qty: 100.0, txt: '100 mg of PT (4 capsules x 25 mg)'}
+  {si: 'hu:intervention:nct02678611-nrpt-1x', ic: 'hu:intervention-component:nct02678611-1x-nr', mat: 'hu:material:nct02678611-nr-as-supplied', qty: 250.0, txt: '250 mg of NR (2 capsules x 125 mg)'},
+  {si: 'hu:intervention:nct02678611-nrpt-1x', ic: 'hu:intervention-component:nct02678611-1x-pt', mat: 'hu:material:nct02678611-pt-as-supplied', qty: 50.0, txt: '50 mg of PT (2 capsules x 25 mg)'},
+  {si: 'hu:intervention:nct02678611-nrpt-2x', ic: 'hu:intervention-component:nct02678611-2x-nr', mat: 'hu:material:nct02678611-nr-as-supplied', qty: 500.0, txt: '500 mg of NR (4 capsules x 125 mg)'},
+  {si: 'hu:intervention:nct02678611-nrpt-2x', ic: 'hu:intervention-component:nct02678611-2x-pt', mat: 'hu:material:nct02678611-pt-as-supplied', qty: 100.0, txt: '100 mg of PT (4 capsules x 25 mg)'}
 ] AS c
 MATCH (si:StudyIntervention {uid: c.si}),
       (mat:IngredientMaterial {uid: c.mat}),
@@ -240,8 +240,8 @@ ON CREATE SET u.assertionUid = a.uid, u.recordedFrom = a.recordedAt, u.relations
 // status: statically-checked
 MATCH (elysium:Organization {uid: 'hu:org:elysium-health-inc'}),
       (chromadex:Organization {uid: 'hu:org:chromadex-inc'}),
-      (si1:StudyIntervention {uid: 'hu:study-intervention:nct02678611-nrpt-1x'}),
-      (si2:StudyIntervention {uid: 'hu:study-intervention:nct02678611-nrpt-2x'}),
+      (si1:StudyIntervention {uid: 'hu:intervention:nct02678611-nrpt-1x'}),
+      (si2:StudyIntervention {uid: 'hu:intervention:nct02678611-nrpt-2x'}),
       (trialNr:IngredientMaterial {uid: 'hu:material:nct02678611-nr-as-supplied'}),
       (niagen:IngredientMaterial {uid: 'hu:material:chromadex-niagen'}),
       (nrE:IngredientMaterial {uid: 'hu:material:elysium-nr-e'}),
@@ -280,7 +280,7 @@ MERGE (h1)-[:SUPPORTED_BY]->(cenLoc);
 
 // "commercially known as Basis": a naming assertion about the intervention, not an EVALUATES edge.
 // status: statically-checked
-MATCH (si:StudyIntervention {uid: 'hu:study-intervention:nct02678611-nrpt-1x'}),
+MATCH (si:StudyIntervention {uid: 'hu:intervention:nct02678611-nrpt-1x'}),
       (loc:SourceLocator {uid: 'hu:locator:pmid29184669-results-trial-overview'})
 MERGE (a:Assertion {uid: 'hu:assertion:nct02678611-nrpt-administered-as-basis'})
 ON CREATE SET a.predicate = 'ADMINISTERED_AS_COMMERCIAL_PRODUCT', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.valueString = 'Basis', a.asReportedName = 'NRPT (commercially known as Basis)', a.recordedAt = datetime('2026-10-03T00:00:00Z')
@@ -305,9 +305,9 @@ ON CREATE SET hrv.relationshipUid = 'hu:rel:' + split(rv.uid, ':')[2], hrv.recor
 MERGE (pub:InformationArtifact:Publication {uid: 'hu:publication:pmid-31278280'})
 ON CREATE SET pub.title = 'Safety and Metabolism of Long-term Administration of NIAGEN (Nicotinamide Riboside Chloride) ...', pub.doi = '10.1038/s41598-019-46120-z', pub.pmid = '31278280', pub.publishedAt = date('2019-07-05'), pub.publicationKind = 'ARTICLE', pub.artifactType = 'Publication', pub.createdAt = datetime()
 MERGE (pub)-[:REPORTS_ON]->(study)
-MERGE (arm:VersionedState:StudyArm {uid: 'hu:study-arm:nct02712593-niagen-300'})
+MERGE (arm:VersionedState:StudyArm {uid: 'hu:arm:nct02712593-niagen-300'})
 ON CREATE SET arm.name = 'Niagen 300', arm.armType = 'EXPERIMENTAL', arm.stateType = 'StudyArm', arm.createdAt = datetime()
-MERGE (si:VersionedState:StudyIntervention {uid: 'hu:study-intervention:nct02712593-niagen-300'})
+MERGE (si:VersionedState:StudyIntervention {uid: 'hu:intervention:nct02712593-niagen-300'})
 ON CREATE SET si.name = 'NIAGEN 300 mg/day', si.route = 'ORAL', si.dosageForm = null, si.durationIso = 'P8W', si.dosesPerDay = null, si.stateType = 'StudyIntervention', si.createdAt = datetime()
 MERGE (ic:VersionedState:InterventionComponent {uid: 'hu:intervention-component:nct02712593-300-nr'})
 ON CREATE SET ic.quantity = 300.0, ic.unitCode = 'mg/d', ic.quantityBasis = 'PER_DAY', ic.massBasis = 'UNSPECIFIED', ic.verbatimDoseText = '300 mg NR', ic.stateType = 'InterventionComponent', ic.createdAt = datetime()
@@ -405,8 +405,8 @@ MERGE (a)-[:SUPPORTED_BY]->(loc);
 // Results. Within-arm vs between-arm is explicit.
 // status: statically-checked
 UNWIND [
-  {uid: 'hu:study-result:nct02678611-nad-1x-d30', od: 'hu:outcome:nct02678611-nad-whole-blood', arm: 'hu:study-arm:nct02678611-nrpt-1x', est: 40.0, unit: '%', q: 'APPROXIMATE', ak: 'SECONDARY_PRESPECIFIED', ck: 'WITHIN_ARM_CHANGE', sc: 'SIGNIFICANT_FAVORABLE', ap: 'PER_PROTOCOL', loc: 'hu:locator:pmid29184669-results-nad'},
-  {uid: 'hu:study-result:nct02678611-ldl-1x-vs-placebo-d60', od: 'hu:outcome:nct02678611-ldl-c', arm: 'hu:study-arm:nct02678611-nrpt-1x', est: 3.5, unit: '%', q: 'APPROXIMATE', ak: 'SECONDARY_PRESPECIFIED', ck: 'BETWEEN_ARM', sc: 'NOT_REPORTED', ap: 'INTENTION_TO_TREAT', loc: 'hu:locator:pmid29184669-results-lipids'}
+  {uid: 'hu:study-result:nct02678611-nad-1x-d30', od: 'hu:outcome:nct02678611-nad-whole-blood', arm: 'hu:arm:nct02678611-nrpt-1x', est: 40.0, unit: '%', q: 'APPROXIMATE', ak: 'SECONDARY_PRESPECIFIED', ck: 'WITHIN_ARM_CHANGE', sc: 'SIGNIFICANT_FAVORABLE', ap: 'PER_PROTOCOL', loc: 'hu:locator:pmid29184669-results-nad'},
+  {uid: 'hu:study-result:nct02678611-ldl-1x-vs-placebo-d60', od: 'hu:outcome:nct02678611-ldl-c', arm: 'hu:arm:nct02678611-nrpt-1x', est: 3.5, unit: '%', q: 'APPROXIMATE', ak: 'SECONDARY_PRESPECIFIED', ck: 'BETWEEN_ARM', sc: 'NOT_REPORTED', ap: 'INTENTION_TO_TREAT', loc: 'hu:locator:pmid29184669-results-lipids'}
 ] AS r
 MATCH (od:OutcomeDefinition {uid: r.od}), (arm:StudyArm {uid: r.arm}), (loc:SourceLocator {uid: r.loc})
 MERGE (res:InformationArtifact:StudyResult {uid: r.uid})
@@ -421,18 +421,18 @@ MERGE (res)-[:SUPPORTED_BY]->(loc);
 // Comparator arm for the between-arm LDL result.
 // status: statically-checked
 MATCH (res:StudyResult {uid: 'hu:study-result:nct02678611-ldl-1x-vs-placebo-d60'}),
-      (placebo:StudyArm {uid: 'hu:study-arm:nct02678611-placebo'})
+      (placebo:StudyArm {uid: 'hu:arm:nct02678611-placebo'})
 MERGE (res)-[:RESULT_FOR_ARM {armRole: 'COMPARATOR'}]->(placebo);
 
 // Adverse events: reported counts with collection method; zero serious AEs is a reported zero.
 // status: statically-checked
 UNWIND [
-  {uid: 'hu:study-result:nct02678611-ae-any-placebo', arm: 'hu:study-arm:nct02678611-placebo', term: 'Any adverse event', ser: 'ANY', aff: 13, ev: 18},
-  {uid: 'hu:study-result:nct02678611-ae-any-1x', arm: 'hu:study-arm:nct02678611-nrpt-1x', term: 'Any adverse event', ser: 'ANY', aff: 15, ev: 25},
-  {uid: 'hu:study-result:nct02678611-ae-any-2x', arm: 'hu:study-arm:nct02678611-nrpt-2x', term: 'Any adverse event', ser: 'ANY', aff: 17, ev: 23},
-  {uid: 'hu:study-result:nct02678611-sae-placebo', arm: 'hu:study-arm:nct02678611-placebo', term: 'Serious adverse event', ser: 'SERIOUS', aff: 0, ev: 0},
-  {uid: 'hu:study-result:nct02678611-sae-1x', arm: 'hu:study-arm:nct02678611-nrpt-1x', term: 'Serious adverse event', ser: 'SERIOUS', aff: 0, ev: 0},
-  {uid: 'hu:study-result:nct02678611-sae-2x', arm: 'hu:study-arm:nct02678611-nrpt-2x', term: 'Serious adverse event', ser: 'SERIOUS', aff: 0, ev: 0}
+  {uid: 'hu:study-result:nct02678611-ae-any-placebo', arm: 'hu:arm:nct02678611-placebo', term: 'Any adverse event', ser: 'ANY', aff: 13, ev: 18},
+  {uid: 'hu:study-result:nct02678611-ae-any-1x', arm: 'hu:arm:nct02678611-nrpt-1x', term: 'Any adverse event', ser: 'ANY', aff: 15, ev: 25},
+  {uid: 'hu:study-result:nct02678611-ae-any-2x', arm: 'hu:arm:nct02678611-nrpt-2x', term: 'Any adverse event', ser: 'ANY', aff: 17, ev: 23},
+  {uid: 'hu:study-result:nct02678611-sae-placebo', arm: 'hu:arm:nct02678611-placebo', term: 'Serious adverse event', ser: 'SERIOUS', aff: 0, ev: 0},
+  {uid: 'hu:study-result:nct02678611-sae-1x', arm: 'hu:arm:nct02678611-nrpt-1x', term: 'Serious adverse event', ser: 'SERIOUS', aff: 0, ev: 0},
+  {uid: 'hu:study-result:nct02678611-sae-2x', arm: 'hu:arm:nct02678611-nrpt-2x', term: 'Serious adverse event', ser: 'SERIOUS', aff: 0, ev: 0}
 ] AS r
 MATCH (arm:StudyArm {uid: r.arm}), (loc:SourceLocator {uid: 'hu:locator:pmid29184669-results-adverse-events'})
 MERGE (ae:InformationArtifact:StudyResult:AdverseEventResult {uid: r.uid})
@@ -447,7 +447,7 @@ MERGE (ae)-[:SUPPORTED_BY]->(loc);
 // Conze result: 300 mg arm, +51% whole-blood NAD+.
 // status: statically-checked
 MATCH (study:Study {uid: 'hu:study:nct02712593-niagen'}),
-      (arm:StudyArm {uid: 'hu:study-arm:nct02712593-niagen-300'}),
+      (arm:StudyArm {uid: 'hu:arm:nct02712593-niagen-300'}),
       (bm:Biomarker {uid: 'hu:biomarker:nad-plus-whole-blood'}),
       (loc:SourceLocator {uid: 'hu:locator:pmid31278280-abstract'})
 MERGE (od:VersionedState:OutcomeDefinition {uid: 'hu:outcome:nct02712593-nad-whole-blood'})
@@ -503,7 +503,7 @@ MERGE (ec)-[:COMPARED_WITH_CONTEXT]->(nearCtx);
 
 // 5a. Basis trial 1X arm -> current Basis formulation.
 // status: statically-checked
-MATCH (si:StudyIntervention {uid: 'hu:study-intervention:nct02678611-nrpt-1x'}),
+MATCH (si:StudyIntervention {uid: 'hu:intervention:nct02678611-nrpt-1x'}),
       (target:FormulationVersion {uid: 'hu:formulation:basis-us-current-2026-07-10'}),
       (res:StudyResult {uid: 'hu:study-result:nct02678611-nad-1x-d30'})
 MERGE (ea:EvidenceAssessment:EvidenceApplicability {uid: 'hu:applicability:nct02678611-1x-to-basis-current'})
@@ -563,7 +563,7 @@ MERGE (dim)-[:SUPPORTED_BY]->(loc);
 // 5b. NIAGEN 300 mg arm -> Tru Niagen 300mg (same branded material, spec version unknown).
 // 5c. NIAGEN 300 mg arm -> current Basis (the trap: same substance, different material, extra active).
 // status: statically-checked
-MATCH (si:StudyIntervention {uid: 'hu:study-intervention:nct02712593-niagen-300'}),
+MATCH (si:StudyIntervention {uid: 'hu:intervention:nct02712593-niagen-300'}),
       (tn:FormulationVersion {uid: 'hu:formulation:tru-niagen-300mg-observed-2026-10-03'}),
       (bf:FormulationVersion {uid: 'hu:formulation:basis-us-current-2026-07-10'}),
       (res:StudyResult {uid: 'hu:study-result:nct02712593-nad-300'})
@@ -655,7 +655,7 @@ MATCH (human:Species {uid: 'hu:species:homo-sapiens'}),
       (blood:AnatomicalContext {uid: 'hu:anatomical-context:whole-blood'}),
       (muscle:AnatomicalContext {uid: 'hu:anatomical-context:skeletal-muscle'}),
       (musc:AnatomicalContext {uid: 'hu:anatomical-context:muscle-stem-cell'}),
-      (arm1x:StudyArm {uid: 'hu:study-arm:nct02678611-nrpt-1x'}),
+      (arm1x:StudyArm {uid: 'hu:arm:nct02678611-nrpt-1x'}),
       (trialNr:IngredientMaterial {uid: 'hu:material:nct02678611-nr-as-supplied'}),
       (elhNr:IngredientMaterial {uid: 'hu:material:elhassan-2019-nr-as-supplied'}),
       (zhNr:IngredientMaterial {uid: 'hu:material:zhang-2016-nr-as-supplied'})
@@ -686,7 +686,7 @@ MERGE (cZh)-[:EXPOSED_TO]->(zhNr);
 // Step assertions with basisKind (KCR-3a).
 // status: statically-checked
 UNWIND [
-  {a: 'hu:assertion:nct02678611-nrpt-1x-increases-nad-whole-blood', subj: 'hu:study-intervention:nct02678611-nrpt-1x', obj: 'hu:biomarker:nad-plus-whole-blood', pred: 'INCREASES_LEVEL_OF', pol: 'POSITIVE', basis: 'DIRECT_MEASUREMENT', ctx: 'hu:mech-context:nct02678611-1x-whole-blood', loc: 'hu:locator:pmid29184669-results-nad'},
+  {a: 'hu:assertion:nct02678611-nrpt-1x-increases-nad-whole-blood', subj: 'hu:intervention:nct02678611-nrpt-1x', obj: 'hu:biomarker:nad-plus-whole-blood', pred: 'INCREASES_LEVEL_OF', pol: 'POSITIVE', basis: 'DIRECT_MEASUREMENT', ctx: 'hu:mech-context:nct02678611-1x-whole-blood', loc: 'hu:locator:pmid29184669-results-nad'},
   {a: 'hu:assertion:basis-paper-nr-supports-sirtuin-activity', subj: 'hu:material:nct02678611-nr-as-supplied', obj: 'hu:molecular-entity:sirtuin-deacetylase-family', pred: 'INCREASES_ACTIVITY_OF', pol: 'POSITIVE', basis: 'HYPOTHESIS', ctx: null, loc: 'hu:locator:pmid29184669-introduction-sirtuins'},
   {a: 'hu:assertion:elhassan-nr-increases-naad-muscle', subj: 'hu:material:elhassan-2019-nr-as-supplied', obj: 'hu:biomarker:naad-skeletal-muscle', pred: 'INCREASES_LEVEL_OF', pol: 'POSITIVE', basis: 'DIRECT_MEASUREMENT', ctx: 'hu:mech-context:elhassan-2019-nr-1g-21d-muscle', loc: 'hu:locator:pmid31412242-abstract'},
   {a: 'hu:assertion:elhassan-nr-sirtuin-proxy-no-change-muscle', subj: 'hu:material:elhassan-2019-nr-as-supplied', obj: 'hu:molecular-entity:sirtuin-deacetylase-family', pred: 'INCREASES_ACTIVITY_OF', pol: 'NEGATIVE', basis: 'DIRECT_MEASUREMENT', ctx: 'hu:mech-context:elhassan-2019-nr-1g-21d-muscle', loc: 'hu:locator:pmid31412242-results-figure3'},

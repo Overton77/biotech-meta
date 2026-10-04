@@ -1,0 +1,1 @@
+Neo4jGraphQL build: OK in 4718ms; vectorProviderConfigured=false; generated types=10497; queries=355; mutations=493; printed SDL chars=6182129

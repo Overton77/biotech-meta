@@ -323,6 +323,43 @@
    "from": "type: \"MODULATES\", direction: OUT, properties: \"DerivedEdgeProperties\")",
    "to": "type: \"MODULATES\", direction: OUT, properties: \"AssociationProjectionProperties\")",
    "ruling": "F-W5-04"
+  },
+  {
+   "from": "@node(labels: [\"Observation\", \"InformationArtifact\"])",
+   "to": "@node(labels: [\"Observation\", \"DiagnosticResult\", \"InformationArtifact\"])",
+   "ruling": "F-W5-10 (CH-P-17; CL-008: Observation carries the DiagnosticResult label so W07 validators see it)"
+  },
+  {
+   "from": "interface Entity {\n  \"Opaque segment of uid. API-created nodes get a UUID from @id; Cypher-ingested nodes must write it themselves.\"\n  id: ID!",
+   "to": "interface Entity {\n  \"Opaque segment of uid. API-created nodes get a UUID from @id; Cypher-ingested nodes must write it themselves.\"\n  id: ID!\n  \"Access class of the row. A public-tier read filters privacyClass = PUBLIC on every interface and union path; null is NOT public (fail closed, F-W5-11).\"\n  privacyClass: PrivacyClass",
+   "ruling": "F-W5-11 (CH-P-02: interface queries must be filterable by privacyClass)"
+  },
+  {
+   "from": "interface ActorIdentity {\n  \"Opaque segment of uid.\"\n  id: ID!",
+   "to": "interface ActorIdentity {\n  \"Opaque segment of uid.\"\n  id: ID!\n  \"Access class (F-W5-11).\"\n  privacyClass: PrivacyClass",
+   "ruling": "F-W5-11"
+  },
+  {
+   "from": "interface SearchIndexable {\n",
+   "to": "interface SearchIndexable {\n  \"Access class (F-W5-11): search results are filtered to PUBLIC before ranking.\"\n  privacyClass: PrivacyClass\n",
+   "ruling": "F-W5-11"
+  }
+ ],
+ "typeDirectiveAdditions": [
+  {
+   "type": "Organization",
+   "directive": "@vector(indexes: [{indexName: \"OrganizationSearchVector\", embeddingProperty: \"searchEmbedding\", queryName: \"organizationsBySearchVector\"}])",
+   "ruling": "F-W5-12 (D-014 provider-less; justification: live OrganizationSearch vector index exists; regenerable from searchText)"
+  },
+  {
+   "type": "Treatment",
+   "directive": "@vector(indexes: [{indexName: \"TreatmentSearchVector\", embeddingProperty: \"searchEmbedding\", queryName: \"treatmentsBySearchVector\"}])",
+   "ruling": "F-W5-12"
+  },
+  {
+   "type": "TechnologyPlatform",
+   "directive": "@vector(indexes: [{indexName: \"TechnologyPlatformSearchVector\", embeddingProperty: \"searchEmbedding\", queryName: \"technologyPlatformsBySearchVector\"}])",
+   "ruling": "F-W5-12"
   }
  ]
 }

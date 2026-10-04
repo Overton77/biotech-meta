@@ -42,6 +42,8 @@ operational last-writer pointer; authoritative lineage is WAS_GENERATED_BY an Ac
 interface Entity {
   "Opaque segment of uid. API-created nodes get a UUID from @id; Cypher-ingested nodes must write it themselves."
   id: ID!
+  "Access class of the row. A public-tier read filters privacyClass = PUBLIC on every interface and union path; null is NOT public (fail closed, F-W5-11)."
+  privacyClass: PrivacyClass
   "Canonical identity hu:<type-token>:<opaque>; uniqueness is created by operations.cypher, never by a directive."
   uid: String!
   "Presentation label only; never identity (D-013: nullable)."
@@ -58,6 +60,8 @@ derivation (`searchFields`, `embeddingModel`, `embeddingDimensions`) and are nev
 Module: kernel. CQ: CQ-AX-14.
 """
 interface SearchIndexable {
+  "Access class (F-W5-11): search results are filtered to PUBLIC before ranking."
+  privacyClass: PrivacyClass
   "Derived text used by fulltext indexes; regenerable; never evidence."
   searchText: String
   "Stored property names searchText was derived from."
@@ -97,6 +101,8 @@ CQ: CQ-EV-02, CQ-PV-01.
 interface ActorIdentity {
   "Opaque segment of uid."
   id: ID!
+  "Access class (F-W5-11)."
+  privacyClass: PrivacyClass
   "Canonical identity."
   uid: String!
   "Presentation label; never identity."
@@ -2093,7 +2099,8 @@ CQ: CQ-EC-01, CQ-EC-02, CQ-EC-03, CQ-CL-05, CQ-MF-01, CQ-AX-18. Module: organiza
 """
 type Organization implements Entity & EntityArchetype & SearchIndexable
   @node(labels: ["Organization", "Entity"])
-  @fulltext(indexes: [{indexName: "OrganizationName", fields: ["name", "searchText", "legalName", "displayName", "canonicalTicker"], queryName: "searchOrganizationsByName"}]) {
+  @fulltext(indexes: [{indexName: "OrganizationName", fields: ["name", "searchText", "legalName", "displayName", "canonicalTicker"], queryName: "searchOrganizationsByName"}])
+  @vector(indexes: [{indexName: "OrganizationSearchVector", embeddingProperty: "searchEmbedding", queryName: "organizationsBySearchVector"}]) {
   id: ID! @id
   uid: String!
   name: String
@@ -5078,7 +5085,8 @@ CQs: CQ-ST-01 (concept link), CQ-EV-04 (guard), CQ-MF-02, CQ-AX-23 (guards), CQ-
 """
 type Treatment implements Entity & EntityArchetype & SearchIndexable
   @node(labels: ["Treatment", "Entity"])
-  @fulltext(indexes: [{indexName: "TreatmentSearch", fields: ["name", "description", "searchText", "treatmentClass", "orphanDrugDesignation"], queryName: "searchTreatments"}]) {
+  @fulltext(indexes: [{indexName: "TreatmentSearch", fields: ["name", "description", "searchText", "treatmentClass", "orphanDrugDesignation"], queryName: "searchTreatments"}])
+  @vector(indexes: [{indexName: "TreatmentSearchVector", embeddingProperty: "searchEmbedding", queryName: "treatmentsBySearchVector"}]) {
   id: ID! @id
   uid: String!
   name: String
@@ -6020,7 +6028,8 @@ CQ-DX-01, CQ-DX-03, CQ-MF-04, candidate CQ-DX-C03. Canonical module: consumer_de
 """
 type TechnologyPlatform implements Entity & EntityArchetype & SearchIndexable
   @node(labels: ["TechnologyPlatform", "Entity"])
-  @fulltext(indexes: [{indexName: "TechnologyPlatformSearch", fields: ["name", "description", "searchText"], queryName: "searchTechnologyPlatforms"}]) {
+  @fulltext(indexes: [{indexName: "TechnologyPlatformSearch", fields: ["name", "description", "searchText"], queryName: "searchTechnologyPlatforms"}])
+  @vector(indexes: [{indexName: "TechnologyPlatformSearchVector", embeddingProperty: "searchEmbedding", queryName: "technologyPlatformsBySearchVector"}]) {
   id: ID! @id
   uid: String!
   name: String
@@ -11044,6 +11053,11 @@ type Protocol implements Entity & EntityArchetype & SearchIndexable
   currentSteps: [ProtocolStep!]! @relationship(type: "HAS_CURRENT_PROTOCOL_STEP", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
   """class: asserted; cardinality: many; catalog: FOR_PROTOCOL (ProtocolResult -> Protocol)"""
   results: [ProtocolResult!]! @relationship(type: "FOR_PROTOCOL", direction: IN, properties: "AssertedEdgeProperties")
+  # ---- fields injected at merge (seam closure; see reports/04-seam-closure-ledger.md) ----
+  """class: asserted; cardinality: many; catalog: DERIVED_FROM_PROTOCOL (W16; admitted F-W5-14, CH-R-05). A protocol another party built from this one is its own Protocol linked here; it is NEVER an edition of the original (editions are the original author's versions or snapshot diffs of the original source; a third-party description of someone else's protocol is a THIRD_PARTY_REPORTED edition only when it reports the original, not a variant)."""
+  derivedFromProtocols: [Protocol!]! @relationship(type: "DERIVED_FROM_PROTOCOL", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse); catalog: DERIVED_FROM_PROTOCOL"""
+  derivedProtocols: [Protocol!]! @relationship(type: "DERIVED_FROM_PROTOCOL", direction: IN, properties: "AssertedEdgeProperties")
 }
 
 """
@@ -11283,6 +11297,11 @@ type MeasurementPlan implements Entity & EntityArchetype
   scheduleText: String
   """class: structural; cardinality: many; catalog: TRACKS_METRIC"""
   tracksMetrics: [Metric!]! @relationship(type: "TRACKS_METRIC", direction: OUT, properties: "StructuralEdgeProperties")
+  # ---- fields injected at merge (seam closure; see reports/04-seam-closure-ledger.md) ----
+  "Anchor instant of the cadence window as the source states it (first dose, enrolment, previous draw); windows are [anchor + cadenceMinDays, anchor + cadenceMaxDays], never a midpoint. Null when the source states only a frequency (F-W5-13, CH-R-04)."
+  cadenceAnchorAt: DateTime
+  "What the anchor is measured from, as stated: FIRST_DOSE, ENROLMENT, PREVIOUS_MEASUREMENT, CALENDAR (controlled string; F-W5-13)."
+  cadenceAnchorBasis: String
 }
 
 """
@@ -11390,7 +11409,7 @@ reference interval never establishes a condition. CQ-PC-08, CQ-PR-04 (public exa
 Module: protocols. Archetype: InformationArtifact.
 """
 type Observation implements Entity & InformationArtifactArchetype & DiagnosticResult
-  @node(labels: ["Observation", "InformationArtifact"]) {
+  @node(labels: ["Observation", "DiagnosticResult", "InformationArtifact"]) {
   id: ID! @id
   uid: String!
   name: String

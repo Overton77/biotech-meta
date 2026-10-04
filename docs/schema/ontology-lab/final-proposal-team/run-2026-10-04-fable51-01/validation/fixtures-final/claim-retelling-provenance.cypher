@@ -643,11 +643,11 @@ MERGE (c)-[:ASSESSES_INTEREST]->(r1);
 //    by recommendation_decisions (Lane 5); referenced here by uid only.
 // ---------------------------------------------------------------------
 
-MERGE (pv:Entity:PolicyVersion {uid: 'hu:policy:answer-quoting-policy-v0'})
-SET pv.entityType = 'PolicyVersion', pv.name = 'Answer quoting policy v0 (fixture placeholder)', pv.createdAt = datetime('2026-10-03T12:00:00Z');
+MERGE (pv:VersionedState:PolicyVersion {uid: 'hu:policy-version:answer-quoting-policy-v0'})
+SET pv.stateType = 'PolicyVersion', pv.policyKey = 'answer-quoting', pv.versionLabel = 'v0', pv.policyKind = 'USE_AUTHORIZATION', pv.privacyClass = 'INTERNAL', pv.payloadHash = 'sha256:fixture-answer-quoting-v0', pv.name = 'Answer quoting policy v0 (fixture placeholder)', pv.createdAt = datetime('2026-10-03T12:00:00Z');
 
 MATCH (l:SourceLocator {uid: 'hu:locator:hl52-page-nmn-gram-daily'}), (a:Assertion {uid: 'hu:claim-occurrence:hl52-sinclair-self-reported-nmn-1g-daily'}),
-      (cur:Agent {uid: 'hu:agent:belllabs-lane4-curator'}), (pv:PolicyVersion {uid: 'hu:policy:answer-quoting-policy-v0'})
+      (cur:Agent {uid: 'hu:agent:belllabs-lane4-curator'}), (pv:PolicyVersion {uid: 'hu:policy-version:answer-quoting-policy-v0'})
 MERGE (ans:Occurrence:Activity {uid: 'hu:activity:answer-composition-fixture-1'})
 SET ans.occurrenceType = 'Activity', ans.activityKind = 'ANSWER_COMPOSITION', ans.startedAt = datetime('2026-10-03T12:30:00Z'),
     ans.createdAt = datetime('2026-10-03T12:30:00Z')

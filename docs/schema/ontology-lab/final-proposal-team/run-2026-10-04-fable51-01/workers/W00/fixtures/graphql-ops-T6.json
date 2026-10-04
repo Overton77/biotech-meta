@@ -1,0 +1,10 @@
+[
+ {"name": "T6a Source.name reads stored title (W00-R-14); sourceKind OTHER with note (W00-R-08)",
+  "query": "{ sources(where: {uid: {eq: \"hu:source:w00-r13-registry\"}}) { uid name canonicalUri sourceKind sourceKindNote } }"},
+ {"name": "T6b redirect record fields (W00-R-11) read through EquivalenceAssessment",
+  "query": "{ equivalenceAssessments(where: {equivalenceKind: {eq: SAME_IDENTITY_MERGED}}, sort: [{recordedAt: ASC}]) { uid equivalenceKind survivingUid retiredUid recordedAt comparesIdentities { __typename ... on Organization { uid } } } }"},
+ {"name": "T6c QUANTITY assertion with object + literal, and statedAsOf (W00-R-02, W00-R-13)",
+  "query": "{ assertions(where: {predicate: {in: [\"ACTIVE_MOIETY_AMOUNT\", \"HOLDS_EQUITY_IN\"]}}, sort: [{uid: ASC}]) { uid predicateClass valueNumber unitCode massBasis amountReferent statedAsOf statedAsOfPrecision object { __typename ... on ChemicalSubstance { uid } ... on Organization { uid } } } }"},
+ {"name": "T6d uid is selectable on the archetype interface (W00-R-05): adjudication considersAssessments returns uid without inline fragments",
+  "query": "{ adjudications(limit: 1) { uid considersAssessments { uid assessmentType } } }"}
+]

@@ -504,6 +504,58 @@
    "CGMP_COMPLIANT"
   ],
   [
+   "PATENT_CLAIMS",
+   "SYNTHESIS_INPUT"
+  ],
+  [
+   "NO_INTERACTION_RECORD",
+   "NO_INTERACTION"
+  ],
+  [
+   "NO_AE_REPORT",
+   "NO_EVENTS"
+  ],
+  [
+   "USE_WITH_CAUTION",
+   "CONTRAINDICATED"
+  ],
+  [
+   "CONTRAINDICATED",
+   "USE_WITH_CAUTION"
+  ],
+  [
+   "CONTRAINDICATION_REMOVED",
+   "SAFE_IN_POPULATION"
+  ],
+  [
+   "POTENTIAL_SIGNAL_LISTED",
+   "CAUSAL_ASSOCIATION"
+  ],
+  [
+   "POTENTIAL_SIGNAL_LISTED",
+   "STOP_USE_ADVICE"
+  ],
+  [
+   "SIGNAL_CLOSED_NO_ACTION",
+   "NO_RISK"
+  ],
+  [
+   "REPORTED_EVIDENCE_GRADE",
+   "EVIDENCE_STRENGTH_ASSESSMENT"
+  ],
+  [
+   "SHARED_SUBSTANCE_FAMILY",
+   "USE_CONSTRAINT_APPLIES"
+  ],
+  [
+   "LEGACY_EVIDENCE_STRENGTH_HINT",
+   "SIGNAL_VERDICT"
+  ],
+  [
+   "STUDY_EXCLUDED_CO_EXPOSURE",
+   "NO_INTERACTION_WITH_CO_EXPOSURE"
+  ],
+  [
    "NO_INSPECTION_RECORD",
    "NOT_INSPECTED"
   ]
@@ -747,7 +799,9 @@
   "Conference": "conference",
   "Community": "community",
   "NarrativeArc": "narrative-arc",
-  "EventImpactAssessment": "event-impact"
+  "EventImpactAssessment": "event-impact",
+  "ResultInterpretation": "result-interpretation",
+  "EvidenceStrengthAssessment": "strength-assessment"
  },
  "uidAliasTokens": [
   "algorithm",
@@ -797,7 +851,7 @@
   "use-profile"
  ],
  "_provenance": {
-  "base": "validation/validation-params.json (Fable, generated from catalog 0.2.0)",
+  "base": "validation/validation-params.json as committed in b3636fb (generated from catalog 0.2.0)",
   "delta": "W00 reconciliation rulings W00-R-01, -07, -20, -23, -25, -37, -41 (see 09-kernel-reconciliation.md)"
  }
 }

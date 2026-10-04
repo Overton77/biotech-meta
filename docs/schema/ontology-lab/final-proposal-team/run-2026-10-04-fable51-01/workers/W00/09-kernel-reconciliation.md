@@ -4,16 +4,17 @@ Run `run-2026-10-04-fable51-01`, worker W00. This pass rules on every seam reque
 
 ## 1. Scope and method
 
-- Requests ruled: **164** = 132 W00-targeted entries of the consolidated inventory (337 total), 1 ledger-only entry found in W09 (W09-CR-01..04 counted with the inventory), 7 W15 requests published after the inventory was built, and 8 W00-SR items Fable named in the brief (W00-SR-01, -02, -05, -07, -10, -11, -12, -14).
-- Rulings: ACCEPTED 145, ACCEPTED_AS_CANDIDATE 14, REJECTED 2, DEFERRED 3 (whole requests). Parts of accepted requests that lacked their own failing case are deferred inside the entry (CHARACTERIZES_EXPOSURE_IN_POPULATION, FORECASTS_COMMERCIAL_OPPORTUNITY, REPORTS_LIFESPAN_EFFECT, DERIVE_MEDIA, USED -> MediaRightsRecord).
-- Re-scan: W10, W15, W17, W18 had no seam file at 01:50Z; W15 published one during the pass (7 W00-targeted requests, ruled here); W10, W17, W18 still had none at the final re-scan (section 6). W21 had published its packet; its 12 requests are ruled.
+- Requests ruled: **164** = all 156 W00-targeted entries of the consolidated inventory as re-read at the final re-scan (389 entries in total at 02:09Z; 132 of 337 when the pass started) plus the 8 W00-SR items Fable named in the brief (W00-SR-01, -02, -05, -07, -10, -11, -12, -14). Every entry was checked against the requester's seam-requests.yaml and 05-decision-seam-ledger.md.
+- Rulings: ACCEPTED 149, ACCEPTED_AS_CANDIDATE 13, REJECTED 2, DEFERRED 0 (whole requests). Parts of accepted requests without their own failing case are deferred inside the entry: CHARACTERIZES_EXPOSURE_IN_POPULATION, FORECASTS_COMMERCIAL_OPPORTUNITY, REPORTS_LIFESPAN_EFFECT, UseKind DERIVE_MEDIA, USED -> MediaRightsRecord, PredicateClass SAFETY.
+- Re-scan: at 01:50Z W10, W15, W17 and W18 had no seam file. W15 published one during the pass; W10, W17 and W18 published theirs before the final re-scan (02:50Z), and their 17 W00-targeted requests were re-ruled from the full text, failing cases and fixtures (three that had been DEFERRED on inventory text alone are now ACCEPTED: W10-SR-05, W10-SR-11, W18-SR-11). W21 was complete at the start. No unruled W00-targeted id remained in any seam-requests.yaml or in the inventory at 02:50Z.
 - Evidence: every ruling cites the requester's source or failing case. Validator rulings were executed (section 5). The SDL fragment was rebuilt with stubs and inside the full merge (section 5).
+- Note for Fable: validation/validation-params.json (02:40Z) already carries an earlier copy of fixtures/validation-params-w00.json; the final W00 file adds 13 implication pairs (FI-W17-01..09, [PATENT_CLAIMS, SYNTHESIS_INPUT]) and tokens for ResultInterpretation and EvidenceStrengthAssessment. Original-vs-revised runs use the 0.2.0 parameters as committed in b3636fb.
 
 ## 2. Theme rulings
 
 ### W00-R-01 uid tokens
 
-One token per primary label, collected in uid-token-registry.yaml (177 labels: 47 catalog 0.2.0 label keys kept unchanged, 130 added or confirmed). Refinement specializations (a node may gain the label later) use the parent token (T2: LegalEntity, RegulatoryAgency, TestingLaboratory -> org; IngredientMaterial subtypes and FoodItem -> material; Organ -> anatomical-context; LabelSnapshot -> snapshot; DrugApproval, OrphanDesignation -> regulatory-status). Creation-time kinds may carry their own token (T3: Document, ClaimOccurrence, AdverseEventResult, CohortParticipant, SourceDiscoveryRecord, TradeItemIdentifier). Collisions: platform = W21 Platform, TechnologyPlatform = technology-platform (W08 yields, as W08 proposed); outcome = W03 Outcome, OutcomeDefinition = outcome-definition; SpecificationCriterion = spec-criterion (owner W12 over W11 suggestion; W11 fallback: migrate). experience-report rejected (type retired). 16 merged-fragment labels still have no token (owners W10, W17, W18, W21 assessments, W08 ToolOrInstrument); V-W00-16 reports them as LABEL_HAS_NO_TOKEN.
+One token per primary label, collected in uid-token-registry.yaml (190 labels: 47 catalog 0.2.0 label keys kept unchanged, 143 added or confirmed). Refinement specializations (a node may gain the label later) use the parent token (T2: LegalEntity, RegulatoryAgency, TestingLaboratory -> org; IngredientMaterial subtypes and FoodItem -> material; Organ -> anatomical-context; LabelSnapshot -> snapshot; DrugApproval, OrphanDesignation -> regulatory-status). Creation-time kinds may carry their own token (T3: Document, ClaimOccurrence, AdverseEventResult, CohortParticipant, SourceDiscoveryRecord, TradeItemIdentifier). Collisions: platform = W21 Platform, TechnologyPlatform = technology-platform (W08 yields, as W08 proposed); outcome = W03 Outcome, OutcomeDefinition = outcome-definition; SpecificationCriterion = spec-criterion (owner W12 over W11 suggestion; W11 fallback: migrate). experience-report rejected (type retired). 3 merged-fragment labels still have no token (W21 ClaimEvidenceAssessment, ConflictRelevanceAssessment, RetellingFidelityAssessment; their nodes pass through the EvidenceAssessment token assessment); V-W00-16 reports unregistered tokens.
 
 Artifacts: uid-token-registry.yaml; V-W00-16; fixtures/validation-params-w00.json uidTypeTokens.
 
@@ -49,7 +50,7 @@ Artifacts: V-313r, V-521r (absorbs V-W23-09, V-W23-10); 10-kernel-operations-del
 
 ### W00-R-07 Predicate registrations, exclusivity, forbidden implications
 
-Collected in predicate-registry.yaml with predicateClass and owner module: REGISTERED when a failing case exists, CANDIDATE otherwise usable, DEFERRED without failing case or owner. predicateExclusivity gains STRAIN_OF, HAS_PATHWAY_VERSION (EXCLUSIVE per subject) and HAS_CAPABILITY_STATE, GOVERNED_BY_SPECIFICATION (EXCLUSIVE with partitionByPath, enforced by the ingestion service and audited by W11 validators); IP_STATUS_OF stays NONEXCLUSIVE. Twenty implication pairs added (W12, W13, W14, W15, W22, W09).
+Collected in predicate-registry.yaml with predicateClass and owner module: REGISTERED when a failing case exists, CANDIDATE otherwise usable, DEFERRED without failing case or owner. predicateExclusivity gains STRAIN_OF, HAS_PATHWAY_VERSION (EXCLUSIVE per subject) and HAS_CAPABILITY_STATE, GOVERNED_BY_SPECIFICATION (EXCLUSIVE with partitionByPath, enforced by the ingestion service and audited by W11 validators); IP_STATUS_OF stays NONEXCLUSIVE. 32 implication pairs added (W09, W10, W12, W13, W14, W15, W17, W22); pairs whose conclusion is a structural type ([DEPICTS, SUPPORTED_BY]) stay out of the V-112 parameter.
 
 Artifacts: predicate-registry.yaml; validation-params-w00.json.
 
@@ -307,9 +308,15 @@ Artifacts: V-231r.
 
 ### W00-R-50 CONSIDERS_ASSESSMENT domain
 
-CONSIDERS_ASSESSMENT may start at any EvidenceAssessment (W10 fixture w10-01: ApplicabilityDimension -> ResolutionHypothesis/EndpointClassification); a NarrativeArc is never its target and never a provenance-state-3 warrant (W18-SR-10, W18-V03). V-504 generalization to assessments (W10-SR-05) DEFERRED for lack of a visible failing case.
+CONSIDERS_ASSESSMENT may start at any EvidenceAssessment (W10 fixture w10-01: ApplicabilityDimension -> ResolutionHypothesis/EndpointClassification); a NarrativeArc is never its target and never a provenance-state-3 warrant (W18-SR-10, W18-V03). V-504 is generalized to assessments by V-504a (W00-R-51).
 
 Artifacts: sdl-fragment.graphql doc.
+
+### W00-R-51 No backdating for assessments
+
+V-504a: an EvidenceAssessment is never recorded before the retrieval of a snapshot whose locator supports it (W10-SR-05, INV-502).
+
+Artifacts: V-504a.
 
 ## 3. Conflicts ruled (winner, loser, loser fallback)
 
@@ -345,12 +352,16 @@ Artifacts: sdl-fragment.graphql doc.
 ## 5. Evidence produced in this pass
 
 - `sdl-fragment.graphql`: parses; builds with stubs under @neo4j/graphql 7.6.3 (see fragment-changelog.md for the numbers). Merged with every worker fragment on disk, union pruning reports no W00 member to drop; the merged schema builds once W17 adds massBasis/amountReferent to its two assertion types and Fable's MR-03 Observation alignment is applied.
-- `validation-corrections.cypher`: run on embedded Neo4j 5.26.31 + APOC against W00 fixtures 01-13 and 30 worker fixture sets; original vs revised row counts in `fixtures/results/validation-corrections-runs.md`.
+- `validation-corrections.cypher`: run on embedded Neo4j 5.26.31 + APOC against 12 W00 fixture sets (fixtures 01-13) and 36 worker fixture sets (W02, W03, W04, W07, W09, W10, W11, W12, W13, W15, W16, W17, W18, W19, W20, W21, W23); original vs revised row counts in `fixtures/results/validation-corrections-runs.md`.
 - New fixture `fixtures/13-reconciliation-rulings.cypher` + `13-queries.cypher` exercise W00-R-02, -03, -08, -11, -13, -16, -17, -19, -20, -01 and -06.
 
 ## 6. Re-scan log
 
-RESCAN_PLACEHOLDER
+| Time (UTC) | W10 | W15 | W17 | W18 | W21 | Inventory |
+|---|---|---|---|---|---|---|
+| 01:50 | no seam file | no seam file | no seam file | no seam file | complete (12 W00 requests) | 337 entries, 132 W00 |
+| 02:05 | fragment + fixtures | seam file (7 W00) | fragment + fixtures | fragment + fixtures | complete | 337 |
+| 02:50 | complete (6 W00) | complete (7 W00) | complete (5 W00) | complete (6 W00) | complete | 389 entries, 156 W00; all ruled |
 
 ## 7. Per-request rulings
 
@@ -415,12 +426,12 @@ RESCAN_PLACEHOLDER
 | W09-SR-13 | W09 | ACCEPTED | W00-R-17 | Stored legacy type renamed LEGACY_EVALUATES at migration; Study.evaluates keeps its GraphQL name with type LEGACY_EVALUATES; EVALUATES is Adjudication -> Assertion only (fragment doc); V-W00-15 reports USE_LEGACY_EVALUATES. |
 | W09-SR-14 | W09 | ACCEPTED | W00-R-08 | TRIAL_REGISTRY_RECORD and BIBLIOGRAPHIC_RECORD added (W19 spelling wins: one value covers PubMed, Crossref, OpenAlex records). W09 fallback: use BIBLIOGRAPHIC_RECORD wherever BIBLIOGRAPHIC_DATABASE_RECORD was planned. |
 | W09-SR-16 | W09 | ACCEPTED_AS_CANDIDATE | W00-R-07 | CITES_AS_REFERENCE, EVALUATES_RISK_FACTOR CANDIDATE; [REGISTRY_RESULTS_NOT_POSTED, RESULTS_UNPUBLISHED] added to implicationPairs. |
-| W10-SR-01 | W10 | ACCEPTED | W00-R-01 | UseContextProfile use-profile, EndpointClassification endpoint-classification, EvidenceSynthesis synthesis keyed by label. |
-| W10-SR-04 | W10 | ACCEPTED | W00-R-50 | CONSIDERS_ASSESSMENT domain = any EvidenceAssessment (fragment doc on Adjudication.considersAssessments; W10 declares the field on its types); NarrativeArc never a target (W18-SR-10). |
-| W10-SR-05 | W10 | DEFERRED | W00-R-50 | None now. Candidate W10-V16b to be ruled when W10 publishes its failing case; V-511 already covers Adjudications. |
-| W10-SR-06 | W10 | ACCEPTED_AS_CANDIDATE | W00-R-07 | REPORTS_POOLED_ESTIMATE CANDIDATE (QUANTITY literal); INV-206 scope left to W09/W10. |
-| W10-SR-07 | W10 | ACCEPTED | W00-R-05 | uid/id on EvidenceAssessmentArchetype (done). |
-| W10-SR-11 | W10 | DEFERRED | W00-R-07 | None now; [PATENT_CLAIMS, SYNTHESIS_INPUT] and the composite pair await W10 failing cases. |
+| W10-SR-01 | W10 | ACCEPTED | W00-R-01 | UseContextProfile use-profile, EndpointClassification endpoint-classification, EvidenceSynthesis synthesis, ResultInterpretation result-interpretation, EvidenceStrengthAssessment strength-assessment; existing hu:assessment: uid... |
+| W10-SR-04 | W10 | ACCEPTED | W00-R-50 | CONSIDERS_ASSESSMENT domain = any EvidenceAssessment, class structural (fragment doc on Adjudication.considersAssessments; W10 declares the field on its types); NarrativeArc never a target (W18-SR-10). |
+| W10-SR-05 | W10 | ACCEPTED | W00-R-51 | W10-V16b adopted as V-504a (validation-corrections.cypher). |
+| W10-SR-06 | W10 | ACCEPTED_AS_CANDIDATE | W00-R-07 | REPORTS_POOLED_ESTIMATE CANDIDATE (QUANTITY literal); the INV-206 extension to pooled analyses stays a W10 method rule (synthesis-v0.1) until a validator exists. |
+| W10-SR-07 | W10 | ACCEPTED | W00-R-05 | uid/id on EvidenceAssessmentArchetype (done; GraphQL check T6d). |
+| W10-SR-11 | W10 | ACCEPTED | W00-R-07 | [PATENT_CLAIMS, SYNTHESIS_INPUT] registered and added to implicationPairs; the composite [INSTANTIATES_TREATMENT + USES_COMPONENT(ADMINISTERED_PRODUCT), EVIDENCE_APPLIES_TO_PRODUCT] registered as enforced by V-201 (not a pairwi... |
 | W11-SR-04 | W11 | ACCEPTED | W00-R-07 | predicateExclusivity HAS_CAPABILITY_STATE and GOVERNED_BY_SPECIFICATION with partitionByPath; enforced in the ingestion write transaction, audited by V-W11-02/07; excluded from the generic $exclusiveTypes checks. |
 | W11-SR-08 | W11 | ACCEPTED | W00-R-01 | Tokens specification, specification-version, process, process-step, capability; SpecificationCriterion -> spec-criterion (owner wins; W11 fallback: migrate any hu:specification-criterion: uid). |
 | W11-SR-09 | W11 | ACCEPTED_AS_CANDIDATE | W00-R-07 | CLAIMS_THIRD_PARTY_CERTIFICATION and SPECIFICATION_EFFECTIVE_FROM CANDIDATE (literal; never project to COVERS/CERTIFIED_UNDER or to a bound). |
@@ -459,15 +470,15 @@ RESCAN_PLACEHOLDER
 | W16-SR-09 | W16 | REJECTED | W00-R-45 | No kernel change. W16 fallback: W09 owns one shared route enum (or EDQM Standard Terms code string) and W16 switches to it; Fable rules ownership. |
 | W16-SR-18 | W16 | ACCEPTED | W00-R-19 | ProtocolResult.mentions uses MENTIONS_ENTITY with RetrievalEdgeProperties (derived). W16 fallback for a curated link: an asserted Assertion, never a structural MENTIONS. |
 | W17-SR-02 | W17 | ACCEPTED | W00-R-01 | AdverseEffect adverse-effect, SafetySignal safety-signal, UseConstraint use-constraint; ContraindicationAssertion and InteractionAssertion use assertion (RelationshipAssertion precedent). |
-| W17-SR-03 | W17 | ACCEPTED | W00-R-07 | Four predicates REGISTERED; FI-W17-01..09 DEFERRED until W17 publishes 02-cq-coverage.md section 3. |
+| W17-SR-03 | W17 | ACCEPTED_AS_CANDIDATE | W00-R-07 | Four predicates CANDIDATE while the module is candidate (W17 proposal); FI-W17-01..09 registered and their 12 pairs added to implicationPairs; PredicateClass SAFETY DEFERRED. |
 | W17-SR-05 | W17 | ACCEPTED | W00-R-21 / W00-R-22 | SafetySignal removed from AssertionSubjectTarget and added to SupportedRecordTarget; AdverseEffect kept. |
-| W17-SR-06 | W17 | ACCEPTED_AS_CANDIDATE | W00-R-49 | Part (a) confirmed: SafetySignal is its own EvidenceAssessment type beside EvidenceSynthesis; remaining parts DEFERRED to W10/W17 packets. |
+| W17-SR-06 | W17 | ACCEPTED | W00-R-49 | (a) SafetySignal is its own EvidenceAssessment type beside EvidenceSynthesis; (b) a UseContextProfile may be a POPULATION scope member of a UseConstraint; (c) EvidenceStrength stays the legacy hint enum; (d) wording is W10's. |
 | W17-SR-09 | W17 | ACCEPTED | W00-R-49 | V-231 replaced by V-231r (mechanism class only; null class read as mechanism); V-W17-01..13 adopted by reference. |
 | W18-SR-01 | W18 | ACCEPTED | W00-R-01 | Event event, Conference conference, Community community, NarrativeArc narrative-arc, EventImpactAssessment event-impact. |
-| W18-SR-02 | W18 | ACCEPTED | W00-R-49 | Promotion is Fable registry business; union membership follows the archetypes (W00-R-21/22). |
+| W18-SR-02 | W18 | ACCEPTED | W00-R-49 | Promotion is Fable registry business; once the catalog carries the module, the validation parameters regenerate from it (W18 params file is the input). Union membership follows the archetypes (W00-R-21/22). |
 | W18-SR-04 | W18 | ACCEPTED | W00-R-09 / W00-R-13 | ActivityKind CURATION added; statedTense documents FUTURE (controlled string). |
-| W18-SR-10 | W18 | ACCEPTED_AS_CANDIDATE | W00-R-50 | NarrativeArc excluded from provenance state 3 and from CONSIDERS_ASSESSMENT targets; W18-V03 adopted by reference (final V-4xx id by Fable). |
-| W18-SR-11 | W18 | DEFERRED | W00-R-29 | None now; Event.announcementAs... (as W18 proposes) stays a W18 field until a failing case shows the need for a structural pointer. |
+| W18-SR-10 | W18 | ACCEPTED | W00-R-50 | NarrativeArc excluded from provenance state 3 and from CONSIDERS_ASSESSMENT targets; W18-V03 adopted by reference (final V-4xx id by Fable). |
+| W18-SR-11 | W18 | ACCEPTED | W00-R-29 | No new edge; ANNOUNCED_IN keeps its catalog domain (SourceRevisionEvent -> SourceSnapshot); revisit only if the derivation proves ambiguous. |
 | W19-SR-01 | W19 | ACCEPTED | W00-R-08 | Eight values added (TRIAL_REGISTRY_RECORD, BIBLIOGRAPHIC_RECORD, NEWS_ARTICLE, LEGISLATION_OR_REGULATION, PRESENTATION_SLIDES, PERSONAL_WEBPAGE, TECHNICAL_DOCUMENTATION, OTHER) plus Source.sourceKindNote; V-W00-17. |
 | W19-SR-02 | W19 | ACCEPTED | W00-R-15 | Source.renditionCoverage (CANDIDATE enum RenditionCoverage) kept; FI [NOT_FOUND_IN_PARTIAL_CAPTURE, NOT_DISCLOSED] extended to complete captures of PARTIAL renditions. |
 | W19-SR-03 | W19 | ACCEPTED | W00-R-09 | ActivityKind DISCOVERY added; SourceDiscoveryRecord shares the Activity label (read through Activity, MR-01); discovery-only fields stay on the specialization. |

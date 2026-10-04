@@ -52,6 +52,11 @@ for (const inj of INJ) {
   if (!lines.length) continue;
   body = body.slice(0, end) + `\n  # ---- fields injected at merge (seam closure; see reports/04-seam-closure-ledger.md) ----\n` + lines.join("\n") + body.slice(end);
 }
+for (const r of R.typeDirectiveAdditions || []) {
+  const m = body.match(new RegExp(`(^type ${r.type} [\\s\\S]*?)([ \\t]*\\{[ \\t]*\\n)`, "m"));
+  if (!m) { console.log("typeDirectiveAddition: type not found", r.type); continue; }
+  body = body.replace(m[0], `${m[1]}\n  ${r.directive}${m[2]}`); console.log(`type ${r.type}: +${r.directive.slice(0, 40)}`);
+}
 for (const r of R.textReplacements || []) { const before = body; body = body.split(r.from).join(r.to); if (before === body) console.log("text replacement: no match", r.from.slice(0, 60)); }
 // union and enum additions (seam closure files next to the injections file, optional)
 const sidecar = name => { try { return JSON.parse(readFileSync(injPath.replace(/field-injections\.json$/, name), "utf8")); } catch { return []; } };

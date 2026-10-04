@@ -266,6 +266,12 @@ labels:
     token: assessment
     status: CATALOG_0.2.0
     owner: '-'
+  EvidenceStrengthAssessment:
+    token: strength-assessment
+    status: ACCEPTED
+    requestedBy: W10-SR-01
+    owner: W10
+    note: 'existing hu:assessment: uids stay valid through the EvidenceAssessment label token'
   EvidenceSynthesis:
     token: synthesis
     status: ACCEPTED
@@ -749,6 +755,12 @@ labels:
     token: resolution
     status: CATALOG_0.2.0
     owner: W00
+  ResultInterpretation:
+    token: result-interpretation
+    status: ACCEPTED
+    requestedBy: W10-SR-01
+    owner: W10
+    note: 'existing hu:assessment: uids stay valid through the EvidenceAssessment label token'
   RiskFactor:
     token: risk-factor
     status: ACCEPTED
@@ -1009,12 +1021,6 @@ labelsInMergedFragmentsWithoutToken:
   action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 - label: ConflictRelevanceAssessment
   owner: W21
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: EvidenceStrengthAssessment
-  owner: W10
-  action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
-- label: ResultInterpretation
-  owner: W10
   action: owner must request a token before production ingestion (V-W00-16 reports LABEL_HAS_NO_TOKEN)
 - label: RetellingFidelityAssessment
   owner: W21

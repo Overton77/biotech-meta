@@ -57,6 +57,8 @@ CREATE CONSTRAINT event_uid IF NOT EXISTS FOR (n:Event) REQUIRE n.uid IS UNIQUE;
 CREATE CONSTRAINT event_live_id IF NOT EXISTS FOR (n:Event) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT event_impact_assessment_uid IF NOT EXISTS FOR (n:EventImpactAssessment) REQUIRE n.uid IS UNIQUE;
 CREATE CONSTRAINT event_impact_assessment_live_id IF NOT EXISTS FOR (n:EventImpactAssessment) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT evidence_strength_assessment_uid IF NOT EXISTS FOR (n:EvidenceStrengthAssessment) REQUIRE n.uid IS UNIQUE;
+CREATE CONSTRAINT evidence_strength_assessment_live_id IF NOT EXISTS FOR (n:EvidenceStrengthAssessment) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT evidence_synthesis_uid IF NOT EXISTS FOR (n:EvidenceSynthesis) REQUIRE n.uid IS UNIQUE;
 CREATE CONSTRAINT evidence_synthesis_live_id IF NOT EXISTS FOR (n:EvidenceSynthesis) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT exposure_uid IF NOT EXISTS FOR (n:Exposure) REQUIRE n.uid IS UNIQUE;
@@ -201,6 +203,8 @@ CREATE CONSTRAINT regulatory_step_uid IF NOT EXISTS FOR (n:RegulatoryStep) REQUI
 CREATE CONSTRAINT regulatory_step_live_id IF NOT EXISTS FOR (n:RegulatoryStep) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT regulatory_submission_uid IF NOT EXISTS FOR (n:RegulatorySubmission) REQUIRE n.uid IS UNIQUE;
 CREATE CONSTRAINT regulatory_submission_live_id IF NOT EXISTS FOR (n:RegulatorySubmission) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT result_interpretation_uid IF NOT EXISTS FOR (n:ResultInterpretation) REQUIRE n.uid IS UNIQUE;
+CREATE CONSTRAINT result_interpretation_live_id IF NOT EXISTS FOR (n:ResultInterpretation) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT risk_factor_uid IF NOT EXISTS FOR (n:RiskFactor) REQUIRE n.uid IS UNIQUE;
 CREATE CONSTRAINT risk_factor_live_id IF NOT EXISTS FOR (n:RiskFactor) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT safety_signal_uid IF NOT EXISTS FOR (n:SafetySignal) REQUIRE n.uid IS UNIQUE;
