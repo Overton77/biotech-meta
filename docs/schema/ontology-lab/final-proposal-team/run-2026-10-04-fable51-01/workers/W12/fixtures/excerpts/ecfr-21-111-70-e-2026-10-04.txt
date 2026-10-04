@@ -1,0 +1,4 @@
+SOURCE: https://www.ecfr.gov/current/title-21/chapter-I/subchapter-B/part-111/subpart-E/section-111.70
+CAPTURE: Firecrawl scrape (directQuote), 2026-10-04T01:12Z; PARTIAL_EXCERPT; page states "up to date as of 10/01/2026"
+EXCERPT (verbatim):
+(e) For each dietary supplement that you manufacture you must establish product specifications for the identity, purity, strength, and composition of the finished batch of the dietary supplement, and for limits on those types of contamination that may adulterate, or that may lead to adulteration of, the finished batch of the dietary supplement to ensure the quality of the dietary supplement.

@@ -1,0 +1,790 @@
+# =====================================================================================================
+# W16 Protocols and public workflow definitions — SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01 · Worker: W16 (Opus 5.5) · Coordinator/synthesizer: Fable 5.1
+# Canonical catalog module: protocols (catalog/schema.yaml 0.2.0, digest 8fb50ff0…84f0)
+# CQs served: CQ-PR-01..06, CQ-PC-08, CQ-AX-22, CQ-RC-06 (constraint uids only); candidates CQ-PR-C01..C06
+# Contract: 01-shared-contract.md sections A and B (B1 standalone, no extend, no @cypher; D-001, D-004, D-011, D-013, D-016)
+# Imports by name only (never redefined here):
+#   W00: Entity, SearchIndexable, EntityArchetype, VersionedStateArchetype, InformationArtifactArchetype,
+#        PrivacyClass, NodeMaturity, SpeechAct, QuantityBasis, MassBasis, AmountReferent, ReportedStatus,
+#        AssertedEdgeProperties, StructuralEdgeProperties, DerivedEdgeProperties
+#   W07: DiagnosticResult (interface), DiagnosticResultKind, Metric, LabTest, AssayVersion, AlgorithmVersion,
+#        ReferenceIntervalVersion, Biomarker
+#   W01: Person · W02: IngredientMaterial, ChemicalSubstance, ChemicalForm · W03: Condition, Outcome, Mechanism
+#   W04: Product, ProductVariant, FormulationVersion · W05: FoodItem, FoodProduct, Exposure, Lifestyle
+#   W06: Treatment, Procedure · W08: Device, ToolOrInstrument · W17: SafetySignal, AdverseEffect
+# Privacy: this fragment contains no private-personal type, value, uid prefix or relationship (contract A9, D-012).
+#   Private adoption (ProtocolInUse, ProtocolAdoptionVersion, ProtocolDeviation) and PersonalMeasurement live
+#   only in the private context store (W23 contract) and reference ProtocolEdition/ProtocolStep by uid + stepKey.
+# Assumption flagged for W07 (seam W16-SR-03): DiagnosticResult declares
+#   resultKind: DiagnosticResultKind, valueNumber: Float, valueString: String, unitCode: String,
+#   valueStatus: ReportedStatus, observedAt: DateTime, reportedAt: DateTime, privacyClass: PrivacyClass.
+#   Observation below conforms to that shape; if W07 chooses other field types Observation follows W07.
+# =====================================================================================================
+
+# ----------------------------------------------------------------------------------------------------
+# Enums (owner W16). Live enums kept at live values; catalog enums at catalog 0.2.0 values.
+# New values are ledger requests (seam-requests.yaml W16-SR-07/08), never added here.
+# ----------------------------------------------------------------------------------------------------
+
+"""Kind of public protocol (live enum, kept). A classification of the definition, not of any person's use."""
+enum ProtocolType {
+  TREATMENT_PROTOCOL
+  SUPPLEMENT_PROTOCOL
+  DIAGNOSTIC_PROTOCOL
+  MONITORING_PROTOCOL
+  TESTING_PROTOCOL
+  SCREENING_PROTOCOL
+  EXERCISE_PROTOCOL
+  NUTRITION_PROTOCOL
+  FASTING_PROTOCOL
+  SLEEP_PROTOCOL
+  RECOVERY_PROTOCOL
+  DRUG_ADMINISTRATION_PROTOCOL
+  DOSING_PROTOCOL
+  TITRATION_PROTOCOL
+  LAB_PANEL_PROTOCOL
+  IMAGING_PROTOCOL
+  BIOPSY_PROTOCOL
+  SAMPLE_COLLECTION_PROTOCOL
+  CLINICAL_TRIAL_PROTOCOL
+  RESEARCH_PROTOCOL
+  EXPERIMENTAL_PROTOCOL
+  SOP
+  WORKFLOW
+  UNKNOWN
+}
+
+"""Recurrence pattern of a step or edition schedule (live enum, kept). Recurrence is schedule, never a DEPENDS_ON loop."""
+enum SchedulePattern {
+  ONE_TIME
+  RECURRING
+  DAILY
+  WEEKLY
+  MONTHLY
+  CYCLIC
+  INTERMITTENT
+  AS_NEEDED
+  EVENT_DRIVEN
+  PHASE_BASED
+  UNKNOWN
+}
+
+"""Unit for cadence intervals, occurrence periods and dependency lags (live enum, kept; YEAR and MINUTE requested in W16-SR-07)."""
+enum CadenceUnit {
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  CYCLE
+  AS_NEEDED
+  UNKNOWN
+}
+
+"""Source-stated time-of-day anchor (live enum, kept). Clock times stay verbatim in timingText."""
+enum TimeOfDay {
+  MORNING
+  AFTERNOON
+  EVENING
+  NIGHT
+  BEDTIME
+  UPON_WAKING
+  PRE_MEAL
+  WITH_MEAL
+  POST_MEAL
+  FASTED
+  ANYTIME
+  UNKNOWN
+}
+
+"""Day of week (live enum, kept)."""
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+"""Action kind of a protocol step (live enum, kept). AVOID is a step ("do not eat after 5 pm"), not the absence of a step."""
+enum ProtocolStepType {
+  ADMINISTER
+  INGEST
+  INJECT
+  INFUSE
+  APPLY
+  MEASURE
+  TEST
+  SAMPLE
+  OBSERVE
+  RECORD
+  MONITOR
+  EXERCISE
+  SLEEP
+  FAST
+  EAT
+  AVOID
+  ADJUST
+  TITRATE
+  RECOVER
+  REVIEW
+  DECISION
+  OTHER
+  UNKNOWN
+}
+
+"""How the source frames a step's necessity (catalog requirementLevel). Replaces live isOptional; isOptional=false never maps to ESSENTIAL."""
+enum RequirementLevel {
+  ESSENTIAL
+  RECOMMENDED
+  OPTIONAL
+  CONDITIONAL
+  NOT_STATED
+}
+
+"""Whether a requirement level or dependency was stated by the source or inferred editorially (catalog requirementBasis)."""
+enum RequirementBasis {
+  STATED_BY_SOURCE
+  EDITORIAL_INFERENCE
+  NOT_STATED
+}
+
+"""Kind of step-to-step dependency (catalog dependencyKind). Ordering kinds (REQUIRES_*) form a DAG per edition; CONCURRENT_WITH and MUTUALLY_EXCLUSIVE_WITH are symmetric and never ordering."""
+enum StepDependencyKind {
+  REQUIRES_PRIOR_COMPLETION
+  REQUIRES_RESULT_OF
+  CONCURRENT_WITH
+  MUTUALLY_EXCLUSIVE_WITH
+}
+
+"""Role a constraint plays for a step, edition or adjustment rule (catalog constraintRole)."""
+enum ConstraintRole {
+  APPLIES_WHEN
+  CONTRAINDICATED_WHEN
+  REQUIRES_BEFORE
+}
+
+"""Kind of fact a constraint tests (catalog constraintKind). Replaces live free-text constraintType."""
+enum ConstraintKind {
+  POPULATION
+  CONDITION_PRESENT
+  CONDITION_ABSENT
+  MEASUREMENT_THRESHOLD
+  PHASE
+  TIME_WINDOW
+  CO_INTERVENTION
+}
+
+"""When a measurement plan measures (catalog planTiming). Replaces live free-text planType."""
+enum MeasurementPlanTiming {
+  BASELINE
+  DURING
+  FOLLOW_UP
+  PERIODIC
+}
+
+"""What fires a review/adjustment rule (catalog triggerKind)."""
+enum ReviewTriggerKind {
+  THRESHOLD_CROSSED
+  TREND
+  ADVERSE_EVENT_REPORTED
+  SCHEDULED_REVIEW
+}
+
+"""Comparator for rule and constraint thresholds and one-sided targets (catalog comparator). OUTSIDE_REFERENCE_RANGE never implies a condition."""
+enum ThresholdComparator {
+  GT
+  GTE
+  LT
+  LTE
+  OUTSIDE_REFERENCE_RANGE
+}
+
+"""What a rule says to do (catalog triggerAction). A public rule never authorizes a private dose change."""
+enum ReviewTriggerAction {
+  REVIEW
+  PAUSE_STEP
+  STOP_PROTOCOL
+  ADJUST_DOSE
+  CONTACT_CLINICIAN
+}
+
+"""Whose rule it is (catalog ruleBasis). BELLLABS_SAFETY_POLICY rules are INTERNAL and name a PolicyVersion uid."""
+enum ReviewRuleBasis {
+  STATED_BY_SOURCE
+  BELLLABS_SAFETY_POLICY
+}
+
+"""How a protocol change became known (catalog protocolChangeProvenance). An edition carries only SOURCE_VERSIONED or SNAPSHOT_DIFF; THIRD_PARTY_REPORTED labels Assertions and query rows, never an edition."""
+enum ProtocolChangeProvenance {
+  SOURCE_VERSIONED
+  SNAPSHOT_DIFF
+  THIRD_PARTY_REPORTED
+}
+
+# ----------------------------------------------------------------------------------------------------
+# Unions (owner W16). Members must exist in the final schema (owners listed in the banner).
+# ----------------------------------------------------------------------------------------------------
+
+"""Range of USES (step -> declared material/product). Replaces live StepSubstance; Compound/CompoundForm retired (D-002). Pinning a FormulationVersion binds the exact composition; a Product/ProductVariant target floats and is resolved as-of."""
+union StepSubstanceTarget = IngredientMaterial | ChemicalSubstance | ChemicalForm | Product | ProductVariant | FormulationVersion | FoodItem | FoodProduct
+
+"""Range of EMPLOYS (step -> device, test, assay version, instrument or exposure). Replaces live StepInstrument; AssayVersion and ToolOrInstrument added for version-pinned measurement steps."""
+union StepInstrumentTarget = Device | LabTest | AssayVersion | ToolOrInstrument | Exposure
+
+"""Range of TARGETS (stated purpose of a step or edition). Stated intent only; never efficacy evidence. Replaces live TherapeuticTarget."""
+union TherapeuticTargetTarget = Condition | Outcome | Mechanism
+
+"""Range of BASED_ON (constraint -> the fact it tests). Catalog range kept exactly. Replaces live ConstraintBasis."""
+union ConstraintBasisTarget = Condition | Biomarker | LabTest | Metric
+
+"""Range of ProtocolResult MENTIONS (extraction aid; a mention is not an endorsement or a result about the thing). Replaces live ProtocolResultMention; Compound -> ChemicalSubstance."""
+union ProtocolResultMentionTarget = ChemicalSubstance | IngredientMaterial | Product | ProductVariant | Device | Condition | Treatment | Procedure | Lifestyle | SafetySignal | AdverseEffect
+
+# ----------------------------------------------------------------------------------------------------
+# Relationship-property types (owner W16). Each specializes a frozen W00 type and contains all its fields.
+# ----------------------------------------------------------------------------------------------------
+
+"""HAS_PROTOCOL_STEP edge (structural; specializes StructuralEdgeProperties: orderIndex, notes, mongoResearchRunId). Order belongs to the edge, so one unchanged step shared by two editions may sit at different positions (protocols.io V1 step 1 is V2 step 2)."""
+type StepOrderProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  "Source's own step label or number as printed (\"2\", \"1.10.15\"); display and locator aid, never identity."
+  sourceStepLabel: String
+  "Source section heading containing the step (\"Routine Measurement\", \"Monitoring lithium\")."
+  sectionLabel: String
+}
+
+"""DEPENDS_ON edge (structural; specializes StructuralEdgeProperties). Ordering kinds are acyclic within an edition (V-528p); lag bounds are a bounded range ("1 week after starting" = lagMin 1, lagMax 1, WEEK); both endpoints must belong to the same edition (V-527p)."""
+type StepDependencyProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  dependencyKind: StepDependencyKind!
+  "Minimum delay after the prerequisite completes (or its result is available) before this step; null = not stated."
+  lagMin: Int
+  "Maximum delay; null = not stated (never inferred from lagMin)."
+  lagMax: Int
+  lagUnit: CadenceUnit
+  "Stated by the source or editorial inference."
+  dependencyBasis: RequirementBasis
+}
+
+"""HAS_CONSTRAINT edge (structural; specializes StructuralEdgeProperties). Constraints combine in conjunctive normal form: edges with the same conditionGroup are OR-ed, different groups are AND-ed, a null group is its own group; negated tests the absence of the constraint's fact (needed for "every 6 months, or every 3 months for people in any of the following groups")."""
+type ConstraintRoleProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  constraintRole: ConstraintRole!
+  "Disjunction group key, unique within the owning step/edition/rule (\"g1\"). Same key = OR."
+  conditionGroup: String
+  "true = the role applies when the constraint's fact does NOT hold. Null is read as false."
+  negated: Boolean
+}
+
+"""USES edge: declared dose of a public protocol step (structural; specializes StructuralEdgeProperties). Never a person's intake, never measured composition, never a calculated active-moiety amount (those are CALCULATED Assertions, INV-307). quantity..quantityMax is a bounded range ("Magnesium 500 to 600 mg daily"); verbatimDoseText always preserves the source text."""
+type StepDoseProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  "Declared amount (lower bound when quantityMax is set). Null with verbatimDoseText = not normalized."
+  quantity: Float
+  "Upper bound of a declared range; null = single value or not stated."
+  quantityMax: Float
+  "UCUM unit (mg, g, mL, [iU], {capsule}, {scoop})."
+  unitCode: String
+  "PER_DOSE, PER_DAY ...: required when quantity is set (V-537p). \"200 mg twice daily\" is 200 PER_DOSE, not 400 PER_DAY."
+  quantityBasis: QuantityBasis
+  "SALT_FORM, ACTIVE_MOIETY, MATERIAL_AS_IS, UNSPECIFIED."
+  massBasis: MassBasis
+  amountReferent: AmountReferent
+  "Route as stated or normalized code text (oral, subcutaneous, topical, inhaled). Controlled vocabulary pending (W16-SR-09)."
+  route: String
+  "Exact source dose text (\"Repatha 140 mg/mL every two weeks\")."
+  verbatimDoseText: String
+  "Source standardization text (\"standardized to 95% curcuminoids\"); live DoseMetadata.standardizedTo."
+  standardizedToText: String
+}
+
+# ----------------------------------------------------------------------------------------------------
+# Node types
+# ----------------------------------------------------------------------------------------------------
+
+"""
+Enduring identity of a public protocol or workflow definition (a published longevity protocol page, a clinical
+monitoring guideline, a protocols.io lineage). It is NOT a version (ProtocolEdition), NOT a study protocol document
+(ProtocolVersion, W09), and NOT any person's adoption or execution (private store, W23). Schedule, steps, goals and
+authorship belong to editions; the live mutable fields (versionLabel, lastUpdatedAt, scheduleText, cadence…) moved to
+ProtocolEdition. Identity is the uid; publicUrl and name are never identity. CQ-PR-01, CQ-PR-02, CQ-PR-05 (as the
+shared uid a private adoption references), CQ-AX-22. Module: protocols. Archetype: Entity.
+"""
+type Protocol implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Protocol", "Entity"])
+  @fulltext(indexes: [{indexName: "ProtocolSearch", fields: ["name", "description", "searchText"], queryName: "searchProtocols"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Derived search vector over name/description (retrieval justification in 07-operations.md); @vector is added only by Fable at merge, without provider (D-014)."
+  searchEmbedding: [Float!]
+  protocolType: ProtocolType
+  "Canonical public URL as displayed; a locator aid, never identity (the Source owns canonicalUri)."
+  publicUrl: String
+  """class: asserted; cardinality: one_or_more over time, EXCLUSIVE per subject in valid x recorded time (predicateExclusivity HAS_PROTOCOL_EDITION); catalog: HAS_PROTOCOL_EDITION"""
+  editions: [ProtocolEdition!]! @relationship(type: "HAS_PROTOCOL_EDITION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived (read-only, D-004); cardinality: many; rule protocol-current-steps-v1 = steps of the edition whose HAS_PROTOCOL_EDITION episode has recordedTo null and contains now (OPEN_END_* reported); regenerated on every edition attachment; never the only history; catalog: none (projection of HAS_PROTOCOL_STEP)"""
+  currentSteps: [ProtocolStep!]! @relationship(type: "HAS_CURRENT_PROTOCOL_STEP", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: asserted; cardinality: many; catalog: FOR_PROTOCOL (ProtocolResult -> Protocol)"""
+  results: [ProtocolResult!]! @relationship(type: "FOR_PROTOCOL", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+Immutable structured content of one observed or published state of a Protocol: its steps, constraints, measurement
+plans, adjustment rules, targets, goals and included subprotocols. A new edition exists exactly when the canonicalized
+protocol payloadHash changes (not when raw page bytes change: 37 distinct Wayback digests of the Blueprint page are not
+37 editions). changeProvenance says whether the source labelled the version (SOURCE_VERSIONED: protocols.io V.2, NICE
+"Last updated") or BellLabs detected it by snapshot diff (SNAPSHOT_DIFF). A third-party report of a change is an
+Assertion, never an edition. Attached to its Protocol by HAS_PROTOCOL_EDITION (asserted_edge, EXCLUSIVE). NOT the study
+ProtocolVersion (InformationArtifact, W09) even when a study protocol describes the same regimen. CQ-PR-01..04, CQ-AX-22.
+Module: protocols. Archetype: VersionedState.
+"""
+type ProtocolEdition implements Entity & VersionedStateArchetype
+  @node(labels: ["ProtocolEdition", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  "sha256:<hex> over the canonicalized edition payload (steps by stepKey+payloadHash, constraints, plans, rules, targets, goals, inclusions); excludes order-free display text, createdAt and capture metadata."
+  payloadHash: String!
+  "Source-stated start of applicability, if any (rare); query validity comes from the HAS_PROTOCOL_EDITION episode."
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "The source's own version label (\"V.2\"); null when the source shows none. Never invented by BellLabs."
+  editionLabel: String
+  "Source-printed version/update date without time (NICE \"Last updated: 02 September 2025\"); a byline date that does not change with content is recorded but is not a version label."
+  sourceVersionDate: Date
+  sourceVersionDateText: String
+  "SOURCE_VERSIONED or SNAPSHOT_DIFF only (V-530p)."
+  changeProvenance: ProtocolChangeProvenance!
+  "Version of the payload canonicalization (for example W16-CANON-1); payloadHash values compare only within one version."
+  payloadCanonicalizationVersion: String
+  "Method version of the stepKey alignment Activity that keyed this edition's steps against the previous edition (OPEN-QUESTIONS P2 item 4)."
+  stepKeyAlignmentVersion: String
+  "Edition-level schedule as printed (live Protocol.scheduleText/cadence). Preserved whenever normalization is incomplete."
+  scheduleText: String
+  schedulePattern: SchedulePattern
+  cadenceUnit: CadenceUnit
+  "Bounded cadence range: every 3-6 months = 3..6 MONTH, never a midpoint."
+  cadenceIntervalMin: Int
+  cadenceIntervalMax: Int
+  occurrencesPerPeriodMin: Int
+  occurrencesPerPeriodMax: Int
+  occurrencePeriodUnit: CadenceUnit
+  "Overall course length in days (live durationDaysMin/Max)."
+  durationDaysMin: Int
+  durationDaysMax: Int
+  "Cycle structure: total cycle length, active (on) part, number of cycles; each a bounded range."
+  cycleLengthDaysMin: Int
+  cycleLengthDaysMax: Int
+  cycleActiveDaysMin: Int
+  cycleActiveDaysMax: Int
+  cycleCountMin: Int
+  cycleCountMax: Int
+  timeOfDay: TimeOfDay
+  daysOfWeek: [DayOfWeek!]
+  isContinuous: Boolean
+  isAsNeeded: Boolean
+  requiresFasting: Boolean
+  requiresMonitoring: Boolean
+  """class: asserted; cardinality: exactly_one (inverse of HAS_PROTOCOL_EDITION); catalog: HAS_PROTOCOL_EDITION"""
+  protocol: [Protocol!]! @relationship(type: "HAS_PROTOCOL_EDITION", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_PROTOCOL_STEP (D-004; replaces live Protocol HAS_STEP)"""
+  steps: [ProtocolStep!]! @relationship(type: "HAS_PROTOCOL_STEP", direction: OUT, properties: "StepOrderProperties")
+  """class: structural; cardinality: many; catalog: HAS_CONSTRAINT (edition-level applicability/contraindication)"""
+  constraints: [Constraint!]! @relationship(type: "HAS_CONSTRAINT", direction: OUT, properties: "ConstraintRoleProperties")
+  """class: structural; cardinality: many; catalog: HAS_MEASUREMENT_PLAN"""
+  measurementPlans: [MeasurementPlan!]! @relationship(type: "HAS_MEASUREMENT_PLAN", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_ADJUSTMENT_RULE"""
+  adjustmentRules: [ProtocolAdjustmentRule!]! @relationship(type: "HAS_ADJUSTMENT_RULE", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_FUNCTIONAL_GOAL (source-stated goal; a goal is not an outcome claim)"""
+  functionalGoals: [FunctionalGoal!]! @relationship(type: "HAS_FUNCTIONAL_GOAL", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; registry: HAS_TARGET (source-stated numeric targets of this edition)"""
+  targets: [Target!]! @relationship(type: "HAS_TARGET", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; registry: TARGETS (stated purpose; never efficacy)"""
+  therapeuticTargets: [TherapeuticTargetTarget!]! @relationship(type: "TARGETS", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; registry: INCLUDES_PROTOCOL. PINNED binding: the source names a specific subprotocol version, so the included edition is fixed."""
+  includedEditions: [ProtocolEdition!]! @relationship(type: "INCLUDES_PROTOCOL", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; registry: HAS_SUBPROTOCOL. FLOATING binding: the source names the subprotocol without a version; the edition in force is resolved as-of (QS-2b on the subprotocol's HAS_PROTOCOL_EDITION) and is reported as RESOLVED_AS_OF, never stored as if stated."""
+  subprotocols: [Protocol!]! @relationship(type: "HAS_SUBPROTOCOL", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: FOR_PROTOCOL (ProtocolResult -> ProtocolEdition)"""
+  results: [ProtocolResult!]! @relationship(type: "FOR_PROTOCOL", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+One step of a public protocol edition: what to do (stepKind), with what (USES, EMPLOYS), when and how often
+(schedule ranges, cycles, repetition), under which conditions (HAS_CONSTRAINT), after/with/instead of which other
+steps (DEPENDS_ON), and how necessary the source says it is (requirementLevel/requirementBasis). stepKey is the lineage
+key stable across editions of one protocol (dose or timing changes keep it; substituting a different material or
+action gives a new key); payloadHash identifies the immutable payload, so an unchanged step node may be shared by
+consecutive editions. speechAct separates the author's reported practice ("My sauna protocol: daily") from advice to
+readers ("Aim for 3 to 5 sessions per week"). It is NOT a person's execution, adherence or deviation (private store).
+CQ-PR-01, CQ-PR-02, CQ-PR-03, CQ-PR-06. Module: protocols. Archetype: Entity (catalog), immutable once attached.
+"""
+type ProtocolStep implements Entity & EntityArchetype
+  @node(labels: ["ProtocolStep", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Per-protocol lineage slug (\"creatine-pre-workout\", \"plasma-lithium-year1\"); unique within an edition (V-525p); never the display text or the step number."
+  stepKey: String!
+  "sha256:<hex> over the step payload incl. outgoing USES/EMPLOYS/HAS_CONSTRAINT/DEPENDS_ON (targets by stepKey); excludes orderIndex."
+  payloadHash: String!
+  stepKind: ProtocolStepType
+  stepKindRaw: String
+  stepDescription: String
+  "STATES, REPORTS_PRACTICE, RECOMMENDS, CAUTIONS ... (W00 kernel enum). A practice report is not a recommendation."
+  speechAct: SpeechAct
+  requirementLevel: RequirementLevel!
+  requirementBasis: RequirementBasis!
+  "Step fields the source explicitly leaves unstated (\"Dr. X takes spermidine at an unspecified dosage\" -> ['dose']); distinct from null = not extracted."
+  notReportedFields: [String!]
+  "Verbatim schedule texts; kept whenever normalization is incomplete."
+  scheduleText: String
+  frequencyText: String
+  timingText: String
+  durationText: String
+  schedulePattern: SchedulePattern
+  cadenceUnit: CadenceUnit
+  "Bounded interval between occurrences (every 3 to 6 months = 3..6 MONTH). Live cadenceInterval maps to min = max."
+  cadenceIntervalMin: Int
+  cadenceIntervalMax: Int
+  "Occurrences per period (3 to 5 sauna sessions per WEEK; twice per DAY)."
+  occurrencesPerPeriodMin: Int
+  occurrencesPerPeriodMax: Int
+  occurrencePeriodUnit: CadenceUnit
+  "Total repetitions of the step (HBOT: 60 sessions)."
+  totalOccurrencesMin: Int
+  totalOccurrencesMax: Int
+  timeOfDay: TimeOfDay
+  daysOfWeek: [DayOfWeek!]
+  "Length of one occurrence in minutes (live durationMinutesMin/Max)."
+  durationMinutesMin: Int
+  durationMinutesMax: Int
+  "Length of the whole step course in days (\"reduce over at least 4 weeks\" = 28..null)."
+  durationDaysMin: Int
+  durationDaysMax: Int
+  "Cycle structure (\"6 week cycles on and off\" = length 84, active 42; FMD \"5 days per month for 3 months\" = length 28..31, active 5, count 3)."
+  cycleLengthDaysMin: Int
+  cycleLengthDaysMax: Int
+  cycleActiveDaysMin: Int
+  cycleActiveDaysMax: Int
+  cycleCountMin: Int
+  cycleCountMax: Int
+  "Verbatim termination of a repetition (\"weekly until the levels are stable\"); structured REPEAT_UNTIL role requested (W16-SR-08)."
+  repeatUntilText: String
+  isAsNeeded: Boolean
+  """class: structural; cardinality: one_or_more (inverse of HAS_PROTOCOL_STEP); catalog: HAS_PROTOCOL_STEP"""
+  editions: [ProtocolEdition!]! @relationship(type: "HAS_PROTOCOL_STEP", direction: IN, properties: "StepOrderProperties")
+  """class: structural; cardinality: many; catalog: DEPENDS_ON {dependencyKind}; endpoints in the same edition (V-527p); ordering kinds acyclic (V-528p)"""
+  dependsOn: [ProtocolStep!]! @relationship(type: "DEPENDS_ON", direction: OUT, properties: "StepDependencyProperties")
+  """class: structural; cardinality: many; catalog: HAS_CONSTRAINT {constraintRole}; CONDITIONAL steps need an APPLIES_WHEN edge (V-525p)"""
+  constraints: [Constraint!]! @relationship(type: "HAS_CONSTRAINT", direction: OUT, properties: "ConstraintRoleProperties")
+  """class: structural; cardinality: many; registry: USES {StepDoseProperties} — declared dose, never intake"""
+  uses: [StepSubstanceTarget!]! @relationship(type: "USES", direction: OUT, properties: "StepDoseProperties")
+  """class: structural; cardinality: many; registry: EMPLOYS (device, lab test, assay version, instrument, exposure)"""
+  employs: [StepInstrumentTarget!]! @relationship(type: "EMPLOYS", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; registry: TARGETS (stated purpose only)"""
+  targets: [TherapeuticTargetTarget!]! @relationship(type: "TARGETS", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A reusable, immutable public condition a protocol states: a population ("over 40"), a condition present or absent
+("family history of high risk"), a measurement threshold ("last plasma lithium level 0.8 mmol/L or higher"), a phase
+(pregnancy, luteal phase), a time window, or a co-intervention ("taking beta blockers"). How it acts (applies-when,
+contraindicated-when, requires-before), how it combines (conditionGroup) and whether it is negated live on the
+HAS_CONSTRAINT edge. NOT a person's declared condition (private) and NOT a contraindication assertion of the safety
+module (W17); it records what the protocol source says. CQ-PR-02, CQ-PR-03, CQ-RC-06 (blocking constraint uids).
+Module: protocols. Archetype: Entity.
+"""
+type Constraint implements Entity & EntityArchetype
+  @node(labels: ["Constraint", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Nullable only for migrated live constraints whose free-text constraintType could not be classified (V-522-style review queue)."
+  constraintKind: ConstraintKind
+  "Verbatim condition text (\"if over 40 or a family history of high risk\" is split into two constraints; each keeps its own span)."
+  constraintText: String
+  "Optional numeric test (POPULATION age > 40 a; MEASUREMENT_THRESHOLD >= 0.8 mmol/L)."
+  comparator: ThresholdComparator
+  thresholdValue: Float
+  "UCUM (a, mmol/L, mg/dL)."
+  thresholdUnitCode: String
+  """class: structural; cardinality: zero_or_one typical, many allowed; catalog: BASED_ON"""
+  basedOn: [ConstraintBasisTarget!]! @relationship(type: "BASED_ON", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A public plan for what to measure and when, so a protocol can be evaluated: baseline, during, follow-up or periodic,
+with a bounded cadence in days ("Blood draw, every 3 to 6 months" = 90..183, never a midpoint), whether the result is
+required to evaluate the protocol, and the maximum acceptable baseline age. NOT a person's measurement (private
+PersonalMeasurement) and NOT a public Observation. CQ-PR-03, CQ-PR-04. Module: protocols. Archetype: Entity.
+"""
+type MeasurementPlan implements Entity & EntityArchetype
+  @node(labels: ["MeasurementPlan", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  planTiming: MeasurementPlanTiming
+  requiredForEvaluation: Boolean
+  maxBaselineAgeDays: Int
+  "Bounded cadence; month-to-day conversion uses 30 days per month lower and 31 upper (W16-CADENCE-1) and keeps scheduleText."
+  cadenceMinDays: Int
+  cadenceMaxDays: Int
+  scheduleText: String
+  """class: structural; cardinality: many; catalog: TRACKS_METRIC"""
+  tracksMetrics: [Metric!]! @relationship(type: "TRACKS_METRIC", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A public review or adjustment rule: when an observation crosses a threshold, trends, an adverse event is reported or a
+scheduled review falls due, the source (STATED_BY_SOURCE, PUBLIC) or BellLabs policy (BELLLABS_SAFETY_POLICY, INTERNAL,
+scoped by policyVersionUid) says to review, pause a step, stop, adjust dose or contact a clinician. It is NOT a decision
+about any person: the private store evaluates it against private measurements and opens pending items; a public trigger
+never recommends a private dose change. An OUTSIDE_REFERENCE_RANGE trigger never establishes a condition.
+CQ-PR-04, CQ-RC-06. Module: protocols. Archetype: Entity.
+"""
+type ProtocolAdjustmentRule implements Entity & EntityArchetype
+  @node(labels: ["ProtocolAdjustmentRule", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  triggerKind: ReviewTriggerKind
+  comparator: ThresholdComparator
+  thresholdValue: Float
+  thresholdUnitCode: String
+  triggerAction: ReviewTriggerAction
+  ruleBasis: ReviewRuleBasis
+  "Verbatim rule text (\"Monitor lithium dose and plasma lithium levels more frequently if ... eGFR falls over 2 or more tests\")."
+  ruleText: String
+  "Required when ruleBasis = BELLLABS_SAFETY_POLICY (then privacyClass INTERNAL); a uid of W23's PolicyVersion (V-533p)."
+  policyVersionUid: String
+  """class: structural; cardinality: many; catalog: RULE_TRIGGERED_BY (live TRIGGERED_BY renamed; TRIGGERED_BY stays W10's)"""
+  triggeredByMetrics: [Metric!]! @relationship(type: "RULE_TRIGGERED_BY", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: MODIFIES_STEP (steps of the same edition)"""
+  modifiesSteps: [ProtocolStep!]! @relationship(type: "MODIFIES_STEP", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; registry: MODIFIES_TARGET"""
+  modifiesTargets: [Target!]! @relationship(type: "MODIFIES_TARGET", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; registry: HAS_CONSTRAINT (domain extended to rules; replaces live REQUIRES_CONDITION)"""
+  constraints: [Constraint!]! @relationship(type: "HAS_CONSTRAINT", direction: OUT, properties: "ConstraintRoleProperties")
+}
+
+"""
+A source-stated numeric or ordinal target of a protocol edition for one metric ("Aim to maintain plasma lithium level
+between 0.6 and 0.8 mmol per litre"; "hsCRP below detectable"). Bounds are a range with UCUM unit; a one-sided target
+uses comparator. NOT a reference interval (W07 ReferenceIntervalVersion), NOT a person's goal (private UserGoalVersion
+references FunctionalGoal/Target by uid), and NOT evidence that the target is reached. CQ-PR-03, CQ-PR-04.
+Module: protocols. Archetype: Entity.
+"""
+type Target implements Entity & EntityArchetype
+  @node(labels: ["Target", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  targetType: String
+  targetText: String
+  lowerBound: Float
+  upperBound: Float
+  unitCode: String
+  comparator: ThresholdComparator
+  """class: structural; cardinality: zero_or_one typical; registry: FOR_METRIC (Target -> Metric)"""
+  forMetrics: [Metric!]! @relationship(type: "FOR_METRIC", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A public functional goal concept a protocol states ("better sleep", "cardiovascular health"), reusable across protocols
+and referenced by private goals by uid. It is not an outcome claim and not evidence. OPERATIONALIZED_BY links it to
+measurable Targets. CQ-PC-01 (as shared reference), CQ-PR-03. Module: protocols. Archetype: Entity.
+"""
+type FunctionalGoal implements Entity & EntityArchetype
+  @node(labels: ["FunctionalGoal", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  goalType: String
+  """class: structural; cardinality: many; registry: OPERATIONALIZED_BY"""
+  operationalizedBy: [Target!]! @relationship(type: "OPERATIONALIZED_BY", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A public, source-attributed observation: a value a public person published about themselves (a posted lab report),
+a population-level value from a public protocol result, or a value in a public protocol page. Implements W07's
+DiagnosticResult contract (result kind, value, unit, value status, assay/algorithm/reference-interval version edges),
+so public observations obey the same comparability rules (INV-301). Every Observation is attributed by an asserted
+RECORDS edge or by inclusion in an attributed ProtocolResult (V-532p). It is NEVER the private measurement store:
+PersonalMeasurement lives only in the private store and never carries this label (V-524). An observation outside a
+reference interval never establishes a condition. CQ-PC-08, CQ-PR-04 (public examples), CQ-AX-22.
+Module: protocols. Archetype: InformationArtifact.
+"""
+type Observation implements Entity & InformationArtifactArchetype & DiagnosticResult
+  @node(labels: ["Observation", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  "When the observed state held (specimen or measurement time) as published; DiagnosticResult.observedAt."
+  observedAt: DateTime
+  contentHash: String
+  observationType: String
+  "Public population or public person scope as stated (\"protocol author, self-reported\", \"71 completers\"); never a private user."
+  observedPopulation: String
+  resultKind: DiagnosticResultKind
+  valueNumber: Float
+  valueString: String
+  unitCode: String
+  valueStatus: ReportedStatus
+  reportedAt: DateTime
+  "Verbatim value text (\"hsCRP below detectable levels\")."
+  valueText: String
+  """class: structural; cardinality: zero_or_one; registry: MEASURES_METRIC (type owned by W07; Observation -> Metric)"""
+  measuresMetrics: [Metric!]! @relationship(type: "MEASURES_METRIC", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; registry: PART_OF_PLAN"""
+  partOfPlans: [MeasurementPlan!]! @relationship(type: "PART_OF_PLAN", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; registry: FROM_LAB_TEST"""
+  fromLabTests: [LabTest!]! @relationship(type: "FROM_LAB_TEST", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; registry: FROM_DEVICE"""
+  fromDevices: [Device!]! @relationship(type: "FROM_DEVICE", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: PRODUCED_BY_ASSAY_VERSION (W07 DiagnosticResult contract)"""
+  producedByAssayVersions: [AssayVersion!]! @relationship(type: "PRODUCED_BY_ASSAY_VERSION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: COMPUTED_BY_ALGORITHM_VERSION (W07)"""
+  computedByAlgorithmVersions: [AlgorithmVersion!]! @relationship(type: "COMPUTED_BY_ALGORITHM_VERSION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: INTERPRETED_WITH_REFERENCE_INTERVAL_VERSION (W07)"""
+  interpretedWithReferenceIntervalVersions: [ReferenceIntervalVersion!]! @relationship(type: "INTERPRETED_WITH_REFERENCE_INTERVAL_VERSION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; registry: ABOUT_CONDITION (only from an Assertion; never derived from a threshold trigger, V-536p)"""
+  aboutConditions: [Condition!]! @relationship(type: "ABOUT_CONDITION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; registry: ABOUT_PROTOCOL (Observation -> Protocol)"""
+  aboutProtocols: [Protocol!]! @relationship(type: "ABOUT_PROTOCOL", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; registry: ABOUT_PROTOCOL (Observation -> ProtocolEdition, when the source binds the edition)"""
+  aboutEditions: [ProtocolEdition!]! @relationship(type: "ABOUT_PROTOCOL", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: zero_or_one; registry: RECORDS (Person -> Observation; public persons and published self-reports only; field Person.recordsObservations is W01's, seam W16-SR-05)"""
+  recordedBy: [Person!]! @relationship(type: "RECORDS", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; catalog: INCLUDES_OBSERVATION (inverse)"""
+  includedInResults: [ProtocolResult!]! @relationship(type: "INCLUDES_OBSERVATION", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+A public, source-attributed report of results of following a protocol (a protocol author posting before/after
+numbers, a public program report). It records what was reported, which protocol or edition it is about, the
+observations it includes and the outcomes it claims. It is NOT evidence of efficacy (a before/after report does not
+prove effect; claims are asserted edges, assessed by W10), NOT a study result (StudyResult, W09) and NOT a private
+outcome (only consented de-identified contributions may ever enter, through the W23 pipeline). Provenance is
+Assertion -> SourceLocator (live supportedBy retired). CQ-PC-08, CQ-PR-06 (as reported, not as evidence).
+Module: protocols. Archetype: InformationArtifact.
+"""
+type ProtocolResult implements Entity & InformationArtifactArchetype
+  @node(labels: ["ProtocolResult", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  resultSummary: String
+  """class: asserted; cardinality: zero_or_one with forEditions non-empty, else one; catalog: FOR_PROTOCOL"""
+  forProtocols: [Protocol!]! @relationship(type: "FOR_PROTOCOL", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_one; catalog: FOR_PROTOCOL (edition-bound when the source states the version followed; CQ-AX-22)"""
+  forEditions: [ProtocolEdition!]! @relationship(type: "FOR_PROTOCOL", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; catalog: INCLUDES_OBSERVATION"""
+  includesObservations: [Observation!]! @relationship(type: "INCLUDES_OBSERVATION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; registry: CLAIMS_OUTCOME (a claim, assessed elsewhere; never efficacy)"""
+  claimsOutcomes: [Outcome!]! @relationship(type: "CLAIMS_OUTCOME", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; live MENTIONS kept for this range (extraction aid; type semantics W00/W20; a mention is not an endorsement)"""
+  mentions: [ProtocolResultMentionTarget!]! @relationship(type: "MENTIONS", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: zero_or_one; registry: POSTS_RESULT (Person -> ProtocolResult; field Person.postsResults is W01's, seam W16-SR-05)"""
+  postedBy: [Person!]! @relationship(type: "POSTS_RESULT", direction: IN, properties: "AssertedEdgeProperties")
+}

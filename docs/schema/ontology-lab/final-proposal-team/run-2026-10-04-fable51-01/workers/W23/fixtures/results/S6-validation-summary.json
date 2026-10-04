@@ -1,0 +1,107 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/neo4j/validation.cypher",
+ "total": 174,
+ "ok": 174,
+ "failed": 0,
+ "rowsByStatement": [
+  {
+   "n": 34,
+   "id": "V-118",
+   "title": "V-118: uid backfill progress over live GraphQL nodes (informational; counts per label).",
+   "status": "ok",
+   "rows": 10,
+   "sample": [
+    {
+     "label": "VersionedState",
+     "nodes": 4,
+     "withUid": 4,
+     "missingUid": 0
+    },
+    {
+     "label": "Entity",
+     "nodes": 5,
+     "withUid": 5,
+     "missingUid": 0
+    },
+    {
+     "label": "Occurrence",
+     "nodes": 7,
+     "withUid": 7,
+     "missingUid": 0
+    },
+    {
+     "label": "AnswerRecord",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    },
+    {
+     "label": "Product",
+     "nodes": 1,
+     "withUid": 1,
+     "missingUid": 0
+    }
+   ]
+  },
+  {
+   "n": 117,
+   "id": "V-401b",
+   "title": "V-401b (informational): ACCEPTED assertions whose only locators are coarse (SECTION or ",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "acceptedAssertionsWithOnlyCoarseLocators": 0
+    }
+   ]
+  },
+  {
+   "n": 145,
+   "id": "V-429",
+   "title": "V-429: an answer-composition activity that used any locator or assertion must name",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "unauthorizedUse": "hu:activity:w23-bad-unauthorized-use",
+     "usedUid": "hu:assertion:w23-a2-variant-fv-a1c"
+    }
+   ]
+  },
+  {
+   "n": 166,
+   "id": "V-514b",
+   "title": "V-514b (informational): assertions without contentHash (legacy or fixture records; new ",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "assertionsWithoutContentHash": 0
+    }
+   ]
+  },
+  {
+   "n": 169,
+   "id": "V-522",
+   "title": "V-522 (informational): semantic nodes without a privacyClass. Null must never be read a",
+   "status": "ok",
+   "rows": 2,
+   "sample": [
+    {
+     "labels": [
+      "VersionedState",
+      "PolicyVersion"
+     ],
+     "nodeWithoutPrivacyClass": "hu:policy-version:w23-unclassified-draft"
+    },
+    {
+     "labels": [
+      "Occurrence",
+      "Activity"
+     ],
+     "nodeWithoutPrivacyClass": "hu:activity:w23-unclassified-legacy-run"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,119 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/02-public-projection.cypher",
+ "uri": "bolt://127.0.0.1:39915/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 3,
+ "ok": 3,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "QS-5a",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 155,
+   "sample": [
+    {
+     "reachedNodes": 15,
+     "reachedLabels": [
+      "Assertion",
+      "Entity",
+      "ProductVariant",
+      "Product",
+      "InformationArtifact",
+      "SourceLocator",
+      "FormulationVersion",
+      "VersionedState",
+      "SourceSnapshot",
+      "Source",
+      "Adjudication",
+      "EvidenceAssessment"
+     ],
+     "reachesPolicyLayer": false,
+     "reachesLineage": false,
+     "reachesAnswerRecord": false,
+     "nonPublicReached": []
+    }
+   ],
+   "header": "// W23 fixture 02: tier closure on data (QUERIES ONLY; load 00-shared-base.cypher first).\n// CQ-AX-12, CQ-AX-13, CQ-PC-08. A compiler emits these from a projection request (QS-5a/QS-5b); the label allow-list\n// comes from the tier closure table in 04-model-cards.md and the instance test is an ALLOW-"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 72,
+   "sample": [
+    {
+     "reachedNodes": 21,
+     "reachesPolicyLayer": true,
+     "reachesLineage": true,
+     "reachesAnswerRecord": true,
+     "policyVersionsReached": [
+      "hu:policy-version:w23-use-quote-summarize-v1"
+     ],
+     "privateReached": []
+    }
+   ],
+   "header": "// Q-PP-2 (OPERATOR_AUDIT): same traversal with the operator closure (INTERNAL lineage and policy admitted; private\n// records never). Expected: one row; reachesPolicyLayer true (the use-authorization policy v1, two hops from A1 through the\n// composing Activity), reachesLineage true, reachesAnswerR"
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 122,
+   "sample": [
+    {
+     "admittedPublicNodes": 16,
+     "fieldsStripped": [
+      "privacyClass"
+     ],
+     "admittedWithRunId": 0,
+     "projectedKeysLeakingInternal": 0
+    }
+   ],
+   "header": "// Q-PP-3 (PUBLIC_ANSWER, field closure): which INTERNAL fields the compiler must strip from admitted PUBLIC nodes before\n// they leave the graph (mongoResearchRunId, privacyClass, derived search fields, agentRunUid, humanReviewPending).\n// Expected on the base: one row; every admitted PUBLIC node c"
+  }
+ ]
+}

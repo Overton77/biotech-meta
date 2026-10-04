@@ -1,0 +1,11 @@
+SOURCE A: https://fdc.nal.usda.gov/Foundation_Foods_Documentation (Firecrawl query/directQuote; cache of 2026-10-03T21:23:23Z)
+"All reported values are based on a 100-gram or percent basis of the edible portion."
+"data for common dry beans of different cultivars, growing locations, and growing conditions are presented on a 0% moisture basis rather than as sold."
+"N = (V*W)/100; ... V = nutrient value per 100 g (Nutr_Val in the Nutrient Data file), and W = weight (in g) of portion (Gm_Wgt in the Weight file)."
+SOURCE B: https://fdc.nal.usda.gov/faq (Firecrawl markdown; cache of 2026-10-03T08:47:32Z)
+"SR Legacy, released in April 2018, is the final release of this data type and will not be updated."
+"values for nutrients and other food components reflect those found in particular foods sampled at particular times from particular locations and analyzed or computed with techniques available at that time. These values are therefore a \"snapshot in time,\" and may well change over time."
+"Each FoodData Central datatype uses its own food categorization system that was developed for different purposes."
+"You can search for a current item by its name or by one of the numbers that uniquely identifies that item within a particular FDC data type (e.g., NDB number, FNDDS Food Code, or GTIN number)."
+"Branded Foods ... are data from a public-private partnership that provides values for nutrients in branded and private label foods that appear on the product label. Information in Branded Foods is received from food industry data providers."
+"In FoodData Central, LOQ values are represented with less than (<) values. ... In addition, unavailable LOQ values may be reported as zeros."

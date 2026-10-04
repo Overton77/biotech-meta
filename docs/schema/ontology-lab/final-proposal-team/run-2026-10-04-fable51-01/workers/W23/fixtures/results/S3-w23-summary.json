@@ -1,0 +1,79 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+ "total": 12,
+ "ok": 12,
+ "failed": 0,
+ "rowsByStatement": [
+  {
+   "n": 6,
+   "id": "V-115",
+   "title": "V-W23-04: no shared index (range, text, point, lookup, fulltext or vector) covers a pri",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "violation": "INDEX_COVERS_PRIVATE_LABEL_OR_PROPERTY",
+     "indexName": "w23_leak_goal_search",
+     "indexType": "FULLTEXT",
+     "labelsOrTypes": [
+      "UserGoalVersion",
+      "Product"
+     ],
+     "properties": [
+      "goalStatement",
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "id": "V-521",
+   "title": "V-W23-09: stored privacy classes use the final vocabulary only ('PUBLIC', 'INTERNAL'). ",
+   "status": "ok",
+   "rows": 5,
+   "sample": [
+    {
+     "kind": "NODE",
+     "item": "hu:private-user-context:w23-leak-0001",
+     "privacyClass": "private-personal"
+    },
+    {
+     "kind": "NODE",
+     "item": "hu:private-personal-measurement:w23-leak-m1",
+     "privacyClass": "PRIVATE_PERSONAL"
+    },
+    {
+     "kind": "NODE",
+     "item": "hu:product:w23-leak-class-lower",
+     "privacyClass": "private-personal"
+    },
+    {
+     "kind": "NODE",
+     "item": "hu:product:w23-leak-class-upper",
+     "privacyClass": "PRIVATE_PERSONAL"
+    },
+    {
+     "kind": "NODE",
+     "item": "hu:private-user-goal-version:w23-leak-g1",
+     "privacyClass": "private-personal"
+    }
+   ]
+  },
+  {
+   "n": 12,
+   "id": "V-521",
+   "title": "V-W23-10: private uid values inside LIST properties of relationships (V-521's relations",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "relType": "COMPARED_IN_DECISION",
+     "item": "hu:rel:w23-leak-compared-in-decision",
+     "fromUid": "hu:product-variant:w23-calmroot-us-powder",
+     "toUid": "hu:product:w23-sleepwell"
+    }
+   ]
+  }
+ ]
+}

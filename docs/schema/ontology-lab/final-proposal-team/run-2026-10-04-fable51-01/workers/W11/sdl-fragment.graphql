@@ -1,0 +1,381 @@
+# =====================================================================================================================
+# W11 Manufacturing, specifications and supply readiness -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W11 (Opus 5.5)   Coordinator/synthesizer: Fable 5.1
+# Catalog 0.2.0 digest 8fb50ff0...84f0; live schema digest 86b5e0b5...f112.
+# Canonical catalog modules: products_and_formulations (ManufacturingSpecification, SpecificationVersion,
+#   GOVERNED_BY_SPECIFICATION, VERSION_OF_SPECIFICATION) and manufacturing_readiness (ManufacturingCapability,
+#   HAS_CAPABILITY_STATE, CAPABILITY_FOR_PROCESS, CAPABILITY_FOR_MATERIAL). T-002 proposal (05-decision-seam-ledger.md
+#   D-W11-01): ManufacturingProcess, ManufacturingStep, HAS_STEP, PRODUCED_BY_PROCESS, INPUTS, OUTPUTS,
+#   PERFORMS_PROCESS and HOSTS_PROCESS move to manufacturing_readiness (promoted to provisional); the specification
+#   pair stays in products_and_formulations. Until Fable rules, the baseline module assignment stands.
+# Competency questions: CQ-MF-01, CQ-MF-04, CQ-MF-05, CQ-MF-06, CQ-PF-01 (lineage only), candidates CQ-MF-C01..C05
+#   (02-cq-coverage.md). Invariants: INV-305, D-004, D-008, D-009; validators V-324, V-325 (+ V-324r, V-W11-01..12).
+#
+# Owned here (sole writer): node types ManufacturingSpecification, SpecificationVersion, ManufacturingProcess,
+#   ManufacturingStep, ManufacturingCapability; enums CapabilityStage, CapacityBasis, ProcessKind; relationship-
+#   property type ProcessIoProperties; relationship types GOVERNED_BY_SPECIFICATION, VERSION_OF_SPECIFICATION,
+#   PRODUCED_BY_PROCESS, HAS_STEP, HAS_CAPABILITY_STATE, CAPABILITY_FOR_PROCESS, CAPABILITY_FOR_MATERIAL,
+#   PERFORMS_PROCESS, HOSTS_PROCESS, INPUTS, OUTPUTS. Live PRODUCES, HAS_INPUT, HAS_OUTPUT are merged (migration-map).
+# NOT here: candidate ProcessMaterial (CL-005: no failing case found; live Material retired, see 04-model-cards.md);
+#   SpecificationCriterion and its edge to SpecificationVersion (W12, seam W11-SR-03); IngredientMaterial-side,
+#   Organization-side and Facility-side field slots for the relationships above (supplied as text in
+#   seam-requests.yaml W11-SR-05..07 for W02/W01 to insert at merge).
+# Referenced by name only: W00 Entity, EntityArchetype, VersionedStateArchetype, PrivacyClass, NodeMaturity,
+#   CaptureCompleteness, TimePrecision, ValidTimeBasis, AssertedEdgeProperties, StructuralEdgeProperties, Assertion;
+#   W01 Organization, Facility; W02 IngredientMaterial, ChemicalSubstance; W08 ToolOrInstrument, TechnologyPlatform,
+#   UsageEdgeProperties. ProcessIoProperties embeds every AssertedEdgeProperties field verbatim (contract B4).
+# Relationship class and cardinality are written in each field description and enforced by operations/validation,
+# never by SDL. No `extend`, @cypher, @customResolver, @populatedBy, @jwt*, @subscription, @unique or @vector.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Enums (sole writer W11)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Stage of a ManufacturingCapability state (catalog conventions.capabilityStage, frozen). "Promoted" is NOT a stage: it is
+the kind of source that made the claim (Source.sourceKind). OPERATING requires an authorizing assertion from a
+non-marketing source or a SUPPORT adjudication with verdict SUPPORTED (INV-305, V-324/V-324r). PLANNED never implies
+OPERATING (forbidden implication PLANNED_CAPABILITY -> OPERATING_CAPABILITY): a planned state and a later operating state
+are two states attached by two HAS_CAPABILITY_STATE episodes. SUSPENDED is a temporary halt the source says may end
+(NAI Carlsbad "temporarily closed in October 2023 ... reopened in May 2024"); DISCONTINUED is a stated end.
+"""
+enum CapabilityStage {
+  OPERATING
+  PILOTING
+  PLANNED
+  SUSPENDED
+  DISCONTINUED
+}
+
+"""
+What a stated capacity measures (catalog conventions.capacityBasis, frozen). NAMEPLATE = installed or design capacity as
+stated (Cyanotech FY2002 10-K: 68 large ponds plus auxiliary ponds "totaling approximately 200,000 square meters, all of
+which are currently available for production"). UTILIZED = the used share or used amount as stated (a utilization rate
+uses unitCode '%'; an absolute used amount uses the nameplate unit). NOT_REPORTED = the source states no capacity value
+(NAI FY2026 10-K "persistent excess capacity" is NOT_REPORTED with capacityVerbatim). Capacity is never inferred from
+revenue, headcount or floor area of a building.
+"""
+enum CapacityBasis {
+  NAMEPLATE
+  UTILIZED
+  NOT_REPORTED
+}
+
+"""
+Kind of manufacturing process (catalog ManufacturingProcess.processKind; refines live free-text processClass). The value
+set is a W11 proposal (catalog 0.2.0 names the property without values; ledger request W11-SR-01). Each value is backed
+by a captured case: CHEMICAL_SYNTHESIS (NR chloride two-step synthesis, GRN 000635 dossier figures 2-3), CULTIVATION
+(Cyanotech open-pond microalgae), EXTRACTION (Cyanotech supercritical CO2 astaxanthin extraction), BLENDING and
+PACKAGING (NAI Carlsbad "high-volume powder blending and packaging"), DOSAGE_FORM_MANUFACTURING (encapsulation,
+tableting, softgel), FERMENTATION and BIOCATALYSIS (microbial or enzymatic production; no case captured in this run,
+kept because the live processClass strings use them), PURIFICATION (crystallization, chromatography, washing as a
+separately described process). A process with several kinds is described as steps; processKind is the dominant kind
+the source names. OTHER requires description; UNKNOWN = source names no kind.
+"""
+enum ProcessKind {
+  CHEMICAL_SYNTHESIS
+  FERMENTATION
+  BIOCATALYSIS
+  CULTIVATION
+  EXTRACTION
+  PURIFICATION
+  BLENDING
+  DOSAGE_FORM_MANUFACTURING
+  PACKAGING
+  OTHER
+  UNKNOWN
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Relationship-property type (sole writer W11)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Qualifiers of one asserted process input or output (INPUTS, OUTPUTS). Successor of live DoseMetadata on INPUTS, OUTPUTS,
+PRODUCES, HAS_INPUT, HAS_OUTPUT (dose/doseUnit/role/standardizedTo/quantity/componentName meant intake dose fields and
+are not carried). Contains every field of the frozen AssertedEdgeProperties (relationshipUid, assertionUid, valid and
+recorded bounds, precisions, bases, mongoResearchRunId) because an input list is what a source (a GRAS dossier, a
+filing, a batch record summary) asserts about a process, not a structural fact of a record. One edge per recorded-time
+episode (asserted_edge profile).
+ioRole is a controlled string (candidate enum ProcessIoRole): STARTING_MATERIAL | REAGENT | SOLVENT | PROCESSING_AID |
+INTERMEDIATE | PRODUCT | BY_PRODUCT | EXCIPIENT | CULTURE_MEDIUM | PACKAGING_MATERIAL | UNKNOWN. Role is per use: the same
+IngredientMaterial (nicotinamide) is a STARTING_MATERIAL in NR chloride synthesis and a dietary ingredient elsewhere,
+under one uid. quantity/unitCode (UCUM) with ioQuantityBasis (controlled string PER_BATCH | PER_UNIT_OUTPUT_MASS |
+PER_UNIT_TIME | NOT_STATED) record a stated amount; null quantity = not stated, never zero. gradeText is the verbatim
+grade or concentration ("28% aqueous", "ACS grade"); asReportedName is the verbatim input name ("ammonia hydroxide").
+A process input is never a composition claim about the product: INPUTS never implies CONTAINS or QUANTITATIVELY_CONTAINS
+(forbidden implication proposed, W11-SR-02); residual-solvent limits are W12 SpecificationCriterion rows, not edges here.
+"""
+type ProcessIoProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  ioRole: String
+  quantity: Float
+  unitCode: String
+  ioQuantityBasis: String
+  gradeText: String
+  asReportedName: String
+  orderIndex: Int
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Specification identity and its versions (module products_and_formulations)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+The enduring identity of one named specification owned by one party: a supplier's ingredient specification (ChromaDex
+"Niagen" ingredient specification), a finished-product specification, a customer purchase specification, or a public
+compendial monograph (USP "Nicotinamide Riboside Chloride" dietary supplement monograph). Its content lives only on its
+SpecificationVersions. It is NOT a material (two materials governed by one monograph are not thereby one material:
+forbidden implication SHARES_SPECIFICATION -> SAME_MATERIAL_IDENTITY, W11-SR-02), NOT a test result, NOT a certificate
+and NOT a regulatory status. The owner is an asserted OWNS_SPECIFICATION predicate (organizations, predicate-only); a
+specification owner is not thereby the manufacturer (forbidden OWNS_SPECIFICATION -> PERFORMS_PROCESS proposed: the
+Niagen specification owner relies on W.R. Grace as single NRC supplier, FY2025 10-K).
+specificationKind is a controlled string (candidate enum SpecificationKind): INGREDIENT_SUPPLIER_SPECIFICATION |
+FINISHED_PRODUCT_SPECIFICATION | CUSTOMER_PURCHASE_SPECIFICATION | COMPENDIAL_MONOGRAPH | IN_PROCESS_SPECIFICATION.
+documentIdentifier is the owner's document number when public (null = not public; most supplier spec numbers are not).
+CQ-MF-C02, CQ-MF-C03, CQ-PF-03 (scope), CQ-EV material identity level SAME_BRANDED_MATERIAL_SAME_SPEC. Module
+products_and_formulations. Archetype Entity.
+"""
+type ManufacturingSpecification implements Entity & EntityArchetype
+  @node(labels: ["ManufacturingSpecification", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Controlled string; see type description. Required for new writes (V-W11-08)."
+  specificationKind: String
+  "Owner's document number if publicly stated; null = not public or not captured."
+  documentIdentifier: String
+  """class: structural; cardinality: one_or_more (inverse view of VERSION_OF_SPECIFICATION); catalog: VERSION_OF_SPECIFICATION"""
+  versions: [SpecificationVersion!]! @relationship(type: "VERSION_OF_SPECIFICATION", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+The ONE specification payload type (D-009): one immutable version of a ManufacturingSpecification. Payload = version
+label, effective bounds, the owner's revision identifier when stated, and the set of acceptance criteria. Criteria are
+W12 SpecificationCriterion nodes that point at their version (relationship name requested from W12, W11-SR-03); the
+version records how many criteria were captured (criteriaCount), how completely (criteriaCaptureCompleteness: the USP
+monograph text is licensed and not captured = UNKNOWN; a dossier table = PARTIAL_EXCERPT or COMPLETE), and
+criteriaDigest = 'sha256:<hex>' over the sorted criterion payloadHashes. payloadHash (D-016) is sha256 over the
+canonical JSON of {specificationUid, versionName, revisionIdentifier, effectiveFrom, effectiveTo, criteriaDigest}.
+Any change in a criterion (analyte, comparator, threshold, unit, method, limit stage) is a NEW SpecificationVersion of
+the same ManufacturingSpecification; it is never an in-place edit and never by itself a new IngredientMaterial (case:
+Niagen residual-solvent limits acetone <=3000 ppm and methanol <=740 ppm in the GRN 000635 dossier, 2015, versus
+acetone <=5,000 mg/kg and methanol <=1,000 mg/kg in the specification the applicant proposed to EFSA, EFSA Journal
+2019;17(8):5775 -- same material uid, two versions). Whether a change ALSO changes material identity is decided by the
+substances owner's identity rules (chemical form, grade, taxon, strain), never by a version count.
+effectiveFrom/effectiveTo are source-stated payload (for example a monograph's official date); which version governs a
+material at a time comes from GOVERNED_BY_SPECIFICATION episodes. versionName is the source-stated label; null when the
+source states none (both Niagen dossiers state none: version identity then rests on payloadHash and the citing source).
+It is NOT a lot, NOT a certificate of analysis, NOT a measured result and NOT a label. CQ-MF-C02, CQ-MF-C03, CQ-PF-03.
+Module products_and_formulations. Archetype VersionedState.
+"""
+type SpecificationVersion implements Entity & VersionedStateArchetype
+  @node(labels: ["SpecificationVersion", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  "sha256:<hex> over the canonical payload (see type description); identical payload = identical version."
+  payloadHash: String!
+  "Source-stated first instant the version applies (payload, not query validity)."
+  effectiveFrom: DateTime
+  effectiveFromPrecision: TimePrecision
+  "Source-stated end; null = unknown, never 'still in force'."
+  effectiveTo: DateTime
+  effectiveToPrecision: TimePrecision
+  "Source-stated version label (catalog versionName); null = the source states none."
+  versionName: String
+  "Owner's revision or document-revision identifier when stated (for example 'Rev. 3'); null = not stated."
+  revisionIdentifier: String
+  "Number of SpecificationCriterion nodes captured for this version; null = not counted."
+  criteriaCount: Int
+  "How completely the criteria were captured: COMPLETE | PARTIAL_EXCERPT | UNKNOWN. UNKNOWN never reads as 'no criteria'."
+  criteriaCaptureCompleteness: CaptureCompleteness
+  "sha256:<hex> over the sorted payloadHash values of the version's criteria; null when criteria were not captured."
+  criteriaDigest: String
+  """class: structural; cardinality: exactly_one; catalog: VERSION_OF_SPECIFICATION"""
+  specification: [ManufacturingSpecification!]! @relationship(type: "VERSION_OF_SPECIFICATION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted (asserted_edge, EXCLUSIVE per material and specification, W11-SR-04); cardinality: many; catalog: GOVERNED_BY_SPECIFICATION (inverse view; IngredientMaterial -> SpecificationVersion)"""
+  governedMaterials: [IngredientMaterial!]! @relationship(type: "GOVERNED_BY_SPECIFICATION", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Process identity and its steps (module manufacturing_readiness if T-002 proposal is ruled; baseline
+# products_and_formulations)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A described way of making a material or product: a synthesis route, a cultivation-and-extraction process, a blending and
+packaging operation. Identity = the route as described (owner or performer, kind, ordered steps); a different route
+(for example a crystalline-form process covered by another party's patents) is a different ManufacturingProcess, linked
+to the same IngredientMaterial by its own PRODUCED_BY_PROCESS episode. It is NOT a capability (whether someone can run
+it now, at what scale: ManufacturingCapability), NOT a facility (HOSTS_PROCESS), NOT a performer (PERFORMS_PROCESS),
+NOT a quality-system claim (live qualitySystemKind such as 'cGMP' is a CLAIMS_CGMP_COMPLIANCE assertion or a W12
+CertificationListing, never a process property) and NOT a production scale (live productionScale moves to
+ManufacturingCapability.capacity*). Merge target of live ManufacturingProcess (processKind <- processClass).
+CQ-MF-01, CQ-MF-04, CQ-MF-C04, CQ-MF-C05. Module manufacturing_readiness (proposed, D-W11-01). Archetype Entity.
+"""
+type ManufacturingProcess implements Entity & EntityArchetype
+  @node(labels: ["ManufacturingProcess", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Dominant kind as the source names it (live processClass); null = not extracted."
+  processKind: ProcessKind
+  "Verbatim live processClass when it did not map to a ProcessKind value (migration residue; presentation only)."
+  processKindVerbatim: String
+  "Presentation summary (live processTechnologySummary); never evidence."
+  processTechnologySummary: String
+  """class: structural; cardinality: many (ordered by orderIndex); catalog: HAS_STEP (D-004: manufacturing only)"""
+  steps: [ManufacturingStep!]! @relationship(type: "HAS_STEP", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: INPUTS (process-level input summary when the source gives no steps)"""
+  inputMaterials: [IngredientMaterial!]! @relationship(type: "INPUTS", direction: OUT, properties: "ProcessIoProperties")
+  """class: asserted; cardinality: many; catalog: INPUTS (non-ingredient chemical inputs: solvents, reagents, intermediates)"""
+  inputSubstances: [ChemicalSubstance!]! @relationship(type: "INPUTS", direction: OUT, properties: "ProcessIoProperties")
+  """class: asserted; cardinality: many; catalog: PRODUCED_BY_PROCESS (inverse view; IngredientMaterial -> ManufacturingProcess; replaces live PRODUCES and process-level OUTPUTS)"""
+  producedMaterials: [IngredientMaterial!]! @relationship(type: "PRODUCED_BY_PROCESS", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PERFORMS_PROCESS (inverse view; Organization -> ManufacturingProcess)"""
+  performedBy: [Organization!]! @relationship(type: "PERFORMS_PROCESS", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HOSTS_PROCESS (inverse view; Facility -> ManufacturingProcess; live PhysicalLocation.hostsProcesses)"""
+  hostedAt: [Facility!]! @relationship(type: "HOSTS_PROCESS", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many (inverse view of CAPABILITY_FOR_PROCESS); catalog: CAPABILITY_FOR_PROCESS"""
+  capabilityStates: [ManufacturingCapability!]! @relationship(type: "CAPABILITY_FOR_PROCESS", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+One step of one ManufacturingProcess, in source order (HAS_STEP orderIndex): "Step 1: D-ribofuranose tetra-acetate in
+acetonitrile, gaseous hydrogen chloride ... a slurry of nicotinamide in acetonitrile is charged"; "Step 2: ... slurried
+into methanol ... ammonium hydroxide is slowly added ... methyl t-butyl ether is charged to precipitate" (GRN 000635
+dossier). Belongs to exactly one process; a step reused by another route is a new step node. It is NOT a protocol step
+(D-004: ProtocolStep and HAS_PROTOCOL_STEP are W16's), NOT a test execution (an in-process check "confirmed complete by
+HPLC" is a W12 TestExecution/TestMethod when captured), and NOT a facility. stepKind is a controlled string (candidate
+enum StepKind: REACTION | DEACETYLATION_OR_DEPROTECTION | CRYSTALLIZATION | PRECIPITATION | FILTRATION_OR_CENTRIFUGATION |
+WASHING | DRYING | MILLING | BLENDING | ENCAPSULATION | TABLETING | CULTIVATION | HARVEST | EXTRACTION | PACKAGING |
+OTHER) refining live stepClass. environmentGrade is the source's cleanroom or hygiene grade verbatim (live kept).
+CQ-MF-C04, CQ-MF-C05. Module manufacturing_readiness (proposed). Archetype Entity.
+"""
+type ManufacturingStep implements Entity & EntityArchetype
+  @node(labels: ["ManufacturingStep", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Controlled string (candidate StepKind); live stepClass."
+  stepKind: String
+  "Verbatim operation wording (live operationKind); presentation only."
+  operationKind: String
+  "Verbatim environment or cleanroom grade (live environmentGrade); null = not stated."
+  environmentGrade: String
+  """class: structural; cardinality: exactly_one (inverse view of HAS_STEP); catalog: HAS_STEP"""
+  process: [ManufacturingProcess!]! @relationship(type: "HAS_STEP", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: INPUTS (live HAS_INPUT merged)"""
+  inputMaterials: [IngredientMaterial!]! @relationship(type: "INPUTS", direction: OUT, properties: "ProcessIoProperties")
+  """class: asserted; cardinality: many; catalog: INPUTS (live HAS_INPUT merged)"""
+  inputSubstances: [ChemicalSubstance!]! @relationship(type: "INPUTS", direction: OUT, properties: "ProcessIoProperties")
+  """class: asserted; cardinality: many; catalog: OUTPUTS (live HAS_OUTPUT merged; intermediates and by-products; the product of record is PRODUCED_BY_PROCESS)"""
+  outputMaterials: [IngredientMaterial!]! @relationship(type: "OUTPUTS", direction: OUT, properties: "ProcessIoProperties")
+  """class: asserted; cardinality: many; catalog: OUTPUTS (live HAS_OUTPUT merged)"""
+  outputSubstances: [ChemicalSubstance!]! @relationship(type: "OUTPUTS", direction: OUT, properties: "ProcessIoProperties")
+  """class: asserted; cardinality: many; catalog: USES_EQUIPMENT (relationship and property type owned by W08)"""
+  usesEquipment: [ToolOrInstrument!]! @relationship(type: "USES_EQUIPMENT", direction: OUT, properties: "UsageEdgeProperties")
+  """class: asserted; cardinality: many; catalog: USES_PLATFORM (relationship and property type owned by W08)"""
+  usesPlatforms: [TechnologyPlatform!]! @relationship(type: "USES_PLATFORM", direction: OUT, properties: "UsageEdgeProperties")
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Capability state (module manufacturing_readiness)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+One immutable state of a manufacturing capability of an Organization or a Facility (catalog manufacturing_readiness):
+stage, stated capacity with UCUM unit and basis, and for PLANNED states the stated target date. Attached to its holder
+by HAS_CAPABILITY_STATE asserted episodes (asserted_edge; EXCLUSIVE per holder, process and material, W11-SR-04); a
+stage change is a NEW state node plus a new episode, never an update (NAI Carlsbad: PLANNED from the 2021-08-24
+acquisition release, OPERATING from April 2023, SUSPENDED October 2023, OPERATING again from May 2024, per the FY2024
+and FY2025 10-Ks). A promoted capability that BellLabs does not rely on stays an unattached state that is only the object
+of its Assertion (round 0005; V-324). It is NOT a facility, NOT a process, NOT a certification, NOT a regulatory status
+and NOT a quality claim. capacityVerbatim keeps the source wording when no number is given ("persistent excess
+capacity", capacityBasis NOT_REPORTED). targetOperationalDate is forward-looking payload of a PLANNED state only
+(V-W11-03); it has no valid time and never becomes the validFrom of an OPERATING episode.
+CQ-MF-04, CQ-MF-05, CQ-MF-C01. Module manufacturing_readiness. Archetype VersionedState.
+"""
+type ManufacturingCapability implements Entity & VersionedStateArchetype
+  @node(labels: ["ManufacturingCapability", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  "sha256:<hex> over canonical JSON {stage, capacityValue, capacityUnitCode, capacityBasis, capacityVerbatim, targetOperationalDate, targetOperationalDatePrecision, forProcessUid, forMaterialUid}."
+  payloadHash: String!
+  "Source-stated payload bounds (rarely present); attachment validity lives on HAS_CAPABILITY_STATE."
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Stage as asserted; non-null."
+  stage: CapabilityStage!
+  "Stated capacity amount; null = not stated (never 0)."
+  capacityValue: Float
+  "UCUM unit of capacityValue: m2 (cultivation area), L (vessel volume), kg/a or t/a (output rate), '%' (utilization rate)."
+  capacityUnitCode: String
+  capacityBasis: CapacityBasis
+  "Verbatim capacity wording when not numeric or when the number needs its sentence; presentation and audit."
+  capacityVerbatim: String
+  "PLANNED only: stated target date for becoming operational; forward-looking, no valid time of its own."
+  targetOperationalDate: DateTime
+  targetOperationalDatePrecision: TimePrecision
+  """class: structural; cardinality: zero_or_one; catalog: CAPABILITY_FOR_PROCESS"""
+  forProcess: [ManufacturingProcess!]! @relationship(type: "CAPABILITY_FOR_PROCESS", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: CAPABILITY_FOR_MATERIAL"""
+  forMaterial: [IngredientMaterial!]! @relationship(type: "CAPABILITY_FOR_MATERIAL", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted (asserted_edge); cardinality: zero_or_one holder per state; catalog: HAS_CAPABILITY_STATE (inverse view; Organization -> state)"""
+  heldByOrganizations: [Organization!]! @relationship(type: "HAS_CAPABILITY_STATE", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (asserted_edge); cardinality: zero_or_one holder per state; catalog: HAS_CAPABILITY_STATE (inverse view; Facility -> state)"""
+  heldByFacilities: [Facility!]! @relationship(type: "HAS_CAPABILITY_STATE", direction: IN, properties: "AssertedEdgeProperties")
+}

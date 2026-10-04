@@ -1,0 +1,84 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/neo4j/validation.cypher",
+ "total": 174,
+ "ok": 174,
+ "failed": 0,
+ "rowsByStatement": [
+  {
+   "n": 34,
+   "id": "V-118",
+   "title": "V-118: uid backfill progress over live GraphQL nodes (informational; counts per label).",
+   "status": "ok",
+   "rows": 11,
+   "sample": [
+    {
+     "label": "Product",
+     "nodes": 1,
+     "withUid": 1,
+     "missingUid": 0
+    },
+    {
+     "label": "Entity",
+     "nodes": 6,
+     "withUid": 6,
+     "missingUid": 0
+    },
+    {
+     "label": "FormulationVersion",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    },
+    {
+     "label": "SourceSnapshot",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    },
+    {
+     "label": "InformationArtifact",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    }
+   ]
+  },
+  {
+   "n": 117,
+   "id": "V-401b",
+   "title": "V-401b (informational): ACCEPTED assertions whose only locators are coarse (SECTION or ",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "acceptedAssertionsWithOnlyCoarseLocators": 0
+    }
+   ]
+  },
+  {
+   "n": 148,
+   "id": "V-432",
+   "title": "---------------------------------------------------------------------",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "malformedEquivalenceAssessment": "hu:assessment:w23-merge-capsule-dup",
+     "comparedCount": 0
+    }
+   ]
+  },
+  {
+   "n": 166,
+   "id": "V-514b",
+   "title": "V-514b (informational): assertions without contentHash (legacy or fixture records; new ",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "assertionsWithoutContentHash": 0
+    }
+   ]
+  }
+ ]
+}

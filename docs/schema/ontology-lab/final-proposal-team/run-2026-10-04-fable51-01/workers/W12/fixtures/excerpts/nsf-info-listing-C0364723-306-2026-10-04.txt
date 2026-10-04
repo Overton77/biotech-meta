@@ -1,0 +1,21 @@
+SOURCE: https://info.nsf.org/Certified/BannedSub/Listings.asp?Company=C0364723&Standard=306
+CAPTURE: Firecrawl scrape (onlyMainContent, maxAge 0), 2026-10-04T00:58Z; PARTIAL_EXCERPT (non-Basis rows omitted)
+EXCERPT (verbatim):
+These NSF Official Listings are current as of Saturday, October 3, 2026 at 12:15 a.m. Eastern Time. Please contact NSF to confirm the status of any Listing, report errors, or make suggestions.
+Certified for Sport
+NSF Certification Guideline 306
+Elysium Health 434 Broadway 2nd Floor New York, NY 10013 United States
+Facility :# 1 USA
+Finished Products | Trade Designation | Product ID | Product Form | Manufacturer's Recommended Daily Serving Size |
+Vegetarian | Basis | 231202 | Capsule | 2 capsules |
+| Basis | 24150 24150A 1521-4240 1961-4250 3501-4270 2111-4201 1531-5210 1841-5220 2381-5270 2381-5270A 1231-5280 2791-5211 | Capsule | 2 capsules |
+| Basis | 230605 230901 240108 240906 | Capsule | 2 capsules |
+Vegetarian/Vitamin | Basis | R212-01 M070-01 P043-01 | Capsule | 2 capsules |
+Facility : Salisbury, MD
+Vegetarian/Vitamin | Basis | 5141-3240 2121-3270 | Capsule | 2 capsules |
+Facility : Chester, NY
+Cellular Support/Men/Senior/Vitamin/Women | Basis | 70064 70579 70918 P098-01 70969 | Capsules | 2 capsules |
+Facility : Windsor, Ontario, Canada
+Vegetarian/Vitamin | Basis | M062-01 M099-01 M259-01 R1110-01 R173-01 | Capsule | 2 capsules |
+Number of matching Manufacturers is 1
+Number of matching Products is 18

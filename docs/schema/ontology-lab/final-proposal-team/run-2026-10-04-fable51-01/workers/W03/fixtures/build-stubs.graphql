@@ -1,0 +1,21 @@
+# SCRATCH BUILD STUBS used only to build sdl-fragment.graphql with @neo4j/graphql 7.6.3 (not part of the fragment;
+# other owners define these types). Build: cat build-stubs.graphql ../sdl-fragment.graphql > combined; VECTOR_PROVIDER=0 node build-schema.mjs combined
+interface Entity { id: ID!  uid: String!  name: String  description: String  mongoResearchRunId: String }
+interface SearchIndexable { searchText: String  searchFields: [String!]  embeddingModel: String  embeddingDimensions: Int }
+interface EntityArchetype { entityType: String! }
+interface OccurrenceArchetype { occurrenceType: String!  startedAt: DateTime  endedAt: DateTime }
+enum PrivacyClass { PUBLIC INTERNAL }
+enum NodeMaturity { CANDIDATE PROVISIONAL ACCEPTED DEPRECATED }
+enum Polarity { POSITIVE NEGATIVE MIXED UNKNOWN }
+enum TimePrecision { INSTANT DAY MONTH QUARTER YEAR DECADE }
+enum ValidTimeBasis { STATED_BY_SOURCE PUBLICATION_PROXY OBSERVATION_ONLY INFERRED UNKNOWN }
+type StructuralEdgeProperties @relationshipProperties { orderIndex: Int  notes: String  mongoResearchRunId: String }
+type IdentifierLinkProperties @relationshipProperties { relationshipUid: String!  assertionUid: String!  validFrom: DateTime  validTo: DateTime  validFromPrecision: TimePrecision  validToPrecision: TimePrecision  validFromBasis: ValidTimeBasis!  validToBasis: ValidTimeBasis!  recordedFrom: DateTime!  recordedTo: DateTime  isPrimary: Boolean  mongoResearchRunId: String }
+type Assertion implements Entity @node(labels: ["Assertion"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String predicate: String! basisKind: String }
+type Identifier implements Entity @node(labels: ["Identifier", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String scheme: String! value: String! }
+type ChemicalSubstance implements Entity @node(labels: ["ChemicalSubstance", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type ChemicalForm implements Entity @node(labels: ["ChemicalForm", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type IngredientMaterial implements Entity @node(labels: ["IngredientMaterial", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Biomarker implements Entity @node(labels: ["Biomarker", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String measuredInMatrix: [AnatomicalContext!]! @relationship(type: "MEASURED_IN_MATRIX", direction: OUT) }
+type Metric implements Entity @node(labels: ["Metric", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type StudyArm implements Entity @node(labels: ["StudyArm", "VersionedState"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }

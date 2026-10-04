@@ -1,0 +1,6 @@
+pglast v8.4 PG grammar (18, 4): OK, 24 statements
+  WITHOUT OVERLAPS table: OK
+  EXCLUDE table: OK
+pglast v7.20 PG grammar (17, 7): PARSE ERROR: syntax error at or near "WITHOUT", at index 3608
+  WITHOUT OVERLAPS table: PARSE ERROR: syntax error at or near "WITHOUT", at index 329
+  EXCLUDE table: OK

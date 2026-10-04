@@ -1,0 +1,99 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/neo4j/validation.cypher",
+ "total": 174,
+ "ok": 174,
+ "failed": 0,
+ "rowsByStatement": [
+  {
+   "n": 34,
+   "id": "V-118",
+   "title": "V-118: uid backfill progress over live GraphQL nodes (informational; counts per label).",
+   "status": "ok",
+   "rows": 10,
+   "sample": [
+    {
+     "label": "Product",
+     "nodes": 1,
+     "withUid": 1,
+     "missingUid": 0
+    },
+    {
+     "label": "Entity",
+     "nodes": 5,
+     "withUid": 5,
+     "missingUid": 0
+    },
+    {
+     "label": "FormulationVersion",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    },
+    {
+     "label": "SourceSnapshot",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    },
+    {
+     "label": "InformationArtifact",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    }
+   ]
+  },
+  {
+   "n": 37,
+   "id": "V-121",
+   "title": "Expected by hand from lines 502, 738, 2660 to 2745 of current_biotech_schema.graphql:",
+   "status": "ok",
+   "rows": 2,
+   "sample": [
+    {
+     "answerRecordUid": "hu:answer-record:w23-bad-asker-log"
+    },
+    {
+     "answerRecordUid": "hu:answer-record:w23-bad-untraced"
+    }
+   ]
+  },
+  {
+   "n": 117,
+   "id": "V-401b",
+   "title": "V-401b (informational): ACCEPTED assertions whose only locators are coarse (SECTION or ",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "acceptedAssertionsWithOnlyCoarseLocators": 0
+    }
+   ]
+  },
+  {
+   "n": 166,
+   "id": "V-514b",
+   "title": "V-514b (informational): assertions without contentHash (legacy or fixture records; new ",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "assertionsWithoutContentHash": 0
+    }
+   ]
+  },
+  {
+   "n": 168,
+   "id": "V-521",
+   "title": "V-521: no private uid values or private-personal class on shared nodes or relationships",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "kind": "NODE",
+     "item": "hu:answer-record:w23-bad-asker-log"
+    }
+   ]
+  }
+ ]
+}

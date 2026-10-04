@@ -1,0 +1,317 @@
+# =====================================================================================================================
+# W05 Food, lifestyle and exposures -- SDL fragment (worker recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W05 (Opus 5.5)   Coordinator/synthesizer: Fable 5.1
+# Proposed candidate module: food_lifestyle_exposure (live seam types owned by no catalog module; T-005).
+# Authority digests: catalog/schema.yaml 0.2.0 sha256 8fb50ff0...84f0
+#   (8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0); live schema 86b5e0b5...f112.
+# Competency questions: CQ-ST-01, CQ-ST-02, CQ-EV-04 (EXPOSURE / MATERIAL_IDENTITY inputs), CQ-PR-02 (step targets via
+#   W16), CQ-RC-05 (practice report versus recommendation); candidates CQ-FL-C01..C05 (02-cq-coverage.md).
+#
+# Owned here (sole writer): node types FoodItem, Exposure, Lifestyle; enums ExposureRoute, ExposureDurationCategory,
+#   ExposureSetting, FoodVariantKind; relationship-property type FoodVariantProperties; union ExposureAgentTarget;
+#   relationship types VARIANT_OF and HAS_EXPOSURE_AGENT (renamed from the Exposure use of live INVOLVES, which
+#   collides with W18's event INVOLVES).
+# Disposed here, NOT defined: live FoodProduct (retired into W04 Product with productKind CONVENTIONAL_FOOD; one identity,
+#   uid token `product`), live CONTAINS_COMPOUND (retired into W02 QUANTITATIVELY_CONTAINS / PROVIDES_CONSTITUENT
+#   assertions), live HAS_INGREDIENT (retired into W04 FormulationVersion -> IngredientComponent -> USES_MATERIAL),
+#   live union ExposureAgent (replaced by ExposureAgentTarget). See migration-map.yaml.
+# Referenced by name only (other owners):
+#   W00: Entity, EntityArchetype, SearchIndexable, PrivacyClass, NodeMaturity, Identifier, IdentifierLinkProperties,
+#        StructuralEdgeProperties (VARIANT_OF properties embed every AssertedEdgeProperties field, contract B4)
+#   W02: IngredientMaterial, ChemicalSubstance, Nutrient, QuantitativeContentProperties
+#   W03: ExposureBasis (enum), Mechanism, Condition, Outcome, AssociationProjectionProperties
+#   W04: Product, ProductVariant           W17: SafetySignal, SafetyEdgeProperties
+#   W20: Document, Chunk, DerivedSupportProperties
+# Labels: FoodItem is a specialization of IngredientMaterial (["FoodItem","IngredientMaterial","Entity"], uid token
+#   `material`, one identity); Exposure and Lifestyle need new uid tokens `exposure` and `lifestyle` (W05-SR-01, W00).
+# Relationship class and cardinality are written in field descriptions and enforced by the operations/validation layer.
+# Derived fields are read-only (@settable false) and written only by their owner's projection job.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Enums (new; owner W05). Each value is grounded in a retrieved source (03-source-manifest.md) or a fixture.
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Route by which an agent reaches the body in a characterized Exposure. ORAL covers diet, drinking water and capsules; the
+vehicle or medium is Exposure.mediumText, never a route value (EPA IRIS selenium: "Reference Dose for Chronic Oral
+Exposure", diet). INHALATION and DERMAL are the other IRIS route families; PARENTERAL covers injection/infusion;
+EXTERNAL_PHYSICAL covers whole-body physical agents of practices (heat, cold, light) that have no uptake route;
+MULTIPLE is an aggregate characterization over routes stated by the source; NOT_STATED means the source gives no route
+(never inferred from the agent). Not a dosage form (W04/W09) and not a W03 MechanismEvidenceContext vehicle string.
+"""
+enum ExposureRoute {
+  ORAL
+  INHALATION
+  DERMAL
+  OCULAR
+  PARENTERAL
+  EXTERNAL_PHYSICAL
+  MULTIPLE
+  NOT_STATED
+}
+
+"""
+Duration class of a characterized Exposure as the source states it. Source definitions differ (EPA acute/short-term/
+subchronic/chronic; IRIS "based on lifetime exposure"); the verbatim wording is Exposure.durationText and a numeric
+duration, when stated, is Exposure.durationIso. NOT_STATED = the source gives no duration; it is never read as CHRONIC.
+"""
+enum ExposureDurationCategory {
+  ACUTE
+  SHORT_TERM
+  SUBCHRONIC
+  CHRONIC
+  LIFETIME
+  NOT_STATED
+}
+
+"""
+Setting in which the characterized exposure occurs. DIETARY (food and drink, including food grown in a high-selenium
+area: IRIS/Yang 1989b), ENVIRONMENTAL (ambient air, water, soil outside the diet), OCCUPATIONAL (workplace),
+BEHAVIORAL_PRACTICE (a Lifestyle practice such as sauna bathing), NOT_STATED. A setting is not a population and not a
+person's circumstance (no private context in the shared graph).
+"""
+enum ExposureSetting {
+  DIETARY
+  ENVIRONMENTAL
+  OCCUPATIONAL
+  BEHAVIORAL_PRACTICE
+  NOT_STATED
+}
+
+"""
+Axis on which a food variant differs from its base food on a VARIANT_OF edge. Grounded in reference-food records whose
+identity includes preparation or processing (USDA FDC 170569 "Nuts, brazilnuts, dried, unblanched"; FoodOn
+"brazilnut (shell off, dried)"). It qualifies one edge; it is not a food classification and not a nutrition taxonomy.
+"""
+enum FoodVariantKind {
+  PREPARATION
+  PROCESSING
+  CULTIVAR_OR_BREED
+  PRODUCTION_SYSTEM
+  PLANT_OR_ANIMAL_PART
+  OTHER
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Relationship-property type
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Asserted VARIANT_OF edge (FoodItem variant -> FoodItem base). Contains every field of the frozen AssertedEdgeProperties
+(asserted_edge profile; one edge per recorded-time episode; assertionUid required, D-011) plus variantKind. Successor of
+live RoleMetadata on VARIANT_OF and of the node field FoodItem.variantKind. CQ-FL-C01.
+"""
+type FoodVariantProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  "Axis of variation stated or curated for this edge; null = not recorded (never inferred from the description string)."
+  variantKind: FoodVariantKind
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Union
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Agents an Exposure characterization can involve (range of HAS_EXPOSURE_AGENT). Successor of live union ExposureAgent
+(FoodItem | FoodProduct | Ingredient | Compound | Lifestyle): FoodItem and Ingredient -> IngredientMaterial (a FoodItem
+node carries the IngredientMaterial label and resolves through that member; read food fields with foodItems(uid)),
+FoodProduct -> Product / ProductVariant (W04), Compound -> ChemicalSubstance (D-002). FoodItem is deliberately NOT a
+member: tested under @neo4j/graphql 7.6.3 on Neo4j 5.26.31 (2026-10-04), a union that lists both a parent label type and
+its specialization returns the same node twice (once per matching member), so a union never lists a specialization
+beside its parent (W05-SR-09, rule proposed to W00/Fable). Physical agents with no owner type (ultraviolet radiation,
+noise, PM2.5 as a mixture) are out of range until a candidate CQ admits them (CQ-FL-C05).
+"""
+union ExposureAgentTarget = IngredientMaterial | ChemicalSubstance | Nutrient | Product | ProductVariant | Lifestyle
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Node types
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A reference food concept as a food-composition or food-ontology source defines it, at the preparation it names
+("Nuts, brazilnuts, dried, unblanched", USDA FDC 170569; "Peanuts" with preparation unresolved). It is a specialization
+of IngredientMaterial (labels FoodItem, IngredientMaterial, Entity; uid token `material`), so composition uses W02's
+QUANTITATIVELY_CONTAINS / PROVIDES_CONSTITUENT assertions, a study arm reaches it through W09 USES_INTERVENTION_MATERIAL,
+and a packaged food reaches it through W04 IngredientComponent USES_MATERIAL, all without a parallel food identity.
+It is NOT a marketed product (that is a W04 Product with productKind CONVENTIONAL_FOOD), NOT a dietary pattern (Lifestyle
+or a W16 Protocol), NOT an exposure (Exposure), NOT a person's meal (private, outside the graph) and NOT a node in a
+universal nutrition taxonomy: foodGroup is the category of one named source system. A different preparation that the
+source treats as a different food is a different FoodItem linked by VARIANT_OF. Identifiers (FDC ID, NDB number, FoodOn
+IRI) are Identifier records; an FDC ID identifies a dataset record, so two FDC IDs may resolve to one FoodItem and one
+FDC ID never merges two foods by itself. CQ-ST-01, CQ-ST-02, CQ-EV-04, CQ-FL-C01, CQ-FL-C02. Candidate module
+food_lifestyle_exposure. Archetype Entity.
+"""
+type FoodItem implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["FoodItem", "IngredientMaterial", "Entity"])
+  @fulltext(indexes: [{indexName: "FoodItemSearch", fields: ["name", "description", "searchText", "foodGroup"], queryName: "searchFoodItems"}]) {
+  id: ID! @id
+  "hu:material:<opaque>; the IngredientMaterial token, because FoodItem is a specialization of IngredientMaterial (one identity)."
+  uid: String!
+  "Presentation only; never identity (D-013). Reference-source description is preserved in descriptionVerbatim."
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'FoodItem' (the IngredientMaterial view reads materialKind FOOD, W05-SR-02)."
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Food description exactly as the defining reference source writes it (FDC 'Nuts, brazilnuts, dried, unblanched'); identity-relevant text, immutable once set."
+  descriptionVerbatim: String
+  "Category in ONE named source system (FDC SR 'Nut and Seed Products'); display and search only, never a cross-source taxonomy. Null = not recorded."
+  foodGroup: String
+  "Name of the category system foodGroup comes from: SR_FOOD_CATEGORY, WWEIA_FOOD_CATEGORY, GS1_GPC, or another source-stated system. Required when foodGroup is set (V-W05-05)."
+  foodGroupSystem: String
+  "Preparation or processing descriptors as stated by the defining source ('dried', 'unblanched'); identity-relevant. Empty list = none stated; null = not recorded."
+  processingMethods: [String!]
+  "Verbatim preparation wording when the source gives a sentence rather than descriptors; never a recipe or a person's preparation."
+  preparationNotes: String
+  "Production-system descriptor stated by the source ('organic', 'wild-harvested'); null = not stated. Identity-relevant only when the source distinguishes foods by it."
+  productionType: String
+  "Scientific name as written in the defining record ('Bertholletia excelsa'); the taxon link itself is W02 DERIVED_FROM_TAXON (W05-SR-03)."
+  scientificNameVerbatim: String
+
+  """class: asserted; cardinality: zero_or_one base per variant episode; catalog: VARIANT_OF (new, owner W05); this node is the variant"""
+  variantOf: [FoodItem!]! @relationship(type: "VARIANT_OF", direction: OUT, properties: "FoodVariantProperties")
+  """class: asserted (inverse view); cardinality: many; catalog: VARIANT_OF; live FoodItem.hasVariants"""
+  hasVariants: [FoodItem!]! @relationship(type: "VARIANT_OF", direction: IN, properties: "FoodVariantProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS (owner W02; quantity, unitCode, basis plus the composition qualifiers requested in W05-SR-04); replaces live CONTAINS_COMPOUND"""
+  quantifiedSubstances: [ChemicalSubstance!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: OUT, properties: "QuantitativeContentProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS (owner W02); FDC nutrient rows target Nutrient when W02 types them so"""
+  quantifiedNutrients: [Nutrient!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: OUT, properties: "QuantitativeContentProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (owner W00); FDC_ID, NDB_NUMBER, FOODON_IRI scoped to their issuer"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted (owner W17 SafetyEdgeProperties); cardinality: many; catalog: HAS_SAFETY_SIGNAL; live FoodItem.hasSafetySignals"""
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyEdgeProperties")
+  """class: structural (inverse view); cardinality: many; catalog: HAS_EXPOSURE_AGENT"""
+  characterizedExposures: [Exposure!]! @relationship(type: "HAS_EXPOSURE_AGENT", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+A characterized exposure: a reusable, source-stated description of contact with one or more agents by a route, for a
+duration class (and duration when stated), at an intensity with a unit and basis, in a setting and medium. Example:
+"dietary selenium intake, oral, lifetime, mg/kg-day" as characterized by EPA IRIS (Yang et al. 1989b). It is an
+Entity whose identity is the characterization tuple (agents, route, durationCategory, durationIso, intensity value,
+unit and basis, setting, medium), recorded as characterizationHash; any change of the tuple is a new Exposure.
+It is NOT an occurrence of anyone's exposure (no person, cohort member or date of contact), NOT a protocol step (a W16
+ProtocolStep prescribes doing something; it never establishes a characterized exposure), NOT a study arm or study
+intervention (W09), NOT a reference value or hazard verdict (statements such as an RfD are Assertions with this node as
+subject, W17/W10), and NOT a mechanism evidence context (W03 MechanismEvidenceContext is the Occurrence of one tested
+exposure group). Null characterization fields mean not stated; notReportedFields lists fields a source explicitly
+leaves unreported. CQ-EV-04 (EXPOSURE dimension), CQ-FL-C02, CQ-FL-C03. Candidate module food_lifestyle_exposure.
+Archetype Entity.
+"""
+type Exposure implements Entity & EntityArchetype
+  @node(labels: ["Exposure", "Entity"]) {
+  id: ID! @id
+  "hu:exposure:<opaque> (token requested, W05-SR-01)."
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Exposure'."
+  entityType: String!
+  "sha256:<hex> over the canonical characterization tuple (07-operations.md, exposure-tuple/v1); idempotence key; immutable."
+  characterizationHash: String
+  "Setting; null = not recorded. Replaces live exposureType/exposureContext free text."
+  setting: ExposureSetting
+  "Route; NOT_STATED when the source is silent. Never inferred from the agent or the medium."
+  route: ExposureRoute
+  "Medium or vehicle as stated ('diet', 'drinking water', 'ambient air'); null = not stated."
+  mediumText: String
+  durationCategory: ExposureDurationCategory
+  "Verbatim duration wording ('based on lifetime exposure'); preserves the source's own class definition."
+  durationText: String
+  "ISO 8601 duration when the source states a numeric duration (P16W); null = not stated."
+  durationIso: String
+  "Intensity value as stated or calculated by the source; null = not stated. Never 0 for unknown."
+  intensityValue: Float
+  "UCUM unit of intensityValue (mg/kg/d, ug/d, ug/m3); required with intensityValue (V-W05-03)."
+  intensityUnitCode: String
+  "Basis of intensityValue, reusing W03's ExposureBasis (PER_KG_BODY_WEIGHT_PER_DAY, ABSOLUTE_PER_DAY, SINGLE_DOSE, MEDIUM_CONCENTRATION, DIET_CONCENTRATION); required with intensityValue."
+  intensityBasis: ExposureBasis
+  "Verbatim intensity wording, including assumptions such as 'average adult body weight of 55 kg'."
+  intensityText: String
+  "Verbatim frequency wording when the exposure is episodic ('4-7 times per week'); recurrence structures belong to W16 schedules."
+  frequencyText: String
+  "Names of characterization fields the source explicitly does not report (for example ['route']); distinct from null (not extracted)."
+  notReportedFields: [String!]
+
+  """class: structural; cardinality: one_or_more; catalog: HAS_EXPOSURE_AGENT (new name for the Exposure use of live INVOLVES; owner W05). orderIndex orders a multi-agent characterization."""
+  agents: [ExposureAgentTarget!]! @relationship(type: "HAS_EXPOSURE_AGENT", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A practice concept: a repeatable behaviour or way of living that sources describe, recommend, report doing or study
+(sauna bathing, time-restricted eating, resistance training, a cardioprotective dietary pattern as a generic idea). It
+is NOT a specific defined regimen with steps, schedule and editions (that is a W16 Protocol/ProtocolEdition, which may
+cite this concept), NOT a characterized exposure (an Exposure may name this practice as its agent, carrying route,
+duration and intensity), NOT a person's adherence or history (private, outside the graph), and NOT a recommendation by
+anyone: who reports doing it versus who recommends it lives on Assertions with speechAct REPORTS_PRACTICE versus
+RECOMMENDS (INV forbidden implication REPORTS_PRACTICE -> RECOMMENDS). Live intensitySummary and exposurePattern move to
+Exposure (migration-map.yaml). lifestyleClass and lifestyleDomain are display facets, never a taxonomy. Mechanism,
+condition and outcome links are read-only derived projections owned by W03 (W05-SR-05). CQ-RC-05, CQ-FL-C03,
+CQ-FL-C04. Candidate module food_lifestyle_exposure. Archetype Entity.
+"""
+type Lifestyle implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Lifestyle", "Entity"])
+  @fulltext(indexes: [{indexName: "LifestyleSearch", fields: ["name", "description", "searchText", "lifestyleClass"], queryName: "searchLifestyles"}]) {
+  id: ID! @id
+  "hu:lifestyle:<opaque> (token requested, W05-SR-01)."
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Lifestyle'."
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Display facet (live). Not identity, not a taxonomy."
+  lifestyleClass: String
+  "Display facet (live: diet, sleep, activity, thermal ...). Not identity, not a taxonomy."
+  lifestyleDomain: String
+
+  """class: structural (inverse view); cardinality: many; catalog: HAS_EXPOSURE_AGENT"""
+  characterizedExposures: [Exposure!]! @relationship(type: "HAS_EXPOSURE_AGENT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: derived (W03 mx-proj/v1, read-only); catalog: AFFECTS_MECHANISM; domain extension to Lifestyle requested (W05-SR-05)"""
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (W03 one-to-one projection, read-only); catalog: ASSOCIATED_WITH_CONDITION (W05-SR-05)"""
+  associatedWithConditions: [Condition!]! @relationship(type: "ASSOCIATED_WITH_CONDITION", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (W03 one-to-one projection, read-only); catalog: ASSOCIATED_WITH_OUTCOME (W05-SR-05)"""
+  associatedWithOutcomes: [Outcome!]! @relationship(type: "ASSOCIATED_WITH_OUTCOME", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: asserted (owner W17); cardinality: many; catalog: HAS_SAFETY_SIGNAL; live Lifestyle.hasSafetySignals"""
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyEdgeProperties")
+  """class: derived (owner W20, read-only); catalog: SUPPORTED_BY_DOCUMENT; never source support by itself"""
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (owner W20, read-only); catalog: SUPPORTED_BY_CHUNK; a chunk match is not source support"""
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+}

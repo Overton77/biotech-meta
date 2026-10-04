@@ -1,0 +1,5 @@
+Source: https://www.accessdata.fda.gov/drugsatfda_docs/nda/2017/209176orig1s000medr.pdf and https://www.accessdata.fda.gov/drugsatfda_docs/nda/2019/209176Orig1s007.pdf
+Captured: 2026-10-04 via Firecrawl web search (SEARCH_EXTRACT; PDFs not opened).
+Search description 1 (209176Orig1s000 medical review): "This review concludes that there is adequate evidence to recommend an approval of edaravone for the indication of the treatment of Amyotrophic ..."
+Search description 2 (NDA 209176/S-007): "RADICAVA is a prescription medicine used to treat people with Amyotrophic Lateral Sclerosis (ALS). It is not known if RADICAVA is safe and ..."
+Cannot establish from these extracts: approval date, applicant name, the action letter, or orphan exclusivity for this NDA.

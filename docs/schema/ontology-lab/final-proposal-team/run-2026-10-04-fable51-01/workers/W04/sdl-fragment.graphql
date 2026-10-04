@@ -1,0 +1,628 @@
+# =====================================================================================================================
+# W04 Products, formulations and labels -- SDL fragment (worker packet, not the final schema)
+# Run: run-2026-10-04-fable51-01. Worker: W04 (Opus 5.5). Synthesizer: Fable 5.1.
+# Catalog modules: products_and_commerce (product identity: Product, ProductVariant, PackageConfiguration,
+#   HAS_VARIANT, HAS_PACKAGE_CONFIGURATION, IDENTIFIED_BY), products_and_formulations (FormulationVersion,
+#   IngredientComponent, HAS_FORMULATION_VERSION, HAS_INGREDIENT_COMPONENT, NESTED_COMPONENT, USES_MATERIAL,
+#   CONTAINS, CONTAINS_COMPOUND_FORM), labels (LabelSnapshot, LabelDeclaration, ServingDefinition,
+#   QuantityDeclaration and their edges). Live compatibility type: ProductSnapshot.
+# CQs: CQ-ID-01, CQ-ID-02, CQ-ID-03, CQ-ID-05, CQ-PF-01, CQ-PF-02, CQ-PF-03 (endpoints), CQ-AX-17, CQ-AX-25,
+#   CQ-TM-01/02/05 (HAS_FORMULATION_VERSION episodes); candidates CQ-PF-C01..C03 (see 02-cq-coverage.md).
+# Authority digest: catalog/schema.yaml 0.2.0 sha256 8fb50ff0...84f0 (8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0).
+# Contract: 01-shared-contract.md section B. No `extend`. Types owned by other workers are referenced by name only:
+#   W00 Entity, SearchIndexable, TemporalSnapshot, *Archetype interfaces, AssertedEdgeProperties, StateEpisodeProperties,
+#   DerivedEdgeProperties, StructuralEdgeProperties, IdentifierLinkProperties, TradeItemIdentifier and kernel enums;
+#   W01 Organization; W02 IngredientMaterial, ChemicalForm; W07 PanelDefinition, LabTest; W08 TechnologyPlatform,
+#   Device, ToolOrInstrument, UsageEdgeProperties; W13 RegulatoryPathway, RegulatoryStatus; W15 MerchantListing;
+#   W17 SafetySignal, SafetyEdgeProperties; W20 Document, Chunk, DerivedSupportProperties.
+# Cardinality and class live in field descriptions and are enforced by the operations/validation layer, not by SDL.
+# =====================================================================================================================
+
+"""
+The enduring marketed concept (the brand-level product such as "Basis" or "Tru Niagen"), stable across reformulations,
+renamings of variants, package changes and merchants. It is NOT a variant (consumer-distinguishable strength, dosage form,
+flavor or jurisdiction), NOT a formulation (time-bounded composition), NOT a package (count, net quantity), NOT a listing
+or offer, and NOT an approval or a regulatory classification. Composition, label and regulatory facts on this type are
+display projections only (INV-005, V-322). Serves CQ-ID-01, CQ-ID-05, CQ-AX-17, CQ-AX-25 (via variants). Canonical
+module products_and_commerce. Archetype Entity.
+"""
+type Product implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Product", "Entity"])
+  @fulltext(indexes: [{indexName: "ProductSearch", fields: ["name", "description", "searchText", "productType", "productClass", "primaryRegulatoryIdentifier", "regulatoryAuthorizationId"], queryName: "searchProducts"}]) {
+  id: ID! @id
+  "hu:product:<opaque>; uniqueness from the operations file (live_product_uid)."
+  uid: String!
+  "Presentation only; never identity (D-013 nullable)."
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Product'."
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Regenerable embedding of name/description/searchText for QS-8 candidate lookup (INV-107); never evidence. Vector index added by Fable only (D-014)."
+  searchEmbedding: [Float!]
+  "How the product is marketed (commercial kind as presented by its marketer). Not a regulatory classification; jurisdictional status is RegulatoryStatus (W13). Null = not recorded."
+  productKind: ProductKind
+  "DEPRECATED legacy free-text kind; migrated into productKind where mappable. Kept for the ProductSearch index and old clients."
+  productType: String
+  "Legacy display text (current materialized fact); not authoritative, no CQ depends on it."
+  applicationContext: String
+  "Display tags; not a taxonomy and never identity."
+  categories: [String!]
+  "Derived display (YEAR precision) of the earliest accepted MARKETS_PRODUCT assertion validFrom. A store record creation date is not a launch date. Not settable through the API."
+  launchYear: Int @settable(onCreate: false, onUpdate: false)
+  "Legacy display text."
+  targetCustomer: String
+  "Legacy display text."
+  deliveryModel: String
+  "Derived display. APPROVED only when a RegulatoryStatus{statusKind: APPROVAL} is STATUS_OF this product and is named in regulatoryProjectionStatusUids (V-322). Development stages are company statements, not approval."
+  status: ProductStatus @settable(onCreate: false, onUpdate: false)
+  "Derived display of the APPROVAL status year (V-322 / V-W04-03)."
+  approvedYear: Int @settable(onCreate: false, onUpdate: false)
+  "Legacy display text (in ProductSearch)."
+  productClass: String
+  "Display text only (INV-005). Composition is authoritative only through FormulationVersion and IngredientComponent; never parse this."
+  formulationSummary: String @settable(onCreate: false, onUpdate: false)
+  "Legacy display text; indications are claims (Assertions, W21) or approved-use records (W13), never this field."
+  indicationSummary: String
+  "Legacy display text."
+  modalitySummary: String
+  "Derived display of an Identifier on the projected RegulatoryStatus/RegulatorySubmission (W13)."
+  regulatoryAuthorizationId: String @settable(onCreate: false, onUpdate: false)
+  "Derived display of the primary Identifier (HAS_IDENTIFIER, W00). A string match here is a candidate, never identity (CQ-ID-04)."
+  primaryRegulatoryIdentifier: String @settable(onCreate: false, onUpdate: false)
+  "uids of the RegulatoryStatus records that status, approvedYear and regulatoryAuthorizationId project (V-322 / V-W04-03). Empty = no regulatory projection."
+  regulatoryProjectionStatusUids: [String!] @settable(onCreate: false, onUpdate: false)
+  "Materialization timestamp of the display fields (operational). Answers state lastObservedAt, not 'current'."
+  currentAsOf: DateTime
+
+  """class: asserted; cardinality: one_or_more (zero allowed for legacy nodes); catalog: HAS_VARIANT (products_and_commerce); temporalCardinality NONEXCLUSIVE"""
+  variants: [ProductVariant!]! @relationship(type: "HAS_VARIANT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural (legacy TemporalSnapshot seam, round 0007 section 12); cardinality: many; read-only cache of first episodes"""
+  snapshots: [ProductSnapshot!]! @relationship(type: "HAS_SNAPSHOT", direction: OUT) @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; catalog: CONTAINS (Product -> IngredientMaterial); rule contains-v1 over all variants' believed formulation versions; never filtered on alone (CQ-AX-25)"""
+  containsMaterials: [IngredientMaterial!]! @relationship(type: "CONTAINS", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; catalog: CONTAINS_COMPOUND_FORM (Product -> ChemicalForm, round 0002 R11, D-002); rule contains-form-v1; live DoseMetadata moved to IngredientComponent"""
+  containsCompoundForms: [ChemicalForm!]! @relationship(type: "CONTAINS_COMPOUND_FORM", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: legacy read-only (live OFFERS, RoleMetadata dropped); cardinality: many; successor SELLS_PRODUCT derived from SELLER_OF_RECORD_FOR (W15, INV-306); returned as LEGACY_UNDATED"""
+  offeredBy: [Organization!]! @relationship(type: "OFFERS", direction: IN) @settable(onCreate: false, onUpdate: false)
+  """class: legacy read-only (live MANUFACTURES); cardinality: many; successor is the asserted manufacturing predicate chosen by W01/W11 (seam W04-SR-07)"""
+  manufacturedBy: [Organization!]! @relationship(type: "MANUFACTURES", direction: IN) @settable(onCreate: false, onUpdate: false)
+  """class: legacy read-only (live CONTRACTS_MANUFACTURING); cardinality: many; seam W04-SR-07"""
+  contractManufacturedBy: [Organization!]! @relationship(type: "CONTRACTS_MANUFACTURING", direction: IN) @settable(onCreate: false, onUpdate: false)
+  """class: legacy read-only (live LISTS_PRODUCT whose two sides declared different property types); cardinality: many; successor LISTING_FOR -> ProductVariant | PackageConfiguration (W15)"""
+  listedIn: [MerchantListing!]! @relationship(type: "LISTS_PRODUCT", direction: IN) @settable(onCreate: false, onUpdate: false)
+  """class: asserted; cardinality: many; catalog: IMPLEMENTS_PLATFORM (W08; live IMPLEMENTS renamed)"""
+  implementsPlatforms: [TechnologyPlatform!]! @relationship(type: "IMPLEMENTS_PLATFORM", direction: OUT, properties: "UsageEdgeProperties")
+  """class: legacy read-only (live CLASSIFIED_AS to union ProductClassification); cardinality: many; seam W04-SR-08 (a product classified as a device is a product-kind or device-model question for W08)"""
+  classifiedAsDevices: [Device!]! @relationship(type: "CLASSIFIED_AS", direction: OUT) @settable(onCreate: false, onUpdate: false)
+  """class: legacy read-only (live CLASSIFIED_AS); cardinality: many; seam W04-SR-08"""
+  classifiedAsInstruments: [ToolOrInstrument!]! @relationship(type: "CLASSIFIED_AS", direction: OUT) @settable(onCreate: false, onUpdate: false)
+  """class: asserted; cardinality: many; catalog: IMPLEMENTS_PANEL (relationship type owned by W15; consumer test products remain Product)"""
+  implementsPanels: [PanelDefinition!]! @relationship(type: "IMPLEMENTS_PANEL", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; live DELIVERS_LABTEST (relationship owner unassigned in the registry; seam W04-SR-09)"""
+  deliversLabTests: [LabTest!]! @relationship(type: "DELIVERS_LABTEST", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived read-only; cardinality: many; live FOLLOWS_PATHWAY; derived from RegulatorySubmission UNDER_PATHWAY (W13)"""
+  followsRegulatoryPathways: [RegulatoryPathway!]! @relationship(type: "FOLLOWS_PATHWAY", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived read-only; cardinality: many; live HAS_REGULATORY_STATUS; projection of RegulatoryStatus STATUS_OF assertions (W13); registration is never a product status (V-323)"""
+  hasRegulatoryStatuses: [RegulatoryStatus!]! @relationship(type: "HAS_REGULATORY_STATUS", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: asserted; cardinality: many; catalog: HAS_SAFETY_SIGNAL (W17)"""
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyEdgeProperties")
+}
+
+"""
+A consumer-distinguishable realization of a Product: labeled strength per dosage unit, dosage form, flavor or jurisdiction
+that consumers, regulators or commerce systems distinguish (round 0001 Candidate B). Example: "Tru Niagen 300mg capsule
+(US)" versus "Tru Niagen 150mg capsule (US)" (same 300 mg serving, different unit strength). It is NOT a package count
+(PackageConfiguration), NOT a formulation (time-bounded composition attached by HAS_FORMULATION_VERSION) and does NOT stand
+for its current formulation when a study names it (round 0002 R1; INV-201). Serves CQ-ID-01, CQ-ID-02, CQ-ID-05, CQ-PF-02,
+CQ-AX-17, CQ-AX-25. Canonical module products_and_commerce. Archetype Entity.
+"""
+type ProductVariant implements Entity & EntityArchetype
+  @node(labels: ["ProductVariant", "Entity"]) {
+  id: ID! @id
+  "hu:product-variant:<opaque>"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'ProductVariant'."
+  entityType: String!
+  "Labeled strength as marketed (verbatim, e.g. '300 mg NIAGEN per capsule'); composition is on the formulation version."
+  strengthDescriptor: String
+  "Dosage form of the marketed unit (e.g. CAPSULE, POWDER_STICK_PACK); receives the dosage-form part of live CompoundForm (D-002). Controlled list pending (seam W04-SR-10)."
+  dosageForm: String
+  flavor: String
+  "Jurisdiction in which the variant is marketed (ISO 3166-1 alpha-2, or 'EU'); null = not recorded, never 'global'."
+  jurisdiction: String
+
+  """class: asserted; cardinality: exactly_one (service-enforced); catalog: HAS_VARIANT"""
+  product: [Product!]! @relationship(type: "HAS_VARIANT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_PACKAGE_CONFIGURATION; temporalCardinality NONEXCLUSIVE (30, 90 counts sold concurrently)"""
+  packageConfigurations: [PackageConfiguration!]! @relationship(type: "HAS_PACKAGE_CONFIGURATION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many episodes, at most one believed per (valid time, recorded time, jurisdiction); catalog: HAS_FORMULATION_VERSION; predicateExclusivity EXCLUSIVE partitionBy jurisdiction (V-508, V-509)"""
+  formulationVersions: [FormulationVersion!]! @relationship(type: "HAS_FORMULATION_VERSION", direction: OUT, properties: "FormulationEdgeProperties")
+  """class: asserted; cardinality: many; catalog: IDENTIFIED_BY (GTIN/UPC, retailer SKU, NSF Product ID as TradeItemIdentifier)"""
+  tradeItemIdentifiers: [TradeItemIdentifier!]! @relationship(type: "IDENTIFIED_BY", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: LABEL_FOR (LabelSnapshot -> ProductVariant)"""
+  labelSnapshots: [LabelSnapshot!]! @relationship(type: "LABEL_FOR", direction: IN, properties: "AssertedEdgeProperties")
+  """class: derived; cardinality: many; catalog: CONTAINS (ProductVariant -> IngredientMaterial); rule contains-v1; regenerable; never the only history (V-004, V-W04-02)"""
+  containsMaterials: [IngredientMaterial!]! @relationship(type: "CONTAINS", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A package configuration of a variant: package form, unit count and net quantity (for example a bottle of 30 vegetarian
+capsules, GTIN 850015311857, versus a bottle of 90, GTIN 850015311895). Immutable payload attached to the variant by an
+asserted, NONEXCLUSIVE HAS_PACKAGE_CONFIGURATION episode; a count change is a new configuration and a bounded episode, never
+a new FormulationVersion. A multi-bottle kit offered as a "size" is a Bundle of configurations (W15), not a configuration.
+Serves CQ-ID-05, CQ-PF-02, CQ-PF-03 (scope endpoint), CQ-AX-17. Canonical module products_and_commerce. Archetype
+VersionedState.
+"""
+type PackageConfiguration implements Entity & VersionedStateArchetype
+  @node(labels: ["PackageConfiguration", "VersionedState"]) {
+  id: ID! @id
+  "hu:package-configuration:<opaque> (token requested, W04-SR-01)"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'PackageConfiguration'."
+  stateType: String!
+  "sha256:<hex> over the canonical payload (packageForm, unitCount, unitDescription, netQuantity, netQuantityUnit) (D-016)."
+  payloadHash: String!
+  "Source-stated payload bounds only; query validity comes from the attachment episode."
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "e.g. BOTTLE, BLISTER, STICK_PACK_CARTON, POUCH (free text until a controlled list is ruled)."
+  packageForm: String
+  "Count of dosage units in the package (capsules, stick packs). Null = not stated."
+  unitCount: Int
+  "Unit noun as printed ('vegetarian capsules')."
+  unitDescription: String
+  "Net quantity of contents when stated by weight or volume."
+  netQuantity: Float
+  "UCUM code for netQuantity (g, mL)."
+  netQuantityUnit: String
+
+  """class: asserted; cardinality: one_or_more (service-enforced); catalog: HAS_PACKAGE_CONFIGURATION"""
+  variants: [ProductVariant!]! @relationship(type: "HAS_PACKAGE_CONFIGURATION", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: IDENTIFIED_BY (GTIN per package; GS1 assigns a new GTIN when the count changes)"""
+  tradeItemIdentifiers: [TradeItemIdentifier!]! @relationship(type: "IDENTIFIED_BY", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: LABEL_FOR (LabelSnapshot -> PackageConfiguration)"""
+  labelSnapshots: [LabelSnapshot!]! @relationship(type: "LABEL_FOR", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+Live compatibility type: a frozen display payload of Product facts with the live TemporalSnapshot fields cached from its
+first HAS_STATE-style episode (round 0007 section 12). One node per episode; payload never changes after commit except the
+single recordedTo write (V-513). It is NOT a formulation (formulationSummary is display text, INV-005), NOT a regulatory
+record (status/approvedYear are YEAR-precision display projections, V-322) and NOT evidence. Serves CQ-TM-01/CQ-TM-04 for
+legacy data only; new writes use Assertions and FormulationVersion. Canonical module: live seam (catalog liveSeamTypes).
+Archetype VersionedState.
+"""
+type ProductSnapshot implements Entity & VersionedStateArchetype & SearchIndexable & TemporalSnapshot
+  @node(labels: ["ProductSnapshot", "VersionedState"])
+  @fulltext(indexes: [{indexName: "ProductSnapshotSearch", fields: ["name", "description", "searchText"], queryName: "searchProductSnapshots"}]) {
+  id: ID! @id
+  "hu:product-snapshot:<opaque> (token requested, W04-SR-01)"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'ProductSnapshot'."
+  stateType: String!
+  "sha256:<hex> over the display payload; re-instatement creates a new node with the same payloadHash."
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Cache of the first episode's valid start (null = unknown)."
+  validFrom: DateTime
+  validTo: DateTime
+  "Cache of the first episode's recorded start; service-assigned, never backdated."
+  recordedFrom: DateTime
+  recordedTo: DateTime
+  snapshotType: String
+  productType: String
+  applicationContext: String
+  categories: [String!]
+  launchYear: Int
+  targetCustomer: String
+  deliveryModel: String
+  status: ProductStatus
+  approvedYear: Int
+  productClass: String
+  "Display text only (INV-005)."
+  formulationSummary: String
+  indicationSummary: String
+  modalitySummary: String
+  regulatoryAuthorizationId: String
+  searchEmbedding: [Float!]
+  "Assertions this snapshot projects (round 0007 section 12)."
+  assertionUids: [String!]
+
+  """class: structural (legacy); cardinality: exactly_one; HAS_SNAPSHOT from Product"""
+  product: [Product!]! @relationship(type: "HAS_SNAPSHOT", direction: IN) @settable(onCreate: false, onUpdate: false)
+  """class: derived read-only; cardinality: many; W20 SUPPORTED_BY_DOCUMENT shortcut naming its locator"""
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived read-only; cardinality: many; W20 SUPPORTED_BY_CHUNK shortcut naming its locator (INV-404)"""
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A time-bounded composition of one variant in one jurisdiction: an immutable payload (its IngredientComponents and the
+ServingDefinition their per-serving amounts refer to) attached to the variant by asserted, bitemporal, EXCLUSIVE
+HAS_FORMULATION_VERSION episodes. Any composition change (material, amount, basis, serving size) is a new version; a label
+text change that does not establish a composition change is not (it is a new LabelSnapshot, CQ-ID-05). A correction makes a
+replacement version and closes the old episode in recorded time (SOURCE_CORRECTION); a reformulation bounds the old episode
+in valid time (VALIDITY_BOUNDED) (round 0007). It is NOT a measured composition (INV-006), NOT a lot, NOT a study
+intervention. Serves CQ-ID-01, CQ-ID-02, CQ-ID-05, CQ-AX-17, CQ-AX-25, CQ-TM-01/02/05. Canonical module
+products_and_formulations. Archetype VersionedState.
+"""
+type FormulationVersion implements Entity & VersionedStateArchetype
+  @node(labels: ["FormulationVersion", "VersionedState"]) {
+  id: ID! @id
+  "hu:formulation:<opaque>"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'FormulationVersion'."
+  stateType: String!
+  "sha256:<hex> over the canonical composition payload: jurisdiction, serving (count, unit) and, per component in labelOrder, material uid, role, quantity, unitCode, quantityBasis, massBasis, amountReferent, nesting. declaredAs and versionName are excluded (label text is not composition)."
+  payloadHash: String!
+  "Source-stated effective bounds (e.g. 'new formula from lot X'); query validity comes from the attachment episode."
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Human label, e.g. 'Basis US label observed 2026-07-10'; never identity."
+  versionName: String
+  "Jurisdiction whose label or specification states this composition; exclusivity partition key (with FormulationEdgeProperties.jurisdiction)."
+  jurisdiction: String
+
+  """class: asserted; cardinality: one_or_more variants; catalog: HAS_FORMULATION_VERSION"""
+  variants: [ProductVariant!]! @relationship(type: "HAS_FORMULATION_VERSION", direction: IN, properties: "FormulationEdgeProperties")
+  """class: structural; cardinality: one_or_more; catalog: HAS_INGREDIENT_COMPONENT; orderIndex = label order"""
+  components: [IngredientComponent!]! @relationship(type: "HAS_INGREDIENT_COMPONENT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: USES_SERVING_DEFINITION (domain extended to FormulationVersion, decision W04-D07): the serving that PER_SERVING component amounts refer to; part of the payload"""
+  servingDefinition: [ServingDefinition!]! @relationship(type: "USES_SERVING_DEFINITION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: DECLARES_FORMULATION (LabelSnapshot -> FormulationVersion)"""
+  declaredByLabels: [LabelSnapshot!]! @relationship(type: "DECLARES_FORMULATION", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A contextual component inside one FormulationVersion: role, label order, declared quantity with unit, quantity basis, mass
+basis and amount referent, and nesting under a blend. It points to the IngredientMaterial it uses (USES_MATERIAL, W02 owns
+the material). It is NOT the material identity, NOT a measured amount (INV-006), and its amount refers to amountReferent
+(INV-307): a salt-form label amount is never an active-moiety amount (active moiety is a CALCULATED Assertion). Serves
+CQ-PF-01, CQ-ID-03, CQ-AX-17, CQ-AX-25. Canonical module products_and_formulations. Archetype VersionedState.
+"""
+type IngredientComponent implements Entity & VersionedStateArchetype
+  @node(labels: ["IngredientComponent", "VersionedState"]) {
+  id: ID! @id
+  "hu:component:<opaque>"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'IngredientComponent'."
+  stateType: String!
+  "sha256:<hex> over the composition fields below except declaredAs."
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "DIETARY_INGREDIENT, OTHER_INGREDIENT, PROPRIETARY_BLEND, BLEND_CONSTITUENT, CAPSULE_SHELL ... (controlled list pending, W04-SR-10; live DoseMetadata.role)."
+  role: String
+  "1-based order on the label panel."
+  labelOrder: Int
+  "Declared amount (live DoseMetadata.dose). Null with amountReferent NOT_STATED = no amount stated (not zero)."
+  quantity: Float
+  "UCUM unit (live DoseMetadata.doseUnit)."
+  unitCode: String
+  "PER_SERVING for US Supplement Facts amounts; the serving is the version's ServingDefinition."
+  quantityBasis: QuantityBasis
+  "SALT_FORM, ACTIVE_MOIETY, MATERIAL_AS_IS or UNSPECIFIED; required when quantity is set (V-W04-05). A label line naming the salt gives SALT_FORM; a line naming a material without its salt gives MATERIAL_AS_IS."
+  massBasis: MassBasis
+  "Which entity the amount refers to (21 CFR 101.36(b)(2)(ii), (b)(3)(ii), proprietary blend total); never ACTIVE_MOIETY (V-330)."
+  amountReferent: AmountReferent
+  "Ingredient text as printed (live DoseMetadata.componentName); display, excluded from payloadHash."
+  declaredAs: String
+  "True for (b)(2)/(b)(3) dietary ingredients; false for other ingredients (excipients); null = not classified."
+  isDietaryIngredient: Boolean
+
+  """class: structural; cardinality: exactly_one; catalog: HAS_INGREDIENT_COMPONENT"""
+  formulationVersion: [FormulationVersion!]! @relationship(type: "HAS_INGREDIENT_COMPONENT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: NESTED_COMPONENT (blend -> constituent component)"""
+  nestedComponents: [IngredientComponent!]! @relationship(type: "NESTED_COMPONENT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: NESTED_COMPONENT (inverse)"""
+  parentComponent: [IngredientComponent!]! @relationship(type: "NESTED_COMPONENT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: exactly_one (V-005); catalog: USES_MATERIAL"""
+  material: [IngredientMaterial!]! @relationship(type: "USES_MATERIAL", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+A captured product label: a SourceSnapshot specialization (same node, same `hu:snapshot:` uid) whose content is a label
+panel for a variant or package, with jurisdiction, language and label version text. Immutable like every snapshot; a new
+capture is a new node. It is NOT a formulation (its content is a declaration; DECLARES_FORMULATION is an assertion), NOT a
+measured result (INV-006) and NOT a study intervention. Stored property names of the SourceSnapshot fields follow W00's
+SourceSnapshot. Serves CQ-PF-01, CQ-PF-02, CQ-ID-02, CQ-ID-05, QS-7 (NOT_DECLARED_IN_COVERING_SOURCE). Canonical module
+labels. Archetype InformationArtifact.
+"""
+type LabelSnapshot implements Entity & InformationArtifactArchetype
+  @node(labels: ["LabelSnapshot", "SourceSnapshot", "InformationArtifact"]) {
+  id: ID! @id
+  "hu:snapshot:<opaque> (the capture's identity; token mapping requested, W04-SR-01)"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'LabelSnapshot'."
+  artifactType: String!
+  "Issue time stated by the source; null for most label pages."
+  publishedAt: DateTime
+  "When the content is known to have been displayed (archive capture time for late sources)."
+  observedAt: DateTime
+  "sha256:<hex>; basis in contentHashBasis."
+  contentHash: String
+  "When BellLabs fetched the bytes (W00 SourceSnapshot field)."
+  retrievedAt: DateTime
+  contentHashBasis: ContentHashBasis
+  captureCompleteness: CaptureCompleteness
+  canonicalUri: String
+  storageUri: String
+  archiveUri: String
+  mimeType: String
+  language: String
+  "Jurisdiction of the label (US Supplement Facts = 'US')."
+  jurisdiction: String
+  "Any version marker printed on the label (lot-independent revision code), verbatim; null = none printed."
+  labelVersionText: String
+
+  """class: asserted; cardinality: zero_or_one variant; catalog: LABEL_FOR"""
+  labelForVariants: [ProductVariant!]! @relationship(type: "LABEL_FOR", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_one package; catalog: LABEL_FOR; required when the label states servings per container (V-W04-07)"""
+  labelForPackages: [PackageConfiguration!]! @relationship(type: "LABEL_FOR", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_one; catalog: DECLARES_FORMULATION"""
+  declaresFormulations: [FormulationVersion!]! @relationship(type: "DECLARES_FORMULATION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_DECLARATION; orderIndex = panelOrder"""
+  declarations: [LabelDeclaration!]! @relationship(type: "HAS_DECLARATION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: USES_SERVING_DEFINITION"""
+  servingDefinitions: [ServingDefinition!]! @relationship(type: "USES_SERVING_DEFINITION", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+One declaration line or statement captured from a label panel, verbatim ("Elysium NR (Nicotinamide Riboside Chloride)
+250 mg"), with its kind and panel order. It records what the label says; the material it names is an asserted
+DECLARATION_IDENTIFIES_MATERIAL link, and its amount is a QuantityDeclaration. It is NOT measured composition (INV-006, V-011),
+NOT an IngredientComponent and NOT a listing title (forbidden LISTING_TITLE_AMOUNT -> LABEL_DECLARED_AMOUNT). Serves CQ-PF-01,
+CQ-PF-02, CQ-ID-03, CQ-ID-05. Canonical module labels. Archetype InformationArtifact.
+"""
+type LabelDeclaration implements Entity & InformationArtifactArchetype
+  @node(labels: ["LabelDeclaration", "InformationArtifact"]) {
+  id: ID! @id
+  "hu:label-declaration:<opaque>"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'LabelDeclaration'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  "sha256:<hex> of verbatimText under NFC-WS1."
+  contentHash: String
+  "The declaration exactly as printed (not normalized, not corrected)."
+  verbatimText: String
+  declarationKind: DeclarationKind
+  "1-based order within the panel."
+  panelOrder: Int
+
+  """class: structural; cardinality: exactly_one; catalog: HAS_DECLARATION"""
+  labelSnapshot: [LabelSnapshot!]! @relationship(type: "HAS_DECLARATION", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: zero_or_one; catalog: DECLARATION_IDENTIFIES_MATERIAL"""
+  identifiesMaterials: [IngredientMaterial!]! @relationship(type: "DECLARATION_IDENTIFIES_MATERIAL", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: HAS_QUANTITY_DECLARATION"""
+  quantityDeclarations: [QuantityDeclaration!]! @relationship(type: "HAS_QUANTITY_DECLARATION", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+The amount stated by one label declaration: value, UCUM unit, basis, percent daily value and its reported status, and the
+amountReferent that says what entity the amount weighs (21 CFR 101.36). It is NOT a calculated active-moiety or nutrient
+equivalent amount (those are CALCULATED Assertions, INV-307, V-330) and NOT a measurement (INV-006). Serves CQ-PF-01, CQ-PF-02,
+CQ-AX-17. Canonical module labels. Archetype InformationArtifact.
+"""
+type QuantityDeclaration implements Entity & InformationArtifactArchetype
+  @node(labels: ["QuantityDeclaration", "InformationArtifact"]) {
+  id: ID! @id
+  "hu:quantity-declaration:<opaque> (token requested, W04-SR-01)"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'QuantityDeclaration'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  "Declared amount as printed; null with amountReferent NOT_STATED."
+  value: Float
+  "UCUM unit as printed (mg, mcg, g)."
+  unitCode: String
+  "Basis of the amount (US Supplement Facts: PER_SERVING). Catalog property `basis` (renamed for uniformity, migration-map)."
+  quantityBasis: QuantityBasis
+  "Percent daily value as printed; null when not printed."
+  dailyValuePercent: Float
+  "REPORTED (a percent is printed), NOT_APPLICABLE (label states 'Daily Value not established'), NOT_REPORTED (panel silent). Keeps 'not established' distinct from missing (INV-007)."
+  dailyValueStatus: ReportedStatus
+  "Referent of the amount; never ACTIVE_MOIETY / NUTRIENT_EQUIVALENT (V-330)."
+  amountReferent: AmountReferent
+  "uid of the IngredientMaterial, Nutrient, Constituent or blend component the amount weighs; null = unresolved."
+  amountReferentUid: String
+
+  """class: structural; cardinality: exactly_one; catalog: HAS_QUANTITY_DECLARATION"""
+  declaration: [LabelDeclaration!]! @relationship(type: "HAS_QUANTITY_DECLARATION", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+A serving definition: serving count and unit noun ("2 Vegetarian Capsules") and, only when it belongs to a package label,
+the stated servings per container. Attached structurally to a LabelSnapshot (what the label states) and to a
+FormulationVersion (the serving that PER_SERVING amounts refer to; then servingsPerContainer is null because servings per
+container is a package fact, 21 CFR 101.36(b)(1)(ii); V-W04-07). It is NOT a dose recommendation, NOT a protocol schedule and
+NOT a person's intake. Serves CQ-PF-01, CQ-AX-17, CQ-PF-C02. Canonical module labels. Archetype VersionedState.
+"""
+type ServingDefinition implements Entity & VersionedStateArchetype
+  @node(labels: ["ServingDefinition", "VersionedState"]) {
+  id: ID! @id
+  "hu:serving-definition:<opaque> (token requested, W04-SR-01)"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'ServingDefinition'."
+  stateType: String!
+  "sha256:<hex> over servingCount, unitDescription, servingsPerContainer."
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Dosage units per serving (2 for 'Serving Size: 2 Vegetarian Capsules')."
+  servingCount: Float
+  "Unit noun as printed ('Vegetarian Capsules'); 101.36(b)(1)(i) requires a term appropriate to the form."
+  unitDescription: String
+  "Servings per container as printed; package-scoped; null on a formulation's serving and when not stated."
+  servingsPerContainer: Float
+  "The serving statement verbatim ('Serving Size: 1 Vegetarian Capsule Servings Per Container: 90'), including qualifiers such as 'about'."
+  servingStatementVerbatim: String
+
+  """class: structural; cardinality: many; catalog: USES_SERVING_DEFINITION (from LabelSnapshot)"""
+  labelSnapshots: [LabelSnapshot!]! @relationship(type: "USES_SERVING_DEFINITION", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; USES_SERVING_DEFINITION from FormulationVersion (decision W04-D07)"""
+  formulationVersions: [FormulationVersion!]! @relationship(type: "USES_SERVING_DEFINITION", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+Properties of HAS_FORMULATION_VERSION (ProductVariant -> FormulationVersion). Contains every field of the frozen
+AssertedEdgeProperties (asserted_edge profile: one edge per recorded-time episode; bounds, precisions and bases equal the
+authorizing Assertion's; only recordedTo may be written once, from null) plus `jurisdiction`, the exclusivity partition key
+of predicateExclusivity HAS_FORMULATION_VERSION {EXCLUSIVE, partitionBy: [jurisdiction]}. jurisdiction equals the target
+FormulationVersion.jurisdiction when both are set (V-W04-08); null only on legacy edges.
+"""
+type FormulationEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  jurisdiction: String
+}
+
+"""
+Live product development/market stage display (live enum, values unchanged). DISCOVERY, RESEARCH, PRECLINICAL and CLINICAL
+are company-reported development stages; DISCONTINUED is a market fact that needs a stated end; APPROVED is a derived
+projection valid only with an APPROVAL RegulatoryStatus (V-322). Marketed is never approved.
+"""
+enum ProductStatus {
+  DISCOVERY
+  RESEARCH
+  PRECLINICAL
+  CLINICAL
+  APPROVED
+  DISCONTINUED
+}
+
+"""
+How a product is marketed (commercial kind), not its jurisdictional regulatory classification (W13) and not a sector
+taxonomy. Values are the kinds present in the live data and fixtures; new values are ledger requests.
+"""
+enum ProductKind {
+  DIETARY_SUPPLEMENT
+  CONVENTIONAL_FOOD
+  DRUG
+  BIOLOGIC
+  MEDICAL_DEVICE
+  CONSUMER_DEVICE
+  DIAGNOSTIC_TEST_SERVICE
+  COSMETIC
+  OTHER
+}
+
+"""
+Kind of a label declaration line, grounded in 21 CFR 101.36 for US Supplement Facts: NUTRIENT ((b)(2) dietary ingredient
+with an RDI/DRV; amount is the nutrient, not its source), OTHER_DIETARY_INGREDIENT ((b)(3); amount is the ingredient as
+listed), DIETARY_INGREDIENT (0.1.0 value: dietary ingredient not yet classified as (b)(2) or (b)(3)), PROPRIETARY_BLEND
+(blend line; amount is the blend total), BLEND_CONSTITUENT (indented constituent; amount usually not stated),
+SOURCE_INGREDIENT ('as'/'from' parenthetical source), OTHER_INGREDIENT ('Other Ingredients' excipient list), DIRECTIONS
+(suggested use), WARNING, OTHER_STATEMENT.
+"""
+enum DeclarationKind {
+  NUTRIENT
+  OTHER_DIETARY_INGREDIENT
+  DIETARY_INGREDIENT
+  PROPRIETARY_BLEND
+  BLEND_CONSTITUENT
+  SOURCE_INGREDIENT
+  OTHER_INGREDIENT
+  DIRECTIONS
+  WARNING
+  OTHER_STATEMENT
+}

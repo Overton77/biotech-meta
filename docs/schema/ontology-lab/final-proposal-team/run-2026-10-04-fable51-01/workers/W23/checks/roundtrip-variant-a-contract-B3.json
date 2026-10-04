@@ -31,19 +31,90 @@
   }
  },
  "roundTrip": {
-  "create": [
-   "Field \"uid\" is not defined by type \"AssertionArchetypeWhere\". Did you mean \"AND\"?",
-   "Field \"uid\" is not defined by type \"AssertionArchetypeWhere\". Did you mean \"AND\"?",
+  "create": {
+   "createAnswerRecords": {
+    "answerRecords": [
+     {
+      "uid": "hu:answer-record:w23-rt-ar1",
+      "accessTier": "PUBLIC_ANSWER",
+      "privateContext": "EXCLUDED"
+     }
+    ]
+   }
+  },
+  "connectAssessmentByUidThroughInterface": [
    "Field \"uid\" is not defined by type \"EvidenceAssessmentArchetypeWhere\". Did you mean \"AND\"?"
   ],
-  "read": [
-   "Cannot query field \"uid\" on type \"AssertionArchetype\". Did you mean to use an inline fragment on \"Entity\", \"Assertion\", or \"ClaimOccurrence\"?",
-   "Cannot query field \"uid\" on type \"AssertionArchetype\". Did you mean to use an inline fragment on \"Entity\", \"Assertion\", or \"ClaimOccurrence\"?",
-   "Cannot query field \"uid\" on type \"EvidenceAssessmentArchetype\". Did you mean to use an inline fragment on \"Entity\", \"Adjudication\", or \"EvidenceApplicability\"?"
+  "read": {
+   "answerRecords": [
+    {
+     "uid": "hu:answer-record:w23-rt-ar1",
+     "accessTier": "PUBLIC_ANSWER",
+     "privateContext": "EXCLUDED",
+     "traceDepth": "ADJUDICATION",
+     "citesAssertions": [
+      {
+       "__typename": "Assertion",
+       "uid": "hu:claim-occurrence:w23-rt-co1",
+       "predicate": "RECOMMENDS"
+      },
+      {
+       "__typename": "Assertion",
+       "uid": "hu:assertion:w23-rt-a1",
+       "predicate": "HAS_FORMULATION_VERSION"
+      }
+     ],
+     "citesAssertionsConnection": {
+      "edges": [
+       {
+        "properties": {
+         "orderIndex": 2
+        },
+        "node": {
+         "__typename": "Assertion",
+         "uid": "hu:claim-occurrence:w23-rt-co1"
+        }
+       },
+       {
+        "properties": {
+         "orderIndex": 1
+        },
+        "node": {
+         "__typename": "Assertion",
+         "uid": "hu:assertion:w23-rt-a1"
+        }
+       }
+      ]
+     },
+     "citesAssessments": [
+      {
+       "__typename": "Adjudication",
+       "assessmentType": "ADJUDICATION",
+       "uid": "hu:adjudication:w23-rt-adj1",
+       "verdict": "SUPPORTED"
+      }
+     ]
+    }
+   ]
+  },
+  "readDateTime": [
+   "Unknown function 'apoc.date.convertFormat' (line 4, column 29 (offset: 99))"
   ],
   "updateAttempt": [
    "Cannot query field \"updateAnswerRecords\" on type \"Mutation\". Did you mean \"createAnswerRecords\" or \"updateAssertions\"?"
   ],
-  "storedNode": []
+  "storedNode": [
+   {
+    "labels": [
+     "AnswerRecord",
+     "Occurrence"
+    ],
+    "accessTier": "PUBLIC_ANSWER",
+    "privacyClass": "INTERNAL",
+    "privateContext": "EXCLUDED",
+    "hasId": true,
+    "hasCreatedAt": true
+   }
+  ]
  }
 }

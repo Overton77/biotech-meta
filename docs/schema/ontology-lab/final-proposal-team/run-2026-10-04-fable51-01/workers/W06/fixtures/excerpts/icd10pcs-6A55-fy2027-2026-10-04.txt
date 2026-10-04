@@ -1,0 +1,6 @@
+Captured: 2026-10-04 via ICD-10 Codes MCP search_codes(query '6A55', code_type procedure, search_by code). Code set FY2027 (in effect 2026-10-01 to 2027-09-30).
+6A550Z3 Pheresis of Plasma, Single (valid for HIPAA)
+6A551Z3 Pheresis of Plasma, Multiple (valid for HIPAA)
+6A550ZV Pheresis of Hematopoietic Stem Cells, Single
+6A551ZV Pheresis of Hematopoietic Stem Cells, Multiple
+(12 codes returned in total; erythrocytes, leukocytes, platelets, cord blood stem cells also present.)

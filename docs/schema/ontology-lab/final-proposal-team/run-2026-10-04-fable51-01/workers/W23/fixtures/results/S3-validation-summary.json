@@ -1,0 +1,238 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/neo4j/validation.cypher",
+ "total": 174,
+ "ok": 174,
+ "failed": 0,
+ "rowsByStatement": [
+  {
+   "n": 29,
+   "id": "V-113",
+   "title": "V-113: no shared node points at a private node (public/private boundary).",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "sharedLabels": [
+      "EvidenceAssessment",
+      "EvidenceApplicability"
+     ],
+     "sharedUid": "hu:applicability:w23-leak-personal-applicability",
+     "relType": "ASSESSES_APPLICABILITY_TO",
+     "privateUid": "hu:private-user-context:w23-leak-0001"
+    }
+   ]
+  },
+  {
+   "n": 30,
+   "id": "V-114",
+   "title": "V-114: private-to-shared references use only governed reference types.",
+   "status": "ok",
+   "rows": 2,
+   "sample": [
+    {
+     "privateUid": "hu:private-user-context:w23-leak-0001",
+     "relType": "INTERESTED_IN",
+     "sharedUid": "hu:product:w23-calmroot"
+    },
+    {
+     "privateUid": "hu:private-user-context:w23-leak-0001",
+     "relType": "INTERESTED_IN",
+     "sharedUid": "hu:product-variant:w23-sleepwell-us-capsule"
+    }
+   ]
+  },
+  {
+   "n": 31,
+   "id": "V-115",
+   "title": "V-115: private nodes do not carry labels that a shared fulltext or vector index covers.",
+   "status": "ok",
+   "rows": 2,
+   "sample": [
+    {
+     "privateUid": "hu:product:w23-leak-class-lower",
+     "labels": [
+      "Product",
+      "Entity"
+     ]
+    },
+    {
+     "privateUid": "hu:private-user-goal-version:w23-leak-g1",
+     "labels": [
+      "VersionedState",
+      "UserGoalVersion"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 32,
+   "id": "V-116",
+   "title": "V-116: private nodes carry no search text or embedding unless a private index is declar",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "privateUid": "hu:private-user-goal-version:w23-leak-g1",
+     "labels": [
+      "VersionedState",
+      "UserGoalVersion"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 34,
+   "id": "V-118",
+   "title": "V-118: uid backfill progress over live GraphQL nodes (informational; counts per label).",
+   "status": "ok",
+   "rows": 11,
+   "sample": [
+    {
+     "label": "FormulationVersion",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    },
+    {
+     "label": "Entity",
+     "nodes": 6,
+     "withUid": 6,
+     "missingUid": 0
+    },
+    {
+     "label": "SourceSnapshot",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    },
+    {
+     "label": "InformationArtifact",
+     "nodes": 2,
+     "withUid": 2,
+     "missingUid": 0
+    },
+    {
+     "label": "Assertion",
+     "nodes": 3,
+     "withUid": 3,
+     "missingUid": 0
+    }
+   ]
+  },
+  {
+   "n": 42,
+   "id": "V-203",
+   "title": "V-203 (INV-202): exactly one evidence target and exactly one use target.",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "assessment": "hu:applicability:w23-leak-personal-applicability",
+     "evidenceTargets": 0,
+     "useTargets": 1
+    }
+   ]
+  },
+  {
+   "n": 117,
+   "id": "V-401b",
+   "title": "V-401b (informational): ACCEPTED assertions whose only locators are coarse (SECTION or ",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "acceptedAssertionsWithOnlyCoarseLocators": 0
+    }
+   ]
+  },
+  {
+   "n": 166,
+   "id": "V-514b",
+   "title": "V-514b (informational): assertions without contentHash (legacy or fixture records; new ",
+   "status": "ok",
+   "rows": 1,
+   "sample": [
+    {
+     "assertionsWithoutContentHash": 0
+    }
+   ]
+  },
+  {
+   "n": 167,
+   "id": "V-520",
+   "title": "V-520: no private-store labels in the shared graph (production form of fixture F-V6).",
+   "status": "ok",
+   "rows": 3,
+   "sample": [
+    {
+     "labels": [
+      "Entity",
+      "UserContext"
+     ],
+     "privateNodeInSharedGraph": "hu:private-user-context:w23-leak-0001"
+    },
+    {
+     "labels": [
+      "InformationArtifact",
+      "Observation",
+      "PersonalMeasurement"
+     ],
+     "privateNodeInSharedGraph": "hu:private-personal-measurement:w23-leak-m1"
+    },
+    {
+     "labels": [
+      "VersionedState",
+      "UserGoalVersion"
+     ],
+     "privateNodeInSharedGraph": "hu:private-user-goal-version:w23-leak-g1"
+    }
+   ]
+  },
+  {
+   "n": 168,
+   "id": "V-521",
+   "title": "V-521: no private uid values or private-personal class on shared nodes or relationships",
+   "status": "ok",
+   "rows": 7,
+   "sample": [
+    {
+     "kind": "NODE",
+     "item": "hu:private-user-context:w23-leak-0001"
+    },
+    {
+     "kind": "NODE",
+     "item": "hu:product:w23-calmroot"
+    },
+    {
+     "kind": "NODE",
+     "item": "hu:private-personal-measurement:w23-leak-m1"
+    },
+    {
+     "kind": "NODE",
+     "item": "hu:product-variant:w23-calmroot-us-powder"
+    },
+    {
+     "kind": "NODE",
+     "item": "hu:product:w23-leak-class-lower"
+    }
+   ]
+  },
+  {
+   "n": 171,
+   "id": "V-524",
+   "title": "V-524: shared applicability never targets a personal context; private measurements neve",
+   "status": "ok",
+   "rows": 2,
+   "sample": [
+    {
+     "violation": "APPLICABILITY_TO_USER_CONTEXT",
+     "item": "hu:applicability:w23-leak-personal-applicability"
+    },
+    {
+     "violation": "OBSERVATION_PERSONAL_MEASUREMENT_COLLAPSE",
+     "item": "hu:private-personal-measurement:w23-leak-m1"
+    }
+   ]
+  }
+ ]
+}

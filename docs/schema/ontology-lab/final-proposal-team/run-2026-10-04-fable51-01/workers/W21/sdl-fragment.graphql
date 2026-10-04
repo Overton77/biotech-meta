@@ -1,0 +1,703 @@
+# =====================================================================================================
+# W21 Narrative media, speakers and claims -- sdl-fragment.graphql
+# Run: run-2026-10-04-fable51-01. Worker model: Opus 5.5. Coordinator/synthesizer: Fable 5.1.
+# Canonical catalog module: claims_and_documents (catalog 0.2.0, digest 8fb50ff0…84f0).
+# Live schema digest read: 86b5e0b5…f112 (current_biotech_schema.graphql lines 151-187, 498, 1070, 2187-2197,
+# 2643-2663, 2762-2882).
+# CQs served: CQ-CL-01..06, CQ-CL-08, CQ-CL-09 (disposal), CQ-PV-01, CQ-PV-02, CQ-PV-05, CQ-EC-03, CQ-CM-04 (seam),
+# CQ-AX-05, CQ-AX-18, CQ-RC-05; candidates CQ-CL-C01..C04 (see 02-cq-coverage.md).
+#
+# Contains ONLY the elements the ownership registry assigns to W21 (plus the two new structural relationship types
+# DELIMITED_BY, IN_RENDITION, DISTRIBUTES_RENDITION and the property type InstanceOfProperties, each requested for
+# registry admission in seam-requests.yaml W21-SR-03/04/05). Every other name (Source, SourceSnapshot,
+# SourceLocator, Assertion, Activity, Agent, Person, Organization, ConsumerBrand, PseudonymousActor,
+# AnonymousActor, Document, Publication, Chunk, Study, StudyResult, MediaAsset, Event, TechnologyPlatform,
+# ToolOrInstrument, ManufacturingProcess, ManufacturingStep, IngredientMaterial, Treatment, Procedure,
+# SafetySignal, the shared interfaces, kernel enums, RoleType, EvidenceStrength, AssociationPolarity,
+# AssertionSubjectTarget, AsserterTarget and the W00/W20/W22 relationship-property types) is imported by name.
+#
+# Relationship class and cardinality are written in each relationship field's description and are enforced by
+# the operations/validation layer (07-operations.md), never by SDL.
+# Retired live elements (ExperienceReport, SPONSORS_PRODUCT, AUTHORS, REPORTS, EXTRACTED_FROM,
+# EXTRACTED_FROM_SEGMENT, INCLUDES_EPISODE, UTTERED_BY, Episode.onPlatforms, Episode.hasTranscriptVersions,
+# Claim.evidenceStrength/isClinical/isPreclinical/about/supportedBy, RelationshipAssertion.subject/object lists,
+# confidence, supportedByClaims) are mapped in migration-map.yaml and are intentionally absent here.
+# RECOMMENDS (derived, CL-016) and the Organization/ConsumerBrand side of SPONSORS_CONTENT are fields on W01
+# types; their exact field text is in seam-requests.yaml (W21-SR-07, W21-SR-08).
+# =====================================================================================================
+
+# -----------------------------------------------------------------------------------------------------
+# Distribution identities: Platform, Channel, Series
+# -----------------------------------------------------------------------------------------------------
+
+"""
+A distribution or directory service on which channels publish renditions of works (YouTube, a podcast hosting
+service such as Megaphone, the Apple Podcasts directory, Substack). It is an Entity: a persistent identity, not a
+URL and not a company (the operating company is an Organization). A Platform is not a publisher of content and
+asserts nothing; hosting a channel is never selling, sponsoring or endorsing. Serves CQ-CL-01 (which rendition, on
+which platform) and CQ-CL-08 (platform-level dynamic ad insertion). Module claims_and_documents; archetype Entity.
+uid token `platform` is REQUESTED (seam W21-SR-01); it is not yet in conventions.uidTypeTokens.
+"""
+type Platform implements Entity & EntityArchetype @node(labels: ["Platform", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Controlled string (enum candidate W21-SR-02): VIDEO_HOST, AUDIO_FEED_HOST, PODCAST_DIRECTORY, NEWSLETTER_HOST, WEBCAST_HOST, OTHER. Observed; immutable per identity."""
+  platformType: String
+  """Display home page; never identity (contract A2)."""
+  url: String
+  """class: structural; cardinality: many (each Channel has exactly one hosting Platform); catalog: HOSTS_CHANNEL (live, kept)"""
+  hostsChannels: [Channel!]! @relationship(type: "HOSTS_CHANNEL", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: ON_PLATFORM (kept only for PseudonymousActor -> Platform: the handle exists on this platform; Episode -> Platform is retired)"""
+  pseudonymousAccounts: [PseudonymousActor!]! @relationship(type: "ON_PLATFORM", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+A publisher-operated distribution account on exactly one Platform (a YouTube channel, a podcast RSS feed, a
+newsletter publication). It is an Entity. It is not the show (that is Series), not the operating company (that is
+an Organization linked by the asserted OPERATES_CHANNEL), and not a rendition (renditions are Sources it
+distributes). Serves CQ-CL-01, CQ-CL-05 (sponsorship and operator ties of the channel), CQ-CL-08 (which channel's
+rendition carried which ads). Module claims_and_documents; archetype Entity; uid token `channel`.
+"""
+type Channel implements Entity & EntityArchetype @node(labels: ["Channel", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Controlled string: VIDEO_CHANNEL, PODCAST_FEED, NEWSLETTER, WEBCAST_SERIES_ACCOUNT, OTHER."""
+  channelType: String
+  """class: structural; cardinality: exactly_one (per Channel); catalog: HOSTS_CHANNEL"""
+  platform: [Platform!]! @relationship(type: "HOSTS_CHANNEL", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted (asserted_edge profile); cardinality: many; catalog: OPERATES_CHANNEL (organizations role predicate)"""
+  operators: [Organization!]! @relationship(type: "OPERATES_CHANNEL", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (AppearanceProperties: asserted_edge + roleType HOST|CO_HOST); cardinality: many; catalog: SERVES_ON_CHANNEL"""
+  hosts: [Person!]! @relationship(type: "SERVES_ON_CHANNEL", direction: IN, properties: "AppearanceProperties")
+  """class: structural; cardinality: many; catalog: HAS_SERIES (live, kept)"""
+  hasSeries: [Series!]! @relationship(type: "HAS_SERIES", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_EPISODE"""
+  hasEpisodes: [Episode!]! @relationship(type: "HAS_EPISODE", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many (each rendition Source has zero_or_one distributing Channel); catalog: DISTRIBUTES_RENDITION (NEW, W21-SR-05)"""
+  distributesRenditions: [Source!]! @relationship(type: "DISTRIBUTES_RENDITION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted (FINANCIAL_INTEREST member; asserted_edge); cardinality: many; catalog: SPONSORS_CONTENT"""
+  sponsoringOrganizations: [Organization!]! @relationship(type: "SPONSORS_CONTENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (FINANCIAL_INTEREST member; asserted_edge); cardinality: many; catalog: SPONSORS_CONTENT"""
+  sponsoringBrands: [ConsumerBrand!]! @relationship(type: "SPONSORS_CONTENT", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A named series of works that persists across platforms and channels (a podcast show, a sub-series such as
+"Huberman Lab Essentials", a lecture series). It is an Entity. It is not a channel account, not a NarrativeArc
+(an interpretation, W18) and not a Conference (W18). Serves CQ-CL-01 and identity collisions between a series'
+original and re-edited episodes. Module claims_and_documents; archetype Entity; uid token `series`.
+"""
+type Series implements Entity & EntityArchetype @node(labels: ["Series", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Controlled string: PODCAST_SERIES, SUB_SERIES, LECTURE_SERIES, VIDEO_SERIES, NEWSLETTER_SERIES, OTHER."""
+  seriesType: String
+  """class: structural; cardinality: many; catalog: HAS_SERIES"""
+  channels: [Channel!]! @relationship(type: "HAS_SERIES", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_EPISODE (live INCLUDES_EPISODE merged into HAS_EPISODE; field name kept)"""
+  includesEpisodes: [Episode!]! @relationship(type: "HAS_EPISODE", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted (FINANCIAL_INTEREST member; asserted_edge); cardinality: many; catalog: SPONSORS_CONTENT"""
+  sponsoringOrganizations: [Organization!]! @relationship(type: "SPONSORS_CONTENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (FINANCIAL_INTEREST member; asserted_edge); cardinality: many; catalog: SPONSORS_CONTENT"""
+  sponsoringBrands: [ConsumerBrand!]! @relationship(type: "SPONSORS_CONTENT", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+# -----------------------------------------------------------------------------------------------------
+# Works and their parts: Episode, EpisodeSegment
+# -----------------------------------------------------------------------------------------------------
+
+"""
+A published audio or video work: a podcast episode, a video, or a recorded talk/lecture/panel (episodeType
+CONFERENCE_TALK, LECTURE, WEBINAR, PANEL). It is the work-level Entity (D-005); every page, video file, audio feed
+item, directory record or transcript document that renders it is a Source linked RENDITION_OF it. Media times,
+sponsor reads and transcript texts belong to renditions, never to the Episode itself (dynamic ad insertion). A
+re-edited release (for example an "Essentials" cut) is a different Episode, not a rendition. A slide deck shown
+in a talk is a Document container in its own right, never a rendition of the talk (decision W21-D06). Serves
+CQ-CL-01, CQ-CL-05 (publication time as the statement date), CQ-CL-08, CQ-PV-02, CQ-AX-18.
+Module claims_and_documents; archetype Entity; uid token `episode`.
+"""
+type Episode implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Episode", "Entity"])
+  @fulltext(indexes: [{indexName: "EpisodeSearch", fields: ["name", "title", "summaryText"], queryName: "searchEpisodes"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """Controlled string: FULL, TRAILER, BONUS, EXCERPT, RE_EDIT, CONFERENCE_TALK, LECTURE, WEBINAR, PANEL (RSS itunes:episodeType full|trailer|bonus maps to the first three)."""
+  episodeType: String
+  """Title as published by the series publisher (presentation, never identity)."""
+  title: String
+  """Publisher-assigned number in the primary series feed; not an identity key (numbering is reused across feeds)."""
+  episodeNumber: Int
+  seasonNumber: Int
+  """First publication instant of the work as stated by the publisher feed or directory (observed). Used as the PUBLICATION_PROXY valid-time anchor of in-container statements."""
+  publishedAt: DateTime
+  publishedAtPrecision: TimePrecision
+  """Nominal duration stated by the publisher; rendition durations differ under dynamic ad insertion and are not stored here."""
+  durationSeconds: Int
+  summaryText: String
+  """Derived retrieval vector (INV-107); @vector is added only by Fable at merge, without provider."""
+  searchEmbedding: [Float!]
+  """class: structural; cardinality: many; catalog: RENDITION_OF (provenance, W00) -- page, video, audio feed item, directory record or transcript document"""
+  renditions: [Source!]! @relationship(type: "RENDITION_OF", direction: IN)
+  """class: structural; cardinality: many; catalog: HAS_SEGMENT (orderIndex on the edge)"""
+  segments: [EpisodeSegment!]! @relationship(type: "HAS_SEGMENT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_EPISODE"""
+  channels: [Channel!]! @relationship(type: "HAS_EPISODE", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_EPISODE"""
+  series: [Series!]! @relationship(type: "HAS_EPISODE", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted (AppearanceProperties = asserted_edge + roleType); cardinality: many; catalog: APPEARS_IN (live field name kept)"""
+  personsInEpisode: [Person!]! @relationship(type: "APPEARS_IN", direction: IN, properties: "AppearanceProperties")
+  """class: asserted (AppearanceProperties); cardinality: many; catalog: APPEARS_IN (handle-only participants)"""
+  pseudonymousParticipants: [PseudonymousActor!]! @relationship(type: "APPEARS_IN", direction: IN, properties: "AppearanceProperties")
+  """class: asserted (FINANCIAL_INTEREST member; asserted_edge); cardinality: many; catalog: SPONSORS_CONTENT"""
+  sponsoringOrganizations: [Organization!]! @relationship(type: "SPONSORS_CONTENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (FINANCIAL_INTEREST member; asserted_edge); cardinality: many; catalog: SPONSORS_CONTENT"""
+  sponsoringBrands: [ConsumerBrand!]! @relationship(type: "SPONSORS_CONTENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many (each ClaimOccurrence has exactly one container); catalog: OCCURS_IN"""
+  claimOccurrences: [ClaimOccurrence!]! @relationship(type: "OCCURS_IN", direction: IN)
+  """class: derived (legacy retrieval projection, read-only; name collision with catalog MENTIONS SourceLocator->Mention is seam W21-SR-10); cardinality: many; catalog: none (live Episode.mentions)"""
+  mentions: [EpisodeMentionableTarget!]! @relationship(type: "MENTIONS", direction: OUT) @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A delimited part of an Episode as published or as identified by BellLabs: a sponsor read, an editorial chapter, an
+introduction, prepared remarks, a Q&A block or a dynamically inserted ad break. It is an InformationArtifact (a
+record about the work's structure), not an Occurrence and not a time range: timing lives on SourceLocators bound
+to one rendition (DELIMITED_BY), and a rendition-specific segment (a dynamic ad, a platform-specific sponsor read)
+names that rendition (IN_RENDITION). A segment without IN_RENDITION is claimed to exist in every rendition.
+segmentType SPONSOR_READ answers CQ-CL-08; it never makes a statement an endorsement. Serves CQ-CL-08, CQ-PV-02.
+Module claims_and_documents; archetype InformationArtifact; uid token `episode-segment`.
+"""
+type EpisodeSegment implements Entity & InformationArtifactArchetype @node(labels: ["EpisodeSegment", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  """Controlled string (enum candidate W21-SR-02): SPONSOR_READ, DYNAMIC_AD, EDITORIAL, CHAPTER, INTRODUCTION, PREPARED_REMARKS, Q_AND_A, DISCLAIMER, OTHER."""
+  segmentType: String
+  """Chapter or section title exactly as the publisher printed it, for example "ROKA, InsideTracker, Magic Spoon"."""
+  chapterTitleVerbatim: String
+  """How the segment boundaries were obtained: PUBLISHER_CHAPTER, RENDITION_TRANSCRIPT_CUE, MANUAL, NOT_DELIMITED."""
+  delimitationBasis: String
+  """class: structural; cardinality: exactly_one; catalog: HAS_SEGMENT"""
+  episode: [Episode!]! @relationship(type: "HAS_SEGMENT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: IN_RENDITION (NEW, W21-SR-04) -- the rendition Source this segment exists in; absent = work-level segment"""
+  inRendition: [Source!]! @relationship(type: "IN_RENDITION", direction: OUT)
+  """class: structural; cardinality: many (at most one per rendition); catalog: DELIMITED_BY (NEW, W21-SR-03) -- MEDIA_TIME or TEXT_QUOTE locators that bound the segment on a rendition snapshot"""
+  delimitedBy: [SourceLocator!]! @relationship(type: "DELIMITED_BY", direction: OUT)
+  """class: structural; cardinality: many; catalog: OCCURS_IN_SEGMENT (shared name with W20 Chunk edge, same meaning: lies within)"""
+  claimOccurrences: [ClaimOccurrence!]! @relationship(type: "OCCURS_IN_SEGMENT", direction: IN)
+}
+
+# -----------------------------------------------------------------------------------------------------
+# Proposition identity and source-attributed assertions
+# -----------------------------------------------------------------------------------------------------
+
+"""
+The identity of a proposition that many assertions can instantiate ("NMN raises NAD+", "Sinclair takes about 1 g
+of NMN per day"). It is an Entity with no source, no asserter, no truth value and no evidence strength (D-006,
+V-418): evidence strength is a ClaimEvidenceAssessment; corroboration is several Assertions INSTANCE_OF one Claim.
+claimType says what the proposition is about (a different axis from Assertion.assertionBasis); claimPolarity is
+the direction inside the proposition ("lowers" versus "raises"), while affirmation versus denial is
+Assertion.polarity. Serves CQ-CL-06, CQ-AX-05, CQ-EV-03. Module claims_and_documents; archetype Entity; uid token
+`claim`.
+"""
+type Claim implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Claim", "Entity"])
+  @fulltext(indexes: [{indexName: "ClaimSearch", fields: ["name", "description", "searchText"], queryName: "searchClaims"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """Normalized proposition text written by BellLabs; never a quotation (quotations live on SourceLocator.exact)."""
+  claimText: String
+  claimType: ClaimType
+  """Direction inside the proposition (live AssociationPolarity; owner seam W21-SR-11)."""
+  claimPolarity: AssociationPolarity
+  isQuantitative: Boolean
+  isCausal: Boolean
+  isMechanistic: Boolean
+  """Derived retrieval vector (INV-107); @vector added only by Fable at merge."""
+  searchEmbedding: [Float!]
+  """class: derived (ruleOnly; InstanceOfProperties: derivationRule or hypothesisUid); cardinality: many; catalog: INSTANCE_OF (live field name kept)"""
+  occurrences: [ClaimOccurrence!]! @relationship(type: "INSTANCE_OF", direction: IN, properties: "InstanceOfProperties")
+  """class: derived (ruleOnly); cardinality: many; catalog: INSTANCE_OF"""
+  relationshipAssertions: [RelationshipAssertion!]! @relationship(type: "INSTANCE_OF", direction: IN, properties: "InstanceOfProperties")
+  """class: structural; cardinality: many (each assessment targets exactly one Claim); catalog: ASSESSES_CLAIM_EVIDENCE"""
+  evidenceAssessments: [ClaimEvidenceAssessment!]! @relationship(type: "ASSESSES_CLAIM_EVIDENCE", direction: IN)
+}
+
+"""
+A source-attributed assertion made by exactly one asserter in exactly one container (Episode, Document or
+Publication) at a located span: "the guest said X in episode 52". Labels ["ClaimOccurrence","Assertion"]
+(D-006); it carries the full Assertion contract (one subject, one object or one typed literal, controlled
+predicate, status = capture fidelity, assertionBasis, speechAct, reportedSpeechAct, bitemporal fields). It is not
+the proposition (Claim), not a retelling of someone else's statement (a retelling is its own ClaimOccurrence
+linked RETELLS, with ATTRIBUTES_TO the credited party), and not a truth verdict. Two speakers in one caption cue
+are two ClaimOccurrences. A practice report (speechAct REPORTS_PRACTICE) never projects RECOMMENDS. Serves
+CQ-CL-01..06, CQ-CL-08, CQ-PV-01, CQ-PV-02, CQ-PV-05, CQ-AX-05, CQ-RC-05. Module claims_and_documents; archetype
+Assertion; uid token `claim-occurrence`. Live ExperienceReport is folded in (assertionBasis PERSONAL_EXPERIENCE).
+"""
+type ClaimOccurrence implements Entity & AssertionArchetype @node(labels: ["ClaimOccurrence", "Assertion"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  predicate: String!
+  status: AssertionStatus!
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  contentHash: String
+  polarity: Polarity
+  basisKind: BasisKind
+  predicateClass: PredicateClass
+  assertionBasis: AssertionBasis
+  speechAct: SpeechAct
+  reportedSpeechAct: SpeechAct
+  valueString: String
+  valueNumber: Float
+  valueBoolean: Boolean
+  unitCode: String
+  quantityBasis: QuantityBasis
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis
+  validToBasis: ValidTimeBasis
+  jurisdiction: String
+  derivationRule: String
+  extractionMethod: String
+  extractionConfidence: Float
+  """Deprecated (KCR-4.4): new writes link WAS_GENERATED_BY an Activity."""
+  agentRunUid: String
+  """Deprecated (INV-407): never written for new records."""
+  confidence: Float
+  """Display copy of the primary locator's exact text; the locator is authoritative (live field kept)."""
+  utteranceText: String
+  """Role title or code exactly as spoken or printed (kernel optional; for on-air role disclosures)."""
+  roleTitleVerbatim: String
+  """Tense in which a role or practice was stated: PAST, PRESENT, FUTURE (kernel optional)."""
+  statedTense: String
+  """Denormalized segment kind (kernel optional), for example SPONSOR_READ; must agree with OCCURS_IN_SEGMENT (V-W21-02)."""
+  segmentKind: String
+  """class: structural; cardinality: exactly_one; catalog: HAS_SUBJECT (W00)"""
+  subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT)
+  """class: structural; cardinality: zero_or_one (xor typed literal); catalog: HAS_OBJECT (W00)"""
+  object: [AssertionSubjectTarget!]! @relationship(type: "HAS_OBJECT", direction: OUT)
+  """class: structural; cardinality: exactly_one (KCR-4.3, V-410); catalog: ASSERTED_BY (W00; range narrowed for occurrences: no Agent)"""
+  assertedBy: [ClaimSpeakerTarget!]! @relationship(type: "ASSERTED_BY", direction: OUT)
+  """class: structural; cardinality: exactly_one (V-410, V-411); catalog: OCCURS_IN"""
+  occursIn: [OccurrenceContainerTarget!]! @relationship(type: "OCCURS_IN", direction: OUT)
+  """class: structural; cardinality: many; catalog: OCCURS_IN_SEGMENT"""
+  inSegments: [EpisodeSegment!]! @relationship(type: "OCCURS_IN_SEGMENT", direction: OUT)
+  """class: structural; cardinality: one_or_more when ACCEPTED (V-401), all in renditions of the container (V-411); catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: derived (must name locatorUid, V-407); cardinality: many; catalog: SUPPORTED_BY_CHUNK (W20 property type)"""
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties")
+  """class: structural; cardinality: one_or_more for new writes; catalog: WAS_GENERATED_BY (W00)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: derived (ruleOnly: derivationRule or hypothesisUid, V-417); cardinality: zero_or_one; catalog: INSTANCE_OF"""
+  instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "InstanceOfProperties")
+  """class: structural; cardinality: many; same container (V-416); catalog: QUALIFIED_BY"""
+  qualifiedBy: [ClaimOccurrence!]! @relationship(type: "QUALIFIED_BY", direction: OUT, properties: "QualificationProperties")
+  """class: structural; cardinality: many; catalog: QUALIFIED_BY (inverse)"""
+  qualifies: [ClaimOccurrence!]! @relationship(type: "QUALIFIED_BY", direction: IN, properties: "QualificationProperties")
+  """class: structural; cardinality: many, acyclic, no shared span (V-412, V-413); catalog: RETELLS"""
+  retells: [Assertion!]! @relationship(type: "RETELLS", direction: OUT, properties: "RetellingProperties")
+  """class: structural; cardinality: many; catalog: RETELLS (inverse)"""
+  retoldBy: [ClaimOccurrence!]! @relationship(type: "RETELLS", direction: IN, properties: "RetellingProperties")
+  """class: structural; cardinality: zero_or_one; never the asserter of this occurrence; catalog: ATTRIBUTES_TO"""
+  attributesTo: [ClaimSpeakerTarget!]! @relationship(type: "ATTRIBUTES_TO", direction: OUT)
+  """class: structural; cardinality: zero_or_one; same label; catalog: SUPERSEDES (W00)"""
+  supersedes: [ClaimOccurrence!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (inverse)"""
+  supersededBy: [ClaimOccurrence!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties")
+}
+
+"""
+A structured relational assertion read from a non-utterance span (a registry field, a table cell, a figure, a
+label panel): exactly one subject, one object or one typed literal, a controlled predicate, at most one asserter,
+SUPPORTED_BY a locator. Labels ["RelationshipAssertion","Assertion"] (D-006). It is not a ClaimOccurrence (no
+speaker, no container requirement) and it is never a second record of an utterance already captured as a
+ClaimOccurrence (V-419). Multi-subject live instances split one per proposition (V-420); cross-claim syntheses
+move to ClaimEvidenceAssessment. Serves CQ-EV-02, CQ-CL-06. Module claims_and_documents; archetype Assertion;
+uid token `assertion`.
+"""
+type RelationshipAssertion implements Entity & AssertionArchetype @node(labels: ["RelationshipAssertion", "Assertion"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  predicate: String!
+  status: AssertionStatus!
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  contentHash: String
+  polarity: Polarity
+  basisKind: BasisKind
+  predicateClass: PredicateClass
+  assertionBasis: AssertionBasis
+  speechAct: SpeechAct
+  reportedSpeechAct: SpeechAct
+  valueString: String
+  valueNumber: Float
+  valueBoolean: Boolean
+  unitCode: String
+  quantityBasis: QuantityBasis
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis
+  validToBasis: ValidTimeBasis
+  jurisdiction: String
+  derivationRule: String
+  extractionMethod: String
+  extractionConfidence: Float
+  """Deprecated (KCR-4.4)."""
+  agentRunUid: String
+  """Deprecated (INV-407): never written for new records."""
+  confidence: Float
+  """Verbatim relation wording in the source; the controlled form is predicate."""
+  predicateText: String
+  """Deprecated live uncontrolled relation label; mapped to predicate or left with status UNRESOLVED at migration."""
+  relationshipType: String
+  """Display surface form of the subject as printed (not identity)."""
+  subjectLabel: String
+  """Display surface form of the object as printed (not identity)."""
+  objectLabel: String
+  """class: structural; cardinality: exactly_one; catalog: HAS_SUBJECT (W00)"""
+  subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: HAS_OBJECT (W00)"""
+  object: [AssertionSubjectTarget!]! @relationship(type: "HAS_OBJECT", direction: OUT)
+  """class: structural; cardinality: at_most_one; catalog: ASSERTED_BY (W00 range)"""
+  assertedBy: [AsserterTarget!]! @relationship(type: "ASSERTED_BY", direction: OUT)
+  """class: structural; cardinality: one_or_more when ACCEPTED; catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; catalog: WAS_GENERATED_BY (W00)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: derived (ruleOnly); cardinality: zero_or_one; catalog: INSTANCE_OF"""
+  instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "InstanceOfProperties")
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00)"""
+  supersedes: [RelationshipAssertion!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural (media seam W22); cardinality: many; catalog: VISUALIZES (live, kept)"""
+  visualizedBy: [MediaAsset!]! @relationship(type: "VISUALIZES", direction: IN, properties: "MediaLinkProperties")
+}
+
+# -----------------------------------------------------------------------------------------------------
+# Assessments (EvidenceAssessment archetype): never truth on the assessed assertion itself
+# -----------------------------------------------------------------------------------------------------
+
+"""
+BellLabs' method-versioned grade of the evidence for one Claim (replaces live Claim.evidenceStrength, V-418). It
+is an EvidenceAssessment: immutable, superseded by a newer assessment, never a property of the Claim and never a
+capture-fidelity status. It coordinates with W10's EvidenceSynthesis/EvidenceStrengthAssessment method contract.
+Serves CQ-EV-03, CQ-AX-24, CQ-PV-01 (state 3). Module claims_and_documents; archetype EvidenceAssessment; uid token
+`assessment`.
+"""
+type ClaimEvidenceAssessment implements Entity & EvidenceAssessmentArchetype @node(labels: ["ClaimEvidenceAssessment", "EvidenceAssessment"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  assessmentType: String!
+  methodVersion: String!
+  status: AssessmentStatus!
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  summary: String
+  overallScore: Float
+  """Deprecated (INV-407)."""
+  confidence: Float
+  """Grade under criteriaVersion (live EvidenceStrength, W10 legacy hint enum); null = not graded."""
+  evidenceStrength: EvidenceStrength
+  criteriaVersion: String
+  assessedAt: DateTime
+  """class: structural; cardinality: exactly_one; catalog: ASSESSES_CLAIM_EVIDENCE"""
+  claim: [Claim!]! @relationship(type: "ASSESSES_CLAIM_EVIDENCE", direction: OUT)
+  """class: structural; cardinality: many; catalog: CLAIM_EVIDENCE_BASED_ON (Assertion range)"""
+  basedOnAssertions: [Assertion!]! @relationship(type: "CLAIM_EVIDENCE_BASED_ON", direction: OUT)
+  """class: structural; cardinality: many; catalog: CLAIM_EVIDENCE_BASED_ON (Study range)"""
+  basedOnStudies: [Study!]! @relationship(type: "CLAIM_EVIDENCE_BASED_ON", direction: OUT)
+  """class: structural; cardinality: many; catalog: CLAIM_EVIDENCE_BASED_ON (StudyResult range)"""
+  basedOnResults: [StudyResult!]! @relationship(type: "CLAIM_EVIDENCE_BASED_ON", direction: OUT)
+  """class: structural; cardinality: many; catalog: CLAIM_EVIDENCE_BASED_ON (Publication range)"""
+  basedOnPublications: [Publication!]! @relationship(type: "CLAIM_EVIDENCE_BASED_ON", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00)"""
+  assessedByAgents: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00)"""
+  assessedByPeople: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00)"""
+  supersedes: [ClaimEvidenceAssessment!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+}
+
+"""
+BellLabs' comparison of exactly one retelling with exactly one original that it RETELLS (directly or through a
+chain): lost qualifications, changed speech act or basis, broadened scope, changed amount or attribution, ignored
+correction. Loss is a property of the comparison, never of either assertion (V-414, V-415, INV-403). A null flag
+means "not assessed" (for example because the retelling capture is partial), never "faithful". Serves CQ-CL-04,
+CQ-CL-06, CQ-PV-05. Module claims_and_documents; archetype EvidenceAssessment; uid token `assessment`.
+"""
+type RetellingFidelityAssessment implements Entity & EvidenceAssessmentArchetype @node(labels: ["RetellingFidelityAssessment", "EvidenceAssessment"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  assessmentType: String!
+  methodVersion: String!
+  status: AssessmentStatus!
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  summary: String
+  overallScore: Float
+  """Deprecated (INV-407)."""
+  confidence: Float
+  qualificationLost: Boolean
+  lostQualificationKinds: [QualificationKind!]
+  speechActChanged: Boolean
+  speechActFrom: SpeechAct
+  speechActTo: SpeechAct
+  assertionBasisChanged: Boolean
+  scopeBroadened: Boolean
+  """Purpose or outcome wording the retelling adds, verbatim (for example "to slow aging")."""
+  addedPurposeText: String
+  quantityChanged: Boolean
+  attributionChanged: Boolean
+  correctionIgnored: Boolean
+  assessedAt: DateTime
+  """class: structural; cardinality: exactly_one; catalog: ASSESSES_RETELLING"""
+  retelling: [Assertion!]! @relationship(type: "ASSESSES_RETELLING", direction: OUT)
+  """class: structural; cardinality: exactly_one; catalog: AGAINST_ORIGINAL"""
+  original: [Assertion!]! @relationship(type: "AGAINST_ORIGINAL", direction: OUT)
+  """class: structural; cardinality: many; catalog: IDENTIFIES_LOST_QUALIFICATION"""
+  lostQualifications: [Assertion!]! @relationship(type: "IDENTIFIES_LOST_QUALIFICATION", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00)"""
+  assessedByAgents: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00)"""
+  assessedByPeople: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00)"""
+  supersedes: [RetellingFidelityAssessment!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+}
+
+"""
+BellLabs' judgment of whether one or more FINANCIAL_INTEREST assertions (sponsorship, affiliate, investment,
+equity, board, advisory, employment, founding, IP, compensation) are relevant to one assertion, whether their
+valid time overlaps the statement, and where the tie was disclosed. It informs source-reliability review and
+answer disclosure; it never sets a truth verdict (V-424, INV-405) and "not found in a partial capture" is never
+"not disclosed" (V-426). The disclosure span, when found, is SUPPORTED_BY. Serves CQ-CL-05, CQ-EC-03, CQ-AX-18.
+Module claims_and_documents; archetype EvidenceAssessment; uid token `assessment`.
+"""
+type ConflictRelevanceAssessment implements Entity & EvidenceAssessmentArchetype @node(labels: ["ConflictRelevanceAssessment", "EvidenceAssessment"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  assessmentType: String!
+  methodVersion: String!
+  status: AssessmentStatus!
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  summary: String
+  overallScore: Float
+  """Deprecated (INV-407)."""
+  confidence: Float
+  relevanceLevel: RelevanceLevel
+  relevanceBasis: RelevanceBasis
+  temporalOverlap: TemporalOverlap
+  disclosureFinding: DisclosureFinding
+  """Free-text statement of any scope ambiguity (for example group-level role codes)."""
+  scopeAmbiguity: String
+  assessedAt: DateTime
+  """class: structural; cardinality: exactly_one; catalog: FOR_OCCURRENCE"""
+  forOccurrence: [Assertion!]! @relationship(type: "FOR_OCCURRENCE", direction: OUT)
+  """class: structural; cardinality: one_or_more (FINANCIAL_INTEREST predicates); catalog: ASSESSES_INTEREST"""
+  interests: [Assertion!]! @relationship(type: "ASSESSES_INTEREST", direction: OUT)
+  """class: structural; cardinality: many; the disclosure span(s); catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00)"""
+  assessedByAgents: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00)"""
+  assessedByPeople: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00)"""
+  supersedes: [ConflictRelevanceAssessment!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+}
+
+# -----------------------------------------------------------------------------------------------------
+# Enum and unions owned by W21
+# -----------------------------------------------------------------------------------------------------
+
+"""What a proposition is about (live values, unchanged). A different axis from AssertionBasis (how the asserter supports it) and SpeechAct (what the utterance does)."""
+enum ClaimType {
+  MECHANISTIC_CLAIM
+  CAUSAL_CLAIM
+  ASSOCIATION_CLAIM
+  EFFICACY_CLAIM
+  SAFETY_CLAIM
+  DOSING_CLAIM
+  BIOMARKER_CLAIM
+  DIAGNOSTIC_CLAIM
+  PROGNOSTIC_CLAIM
+  PREDICTIVE_CLAIM
+  REGULATORY_CLAIM
+  COMMERCIAL_CLAIM
+  LEGAL_CLAIM
+  HISTORICAL_CLAIM
+  COMPARATIVE_CLAIM
+  PREVALENCE_CLAIM
+  INCIDENCE_CLAIM
+  METHOD_CLAIM
+  UNKNOWN
+}
+
+"""Asserter range of a ClaimOccurrence and range of ATTRIBUTES_TO (live ClaimSpeaker plus Organization for slide decks, press statements and show notes; no Agent: a model output is never source content)."""
+union ClaimSpeakerTarget = Person | Organization | PseudonymousActor | AnonymousActor
+
+"""OCCURS_IN range: the work (Episode, Publication) whose renditions supply locators, or a Document that is its own work (web page, newsletter issue, slide deck). Publication added with a failing case (W21-D05, W21-SR-06)."""
+union OccurrenceContainerTarget = Episode | Document | Publication
+
+"""Legacy read-only range of Episode.mentions (live EpisodeMentionable with Material mapped to IngredientMaterial under D-008)."""
+union EpisodeMentionableTarget = Event | TechnologyPlatform | ToolOrInstrument | ManufacturingProcess | ManufacturingStep | IngredientMaterial | Treatment | Procedure | SafetySignal
+
+# -----------------------------------------------------------------------------------------------------
+# Relationship-property types owned by W21 (each embeds every field of the frozen W00 type it specializes)
+# -----------------------------------------------------------------------------------------------------
+
+"""QUALIFIED_BY (structural): specializes StructuralEdgeProperties (orderIndex, notes, mongoResearchRunId) and adds relationshipUid and the required qualificationKind (V-416)."""
+type QualificationProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  relationshipUid: String!
+  qualificationKind: QualificationKind!
+}
+
+"""RETELLS (structural): specializes StructuralEdgeProperties and adds relationshipUid, retellingMode, linkBasis and the basis-conditional hypothesisUid (BELLLABS_MATCH) or citationLocatorUid (EXPLICIT_CITATION) (V-413)."""
+type RetellingProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  relationshipUid: String!
+  retellingMode: RetellingMode!
+  linkBasis: RetellingLinkBasis!
+  hypothesisUid: String
+  citationLocatorUid: String
+}
+
+"""APPEARS_IN and SERVES_ON_CHANNEL (asserted): specializes AssertedEdgeProperties (every field) and adds roleType (W01 RoleType gaining HOST, CO_HOST, GUEST, MODERATOR, W21-SR-09) and roleTitleVerbatim."""
+type AppearanceProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  roleType: RoleType!
+  roleTitleVerbatim: String
+}
+
+"""INSTANCE_OF (derived, ruleOnly): specializes DerivedEdgeProperties (every field) and adds hypothesisUid (catalog oneOf: derivationRule or hypothesisUid; V-417). Registry admission requested W21-SR-12."""
+type InstanceOfProperties @relationshipProperties {
+  projectionOfAssertionUid: String
+  derivationRule: String
+  derivedFromAssertionUids: [String!]
+  derivedFromAssessmentUids: [String!]
+  derivedAt: DateTime
+  mongoResearchRunId: String
+  hypothesisUid: String
+}

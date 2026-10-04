@@ -1,0 +1,7 @@
+Source: https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/whoop-inc-709755-06172026
+Retrieved: 2026-10-04 via Firecrawl scrape (cacheState: hit; cachedAt 2026-10-02T01:22:10Z). article:published_time Tue, 06/23/2026.
+Capture: PARTIAL_EXCERPT (letter body).
+---
+CLOSEOUT LETTER WHOOP, Inc. MARCS-CMS 709755 — June 17, 2026
+Based on changes your firm has made to your "Blood Pressure Insights" product ("BPI") and its labeling in response to our Warning Letter dated July 14, 2025, and consistent with the Food and Drug Administration's updated guidance document, General Wellness: Policy for Low Risk Devices, FDA does not intend to enforce the device statutory and regulatory requirements for your BPI product as modified.
+We note that this letter is specific to your BPI product as modified and not to any other product, feature or other modifications to BPI.

@@ -1,0 +1,839 @@
+# =====================================================================================================
+# W22 Media assets, depictions and rights - SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01. Worker: W22, model Opus 5.5. Synthesizer: Fable 5.1.
+# Canonical catalog module: media (maturity future -> proposed provisional). Rights seam with W23 (PolicyVersion),
+# locator seam with W00 (SourceLocator IMAGE_REGION, LOCATES_REGION; D-010, CL-011), label seam with W04
+# (LabelDeclaration), relationship-name ruling CL-014 (HAS_MEDIA_VARIANT).
+# Catalog digest 8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0 (8fb50ff0...84f0);
+# live schema digest 86b5e0b5...f112 (lines 300-394, 2199-2569).
+# CQs served: CQ-PV-01, CQ-PV-02, CQ-PV-03, CQ-PV-06, CQ-AX-01 (existing); candidates CQ-MD-C01..CQ-MD-C06
+# (see 02-cq-coverage.md). Validation family: candidate V-601..V-614 (fixtures/v-media-validation.cypher).
+# Conventions: contract section B. No extend, no @cypher/@customResolver/@populatedBy/@jwt/@subscription,
+# no @vector (Fable adds MediaAsset/GraphView vector indexes at merge if the retrieval justification in
+# 07-operations.md is accepted). Every type is written in full. Types referenced but owned elsewhere:
+# W00 Entity, SearchIndexable, InformationArtifactArchetype, VersionedStateArchetype,
+# EvidenceAssessmentArchetype, PrivacyClass, NodeMaturity, ContentHashBasis, TimePrecision, ValidTimeBasis,
+# AssessmentStatus, AssertedEdgeProperties, DerivedEdgeProperties, StructuralEdgeProperties,
+# SupersessionProperties, SourceLocator, Activity, Assertion; W21 ClaimOccurrence, RelationshipAssertion, Claim;
+# W09 StudyResult; W03 Association; W04 Product, LabelDeclaration; plus the union members listed below.
+# Retired live elements (not defined here; see migration-map.yaml): MediaSource (node), MediaLinkMetadata,
+# MediaSourceMetadata, AnnotationMetadata, RenderingMetadata, BiologicalModelMetadata,
+# MolecularRenderingMetadata, ProductLabelMention, SUPPORTS_CLAIM, SUPPORTS_CLAIM_OCCURRENCE,
+# SUPPORTED_BY_CHUNK (media), SOURCE_DOCUMENT, SOURCE_CHUNK, SOURCE_EPISODE, SOURCE_LISTING, MENTIONS and
+# ASSERTS on ProductLabelRegion, HAS_VARIANT (media meaning; CL-014).
+# =====================================================================================================
+
+"""
+A curated media work-object (image, video, audio, figure, chart, diagram, 3D model) that BellLabs references or
+holds, independent of any one byte rendition. Byte facts (format, size, dimensions, hashes, storage) live on its
+MediaVariant renditions; exactly one ORIGINAL variant exists when bytes are held, and `contentHash` repeats that
+variant's raw-byte hash (V-611). It is NOT a Source or SourceSnapshot (the evidence capture of a retrieval
+endpoint; the two share bytes only through equal raw-byte hashes and DERIVED_FROM_SOURCE), NOT a claim that what
+it shows is true, and NOT permission to display it (rights are MediaRightsRecord states; permission is a
+PolicyVersion decision through AUTHORIZED_BY). Depiction and explanation links are assertions, never causal proof;
+EVIDENCES is a derived shortcut that exists only when an Assertion is SUPPORTED_BY an IMAGE_REGION locator on an
+original captured rendition. CQs: CQ-MD-C01, CQ-MD-C02, CQ-MD-C03, CQ-MD-C04, CQ-MD-C05, CQ-MD-C06, CQ-PV-01,
+CQ-PV-06. Module: media. Archetype: InformationArtifact.
+"""
+type MediaAsset implements Entity & InformationArtifactArchetype & SearchIndexable
+  @node(labels: ["MediaAsset", "InformationArtifact"])
+  @fulltext(indexes: [{indexName: "MediaAssetSearch", fields: ["name", "description", "title", "altText", "caption", "transcriptText", "ocrText", "searchText"], queryName: "searchMediaAssets"}]) {
+  id: ID! @id
+  "hu:media-asset:<opaque>; token proposed in W22-SR-01"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'MEDIA_ASSET'."
+  artifactType: String!
+  "Publication instant stated by the publishing source (live sourcePublishedAt). Null = not stated."
+  publishedAt: DateTime
+  publishedAtPrecision: TimePrecision
+  "Instant the asset is known to have been displayed at its source (archive capture date for late sources)."
+  observedAt: DateTime
+  "sha256:<hex> over the raw bytes of the ORIGINAL variant (live checksumSha256). Never a publisher-stated checksum."
+  contentHash: String
+  contentHashBasis: ContentHashBasis
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Embedding of caption/alt/OCR text; computed outside the API. Vector index only if Fable accepts 07-operations.md R-3."
+  searchEmbedding: [Float!]
+  assetType: MediaAssetType!
+  "Purpose declared by the creator or curator. Never implies a link role; EVIDENCE here never implies EVIDENCES."
+  mediaPurpose: MediaPurpose
+  "How the ORIGINAL bytes came to exist (captured by a camera or instrument, generated by a model, rendered...)."
+  generationMode: MediaGenerationMode
+  "Creator- or publisher-disclosed synthetic content. Null = not disclosed (unknown), never false."
+  isSynthetic: Boolean
+  "The ORIGINAL bytes are an edited or composited version of an earlier capture, as disclosed or detected. Null = unknown."
+  isEdited: Boolean
+  "Verbatim disclosure of modifications (required by e.g. CC BY 4.0 'indicate if changes were made'); null = none found."
+  editDisclosureText: String
+  "Creation or capture instant stated by the creator or embedded metadata (e.g. Commons DateTimeOriginal), not our retrieval."
+  capturedAt: DateTime
+  capturedAtPrecision: TimePrecision
+  "Presentation URL of the asset's landing page; never identity."
+  canonicalUrl: String
+  title: String
+  "Alt text as published by the source; presentation and search only (depiction is asserted through DEPICTS)."
+  altText: String
+  "Caption as published; a caption used as support is cited through a SourceLocator, not through this field."
+  caption: String
+  "Derived search text (transcription); never a locator."
+  transcriptText: String
+  "Derived search text (OCR); never a locator."
+  ocrText: String
+  """class: structural; cardinality: one_or_more when bytes are held (exactly one ORIGINAL); catalog: HAS_MEDIA_VARIANT (CL-014 rename of media HAS_VARIANT)"""
+  variants: [MediaVariant!]! @relationship(type: "HAS_MEDIA_VARIANT", direction: OUT)
+  """class: structural; cardinality: many; catalog: DERIVED_FROM_SOURCE (retargeted from retired MediaSource to the W00 SourceLocator: WHOLE_SNAPSHOT for a standalone file, PDF_PAGE for a figure, IMAGE_REGION for a crop of a page capture, MEDIA_TIME for a frame)"""
+  sourceLocators: [SourceLocator!]! @relationship(type: "DERIVED_FROM_SOURCE", direction: OUT, properties: "MediaSourceProperties")
+  """class: structural; cardinality: many; catalog: PART_OF_MEDIA (inverse; orderIndex orders panels)"""
+  figurePanels: [FigurePanel!]! @relationship(type: "PART_OF_MEDIA", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: DEPICTS (projection of one Assertion per episode; depiction is not source support)"""
+  depicts: [MediaSubjectTarget!]! @relationship(type: "DEPICTS", direction: OUT, properties: "MediaLinkProperties")
+  """class: asserted; cardinality: many; catalog: EXPLAINS (aboutness/topic of an explanatory asset; never causal proof, never EVIDENCES)"""
+  explains: [MediaSubjectTarget!]! @relationship(type: "EXPLAINS", direction: OUT, properties: "MediaLinkProperties")
+  """class: asserted; cardinality: many; catalog: VISUALIZES (a chart or figure renders a proposition or result)"""
+  visualizes: [MediaVisualizableRelationshipTarget!]! @relationship(type: "VISUALIZES", direction: OUT, properties: "MediaLinkProperties")
+  """class: derived (rule MEDIA-EV-1, regenerable, never the only history); cardinality: many; catalog: EVIDENCES. Written only by the derivation job from Assertion-SUPPORTED_BY->SourceLocator{IMAGE_REGION}-LOCATES_REGION->MediaAnnotation<-HAS_ANNOTATION-ORIGINAL MediaVariant"""
+  evidences: [MediaVisualizableRelationshipTarget!]! @relationship(type: "EVIDENCES", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: VISUALIZES_TRAVERSAL (this asset is a rendering of a GraphView; rendering parameters live on the generating Activity)"""
+  visualizesTraversal: [GraphView!]! @relationship(type: "VISUALIZES_TRAVERSAL", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many (one per stated rights offer or terms version; dual licences are two records); catalog: HAS_RIGHTS_RECORD (candidate CQ-MD-C03). Absence of any record means rights NOT CHECKED, never permission"""
+  rightsRecords: [MediaRightsRecord!]! @relationship(type: "HAS_RIGHTS_RECORD", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; catalog: ASSESSES_MEDIA (inverse)"""
+  suitabilityAssessments: [MediaSuitabilityAssessment!]! @relationship(type: "ASSESSES_MEDIA", direction: IN)
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (W00 relationship; domain extension requested W22-SR-03). Creation, extraction or generation lineage"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+}
+
+"""
+One byte rendition of a MediaAsset: the ORIGINAL as obtained, a publisher-provided rendition (a CDN width
+variant), or a BellLabs derivative (crop, thumbnail, annotation overlay, transcode). Identity of the bytes is the
+raw-byte `contentHash` (sha256); a rendition that equals a SourceSnapshot's bytes shares that snapshot's hash, which
+is the only link between asset bytes and evidence captures. `perceptualHash` is a similarity feature and never
+establishes byte identity, asset identity or rights. A publisher-stated checksum (e.g. Wikimedia Commons SHA-1) is
+kept in `statedChecksum`, never in `contentHash`. Every non-ORIGINAL variant has a generating Activity (CAPTURE for
+publisher renditions, MEDIA_TRANSFORMATION that USED the parent variant and, for crops, the region annotation;
+V-607, V-614). CQs: CQ-MD-C04, CQ-MD-C06, CQ-PV-02, CQ-PV-03. Module: media. Archetype: InformationArtifact.
+"""
+type MediaVariant implements Entity & InformationArtifactArchetype
+  @node(labels: ["MediaVariant", "InformationArtifact"]) {
+  id: ID! @id
+  "hu:media-variant:<opaque>; token proposed in W22-SR-01"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'MEDIA_VARIANT'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  "sha256:<hex> over the raw bytes of this rendition (D-016); SYNTHETIC_FIXTURE basis in fixtures."
+  contentHash: String
+  contentHashBasis: ContentHashBasis
+  variantKind: MediaVariantKind!
+  mediaFormat: MediaFormat
+  mimeType: String
+  "BellLabs object-store location of the bytes; internal operational field."
+  storageUri: String
+  "Delivery URL of this rendition (e.g. a CDN width variant); never identity."
+  url: String
+  fileSizeBytes: Int
+  widthPx: Int
+  heightPx: Int
+  durationSeconds: Float
+  frameRate: Float
+  colorSpace: String
+  "Perceptual hash value; meaningful only with its algorithm; a match is a near-duplicate hint, not identity."
+  perceptualHash: String
+  "Algorithm and parameters of perceptualHash (e.g. 'pHash-DCT-64'); required when perceptualHash is set."
+  perceptualHashAlgorithm: String
+  "Checksum stated by the hosting service, recorded verbatim (e.g. Commons imageinfo sha1); never our contentHash."
+  statedChecksum: String
+  "Algorithm of statedChecksum as stated (e.g. 'SHA-1')."
+  statedChecksumAlgorithm: String
+  """class: structural; cardinality: exactly_one; catalog: HAS_MEDIA_VARIANT (inverse)"""
+  asset: [MediaAsset!]! @relationship(type: "HAS_MEDIA_VARIANT", direction: IN)
+  """class: structural; cardinality: many; catalog: HAS_ANNOTATION (moved from MediaAsset: coordinates are defined only on one rendition's raster)"""
+  annotations: [MediaAnnotation!]! @relationship(type: "HAS_ANNOTATION", direction: OUT)
+  """class: structural; cardinality: zero_or_one (exactly_one for non-ORIGINAL); catalog: WAS_GENERATED_BY (W00; W22-SR-03)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+}
+
+"""
+An intentional, stable selection of a region, time range, frame range or 3D sub-object on exactly one MediaVariant,
+in the coordinate frame named by `normalizationVersion` (IMG-PX1 proposed in W22-SR-05). It may back a W00
+`SourceLocator{selectorKind: IMAGE_REGION}` through `mediaAnnotationUid` plus the structural LOCATES_REGION edge
+(D-010); it never replaces the locator or the snapshot, and a locator may use it as support only when the
+annotated variant's bytes equal the locator's snapshot bytes (V-602) and the variant is an ORIGINAL capture
+(V-606). It is NOT a Chunk and NOT a claim about what the region shows (that is ANNOTATES_SUBJECT, asserted).
+CQs: CQ-PV-02, CQ-MD-C04, CQ-MD-C05. Module: media. Archetype: InformationArtifact.
+"""
+type MediaAnnotation implements Entity & InformationArtifactArchetype
+  @node(labels: ["MediaAnnotation", "InformationArtifact"]) {
+  id: ID! @id
+  "hu:media-annotation:<opaque>; token proposed in W22-SR-01"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'MEDIA_ANNOTATION'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  "sha256 over the canonical serialization of the selection (type, normalizationVersion, coordinates); optional."
+  contentHash: String
+  annotationType: AnnotationType!
+  label: String
+  "Text read inside the region (OCR or manual); derived, never a quote anchor by itself."
+  text: String
+  "Coordinate frame of x/y/width/height/polygon (e.g. 'IMG-PX1'); required when the annotation backs a locator."
+  normalizationVersion: String
+  x: Float
+  y: Float
+  width: Float
+  height: Float
+  polygonJson: String
+  maskUri: String
+  startTimeSeconds: Float
+  endTimeSeconds: Float
+  frameStart: Int
+  frameEnd: Int
+  meshObjectName: String
+  vertexGroupName: String
+  volumeRegionJson: String
+  """class: structural; cardinality: exactly_one; catalog: HAS_ANNOTATION (inverse)"""
+  variant: [MediaVariant!]! @relationship(type: "HAS_ANNOTATION", direction: IN)
+  """class: asserted; cardinality: many; catalog: ANNOTATES_SUBJECT (what the region shows, as asserted)"""
+  annotatesSubjects: [MediaSubjectTarget!]! @relationship(type: "ANNOTATES_SUBJECT", direction: OUT, properties: "MediaLinkProperties")
+  """class: structural; cardinality: many; catalog: LOCATES_REGION (W00 defines SourceLocator -[:LOCATES_REGION]-> MediaAnnotation; this is the inverse field, D-010)"""
+  locatedBy: [SourceLocator!]! @relationship(type: "LOCATES_REGION", direction: IN)
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (W00; W22-SR-03)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+}
+
+"""
+A saved, reproducible graph view specification (query, traversal, layout) and its viewpoint. Its rendered images are
+MediaAssets linked by VISUALIZES_TRAVERSAL. A rendered traversal is never a source and never support for an
+assertion; INCLUDES_SUBJECT is derived from the specification at the stated viewpoint. CQs: CQ-PV-01 (a view is
+state 4 at most), CQ-MD-C02. Module: media. Archetype: InformationArtifact.
+"""
+type GraphView implements Entity & InformationArtifactArchetype & SearchIndexable
+  @node(labels: ["GraphView", "InformationArtifact"])
+  @fulltext(indexes: [{indexName: "GraphViewSearch", fields: ["name", "description", "searchText", "queryText"], queryName: "searchGraphViews"}]) {
+  id: ID! @id
+  "hu:graph-view:<opaque>; token proposed in W22-SR-01"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'GRAPH_VIEW'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  "sha256 over the canonical traversal specification; the derivation anchor of INCLUDES_SUBJECT."
+  contentHash: String
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  graphViewType: GraphViewType
+  queryText: String
+  cypherQuery: String
+  graphqlQuery: String
+  traversalSpecJson: String
+  layoutSpecJson: String
+  "Recorded-time viewpoint the view was evaluated at (QS-2 'as recorded at R'); null = not reproducible."
+  viewpointRecordedAt: DateTime
+  "Valid-time viewpoint the view was evaluated at ('valid at V')."
+  viewpointValidAt: DateTime
+  renderedSvgUri: String
+  renderedImageUri: String
+  interactiveViewUri: String
+  """class: derived (rule GRAPHVIEW-INCLUDE-1 over contentHash at the viewpoint; regenerable); cardinality: many; catalog: INCLUDES_SUBJECT"""
+  includesSubjects: [MediaSubjectTarget!]! @relationship(type: "INCLUDES_SUBJECT", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural; cardinality: many; catalog: VISUALIZES_TRAVERSAL (inverse)"""
+  renderings: [MediaAsset!]! @relationship(type: "VISUALIZES_TRAVERSAL", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+A labelled panel of a figure asset (e.g. 'Figure 1D' of a publication figure), optionally bound to the region
+annotation that delimits it. Caption text is captured presentation text; citing a panel as support goes through a
+SourceLocator on the captured rendition. It is NOT the Publication and NOT the result it shows (VISUALIZES points at
+the W09 StudyResult or the assertion). CQs: CQ-MD-C05, CQ-PV-01. Module: media. Archetype: InformationArtifact.
+"""
+type FigurePanel implements Entity & InformationArtifactArchetype
+  @node(labels: ["FigurePanel", "InformationArtifact"]) {
+  id: ID! @id
+  "hu:figure-panel:<opaque>; token proposed in W22-SR-01"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'FIGURE_PANEL'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  panelLabel: String
+  figureNumber: String
+  captionText: String
+  """class: structural; cardinality: exactly_one; catalog: PART_OF_MEDIA (orderIndex on the edge)"""
+  partOfMedia: [MediaAsset!]! @relationship(type: "PART_OF_MEDIA", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: FROM_ANNOTATION (the region delimiting the panel)"""
+  region: [MediaAnnotation!]! @relationship(type: "FROM_ANNOTATION", direction: OUT)
+  """class: asserted; cardinality: many; catalog: DEPICTS"""
+  depicts: [MediaSubjectTarget!]! @relationship(type: "DEPICTS", direction: OUT, properties: "MediaLinkProperties")
+  """class: asserted; cardinality: many; catalog: VISUALIZES"""
+  visualizes: [MediaVisualizableRelationshipTarget!]! @relationship(type: "VISUALIZES", direction: OUT, properties: "MediaLinkProperties")
+  """class: derived (rule MEDIA-EV-1 via the panel region); cardinality: many; catalog: EVIDENCES"""
+  evidences: [MediaVisualizableRelationshipTarget!]! @relationship(type: "EVIDENCES", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A region of a product-label image (Supplement Facts panel, ingredient list, warning...) delimited by exactly one
+MediaAnnotation on the captured label rendition. The declarations read from it are W04 LabelDeclarations that it
+contains (REGION_HAS_DECLARATION); their quantities and material identities stay W04's asserted facts. Which product
+the label belongs to is W04's LABEL_FOR on the LabelSnapshot; ABOUT_PRODUCT here is only a derived shortcut. The
+region is NOT the label snapshot, NOT a crop (a crop is a MediaVariant), and its OCR text is never a quote anchor.
+CQs: CQ-MD-C04, CQ-PV-02, CQ-PF family via W04. Module: media (seam labels, W04). Archetype: InformationArtifact.
+"""
+type ProductLabelRegion implements Entity & InformationArtifactArchetype
+  @node(labels: ["ProductLabelRegion", "InformationArtifact"]) {
+  id: ID! @id
+  "hu:label-region:<opaque>; token proposed in W22-SR-01"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'PRODUCT_LABEL_REGION'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  labelRegionType: LabelRegionType
+  "OCR text of the region; derived search text, never a locator."
+  extractedText: String
+  """class: structural; cardinality: exactly_one; catalog: FROM_ANNOTATION"""
+  region: [MediaAnnotation!]! @relationship(type: "FROM_ANNOTATION", direction: OUT)
+  """class: structural; cardinality: many; catalog: REGION_HAS_DECLARATION (new; replaces live MENTIONS/ASSERTS on this type; W22-SR-07 with W04)"""
+  declarations: [LabelDeclaration!]! @relationship(type: "REGION_HAS_DECLARATION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: derived (rule LABEL-REGION-PRODUCT-1 from W04 LABEL_FOR on the LabelSnapshot whose IMAGE_REGION locator LOCATES_REGION this region's annotation); cardinality: zero_or_one; catalog: ABOUT_PRODUCT"""
+  aboutProduct: [Product!]! @relationship(type: "ABOUT_PRODUCT", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A method-versioned BellLabs assessment of ONE suitability dimension of one media asset (optionally inspected on one
+rendition) for one intended display role and optional subject: display quality, depiction accuracy, authenticity,
+or extraction accuracy. Each dimension is its own node; dimensions are never averaged into one score. It replaces
+the live unsourced `qualityScore`/`authenticityScore`, which migrate with methodVersion 'legacy-unsourced' and are
+ignored by selection queries. It is NOT an evidence verdict, NOT a truth or support adjudication, and NOT rights
+clearance. Immutable; a re-assessment is a new node linked by SUPERSEDES. CQs: CQ-MD-C01, CQ-MD-C02.
+Module: media. Archetype: EvidenceAssessment. Maturity: candidate promoted by failing case mp1/mp2 (unsourced 0.97
+score outranking a method-versioned SUITABLE assessment).
+"""
+type MediaSuitabilityAssessment implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["MediaSuitabilityAssessment", "EvidenceAssessment"]) {
+  id: ID! @id
+  "hu:media-assessment:<opaque>; token proposed in W22-SR-01"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'MEDIA_SUITABILITY'."
+  assessmentType: String!
+  "Method and criteria version (e.g. 'bl-media-display-quality-v1'); 'legacy-unsourced' marks migrated live scores."
+  methodVersion: String!
+  status: AssessmentStatus!
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  summary: String
+  "Score on the method's scale; meaningful only with methodVersion and scoreScale. Not a probability of truth."
+  overallScore: Float
+  "Deprecated (contract A4); not written by new assessments."
+  confidence: Float
+  dimension: MediaSuitabilityDimension!
+  verdict: SuitabilityVerdict!
+  "Display role the suitability is judged for (PRIMARY_IMAGE, THUMBNAIL, MECHANISM_DIAGRAM...)."
+  intendedRole: MediaRelationRole
+  "Scale of overallScore, e.g. '0..1 higher-better'."
+  scoreScale: String
+  "Verbatim criteria applied (e.g. 'min short edge 800 px; no watermark; legible labels at 400 px')."
+  criteriaSummary: String
+  """class: structural; cardinality: exactly_one; catalog: ASSESSES_MEDIA"""
+  assessesMedia: [MediaAsset!]! @relationship(type: "ASSESSES_MEDIA", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: ASSESSED_ON_VARIANT (new; the rendition inspected; display quality differs between an 1946 px and a 416 px rendition)"""
+  assessedOnVariant: [MediaVariant!]! @relationship(type: "ASSESSED_ON_VARIANT", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: ASSESSES_SUITABILITY_FOR (new; the subject the role is judged for)"""
+  forSubject: [MediaSubjectTarget!]! @relationship(type: "ASSESSES_SUITABILITY_FOR", direction: OUT)
+  """class: structural; cardinality: exactly_one for non-legacy assessments (V-609); catalog: WAS_GENERATED_BY (W00)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00; same label required)"""
+  supersedes: [MediaSuitabilityAssessment!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+}
+
+"""
+The rights terms that a named source states for a media asset, as one immutable state: a licence offer
+(CC BY-SA 3.0 on a Wikimedia Commons file; CC0 on a BioImage Archive study), a copyright notice ('Copyright 2016
+Elsevier Inc. All rights reserved.'), site terms ('personal and non-commercial purposes'), a content-class licence
+(Reactome 'Pathway Illustrations' CC BY 4.0 versus data CC0), or a permission grant. Each offer or terms version is
+its own record (a dual-licensed file has two). Attached to the asset by HAS_RIGHTS_RECORD, an asserted edge whose
+Assertion is SUPPORTED_BY a locator on the captured licence/terms text. Booleans are null when the statement is
+silent. It is NOT permission for any BellLabs use: permission is a PolicyVersion decision (W23) recorded through
+Activity -AUTHORIZED_BY {useKind}-> PolicyVersion; public availability, absence of a record, NO_STATEMENT_FOUND and
+AMBIGUOUS never permit. No legal conclusion (fair use, copyrightability of facts) is recorded here. CQs: CQ-MD-C03,
+CQ-PV-06, CQ-PV-01 (state 5 input). Module: media (rights seam W23). Archetype: VersionedState. Maturity: candidate
+promoted by failing cases mp4 (one license string cannot hold the Commons dual offer, the Reactome content-class
+split, or 'not checked' versus 'checked, none found').
+"""
+type MediaRightsRecord implements Entity & VersionedStateArchetype
+  @node(labels: ["MediaRightsRecord", "VersionedState"]) {
+  id: ID! @id
+  "hu:media-rights:<opaque>; token proposed in W22-SR-01"
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'MEDIA_RIGHTS'."
+  stateType: String!
+  "sha256:<hex> over the canonical payload (status, kind, scope, licence, holder, duties, restrictions)."
+  payloadHash: String!
+  "Start of the terms as stated (e.g. 'Last updated: November 17, 2022'); null = not stated."
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  rightsStatus: MediaRightsStatus!
+  statementKind: RightsStatementKind!
+  statementScope: RightsStatementScope!
+  "Licence short name as stated, e.g. 'CC BY-SA 3.0'."
+  licenseName: String
+  "Canonical licence URL as stated, e.g. 'https://creativecommons.org/licenses/by-sa/3.0'."
+  licenseUri: String
+  "Rights holder as stated (e.g. 'Elsevier Inc'); identity resolution to an Organization is a separate hypothesis."
+  rightsHolderText: String
+  "Attribution string the statement requires or supplies (e.g. 'Lybbar12')."
+  attributionText: String
+  attributionRequired: Boolean
+  shareAlikeRequired: Boolean
+  "The statement requires modifications to be indicated (CC BY 4.0; Reactome 'modifications ... clearly indicated')."
+  modificationIndicationRequired: Boolean
+  "Null = the statement is silent; never defaulted to true."
+  commercialUseAllowed: Boolean
+  derivativesAllowed: Boolean
+  "Verbatim restriction text (e.g. 'solely for your personal and non-commercial purposes')."
+  restrictionsText: String
+  """class: asserted; cardinality: many; catalog: HAS_RIGHTS_RECORD (inverse)"""
+  assets: [MediaAsset!]! @relationship(type: "HAS_RIGHTS_RECORD", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+asserted_edge profile (contract B4 AssertedEdgeProperties, every field kept) specialised for media links
+(DEPICTS, EXPLAINS, VISUALIZES, ANNOTATES_SUBJECT). Successor of live MediaLinkMetadata: `confidence`,
+`isCanonical`, `isRepresentative` and `notes` are retired. `role` is the depiction/explanation role; `isPrimary`
+is the asserting source's own designation (e.g. og:image, first carousel position), not BellLabs' display choice,
+which is derived by the selection query from MediaSuitabilityAssessment and rights; `salience` is a ranking
+feature computed by `salienceMethodVersion`, never an evidence verdict.
+"""
+type MediaLinkProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  role: MediaRelationRole
+  isPrimary: Boolean
+  salience: Float
+  salienceMethodVersion: String
+  "Alt text, caption or label text that grounds the link, verbatim."
+  sourceText: String
+}
+
+"""
+Structural lineage from a MediaAsset to the W00 SourceLocator its bytes were obtained from. Successor of live
+MediaSourceMetadata (sourceRole -> captureRelation; sourceConfidence, extractionMethod, extractedAt -> the generating
+Activity). `captureRelation` SAME_BYTES_AS_SNAPSHOT is the only case where asset bytes and evidence capture are the
+same bytes; it still does not make the asset a Source.
+"""
+type MediaSourceProperties @relationshipProperties {
+  sourceType: MediaSourceType
+  captureRelation: MediaCaptureRelation!
+  "Surrounding text at the source (e.g. alt text or figure title), verbatim."
+  contextText: String
+  mongoResearchRunId: String
+}
+
+"""
+Media subject range (contract B6): identities AND concepts a media asset, panel, annotation or graph view may
+depict, explain, be assessed for or include. Preserves the concept coverage of live MediaSubject (Mechanism,
+Pathway, Biomarker, Metric, Condition, Protocol ...), renamed to final names (D-002, D-007, D-008). Removed members
+(migration-map.yaml): snapshot states, retired legacy names, CohortParticipant and AnonymousActor (privacy and
+no identity to depict), retrieval units (DocumentTextVersion, Segmentation, Chunk), propositions (moved to
+MediaVisualizableRelationshipTarget) and media types themselves. Membership follows the ownership registry; Fable
+prunes members absent from the merged schema.
+"""
+union MediaSubjectTarget =
+  | Organization | LegalEntity | ConsumerBrand | Facility | Person | PseudonymousActor
+  | Product | ProductVariant | PackageConfiguration | Trademark | CertificationProgram | MerchantListing
+  | ChemicalSubstance | ChemicalForm | IngredientMaterial | BrandedIngredientMaterial | BotanicalTaxon | BotanicalPreparation | MicrobialTaxon | MicrobialStrain
+  | Mechanism | Pathway | MolecularEntity | Species | AnatomicalContext | Organ | Outcome | Condition | RiskFactor
+  | Biomarker | Metric | LabTest | PanelDefinition | MeasurementMethod | Specimen
+  | TechnologyPlatform | ToolOrInstrument | Device | Sensor | Modality
+  | FoodItem | FoodProduct | Exposure | Lifestyle | Treatment | Procedure
+  | ManufacturingProcess | ManufacturingStep
+  | RegulatoryAgency | RegulatoryPathway | RegulatoryStep | RegulatoryStatus
+  | Study | StudyArm | StudyPopulation | OutcomeDefinition | StudyResult | Dataset | Publication
+  | Protocol | ProtocolEdition | ProtocolStep | Constraint | MeasurementPlan | Target | FunctionalGoal | Observation | ProtocolAdjustmentRule | ProtocolResult
+  | AdverseEffect | SafetySignal
+  | Community | Conference | Event | NarrativeArc
+  | Platform | Channel | Series | Episode | EpisodeSegment | Claim | ExperienceReport
+  | Document
+
+"""
+Propositions and results a chart or figure can visualize, and (derived only) evidence: generic Assertion,
+ClaimOccurrence, RelationshipAssertion, the Claim proposition, a W09 StudyResult, and the live W03 Association
+(kept only if W03 keeps it; Fable prunes). Successor of live MediaVisualizableRelationship.
+"""
+union MediaVisualizableRelationshipTarget = Assertion | ClaimOccurrence | RelationshipAssertion | Claim | StudyResult | Association
+
+"Kind of media work (live values, unchanged)."
+enum MediaAssetType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT_FIGURE
+  DIAGRAM
+  CHART
+  TABLE_IMAGE
+  SCREENSHOT
+  MICROSCOPY_IMAGE
+  MEDICAL_IMAGE
+  MOLECULAR_STRUCTURE
+  THREE_D_MODEL
+  ANIMATION
+  INTERACTIVE_MODEL
+  POINT_CLOUD
+  MESH
+  TEXTURE
+  THUMBNAIL
+  UNKNOWN
+}
+
+"Container/encoding format of a rendition (live values, unchanged)."
+enum MediaFormat {
+  PNG
+  JPEG
+  WEBP
+  SVG
+  GIF
+  MP4
+  MOV
+  WEBM
+  MP3
+  WAV
+  PDF
+  GLB
+  GLTF
+  OBJ
+  STL
+  PLY
+  USDZ
+  DICOM
+  NIFTI
+  CSV
+  HTML
+  UNKNOWN
+}
+
+"Declared purpose (live values, unchanged). A declared purpose never creates a link: EVIDENCE does not imply EVIDENCES."
+enum MediaPurpose {
+  DEPICTION
+  EXPLANATION
+  EVIDENCE
+  PRODUCT_PHOTO
+  LABEL_IMAGE
+  INSTRUCTIONAL
+  SCIENTIFIC_FIGURE
+  PATHWAY_DIAGRAM
+  ANATOMICAL_MODEL
+  MOLECULAR_RENDERING
+  PROTOCOL_GUIDE
+  COMPARISON
+  BEFORE_AFTER
+  RESULT_VISUALIZATION
+  MARKETING
+  EDUCATIONAL
+  COMMUNITY_POST
+  GENERATED_SUMMARY
+  UNKNOWN
+}
+
+"How the ORIGINAL bytes came to exist (live values, unchanged). GENERATED assets can never back EVIDENCES (V-605)."
+enum MediaGenerationMode {
+  CAPTURED
+  EXTRACTED
+  UPLOADED
+  GENERATED
+  RENDERED
+  DERIVED
+  TRANSCODED
+  ANNOTATED
+  UNKNOWN
+}
+
+"Kind of rendition (live values, unchanged). Only ORIGINAL renditions may carry annotations that back evidence locators (V-606)."
+enum MediaVariantKind {
+  ORIGINAL
+  THUMBNAIL
+  PREVIEW
+  CROPPED
+  RESIZED
+  COMPRESSED
+  TRANSCODED
+  OCR_ENHANCED
+  ANNOTATED
+  MASKED
+  DEPTH_MAP
+  NORMAL_MAP
+  TEXTURE
+  LOW_POLY
+  HIGH_POLY
+  LOD
+  MOBILE_OPTIMIZED
+  PRINT_READY
+  UNKNOWN
+}
+
+"Selection shape (live values, unchanged)."
+enum AnnotationType {
+  BOUNDING_BOX
+  POLYGON
+  POINT
+  MASK
+  SEGMENT
+  FRAME_RANGE
+  TIME_RANGE
+  VOLUME_REGION
+  MESH_REGION
+  LABEL
+  CALLOUT
+  OCR_SPAN
+  TRANSCRIPT_SPAN
+  FIGURE_PANEL
+  CHART_AXIS
+  CHART_SERIES
+  UNKNOWN
+}
+
+"Kind of place a media asset was obtained from (live values, unchanged); now the type of DERIVED_FROM_SOURCE, not a node."
+enum MediaSourceType {
+  DOCUMENT
+  DOCUMENT_FIGURE
+  PRODUCT_PAGE
+  MARKETPLACE_LISTING
+  REGULATORY_LABEL
+  PATENT_FIGURE
+  STUDY_FIGURE
+  VIDEO_FRAME
+  EPISODE_THUMBNAIL
+  SOCIAL_MEDIA_POST
+  USER_UPLOAD
+  GENERATED_OUTPUT
+  RENDER_PIPELINE
+  INSTRUMENT_CAPTURE
+  DEVICE_EXPORT
+  MICROSCOPE_CAPTURE
+  MEDICAL_SCAN
+  UNKNOWN
+}
+
+"Graph view kind (live values, unchanged)."
+enum GraphViewType {
+  MECHANISM_MAP
+  PATHWAY_MAP
+  PRODUCT_SUPPLY_CHAIN
+  COMPANY_ECOSYSTEM_MAP
+  PROTOCOL_FLOWCHART
+  STUDY_EVIDENCE_MAP
+  CLAIM_PROVENANCE_MAP
+  SAFETY_INTERACTION_MAP
+  BIOMARKER_PANEL_MAP
+  REGULATORY_TIMELINE
+  EVENT_TIMELINE
+  NARRATIVE_ARC_MAP
+  UNKNOWN
+}
+
+"Label region kind (live values, unchanged)."
+enum LabelRegionType {
+  SUPPLEMENT_FACTS
+  NUTRITION_FACTS
+  INGREDIENT_LIST
+  DIRECTIONS
+  WARNING
+  MANUFACTURER_INFO
+  CERTIFICATION
+  LOT_NUMBER
+  EXPIRATION_DATE
+  CLAIM_TEXT
+  QR_CODE
+  BARCODE
+  UNKNOWN
+}
+
+"Role of a media link or of an intended display slot (live values, unchanged)."
+enum MediaRelationRole {
+  PRIMARY_IMAGE
+  THUMBNAIL
+  HERO_IMAGE
+  PRODUCT_PHOTO
+  PACKAGE_LABEL
+  SUPPLEMENT_FACTS_LABEL
+  DEVICE_PHOTO
+  CLINIC_PHOTO
+  PROCEDURE_DEMO
+  PROTOCOL_STEP_INSTRUCTION
+  MECHANISM_DIAGRAM
+  PATHWAY_DIAGRAM
+  MOLECULAR_RENDERING
+  ANATOMICAL_RENDERING
+  STUDY_FIGURE
+  RESULT_CHART
+  BEFORE_AFTER
+  SAFETY_WARNING
+  SCREENSHOT
+  LOGO
+  PORTRAIT
+  EVENT_PHOTO
+  PODCAST_COVER
+  SOCIAL_PREVIEW
+  GENERATED_EXPLAINER
+  UNKNOWN
+}
+
+"How an asset's bytes relate to the locator it was obtained from (new; successor of free-text sourceRole)."
+enum MediaCaptureRelation {
+  "ORIGINAL variant bytes equal the snapshot bytes (same raw-byte hash)."
+  SAME_BYTES_AS_SNAPSHOT
+  "Bytes cut from a region or page of a larger capture (figure from a PDF page, crop of a page screenshot)."
+  EXTRACTED_FROM_REGION
+  "A frame or clip taken from a MEDIA_TIME range of a captured rendition."
+  FRAME_FROM_TIME_RANGE
+  "Rendered by BellLabs from data or text found at the locator (e.g. a diagram drawn from a pathway record)."
+  RENDERED_FROM_SOURCE_DATA
+  "Transcoded or re-encoded from the captured bytes."
+  TRANSCODED_FROM_SNAPSHOT
+}
+
+"Separately assessed suitability dimensions (new; candidate type MediaSuitabilityAssessment)."
+enum MediaSuitabilityDimension {
+  "Technical fitness for a display role: resolution, legibility, artefacts, watermarks, cropping."
+  DISPLAY_QUALITY
+  "Whether the asset shows the subject it is linked to (right product variant, right pathway)."
+  DEPICTION_ACCURACY
+  "Whether the asset is what it purports to be (unaltered capture, disclosed generation or editing)."
+  AUTHENTICITY
+  "Accuracy of text or regions extracted from the asset (OCR of a Supplement Facts panel)."
+  EXTRACTION_ACCURACY
+}
+
+"Verdict of one suitability dimension. UNKNOWN and NOT_ASSESSED stay distinct (contract A7)."
+enum SuitabilityVerdict {
+  SUITABLE
+  MARGINAL
+  UNSUITABLE
+  UNKNOWN
+  NOT_ASSESSED
+}
+
+"Status of a stated rights record (new). Only a PolicyVersion decides permission; NO_STATEMENT_FOUND and AMBIGUOUS never permit."
+enum MediaRightsStatus {
+  "A licence offer to the public (Creative Commons BY, BY-SA ...)."
+  OPEN_LICENSE
+  "A public-domain dedication or mark stated by the source (CC0, PDM)."
+  PUBLIC_DOMAIN
+  "An explicit reservation of rights ('All rights reserved')."
+  ALL_RIGHTS_RESERVED
+  "Terms that allow only limited uses (e.g. personal and non-commercial viewing)."
+  RESTRICTED_TERMS
+  "A permission granted to BellLabs by the rights holder (a recorded grant)."
+  PERMISSION_GRANTED
+  "BellLabs or its contractor holds the rights (own capture or own generation), as recorded by BellLabs."
+  HELD_BY_OPERATOR
+  "The checked sources state nothing about rights (checked, none found). Not permission."
+  NO_STATEMENT_FOUND
+  "Statements conflict or their scope over this asset is unclear. Not permission."
+  AMBIGUOUS
+}
+
+"Kind of rights statement (new); ODRL 2.2 alignment noted in the model card (Offer, Agreement, Set), not adopted."
+enum RightsStatementKind {
+  LICENSE_OFFER
+  COPYRIGHT_NOTICE
+  SITE_TERMS
+  PERMISSION_GRANT
+  REPOSITORY_METADATA
+  OPERATOR_RECORD
+}
+
+"What the statement covers (new)."
+enum RightsStatementScope {
+  "This asset specifically (a Commons file page licence)."
+  THIS_ASSET
+  "A named class of content on a site (Reactome 'Pathway Illustrations')."
+  CONTENT_CLASS_ON_SITE
+  "All content of a site (site terms of service)."
+  ENTIRE_SITE
+  "The containing work (an article copyright notice that covers its figures unless excepted)."
+  CONTAINING_WORK
+  "A dataset or study record and its files (a BioImage Archive study licence)."
+  DATASET_RECORD
+}

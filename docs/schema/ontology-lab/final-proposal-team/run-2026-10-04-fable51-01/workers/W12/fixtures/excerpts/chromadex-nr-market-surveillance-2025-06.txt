@@ -1,0 +1,15 @@
+SOURCE: https://s205.q4cdn.com/770776702/files/doc_downloads/MarketSurveillance/2025/Quantitative-Analysis-of-Nicotinamide-Riboside-Consumer-Products-and-Counterfeit-Tru-Niagen-June-2025.pdf
+CAPTURE: Firecrawl scrape (pdf parser), 2026-10-04T01:00Z, 9 pages; PARTIAL_EXCERPT (selected passages)
+EXCERPT (verbatim):
+Quantitative Analysis of Nicotinamide Riboside Consumer Products and Counterfeit Tru Niagen® Products June 2025
+Between February 2023 and June 2025, fifty US-based consumer products labeled as containing NR were purchased from Amazon and various brand websites and analyzed for NR content using a validated High Performance Liquid Chromatography (HPLC) method with a UV-Vis detector.
+To gain insight into the landscape of NR products available to consumers, Niagen Bioscience, Inc. conducted an analysis of fifty non-Niagen® NR products.
+Table 1. Analytical Results for Non-Niagen® Nicotinamide Riboside Consumer Products
+| Brand | Product Name | Product Format | Product Label Claim (mg NR/serving) | Result (mg NR/serving) |
+| Elysium Health | Basis | Capsule | 250 | 261 |
+| Elysium Health | Cofactor | Powder | 250 | 305 |
+| Aesticum | Liposomal Nicotinamide Riboside 2000MG | Softgel | 1500 | ND |
+| Cellulim | Anti-aging Spirit NR 500mg | Capsule | 500 | BRL |
+BRL – Below Reporting Limit; ND – Not Detected Reporting Limit – 1% or less of label claim.
+Table 3. Analysis Results for Counterfeit Tru Niagen® 300 mg Products ... Indicators of counterfeit status included ... the usage of outdated and out-of-market lot numbers ...
+NOTE: no lot numbers, test dates per product, laboratory name, uncertainty or limits of detection are given per row.

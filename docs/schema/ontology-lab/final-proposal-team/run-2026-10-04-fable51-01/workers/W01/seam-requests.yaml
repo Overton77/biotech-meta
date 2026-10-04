@@ -1,0 +1,156 @@
+# W01 seam requests (run-2026-10-04-fable51-01). Format per 04-worker-brief: {id, targetOwner, request, cq, failingCase, proposedRuling}.
+# Fixture and query references are under workers/W01/fixtures/ (executed on embedded Neo4j 5.26.31 Community, see 06).
+
+- id: W01-SR-01
+  targetOwner: "W00"
+  request: "Register uid type tokens `org-snapshot` (OrganizationSnapshot) and `cohort-participant` (CohortParticipant); neither has a token in conventions.uidTypeTokens."
+  cq: [CQ-EC-C01, CQ-CL-07, CQ-AX-14]
+  failingCase: "w01-03 writes hu:org-snapshot:niagen-legal-name-chromadex-corporation and w01-06 writes hu:cohort-participant:w01-synthetic-dataset-a-p03; INV-106 requires a registered token."
+  proposedRuling: "Add both tokens; LegalEntity keeps `org` (shared with Organization), Facility keeps `facility` (absorbs PhysicalLocation, no new token)."
+
+- id: W01-SR-02
+  targetOwner: "W00"
+  request: "Make ActorIdentity.name nullable (`String`) to match D-013 (Entity.name nullable)."
+  cq: [CQ-CL-01, CQ-CL-07]
+  failingCase: "W01 fragment + kernel stub with live `interface ActorIdentity { name: String! }` fails @neo4j/graphql 7.6.3 build (graphql-js: Person.name String does not satisfy ActorIdentity.name String!; error at the first implementing type). With `name: String` the build succeeds (1,362 generated types)."
+  proposedRuling: "ActorIdentity { id: ID!  name: String  description: String  mongoResearchRunId: String }; implemented by Person, PseudonymousActor, AnonymousActor, CohortParticipant."
+
+- id: W01-SR-03
+  targetOwner: "W00"
+  request: "Retire live HAS_SNAPSHOT for Organization->OrganizationSnapshot (and, by the same rule, Product->ProductSnapshot W04 and Listing->ListingSnapshot W15); attach live *Snapshot states by HAS_STATE with StateEpisodeProperties. HAS_SNAPSHOT keeps its catalog meaning Source->SourceSnapshot only."
+  cq: [CQ-TM-01, CQ-TM-07, CQ-EC-C01]
+  failingCase: "Live schema lines 554/624, 773/818, 904/927 use HAS_SNAPSHOT for state attachment; catalog provenance uses HAS_SNAPSHOT for Source->SourceSnapshot (proposed-delta lines 1016/1157). A traversal (x)-[:HAS_SNAPSHOT]->(s) without labels mixes provenance captures with organization states; one relationship type, two meanings (same principle as CL-014). w01-03 attaches two legal-name states by HAS_STATE and Q-W01-04 answers ChromaDex Corporation/CDXC at 2024-06-01 and Niagen Bioscience, Inc./NAGE at 2025-06-01."
+  proposedRuling: "One meaning per type. Organization.states / OrganizationSnapshot.organization use HAS_STATE (bitemporal_attachment); node-level time fields stay as the TemporalSnapshot cache (V-513). V-W01-08 rejects HAS_SNAPSHOT into an OrganizationSnapshot."
+
+- id: W01-SR-04
+  targetOwner: "W00"
+  request: "Make QS-2a/QS-2b validity classes precision-aware (round 0007 section 9 rule) instead of comparing raw bounds; add POSSIBLE_START_PRECISION and POSSIBLE_END_PRECISION."
+  cq: [CQ-TM-04, CQ-AX-18, CQ-CL-05]
+  failingCase: "Steven Rubin BOARD_MEMBER_OF Niagen validFrom 2017-01-01 precision YEAR ('Director Since 2017'). At V=2017-05-15, QS-2b returns OPEN_END_* (validFrom <= V) i.e. 'yes'; the correct answer is POSSIBLE (he may have joined in December). Q-W01-01 probe P01 returns POSSIBLE_START_PRECISION / 'possibly'. Same for end bounds: Sinclair 'B (2011-2017)' at V=2017-06-15 must be POSSIBLE_END_PRECISION."
+  proposedRuling: "Adopt the CASE ladder of Q-W01-01 (KNOWN_NOT_VALID, POSSIBLE_END_PRECISION, POSSIBLE_START_UNKNOWN, POSSIBLE_START_PRECISION, KNOWN, KNOWN_OPEN_END_WITNESSED, POSSIBLE_OPEN_END_STALE) in QS-2a/2b."
+
+- id: W01-SR-05
+  targetOwner: "Fable (example fixture claim-retelling-provenance.cypher; W21 informed)"
+  request: "Correct the 0.2.0 example's role fixture. (a) \"B (2011-2017)\" is stored as validTo 2018-01-01 YEAR, which under the frozen bound rule (contract A6, round 0007 section 9) means \"ended during 2018\"; it must be validTo 2017-01-01 YEAR. (b) Person-to-company FINANCIAL_INTEREST assertions and the projected BOARD_MEMBER_OF edge target the ConsumerBrand hu:brand:insidetracker; a brand has no board, investors or advisors; retarget to the company (LegalEntity hu:org:segterra) with roleTitleVerbatim 'InsideTracker (Segterra)'."
+  cq: [CQ-CL-05, CQ-EC-01, CQ-EC-02]
+  failingCase: "(a) Q-W01-01 probe P07 (as recorded before the W01 fix) answers 'possibly' for 2018-06-01; with the corrected bound (P06) the answer is 'no'. (b) Combined load of the six 0.2.0 fixtures plus W01 fixtures: V-W01-01 returns 1 row (BOARD_MEMBER_OF david-a-sinclair -> hu:brand:insidetracker); V-434 cannot see it because it matches only (o:Organization)."
+  proposedRuling: "Patch the example in Wave 6 (two values and four object references), recorded as an EXTRACTION_FIX supersession in the fixture as w01-01 demonstrates."
+
+- id: W01-SR-06
+  targetOwner: "W00 (validation) and Fable (catalog)"
+  request: "Add an organizations `relationships:` block to the catalog (domain, range, class asserted, temporalProfile asserted_edge, temporalCardinality) for every W01 edge type so that validation-params.json $assertedTypes covers them; extend V-434 to ConsumerBrand targets (or adopt V-W01-01); add V-W01-01..V-W01-12 to validation.cypher."
+  cq: [CQ-CL-05, CQ-EC-01, CQ-MF-01]
+  failingCase: "validation-params.json generated from catalog 0.2.0 lists 68 asserted types and none of BOARD_MEMBER_OF, EMPLOYED_BY, ADVISES_ORGANIZATION, INVESTED_IN, HOLDS_EQUITY_IN, PARENT_OF, OWNS_BRAND, OPERATES_FACILITY, MARKETS_PRODUCT, MANUFACTURES_PRODUCT, DISTRIBUTES_PRODUCT, ENDORSES_PRODUCT, so V-101/V-106 never inspect them. Negative N4 (BOARD_MEMBER_OF to a brand) and N8 (OWNS_BRAND projected from a PROPOSED assertion) pass every 0.2.0 check and are caught only by V-W01-01/V-W01-07."
+  proposedRuling: "Accept the relationship table in 04-model-cards.md section 3 as the catalog block; regenerate params; append V-W01-* checks."
+
+- id: W01-SR-07
+  targetOwner: "W00"
+  request: "KERNEL CHANGE REQUEST. A point-in-time statement (\"beneficially owned ... as of April 25, 2025\"; \"based on Schedule 13D/A filed August 20, 2024\") states a witness instant, not an interval bound. The kernel forbids a bound with OBSERVATION_ONLY basis and derives witnesses only from SourceSnapshot.observedAt, so the source-stated witness date is lost."
+  cq: [CQ-EC-01, CQ-EC-C02, CQ-TM-03]
+  failingCase: "w01-04 HOLDS_EQUITY_IN Pioneer Step -> Niagen: bounds must be null/UNKNOWN; the snapshot observedAt (2026-10-04) and publishedAt (2025-04-29) are both later than the stated holding date 2024-08-20, so 'did Pioneer Step hold Niagen stock on 2024-09-01?' can only answer POSSIBLE_START_UNKNOWN; the filing actually witnesses the holding on 2024-08-20. Primary source: Niagen Bioscience DEF 14A 2025 (SEC EDGAR 0001628280-25-020690), beneficial ownership footnote."
+  proposedRuling: "Add optional Assertion.statedAsOf (DateTime) + statedAsOfPrecision (TimePrecision), copied to asserted edges as witnessAt; the as-of ladder treats V == statedAsOf as KNOWN and keeps bounds null. Alternative (no kernel change): accept POSSIBLE answers and keep the date in roleTitleVerbatim (current W01 workaround)."
+
+- id: W01-SR-08
+  targetOwner: "W00"
+  request: "For present-tense statements the open-end witness is the statement's publication instant (SourceSnapshot.publishedAt), not the capture instant (observedAt). QS-2 uses max(observedAt)."
+  cq: [CQ-AX-18, CQ-TM-04]
+  failingCase: "The 2025 proxy (publishedAt 2025-04-29) captured 2026-10-04 says Yu 'has been a director ... since August 2017'. With observedAt as witness, 'director on 2026-06-01?' is OPEN_END_SUPPORTED ('yes'); the source says nothing after 2025-04-29. Q-W01-01 uses coalesce(publishedAt, observedAt)."
+  proposedRuling: "Witness = coalesce(snapshot.publishedAt, snapshot.observedAt) for assertions whose statedTense is PRESENT or null; live pages without publishedAt keep observedAt."
+
+- id: W01-SR-09
+  targetOwner: "Fable (catalog enum value; W01 owns OrganizationType)"
+  request: "Add OrganizationType value CORPORATE_GROUP for an Organization that is a family of companies printed as one party (not one legal person, not a holding company)."
+  cq: [CQ-CL-05, CQ-EC-03]
+  failingCase: "Sinclair affiliations page: 'EdenRoc Sciences companies F,I,E,A,B, IP' followed by member lines ('MetroBiotech International, an EdenRoc Sciences company'). The group node hu:org:edenroc-sciences cannot be classified: HOLDING_COMPANY asserts a legal structure the page does not state; UNKNOWN loses the group/member distinction that V-434 depends on."
+  proposedRuling: "Add CORPORATE_GROUP (candidate) to OrganizationType; a CORPORATE_GROUP node never carries LegalEntity."
+
+- id: W01-SR-10
+  targetOwner: "Fable (catalog organizations module)"
+  request: "(1) Register candidate forbidden implications [HOLDS_EQUITY_IN, PARENT_OF] and [BOARD_MEMBER_OF, EMPLOYED_BY]. (2) Canonicalize SUBSIDIARY_OF assertions to PARENT_OF (subject = parent) with the source phrasing in roleTitleVerbatim; SUBSIDIARY_OF stays a registered alias for extraction only. (3) Mark OWNS_PRODUCT, LABELS_PRODUCT, OWNS_SPECIFICATION, OPERATES_LABORATORY, OPERATES_CERTIFICATION_PROGRAM, DEVELOPS_PRODUCT_CLASS, CLAIMS_CGMP_COMPLIANCE as assertion-only predicates (no projected edge type in 0.3). (4) Projection rule: a W01 asserted edge is projected only from an ACCEPTED assertion (V-W01-07)."
+  cq: [CQ-EC-C02, CQ-EC-01, CQ-MF-01]
+  failingCase: "Negative N3 (PARENT_OF Pioneer Step -> Niagen projected from the HOLDS_EQUITY_IN assertion) passes V-112 with catalog 0.2.0 pairs and is flagged FORBIDDEN_IMPLICATION_USED_AS_PREMISE only with the candidate pair (5 V-112 rows instead of 4). Proxy excerpt: Wendy Yu is a director and the investor's nominee while Pioneer Step only holds 6,917,783 shares; Robert Fried is both director and CEO; Steven Rubin is director only: board membership does not imply employment."
+  proposedRuling: "Accept (1)-(4) into catalog 0.3 organizations."
+
+- id: W01-SR-11
+  targetOwner: "W23"
+  request: "Confirm the public-person-only rule for Person (no birth date/place, death date) and the CohortParticipant rules: only tokens printed by a public source; explicit privacyClass; no relationship of any type between Person and CohortParticipant (live HAS_PARTICIPANT_TOKEN retired); participants derived from BellLabs users live only in the private store. Close CL-018."
+  cq: [CQ-PC-08, CQ-CL-09]
+  failingCase: "w01-91: a named Person linked by HAS_PARTICIPANT_TOKEN to dataset A's participant P03 re-identifies every report P03 made (V-W01-05 row); a CohortParticipant without privacyClass (V-W01-05, V-522); a :PrivateRecord measurement reached from a shared participant (V-113 row)."
+  proposedRuling: "Adopt V-W01-05 with V-113/V-520/V-521; W23 documents export-and-delete for live participant nodes created from user data."
+
+- id: W01-SR-12
+  targetOwner: "W06 (with W03)"
+  request: "Live Organization.worksOnConditions (WORKS_ON_CONDITION) has no catalog counterpart and no owner. W01 retires it; values become DEVELOPS_PRODUCT_CLASS literal assertions or, when a treatment is named, W06 DEVELOPS_TREATMENT."
+  cq: [CQ-EC-01]
+  failingCase: "A 'works on' edge cannot say develop versus fund versus market; it would put a sponsor of a disease foundation in the same neighbourhood as a drug developer."
+  proposedRuling: "Retire; W06 confirms DEVELOPS_TREATMENT coverage."
+
+- id: W01-SR-13
+  targetOwner: "W11"
+  request: "(a) Live CONTRACTS_MANUFACTURING edges whose target is a CompoundForm (material) map to W11 ManufacturingCapability/PERFORMS_PROCESS review, not to a W01 edge. (b) Field slots on Facility for HOSTS_PROCESS (live PhysicalLocation.hostsProcesses) and HAS_CAPABILITY_STATE (catalog Organization|Facility -> ManufacturingCapability): W11 supplies the field definitions, Fable inserts them into Facility and Organization."
+  cq: [CQ-MF-01, CQ-MF-04]
+  failingCase: "Live ContractManufacturingTarget = Product | CompoundForm | Organization: a CMO 'contract manufacturing NR chloride' says nothing about which client and is capability, not a client relationship."
+  proposedRuling: "As requested."
+
+- id: W01-SR-14
+  targetOwner: "W11 and W15"
+  request: "Live PhysicalLocation.hostsProducts (HOSTS_PRODUCT, RoleMetadata) is ambiguous (made at, sold at, stored at). W01 retires it; each live edge becomes a PROPOSED review assertion routed to W11 (manufacture site) or W15 (availability)."
+  cq: [CQ-MF-01, CQ-CM-01]
+  failingCase: "21 CFR 101.5(e): a label may print the principal place of business instead of the plant; a 'hosts product' edge from that address would assert manufacture at an office (w01-05, Q-W01-07 shows the office is not the manufacturing site)."
+  proposedRuling: "Retire with routed review."
+
+- id: W01-SR-15
+  targetOwner: "W15"
+  request: "(a) Listing.availableIn (AVAILABLE_IN -> PhysicalLocation): range becomes Facility for in-clinic availability or a jurisdiction string for market availability. (b) Seller display accounts (filing-vs-capability uses organizationKind SELLER_ACCOUNT and MARKETPLACE_OPERATOR, not live OrganizationType values) are not Organizations by default; W15 decides a commerce account node or maps to OrganizationType MARKETPLACE/UNKNOWN. (c) OFFERS and LISTS disposition per registry; W01 recommends MARKETS_PRODUCT for brand-owner 'offers'."
+  cq: [CQ-CM-01, CQ-EC-02]
+  failingCase: "'TRU NIAGEN (Amazon seller display name)' as an Organization invites name-matching it to ChromaDex, Inc. (the mark registrant) or to the brand Tru Niagen: three identities, one string."
+  proposedRuling: "W15 rules; W01 keeps OrganizationType values frozen."
+
+- id: W01-SR-16
+  targetOwner: "W22"
+  request: "MediaSubjectTarget member PhysicalLocation is replaced by Facility (CL-015 merge)."
+  cq: [CQ-AX-14]
+  failingCase: "Live union MediaSubject (line 2375) names PhysicalLocation, which no longer exists after the merge."
+  proposedRuling: "Replace the member."
+
+- id: W01-SR-17
+  targetOwner: "W09"
+  request: "Writer of the study-role predicates SPONSORS_STUDY, FUNDS_STUDY, SERVES_AS_CRO_FOR, HOSTS_STUDY_SITE, PROVIDES_INVESTIGATIONAL_PRODUCT (catalog organizations.assertedPredicates) and of live SPONSORED_BY/OPERATED_BY/INVESTIGATED_BY: W01 proposes W09 writes them (Study-side fields) using W01's RoleEdgeProperties; W01 reserves the Organization-side field slots sponsorsStudies, fundsStudies, servesAsCroFor, hostsStudySites, providesInvestigationalProduct. CQ-EC-04: author affiliation is an AFFILIATED_WITH assertion per publication (W20/W09 locator), never FUNDS_STUDY."
+  cq: [CQ-EC-04, CQ-ST-02, CQ-EC-01]
+  failingCase: "Round 0006 D8: PMID 38241160 lists an author affiliated with 'Elysium Health Inc.'; a neighbourhood built from affiliations adds Elysium as sponsor ([AUTHOR_AFFILIATED_WITH, FUNDS_STUDY])."
+  proposedRuling: "W09 writes study-role edges; Fable records the writer in the registry."
+
+- id: W01-SR-18
+  targetOwner: "W12"
+  request: "TestingLaboratory granularity = the certified laboratory unit (one CLIA certificate or one accreditation scope), an Organization specialization; its physical sites are Facility nodes reached by OPERATES_FACILITY {facilityRole: LABORATORY}; site-scoped identifiers (CLIA number, FEI) attach where the issuing rule scopes them. OPERATES_LABORATORY remains an assertion-only predicate."
+  cq: [CQ-DX-01, CQ-MF-01]
+  failingCase: "42 CFR 493.35(a)/493.55(a)(2): a separate certificate application for each laboratory location, except mobile labs covered under the home base's certificate and contiguous hospital campuses: one laboratory unit may have zero fixed sites (mobile) or several (campus); a TestingLaboratory that is also a Facility could not represent either."
+  proposedRuling: "As requested; W12 cards say so."
+
+- id: W01-SR-19
+  targetOwner: "W14"
+  request: "Brand, trademark and legal entity are three identities. OWNS_TRADEMARK (W14) never implies OWNS_BRAND or MARKETS_PRODUCT (INV-009); W14's Trademark links to ConsumerBrand only through an explicit assertion."
+  cq: [CQ-EC-02]
+  failingCase: "TRU NIAGEN mark (US Reg. 5,370,103) is registered to ChromaDex, Inc. (wholly owned subsidiary) while the parent press release calls Tru Niagen the brand of 'ChromaDex's consumer products' (w01-03: both OWNS_BRAND readings stay PROPOSED)."
+  proposedRuling: "W14 adds no inference rule; a candidate forbidden implication [OWNS_TRADEMARK, OWNS_BRAND] is recorded if W14 finds a licensed-brand case."
+
+- id: W01-SR-20
+  targetOwner: "W08, W11, W12, W13, W15, W16, W18, W20, W21, W09"
+  request: "Field slots reserved on W01 types for relationships owned elsewhere; owners send the exact field text and Fable inserts it. Organization: developsPlatforms, usesPlatforms, usesTools (W08); performsProcesses, capabilityStates (W11); hostsListings, listsOffers, sellerOfRecordFor, fulfillsOffers, affiliateForOffers (W15); sponsorsContent, operatesChannels (W21); exhibitsAt, hostsEvents (W18); submittedRegulatorySubmissions (W13, inverse SUBMITTED_BY); sponsorsStudies, fundsStudies, servesAsCroFor, hostsStudySites, providesInvestigationalProduct (W09). Facility: hostsProcesses, capabilityStates (W11), regulatoryStatuses (W13, STATUS_OF IN), certificationScopes (W12, COVERS IN). Person: appearsIn, servesOnChannels, recommends, authorsReports (W21); speaksAt, attends (W18); recordsObservations, postsResults (W16); authoredDocuments (W20); affiliateForOffers (W15); investigatedStudies (W09). PseudonymousActor: onPlatforms, authorsReports (W21). AnonymousActor: authorsReports (W21). CohortParticipant: reportsExperiences (W21). ConsumerBrand: sponsorsContent (W21), marketedUnderMarks (W14)."
+  cq: [CQ-AX-14]
+  failingCase: "Without the slots the merged schema loses live API fields (for example Person.appearsIn) or two workers write the same type."
+  proposedRuling: "Slots accepted; W01 remains sole writer of the type text and Fable merges supplied fields verbatim."
+
+- id: W01-SR-21
+  targetOwner: "W21"
+  request: "SPONSORS_CONTENT (FINANCIAL_INTEREST member, W21 writer) uses an asserted_edge properties type; W01 offers RoleEdgeProperties (compensationKind usable for paid placements). ConflictRelevanceAssessment ASSESSES_INTEREST targets W01 role Assertions; AFFILIATED_WITH is not a FINANCIAL_INTEREST member but enters relevance paths (CQ-EC-03) only as a hop, never as the interest."
+  cq: [CQ-CL-05, CQ-EC-03, CQ-CL-08]
+  failingCase: "Round 0006 fixture: the guest's 'scientific lead guy' (AFFILIATED_WITH) and the host's sponsor read must both feed the relevance assessment without the affiliation being counted as a money tie."
+  proposedRuling: "As requested."
+
+- id: W01-SR-22
+  targetOwner: "W00"
+  request: "KERNEL QUESTION (no change requested now). A quantity that qualifies an object assertion (share count of an equity stake) has no kernel home because INV-003 makes object and literal exclusive and HAS_SUBJECT cannot target an Assertion."
+  cq: [CQ-EC-C02]
+  failingCase: "First run of w01-04 put '6,917,783 shares' in valueString of the HOLDS_EQUITY_IN assertion; V-003 returned 1 row (objects 1, literals 1). Current workaround: verbatim text in roleTitleVerbatim and OwnershipEdgeProperties.stakeClassVerbatim; numeric stakePercent only when the source states it."
+  proposedRuling: "Keep the workaround for 0.3; revisit when a CQ needs arithmetic on stakes."

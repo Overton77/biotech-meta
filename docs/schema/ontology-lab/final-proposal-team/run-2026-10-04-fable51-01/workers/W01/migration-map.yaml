@@ -1,0 +1,194 @@
+# W01 migration map (run-2026-10-04-fable51-01). Live = docs/schema/current_biotech_schema.graphql (sha256 86b5e0b5...f112).
+# action: keep | rename | move | split | merge | derive | retire. "final: null" = no element in the final schema.
+# Relabel and rewrite statements are sketched in 07-operations.md section 5; every rewrite of a role edge creates an
+# Assertion (status PROPOSED, basis UNKNOWN, reviewerType MIGRATION) before any edge is projected, because live edges carry
+# no assertion and cannot be ACCEPTED without a source review (V-W01-07).
+
+# ---------------- Organization (live lines 503-576) ----------------
+- {live: Organization, final: Organization, action: keep, note: "labels become [Organization, Entity]; organizations whose legal identity is registered gain LegalEntity (backfill only from a registry identifier or a filing; never from the presence of legalName alone)"}
+- {live: Organization.id, final: Organization.id, action: keep, note: "opaque segment of uid (round 0009 seam); uid backfilled hu:org:<id>"}
+- {live: Organization.name, final: Organization.name, action: keep, note: "String! -> String (D-013); presentation only"}
+- {live: Organization.description, final: Organization.description, action: keep}
+- {live: Organization.mongoResearchRunId, final: Organization.mongoResearchRunId, action: keep, note: "operational; Activity.externalRunId is authoritative lineage"}
+- {live: Organization.createdAt, final: Organization.createdAt, action: keep}
+- {live: Organization.updatedAt, final: Organization.updatedAt, action: keep}
+- {live: Organization.searchText, final: Organization.searchText, action: keep}
+- {live: Organization.searchFields, final: Organization.searchFields, action: keep}
+- {live: Organization.embeddingModel, final: Organization.embeddingModel, action: keep}
+- {live: Organization.embeddingDimensions, final: Organization.embeddingDimensions, action: keep}
+- {live: Organization.searchEmbedding, final: Organization.searchEmbedding, action: keep, note: "@vector re-added by Fable without provider (D-014)"}
+- {live: Organization.canonicalTicker, final: Organization.canonicalTicker, action: keep, note: "current display projection; history moves to OrganizationSnapshot.canonicalTicker and Identifier(scheme TICKER) (CDXC -> NAGE case)"}
+- {live: Organization.legalName, final: Organization.legalName, action: keep, note: "current display projection, only on LegalEntity (V-W01-11); history in OrganizationSnapshot.legalName"}
+- {live: Organization.displayName, final: Organization.displayName, action: keep}
+- {live: Organization.organizationType, final: Organization.organizationType, action: keep, note: "catalog organizationKind; classification, never a role (INV-009)"}
+- {live: Organization.active, final: OrganizationSnapshot.active, action: move}
+- {live: Organization.incorporatedOn, final: LegalEntity.incorporatedOn, action: move, note: "DateTime -> Date (source-stated registry date); only on LegalEntity"}
+- {live: Organization.dissolvedOn, final: LegalEntity.dissolvedOn, action: move, note: "DateTime -> Date; null = unknown"}
+- {live: Organization.operatingFrom, final: null, action: retire, note: "operating interval is OrganizationSnapshot.active episodes; values migrate to a PROPOSED snapshot episode"}
+- {live: Organization.operatingTo, final: null, action: retire, note: "as operatingFrom"}
+- {live: Organization.foundedYear, final: OrganizationSnapshot.foundedYear, action: move}
+- {live: Organization.fundingStage, final: OrganizationSnapshot.fundingStage, action: move}
+- {live: Organization.totalFundingUsd, final: OrganizationSnapshot.totalFundingUsd, action: move}
+- {live: Organization.employeeCountMin, final: OrganizationSnapshot.employeeCountMin, action: move}
+- {live: Organization.employeeCountMax, final: OrganizationSnapshot.employeeCountMax, action: move}
+- {live: Organization.employeeCountEstimate, final: OrganizationSnapshot.employeeCountEstimate, action: move}
+- {live: Organization.employeeCountBand, final: OrganizationSnapshot.employeeCountBand, action: move}
+- {live: Organization.employeeCountRaw, final: OrganizationSnapshot.employeeCountRaw, action: move}
+- {live: Organization.revenueModel, final: OrganizationSnapshot.revenueModel, action: move}
+- {live: Organization.valueChainStages, final: OrganizationSnapshot.valueChainStages, action: move}
+- {live: Organization.sector, final: OrganizationSnapshot.sector, action: move}
+- {live: Organization.websiteUrl, final: OrganizationSnapshot.websiteUrl, action: move, note: "a URL is never identity; the site is a Source"}
+- {live: Organization.headquartersSummary, final: OrganizationSnapshot.headquartersSummary, action: move}
+- {live: Organization.operatingSummary, final: OrganizationSnapshot.operatingSummary, action: move}
+- {live: Organization.marketCapUsd, final: OrganizationSnapshot.marketCapUsd, action: move}
+- {live: Organization.pipelineSummary, final: OrganizationSnapshot.pipelineSummary, action: move}
+- {live: Organization.competitivePositionSummary, final: OrganizationSnapshot.competitivePositionSummary, action: move}
+- {live: Organization.isPublicCompany, final: OrganizationSnapshot.isPublicCompany, action: move}
+- {live: Organization.isInvestor, final: null, action: retire, note: "role flag; investors are INVESTED_IN/HOLDS_EQUITY_IN edges (INV-009); V-W01-09"}
+- {live: Organization.isProviderOrganization, final: null, action: retire, note: "role flag (V-W01-09)"}
+- {live: Organization.isResearchOrganization, final: null, action: retire, note: "role flag; classification is organizationType (V-W01-09)"}
+- {live: Organization.isManufacturer, final: null, action: retire, note: "role flag; manufacturing is MANUFACTURES_PRODUCT / ManufacturingCapability (V-W01-09)"}
+- {live: Organization.currentAsOf, final: Organization.currentAsOf, action: keep, note: "materialization instant of legalName/canonicalTicker only"}
+- {live: "Organization.snapshots (HAS_SNAPSHOT)", final: "Organization.states (HAS_STATE, StateEpisodeProperties)", action: rename, note: "HAS_SNAPSHOT is the provenance Source->SourceSnapshot edge; one type one meaning (W01-SR-03). Each live snapshot node gets one HAS_STATE episode built from its node-level validFrom/validTo/recordedFrom/recordedTo; bases UNKNOWN when absent"}
+- {live: "Organization.listings (LISTS, ListingMetadata)", final: null, action: move, note: "handed to W15 (registry: W15 disposes LISTS); W01 reserves no field"}
+- {live: "Organization.locations (HAS_LOCATION, TemporalMetadata)", final: "Organization.operatesFacilities (OPERATES_FACILITY, FacilityEdgeProperties)", action: rename, note: "live PhysicalLocation.locationType -> FacilityEdgeProperties.facilityRole for HEADQUARTERS/REGISTERED_OFFICE roles; edges re-created only from PROPOSED migration assertions; REMOTE/VIRTUAL targets are not migrated (review list)"}
+- {live: "Organization.developsPlatforms (DEVELOPS_PLATFORM)", final: null, action: move, note: "W08 owns DEVELOPS_PLATFORM; W01 reserves field slot developsPlatforms (W01-SR-20)"}
+- {live: "Organization.usesPlatforms (USES_PLATFORM)", final: null, action: move, note: "W08; field slot reserved"}
+- {live: "Organization.usesTools (USES)", final: null, action: move, note: "W08 (USES_EQUIPMENT) / W16 (USES); field slot reserved"}
+- {live: "Organization.offersProducts (OFFERS, RoleMetadata)", final: null, action: move, note: "registry: W15 disposes OFFERS. W01 recommendation: brand-owner offers -> MARKETS_PRODUCT assertions; seller offers -> SELLER_OF_RECORD_FOR (W15); never SELLS_PRODUCT directly (INV-306)"}
+- {live: "Organization.offersProcedures (OFFERS_PROCEDURE)", final: null, action: move, note: "W06"}
+- {live: "Organization.developsTreatments (DEVELOPS_TREATMENT)", final: null, action: move, note: "W06"}
+- {live: "Organization.offersTreatments (OFFERS_TREATMENT)", final: null, action: move, note: "W06"}
+- {live: "Organization.worksOnConditions (WORKS_ON_CONDITION)", final: null, action: retire, note: "no owner and no CQ; values migrate to DEVELOPS_PRODUCT_CLASS literal assertions (valueString) or W06 DEVELOPS_TREATMENT when a treatment is named (W01-SR-12)"}
+- {live: "Organization.manufactures (MANUFACTURES, RoleMetadata)", final: "Organization.manufacturesProducts (MANUFACTURES_PRODUCT, RoleEdgeProperties)", action: rename, note: "target union Producible = Product | FoodProduct: Product targets migrate; FoodProduct targets go to W05 review list"}
+- {live: "Organization.performsProcesses (PERFORMS_PROCESS)", final: null, action: move, note: "W11 owns PERFORMS_PROCESS; field slot reserved"}
+- {live: "Organization.controls (CONTROLS, OwnershipMetadata)", final: "PARENT_OF or HOLDS_EQUITY_IN (OwnershipEdgeProperties)", action: split, note: "PARENT_OF only where control is stated (subsidiary, wholly owned, majority control); otherwise HOLDS_EQUITY_IN with stakePercent; ambiguous edges become PROPOSED assertions without projection"}
+- {live: "OwnershipMetadata.stakePercent", final: OwnershipEdgeProperties.stakePercent, action: keep}
+- {live: "OwnershipMetadata.validFrom/validTo/recordedFrom/recordedTo", final: "OwnershipEdgeProperties (asserted_edge fields)", action: keep, note: "precision and bases added; null bounds get basis UNKNOWN"}
+- {live: "OwnershipMetadata.confidence", final: null, action: retire, note: "no method (INV-407); kept only as extractionConfidence on the migration Assertion with unknown method"}
+- {live: "OwnershipMetadata.notes", final: null, action: retire, note: "moved to Assertion.description of the migration assertion"}
+- {live: OwnershipMetadata, final: OwnershipEdgeProperties, action: rename}
+- {live: "Organization.contractsManufacturing (CONTRACTS_MANUFACTURING, union ContractManufacturingTarget)", final: "CONTRACT_MANUFACTURES_FOR / MANUFACTURES_PRODUCT", action: split, note: "target Organization -> CONTRACT_MANUFACTURES_FOR (manufacturer -> client); target Product -> MANUFACTURES_PRODUCT with roleTitleVerbatim 'contract manufacturer'; target CompoundForm -> W11 capability review (W01-SR-13)"}
+- {live: ContractManufacturingTarget, final: null, action: retire, note: "union removed; ranges are Organization (CONTRACT_MANUFACTURES_FOR) and Product (MANUFACTURES_PRODUCT)"}
+- {live: Producible, final: null, action: retire, note: "union removed from W01 edges; FoodProduct manufacturing left to W05 if a CQ appears"}
+- {live: "Organization.sponsors (SPONSORS, union Sponsorable)", final: null, action: move, note: "W21 SPONSORS_CONTENT (Channel/Episode) and W18 SponsorableTarget (Conference); bare SPONSORS collides with SPONSORS_STUDY"}
+- {live: "Organization.exhibitsAt (EXHIBITS_AT)", final: null, action: move, note: "W18 owns EXHIBITS_AT; field slot reserved"}
+- {live: "Organization.operatesChannels (OPERATES_CHANNEL)", final: null, action: move, note: "W21 owns OPERATES_CHANNEL; field slot reserved"}
+- {live: "Organization.employs (EMPLOYS)", final: "Person.employedBy / Organization.employees (EMPLOYED_BY)", action: rename, note: "direction reversed (Person -> Organization)"}
+- {live: "Organization.hasBoardMembers (HAS_BOARD_MEMBER)", final: "Person.boardMemberOf / Organization.boardMembers (BOARD_MEMBER_OF)", action: rename, note: "direction reversed; roleType BOARD_OBSERVER becomes AFFILIATED_WITH (V-W01-12)"}
+- {live: "Organization.foundedBy (FOUNDED_BY)", final: "FOUNDED_ORGANIZATION (Person|Organization -> Organization)", action: rename, note: "direction reversed"}
+- {live: "Organization.hasCeos (HAS_CEO, TemporalMetadata)", final: "EMPLOYED_BY {corporateRoleType: CEO, roleType: CEO, seniorityLevel: C_SUITE}", action: merge, note: "direction reversed; TemporalMetadata time fields carried; confidence/notes retired"}
+- {live: "TemporalMetadata (on HAS_CEO, HAS_LOCATION)", final: "RoleEdgeProperties / FacilityEdgeProperties", action: rename, note: "TemporalMetadata uses on LISTS_PRODUCT, LISTS_PROCEDURE (W15) and HOSTS_PROCESS (W11) are those owners' migrations"}
+
+# ---------------- LegalEntity, ConsumerBrand, Facility (catalog-only before this run) ----------------
+- {live: null, final: LegalEntity, action: keep, note: "catalog node (organizations); first GraphQL projection; labels [LegalEntity, Organization, Entity]; uid token org"}
+- {live: null, final: ConsumerBrand, action: keep, note: "catalog node; first GraphQL projection; never an Organization (V-433, V-W01-03)"}
+- {live: null, final: Facility, action: keep, note: "catalog node; absorbs PhysicalLocation (CL-015)"}
+
+# ---------------- OrganizationSnapshot (live lines 578-628) ----------------
+- {live: OrganizationSnapshot, final: OrganizationSnapshot, action: keep, note: "labels [OrganizationSnapshot, VersionedState]; implements VersionedStateArchetype and TemporalSnapshot (cache); token org-snapshot requested (W01-SR-01)"}
+- {live: OrganizationSnapshot.snapshotType, final: OrganizationSnapshot.stateType, action: rename, note: "SET stateType = coalesce(snapshotType, 'ORGANIZATION_PROFILE'); no @alias (contract B2)"}
+- {live: "OrganizationSnapshot.validFrom/validTo/recordedFrom/recordedTo", final: "OrganizationSnapshot.validFrom/validTo/recordedFrom/recordedTo (TemporalSnapshot cache) + HAS_STATE StateEpisodeProperties", action: keep, note: "node values copied once into the HAS_STATE episode; node fields become a read-only cache of the first episode (V-513)"}
+- {live: "OrganizationSnapshot payload fields (legalName, displayName, organizationType, active, foundedYear, fundingStage, totalFundingUsd, employeeCount*, revenueModel, valueChainStages, sector, websiteUrl, headquarters, headquartersSummary, operatingSummary, marketCapUsd, pipelineSummary, competitivePositionSummary, isPublicCompany)", final: same names on OrganizationSnapshot, action: keep, note: "frozen payload; payloadHash computed at migration (sha256 over canonical JSON of payload fields)"}
+- {live: "OrganizationSnapshot.isInvestor/isProviderOrganization/isResearchOrganization/isManufacturer", final: null, action: retire, note: "role flags (INV-009)"}
+- {live: "OrganizationSnapshot.name/description/searchText/searchFields/embeddingModel/embeddingDimensions/searchEmbedding", final: same, action: keep}
+- {live: null, final: "OrganizationSnapshot.payloadHash, assertionUids, canonicalTicker, effectiveFrom, effectiveTo", action: keep, note: "added (round 0007 seam; ticker history)"}
+- {live: "OrganizationSnapshot.organization (HAS_SNAPSHOT IN)", final: "OrganizationSnapshot.organization (HAS_STATE IN)", action: rename}
+- {live: "OrganizationSnapshot.supportedByDocuments (SUPPORTED_BY_DOCUMENT)", final: null, action: retire, note: "provenance via assertionUids -> Assertion -> SUPPORTED_BY SourceLocator (alignment round 0006); W20 keeps SUPPORTED_BY_DOCUMENT only where it owns it"}
+- {live: "OrganizationSnapshot.supportedByChunks (SUPPORTED_BY_CHUNK)", final: null, action: retire, note: "a Chunk is never a locator (INV-404)"}
+
+# ---------------- PhysicalLocation (live lines 630-651) -> Facility ----------------
+- {live: PhysicalLocation, final: Facility, action: merge, note: "relabel :PhysicalLocation -> :Facility:Entity; uid hu:facility:<id>; nodes with locationType REMOTE or VIRTUAL are not migrated (review list; text goes to OrganizationSnapshot.operatingSummary)"}
+- {live: PhysicalLocation.locationType, final: Facility.facilityKind, action: rename, note: "HEADQUARTERS/REGISTERED_OFFICE/CORPORATE_OFFICE are site roles for an organization: copied to FacilityEdgeProperties.facilityRole of the OPERATES_FACILITY edge, facilityKind set to CORPORATE_OFFICE or OTHER"}
+- {live: PhysicalLocation.latitude, final: Facility.latitude, action: keep}
+- {live: PhysicalLocation.longitude, final: Facility.longitude, action: keep}
+- {live: PhysicalLocation.country, final: Facility.country, action: keep}
+- {live: PhysicalLocation.region, final: Facility.region, action: keep}
+- {live: PhysicalLocation.city, final: Facility.city, action: keep}
+- {live: PhysicalLocation.addressText, final: Facility.addressText, action: keep, note: "catalog Facility.address"}
+- {live: PhysicalLocation.postalCode, final: Facility.postalCode, action: keep}
+- {live: PhysicalLocation.establishmentIdentifier, final: "Identifier via HAS_IDENTIFIER", action: move, note: "scheme required (FEI, DUNS, CLIA); unknown scheme -> Identifier scheme 'UNSPECIFIED_ESTABLISHMENT_ID' with a PROPOSED assertion and review"}
+- {live: PhysicalLocation.isHeadquarters, final: "FacilityEdgeProperties.facilityRole = HEADQUARTERS", action: move, note: "a site is headquarters FOR an organization, not in itself"}
+- {live: PhysicalLocation.isManufacturingSite, final: "Facility.facilityKind = MANUFACTURING_SITE", action: derive}
+- {live: PhysicalLocation.isClinicalSite, final: "Facility.facilityKind = CLINIC", action: derive}
+- {live: PhysicalLocation.isResearchSite, final: "Facility.facilityKind = RESEARCH_SITE", action: derive}
+- {live: "PhysicalLocation.hostsProcesses (HOSTS_PROCESS, TemporalMetadata)", final: null, action: move, note: "W11 owns HOSTS_PROCESS; field slot Facility.hostsProcesses reserved (W01-SR-20)"}
+- {live: "PhysicalLocation.hostsProducts (HOSTS_PRODUCT, RoleMetadata)", final: null, action: retire, note: "ambiguous (made at? sold at? stored at?); each edge becomes a PROPOSED review assertion routed to W11 (manufacture) or W15 (availability) (W01-SR-14)"}
+- {live: "Listing.availableIn (AVAILABLE_IN -> PhysicalLocation)", final: null, action: move, note: "W15 owns AVAILABLE_IN; range becomes Facility (in-clinic availability) or a jurisdiction string (W01-SR-15)"}
+- {live: "MediaSubject member PhysicalLocation", final: "MediaSubjectTarget member Facility", action: rename, note: "W22 owns the union (W01-SR-16)"}
+
+# ---------------- Person (live lines 1072-1110) ----------------
+- {live: Person, final: Person, action: keep, note: "public actors only; labels [Person, Entity]"}
+- {live: "Person.id/name/description/mongoResearchRunId/createdAt/updatedAt", final: same, action: keep, note: "name nullable (D-013)"}
+- {live: "Person.searchText/searchFields/embeddingModel/embeddingDimensions/searchEmbedding", final: same, action: keep}
+- {live: Person.title, final: Person.title, action: keep, note: "display headline only; role facts are edges"}
+- {live: Person.bio, final: Person.bio, action: keep, note: "display text"}
+- {live: Person.birthDate, final: null, action: retire, note: "personal data with no CQ; HIPAA Safe Harbor treats dates finer than year as identifying (SRC-HHS-HIPAA-DEID); not stored in the shared graph (W01-SR-11 to W23)"}
+- {live: Person.birthCity, final: null, action: retire, note: "as birthDate"}
+- {live: Person.birthState, final: null, action: retire, note: "as birthDate"}
+- {live: Person.birthCountry, final: null, action: retire, note: "as birthDate"}
+- {live: Person.deathDate, final: null, action: retire, note: "no CQ; if needed later, an Assertion with source"}
+- {live: Person.linkedInUrl, final: "Identifier(scheme LINKEDIN_PROFILE_URL) via HAS_IDENTIFIER", action: move}
+- {live: Person.twitterUrl, final: "Identifier(scheme X_PROFILE_URL)", action: move}
+- {live: Person.facebookUrl, final: "Identifier(scheme FACEBOOK_PROFILE_URL)", action: move}
+- {live: Person.instagramUrl, final: "Identifier(scheme INSTAGRAM_PROFILE_URL)", action: move}
+- {live: Person.youtubeChannelUrl, final: "Identifier(scheme YOUTUBE_CHANNEL_URL); W21 Channel when the channel is modeled", action: move}
+- {live: Person.personalWebsiteUrl, final: "Source (sourceKind SELF_DISCLOSURE_PAGE or ORGANIZATION_WEBPAGE)", action: move, note: "a URL is never identity"}
+- {live: null, final: Person.orcid, action: keep, note: "catalog property; display mirror of the primary ORCID Identifier"}
+- {live: "Person.holdsRoleAt (HOLDS_ROLE_AT, RoleMetadata)", final: "typed role edges", action: split, note: "by RoleMetadata.roleType: BOARD_MEMBER/CHAIRPERSON -> BOARD_MEMBER_OF; BOARD_OBSERVER -> AFFILIATED_WITH; ADVISOR/SCIENTIFIC_ADVISOR/CLINICAL_ADVISOR -> ADVISES_ORGANIZATION; INVESTOR/LEAD_INVESTOR -> INVESTED_IN; FOUNDER/CO_FOUNDER -> FOUNDED_ORGANIZATION; EMPLOYEE and officer titles CEO/PRESIDENT/COO/CFO/CTO/CMO/CSO -> EMPLOYED_BY (rule R-ROLE-1); SPONSOR -> W21 SPONSORS_CONTENT or W09 SPONSORS_STUDY by range; PRINCIPAL_INVESTIGATOR -> W09 INVESTIGATED_BY; AUTHOR/SPEAKER/REVIEWER/EXHIBITOR -> W20/W18/W21; OPERATOR/PARTNER/MANUFACTURER/DISTRIBUTOR/UNKNOWN or null -> AFFILIATED_WITH with roleTitleVerbatim; HOLDS_ROLE_AT type retired"}
+- {live: "Person.affiliatedWith (AFFILIATED_WITH, RoleMetadata)", final: "Person.affiliatedWith (AFFILIATED_WITH, RoleEdgeProperties)", action: keep, note: "asserted; not FINANCIAL_INTEREST; not FUNDS_STUDY"}
+- {live: "Person.advises (ADVISES, RoleMetadata)", final: "Person.advisesOrganizations (ADVISES_ORGANIZATION, RoleEdgeProperties)", action: rename}
+- {live: "Person.servesOnChannels (SERVES_ON_CHANNEL)", final: null, action: move, note: "W21 owns; field slot reserved"}
+- {live: "Person.appearsIn (APPEARS_IN)", final: null, action: move, note: "W21 owns; field slot reserved; RoleType gains HOST, CO_HOST, GUEST (done here)"}
+- {live: "Person.recommends (RECOMMENDS, RecommendationMetadata)", final: null, action: move, note: "W21 owns (CL-016): projection of an assertion with speechAct RECOMMENDS (V-423); field slot reserved"}
+- {live: "Person.speaksAt (SPEAKS_AT)", final: null, action: move, note: "W18; field slot reserved"}
+- {live: "Person.attends (ATTENDS)", final: null, action: move, note: "W18; field slot reserved"}
+- {live: "Person.linksTo (LINKS_TO -> PseudonymousActor)", final: "ResolutionHypothesis PROPOSES_MATCH", action: retire, note: "an identity link is a hypothesis (CQ-CL-07); each live edge becomes a PROPOSED ResolutionHypothesis"}
+- {live: "Person.hasParticipantTokens (HAS_PARTICIPANT_TOKEN -> CohortParticipant)", final: null, action: retire, note: "re-identification link; never stored in the shared graph (V-W01-05; CL-018 with W23). Live edges are deleted after export to the private store if W23 asks for it"}
+- {live: "Person.recordsObservations (RECORDS -> Observation)", final: null, action: move, note: "W16 owns RECORDS (public persons, published self-reports only); field slot reserved"}
+- {live: "Person.postsResults (POSTS_RESULT -> ProtocolResult)", final: null, action: move, note: "W16 owns; field slot reserved"}
+- {live: "Person.authorsReports (AUTHORS -> ExperienceReport)", final: null, action: move, note: "W21 owns AUTHORS; field slot reserved on Person, PseudonymousActor, AnonymousActor"}
+
+# ---------------- RoleMetadata ----------------
+- {live: RoleMetadata, final: RoleEdgeProperties, action: rename, note: "on W01 role edges only; other owners' edges that use RoleMetadata migrate to their own property types"}
+- {live: RoleMetadata.role, final: RoleEdgeProperties.roleTitleVerbatim, action: merge, note: "with title and corporateRole: first non-null in order title, corporateRole, role; full text also on the migration Assertion"}
+- {live: RoleMetadata.title, final: RoleEdgeProperties.roleTitleVerbatim, action: merge}
+- {live: RoleMetadata.corporateRole, final: RoleEdgeProperties.roleTitleVerbatim, action: merge}
+- {live: RoleMetadata.roleType, final: "edge type + RoleEdgeProperties.roleType", action: split, note: "selects the predicate (see Person.holdsRoleAt) and is kept as refinement"}
+- {live: RoleMetadata.corporateRoleType, final: RoleEdgeProperties.corporateRoleType, action: keep}
+- {live: RoleMetadata.seniorityLevel, final: RoleEdgeProperties.seniorityLevel, action: keep}
+- {live: "RoleMetadata.validFrom/validTo/recordedFrom/recordedTo", final: "RoleEdgeProperties asserted_edge fields", action: keep, note: "precision required with a bound; missing precision on legacy edges -> INSTANT with basis UNKNOWN is forbidden; use the coarsest the source allows or null the bound and keep the value on the migration Assertion description"}
+- {live: RoleMetadata.confidence, final: null, action: retire, note: "INV-407"}
+- {live: RoleMetadata.notes, final: null, action: retire}
+- {live: RoleMetadata.mongoResearchRunId, final: RoleEdgeProperties.mongoResearchRunId, action: keep}
+
+# ---------------- Pseudonymous / anonymous actors, cohort participants ----------------
+- {live: PseudonymousActor, final: PseudonymousActor, action: keep, note: "labels [PseudonymousActor, Entity]"}
+- {live: PseudonymousActor.handle, final: PseudonymousActor.handle, action: keep, note: "display mirror; platform-scoped Identifier authoritative"}
+- {live: "PseudonymousActor.onPlatforms (ON_PLATFORM)", final: null, action: move, note: "W21 owns ON_PLATFORM; field slot reserved"}
+- {live: "PseudonymousActor.authorsReports (AUTHORS)", final: null, action: move, note: "W21"}
+- {live: "PseudonymousActor.linkedFrom (LINKS_TO IN)", final: null, action: retire, note: "see Person.linksTo"}
+- {live: AnonymousActor, final: AnonymousActor, action: keep}
+- {live: AnonymousActor.anonymityClass, final: AnonymousActor.anonymityClass, action: keep, note: "free text; enum candidate only with values from a source"}
+- {live: "AnonymousActor.authorsReports (AUTHORS)", final: null, action: move, note: "W21"}
+- {live: CohortParticipant, final: CohortParticipant, action: keep, note: "labels [CohortParticipant, PseudonymousActor, Entity]; implements ActorIdentity; only tokens printed by a public source; privacyClass mandatory; nodes derived from BellLabs users are exported to the private store and deleted (W23)"}
+- {live: CohortParticipant.participantToken, final: CohortParticipant.participantToken, action: keep, note: "plus Identifier(scheme PARTICIPANT_TOKEN, issuer = study/dataset uid)"}
+- {live: "CohortParticipant.reportsExperiences (REPORTS)", final: null, action: move, note: "W21 owns REPORTS; field slot reserved"}
+
+# ---------------- Enums ----------------
+- {live: OrganizationType, final: OrganizationType, action: keep, note: "values unchanged; CORPORATE_GROUP requested (W01-SR-09)"}
+- {live: FundingStage, final: FundingStage, action: keep}
+- {live: EmployeeCountBand, final: EmployeeCountBand, action: keep}
+- {live: LocationType, final: LocationType, action: keep, note: "REMOTE/VIRTUAL never on Facility (V-W01-04)"}
+- {live: RoleType, final: RoleType, action: keep, note: "+ HOST, CO_HOST, GUEST (catalog APPEARS_IN note, round 0006)"}
+- {live: CorporateRoleType, final: CorporateRoleType, action: keep}
+- {live: SeniorityLevel, final: SeniorityLevel, action: keep}
+- {live: null, final: CompensationKind, action: keep, note: "catalog qualifier values of RECEIVES_COMPENSATION_FROM"}
+
+# ---------------- Unions touching W01 types (owners elsewhere) ----------------
+- {live: "Recommendable member Organization", final: null, action: move, note: "W21 (RECOMMENDS range)"}
+- {live: "ProvenanceSource member Organization", final: null, action: move, note: "W16 (ProtocolResult.supportedBy seam); an Organization is never a provenance source (a Source is)"}
+- {live: "DocumentAuthor (Person | Organization)", final: null, action: move, note: "W20"}
+- {live: "ClaimSpeaker / ExperienceAuthor (Person | PseudonymousActor | AnonymousActor)", final: null, action: move, note: "W21 AsserterTarget/ClaimSpeakerTarget; CohortParticipant resolves as PseudonymousActor"}
+- {live: "EventParticipant / EventSubject members Organization, Person", final: null, action: move, note: "W18"}
+- {live: "EvidenceSubject / ClaimSubject / AssociationParticipant members Organization, OrganizationSnapshot, Person, PseudonymousActor, AnonymousActor, CohortParticipant", final: null, action: move, note: "W00 AssertionSubjectTarget / W03 / W20 / W21"}

@@ -1,0 +1,10 @@
+Source: https://www.next-health.com/product/therapeutic-plasma-exchange
+Captured: 2026-10-04 via Tavily extract (basic, markdown, query-reranked). PARTIAL_EXCERPT: the extractor elided sections marked [...] including "How Does Plasma Exchange Work?" body.
+Verbatim spans:
+"### What is a Therapeutic Plasma Exchange?"
+"Therapeutic plasma exchange (TPE) is a cutting-edge medical service that refreshes the patient's plasma (the liquid part of the blood) in order to remove particles that are known contributors to disease and accelerated aging."
+"Therapeutic Plasma Exchange at Next Health includes a Baseline Test and a Total Tox Burden Test before each session. This empowers you to monitor the impact of TPE on your health journey and maximize your results. Post session labs can be purchased at an additional cost."
+"At Next Health, Therapeutic Plasma Exchange costs $10,000."
+"### 3 Sessions: Therapeutic Plasma Exchange Bundle  $ 24,000.00 USD"
+"### 6 Sessions: Therapeutic Plasma Exchange Bundle  $ 45,000.00 USD"
+"many individuals report experiencing an increased sense of vitality and overall well-being within a few weeks to a couple of months after undergoing the procedure."

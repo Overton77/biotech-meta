@@ -1,0 +1,13 @@
+{
+ "_comment": "Shared-graph half of a private RecommendationSnapshot replay request (private-store-interface.md section 5). The private context store sends ONLY shared uids and the stored viewpoint (privateContext REFERENCED_BY_UID_ONLY); no hu:private- uid, no personal value, no missingFactKeys leave the store. Values mirror the synthetic snapshot s1 of examples/recommendation-snapshot.cypher re-keyed to W23 fixture uids.",
+ "evidenceRecordedAt": "2026-04-10T09:00:00Z",
+ "evidenceValidAt": "2026-04-10T09:00:00Z",
+ "nowRecordedAt": "2026-10-04T00:00:00Z",
+ "policyVersionUid": "hu:policy-version:w23-sleep-support-ranking-v3",
+ "options": [
+  {"subjectUid": "hu:product-variant:w23-sleepwell-us-capsule",
+   "stateUids": ["hu:formulation:w23-sleepwell-fv-a1"],
+   "evidenceAssertionUids": ["hu:assertion:w23-a1-variant-fv-a1"],
+   "adjudicationUids": ["hu:adjudication:w23-cf-a1"]}
+ ]
+}

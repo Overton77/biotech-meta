@@ -36,19 +36,27 @@ const create = `mutation {
     citesAssertions: { connect: [
       { where: { node: { uid: { eq: "hu:assertion:w23-rt-a1" } } }, edge: { orderIndex: 1 } },
       { where: { node: { uid: { eq: "hu:claim-occurrence:w23-rt-co1" } } }, edge: { orderIndex: 2 } } ] },
-    citesAssessments: { connect: [ { where: { node: { uid: { eq: "hu:adjudication:w23-rt-adj1" } } }, edge: { orderIndex: 1 } } ] }
   }]) { answerRecords { uid accessTier privateContext } }
 }`;
 const r1 = await graphql({ schema, source: create, contextValue: {} });
 out.roundTrip.create = r1.errors ? r1.errors.map(e => e.message) : r1.data;
+const connAss = `mutation { createAnswerRecords(input: [{ uid: "hu:answer-record:w23-rt-ar2", occurrenceType: "ANSWER_PUBLICATION",
+  recordedAsOf: "2026-04-10T09:00:00Z", schemaDigest: "sha256:x", queryShapeId: "QS-1a", accessTier: PUBLIC_ANSWER, privateContext: EXCLUDED,
+  citesAssessments: { connect: [ { where: { node: { uid: { eq: "hu:adjudication:w23-rt-adj1" } } }, edge: { orderIndex: 1 } } ] } }]) { answerRecords { uid } } }`;
+const r1b = await graphql({ schema, source: connAss, contextValue: {} });
+out.roundTrip.connectAssessmentByUidThroughInterface = r1b.errors ? r1b.errors.map(e => e.message) : r1b.data;
+await s.run(`MATCH (r:AnswerRecord {uid:'hu:answer-record:w23-rt-ar1'}), (j:Adjudication {uid:'hu:adjudication:w23-rt-adj1'}) MERGE (r)-[:CITES_ASSESSMENT {orderIndex: 1}]->(j)`);
 const read = `query { answerRecords(where: { uid: { eq: "hu:answer-record:w23-rt-ar1" } }) {
-  uid recordedAsOf accessTier privateContext traceDepth
+  uid accessTier privateContext traceDepth
   citesAssertions { __typename uid predicate }
   citesAssertionsConnection { edges { properties { orderIndex } node { __typename uid } } }
-  citesAssessments { __typename uid assessmentType }
+  citesAssessments { __typename assessmentType ... on Adjudication { uid verdict } ... on EvidenceApplicability { uid } }
 } }`;
 const r2 = await graphql({ schema, source: read, contextValue: {} });
 out.roundTrip.read = r2.errors ? r2.errors.map(e => e.message) : r2.data;
+// DateTime output: the generated Cypher formats DateTime with apoc.date.convertFormat (APOC required); probe it separately.
+const r2b = await graphql({ schema, source: `query { answerRecords(where: { uid: { eq: "hu:answer-record:w23-rt-ar1" } }) { recordedAsOf } }`, contextValue: {} });
+out.roundTrip.readDateTime = r2b.errors ? r2b.errors.map(e => e.message.split("\n")[0]) : r2b.data;
 const upd = `mutation { updateAnswerRecords(where: { uid: { eq: "hu:answer-record:w23-rt-ar1" } }, update: { queryShapeId: { set: "QS-9" } }) { answerRecords { uid } } }`;
 const r3 = await graphql({ schema, source: upd, contextValue: {} });
 out.roundTrip.updateAttempt = r3.errors ? r3.errors.map(e => e.message) : r3.data;

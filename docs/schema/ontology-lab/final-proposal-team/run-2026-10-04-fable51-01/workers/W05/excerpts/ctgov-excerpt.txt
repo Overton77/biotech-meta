@@ -1,0 +1,10 @@
+SOURCE: https://clinicaltrials.gov/api/v2/studies/NCT03728127?fields=protocolSection.armsInterventionsModule,... (Firecrawl relay 2026-10-04; direct curl BLOCKED 403). lastUpdatePostDate 2023-03-01 ACTUAL.
+armGroups[0]: {"label":"DicaBr group and nuts (DCBN)","type":"EXPERIMENTAL","description":"Brazilian cardioprotective diet plus 30g/day of mixed nuts (10g of peanuts, 10g of cashew nuts and 10g of Brazil nuts)","interventionNames":["Dietary Supplement: Brazilian cardioprotective diet plus 30g/day of mixed nuts"]}
+armGroups[1]: {"label":"DicaBr group (DCB)","type":"ACTIVE_COMPARATOR","description":"Brazilian cardioprotective diet","interventionNames":["Dietary Supplement: Brazilian cardioprotective diet"]}
+interventions[0]: {"type":"DIETARY_SUPPLEMENT","name":"Brazilian cardioprotective diet","description":"Brazilian cardioprotective diet prescription","armGroupLabels":["DicaBr group (DCB)"]}
+interventions[1]: {"type":"DIETARY_SUPPLEMENT","name":"Brazilian cardioprotective diet plus 30g/day of mixed nuts","description":"Brazilian cardioprotective diet plus 30g/day of nuts (10g of peanuts, 10g of cashew nuts and 10g of Brazil nuts)","armGroupLabels":["DicaBr group and nuts (DCBN)"]}
+MCP get_trial_details (ClinicalTrials.gov MCP) primary outcome: "LDL-c", time_frame "Changes in LDL-c after 16 weeks"; brief summary: "All patients will receive the same dietary prescription, the DCBN group also will receive 30g/day of nuts (10g of peanuts, 10g of cashew nuts and 10g of Brazilian nuts)."
+SOURCE: https://clinicaltrials.gov/api/v2/studies/NCT03111355?fields=... (Firecrawl relay 2026-10-04). lastUpdatePostDate 2018-06-01 ACTUAL.
+armGroups[0]: {"label":"Brazil Nut supplementation","type":"EXPERIMENTAL","description":"Consumption of one Brazil nut a day for 2 months followed by 2 months without intervention","interventionNames":["Dietary Supplement: Brazil nut"]}
+interventions[0]: {"type":"DIETARY_SUPPLEMENT","name":"Brazil nut","description":"one nut a day for 2 months, no intervention for 2 months","armGroupLabels":["Brazil Nut supplementation"]}
+MCP detailed_description: "Brazil nuts are the richest source of selenium in nature"

@@ -108,7 +108,8 @@ ACTS_IN) carry derivationRule 'mx-proj/v1' and a non-empty derivedFromAssertionU
 MEDIATES_RISK_THROUGH, ASSOCIATED_WITH_*) carry projectionOfAssertionUid of an assertion whose predicate equals the edge
 type. Never assertionUid. Every cited assertion is ACCEPTED, basisKind DIRECT_MEASUREMENT, polarity POSITIVE, current
 (recordedTo null) and has exactly one MechanismEvidenceContext (INV-211).
-projectedPolarity is always POSITIVE in mx-proj/v1 (a null or mixed measurement never produces a shortcut edge; it stays
+projectedPredicate is the shared predicate of the cited assertions (one edge per subject, object and predicate, so IMPROVES
+and IMPAIRS never merge). projectedPolarity is always POSITIVE in mx-proj/v1 (a null or mixed measurement never produces a shortcut edge; it stays
 an assertion answerable by CQ-MX-03). speciesUids / settings / anatomicalContextUids are the union over the cited
 assertions' contexts so that a consumer of the shortcut sees where the effect was measured. associationShape,
 specificity and effectSummary are live display strings, never truth-bearing.
@@ -121,6 +122,7 @@ type AssociationProjectionProperties @relationshipProperties {
   derivedAt: DateTime
   mongoResearchRunId: String
   projectedPolarity: Polarity
+  projectedPredicate: String
   speciesUids: [String!]
   settings: [MechanismSetting!]
   anatomicalContextUids: [String!]

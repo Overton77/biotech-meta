@@ -1,0 +1,329 @@
+# =====================================================================================================
+# W08 Platforms, instruments and devices (sdl-fragment.graphql)
+# Worker: W08, run run-2026-10-04-fable51-01, model Opus 5.5 (claude-opus-5-5). Coordinator: Fable 5.1.
+# Catalog modules: consumer_devices (future; Device, Sensor, Modality, candidate FirmwareVersion; catalog DeviceModel is
+#                  the live Device, see migration-map.yaml) and the live seam types TechnologyPlatform, ToolOrInstrument
+#                  (catalog conventions.liveSeamTypes; ToolOrInstrument is the range of diagnostics RUNS_ON_INSTRUMENT).
+# Competency questions: CQ-DX-01, CQ-DX-02, CQ-DX-03, CQ-DX-09, CQ-MF-02, CQ-MF-03, CQ-MF-04, CQ-PR-02, CQ-PR-03,
+#                       CQ-MX-02 (instrument/platform qualifiers only); candidates CQ-DX-C01, CQ-DX-C02, CQ-DX-C03
+#                       (02-cq-coverage.md).
+# Source digest: catalog/schema.yaml 8fb50ff0…84f0 (8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0).
+#
+# Imports by name only (owners): Entity, EntityArchetype, VersionedStateArchetype, SearchIndexable, PrivacyClass,
+# NodeMaturity, TimePrecision, ValidTimeBasis, AssertedEdgeProperties, StructuralEdgeProperties (W00); Organization
+# (W01); Product (W04); AssayVersion, MeasurementMethod, Metric, AlgorithmVersionBasis, MeasurementEdgeProperties (W07);
+# ManufacturingStep (W11).
+#
+# Relationship types used here but owned elsewhere (endpoint fields on W08 types only; seam requests W08-SR-01..05):
+# PERFORMED_WITH_ASSAY_VERSION and RUNS_ON_INSTRUMENT (W07), MEASURES_METRIC (W07). Relationship types owned here:
+# DEVELOPS_PLATFORM, USES_PLATFORM, IMPLEMENTS_PLATFORM, USES_MODALITY, HAS_SENSOR, USES_EQUIPMENT, RUNS_ON_PLATFORM,
+# and the candidates FIRMWARE_VERSION_OF, RUNS_FIRMWARE_VERSION, EMBODIES_MODEL (rename of live CLASSIFIED_AS),
+# RUNS_ON_DEVICE. Union EquipmentModelTarget is the B6 rename of the live union ProductClassification.
+#
+# Boundaries written into every description below: a Device or ToolOrInstrument is an equipment MODEL identity; it
+# never carries a regulatory status (510(k) clearance, De Novo, approval are W13 RegulatoryStatus records on a
+# Product), a performance claim (an Assertion asserted by the manufacturer), an assay configuration (W07 AssayVersion)
+# or a firmware state (FirmwareVersion / AssayVersion.softwareVersion). Individual units (serial numbers, a person's
+# own device) are private and never appear in the shared graph (contract A9, D-012).
+#
+# Enforcement note: cardinality, relationship class and the forbidden implications are enforced by the write service
+# and audited by V-W08-01 ... V-W08-10 (07-operations.md, fixtures/w08-validation.cypher), never by SDL alone.
+# =====================================================================================================
+
+"""
+Equipment-model endpoint: an instrument model (ToolOrInstrument) or a device model (Device). Renames the live union
+`ProductClassification` (live line 688) under contract B6. Used as the range of EMBODIES_MODEL (Product side, W04) and,
+on request W08-SR-01, of diagnostics RUNS_ON_INSTRUMENT (W07) so that a wearable's measurement procedure
+(AssayVersion) can name the device model it runs on. Members are model-level identities only.
+"""
+union EquipmentModelTarget = ToolOrInstrument | Device
+
+"""
+Usage qualifiers on an asserted usage or implementation edge (USES_PLATFORM, USES_EQUIPMENT, IMPLEMENTS_PLATFORM,
+USES_MODALITY). Successor of live `UsageMetadata` (live line 159). Contains every field of the frozen
+W00 type AssertedEdgeProperties (asserted_edge profile: one edge per recorded-time episode, projection of exactly one
+Assertion whose predicate equals the edge type) plus:
+- usageContext: verbatim context the source gives for the use ("BeadChip scanning", "spray drying step"); display and
+  filter text, never a controlled vocabulary.
+- isPrimary: true only when the source itself names this as the primary/default platform or equipment; null = not
+  stated (never false by default).
+- notes: curator note.
+The live `UsageMetadata.confidence` is not carried: extraction confidence lives on the authorizing Assertion with its
+Activity and methodVersion (contract A4).
+"""
+type UsageEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  usageContext: String
+  isPrimary: Boolean
+  notes: String
+}
+
+"""
+A technology platform: a named technology family or platform class that products, instrument models, device models
+and measurement methods implement or run on (for example "Illumina Infinium BeadChip array" or, vendor-neutral,
+"DNA methylation microarray"; "mRNA-LNP delivery platform" for a developer). It is NOT an instrument model (that is
+ToolOrInstrument, e.g. "Illumina iScan System"), NOT a method principle of an assay (W07 MeasurementMethod, e.g.
+"methylation array"), NOT a kit or consumable version (W07 AssayVersion.assayKitIdentifier, e.g. EPIC v2.0 kit
+20087706), and NOT a claim that any organization operates a capability (W11 ManufacturingCapability). Sharing a
+platform never licenses comparability between two assay versions (forbidden implication
+[SAME_TECHNOLOGY_PLATFORM, COMPARABLE_ASSAY_VERSION]; comparability needs a W07 ComparabilityAssessment, V-302).
+CQ-DX-01, CQ-DX-03, CQ-MF-04, candidate CQ-DX-C03. Canonical module: consumer_devices (future) seam type
+`TechnologyPlatform` (live line 1377). Archetype: Entity. uid token requested: technology-platform (W08-SR-06).
+"""
+type TechnologyPlatform implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["TechnologyPlatform", "Entity"])
+  @fulltext(indexes: [{indexName: "TechnologyPlatformSearch", fields: ["name", "description", "searchText"], queryName: "searchTechnologyPlatforms"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype discriminator; value 'TECHNOLOGY_PLATFORM'."
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Live stored embedding property kept for compatibility; no @vector index is declared here (D-014: Fable adds one only with a retrieval justification)."
+  searchEmbedding: [Float!]
+  "Verbatim or curated class text ('MICROARRAY', 'NGS', 'PPG wearable'); display and filter text, not identity, not an enum."
+  platformClass: String
+  """class: asserted; cardinality: many; catalog: DEVELOPS_PLATFORM (Organization -> TechnologyPlatform). Developing a platform does not imply owning its patents (W14) or manufacturing products on it (W01/W11)."""
+  developedBy: [Organization!]! @relationship(type: "DEVELOPS_PLATFORM", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: USES_PLATFORM (Organization -> TechnologyPlatform). Use is not an OPERATING capability (CQ-MF-04)."""
+  usedByOrganizations: [Organization!]! @relationship(type: "USES_PLATFORM", direction: IN, properties: "UsageEdgeProperties")
+  """class: asserted; cardinality: many; catalog: USES_PLATFORM (ManufacturingStep -> TechnologyPlatform; W11 writes the OUT field)."""
+  usedByManufacturingSteps: [ManufacturingStep!]! @relationship(type: "USES_PLATFORM", direction: IN, properties: "UsageEdgeProperties")
+  """class: asserted; cardinality: many; catalog: IMPLEMENTS_PLATFORM (Device -> TechnologyPlatform)."""
+  implementedByDevices: [Device!]! @relationship(type: "IMPLEMENTS_PLATFORM", direction: IN, properties: "UsageEdgeProperties")
+  """class: asserted; cardinality: many; catalog: IMPLEMENTS_PLATFORM (ToolOrInstrument -> TechnologyPlatform; new domain, see 01-domain-recommendation.md)."""
+  implementedByInstruments: [ToolOrInstrument!]! @relationship(type: "IMPLEMENTS_PLATFORM", direction: IN, properties: "UsageEdgeProperties")
+  """class: asserted; cardinality: many; catalog: IMPLEMENTS_PLATFORM (Product -> TechnologyPlatform; merges live Product IMPLEMENTS; W04 writes the OUT field)."""
+  implementedByProducts: [Product!]! @relationship(type: "IMPLEMENTS_PLATFORM", direction: IN, properties: "UsageEdgeProperties")
+  """class: structural (reference-concept link, accepted from W07's fragment, decision D-W08-07); cardinality: many; catalog: RUNS_ON_PLATFORM (MeasurementMethod -> TechnologyPlatform; W07 writes the OUT field). Generic capability of a method principle; never used for comparability."""
+  supportedMethods: [MeasurementMethod!]! @relationship(type: "RUNS_ON_PLATFORM", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+An instrument or tool MODEL used to run assays, process samples or perform manufacturing steps (for example "Tosoh G8",
+"Roche cobas c513", "Illumina iScan System", "Illumina NextSeq 550 System", a spray-dryer model). Identity: the model
+as designated by its manufacturer, resolved through Identifier records (catalog number, GUDID device identifier);
+the display name is never identity. It is NOT a physical unit (serial-numbered units are out of scope; a lab's own
+unit is not modelled), NOT a technology platform (TechnologyPlatform), NOT the assay configuration that runs on it
+(W07 AssayVersion: lab + method + instrument + kit + software version + traceability), NOT the commercial offering
+(W04 Product, linked by EMBODIES_MODEL) and NOT a regulatory status (W13 RegulatoryStatus STATUS_OF the Product; the
+same hardware model can be offered as a cleared Dx product and used "in Research Mode", which is AssayVersion
+configuration, not a second instrument identity). Range of diagnostics RUNS_ON_INSTRUMENT (W07, structural,
+zero_or_one per AssayVersion). CQ-DX-01, CQ-DX-03, CQ-MF-04, candidate CQ-DX-C03. Canonical module: live seam type
+(diagnostics consumer); research owner W08. Archetype: Entity. uid token: instrument (registered).
+"""
+type ToolOrInstrument implements Entity & EntityArchetype
+  @node(labels: ["ToolOrInstrument", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype discriminator; value 'TOOL_OR_INSTRUMENT'."
+  entityType: String!
+  "Verbatim or curated class text ('array scanner', 'HPLC analyzer', 'sequencer'); display and filter text only."
+  toolClass: String
+  """class: asserted; cardinality: many; catalog: IMPLEMENTS_PLATFORM (ToolOrInstrument -> TechnologyPlatform)."""
+  implementsPlatforms: [TechnologyPlatform!]! @relationship(type: "IMPLEMENTS_PLATFORM", direction: OUT, properties: "UsageEdgeProperties")
+  """class: structural; cardinality: zero_or_one per AssayVersion; catalog: RUNS_ON_INSTRUMENT (W07 AssayVersion -> ToolOrInstrument). Read side only."""
+  usedByAssayVersions: [AssayVersion!]! @relationship(type: "RUNS_ON_INSTRUMENT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: USES_EQUIPMENT (Organization -> ToolOrInstrument; renames live Organization USES). Use is not an operating capability."""
+  usedByOrganizations: [Organization!]! @relationship(type: "USES_EQUIPMENT", direction: IN, properties: "UsageEdgeProperties")
+  """class: asserted; cardinality: many; catalog: USES_EQUIPMENT (ManufacturingStep -> ToolOrInstrument; W11 writes the OUT field)."""
+  usedByManufacturingSteps: [ManufacturingStep!]! @relationship(type: "USES_EQUIPMENT", direction: IN, properties: "UsageEdgeProperties")
+  """class: asserted; cardinality: many; catalog: EMBODIES_MODEL (W04 Product -> EquipmentModelTarget; candidate rename of live CLASSIFIED_AS, seam W08-SR-03). The Product carries price, listings and regulatory status; this node carries none of them."""
+  embodiedByProducts: [Product!]! @relationship(type: "EMBODIES_MODEL", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A device MODEL: a consumer or clinical hardware model as designated by its maker (for example "WHOOP 4.0", "WHOOP MG",
+"Oura Ring Gen3"). This is the catalog's consumer_devices DeviceModel; the live name Device is kept (live line 1457;
+alignment: "Live Device is model-level"). Hardware generations or SKUs with different sensors are different Device
+nodes; firmware releases are NOT (they are FirmwareVersion states of one Device, or AssayVersion.softwareVersion when
+FirmwareVersion is not adopted). It is NOT a regulatory "device": FDA clearance, De Novo grant or approval is a W13
+RegulatoryStatus STATUS_OF a W04 Product (for example the software product "WHOOP ECG (electrocardiogram) Feature
+(1.0)", K243236, which RUNS_ON_DEVICE WHOOP MG; the 510(k) summary calls the strap system "consumer (non-device)").
+It carries no performance property: accuracy, sensitivity or "medical grade" statements are Assertions asserted by
+their maker (assertionBasis MANUFACTURER_CLAIM or STUDY_RESULT) about a Product, AssayVersion or AlgorithmVersion.
+It is NOT the measurement procedure (W07 AssayVersion RUNS_ON_INSTRUMENT this device, PERFORMED_WITH_ASSAY_VERSION
+episodes from this device) and NOT a unit owned by a person (private; PersonalMeasurement.deviceUid references this
+model uid from the private store, never the reverse). CQ-DX-02, CQ-DX-03, CQ-DX-09, CQ-MF-02, CQ-PR-02, CQ-PR-03,
+candidates CQ-DX-C01, CQ-DX-C02. Canonical module: consumer_devices (future). Archetype: Entity. uid token requested:
+device (already used by property-cards P-02; W08-SR-06).
+"""
+type Device implements Entity & EntityArchetype
+  @node(labels: ["Device", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype discriminator; value 'DEVICE'."
+  entityType: String!
+  "Verbatim or curated class text ('wrist-worn wearable', 'smart ring', 'CGM'); display and filter text only. Never a regulatory classification (product code and class live on RegulatoryStatus)."
+  deviceClass: String
+  "Verbatim family or line name ('WHOOP', 'Oura Ring'); grouping text, never identity."
+  deviceFamily: String
+  """class: asserted; cardinality: many; catalog: USES_MODALITY (Device -> Modality)."""
+  usesModalities: [Modality!]! @relationship(type: "USES_MODALITY", direction: OUT, properties: "UsageEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_SENSOR (Device -> Sensor). A hardware composition statement by a source, one episode per recorded-time belief."""
+  hasSensors: [Sensor!]! @relationship(type: "HAS_SENSOR", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: IMPLEMENTS_PLATFORM (Device -> TechnologyPlatform)."""
+  implementsPlatforms: [TechnologyPlatform!]! @relationship(type: "IMPLEMENTS_PLATFORM", direction: OUT, properties: "UsageEdgeProperties")
+  """class: asserted; cardinality: many; catalog: MEASURES_METRIC (W07 relationship type and W07 property type MeasurementEdgeProperties, which already names the Device domain; seam W08-SR-02 confirms). Means only that a source asserts the device model reports values of the Metric. It never implies resultKind MEASURED (sleep stages are INFERRED), validated accuracy, or an assay version; measured semantics belong to AssayVersion."""
+  measuresMetrics: [Metric!]! @relationship(type: "MEASURES_METRIC", direction: OUT, properties: "MeasurementEdgeProperties")
+  """class: asserted; temporalProfile: asserted_edge; cardinality: many; catalog: PERFORMED_WITH_ASSAY_VERSION (W07 relationship type; Device domain added by seam W08-SR-01). Which measurement procedure the device model's feature ran with, over which valid time (firmware rollout; phased rollouts keep validFrom precision coarse)."""
+  performedWithAssayVersions: [AssayVersion!]! @relationship(type: "PERFORMED_WITH_ASSAY_VERSION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: zero_or_one per AssayVersion; catalog: RUNS_ON_INSTRUMENT (W07; range EquipmentModelTarget by seam W08-SR-01). Read side only."""
+  usedByAssayVersions: [AssayVersion!]! @relationship(type: "RUNS_ON_INSTRUMENT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many (each FirmwareVersion has exactly_one); catalog: FIRMWARE_VERSION_OF (candidate). Read side only."""
+  firmwareVersions: [FirmwareVersion!]! @relationship(type: "FIRMWARE_VERSION_OF", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: EMBODIES_MODEL (W04 Product -> EquipmentModelTarget; candidate rename of live CLASSIFIED_AS)."""
+  embodiedByProducts: [Product!]! @relationship(type: "EMBODIES_MODEL", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: RUNS_ON_DEVICE (candidate; W04 Product -> Device, seam W08-SR-04). A software product that runs on this device model; its regulatory status is the product's, never the device's (forbidden implication [COMPATIBLE_SOFTWARE_CLEARED, DEVICE_CLEARED])."""
+  compatibleSoftwareProducts: [Product!]! @relationship(type: "RUNS_ON_DEVICE", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A sensing or energy-delivery modality: the physical principle a device model uses to sense a signal or deliver
+energy (for example "photoplethysmography (PPG)", "single-lead ECG", "triaxial accelerometry", "photobiomodulation").
+Kept as a live seam with narrowed meaning: it describes device capability. It is NOT the method principle of a
+measurement procedure (W07 MeasurementMethod, which is authoritative for what an AssayVersion does), NOT a metric
+and NOT a therapy claim. parameterNames/parameterUnits are display descriptors (units UCUM when present). CQ-DX-01
+(device side), CQ-PR-02 (steps that employ a modality through a device). Canonical module: consumer_devices
+(future; live line 1475). Archetype: Entity. uid token requested: modality (W08-SR-06). Maturity: PROVISIONAL.
+"""
+type Modality implements Entity & EntityArchetype
+  @node(labels: ["Modality", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype discriminator; value 'MODALITY'."
+  entityType: String!
+  "Verbatim or curated class text ('optical', 'electrical', 'inertial'); display text."
+  modalityClass: String
+  "Verbatim family text ('sensing', 'energy delivery'); display text."
+  modalityFamily: String
+  "Names of the physical parameters the modality is described by (e.g. 'wavelength'); parallel to parameterUnits."
+  parameterNames: [String!]
+  "UCUM units for parameterNames, position by position (e.g. 'nm'); null entry = unit not stated."
+  parameterUnits: [String!]
+  """class: asserted; cardinality: many; catalog: USES_MODALITY (Device -> Modality). Read side."""
+  usedByDevices: [Device!]! @relationship(type: "USES_MODALITY", direction: IN, properties: "UsageEdgeProperties")
+}
+
+"""
+A sensor component kind as installed in device models (for example "green/red/IR LED-photodiode PPG sensor",
+"ECG electrodes in clasp", "skin temperature sensor"). Kept as a live seam (live line 1485). It is NOT a measurement
+procedure and does not measure a Metric on its own: the live Sensor MEASURES_METRIC edge is retired (a sensor emits a
+signal; the metric comes from an AssayVersion or AlgorithmVersion). NOT a unit and NOT a supplier part number unless
+an Identifier says so. CQ-DX-01 (device side), candidate CQ-DX-C01 (hardware revisions that change sensors are new
+Device nodes). Canonical module: consumer_devices (future). Archetype: Entity. uid token requested: sensor
+(W08-SR-06). Maturity: PROVISIONAL.
+"""
+type Sensor implements Entity & EntityArchetype
+  @node(labels: ["Sensor", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype discriminator; value 'SENSOR'."
+  entityType: String!
+  "Verbatim or curated sensor type text ('optical PPG', 'ECG electrode'); display text."
+  sensorType: String
+  """class: asserted; cardinality: many; catalog: HAS_SENSOR (Device -> Sensor). Read side."""
+  installedInDevices: [Device!]! @relationship(type: "HAS_SENSOR", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+CANDIDATE (CQ-DX-C01; failing case fixtures/w08-device-firmware-assay.cypher F-1/F-2). One released firmware build of
+one component of one device model, as the vendor labels it (for example WHOOP 4.0 core firmware "41.16.1.0", Bluetooth
+firmware "17.2.2.0"). Identity: device model uid + componentLabel + versionLabel; payloadHash over those three. It
+exists because vendor release notes make statements whose subject is the firmware release itself ("Improved heart
+rate estimation algorithm"; "Improvements to battery life") and that no AssayVersion can carry, and because one
+device runs several separately versioned firmware components. It is NOT the measurement procedure (W07 AssayVersion,
+which declares the firmware it ran with by RUNS_FIRMWARE_VERSION and keeps the materialized string in
+softwareVersion), NOT an algorithm version that runs in an app or cloud service (W07 AlgorithmVersion), NOT evidence
+that every unit received it (phased rollout: forbidden implication [FIRMWARE_RELEASE_NOTED,
+FIRMWARE_DEPLOYED_TO_ALL_UNITS]) and NOT a regulatory scope (a cleared software module embedded in firmware is a
+Product with its own RegulatoryStatus). Release-note content, "current version" markers and release dates are
+Assertions with locators; effectiveFrom/effectiveTo hold only source-stated release bounds (null = not stated; the
+WHOOP 4.0 page states none). Vendor version strings are not assumed to sort chronologically. Canonical module:
+consumer_devices (catalog-owned name FirmwareVersion). Archetype: VersionedState. uid token requested:
+firmware-version (W08-SR-06). If Fable does not admit this candidate, AssayVersion.softwareVersion remains the only
+firmware record (catalog seam) and release-note assertions fall back to subject Device with a literal valueString.
+"""
+type FirmwareVersion implements Entity & VersionedStateArchetype
+  @node(labels: ["FirmwareVersion", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype discriminator; value 'FIRMWARE_VERSION'."
+  stateType: String!
+  "sha256:<hex> over the identity payload (deviceUid, componentLabel, versionLabel), NFC-WS1 joined by U+001F (D-016)."
+  payloadHash: String!
+  "Source-stated release start; null = not stated (never the capture date)."
+  effectiveFrom: DateTime
+  "Source-stated withdrawal or end of distribution; null = unknown, never 'still current'."
+  effectiveTo: DateTime
+  "Vendor version string exactly as published ('41.16.1.0'). Not parsed into numbers; ordering is not inferred."
+  versionLabel: String!
+  "How the label is known (W07 enum AlgorithmVersionBasis): VENDOR_VERSION_STRING when the vendor publishes it, UNKNOWN otherwise."
+  versionBasis: AlgorithmVersionBasis
+  "Verbatim component name the vendor uses ('core firmware', 'Bluetooth firmware', 'ECG Strap Module firmware'); null = single-component device or not stated."
+  componentLabel: String
+  """class: structural; cardinality: exactly_one; catalog: FIRMWARE_VERSION_OF (candidate; FirmwareVersion -> Device)."""
+  firmwareVersionOf: [Device!]! @relationship(type: "FIRMWARE_VERSION_OF", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one per AssayVersion; catalog: RUNS_FIRMWARE_VERSION (candidate; W07 AssayVersion -> FirmwareVersion, OUT field requested by W08-SR-05). AssayVersion.softwareVersion must equal versionLabel (V-W08-05)."""
+  declaredByAssayVersions: [AssayVersion!]! @relationship(type: "RUNS_FIRMWARE_VERSION", direction: IN, properties: "StructuralEdgeProperties")
+}

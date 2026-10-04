@@ -1,0 +1,229 @@
+# =====================================================================================================
+# W19 Source Intelligence — candidate SDL fragment
+# Run run-2026-10-04-fable51-01; worker W19 (Opus 5.5); synthesizer Fable 5.1.
+# Catalog module: provenance (canonical Source, SourceSnapshot, SourceLocator, SourceRevisionEvent, Activity
+# stay with W00; Document SDL stays with W20). Catalog digest 8fb50ff0…84f0 (catalog 0.2.0).
+# Everything in this file is CANDIDATE (maturity CANDIDATE). Each type is admitted only with a named candidate CQ
+# and a failing fixture in workers/W19/fixtures:
+#   SourceAuthorityAssessment  -> CQ-PV-C01 (fixture 05, query Q-15; failing case: a non-marketing securities filing
+#                                 supports an OPERATING capability state; a registry "has_results=false" read as
+#                                 "results unpublished")
+#   SourceCoverageRequirement  -> CQ-PV-C02 (fixture 05, Q-13a/Q-13b; failing case: a registry fact answered from a
+#                                 stale snapshot, or a required source never captured, with no way to say so)
+#   SourceDiscoveryRecord      -> CQ-PV-C03 (fixture 05, Q-13a/Q-17; failing case: ClinicalTrials.gov record history
+#                                 BLOCKED this session would otherwise read as "no prior versions")
+#   AuthorityScope, DiscoveryOutcome enums (owned by W19).
+# Existing CQs served: CQ-PV-05, CQ-AX-05, CQ-AX-07, CQ-ST-08, CQ-EV-05 (with W00/W09/W21 types).
+# Referenced, not defined here (other owners): Entity, EvidenceAssessmentArchetype, InformationArtifactArchetype,
+# OccurrenceArchetype, PrivacyClass, NodeMaturity, AssessmentStatus, SourceKind, ActivityKind, Source, SourceSnapshot,
+# Activity, SupersessionProperties (W00).
+# Seam dependencies: ActivityKind value DISCOVERY (W19-SR-03), uid tokens source-authority / coverage-requirement /
+# source-discovery (W19-SR-05), SourceKind additions (W19-SR-01). No reliability or truth score exists on any type.
+# =====================================================================================================
+
+"""
+Controlled scope of claims for which a source is normally primary or highly relevant. It replaces, as a filterable
+vocabulary, the 240 free-text `authorityFor` tags of the 127 entries in docs/schema/sources/source-registry.yaml
+(mapping: workers/W19/registry-authority-mapping.yaml); the verbatim tags are kept on SourceAuthorityAssessment.
+A scope is about the kind of proposition, never about the truth of a proposition: SELF_DECLARATION authorizes
+"the company says X", never X. A source not assessed for a scope is UNKNOWN for it, not "not authoritative".
+Owner: W19 (candidate). CQ-PV-C01, CQ-PV-05.
+"""
+enum AuthorityScope {
+  "The publisher's own statements about itself, its products, services, roles, policies or plans (company pages, marketing, self-disclosures, securities filings, company characterizations of agency actions)."
+  SELF_DECLARATION
+  "Declarations printed on a product label or label page as displayed (Supplement Facts, dose, dosage form)."
+  LABEL_DECLARATION
+  "Offer, price, availability, seller of record or fulfiller as displayed by a commerce surface at observation time."
+  COMMERCE_DISPLAY
+  "What was said or written in a work, as rendered by its publisher or platform (transcripts, captions, audio/video renditions, episode metadata)."
+  SPEECH_RENDITION
+  "A source's own report about another party's statement, work or status (news, trade press, retellings, third-party profiles and directories, secondary summaries). Authoritative only for 'this source reports X'."
+  SECONDARY_REPORT
+  "Design, population, interventions, results, funding, conflicts and affiliations of a study as reported by its authors (articles, preprints, corrected text of an article)."
+  STUDY_REPORT
+  "Registered study information as shown in a trial registry at observation time (status, enrollment, outcomes, arms, sites, results-posted flag)."
+  TRIAL_REGISTRATION
+  "Bibliographic metadata and revision status of a publication (publication type, correction/retraction links, existence and date of notices)."
+  BIBLIOGRAPHIC_STATUS
+  "An authority's recorded action, decision, finding or status about a named subject (designations, grants, GRAS responses, warning letters, court findings)."
+  REGULATORY_ACTION
+  "Meaning, process and text of laws, regulations, guidance and agency policy (not product-specific status)."
+  REGULATORY_FRAMEWORK
+  "A certifier's listing status and scope, and the certifier's definition of its own programs."
+  CERTIFICATION_STATUS
+  "Definitions and specifications of terms, codes, standards, methods, models and documented system behaviour as issued by the defining body (LOINC, W3C, FHIR, CLSI, NGSP, technical documentation)."
+  REFERENCE_DEFINITION
+}
+
+"""
+Outcome of one attempt to find or fetch a source for a subject. Distinct from SourceSnapshot.captureCompleteness:
+a BLOCKED or NOT_FOUND attempt produces no snapshot at all, and an HTTP 200 that returns an error page is BLOCKED,
+not FOUND. Absence of any SourceDiscoveryRecord means NOT_ATTEMPTED (computed, never stored).
+Owner: W19 (candidate). CQ-PV-C03.
+"""
+enum DiscoveryOutcome {
+  "The target was reached and at least one Source was identified or captured."
+  FOUND
+  "The search ran to completion on a covering index or endpoint and returned no match."
+  NOT_FOUND
+  "Access was denied (egress policy, 401/403, paywall, login, robots, error page served with 200)."
+  BLOCKED
+  "The attempt returned a truncated or query-biased result; the target may exist beyond what was read."
+  PARTIAL
+  "A technical failure (timeout, 5xx, parser error) unrelated to access policy; retryable."
+  ERROR
+}
+
+"""
+Method-versioned BellLabs judgment of which AuthorityScope values one Source is primary or highly relevant for, with
+the registry's verbatim authorityFor / notAuthorityFor tags. It is claim-scoped: it never scores the publisher, never
+sets Assertion.status, never sets an Adjudication verdict and never carries overallScore (left null). Re-assessment is a
+new node linked by SUPERSEDES. What it is not: a reliability score, a truth value, or a property of the publisher.
+CQ: CQ-PV-C01 (candidate), CQ-PV-05, CQ-ST-08. Module: provenance (candidate). Archetype: EvidenceAssessment.
+"""
+type SourceAuthorityAssessment implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["SourceAuthorityAssessment", "EvidenceAssessment"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  # EvidenceAssessmentArchetype
+  assessmentType: String!
+  methodVersion: String!
+  status: AssessmentStatus!
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  summary: String
+  "Never written for this type (a composite authority score would be a global truth score)."
+  overallScore: Float
+  "Deprecated kernel field; never written for this type."
+  confidence: Float
+  # domain fields
+  "Scopes the source is judged primary or highly relevant for. Empty list = assessed and no scope granted."
+  authorityScopes: [AuthorityScope!]!
+  "Verbatim authorityFor tags (registry vocabulary); claim-specific record kept beside the controlled scopes."
+  authorityForTags: [String!]
+  "Verbatim notAuthorityFor tags: inferences this source cannot establish by itself (for example whether_results_were_published)."
+  notAuthorityForTags: [String!]
+  "Registry entry id (docs/schema/sources/source-registry.yaml) the assessment was derived from, when any."
+  registryEntryId: String
+  assessedAt: DateTime!
+  rationale: String
+  """class: structural; cardinality: exactly_one; catalog: ASSESSES_SOURCE_AUTHORITY (candidate)"""
+  assessesSource: [Source!]! @relationship(type: "ASSESSES_SOURCE_AUTHORITY", direction: OUT)
+  """class: structural; cardinality: many; catalog: ASSESSED_ON_SNAPSHOT (candidate). Captures examined; a listing's authority is 'as of page update'."""
+  assessedOnSnapshots: [SourceSnapshot!]! @relationship(type: "ASSESSED_ON_SNAPSHOT", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (W00)"""
+  wasGeneratedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00), sameLabelRequired"""
+  supersedes: [SourceAuthorityAssessment!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+}
+
+"""
+INTERNAL operational specification: for subjects of one catalog label, which source kinds (and authority scopes) must
+have been captured, how fresh the newest capture must be, and whether record history must be retrieved. Coverage and
+freshness status are computed by query (Q-13a) as of a recorded-time viewpoint; they are never stored on subjects or
+assertions and never change Assertion.status or a SUPPORT verdict. Immutable; a new version is a new node with the same
+requirementKey, and recordedTo closes the old one. What it is not: a policy permission (PolicyVersion, W23), a truth rule.
+CQ: CQ-PV-C02 (candidate), CQ-ST-08, CQ-EV-05, CQ-AX-06. Module: provenance (candidate). Archetype: InformationArtifact.
+"""
+type SourceCoverageRequirement implements Entity & InformationArtifactArchetype
+  @node(labels: ["SourceCoverageRequirement", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  "INTERNAL for every instance; excluded from public projections."
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  # InformationArtifactArchetype
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  # domain fields
+  "Stable key shared by all versions of one requirement, for example trial-registration.registry-record."
+  requirementKey: String!
+  versionLabel: String!
+  "Catalog primary label of the subjects this requirement covers (for example TrialRegistration, Publication, Episode)."
+  subjectLabel: String!
+  "Optional predicate list when the requirement covers only some claims about the subject."
+  predicateScope: [String!]
+  requiredSourceKinds: [SourceKind!]!
+  requiredAuthorityScopes: [AuthorityScope!]
+  "Maximum age in days of the newest required capture (observedAt) at the viewpoint; null = no freshness bound."
+  maxSnapshotAgeDays: Int
+  "When true, only COMPLETE captures of FULL renditions satisfy the requirement."
+  requireCompleteCapture: Boolean!
+  "When true, the source's record history (prior versions) must be retrieved, not only the current record."
+  revisionHistoryRequired: Boolean!
+  rationale: String
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  """class: structural; cardinality: many (inverse of FOR_COVERAGE_REQUIREMENT)"""
+  discoveryRecords: [SourceDiscoveryRecord!]! @relationship(type: "FOR_COVERAGE_REQUIREMENT", direction: IN)
+}
+
+"""
+One bounded attempt to find or fetch a source for a subject: the outcome (FOUND, NOT_FOUND, BLOCKED, PARTIAL, ERROR),
+the endpoint tried, the query, and the block evidence. It is a specialization of the PROV Activity (labels
+SourceDiscoveryRecord + Activity + Occurrence, like Document + Source + Entity), so W00's WAS_ASSOCIATED_WITH and
+SourceSnapshot WAS_GENERATED_BY apply to it unchanged; activityKind is DISCOVERY. It references its subject by uid
+(subjectUid) on purpose: operational records stay out of the knowledge traversal and cannot become truth premises.
+What it is not: a capture (no bytes), evidence of absence, or a snapshot completeness value.
+CQ: CQ-PV-C03 (candidate), CQ-ST-08, CQ-PV-03. Module: provenance (candidate). Archetype: Occurrence.
+"""
+type SourceDiscoveryRecord implements Entity & OccurrenceArchetype
+  @node(labels: ["SourceDiscoveryRecord", "Activity", "Occurrence"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  "INTERNAL for every instance; excluded from public projections."
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  # OccurrenceArchetype
+  occurrenceType: String!
+  startedAt: DateTime
+  endedAt: DateTime
+  # Activity fields (W00 Activity contract, repeated because this type carries the Activity label)
+  "Always DISCOVERY (value requested from W00, W19-SR-03)."
+  activityKind: ActivityKind!
+  methodVersion: String
+  externalRunSystem: String
+  externalRunId: String
+  # domain fields
+  discoveryOutcome: DiscoveryOutcome!
+  "What was sought: CURRENT_RECORD (default), RECORD_HISTORY, FULL_TEXT, ITEM_IN_FEED, RENDITION."
+  discoveryTarget: String
+  "Endpoint or search URL actually tried (never a guessed URL)."
+  attemptedUri: String
+  queryText: String
+  "HTTP status when known; a 200 can still be BLOCKED (error page)."
+  responseStatusCode: Int
+  "Verbatim evidence for BLOCKED, PARTIAL or ERROR (proxy message, tool warning, page title)."
+  blockEvidence: String
+  resultCount: Int
+  "uid of the subject searched for (Publication, Episode, TrialRegistration ...); a property, not an edge."
+  subjectUid: String
+  subjectLabel: String
+  """class: structural; cardinality: zero_or_one; catalog: FOR_COVERAGE_REQUIREMENT (candidate)"""
+  forRequirement: [SourceCoverageRequirement!]! @relationship(type: "FOR_COVERAGE_REQUIREMENT", direction: OUT)
+  """class: structural; cardinality: many; catalog: DISCOVERED_SOURCE (candidate)"""
+  discoveredSources: [Source!]! @relationship(type: "DISCOVERED_SOURCE", direction: OUT)
+}

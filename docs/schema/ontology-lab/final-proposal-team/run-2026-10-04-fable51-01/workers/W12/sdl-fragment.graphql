@@ -1,0 +1,754 @@
+# =====================================================================================================================
+# W12 Quality testing and certification -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W12 (Opus 5.5, claude-opus-5-5)   Coordinator/synthesizer: Fable 5.1
+# Canonical catalog module: quality (catalog 0.2.0, digest 8fb50ff0...84f0; live schema digest 86b5e0b5...f112).
+# The live schema (current_biotech_schema.graphql) has NO quality type; every type below is a catalog type written in
+# full for the first time. Seams with live fields (ManufacturingProcess.qualitySystemKind, LocationType.GMP_FACILITY,
+# Material.traceabilityCode, LabelRegionType.CERTIFICATION/LOT_NUMBER/EXPIRATION_DATE) are recorded in migration-map.yaml.
+#
+# Competency questions: CQ-PF-03 (Essential), CQ-MF-06 (Foundational), CQ-AX-19 (Expansion), CQ-AX-04 (missingness,
+# quality part), minimal pair 18 (and 11 for the result/method part); candidates CQ-QA-C01..C04 (02-cq-coverage.md).
+# Invariants and validators: INV-006, INV-007, INV-010, INV-004/104 (CERTIFIED_UNDER), V-008, V-009, V-011, V-124,
+# V-332, proposed V-W12-01..V-W12-12 (fixtures/w12-validation.cypher).
+# OPEN-QUESTIONS P2 quality items 1 (COA vs test summary) and 2 (target / release / shelf-life / uncertainty) are given
+# proposed closures here; item 5 (recalled / expired / counterfeit inventory) is a stated boundary with W15.
+#
+# Owned here (sole writer): node types ProductLot, TestSample, TestExecution, TestMethod, TestingLaboratory,
+# MeasuredResult, SpecificationCriterion, PassFailInterpretation, LotTestSummary, CertificateOfAnalysis,
+# CertificationProgram, CertificationListing, CertificationScope; union CertificationCoverageTarget; enums listed below
+# (all PROPOSED: the catalog defines no quality enum); relationship types LOT_OF, MANUFACTURED_UNDER, SAMPLE_FROM,
+# TESTED_SAMPLE, USED_METHOD, PERFORMED_BY_LAB, PRODUCED_RESULT, EVALUATED_AGAINST, INTERPRETS_RESULT,
+# SUMMARIZES_TESTING, CERTIFIES_RESULTS_FOR, PROGRAM_HAS_LISTING, HAS_CERTIFICATION_SCOPE, COVERS, CERTIFIED_UNDER and
+# the four proposed types APPLIES_CRITERION, INTERPRETS_TESTING_OF, CRITERION_OF_SPECIFICATION, COA_ISSUED_BY
+# (05-decision-seam-ledger.md D-W12-05).
+#
+# Imported by name only (owner):
+#   W00: Entity, EntityArchetype, VersionedStateArchetype, OccurrenceArchetype, InformationArtifactArchetype,
+#        EvidenceAssessmentArchetype, PrivacyClass, NodeMaturity, AssessmentStatus, TimePrecision, QuantityBasis,
+#        MassBasis, AmountReferent, ReportedStatus, SourceLocator, TradeItemIdentifier, AssertedEdgeProperties,
+#        StateEpisodeProperties, DerivedEdgeProperties, StructuralEdgeProperties
+#   W01: Organization, Facility        W02: IngredientMaterial        W04: Product, ProductVariant, FormulationVersion
+#   W11: SpecificationVersion (D-009)  W15: IndividualUnit
+# SUPPORTED_BY is a W00 relationship type; the endpoint fields on MeasuredResult, LotTestSummary and
+# CertificateOfAnalysis need W00 to admit those labels into the SUPPORTED_BY domain (seam W12-SR-02). The field on
+# PassFailInterpretation is already inside the catalog domain (EvidenceAssessment).
+# Relationship class and cardinality are stated in each field description and enforced by the write service and the
+# validation queries, never by SDL. Derived fields are read-only (@settable false) and written only by the projection job.
+# uid type tokens used by the fixtures are PROPOSED (W12-SR-01): lot, test-sample, test-execution, test-method,
+# measured-result, spec-criterion, pass-fail, lot-test-summary, coa, cert-program, cert-listing, cert-scope;
+# TestingLaboratory reuses the registered Organization token org.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Enums (PROPOSED, owner W12). Each value has a failing case in fixtures/ (see 04-model-cards.md).
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Which analytical state a MeasuredResult records (INV-007; V-124, V-W12-04). It is never "not measured" (no
+MeasuredResult exists) and never "not reported" (a source gave only a pass/fail: see PassFailInterpretation
+.resultValueReported). QUANTIFIED requires value; every other value requires value = null.
+NOT_DETECTED: below the method's detection limit ("ND"). DETECTED_NOT_QUANTIFIED: detected below the quantitation
+limit. BELOW_REPORTING_LIMIT: below a stated reporting limit that is not a detection limit ("BRL", for example
+"1% or less of label claim"). ABOVE_QUANTITATION_RANGE: above the calibrated range, value not reported.
+QUALITATIVE_ABSENT / QUALITATIVE_PRESENT: outcome of a presence/absence test in a stated sample quantity (for example
+E. coli "Absent/10g"); a qualitative absence is a test outcome at the method's capability, never proof of zero content.
+"""
+enum ResultQualifier {
+  QUANTIFIED
+  NOT_DETECTED
+  DETECTED_NOT_QUANTIFIED
+  BELOW_REPORTING_LIMIT
+  ABOVE_QUANTITATION_RANGE
+  QUALITATIVE_ABSENT
+  QUALITATIVE_PRESENT
+}
+
+"""Kind of measurement uncertainty stated with a MeasuredResult. EXPANDED requires coverageFactor (k) when the source
+states it; STANDARD is a standard uncertainty (k = 1)."""
+enum UncertaintyKind {
+  EXPANDED
+  STANDARD
+}
+
+"""
+Comparator of a SpecificationCriterion. NOT_LESS_THAN ("NLT", "≥"), NOT_MORE_THAN ("NMT", "≤"), RANGE (threshold and
+upperThreshold, or a nominal value with a stated tolerance), ABSENT_IN (absence in sampleQuantity, for example
+"Absent/10g"), CONFORMS_TO_DESCRIPTION (appearance and identity text), REFERENCE_ONLY (the criterion names a
+reference such as "ICH/USP guidelines" without a numeric limit; criterionText is required and no numeric evaluation is
+possible).
+"""
+enum SpecComparator {
+  NOT_LESS_THAN
+  NOT_MORE_THAN
+  RANGE
+  ABSENT_IN
+  CONFORMS_TO_DESCRIPTION
+  REFERENCE_ONLY
+}
+
+"""
+When a SpecificationCriterion applies (OPEN-QUESTIONS P2 quality 2; ICH Q6A section 2.2). RELEASE: at batch release
+(in-house release limits may be tighter than shelf-life limits). SHELF_LIFE: throughout shelf-life (stability).
+RELEASE_AND_SHELF_LIFE: one criterion stated for both (the US/Japan regulatory default in ICH Q6A). NOT_STATED: the
+source does not say (for example "Internal Specifications ≥ 250 mg/dose"). A label claim is never a criterion: it is a
+W04 QuantityDeclaration (INV-006).
+"""
+enum CriterionPurpose {
+  RELEASE
+  SHELF_LIFE
+  RELEASE_AND_SHELF_LIFE
+  NOT_STATED
+}
+
+"""Who sets a SpecificationCriterion. INTERNAL: the specification owner's own limit ("internal specifications");
+PHARMACOPEIAL: a compendial limit (USP, Ph. Eur.); REGULATORY: a limit stated in law or an agency decision;
+CERTIFICATION_PROGRAM: a certifier's limit (for example an NSF 306 banned-substance panel); NOT_STATED."""
+enum CriterionBasis {
+  INTERNAL
+  PHARMACOPEIAL
+  REGULATORY
+  CERTIFICATION_PROGRAM
+  NOT_STATED
+}
+
+"""
+Verdict of a PassFailInterpretation. INDETERMINATE: under the interpretation's decision rule the result's uncertainty
+interval straddles the limit. NOT_EVALUABLE: result and criterion cannot be compared (unit, quantity basis, mass basis
+or amount referent mismatch; REFERENCE_ONLY criterion; stability result against a release-only criterion). A verdict
+is never a measured value.
+"""
+enum PassFailVerdict {
+  CONFORMS
+  DOES_NOT_CONFORM
+  INDETERMINATE
+  NOT_EVALUABLE
+}
+
+"""
+How a PassFailInterpretation got its verdict. SOURCE_STATED: the verdict is copied from a source ("☑ Pass" on a COA row,
+"Conforms to internal specs" on a lot page) and cites the Assertion that captured it (basisAssertionUid); it may have
+no MeasuredResult and never creates one (V-W12-05). EVALUATED_FROM_RESULT: computed by a named method version from
+exactly one MeasuredResult and one SpecificationCriterion, applying decisionRule.
+"""
+enum VerdictBasis {
+  SOURCE_STATED
+  EVALUATED_FROM_RESULT
+}
+
+"""Purpose of a TestExecution as stated or evident from its source. RELEASE (batch release testing), STABILITY
+(shelf-life study time point), CERTIFICATION (testing by or for a certification program), SURVEILLANCE (market
+purchase testing, for example a competitor's survey), INVESTIGATION (out-of-specification or complaint investigation),
+NOT_STATED."""
+enum TestPurpose {
+  RELEASE
+  STABILITY
+  CERTIFICATION
+  SURVEILLANCE
+  INVESTIGATION
+  NOT_STATED
+}
+
+"""Status of a TestExecution record. INVALIDATED: the source states the execution was invalidated (for example an
+assignable laboratory error in an OOS investigation); its results stay as records and never feed interpretations."""
+enum TestExecutionStatus {
+  COMPLETED
+  INVALIDATED
+  NOT_STATED
+}
+
+"""Whether the source states that a test was inside the reporting laboratory's accreditation scope (real case: the
+Tru Niagen sample COA marks NSF 306 and Appearance rows "Test not in the scope of accreditation to ISO/IEC 17025:2017")."""
+enum AccreditationScopeStatus {
+  WITHIN_SCOPE
+  OUTSIDE_SCOPE
+  NOT_STATED
+}
+
+"""
+What the capture shows about a COA's signature or authorization (WHO TRS 957 Annex 1, 19.1(l)). SIGNATURE_PRESENT:
+a signature or signature image with signer is visible. ELECTRONIC_APPROVAL_STATEMENT: an "electronically approved by"
+statement or equivalent. NONE_IN_COMPLETE_CAPTURE: the complete visual capture shows no signature. NOT_CAPTURED: the
+capture could not show it (for example text-only PDF extraction). NOT_CAPTURED is never read as unsigned.
+"""
+enum SignatureEvidence {
+  SIGNATURE_PRESENT
+  ELECTRONIC_APPROVAL_STATEMENT
+  NONE_IN_COMPLETE_CAPTURE
+  NOT_CAPTURED
+}
+
+"""Status of a CertificationListing as stated by the certifier. A listing that is merely absent from a later capture
+is NOT WITHDRAWN: absence closes nothing until the certifier states it (CQ-CM-05 analogue; V-W12-10)."""
+enum CertificationListingStatus {
+  LISTED
+  SUSPENDED
+  WITHDRAWN
+  EXPIRED
+}
+
+"""What a CertificationProgram certifies. FACILITY (for example NSF/ANSI 455-2 GMP), PRODUCT (for example NSF/ANSI 173
+contents certification), LOT (for example NSF Certified for Sport, which lists tested lots), INGREDIENT_MATERIAL
+(NSF 173DI), LABORATORY (ISO/IEC 17025 accreditation). A FACILITY program's scope covers only Facility (V-W12-06)."""
+enum CertifiedObjectKind {
+  FACILITY
+  PRODUCT
+  LOT
+  INGREDIENT_MATERIAL
+  LABORATORY
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Union
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Range of COVERS (CertificationScope -> covered identity). Catalog range Product|ProductVariant|ProductLot|Facility|
+TradeItemIdentifier (round 0005) plus TestingLaboratory (laboratory accreditation, PROPOSED; fixture
+w12-30-certification-scope.cypher). IngredientMaterial (NSF 173DI) and AssayVersion (NGSP) stay CANDIDATE members until
+a fixture needs them. Coverage of one member never implies coverage of another (V-332, V-W12-06).
+"""
+union CertificationCoverageTarget = Product | ProductVariant | ProductLot | Facility | TradeItemIdentifier | TestingLaboratory
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Node types
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A production lot (batch) of one product variant, identified by the lot code its brand or manufacturer printed or
+published together with that issuer and variant. It is an identity (Entity), not a state: manufacture and expiry dates
+are source-stated attributes of the lot. It is NOT a package configuration, an inventory item, an individual unit or a
+certification; "expired" is computed at query time from expiryDate, never stored; recall and counterfeit status are
+outside this type (W13 recall events, W15 inventory and units). A lot code alone is not identity: the same code under
+another brand or variant is another lot, and a near-identical code ("R110-01" vs "R1110-01") is a ResolutionHypothesis,
+never a merge. CQ-PF-03, CQ-AX-19, CQ-QA-C02, CQ-QA-C04. Catalog module quality. Archetype Entity.
+"""
+type ProductLot implements Entity & EntityArchetype
+  @node(labels: ["ProductLot", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Lot code as printed or published by the issuer (materialized key; the Identifier record carries scheme and issuer)."
+  lotCode: String!
+  "Source-stated manufacture date, stored as the first instant of its precision period."
+  manufactureDate: DateTime
+  manufactureDatePrecision: TimePrecision
+  "Source-stated expiry, first instant of its precision period (\"Exp. 12/2027\" -> 2027-12-01, MONTH)."
+  expiryDate: DateTime
+  expiryDatePrecision: TimePrecision
+  "Verbatim date text (\"Exp. 12/2027\", \"Manuf. 02/2025\", \"07/2028 under the above conditions\")."
+  dateTextVerbatim: String
+  """class: asserted; cardinality: exactly_one; catalog: LOT_OF"""
+  lotOf: [ProductVariant!]! @relationship(type: "LOT_OF", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_one per target kind; catalog: MANUFACTURED_UNDER (FormulationVersion)"""
+  manufacturedUnderFormulation: [FormulationVersion!]! @relationship(type: "MANUFACTURED_UNDER", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_one per target kind; catalog: MANUFACTURED_UNDER (SpecificationVersion, W11)"""
+  manufacturedUnderSpecification: [SpecificationVersion!]! @relationship(type: "MANUFACTURED_UNDER", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural (inverse view); cardinality: many; catalog: SAMPLE_FROM"""
+  samples: [TestSample!]! @relationship(type: "SAMPLE_FROM", direction: IN, properties: "AssertedEdgeProperties")
+  """class: derived (rule w12-certified-under/v1, read-only; only from a scope that COVERS this lot directly, V-332); cardinality: many; catalog: CERTIFIED_UNDER"""
+  certifiedUnder: [CertificationListing!]! @relationship(type: "CERTIFIED_UNDER", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A physical sample taken for testing from one lot, one individual unit, or one ingredient material (catalog SAMPLE_FROM
+range). Separating the sample from the lot is what lets a surveillance purchase of a unit whose lot is unknown be
+recorded without attaching its result to any lot. It is NOT the lot, NOT the unit and NOT the test. CQ-AX-19,
+CQ-QA-C02. Catalog module quality. Archetype Entity.
+"""
+type TestSample implements Entity & EntityArchetype
+  @node(labels: ["TestSample", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Sample code or registration number as stated by the laboratory (WHO TRS 957 19.1(a)); null when not stated."
+  sampleCode: String
+  sampledAt: DateTime
+  sampledAtPrecision: TimePrecision
+  "Verbatim sampling or acquisition description (\"purchased from Amazon and various brand websites\", \"retained sample\")."
+  samplingMethod: String
+  """class: asserted; cardinality: exactly_one across the three fields; catalog: SAMPLE_FROM"""
+  sampleFromLot: [ProductLot!]! @relationship(type: "SAMPLE_FROM", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: exactly_one across the three fields; catalog: SAMPLE_FROM (W15 IndividualUnit)"""
+  sampleFromUnit: [IndividualUnit!]! @relationship(type: "SAMPLE_FROM", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: exactly_one across the three fields; catalog: SAMPLE_FROM (W02 IngredientMaterial)"""
+  sampleFromMaterial: [IngredientMaterial!]! @relationship(type: "SAMPLE_FROM", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+One performance of one test (one row of a COA or report: test, method, analyte) on one sample by a laboratory. It is an
+Occurrence: it happened once, possibly at an unknown time. It is NOT the method (reusable), NOT the result (an artifact
+it produced), NOT the certificate that reports it, and NOT a certification. Laboratory and method are optional because
+real reports omit them (subcontracted rows name no laboratory); an absent edge means "not stated", never "none".
+CQ-QA-C01, CQ-QA-C02, CQ-QA-C03, CQ-AX-19. Catalog module quality. Archetype Occurrence.
+"""
+type TestExecution implements Entity & OccurrenceArchetype
+  @node(labels: ["TestExecution", "Occurrence"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  occurrenceType: String!
+  startedAt: DateTime
+  endedAt: DateTime
+  "Source-stated completion date of the test (WHO TRS 957 19.1(k)), first instant of its precision period; null when only a report date is given."
+  executedAt: DateTime
+  executedAtPrecision: TimePrecision
+  "Verbatim test name from the source row (\"Potency\", \"Microbial*\", \"Certified for Sport at NSF International†\")."
+  testNameVerbatim: String
+  status: TestExecutionStatus
+  testPurpose: TestPurpose
+  accreditationScopeStatus: AccreditationScopeStatus
+  "True when the source states the test was subcontracted; the subcontracted laboratory may be unnamed (no PERFORMED_BY_LAB edge)."
+  subcontracted: Boolean
+  "Verbatim statement about who performed the test when no laboratory identity is given (\"Testing performed at ISO 17025 accredited subcontracted laboratories\", \"As confirmed by a third-party testing lab\")."
+  performerStatementVerbatim: String
+  """class: structural; cardinality: exactly_one; catalog: TESTED_SAMPLE"""
+  testedSample: [TestSample!]! @relationship(type: "TESTED_SAMPLE", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: zero_or_one (absent = not stated); catalog: USED_METHOD"""
+  usedMethod: [TestMethod!]! @relationship(type: "USED_METHOD", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_one (absent = not stated); catalog: PERFORMED_BY_LAB"""
+  performedByLab: [TestingLaboratory!]! @relationship(type: "PERFORMED_BY_LAB", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many (each MeasuredResult has exactly one producer); catalog: PRODUCED_RESULT"""
+  producedResults: [MeasuredResult!]! @relationship(type: "PRODUCED_RESULT", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A reusable analytical procedure as identified by a source (compendial chapter such as "USP <2091>", a technique such
+as "HPLC" with a lab-internal method id, or a certifier panel such as "NSF 306"). Two executions share a method only
+when they share this identity; a technique name alone ("HPLC") is a weak identity and is recorded with
+methodIdentifier null. It is NOT a diagnostics AssayVersion (W07: how a clinical lab runs a test for a measurand) and
+NOT an instrument (W08). CQ-QA-C01, CQ-AX-19, minimal pair 11. Catalog module quality. Archetype Entity.
+"""
+type TestMethod implements Entity & EntityArchetype
+  @node(labels: ["TestMethod", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Compendial or published method identifier (\"USP <2091>\", \"USP <2022>\", \"NSF 306\"); null when only a technique is named."
+  methodIdentifier: String
+  "Version or edition of the method when stated (compendium edition, lab method revision)."
+  methodVersion: String
+  "Verbatim technique (\"HPLC\", \"ICP-MS\", \"HPLC with a UV-Vis detector\")."
+  techniqueVerbatim: String
+}
+
+"""
+An organization that performs or reports analytical tests: a specialization of W01's Organization
+(labels ["TestingLaboratory","Organization","Entity"]; one node, one uid with the registered token org). Affiliation
+with a brand owner (for example "ChromaDex Analytics, Inc. is an affiliate of Niagen Bioscience, Inc.") is a W01 role
+assertion, never a property here, and is what an independence question reads (CQ-AX-19). Accreditation is a
+CertificationListing that COVERS the laboratory; `accreditation` keeps only the laboratory's own verbatim statement and
+is never verification. CQ-AX-19, CQ-QA-C01, CQ-MF-06. Catalog module quality (parentLabel Organization). Archetype Entity.
+"""
+type TestingLaboratory implements Entity & EntityArchetype
+  @node(labels: ["TestingLaboratory", "Organization", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Verbatim self-declared accreditation statement (\"is an ISO/IEC 17025:2017 accredited Chemical Testing Laboratory\"); a claim, not a verified accreditation."
+  accreditation: String
+  """class: asserted (inverse view); cardinality: many; catalog: PERFORMED_BY_LAB"""
+  performedExecutions: [TestExecution!]! @relationship(type: "PERFORMED_BY_LAB", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view); cardinality: many; proposed: COA_ISSUED_BY"""
+  issuedCertificates: [CertificateOfAnalysis!]! @relationship(type: "COA_ISSUED_BY", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+The record of one reported analytical outcome for one analyte from one TestExecution: a value with unit, uncertainty
+and limits, or a qualified non-value (not detected, below reporting limit, qualitatively absent). It is an
+InformationArtifact because it is what a laboratory reported, bound to the source that reported it (SUPPORTED_BY a
+locator; W12-SR-02); a corrected report produces a new MeasuredResult and the old one is never edited. It is NOT a
+label declaration (V-011, INV-006), NOT a pass/fail verdict, and never created from a pass/fail statement (V-W12-05):
+"conforms" or "Pass" without a value creates no MeasuredResult. Not measured = no MeasuredResult; not reported = a
+SOURCE_STATED PassFailInterpretation with resultValueReported NOT_REPORTED. CQ-AX-19, CQ-QA-C02, CQ-QA-C03, CQ-AX-04.
+Catalog module quality. Archetype InformationArtifact.
+"""
+type MeasuredResult implements Entity & InformationArtifactArchetype
+  @node(labels: ["MeasuredResult", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  "Analyte as named by the source (\"Nicotinamide Riboside Chloride\", \"NR\", \"E. coli\")."
+  analyte: String!
+  "uid of the resolved analyte identity (ChemicalSubstance, Constituent, Nutrient, MicrobialTaxon ...); null when unresolved. A pointer, not an edge (precedent QuantityDeclaration.amountReferentUid)."
+  analyteUid: String
+  "Reported value; non-null only when qualifier = QUANTIFIED (V-W12-04)."
+  value: Float
+  "Verbatim result cell (\"555 mg/capsule\", \"261\", \"ND\", \"BRL\")."
+  valueTextVerbatim: String
+  "UCUM unit with annotations for count bases (mg/{capsule}, mg/{serving}, [ppm], [CFU]/g)."
+  unitCode: String
+  "Measurement uncertainty in the same unit as value; null = not reported (never zero)."
+  uncertainty: Float
+  uncertaintyKind: UncertaintyKind
+  "Coverage factor k for an EXPANDED uncertainty when stated."
+  coverageFactor: Float
+  limitOfDetection: Float
+  limitOfQuantitation: Float
+  "Stated reporting limit in unitCode; null when the source states it only relatively (see reportingLimitText)."
+  reportingLimit: Float
+  "Verbatim reporting-limit statement (\"Reporting Limit – 1% or less of label claim\")."
+  reportingLimitText: String
+  qualifier: ResultQualifier!
+  "Sample quantity of a presence/absence test (10 for \"Absent/10g\") with its unit."
+  sampleQuantity: Float
+  sampleQuantityUnitCode: String
+  "Per-what basis of the value when it is a per-dose or per-serving amount (W00 QuantityBasis); null for concentrations."
+  quantityBasis: QuantityBasis
+  "Whether the value is the salt form, the active moiety, the material as is, or unspecified (\"mg NR\" with no counterion)."
+  massBasis: MassBasis
+  "Which entity the amount refers to, when the source says (W00 AmountReferent); needed to compare with a label declaration (CQ-AX-19)."
+  amountReferent: AmountReferent
+  """class: structural (inverse view); cardinality: exactly_one; catalog: PRODUCED_RESULT"""
+  producedBy: [TestExecution!]! @relationship(type: "PRODUCED_RESULT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: zero_or_one (the criterion printed with the result); catalog: EVALUATED_AGAINST"""
+  evaluatedAgainst: [SpecificationCriterion!]! @relationship(type: "EVALUATED_AGAINST", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: one_or_more; kernel SUPPORTED_BY (W00), domain extension requested W12-SR-02"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+One acceptance criterion of one specification version: an analyte or test, a comparator, limits with unit and basis,
+the period it applies to (release, shelf-life, both, not stated) and who sets it (internal, pharmacopeial, regulatory,
+certifier). VersionedState because a criterion is a time-bounded payload of a specification version; a changed limit
+is a new criterion in a new SpecificationVersion (W11), never an edit. targetValue holds a stated nominal or target
+when the source gives one; a label claim is never a criterion (W04 QuantityDeclaration). OPEN-QUESTIONS P2 quality 2;
+CQ-QA-C03. Catalog module quality (payload of W11's SpecificationVersion, D-009). Archetype VersionedState.
+"""
+type SpecificationCriterion implements Entity & VersionedStateArchetype
+  @node(labels: ["SpecificationCriterion", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Analyte or test as named by the source (\"Nicotinamide Riboside Chloride\", \"Heavy Metals\", \"Objectionable USP Organisms\")."
+  analyte: String!
+  analyteUid: String
+  comparator: SpecComparator!
+  "Single limit (NLT/NMT) or lower bound of a RANGE, in unitCode."
+  threshold: Float
+  "Upper bound of a RANGE."
+  upperThreshold: Float
+  unitCode: String
+  "Stated nominal or target value (for example 828 mg/capsule in \"828 mg/capsule ±10%\"); not a label claim."
+  targetValue: Float
+  "Verbatim criterion text (\"NLT 500 mg/capsule\", \"≥ 250 mg/dose\", \"ICH/USP guidelines\", \"Absent/10g\")."
+  criterionText: String!
+  criterionPurpose: CriterionPurpose!
+  criterionBasis: CriterionBasis!
+  sampleQuantity: Float
+  sampleQuantityUnitCode: String
+  quantityBasis: QuantityBasis
+  massBasis: MassBasis
+  amountReferent: AmountReferent
+  """class: structural; cardinality: exactly_one; proposed: CRITERION_OF_SPECIFICATION (D-009, CL-010)"""
+  criterionOf: [SpecificationVersion!]! @relationship(type: "CRITERION_OF_SPECIFICATION", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A verdict that a lot or execution conforms or not to one SpecificationCriterion: either copied from a source with the
+Assertion that captured it (SOURCE_STATED: a COA "☑ Pass", a lot page "Conforms to internal specs") or evaluated by a
+named method version from exactly one MeasuredResult under a stated decision rule (EVALUATED_FROM_RESULT; uncertainty
+and guard bands are applied here, OPEN-QUESTIONS P2 quality 2). It is an EvidenceAssessment: immutable, superseded by
+a new interpretation. It is NOT a measured value and never creates one (V-W12-05); NOT a certification; NOT a
+truth verdict about the product's label. CQ-QA-C02, CQ-QA-C03, CQ-PF-03, minimal pair 18.
+Catalog module quality. Archetype EvidenceAssessment.
+"""
+type PassFailInterpretation implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["PassFailInterpretation", "EvidenceAssessment"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  assessmentType: String!
+  methodVersion: String!
+  status: AssessmentStatus!
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  summary: String
+  overallScore: Float
+  "Deprecated kernel field (contract A4); never written by W12."
+  confidence: Float
+  verdict: PassFailVerdict!
+  verdictBasis: VerdictBasis!
+  "Verbatim verdict text for SOURCE_STATED (\"☑ Pass\", \"Conforms to internal specs\")."
+  verdictTextVerbatim: String
+  "Whether the source reported the underlying value (W00 ReportedStatus). NOT_REPORTED with SOURCE_STATED is the \"pass without numbers\" case."
+  resultValueReported: ReportedStatus
+  "Decision rule for EVALUATED_FROM_RESULT (\"SIMPLE_ACCEPTANCE\", \"GUARD_BAND_EXPANDED_U\"); required for that basis."
+  decisionRule: String
+  "uid of the Assertion that captured a SOURCE_STATED verdict (predicate CONFORMS_TO_SPECIFICATION)."
+  basisAssertionUid: String
+  rationale: String
+  """class: structural; cardinality: exactly_one for EVALUATED_FROM_RESULT, zero for SOURCE_STATED with NOT_REPORTED; catalog: INTERPRETS_RESULT"""
+  interpretsResult: [MeasuredResult!]! @relationship(type: "INTERPRETS_RESULT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: exactly_one; proposed: APPLIES_CRITERION"""
+  appliesCriterion: [SpecificationCriterion!]! @relationship(type: "APPLIES_CRITERION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: exactly_one across the two fields; proposed: INTERPRETS_TESTING_OF (ProductLot)"""
+  interpretsTestingOfLot: [ProductLot!]! @relationship(type: "INTERPRETS_TESTING_OF", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: exactly_one across the two fields; proposed: INTERPRETS_TESTING_OF (TestExecution)"""
+  interpretsTestingOfExecution: [TestExecution!]! @relationship(type: "INTERPRETS_TESTING_OF", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: one_or_more for SOURCE_STATED; kernel SUPPORTED_BY (EvidenceAssessment already in the catalog domain)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A brand's or seller's published summary of lot testing (for example Elysium's Basis lot page: specifications and
+"Conforms to internal specs" per test, "As confirmed by a third-party testing lab", no laboratory name, method, value,
+report number or signature). It records what was summarized for which lot. It is NOT a CertificateOfAnalysis and is
+never promoted to one by its title or by the claim "third-party tested" (OPEN-QUESTIONS P2 quality 1, V-W12-01); its
+pass statements create PassFailInterpretations of basis SOURCE_STATED and no MeasuredResult. CQ-QA-C01, CQ-PF-03,
+minimal pair 18. Catalog module quality. Archetype InformationArtifact.
+"""
+type LotTestSummary implements Entity & InformationArtifactArchetype
+  @node(labels: ["LotTestSummary", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  "Verbatim page or document title (\"Label Claims & Testing\")."
+  title: String
+  "Lot code as printed in the summary."
+  lotCodeVerbatim: String
+  "Verbatim testing attribution (\"*As confirmed by a third-party testing lab.\"); never resolved to a laboratory without another source."
+  attributionStatementVerbatim: String
+  """class: asserted; cardinality: one_or_more across the two fields; catalog: SUMMARIZES_TESTING (ProductLot)"""
+  summarizesLots: [ProductLot!]! @relationship(type: "SUMMARIZES_TESTING", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: SUMMARIZES_TESTING (TestExecution)"""
+  summarizesExecutions: [TestExecution!]! @relationship(type: "SUMMARIZES_TESTING", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: one_or_more; kernel SUPPORTED_BY (W00), domain extension requested W12-SR-02"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A laboratory's batch certificate: an artifact that names the tested lot, the issuing laboratory or organization, and
+per test the method, the acceptance criterion and a result (value or pass/fail), with a report number or date and a
+conclusion (WHO TRS 957 Annex 1 19.1). Classification rule (proposed closure of OPEN-QUESTIONS P2 quality 1,
+V-W12-01): the node is a CertificateOfAnalysis only if it has an issuer (COA_ISSUED_BY), certifies a lot directly or
+through executions, every certified execution has USED_METHOD and at least one MeasuredResult or PassFailInterpretation
+against an APPLIES_CRITERION / EVALUATED_AGAINST criterion, and certificateNumber or reportDate is present. The title
+"Certificate of Analysis" alone is not sufficient; a signature is recorded (signatureEvidence) but its absence in a
+text capture does not demote the artifact. One node per report revision; a revised report (revision 01) is a new node
+on the revised snapshot (kernel SourceRevisionEvent), the old one is never edited. It is NOT a certification of the
+product (CertificationListing) and NOT evidence of independence: the issuer may be an affiliate of the brand.
+CQ-QA-C01, CQ-AX-19, CQ-PF-03, minimal pair 18. Catalog module quality. Archetype InformationArtifact.
+"""
+type CertificateOfAnalysis implements Entity & InformationArtifactArchetype
+  @node(labels: ["CertificateOfAnalysis", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  "Report or certificate number as printed (\"CDXA-RSS-11207-00\")."
+  certificateNumber: String
+  "Revision number as printed (\"00\"); a correction is a new node with a higher revision."
+  revisionNumber: String
+  "Source-stated report date, first instant of its precision period."
+  reportDate: DateTime
+  reportDatePrecision: TimePrecision
+  "Verbatim document title (\"Certificate of Analysis\"); never sufficient for classification."
+  documentTitleVerbatim: String
+  signatureEvidence: SignatureEvidence!
+  "Signer as printed (name or role); null when not shown or not captured."
+  signer: String
+  signedAt: DateTime
+  """class: asserted; cardinality: one_or_more across the two fields; catalog: CERTIFIES_RESULTS_FOR (ProductLot)"""
+  certifiesLots: [ProductLot!]! @relationship(type: "CERTIFIES_RESULTS_FOR", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: CERTIFIES_RESULTS_FOR (TestExecution)"""
+  certifiesExecutions: [TestExecution!]! @relationship(type: "CERTIFIES_RESULTS_FOR", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: exactly_one across the two fields; proposed: COA_ISSUED_BY (TestingLaboratory)"""
+  issuedByLab: [TestingLaboratory!]! @relationship(type: "COA_ISSUED_BY", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: exactly_one across the two fields; proposed: COA_ISSUED_BY (Organization that is not a laboratory, W01)"""
+  issuedByOrganization: [Organization!]! @relationship(type: "COA_ISSUED_BY", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: one_or_more; kernel SUPPORTED_BY (W00), domain extension requested W12-SR-02"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A certification or accreditation programme operated by a certifier under a named standard (NSF Certified for Sport
+under NSF Certification Guideline 306; NSF/ANSI 455-2 GMP; NSF/ANSI 173; ISO/IEC 17025 accreditation). It states what
+kind of object it certifies. It is NOT a listing, NOT a scope and NOT the certifier (W01 Organization, linked by the
+asserted predicate OPERATES_CERTIFICATION_PROGRAM). CQ-PF-03, CQ-MF-06. Catalog module quality. Archetype Entity.
+"""
+type CertificationProgram implements Entity & EntityArchetype
+  @node(labels: ["CertificationProgram", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Standard or guideline the programme certifies against (\"NSF Certification Guideline 306\", \"NSF/ANSI 455-2\")."
+  standard: String
+  certifiedObjectKind: CertifiedObjectKind!
+  """class: structural; cardinality: many; catalog: PROGRAM_HAS_LISTING"""
+  listings: [CertificationListing!]! @relationship(type: "PROGRAM_HAS_LISTING", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+One listing record of a certifier as observed (for example NSF Certified for Sport listing 1786167 "Basis",
+current as of 2026-10-03): status and effective bounds stated by the certifier, the certifier's listing id and the
+"current as of" statement. VersionedState: a status change is a new listing state; the scope it certifies is a separate
+CertificationScope attached by a bitemporal HAS_CERTIFICATION_SCOPE episode, so lots added later are new scope states,
+not edits. A listing without a scope certifies nothing (V-009). It is NOT the product, NOT a facility certification and
+NOT a regulatory status (INV-010). CQ-PF-03, CQ-MF-06, CQ-QA-C04. Catalog module quality. Archetype VersionedState.
+"""
+type CertificationListing implements Entity & VersionedStateArchetype
+  @node(labels: ["CertificationListing", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Certifier's listing record id (\"1786167\"); null when the capture shows none (the info.nsf.org company page)."
+  listingId: String
+  status: CertificationListingStatus!
+  "Certifier's own currency statement as an instant (\"current as of Saturday, October 3, 2026 at 12:15 a.m. Eastern Time\")."
+  listingCurrentAsOf: DateTime
+  "Listed organization as printed (\"Elysium Health\"); identity resolution is a W01 matter."
+  listedOrganizationText: String
+  """class: structural (bitemporal attachment, StateEpisodeProperties); cardinality: one_or_more per recorded episode; catalog: HAS_CERTIFICATION_SCOPE"""
+  scopes: [CertificationScope!]! @relationship(type: "HAS_CERTIFICATION_SCOPE", direction: OUT, properties: "StateEpisodeProperties")
+  """class: structural (inverse view); cardinality: exactly_one; catalog: PROGRAM_HAS_LISTING"""
+  program: [CertificationProgram!]! @relationship(type: "PROGRAM_HAS_LISTING", direction: IN, properties: "StructuralEdgeProperties")
+  """class: derived (inverse view, read-only); cardinality: many; catalog: CERTIFIED_UNDER (lots only; Product/ProductVariant fields requested from W04, W12-SR-05)"""
+  certifiedLots: [ProductLot!]! @relationship(type: "CERTIFIED_UNDER", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+What one listing state certifies, as the certifier wrote it: verbatim scope text, the identifiers printed (lot codes,
+product IDs, UPCs), the facility the certifier grouped them under, form, serving and country of sale. Its COVERS edges
+are asserted, one per resolved covered identity; printed codes that could not be resolved stay in
+coveredIdentifierValues and are covered by nothing. A facility named as a grouping qualifier (facilityQualifierText) is
+NOT covered: only a FACILITY-kind programme's scope COVERS a Facility (V-W12-06), and facility coverage never projects
+to a product, variant or lot (V-332). CQ-PF-03, CQ-MF-06, CQ-QA-C04. Catalog module quality. Archetype VersionedState.
+"""
+type CertificationScope implements Entity & VersionedStateArchetype
+  @node(labels: ["CertificationScope", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Verbatim scope statement or row (trade designation, product type, form, serving)."
+  scopeText: String!
+  "Identifier values exactly as printed (\"P098-01\", \"R1110-01\"), in source order; unresolved values stay here only."
+  coveredIdentifierValues: [String!]
+  "Verbatim facility grouping (\"Chester, NY\", \"# 1 USA\"); a qualifier of the row, never a covered Facility."
+  facilityQualifierText: String
+  productFormText: String
+  servingSizeText: String
+  countryOfSaleText: String
+  """class: asserted; cardinality: one_or_more; catalog: COVERS (range CertificationCoverageTarget)"""
+  covers: [CertificationCoverageTarget!]! @relationship(type: "COVERS", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural (inverse view); cardinality: one_or_more; catalog: HAS_CERTIFICATION_SCOPE"""
+  listing: [CertificationListing!]! @relationship(type: "HAS_CERTIFICATION_SCOPE", direction: IN, properties: "StateEpisodeProperties")
+}

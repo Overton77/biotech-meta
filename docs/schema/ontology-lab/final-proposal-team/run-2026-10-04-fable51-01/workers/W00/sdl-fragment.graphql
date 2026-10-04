@@ -1,0 +1,1634 @@
+# =====================================================================================================
+# W00 Kernel, identity, time and Evidence Provenance — SDL fragment
+# Run: run-2026-10-04-fable51-01 · worker W00 (Opus 5.5) · synthesizer Fable 5.1
+# Catalog: docs/schema/catalog/schema.yaml 0.2.0, digest 8fb50ff0…84f0
+#   (8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0)
+# Modules: kernel (baseArchetypes, conventions), provenance, temporal, identity_resolution
+# Contract realized: 01-shared-contract.md sections A, B3, B4, B5, B7 (frozen text; nothing here changes it)
+# CQs: CQ-EV-01, CQ-EV-02, CQ-EV-05, CQ-TM-01..07, CQ-PV-01..04, CQ-PV-06, CQ-ID-04, CQ-AX-07..09,
+#      CQ-AX-14..16 (see 02-cq-coverage.md)
+# Target: @neo4j/graphql 7.6.3, graphql 16.14.2, Neo4j 5.26.31 Community. No `extend`, no @cypher,
+#   no @unique (uniqueness lives in operations.cypher), no @vector.
+# Other owners' types are referenced by name only: Person, Organization, PseudonymousActor,
+#   AnonymousActor (W01); MechanismEvidenceContext (W03); Publication (W09); DocumentTextVersion,
+#   Chunk, ChunkResolutionProperties (W20); Episode, Claim (W21); MediaAnnotation (W22);
+#   PolicyVersion (W23); and every member of the three unions at the end of this file.
+# Union membership is a CANDIDATE list taken from 02-ownership-registry.md; Fable prunes members that
+#   do not survive the merge. Parent-only rule (executed probe, see 05-decision-seam-ledger.md D-W00-05):
+#   a union never lists a type whose labels are a superset of another member's labels.
+# =====================================================================================================
+
+# -----------------------------------------------------------------------------------------------------
+# 1. Shared GraphQL interfaces (contract B3)
+# -----------------------------------------------------------------------------------------------------
+
+"""
+Live GraphQL interface shared by every node type of the final schema. It is a GraphQL interface, NOT the
+`Entity` archetype label: a SourceSnapshot implements this interface but carries the `InformationArtifact`
+archetype label. `uid` (`hu:<token>:<opaque>`) is the canonical identity; `id` is the opaque segment of
+`uid` stored beside it (INV-106). `name` is presentation only and never identity; it is nullable (D-013) so
+that Cypher-ingested kernel records without a display name are readable. `mongoResearchRunId` is the
+operational last-writer pointer; authoritative lineage is WAS_GENERATED_BY an Activity whose
+`externalRunId` equals it (V-430). Module: kernel. CQs: CQ-AX-09, CQ-ID-04.
+"""
+interface Entity {
+  "Opaque segment of uid. API-created nodes get a UUID from @id; Cypher-ingested nodes must write it themselves."
+  id: ID!
+  "Canonical identity hu:<type-token>:<opaque>; uniqueness is created by operations.cypher, never by a directive."
+  uid: String!
+  "Presentation label only; never identity (D-013: nullable)."
+  name: String
+  "Free-text description; presentation only."
+  description: String
+  "Operational last-writer run id (internal); maps to Activity.externalRunId; never provenance."
+  mongoResearchRunId: String
+}
+
+"""
+Live retrieval surface. Derived search text and embeddings are regenerable projections that name their
+derivation (`searchFields`, `embeddingModel`, `embeddingDimensions`) and are never evidence (INV-107).
+Module: kernel. CQ: CQ-AX-14.
+"""
+interface SearchIndexable {
+  "Derived text used by fulltext indexes; regenerable; never evidence."
+  searchText: String
+  "Stored property names searchText was derived from."
+  searchFields: [String!]
+  "Embedding model identifier for the embedding stored beside this node, if any."
+  embeddingModel: String
+  "Dimension of the stored embedding; must equal the vector length (V-119)."
+  embeddingDimensions: Int
+}
+
+"""
+Live compatibility interface for the live state caches (OrganizationSnapshot, ProductSnapshot; live
+ListingSnapshot is retired by D-007). The node-level times are a cache of the node's first HAS_STATE
+episode (round 0007 section 12); authority is the episode relationship (StateEpisodeProperties) and its
+Assertion. Payload is frozen after commit except one write of `recordedTo` (V-513). Module: temporal.
+CQ: CQ-TM-01.
+"""
+interface TemporalSnapshot {
+  "Cache of the first episode's valid start (half-open; null = unknown)."
+  validFrom: DateTime
+  "Cache of the first episode's valid end (exclusive; null = unknown, never 'ongoing')."
+  validTo: DateTime
+  "Cache of the first episode's recorded start (service-assigned)."
+  recordedFrom: DateTime
+  "Cache of the first episode's recorded end (written once)."
+  recordedTo: DateTime
+}
+
+"""
+Live compatibility interface for actor identities that can assert (Person, PseudonymousActor,
+AnonymousActor). `uid` is added (every implementer already implements Entity) and `name` is relaxed to
+nullable for the same reason as D-013; both changes are backward compatible for implementers. An actor
+identity is never an Agent (software/curator identity) and a handle-only speaker is a PseudonymousActor;
+a link from a handle to a Person is a ResolutionHypothesis. Module: organizations (interface kept by W00).
+CQ: CQ-EV-02, CQ-PV-01.
+"""
+interface ActorIdentity {
+  "Opaque segment of uid."
+  id: ID!
+  "Canonical identity."
+  uid: String!
+  "Presentation label; never identity."
+  name: String
+  "Free-text description."
+  description: String
+  "Operational last-writer run id (internal)."
+  mongoResearchRunId: String
+}
+
+"""
+Archetype contract for persistent identities (archetype label `Entity`). `entityType` is the catalog node
+name of the record (for example 'Source', 'Agent', 'Identifier') and is required on every stored node so the
+archetype is readable without label introspection. Module: kernel (baseArchetypes.Entity).
+"""
+interface EntityArchetype {
+  "Catalog node name of this identity."
+  entityType: String!
+}
+
+"""
+Archetype contract for bounded states (archetype label `VersionedState`). The state node holds payload plus
+`payloadHash` (`sha256:<hex>` over canonicalized payload, D-016) and never its own valid or recorded time:
+query validity comes from the attachment episode (StateEpisodeProperties). `effectiveFrom`/`effectiveTo`
+are the source-stated payload period, a distinct clock (CQ-TM-03). Module: kernel.
+"""
+interface VersionedStateArchetype {
+  "Catalog node name of this state."
+  stateType: String!
+  "sha256:<hex> over the canonicalized immutable payload; replay compares states by it."
+  payloadHash: String!
+  "Source-stated effective start printed in the payload (not query validity)."
+  effectiveFrom: DateTime
+  "Source-stated effective end printed in the payload (not query validity)."
+  effectiveTo: DateTime
+}
+
+"""
+Archetype contract for things that happened (archetype label `Occurrence`): activities, source revision
+events, test executions, price observations. `startedAt`/`endedAt` are when it happened, never when
+BellLabs recorded it. Module: kernel.
+"""
+interface OccurrenceArchetype {
+  "Catalog node name of this occurrence."
+  occurrenceType: String!
+  "When the occurrence started (null = unknown)."
+  startedAt: DateTime
+  "When the occurrence ended (null = unknown or not ended)."
+  endedAt: DateTime
+}
+
+"""
+Archetype contract for representations and records (archetype label `InformationArtifact`).
+`publishedAt` (issuer time), `observedAt` (seen as displayed) and the record's own capture clocks are
+distinct (CQ-TM-03). `contentHash` is `sha256:<hex>` with a named basis where the type carries one.
+Module: kernel.
+"""
+interface InformationArtifactArchetype {
+  "Catalog node name of this artifact."
+  artifactType: String!
+  "Issuer's date for this version of the artifact."
+  publishedAt: DateTime
+  "When the content is known to have been displayed (archive capture time for late sources)."
+  observedAt: DateTime
+  "sha256:<hex> of the content (basis named on the type, e.g. SourceSnapshot.contentHashBasis)."
+  contentHash: String
+}
+
+"""
+Archetype contract for attributable propositions (archetype label `Assertion`). Exactly one subject
+(HAS_SUBJECT) and exactly one object (HAS_OBJECT) or one typed literal (`valueString`, `valueNumber`,
+`valueBoolean` with `unitCode`); at most one asserter (ASSERTED_BY). `status` is CAPTURE FIDELITY, a
+current projection of CAPTURE_FIDELITY adjudications and SUPERSEDES records; it is never truth (INV-406).
+Valid time and content are immutable after commit; `recordedAt` is service-assigned at commit and never
+backdated; `recordedTo` is written once on supersession. `confidence` is deprecated (INV-407): use
+`extractionConfidence` with WAS_GENERATED_BY an Activity. Module: kernel (baseArchetypes.Assertion).
+CQs: CQ-EV-01, CQ-EV-02, CQ-TM-01, CQ-PV-04.
+"""
+interface AssertionArchetype {
+  "Controlled predicate registered in the catalog (relationship names and assertedPredicates)."
+  predicate: String!
+  "Capture-fidelity status (current projection; never truth)."
+  status: AssertionStatus!
+  "Recorded-time start: service-assigned commit time; never backdated; never before supporting snapshot retrievedAt."
+  recordedAt: DateTime!
+  "Recorded-time end: written once from null when superseded; equals SUPERSEDES.recordedAt."
+  recordedTo: DateTime
+  "sha256:<hex> over canonicalized immutable content (required for new writes; service-enforced)."
+  contentHash: String
+  "Affirms, denies, mixed or unknown; 'not reported' is NOT a NEGATIVE assertion."
+  polarity: Polarity
+  "Epistemic basis; required when predicateClass is MECHANISM; CALCULATED needs derivationRule and DERIVED_FROM_ASSERTION inputs."
+  basisKind: BasisKind
+  "Coarse class of the predicate (candidate enum)."
+  predicateClass: PredicateClass
+  "Basis on which the asserter presents the proposition (round 0006)."
+  assertionBasis: AssertionBasis
+  "What this asserter does (states, reports practice, recommends ...)."
+  speechAct: SpeechAct
+  "Speech act this assertion attributes to another party (retellings)."
+  reportedSpeechAct: SpeechAct
+  "Typed literal (string); exclusive with HAS_OBJECT and the other literals."
+  valueString: String
+  "Typed literal (number) with unitCode; exclusive with HAS_OBJECT and the other literals."
+  valueNumber: Float
+  "Typed literal (boolean); exclusive with HAS_OBJECT and the other literals."
+  valueBoolean: Boolean
+  "UCUM unit of valueNumber."
+  unitCode: String
+  "Per-day / per-dose / per-serving basis of a quantity literal (catalog quantityBasis)."
+  quantityBasis: QuantityBasis
+  "Valid-time start (half-open, first instant of its precision period; null = unknown)."
+  validFrom: DateTime
+  "Valid-time end (exclusive; null = unknown, never 'ongoing'; no sentinel dates)."
+  validTo: DateTime
+  "Precision of validFrom; required when validFrom is non-null."
+  validFromPrecision: TimePrecision
+  "Precision of validTo; required when validTo is non-null."
+  validToPrecision: TimePrecision
+  "Why validFrom has its value; OBSERVATION_ONLY/UNKNOWN force a null bound; INFERRED needs derivationRule."
+  validFromBasis: ValidTimeBasis
+  "Why validTo has its value; same rules as validFromBasis."
+  validToBasis: ValidTimeBasis
+  "Jurisdiction scope of the proposition (ISO 3166 code or catalog jurisdiction string)."
+  jurisdiction: String
+  "Named rule for a CALCULATED assertion or an INFERRED bound (e.g. successor_state_start)."
+  derivationRule: String
+  "Legacy extraction method label; authoritative method is the WAS_GENERATED_BY Activity.methodVersion."
+  extractionMethod: String
+  "Extraction dimension of the confidence vector; requires WAS_GENERATED_BY an Activity (V-428)."
+  extractionConfidence: Float
+  "DEPRECATED 0.1.0 run pointer; new writes link WAS_GENERATED_BY an Activity."
+  agentRunUid: String
+  "DEPRECATED (INV-407): read as extractionConfidence with unknown method; never written by new ingestion."
+  confidence: Float
+}
+
+"""
+Archetype contract for adjudicated evaluations (archetype label `EvidenceAssessment`). Immutable; a
+re-assessment is a new node linked by SUPERSEDES (KCR-2a). `methodVersion` is required: a score without a
+method is not one of the confidence-vector dimensions. `status` is the workflow state of the assessment
+record (AssessmentStatus), never the verdict and never an Assertion status. Module: kernel.
+CQs: CQ-EV-02, CQ-AX-09.
+"""
+interface EvidenceAssessmentArchetype {
+  "Catalog node name of this assessment."
+  assessmentType: String!
+  "Identifier and version of the method or policy that produced it."
+  methodVersion: String!
+  "Workflow state of the assessment record."
+  status: AssessmentStatus!
+  "Service-assigned commit time; never backdated."
+  recordedAt: DateTime!
+  "Written once from null when superseded."
+  recordedTo: DateTime
+  "Short human-readable summary (not a verdict field)."
+  summary: String
+  "Composite score; allowed only with methodVersion and every required dimension (INV-204)."
+  overallScore: Float
+  "DEPRECATED generic confidence; name the dimension instead."
+  confidence: Float
+}
+
+# -----------------------------------------------------------------------------------------------------
+# 2. Shared relationship-property types (contract B4)
+# -----------------------------------------------------------------------------------------------------
+
+"""
+asserted_edge profile (catalog temporalProfiles.asserted_edge; K-1, D-011). An asserted edge is a
+regenerable projection of exactly one Assertion: one relationship per recorded-time episode. `assertionUid`
+names that Assertion; its predicate equals the edge type and its subject/object equal the edge endpoints.
+Valid bounds, precisions and bases equal the Assertion's (V-505); `recordedFrom >= assertion.recordedAt`
+and is service-assigned; `recordedTo` is written once and equals the Assertion's `recordedTo` once closed.
+All other properties are immutable. Never carries `projectionOfAssertionUid` (that is DerivedEdgeProperties).
+A domain specialization (e.g. RoleEdgeProperties) must contain every field below and say so.
+"""
+type AssertedEdgeProperties @relationshipProperties {
+  "Stable audit id hu:rel:<opaque>; MERGE key for parallel episodes."
+  relationshipUid: String!
+  "uid of the one Assertion that authorizes this edge."
+  assertionUid: String!
+  "Copied from the Assertion; null = unknown."
+  validFrom: DateTime
+  "Copied from the Assertion; null = unknown, never 'ongoing'."
+  validTo: DateTime
+  "Copied from the Assertion."
+  validFromPrecision: TimePrecision
+  "Copied from the Assertion."
+  validToPrecision: TimePrecision
+  "Copied from the Assertion; UNKNOWN when the bound is null and no basis is stated."
+  validFromBasis: ValidTimeBasis!
+  "Copied from the Assertion; UNKNOWN when the bound is null and no basis is stated."
+  validToBasis: ValidTimeBasis!
+  "Service-assigned commit time of this episode; never client-supplied."
+  recordedFrom: DateTime!
+  "Written once from null when the episode is closed."
+  recordedTo: DateTime
+  "Operational last-writer run id (internal)."
+  mongoResearchRunId: String
+}
+
+"""
+bitemporal_attachment profile (catalog temporalProfiles.bitemporal_attachment, round 0007) for state
+attachments: HAS_STATE and domain attachments such as HAS_FORMULATION_VERSION, HAS_REGISTRATION_VERSION,
+HAS_PROTOCOL_EDITION, HAS_PACKAGE_CONFIGURATION. One relationship per recorded-time episode; immutable
+except one write of `recordedTo`. `assertionUid` is nullable in SDL only because the profile is shared with
+the external private store; in the shared graph every attachment is source-derived and V-101 requires it.
+EXCLUSIVE types (catalog predicateExclusivity) may not definitely overlap in valid and recorded time.
+"""
+type StateEpisodeProperties @relationshipProperties {
+  "Stable audit id hu:rel:<opaque>."
+  relationshipUid: String!
+  "Authorizing Assertion uid (required in the shared graph)."
+  assertionUid: String
+  "Valid start; null = unknown."
+  validFrom: DateTime
+  "Valid end (exclusive); null = unknown."
+  validTo: DateTime
+  "Required when validFrom is non-null."
+  validFromPrecision: TimePrecision
+  "Required when validTo is non-null."
+  validToPrecision: TimePrecision
+  "Basis of validFrom."
+  validFromBasis: ValidTimeBasis!
+  "Basis of validTo."
+  validToBasis: ValidTimeBasis!
+  "Service-assigned commit time; never backdated."
+  recordedFrom: DateTime!
+  "Written once from null."
+  recordedTo: DateTime
+  "Operational last-writer run id (internal)."
+  mongoResearchRunId: String
+}
+
+"""
+Derived edge (catalog relationshipClasses.derived; K-2, D-011): a regenerable traversal shortcut that is
+never the only history. Exactly one citation form: `projectionOfAssertionUid` (1:1 projection; the cited
+predicate equals the edge type), or `derivationRule` plus `derivedFromAssertionUids`, or `derivationRule`
+plus `derivedFromAssessmentUids` (an EvidenceAssessment licenses it; a ResolutionHypothesis uid goes here,
+which is how INSTANCE_OF records its `hypothesisUid`), or `derivationRule` alone only for catalog
+`ruleOnly: true` types. The cited or input predicate is never the premise of a forbidden implication for
+the edge type (V-112). Never carries `assertionUid`.
+"""
+type DerivedEdgeProperties @relationshipProperties {
+  "uid of the single Assertion this edge projects (1:1 projection)."
+  projectionOfAssertionUid: String
+  "Identifier and version of the derivation rule (e.g. contains/v1)."
+  derivationRule: String
+  "Assertions the rule consumed (non-empty when derivationRule is set, unless ruleOnly or assessment-licensed)."
+  derivedFromAssertionUids: [String!]
+  "EvidenceAssessments (incl. ResolutionHypothesis) that license the derivation."
+  derivedFromAssessmentUids: [String!]
+  "When the projection job wrote this edge (operational)."
+  derivedAt: DateTime
+  "Operational last-writer run id (internal)."
+  mongoResearchRunId: String
+}
+
+"""
+Structural edge with optional ordering: part of the internal shape of one captured record (catalog
+relationshipClasses.structural). Needs no Assertion. `orderIndex` orders siblings when the source orders them.
+"""
+type StructuralEdgeProperties @relationshipProperties {
+  "Zero-based order among siblings, when the source orders them."
+  orderIndex: Int
+  "Operational note; never evidence."
+  notes: String
+  "Operational last-writer run id (internal)."
+  mongoResearchRunId: String
+}
+
+"""
+SUPERSEDES qualifiers (K-4, round 0007). Newer → older, like label to like label (Assertion, Adjudication,
+or one EvidenceAssessment type). `recordedAt` equals the newer record's recordedAt and the older record's
+recordedTo. SOURCE_CORRECTION = the source changed content (the corrected state has no current attachment
+for the corrected interval); VALIDITY_BOUNDED = same content, an end became known (old state stays
+attached for its bounded interval). `sourceRevisionEventUid` names the SourceRevisionEvent when one exists.
+"""
+type SupersessionProperties @relationshipProperties {
+  "Why the newer record replaced the older one."
+  supersessionKind: SupersessionKind!
+  "Commit time of the supersession (service-assigned)."
+  recordedAt: DateTime!
+  "uid of the SourceRevisionEvent that triggered it, if any."
+  sourceRevisionEventUid: String
+}
+
+"""
+AUTHORIZED_BY qualifier (provenance state 5): which downstream use a PolicyVersion allowed for one Activity.
+PROV-O has no permission vocabulary; the semantics are BellLabs-defined. Internal.
+"""
+type AuthorizationProperties @relationshipProperties {
+  "The use the policy allowed."
+  useKind: UseKind!
+}
+
+"""
+REANCHORS qualifier: newer-snapshot locator → older-snapshot locator of the same Source (V-409). Re-anchoring
+never mutates the old locator; failure to re-anchor creates no edge and never means the passage was removed.
+"""
+type ReanchorProperties @relationshipProperties {
+  "EXACT or FUZZY match of the quote anchor."
+  anchorMatch: AnchorMatch!
+  "uid of the REANCHORING Activity that produced the match."
+  activityUid: String
+}
+
+"""
+HAS_IDENTIFIER episode (asserted; asserted_edge profile plus `isPrimary`). The validity of the ASSIGNMENT of
+an identifier to a record lives here; the Identifier node holds only the identifier string's own scheme,
+issuer, value and scheme-level validity. A shared (scheme, value) across issuers never establishes identity.
+Specializes AssertedEdgeProperties (contains every field of it).
+"""
+type IdentifierLinkProperties @relationshipProperties {
+  "Stable audit id hu:rel:<opaque>."
+  relationshipUid: String!
+  "Authorizing Assertion (predicate HAS_IDENTIFIER)."
+  assertionUid: String!
+  "Start of the assignment; null = unknown."
+  validFrom: DateTime
+  "End of the assignment (exclusive); null = unknown."
+  validTo: DateTime
+  "Required when validFrom is non-null."
+  validFromPrecision: TimePrecision
+  "Required when validTo is non-null."
+  validToPrecision: TimePrecision
+  "Basis of validFrom."
+  validFromBasis: ValidTimeBasis!
+  "Basis of validTo."
+  validToBasis: ValidTimeBasis!
+  "Service-assigned commit time."
+  recordedFrom: DateTime!
+  "Written once from null."
+  recordedTo: DateTime
+  "Whether the source presents it as the record's primary identifier in its scheme."
+  isPrimary: Boolean
+  "Operational last-writer run id (internal)."
+  mongoResearchRunId: String
+}
+
+# -----------------------------------------------------------------------------------------------------
+# 3. Kernel enums (contract B5; catalog conventions values; AccessTier and TraceDepth are W23's)
+# -----------------------------------------------------------------------------------------------------
+
+"Privacy class of a shared-graph element. There is no private-personal value: private records never enter the shared graph (D-012, INV-506). Stored values are these SCREAMING_SNAKE spellings."
+enum PrivacyClass {
+  PUBLIC
+  INTERNAL
+}
+
+"Schema maturity of a node type or record (catalog conventions.nodeMaturity)."
+enum NodeMaturity {
+  CANDIDATE
+  PROVISIONAL
+  ACCEPTED
+  DEPRECATED
+}
+
+"Capture-fidelity workflow status of an Assertion (catalog assertionStatus). ACCEPTED = accepted as an accurate record of what the asserter said in this source; never truth."
+enum AssertionStatus {
+  EXTRACTED
+  PROPOSED
+  ACCEPTED
+  REJECTED
+  DISPUTED
+  SUPERSEDED
+  UNRESOLVED
+}
+
+"Workflow state of an EvidenceAssessment record (contract B5). Not a verdict."
+enum AssessmentStatus {
+  PROPOSED
+  ACCEPTED
+  SUPERSEDED
+  WITHDRAWN
+}
+
+"CAPTURE_FIDELITY judges the record (feeds Assertion.status); SUPPORT judges the proposition (never changes status)."
+enum AdjudicationKind {
+  CAPTURE_FIDELITY
+  SUPPORT
+}
+
+"Adjudication verdict; meaning depends on AdjudicationKind (catalog verdictSemantics)."
+enum AdjudicationVerdict {
+  SUPPORTED
+  PARTIALLY_SUPPORTED
+  CONTRADICTED
+  INSUFFICIENT
+  NOT_APPLICABLE
+}
+
+"Who reviewed: a person, an agent, an automated policy, or the 0.2.0 migration."
+enum ReviewerType {
+  HUMAN
+  AGENT
+  POLICY
+  MIGRATION
+}
+
+"Epistemic basis of a proposition (rounds 0003 and 0005)."
+enum BasisKind {
+  DIRECT_MEASUREMENT
+  INFERRED_FROM_MEASUREMENT
+  CITED_FROM_PRIOR_WORK
+  HYPOTHESIS
+  CALCULATED
+}
+
+"CANDIDATE (contract B5, owner W00): coarse predicate class; MECHANISM requires basisKind (INV-210)."
+enum PredicateClass {
+  MECHANISM
+  ROLE
+  COMMERCIAL
+  REGULATORY
+  QUANTITY
+  IDENTITY
+  CLAIM
+  OTHER
+}
+
+"On what basis the asserter presents the proposition (round 0006); distinct from basisKind and ClaimType."
+enum AssertionBasis {
+  PERSONAL_EXPERIENCE
+  THIRD_PARTY_ANECDOTE
+  MANUFACTURER_CLAIM
+  STUDY_RESULT
+  MECHANISM_REASONING
+  EXPERT_OPINION
+  UNSTATED
+}
+
+"What an utterance does; a practice report is not a recommendation."
+enum SpeechAct {
+  STATES
+  REPORTS_PRACTICE
+  RECOMMENDS
+  CAUTIONS
+  SPECULATES
+  QUESTIONS
+  DENIES
+}
+
+"Polarity of the proposition; NEGATIVE needs its own assertion and is never inferred from absence."
+enum Polarity {
+  POSITIVE
+  NEGATIVE
+  MIXED
+  UNKNOWN
+}
+
+"Precision of a time bound; a bound is stored as the first UTC instant of its precision period."
+enum TimePrecision {
+  INSTANT
+  DAY
+  MONTH
+  QUARTER
+  YEAR
+  DECADE
+}
+
+"Why a valid-time bound has its value (per bound)."
+enum ValidTimeBasis {
+  STATED_BY_SOURCE
+  PUBLICATION_PROXY
+  OBSERVATION_ONLY
+  INFERRED
+  UNKNOWN
+}
+
+"Why a newer record superseded an older one."
+enum SupersessionKind {
+  SOURCE_CORRECTION
+  VALIDITY_BOUNDED
+  EXTRACTION_FIX
+  RESOLUTION_FIX
+  DUPLICATE_MERGE
+  RE_REVIEW
+  SOURCE_REVISION
+}
+
+"Publisher revision kind (NLM publication types plus web silent change)."
+enum SourceRevisionKind {
+  ERRATUM
+  RETRACTION
+  EXPRESSION_OF_CONCERN
+  CORRECTED_AND_REPUBLISHED
+  NEW_VERSION
+  SILENT_CONTENT_CHANGE
+  WITHDRAWAL
+  REINSTATEMENT
+}
+
+"Typed selector contract of a SourceLocator; SECTION and WHOLE_SNAPSHOT are coarse (V-401b)."
+enum SelectorKind {
+  TEXT_QUOTE
+  TEXT_POSITION
+  MEDIA_TIME
+  PDF_PAGE
+  IMAGE_REGION
+  SECTION
+  WHOLE_SNAPSHOT
+}
+
+"What a SourceSnapshot.contentHash was computed over; SYNTHETIC_FIXTURE is fixture-only."
+enum ContentHashBasis {
+  RAW_BYTES
+  NORMALIZED_TEXT
+  STORED_EXCERPT_TEXT
+  SYNTHETIC_FIXTURE
+}
+
+"Whether a capture holds the whole rendition or excerpts; partial captures never support NOT_DISCLOSED."
+enum CaptureCompleteness {
+  COMPLETE
+  PARTIAL_EXCERPT
+  UNKNOWN
+}
+
+"Catalog sourceKind: kind of retrieval endpoint; classification only, never authority or truth."
+enum SourceKind {
+  PEER_REVIEWED_PUBLICATION
+  PREPRINT
+  CORRECTION_NOTICE
+  RETRACTION_NOTICE
+  EXPRESSION_OF_CONCERN
+  REGULATORY_RECORD
+  REGULATORY_GUIDANCE
+  SECURITIES_FILING
+  PRESS_RELEASE
+  MARKETING_PAGE
+  MANUFACTURER_LABEL_PAGE
+  ORGANIZATION_WEBPAGE
+  SELF_DISCLOSURE_PAGE
+  THIRD_PARTY_PROFILE_PAGE
+  THIRD_PARTY_DIRECTORY
+  CERTIFICATION_LISTING
+  AUDIT_REPORT
+  MARKETPLACE_LISTING
+  TERMINOLOGY_RECORD
+  STANDARDS_DOCUMENT
+  PODCAST_TRANSCRIPT_PAGE
+  VIDEO_RENDITION
+  AUDIO_FEED_ITEM
+  PODCAST_DIRECTORY_RECORD
+  NEWSLETTER
+  MODEL_SERVICE
+  LEGAL_RECORD
+}
+
+"Kind of process an Activity was (PROV-O prov:Activity)."
+enum ActivityKind {
+  CAPTURE
+  TRANSCRIPTION
+  TEXT_EXTRACTION
+  SEGMENTATION
+  EXTRACTION
+  RESOLUTION
+  REANCHORING
+  ADJUDICATION
+  ANSWER_COMPOSITION
+}
+
+"Kind of agent (aligned to Biolink AgentTypeEnum)."
+enum AgentKind {
+  MANUAL_AGENT
+  AUTOMATED_AGENT
+  TEXT_MINING_AGENT
+  DATA_ANALYSIS_PIPELINE
+  COMPUTATIONAL_MODEL
+  MANUAL_VALIDATION_OF_AUTOMATED_AGENT
+}
+
+"Downstream use a PolicyVersion may allow (AUTHORIZED_BY)."
+enum UseKind {
+  QUOTE_IN_ANSWER
+  SUMMARIZE_IN_ANSWER
+  USE_AS_RECOMMENDATION_EVIDENCE
+  SHARE_EXTERNALLY
+}
+
+"How two distinct identities relate; an EquivalenceAssessment never merges them."
+enum EquivalenceKind {
+  SAME_WORK_DIFFERENT_NAME
+  OVERLAPPING_SCOPE
+  RELATED_NOT_EQUIVALENT
+  NOT_EQUIVALENT
+}
+
+"Kind of caveat a qualifying occurrence attaches (QUALIFIED_BY; relationship owned by W21)."
+enum QualificationKind {
+  INDIVIDUAL_VARIATION
+  POPULATION_SCOPE
+  SPECIES_OR_MODEL
+  QUANTITY_BASIS
+  UNCERTAINTY_INTERVAL
+  NEEDS_CONFIRMATION
+  HEDGE
+  TIME_SCOPE
+  CONDITIONAL_USE
+  CONSULT_PROFESSIONAL
+}
+
+"How a retelling reproduces its original (RETELLS; relationship owned by W21)."
+enum RetellingMode {
+  VERBATIM_QUOTE
+  PARAPHRASE
+  SUMMARY
+  TRANSLATION
+}
+
+"Why BellLabs links a retelling to an original."
+enum RetellingLinkBasis {
+  EXPLICIT_CITATION
+  BELLLABS_MATCH
+}
+
+"Relevance of a financial interest to an occurrence (ConflictRelevanceAssessment)."
+enum RelevanceLevel {
+  DIRECT
+  INDIRECT
+  NOT_RELEVANT
+  UNKNOWN
+}
+
+"Path by which an interest is relevant."
+enum RelevanceBasis {
+  SAME_PRODUCT
+  SAME_ORGANIZATION
+  COMPETING_PRODUCT
+  SAME_SUBSTANCE
+  SAME_SUBSTANCE_CLASS_VIA_GROUP
+  SPONSOR_OF_CONTAINER
+  NO_PATH_FOUND
+}
+
+"Disclosure state; NOT_FOUND_IN_PARTIAL_CAPTURE is never NOT_DISCLOSED."
+enum DisclosureFinding {
+  DISCLOSED_IN_CONTAINER
+  DISCLOSED_ELSEWHERE
+  NOT_FOUND_IN_PARTIAL_CAPTURE
+  NOT_DISCLOSED
+  UNKNOWN
+}
+
+"Whether a role interval overlaps an utterance."
+enum TemporalOverlap {
+  OVERLAPS
+  DISJOINT
+  UNKNOWN
+}
+
+"Quote-anchor match quality of a re-anchoring."
+enum AnchorMatch {
+  EXACT
+  FUZZY
+}
+
+"Per-day / per-dose / per-serving / per-kg / single-dose basis of an amount (catalog quantityBasis)."
+enum QuantityBasis {
+  PER_DAY
+  PER_DOSE
+  PER_SERVING
+  PER_KG_BODY_WEIGHT_PER_DAY
+  SINGLE_DOSE
+}
+
+"Mass basis of an amount (salt form vs active moiety vs as-is); UNSPECIFIED is a stated unknown."
+enum MassBasis {
+  SALT_FORM
+  ACTIVE_MOIETY
+  MATERIAL_AS_IS
+  UNSPECIFIED
+}
+
+"What an amount refers to (catalog amountReferent)."
+enum AmountReferent {
+  NUTRIENT_AS_NUTRIENT
+  LISTED_INGREDIENT_AS_LISTED
+  PROPRIETARY_BLEND_TOTAL
+  EXTRACT_TOTAL
+  MARKER_CONSTITUENT
+  NOT_STATED
+}
+
+"Whether a source reported a value; NOT_REPORTED is never zero or absent."
+enum ReportedStatus {
+  REPORTED
+  NOT_REPORTED
+  NOT_APPLICABLE
+}
+
+# -----------------------------------------------------------------------------------------------------
+# 4. Provenance nodes
+# -----------------------------------------------------------------------------------------------------
+
+"""
+Stable identity of ONE retrieval endpoint (one normalized `canonicalUri`): a publisher page, registry or
+database record, document, PDF file, DOI landing endpoint, or media rendition. It is NOT the work: a
+scholarly article's work identity is `Publication` (W09) and an audio/video work is `Episode` (W21); every
+rendition endpoint of a work is its own Source linked RENDITION_OF (CL-003 ruling). It is NOT a capture:
+captures are SourceSnapshots. A live `Document` is a Source specialization (labels Document, Source, Entity;
+D-005) that adds document metadata and never adds identity; read through this type, a Document node must
+also store `id` (see seam W00-SR-03). Source carries no reliability or truth score; authority-scope research
+(W19) attaches assessments by uid (CL-012). Archetype: Entity. Module: provenance.
+CQs: CQ-EV-01, CQ-PV-02, CQ-TM-06, CQ-ID-04.
+"""
+type Source implements Entity & EntityArchetype
+  @node(labels: ["Source", "Entity"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  "Presentation label (often equal to title); never identity."
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Source' (or 'Document' on the specialization)."
+  entityType: String!
+  "Normalized retrieval URI; unique (constraint source_canonical_uri); identity key with uid."
+  canonicalUri: String!
+  "Title as displayed by the endpoint."
+  title: String
+  "Kind of endpoint (classification only)."
+  sourceKind: SourceKind
+  "uid of the publishing Organization when known (reference by uid; no asserted edge in 0.2.0)."
+  publisherUid: String
+  """class: structural; cardinality: many; catalog: HAS_SNAPSHOT (Source → SourceSnapshot). One per capture."""
+  snapshots: [SourceSnapshot!]! @relationship(type: "HAS_SNAPSHOT", direction: OUT)
+  """class: structural; cardinality: many; catalog: HAS_TEXT_VERSION (Source → DocumentTextVersion, W20)."""
+  textVersions: [DocumentTextVersion!]! @relationship(type: "HAS_TEXT_VERSION", direction: OUT)
+  """class: structural; cardinality: zero_or_one work; catalog: RENDITION_OF (Source → Episode)."""
+  renditionOfEpisode: [Episode!]! @relationship(type: "RENDITION_OF", direction: OUT)
+  """class: structural; cardinality: zero_or_one work; catalog: RENDITION_OF (Source → Publication)."""
+  renditionOfPublication: [Publication!]! @relationship(type: "RENDITION_OF", direction: OUT)
+  """class: structural (inverse); cardinality: many; catalog: REVISES_SOURCE (SourceRevisionEvent → Source)."""
+  revisionEvents: [SourceRevisionEvent!]! @relationship(type: "REVISES_SOURCE", direction: IN)
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER. Endpoint-level identifiers only (a DOI belongs to the Publication)."""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+}
+
+"""
+Immutable capture of a Source at a known retrieval time, with a hash whose input is named
+(`contentHashBasis`) and a declared completeness. A changed page, record or newly linked notice is a NEW
+snapshot plus, when the publisher revised it, a SourceRevisionEvent; a snapshot is never edited
+(INV-504). Clocks: `retrievedAt` = when BellLabs fetched the bytes (lower bound for any assertion's
+recordedAt, V-504); `observedAt` = when the content is known to have been displayed (archive capture time
+for a late source; equals retrievedAt for a live crawl); `publishedAt` = issuer time (CQ-TM-03). It is NOT
+a text rendition (DocumentTextVersion, W20) and NOT a locator. Archetype: InformationArtifact.
+Module: provenance. CQs: CQ-EV-01, CQ-TM-02, CQ-TM-03, CQ-PV-02, CQ-AX-07.
+"""
+type SourceSnapshot implements Entity & InformationArtifactArchetype
+  @node(labels: ["SourceSnapshot", "InformationArtifact"])
+  @mutation(operations: [CREATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'SourceSnapshot' (or a specialization name such as 'LabelSnapshot')."
+  artifactType: String!
+  "Issuer's date for this version (with publishedAtPrecision)."
+  publishedAt: DateTime
+  "Precision of publishedAt."
+  publishedAtPrecision: TimePrecision
+  "When the content is known to have been displayed (archive capture time for a late source)."
+  observedAt: DateTime
+  "When BellLabs fetched the bytes; required."
+  retrievedAt: DateTime!
+  "sha256:<hex>; required when cited by an ACCEPTED assertion (V-111)."
+  contentHash: String
+  "Input of contentHash; required for new captures (service-enforced, V-111b)."
+  contentHashBasis: ContentHashBasis
+  "COMPLETE / PARTIAL_EXCERPT / UNKNOWN; required for new captures."
+  captureCompleteness: CaptureCompleteness
+  "Copy of the Source canonicalUri at capture time (the URI actually fetched may differ after redirects)."
+  canonicalUri: String
+  "Where BellLabs stored the captured content (internal)."
+  storageUri: String
+  "External archive copy (e.g. a web archive capture URI)."
+  archiveUri: String
+  "Verbatim provisional/revision notice printed by the publisher in this capture."
+  publisherRevisionNotice: String
+  "MIME type of the captured content."
+  mimeType: String
+  "Language tag of the captured content (BCP 47)."
+  language: String
+  """class: structural (inverse); cardinality: exactly_one; catalog: HAS_SNAPSHOT."""
+  source: [Source!]! @relationship(type: "HAS_SNAPSHOT", direction: IN)
+  """class: structural; cardinality: many; catalog: HAS_LOCATOR (each locator hangs from exactly one snapshot, V-402)."""
+  locators: [SourceLocator!]! @relationship(type: "HAS_LOCATOR", direction: OUT)
+  """class: structural (inverse); cardinality: many; catalog: TEXT_OF_SNAPSHOT (DocumentTextVersion → SourceSnapshot, exactly one per text version)."""
+  textVersions: [DocumentTextVersion!]! @relationship(type: "TEXT_OF_SNAPSHOT", direction: IN)
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (capture Activity)."""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural (inverse); cardinality: many; catalog: USED."""
+  usedBy: [Activity!]! @relationship(type: "USED", direction: IN)
+  """class: structural (inverse); catalog: PRIOR_SNAPSHOT."""
+  revisedFromInEvents: [SourceRevisionEvent!]! @relationship(type: "PRIOR_SNAPSHOT", direction: IN)
+  """class: structural (inverse); catalog: RESULTING_SNAPSHOT."""
+  resultOfRevisionEvents: [SourceRevisionEvent!]! @relationship(type: "RESULTING_SNAPSHOT", direction: IN)
+  """class: structural (inverse); catalog: ANNOUNCED_IN (this snapshot is the notice capture)."""
+  announcesRevisionEvents: [SourceRevisionEvent!]! @relationship(type: "ANNOUNCED_IN", direction: IN)
+}
+
+"""
+Stable, reproducible locator for the exact span, time range, page, region or section supporting an
+assertion, bound to exactly one SourceSnapshot (KCR-4.1). Required fields by `selectorKind`:
+TEXT_QUOTE exact+quoteHash+normalizationVersion; TEXT_POSITION those plus startOffset/endOffset and
+LOCATOR_IN_TEXT_VERSION; MEDIA_TIME those plus mediaStartSeconds/mediaEndSeconds on the rendition's own
+timeline (offsets are not portable across renditions: dynamic ad insertion); PDF_PAGE page+exact+quoteHash+
+normalizationVersion; IMAGE_REGION mediaAnnotationUid+normalizationVersion AND one LOCATES_REGION edge to
+that MediaAnnotation (CL-011 / D-010; the annotation never replaces locator or snapshot); SECTION section;
+WHOLE_SNAPSHOT nothing (coarse). A null `selectorKind` marks a migrated 0.1.0 untyped selector that is not
+reproducible until re-anchored (V-401 rejects it). A Chunk is NEVER a locator (INV-404); RESOLVES_TO_CHUNK is
+derived. Immutable; a newer snapshot gets a new locator and REANCHORS. Archetype: InformationArtifact.
+Module: provenance. CQs: CQ-EV-01, CQ-PV-02, CQ-AX-07.
+"""
+type SourceLocator implements Entity & InformationArtifactArchetype
+  @node(labels: ["SourceLocator", "InformationArtifact"])
+  @mutation(operations: [CREATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'SourceLocator'."
+  artifactType: String!
+  "Not used on locators (time lives on the snapshot); present for the archetype contract."
+  publishedAt: DateTime
+  "Not used on locators; present for the archetype contract."
+  observedAt: DateTime
+  "Optional sha256 of the located content; quoteHash is the span hash."
+  contentHash: String
+  "URI of the located resource (normally the snapshot canonicalUri)."
+  uri: String
+  "Selector contract; null only for migrated untyped 0.1.0 selectors (not reproducible)."
+  selectorKind: SelectorKind
+  "Verbatim cited text before normalization (Web Annotation TextQuoteSelector.exact)."
+  exact: String
+  "Context before exact."
+  prefix: String
+  "Context after exact."
+  suffix: String
+  "sha256:<hex> of exact after normalizationVersion."
+  quoteHash: String
+  "Catalog normalizationVersions id (e.g. NFC-WS1); for IMAGE_REGION it names the region coordinate convention."
+  normalizationVersion: String
+  "Start offset (inclusive, code points) in the linked DocumentTextVersion."
+  startOffset: Int
+  "End offset (exclusive) in the linked DocumentTextVersion."
+  endOffset: Int
+  "Start on the captured rendition's own timeline, seconds."
+  mediaStartSeconds: Float
+  "End on the captured rendition's own timeline, seconds."
+  mediaEndSeconds: Float
+  "How media times were obtained (RENDITION_TRANSCRIPT_CUE, PUBLISHER_CHAPTER, MANUAL; controlled string)."
+  mediaTimeBasis: String
+  "1-based PDF page."
+  page: Int
+  "Named section or panel (SECTION selector)."
+  section: String
+  "uid of the MediaAnnotation that implements an IMAGE_REGION (paired with LOCATES_REGION)."
+  mediaAnnotationUid: String
+  "Speaker label printed in the source next to the span (what the source printed; not BellLabs attribution)."
+  speakerLabelInSource: String
+  "DEPRECATED 0.1.0 untyped selector, read-only; kept so migrated locators stay readable until re-anchored."
+  selector: String @settable(onCreate: false, onUpdate: false)
+  """class: structural (inverse); cardinality: exactly_one; catalog: HAS_LOCATOR."""
+  snapshot: [SourceSnapshot!]! @relationship(type: "HAS_LOCATOR", direction: IN)
+  """class: structural; cardinality: zero_or_one (required for TEXT_POSITION); catalog: LOCATOR_IN_TEXT_VERSION (→ DocumentTextVersion, W20)."""
+  textVersion: [DocumentTextVersion!]! @relationship(type: "LOCATOR_IN_TEXT_VERSION", direction: OUT)
+  """class: structural; cardinality: zero_or_one (exactly_one when IMAGE_REGION); relationship LOCATES_REGION (W22 type MediaAnnotation; CL-011)."""
+  regionAnnotation: [MediaAnnotation!]! @relationship(type: "LOCATES_REGION", direction: OUT)
+  """class: structural; cardinality: many; catalog: REANCHORS (newer → older locator of the same Source)."""
+  reanchors: [SourceLocator!]! @relationship(type: "REANCHORS", direction: OUT, properties: "ReanchorProperties")
+  """class: structural (inverse); catalog: REANCHORS."""
+  reanchoredBy: [SourceLocator!]! @relationship(type: "REANCHORS", direction: IN, properties: "ReanchorProperties")
+  """class: structural; cardinality: many; catalog: MENTIONS (SourceLocator → Mention)."""
+  mentions: [Mention!]! @relationship(type: "MENTIONS", direction: OUT)
+  """class: derived; cardinality: many; catalog: RESOLVES_TO_CHUNK (relationship and ChunkResolutionProperties owned by W20)."""
+  resolvesToChunks: [Chunk!]! @relationship(type: "RESOLVES_TO_CHUNK", direction: OUT, properties: "ChunkResolutionProperties")
+  """class: structural (inverse); cardinality: many; catalog: SUPPORTED_BY (Assertion|Adjudication|EvidenceAssessment → SourceLocator)."""
+  supports: [SupportedRecordTarget!]! @relationship(type: "SUPPORTED_BY", direction: IN)
+  """class: structural (inverse); cardinality: many; catalog: CONTRADICTED_BY (Assertion|Adjudication → SourceLocator)."""
+  contradicts: [SupportedRecordTarget!]! @relationship(type: "CONTRADICTED_BY", direction: IN)
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY."""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural (inverse); catalog: USED."""
+  usedBy: [Activity!]! @relationship(type: "USED", direction: IN)
+}
+
+"""
+A correction, retraction, expression of concern, new version, silent change, withdrawal or reinstatement of
+a Source as issued by its publisher (`occurredAt`, issuer time) and as learned by BellLabs (`recordedAt`,
+service-assigned) (KCR-0007-3). It links exactly one revised Source, the prior and resulting snapshots
+(0..1 each) and the notice snapshot (ANNOUNCED_IN, 0..1). It never edits assertions or adjudications:
+consequences are new adjudications (SUPERSEDES {SOURCE_REVISION}) or new assertions (SUPERSEDES
+{SOURCE_CORRECTION}). A correction notice is never a fact ending ([CORRECTS_SOURCE, FACT_CEASED]).
+Archetype: Occurrence. Module: provenance. CQs: CQ-EV-05, CQ-TM-06, CQ-TM-07.
+"""
+type SourceRevisionEvent implements Entity & OccurrenceArchetype
+  @node(labels: ["SourceRevisionEvent", "Occurrence"])
+  @mutation(operations: [CREATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'SourceRevisionEvent'."
+  occurrenceType: String!
+  "Normally null; occurredAt carries the issuer time."
+  startedAt: DateTime
+  "Normally null."
+  endedAt: DateTime
+  "Kind of publisher revision."
+  revisionKind: SourceRevisionKind!
+  "When the publisher made the revision (issuer time; null = unknown)."
+  occurredAt: DateTime
+  "Precision of occurredAt."
+  occurredAtPrecision: TimePrecision
+  "When BellLabs learned of it (service-assigned at commit)."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  """class: structural; cardinality: exactly_one; catalog: REVISES_SOURCE."""
+  revisesSource: [Source!]! @relationship(type: "REVISES_SOURCE", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: PRIOR_SNAPSHOT."""
+  priorSnapshot: [SourceSnapshot!]! @relationship(type: "PRIOR_SNAPSHOT", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: RESULTING_SNAPSHOT (retrieved after the prior one, V-512)."""
+  resultingSnapshot: [SourceSnapshot!]! @relationship(type: "RESULTING_SNAPSHOT", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: ANNOUNCED_IN (the notice's snapshot)."""
+  announcedIn: [SourceSnapshot!]! @relationship(type: "ANNOUNCED_IN", direction: OUT)
+}
+
+"""
+Generic Assertion written by ingestion (D-006): a structured or literal proposition attributable to a
+source or agent, with all AssertionArchetype fields. Labels ["Assertion"] only, so this type also READS
+ClaimOccurrence and RelationshipAssertion nodes (W21 specializations carry the Assertion label) through
+the kernel fields; do not list it together with those types in a union (D-W00-05). Shape: exactly one
+HAS_SUBJECT; exactly one HAS_OBJECT or one typed literal; at most one ASSERTED_BY (a ClaimOccurrence has
+exactly one asserter and one OCCURS_IN container, V-410); corroboration is several Assertions INSTANCE_OF
+one Claim, never one Assertion with two asserters (KCR-4.3). Status is capture fidelity, never truth.
+Content and valid time are immutable after commit (TM-R1); a change of belief is a new Assertion linked
+SUPERSEDES. Assertions are never deleted (`@mutation` omits DELETE). `massBasis` and `amountReferent`
+realize contract A11 on literal amounts (see KCR W00-SR-01). Archetype: Assertion. Module: kernel /
+provenance. CQs: CQ-EV-01, CQ-EV-02, CQ-EV-05, CQ-TM-01, CQ-TM-02, CQ-TM-07, CQ-PV-01, CQ-PV-04, CQ-AX-07,
+CQ-AX-15.
+"""
+type Assertion implements Entity & AssertionArchetype
+  @node(labels: ["Assertion"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  "Optional display label; never identity."
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  predicate: String! @settable(onCreate: true, onUpdate: false)
+  "Capture-fidelity projection; updated only by the status projection job."
+  status: AssertionStatus!
+  "Service-assigned at commit (API: @timestamp; Cypher ingestion: datetime.transaction())."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  "Written once from null by the supersession transaction."
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  contentHash: String @settable(onCreate: true, onUpdate: false)
+  polarity: Polarity @settable(onCreate: true, onUpdate: false)
+  basisKind: BasisKind @settable(onCreate: true, onUpdate: false)
+  predicateClass: PredicateClass @settable(onCreate: true, onUpdate: false)
+  assertionBasis: AssertionBasis @settable(onCreate: true, onUpdate: false)
+  speechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  reportedSpeechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  valueString: String @settable(onCreate: true, onUpdate: false)
+  valueNumber: Float @settable(onCreate: true, onUpdate: false)
+  valueBoolean: Boolean @settable(onCreate: true, onUpdate: false)
+  unitCode: String @settable(onCreate: true, onUpdate: false)
+  quantityBasis: QuantityBasis @settable(onCreate: true, onUpdate: false)
+  "Mass basis of a quantity literal (contract A11); UNSPECIFIED when the source does not say (e.g. a spoken 'a gram')."
+  massBasis: MassBasis @settable(onCreate: true, onUpdate: false)
+  "What a quantity literal refers to (contract A11)."
+  amountReferent: AmountReferent @settable(onCreate: true, onUpdate: false)
+  validFrom: DateTime @settable(onCreate: true, onUpdate: false)
+  validTo: DateTime @settable(onCreate: true, onUpdate: false)
+  validFromPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validToPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validFromBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  validToBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  jurisdiction: String @settable(onCreate: true, onUpdate: false)
+  derivationRule: String @settable(onCreate: true, onUpdate: false)
+  extractionMethod: String @settable(onCreate: true, onUpdate: false)
+  extractionConfidence: Float @settable(onCreate: true, onUpdate: false)
+  agentRunUid: String @settable(onCreate: false, onUpdate: false)
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "Role title exactly as printed (role assertions); never normalized by guesswork."
+  roleTitleVerbatim: String @settable(onCreate: true, onUpdate: false)
+  "Role code exactly as printed (e.g. 'B', 'I,A,IP')."
+  roleCodeVerbatim: String @settable(onCreate: true, onUpdate: false)
+  "Tense in which a speaker stated it (PAST, PRESENT; controlled string)."
+  statedTense: String @settable(onCreate: true, onUpdate: false)
+  "Kind of segment the assertion was read from (e.g. SPONSOR_READ, EDITORIAL; controlled string)."
+  segmentKind: String @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: exactly_one; catalog: HAS_SUBJECT."""
+  subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one (exclusive with the typed literals); catalog: HAS_OBJECT."""
+  object: [AssertionSubjectTarget!]! @relationship(type: "HAS_OBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: at_most_one (exactly_one for ClaimOccurrence); catalog: ASSERTED_BY."""
+  assertedBy: [AsserterTarget!]! @relationship(type: "ASSERTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: SUPPORTED_BY (provenance state 2)."""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; cardinality: many; catalog: CONTRADICTED_BY."""
+  contradictedBy: [SourceLocator!]! @relationship(type: "CONTRADICTED_BY", direction: OUT)
+  """class: structural; cardinality: many; catalog: SUPERSEDES (newer → older; same label; newer.recordedAt >= older.recordedAt)."""
+  supersedes: [Assertion!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural (inverse); catalog: SUPERSEDES."""
+  supersededBy: [Assertion!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties")
+  """class: structural; cardinality: one_or_more for CALCULATED; catalog: DERIVED_FROM_ASSERTION (inputs of a CALCULATED assertion)."""
+  derivedFromAssertions: [Assertion!]! @relationship(type: "DERIVED_FROM_ASSERTION", direction: OUT)
+  """class: structural (inverse); catalog: DERIVED_FROM_ASSERTION."""
+  inputToAssertions: [Assertion!]! @relationship(type: "DERIVED_FROM_ASSERTION", direction: IN)
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (extraction Activity; provenance state 4)."""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural (inverse); catalog: USED."""
+  usedBy: [Activity!]! @relationship(type: "USED", direction: IN)
+  """class: structural (inverse); cardinality: many; catalog: EVALUATES (Adjudication → Assertion)."""
+  evaluatedBy: [Adjudication!]! @relationship(type: "EVALUATES", direction: IN)
+  """class: structural (inverse); catalog: PROPOSES_MATCH (ResolutionHypothesis → Assertion, e.g. retelling-source match)."""
+  proposedInHypotheses: [ResolutionHypothesis!]! @relationship(type: "PROPOSES_MATCH", direction: IN)
+  """class: structural; cardinality: zero_or_one; catalog: OBSERVED_IN_CONTEXT (relationship owned by W03; exactly one for DIRECT_MEASUREMENT mechanism assertions, INV-210)."""
+  observedInContext: [MechanismEvidenceContext!]! @relationship(type: "OBSERVED_IN_CONTEXT", direction: OUT)
+  """class: derived (ruleOnly); cardinality: zero_or_one; catalog: INSTANCE_OF (Assertion → Claim; relationship owned by W21). hypothesisUid is carried in derivedFromAssessmentUids."""
+  instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "DerivedEdgeProperties")
+}
+
+"""
+Immutable BellLabs evaluation of one or more Assertions (KCR-0007-2). `adjudicationKind` CAPTURE_FIDELITY
+judges whether the record accurately captures what the asserter said in the cited span and is the only kind
+that feeds Assertion.status; SUPPORT judges whether evidence supports the proposition (`verdict`) and never
+changes status (KCR-4.6). A financial interest alone never sets a verdict (INV-405). A re-review is a new
+Adjudication linked SUPERSEDES {RE_REVIEW | SOURCE_REVISION}; historical adjudications keep pointing at the
+snapshots they examined (V-511). `reviewedAt` (review drafted) and `recordedAt` (committed) are both kept.
+Archetype: EvidenceAssessment. Module: provenance. CQs: CQ-EV-02, CQ-EV-05, CQ-TM-01, CQ-TM-06, CQ-AX-07.
+"""
+type Adjudication implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["Adjudication", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Adjudication'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  "Review method or policy version (e.g. label-policy-1)."
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  "Service-assigned commit time."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  overallScore: Float @settable(onCreate: true, onUpdate: false)
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "CAPTURE_FIDELITY or SUPPORT."
+  adjudicationKind: AdjudicationKind! @settable(onCreate: true, onUpdate: false)
+  "Verdict; meaning by adjudicationKind."
+  verdict: AdjudicationVerdict! @settable(onCreate: true, onUpdate: false)
+  "Reviewer rationale (internal text)."
+  rationale: String @settable(onCreate: true, onUpdate: false)
+  "HUMAN, AGENT, POLICY or MIGRATION."
+  reviewerType: ReviewerType! @settable(onCreate: true, onUpdate: false)
+  "When the review was made (may precede recordedAt)."
+  reviewedAt: DateTime @settable(onCreate: true, onUpdate: false)
+  "True when an automated verdict awaits human confirmation."
+  humanReviewPending: Boolean
+  """class: structural; cardinality: one_or_more; catalog: EVALUATES."""
+  evaluates: [Assertion!]! @relationship(type: "EVALUATES", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: CONSIDERS_ASSESSMENT (→ any EvidenceAssessment, resolved through the archetype interface)."""
+  considersAssessments: [EvidenceAssessmentArchetype!]! @relationship(type: "CONSIDERS_ASSESSMENT", direction: OUT)
+  """class: structural; cardinality: many; catalog: SUPPORTED_BY (locators in snapshots retrieved before recordedAt)."""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; cardinality: many; catalog: CONTRADICTED_BY."""
+  contradictedBy: [SourceLocator!]! @relationship(type: "CONTRADICTED_BY", direction: OUT)
+  """class: structural; catalog: SUPERSEDES (Adjudication → Adjudication)."""
+  supersedes: [Adjudication!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural (inverse); catalog: SUPERSEDES."""
+  supersededBy: [Adjudication!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties")
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (ADJUDICATION Activity)."""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: ASSESSED_BY (→ Agent)."""
+  assessedByAgent: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: ASSESSED_BY (→ Person)."""
+  assessedByPerson: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+}
+
+"""
+Scored candidate identity, equivalence or retelling-source resolution that may compete with alternatives
+(COMPETES_WITH). A search hit or a similar name is never identity ([SIMILAR_NAME, SAME_IDENTITY]); a
+hypothesis is a candidate until accepted. `resolutionStatus` is the OUTCOME of the hypothesis (controlled
+string PROPOSED | ACCEPTED | REJECTED | UNRESOLVED; enum requested in W00-SR-04), distinct from `status`, the
+workflow state of the assessment record. `score` is the method's own score, never a resolutionConfidence
+across methods. Archetype: EvidenceAssessment. Module: provenance / identity_resolution.
+CQs: CQ-ID-04, CQ-AX-14, CQ-AX-15.
+"""
+type ResolutionHypothesis implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["ResolutionHypothesis", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'ResolutionHypothesis'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String
+  overallScore: Float
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "Kind of resolution (e.g. MATERIAL_IDENTITY, RETELLING_SOURCE, SAME_ORDERABLE_TEST; controlled string)."
+  resolutionType: String! @settable(onCreate: true, onUpdate: false)
+  "Method score in [0,1] of this hypothesis; null = not scored."
+  score: Float @settable(onCreate: true, onUpdate: false)
+  "Why the match is proposed."
+  rationale: String @settable(onCreate: true, onUpdate: false)
+  "Outcome: PROPOSED, ACCEPTED, REJECTED or UNRESOLVED (controlled string)."
+  resolutionStatus: String
+  """class: structural; cardinality: one_or_more; catalog: PROPOSES_MATCH (→ Entity|VersionedState|InformationArtifact)."""
+  proposesMatch: [AssertionSubjectTarget!]! @relationship(type: "PROPOSES_MATCH", direction: OUT)
+  """class: structural; cardinality: many; catalog: PROPOSES_MATCH (→ Assertion)."""
+  proposesMatchAssertion: [Assertion!]! @relationship(type: "PROPOSES_MATCH", direction: OUT)
+  """class: structural; cardinality: many; catalog: COMPETES_WITH."""
+  competesWith: [ResolutionHypothesis!]! @relationship(type: "COMPETES_WITH", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: RESOLVES_MENTION."""
+  resolvesMention: [Mention!]! @relationship(type: "RESOLVES_MENTION", direction: OUT)
+  """class: structural; catalog: SUPPORTED_BY."""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; catalog: SUPERSEDES."""
+  supersedes: [ResolutionHypothesis!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural; catalog: WAS_GENERATED_BY (RESOLUTION Activity)."""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (→ Agent)."""
+  assessedByAgent: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (→ Person)."""
+  assessedByPerson: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+}
+
+"""
+A software or human-operated agent IDENTITY (model, prompt version, tool version). Runs are Activities, not
+Agent properties (KCR-4.4; V-431 rejects Agent.runUid). An Agent may be an asserter (an automated summary) or
+an assessor. It is not a Person or Organization; it may act on behalf of an Organization. Archetype: Entity.
+Module: provenance. CQs: CQ-PV-03, CQ-AX-09.
+"""
+type Agent implements Entity & EntityArchetype
+  @node(labels: ["Agent", "Entity"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  "Display name of the agent."
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Agent'."
+  entityType: String!
+  "Kind of agent."
+  agentKind: AgentKind!
+  "Model identifier, when the agent is a model."
+  model: String
+  "Prompt version, when applicable."
+  promptVersion: String
+  "Tool version; 'unknown' is a stated unknown."
+  toolVersion: String
+  """class: structural; cardinality: zero_or_one; catalog: ACTED_ON_BEHALF_OF (→ Organization)."""
+  actedOnBehalfOf: [Organization!]! @relationship(type: "ACTED_ON_BEHALF_OF", direction: OUT)
+  """class: structural (inverse); catalog: WAS_ASSOCIATED_WITH."""
+  activities: [Activity!]! @relationship(type: "WAS_ASSOCIATED_WITH", direction: IN)
+  """class: structural (inverse); catalog: ASSERTED_BY (Agent as asserter)."""
+  assertions: [Assertion!]! @relationship(type: "ASSERTED_BY", direction: IN)
+}
+
+"""
+A bounded process that used and generated records: capture, transcription, text extraction, segmentation,
+extraction, resolution, re-anchoring, adjudication, answer composition (prov:Activity). Live
+`mongoResearchRunId` maps to (`externalRunSystem` 'mongo-research', `externalRunId`), unique per pair. An
+answer-composition Activity that USED a locator or assertion must be AUTHORIZED_BY a PolicyVersion with a
+`useKind` (V-429; provenance state 5). `methodVersion` is what makes an `extractionConfidence` interpretable.
+Archetype: Occurrence. Module: provenance. CQs: CQ-PV-01, CQ-PV-03, CQ-PV-06, CQ-AX-09.
+"""
+type Activity implements Entity & OccurrenceArchetype
+  @node(labels: ["Activity", "Occurrence"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Activity'."
+  occurrenceType: String!
+  startedAt: DateTime
+  endedAt: DateTime
+  "Kind of process."
+  activityKind: ActivityKind!
+  "Method identifier and version (e.g. lane4-manual-curation-v0.1)."
+  methodVersion: String
+  "External run system (e.g. 'mongo-research')."
+  externalRunSystem: String
+  "External run id; (externalRunSystem, externalRunId) unique."
+  externalRunId: String
+  """class: structural; cardinality: many; catalog: WAS_ASSOCIATED_WITH (→ Agent)."""
+  associatedWithAgents: [Agent!]! @relationship(type: "WAS_ASSOCIATED_WITH", direction: OUT)
+  """class: structural; cardinality: many; catalog: WAS_ASSOCIATED_WITH (→ Person)."""
+  associatedWithPersons: [Person!]! @relationship(type: "WAS_ASSOCIATED_WITH", direction: OUT)
+  """class: structural; catalog: USED (→ SourceSnapshot)."""
+  usedSnapshots: [SourceSnapshot!]! @relationship(type: "USED", direction: OUT)
+  """class: structural; catalog: USED (→ SourceLocator)."""
+  usedLocators: [SourceLocator!]! @relationship(type: "USED", direction: OUT)
+  """class: structural; catalog: USED (→ Assertion)."""
+  usedAssertions: [Assertion!]! @relationship(type: "USED", direction: OUT)
+  """class: structural; catalog: USED (→ DocumentTextVersion, W20)."""
+  usedTextVersions: [DocumentTextVersion!]! @relationship(type: "USED", direction: OUT)
+  """class: structural; cardinality: many; catalog: AUTHORIZED_BY (→ PolicyVersion, W23; INTERNAL)."""
+  authorizedBy: [PolicyVersion!]! @relationship(type: "AUTHORIZED_BY", direction: OUT, properties: "AuthorizationProperties")
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (Assertion)."""
+  generatedAssertions: [Assertion!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (SourceSnapshot)."""
+  generatedSnapshots: [SourceSnapshot!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (SourceLocator)."""
+  generatedLocators: [SourceLocator!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (DocumentTextVersion)."""
+  generatedTextVersions: [DocumentTextVersion!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+  """class: structural (inverse); catalog: WAS_GENERATED_BY (Adjudication)."""
+  generatedAdjudications: [Adjudication!]! @relationship(type: "WAS_GENERATED_BY", direction: IN)
+}
+
+# -----------------------------------------------------------------------------------------------------
+# 5. Identity resolution nodes
+# -----------------------------------------------------------------------------------------------------
+
+"""
+An external identifier STRING with its scheme and issuer (NCT, PMID, DOI, UNII, CAS, LOINC, GTIN, ASIN,
+patent and FDA submission numbers). Identity of this node is (scheme, issuer, value) — unique by constraint;
+the same (scheme, value) from two issuers is two Identifiers and never establishes identity
+([SHARED_IDENTIFIER_SCHEME_VALUE_ACROSS_ISSUERS, SAME_IDENTITY]). `validFrom`/`validTo` are the scheme-level
+validity of the identifier itself (e.g. a deprecated code); the validity of its ASSIGNMENT to a record lives
+on HAS_IDENTIFIER (IdentifierLinkProperties). The authority release that supplied it is the SourceSnapshot of
+the authority record behind the HAS_IDENTIFIER Assertion (CQ-ID-04). Names never establish identity.
+Archetype: Entity. Module: identity_resolution. CQs: CQ-ID-04, CQ-AX-14.
+"""
+type Identifier implements Entity & EntityArchetype
+  @node(labels: ["Identifier", "Entity"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Identifier'."
+  entityType: String!
+  "Scheme name (e.g. DOI, PMID, NCT, UNII, CAS, LOINC, GTIN, ASIN)."
+  scheme: String! @settable(onCreate: true, onUpdate: false)
+  "Issuing authority or registry (e.g. Regenstrief Institute, Amazon, NLM)."
+  issuer: String! @settable(onCreate: true, onUpdate: false)
+  "Value as normalized by normalizationRule."
+  value: String! @settable(onCreate: true, onUpdate: false)
+  "Jurisdiction or marketplace scope, where the scheme is scoped."
+  jurisdiction: String
+  "Scheme-level validity start of the identifier itself."
+  validFrom: DateTime
+  "Scheme-level validity end (e.g. deprecated code)."
+  validTo: DateTime
+  "Required when validFrom is non-null."
+  validFromPrecision: TimePrecision
+  "Required when validTo is non-null."
+  validToPrecision: TimePrecision
+  "Basis of validFrom."
+  validFromBasis: ValidTimeBasis
+  "Basis of validTo."
+  validToBasis: ValidTimeBasis
+  "Named normalization applied to value (e.g. 'doi-lowercase-v1')."
+  normalizationRule: String
+  """class: asserted (inverse); cardinality: many; catalog: HAS_IDENTIFIER (Entity|VersionedState|InformationArtifact → Identifier)."""
+  identifies: [AssertionSubjectTarget!]! @relationship(type: "HAS_IDENTIFIER", direction: IN, properties: "IdentifierLinkProperties")
+}
+
+"""
+Trade-item specialization of Identifier (GTIN, UPC, EAN, ASIN, SKU) with labels TradeItemIdentifier,
+Identifier, Entity: every TradeItemIdentifier is read by the Identifier type too and the (scheme, issuer,
+value) uniqueness constraint on Identifier covers it. Commerce attachment edges (IDENTIFIED_BY, W04;
+COVERS, W12) target it; see seam W00-SR-07 (IDENTIFIED_BY vs HAS_IDENTIFIER). Archetype: Entity.
+Module: identity_resolution. CQs: CQ-ID-04, CQ-AX-14.
+"""
+type TradeItemIdentifier implements Entity & EntityArchetype
+  @node(labels: ["TradeItemIdentifier", "Identifier", "Entity"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'TradeItemIdentifier'."
+  entityType: String!
+  scheme: String! @settable(onCreate: true, onUpdate: false)
+  issuer: String! @settable(onCreate: true, onUpdate: false)
+  value: String! @settable(onCreate: true, onUpdate: false)
+  "Marketplace or jurisdiction scope (e.g. US for an Amazon.com ASIN)."
+  jurisdiction: String
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis
+  validToBasis: ValidTimeBasis
+  normalizationRule: String
+  """class: asserted (inverse); catalog: HAS_IDENTIFIER."""
+  identifies: [AssertionSubjectTarget!]! @relationship(type: "HAS_IDENTIFIER", direction: IN, properties: "IdentifierLinkProperties")
+}
+
+"""
+A surface form extracted from a located span BEFORE any entity is created or chosen (e.g. "NR", "Dr.
+Sinclair"). A mention is not an identity, not an endorsement ([MENTIONS_PRODUCT, ENDORSES_PRODUCT]) and not
+evidence; candidate identities are ResolutionHypotheses that RESOLVE_MENTION it. Immutable. Archetype:
+InformationArtifact. Module: identity_resolution. CQs: CQ-AX-14, CQ-AX-15.
+"""
+type Mention implements Entity & InformationArtifactArchetype
+  @node(labels: ["Mention", "InformationArtifact"])
+  @mutation(operations: [CREATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Mention'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  "Verbatim surface form."
+  surfaceForm: String!
+  "Kind of mention (e.g. SUBSTANCE_NAME, PERSON_NAME, PRODUCT_NAME; controlled string)."
+  mentionKind: String
+  """class: structural (inverse); cardinality: exactly_one; catalog: MENTIONS (SourceLocator → Mention)."""
+  locatedAt: [SourceLocator!]! @relationship(type: "MENTIONS", direction: IN)
+  """class: structural (inverse); catalog: RESOLVES_MENTION."""
+  resolutionHypotheses: [ResolutionHypothesis!]! @relationship(type: "RESOLVES_MENTION", direction: IN)
+}
+
+"""
+Assessment of how two DISTINCT identities relate when they look alike (same work under different names,
+overlapping scope, related, not equivalent). It never merges them (round 0006, CQ-EC-02); identity claims
+are ResolutionHypotheses. COMPARES_IDENTITIES has exactly two distinct targets (V-432 as corrected in
+fixtures/validation-w00.cypher). The merge-redirect record named in contract A2 has no EquivalenceKind value
+yet (W00-SR-05). Archetype: EvidenceAssessment. Module: identity_resolution. CQs: CQ-ID-04, CQ-AX-14.
+"""
+type EquivalenceAssessment implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["EquivalenceAssessment", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'EquivalenceAssessment'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String
+  overallScore: Float
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "How the two identities relate."
+  equivalenceKind: EquivalenceKind! @settable(onCreate: true, onUpdate: false)
+  "Why."
+  rationale: String @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: exactly_two_distinct; catalog: COMPARES_IDENTITIES (→ Entity|VersionedState)."""
+  comparesIdentities: [AssertionSubjectTarget!]! @relationship(type: "COMPARES_IDENTITIES", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: SUPPORTED_BY."""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; catalog: SUPERSEDES."""
+  supersedes: [EquivalenceAssessment!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural; catalog: WAS_GENERATED_BY."""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (→ Agent)."""
+  assessedByAgent: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (→ Person)."""
+  assessedByPerson: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+}
+
+# -----------------------------------------------------------------------------------------------------
+# 6. Unions (contract B6). CANDIDATE membership from 02-ownership-registry.md; Fable prunes members that do
+#    not survive the merge. Parent-only rule: a specialization whose labels include a member's labels is
+#    NOT listed (it is read through the parent; listing both returns each such node twice — executed probe).
+# -----------------------------------------------------------------------------------------------------
+
+"""
+Range of HAS_SUBJECT / HAS_OBJECT (catalog: Entity|VersionedState|Occurrence|InformationArtifact), reused as
+the range of HAS_IDENTIFIER (inverse), PROPOSES_MATCH and COMPARES_IDENTITIES (validation narrows those).
+Members: every registry node type of those four archetypes, except (a) Assertion- and EvidenceAssessment-
+archetype types (out of the catalog range; an assertion about an assertion is a SUPERSEDES/RETELLS/
+QUALIFIED_BY structure, an assertion about an assessment is a new assessment), (b) specializations covered
+by their parent (Document by Source; LegalEntity, RegulatoryAgency, TestingLaboratory by Organization;
+BrandedIngredientMaterial, BotanicalPreparation, MicrobialPreparation, MaterialMixture by IngredientMaterial;
+DrugApproval, OrphanDesignation by RegulatoryStatus; AdverseEventResult by StudyResult; TradeItemIdentifier
+by Identifier), (c) regenerable retrieval records (Chunk, Segmentation), (d) W23 internal records
+(AnswerRecord, PolicyVersion, DecisionCriterion) so no INTERNAL type is reachable through a public assertion,
+(e) CohortParticipant (private-data seam CL-018), the DiagnosticResult interface and every CANDIDATE type.
+"""
+union AssertionSubjectTarget =
+  # W00
+    Source | SourceSnapshot | SourceLocator | SourceRevisionEvent | Agent | Activity | Identifier | Mention
+  # W01
+  | Organization | ConsumerBrand | Facility | OrganizationSnapshot | Person | PseudonymousActor | AnonymousActor
+  # W02
+  | IngredientMaterial | ChemicalSubstance | ChemicalForm | BotanicalTaxon | MicrobialTaxon | MicrobialStrain
+  | Constituent | Nutrient
+  # W03
+  | Mechanism | Pathway | MolecularEntity | Species | AnatomicalContext | Organ | Outcome | Condition
+  | RiskFactor | MechanismEvidenceContext | Association
+  # W04
+  | Product | ProductVariant | PackageConfiguration | ProductSnapshot | FormulationVersion | IngredientComponent
+  | LabelSnapshot | LabelDeclaration | ServingDefinition | QuantityDeclaration
+  # W05
+  | FoodItem | FoodProduct | Exposure | Lifestyle
+  # W06
+  | Treatment | Procedure
+  # W07
+  | Biomarker | Metric | LabTest | PanelDefinition | MeasurementMethod | Specimen | ReferenceSystem
+  | AssayVersion | Algorithm | AlgorithmVersion | ReferenceIntervalVersion | ReferenceRange
+  # W08
+  | TechnologyPlatform | ToolOrInstrument | Device | Sensor | Modality
+  # W09
+  | Study | TrialRegistration | RegistrationVersion | ProtocolVersion | StudyArm | StudyIntervention
+  | InterventionComponent | StudyPopulation | OutcomeDefinition | StudyResult | Publication | Dataset
+  # W10
+  | UseContextProfile
+  # W11
+  | ManufacturingSpecification | SpecificationVersion | ManufacturingProcess | ManufacturingStep
+  | ManufacturingCapability
+  # W12
+  | ProductLot | TestSample | TestExecution | TestMethod | MeasuredResult | SpecificationCriterion
+  | LotTestSummary | CertificateOfAnalysis | CertificationProgram | CertificationListing | CertificationScope
+  # W13
+  | RegulatoryPathway | RegulatoryStep | RegulatorySubmission | RegulatoryResponse | RegulatoryStatus
+  # W14
+  | PatentFamily | PatentApplication | GrantedPatent | PatentClaim | PatentLicense | Trademark
+  # W15
+  | MerchantListing | Offer | PriceObservation | SubscriptionPlan | Bundle | BundleComponent | InventoryItem
+  | IndividualUnit | AffiliateLink
+  # W16
+  | Protocol | ProtocolEdition | ProtocolStep | Constraint | MeasurementPlan | ProtocolAdjustmentRule | Target
+  | FunctionalGoal | Observation | ProtocolResult
+  # W17
+  | SafetySignal | AdverseEffect
+  # W18
+  | Community | Conference | Event | NarrativeArc
+  # W20
+  | DocumentTextVersion
+  # W21
+  | Platform | Channel | Series | Episode | EpisodeSegment | Claim | ExperienceReport
+  # W22
+  | MediaAsset | MediaVariant | MediaAnnotation | MediaSource | GraphView | FigurePanel | ProductLabelRegion
+
+"""
+Range of ASSERTED_BY (catalog: Person|Organization|Agent|PseudonymousActor|AnonymousActor; KCR-4.3). At most
+one per Assertion; exactly one per ClaimOccurrence. Organization covers its specializations (LegalEntity,
+RegulatoryAgency, TestingLaboratory). The asserter's affiliation is never encoded in the assertion; it is
+computed from time-bounded role assertions.
+"""
+union AsserterTarget = Person | Organization | Agent | PseudonymousActor | AnonymousActor
+
+"""
+Domain of SUPPORTED_BY / CONTRADICTED_BY seen from the SourceLocator (catalog: Assertion|Adjudication|
+EvidenceAssessment). `Assertion` covers ClaimOccurrence and RelationshipAssertion (parent-only rule); the
+EvidenceAssessment members are the catalog EvidenceAssessment-archetype types (CANDIDATE list; pruned by Fable).
+"""
+union SupportedRecordTarget =
+    Assertion | Adjudication | ResolutionHypothesis | EquivalenceAssessment
+  | EvidenceApplicability | ApplicabilityDimension | EndpointClassification | ResultInterpretation
+  | EvidenceSynthesis | EvidenceStrengthAssessment
+  | ClaimEvidenceAssessment | RetellingFidelityAssessment | ConflictRelevanceAssessment
+  | ComparabilityAssessment | PassFailInterpretation | CommerceMatch

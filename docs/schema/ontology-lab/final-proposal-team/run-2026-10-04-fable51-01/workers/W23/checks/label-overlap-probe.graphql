@@ -1,0 +1,10 @@
+# PROBE ONLY (not a fragment): does a union or interface whose member types share a stored label return a node twice?
+# Generic Assertion (labels ["Assertion"]) and ClaimOccurrence (labels ["ClaimOccurrence","Assertion"]) per D-006.
+type ProbeHolder @node { pid: String!
+  viaUnion: [ProbeAssertionTarget!]! @relationship(type: "PROBE_CITES", direction: OUT)
+  viaInterface: [ProbeArchetype!]! @relationship(type: "PROBE_CITES", direction: OUT)
+  viaConcrete: [Assertion!]! @relationship(type: "PROBE_CITES", direction: OUT) }
+interface ProbeArchetype { uid: String! }
+union ProbeAssertionTarget = Assertion | ClaimOccurrence
+type Assertion implements ProbeArchetype @node(labels: ["Assertion"]) { uid: String! }
+type ClaimOccurrence implements ProbeArchetype @node(labels: ["ClaimOccurrence", "Assertion"]) { uid: String! }

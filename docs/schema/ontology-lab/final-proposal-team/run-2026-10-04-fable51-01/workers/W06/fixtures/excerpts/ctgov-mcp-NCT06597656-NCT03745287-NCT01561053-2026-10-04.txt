@@ -1,0 +1,14 @@
+Captured: 2026-10-04 via ClinicalTrials.gov MCP (get_trial_details, search_trials with Essie AREA[InterventionType] filters). Direct API v2 fetch (clinicaltrials.gov) BLOCKED by egress proxy (CONNECT 403). The connector does not return per-intervention type; types below are established by AREA[NCTId] AND AREA[InterventionType]X filter counts (1 = match, 0 = no match).
+NCT06597656 (HORIZON; Sarepta Therapeutics, Inc.; PHASE1; TERMINATED; enrollment 3; start 2024-09-18):
+  brief_title: "A Gene Transfer Therapy to Evaluate the Safety and Efficacy of Delandistrogene Moxeparvovec (SRP-9001) Following Therapeutic Plasma Exchange (Plasmapheresis) in Participants With Duchenne Muscular Dystrophy (DMD) and Pre-existing Antibodies to AAVrh74"
+  interventions: ["delandistrogene moxeparvovec", "Plasmapheresis"]
+  InterventionType filters: PROCEDURE=1, GENETIC=1, BIOLOGICAL=0, DEVICE=0
+  eligibility: "Has elevated AAVrh74 antibody titers per protocol-specified requirements."
+  secondary outcome: "Change from Baseline in rAAVrh74 Antibody Titers" (Baseline, Week 1)
+NCT03745287 (Vertex Pharmaceuticals Incorporated; PHASE2/PHASE3; COMPLETED):
+  title: "A Phase 1/2/3 Study to Evaluate the Safety and Efficacy of a Single Dose of Autologous CRISPR-Cas9 Modified CD34+ Human Hematopoietic Stem and Progenitor Cells (CTX001) in Subjects With Severe Sickle Cell Disease"
+  interventions: ["Exa-cel"]; InterventionType filters: BIOLOGICAL=1, GENETIC=0, DRUG=0
+NCT01561053 (AMBAR; Instituto Grifols, S.A.; PHASE2/PHASE3; COMPLETED):
+  interventions: ["Albumin 5%", "Albumin 20%", "Immunoglobulin"] (plasma exchange itself is not a listed intervention)
+  detailed_description: "...to determine whether plasmapheresis with infusion of human albumin combined with intravenous immunoglobulin (IVIG) is able to modify patient's cognitive, functional, behavioral and global domains. There will be 3 treatment groups and 1 control group."
+Search AREA[InterventionType]PROCEDURE + intervention "therapeutic plasma exchange": total 89 (2026-10-04). Includes NCT05004220 (Charles University; OBSERVATIONAL; "Study of the Plasma Donation Effect - Plasmapheresis"; interventions ["Plasmapheresis"]).

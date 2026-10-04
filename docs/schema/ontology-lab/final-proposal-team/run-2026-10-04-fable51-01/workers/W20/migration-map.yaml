@@ -1,0 +1,519 @@
+# W20 migration map: every live element in W20 scope (live schema 86b5e0b5…f112).
+# action: keep | rename | move | split | merge | derive | retire. Rows whose final field belongs to another worker say so in the note.
+
+- live: "Document"
+  final: "Document @node(labels: [Document, Source, Entity])"
+  action: keep
+  note: "archetype Entity; backfill labels Source, Entity; uid hu:document:<documentId> unless a Source uid already exists"
+- live: "Document.id (@alias documentId)"
+  final: "Document.id (@alias documentId)"
+  action: keep
+  note: "frozen alias; V-117 checks uid ends with documentId"
+- live: "Document.name: String! (@alias title)"
+  final: "Document.name: String (@alias title)"
+  action: keep
+  note: "nullable per D-013; same stored property as Source.title"
+- live: "Document.description"
+  final: "Document.description"
+  action: keep
+  note: ""
+- live: "Document.mongoResearchRunId"
+  final: "Document.mongoResearchRunId"
+  action: keep
+  note: "INTERNAL; lineage via Activity.externalRunId"
+- live: "Document.createdAt"
+  final: "Document.createdAt"
+  action: keep
+  note: "Cypher writers must set it"
+- live: "Document.updatedAt"
+  final: "Document.updatedAt"
+  action: keep
+  note: "operational only; never recorded time"
+- live: "Document.searchText"
+  final: "Document.searchText"
+  action: keep
+  note: "derived (INV-107)"
+- live: "Document.searchFields"
+  final: "Document.searchFields"
+  action: keep
+  note: ""
+- live: "Document.embeddingModel"
+  final: "Document.embeddingModel"
+  action: keep
+  note: ""
+- live: "Document.embeddingDimensions"
+  final: "Document.embeddingDimensions"
+  action: keep
+  note: "V-119"
+- live: "Document.searchEmbedding"
+  final: "Document.searchEmbedding"
+  action: keep
+  note: "@vector added by Fable without provider (D-014)"
+- live: "Document.documentKey: String!"
+  final: "Document.documentKey: String"
+  action: keep
+  note: "nullability relaxed; legacy ingestion key, not identity"
+- live: "Document.documentType: DocumentType! (@alias type)"
+  final: "Document.documentType: DocumentType! (@alias type)"
+  action: keep
+  note: "frozen alias; repo example writes documentType literally (W20-V04)"
+- live: "Document.sourceUrl (@alias url)"
+  final: "Document.sourceUrl (@alias url) + Document.canonicalUri"
+  action: split
+  note: "write canonicalUri = url; W20-V05"
+- live: "Document.documentDomain"
+  final: "Document.documentDomain"
+  action: keep
+  note: ""
+- live: "Document.publisher"
+  final: "Document.publisher"
+  action: keep
+  note: "verbatim; resolved identity in publisherUid"
+- live: "Document.publicationVenue"
+  final: "Document.publicationVenue"
+  action: keep
+  note: ""
+- live: "Document.publishedAt"
+  final: "Document.publishedAt"
+  action: keep
+  note: "materialized cache; per-capture SourceSnapshot.publishedAt authoritative"
+- live: "Document.fileFormat"
+  final: "Document.fileFormat"
+  action: keep
+  note: ""
+- live: "Document.languageCode"
+  final: "Document.languageCode"
+  action: keep
+  note: ""
+- live: "Document.isPeerReviewed"
+  final: "Document.isPeerReviewed"
+  action: keep
+  note: ""
+- live: "Document.isPrimarySource"
+  final: "Document.isPrimarySource (@settable onCreate:false onUpdate:false)"
+  action: keep
+  note: "advisory deprecated, read-only legacy; per-assertion primacy = no outgoing RETELLS"
+- live: "Document.isRegulatorySource"
+  final: "Document.isRegulatorySource"
+  action: keep
+  note: ""
+- live: "Document.isFinancialDisclosure"
+  final: "Document.isFinancialDisclosure"
+  action: keep
+  note: ""
+- live: "(new) Document.uid, entityType, privacyClass, maturity, schemaVersion, sourceKind, publisherUid, snapshots, renditionOfPublications"
+  final: "Document.*"
+  action: keep
+  note: "additive; sourceKind default from DocumentType mapping (04-model-cards.md)"
+- live: "Document.hasTextVersions (HAS_TEXT_VERSION)"
+  final: "Document.hasTextVersions (HAS_TEXT_VERSION)"
+  action: keep
+  note: "structural; backfill TEXT_OF_SNAPSHOT for each text version (alignment migration note 1)"
+- live: "Document.hasChunks (HAS_CHUNK, OrderingMetadata)"
+  final: "Document.hasChunks (HAS_CHUNK, DerivedEdgeProperties, read-only)"
+  action: derive
+  note: "set derivationRule chunk-of-document-text-version-v1; drop OrderingMetadata fields (order = Chunk.index)"
+- live: "Document.about (ABOUT, ExtractionMetadata) -> ClaimSubject"
+  final: "Document.about (ABOUT, RetrievalEdgeProperties) -> AssertionSubjectTarget"
+  action: derive
+  note: "derivationRule = ExtractionMetadata.extractionMethod + extractorVersion (or legacy-unspecified); keep salience/aboutness"
+- live: "Document.authoredBy (AUTHORED_BY, RoleMetadata) -> DocumentAuthor"
+  final: "Document.authoredBy (AUTHORED_BY, AssertedEdgeProperties) -> DocumentAuthorTarget"
+  action: rename
+  note: "asserted; needs relationshipUid, assertionUid (byline assertion on a snapshot locator), recordedFrom; legacy rows get a MIGRATION assertion with basis UNKNOWN"
+- live: "Document.sourceForEpisodes (SOURCE_OF, RoleMetadata)"
+  final: "Document.renditionOfEpisodes (RENDITION_OF)"
+  action: retire
+  note: "relabel SOURCE_OF -> RENDITION_OF (same direction Document -> Episode)"
+- live: "union DocumentAuthor"
+  final: "union DocumentAuthorTarget"
+  action: rename
+  note: "same members Person | Organization"
+- live: "@fulltext DocumentSearch [name, sourceUrl, searchText]"
+  final: "@fulltext DocumentSearch [name, sourceUrl, searchText]; index on stored [title, url, searchText]"
+  action: keep
+  note: "D-015; verified with assertIndexesAndConstraints (run)"
+- live: "@vector DocumentSearchEmbedding (provider OPEN_AI)"
+  final: "@vector DocumentSearchEmbedding without provider (Fable merge)"
+  action: keep
+  note: "D-014"
+- live: "DocumentTextVersion"
+  final: "DocumentTextVersion @node(labels: [DocumentTextVersion, InformationArtifact])"
+  action: keep
+  note: "canonical module provenance (T-003 no transfer); backfill label InformationArtifact"
+- live: "DocumentTextVersion.id (@alias documentTextVersionId)"
+  final: "same"
+  action: keep
+  note: ""
+- live: "DocumentTextVersion.name: String!"
+  final: "DocumentTextVersion.name: String"
+  action: keep
+  note: "D-013"
+- live: "DocumentTextVersion.description, mongoResearchRunId, createdAt, updatedAt"
+  final: "same"
+  action: keep
+  note: ""
+- live: "DocumentTextVersion.versionLabel"
+  final: "same"
+  action: keep
+  note: ""
+- live: "DocumentTextVersion.textVersionHash: String!"
+  final: "same; contentHash mirrors it"
+  action: keep
+  note: "recompute as sha256:<hex> over stored text where the legacy value has another form (W20-V09)"
+- live: "DocumentTextVersion.source: String!"
+  final: "DocumentTextVersion.source: String + WAS_GENERATED_BY Activity"
+  action: split
+  note: "create Activity (TEXT_EXTRACTION or TRANSCRIPTION) per distinct (source, mongoResearchRunId); methodVersion = source value or legacy-unspecified"
+- live: "DocumentTextVersion.text: String!"
+  final: "same"
+  action: keep
+  note: ""
+- live: "(new) DocumentTextVersion.uid, artifactType, normalizationVersion, languageCode, publishedAt, observedAt, contentHash, textOfSnapshot, documents, wasGeneratedBy, locators, chunks"
+  final: "DocumentTextVersion.*"
+  action: keep
+  note: "additive; normalizationVersion null for legacy (producer output); TEXT_OF_SNAPSHOT backfill with captureCompleteness UNKNOWN snapshot when none exists"
+- live: "DocumentTextVersion.hasSegmentations (HAS_SEGMENTATION, OrderingMetadata)"
+  final: "DocumentTextVersion.hasSegmentations (HAS_SEGMENTATION)"
+  action: keep
+  note: "drop OrderingMetadata properties"
+- live: "Segmentation"
+  final: "Segmentation @node(labels: [Segmentation, InformationArtifact])"
+  action: keep
+  note: "uid token segmentation pending (W20-SR-02)"
+- live: "Segmentation.id (@alias segmentationId)"
+  final: "same"
+  action: keep
+  note: ""
+- live: "Segmentation.name: String!"
+  final: "Segmentation.name: String"
+  action: keep
+  note: "D-013"
+- live: "Segmentation.segmentationHash"
+  final: "same"
+  action: keep
+  note: "legacy hashes kept as-is; new hashes over canonical config JSON incl. methodVersion"
+- live: "Segmentation.chunkSize, overlap"
+  final: "same"
+  action: keep
+  note: "unit named by methodVersion"
+- live: "Segmentation.segmentationStrategy (@alias strategy)"
+  final: "same"
+  action: keep
+  note: ""
+- live: "(new) Segmentation.uid, artifactType, methodVersion, textVersion, wasGeneratedBy"
+  final: "Segmentation.*"
+  action: keep
+  note: "additive"
+- live: "Chunk"
+  final: "Chunk @node(labels: [Chunk, InformationArtifact])"
+  action: keep
+  note: "derived retrieval unit; never a locator"
+- live: "Chunk.id (@alias chunkId)"
+  final: "same"
+  action: keep
+  note: ""
+- live: "Chunk.name: String! (@alias chunkKey)"
+  final: "Chunk.name: String (@alias chunkKey)"
+  action: keep
+  note: "D-013; never identity"
+- live: "Chunk.chunkIndex (@alias index)"
+  final: "same"
+  action: keep
+  note: ""
+- live: "Chunk.text"
+  final: "same"
+  action: keep
+  note: "W20-V06 once charStart/charEnd are backfilled"
+- live: "Chunk.segmentationHash: String"
+  final: "same"
+  action: keep
+  note: "required for new writes; backfill from the single Segmentation of the chunk text version when unambiguous, else leave null and report (W20-V07)"
+- live: "Chunk.searchText, searchFields, embeddingModel, embeddingDimensions, searchEmbedding"
+  final: "same"
+  action: keep
+  note: "derived"
+- live: "(new) Chunk.uid, artifactType, charStart, charEnd, contentHash, documents, resolvedFromLocators"
+  final: "Chunk.*"
+  action: keep
+  note: "charStart/charEnd backfill by locating chunk text in its text version (first exact occurrence after the previous chunk start); ambiguous rows stay null"
+- live: "Chunk.nextChunks (NEXT_CHUNK, OrderingMetadata)"
+  final: "Chunk.nextChunks (NEXT_CHUNK)"
+  action: keep
+  note: "drop OrderingMetadata"
+- live: "Chunk.previousChunks (PREV_CHUNK, OrderingMetadata)"
+  final: "Chunk.previousChunks (NEXT_CHUNK direction IN)"
+  action: retire
+  note: "first report PREV_CHUNK edges whose inverse NEXT_CHUNK is missing; create the missing NEXT_CHUNK; then delete PREV_CHUNK (W20-V08)"
+- live: "Chunk.mentions (MENTIONS, ExtractionMetadata) -> ClaimSubject"
+  final: "Chunk.mentions (MENTIONS, RetrievalEdgeProperties) -> AssertionSubjectTarget"
+  action: derive
+  note: "keep salience/aboutness; derivationRule from extraction method"
+- live: "Chunk.about (ABOUT, ExtractionMetadata) -> ClaimSubject"
+  final: "Chunk.about (ABOUT, RetrievalEdgeProperties) -> AssertionSubjectTarget"
+  action: derive
+  note: ""
+- live: "Chunk.assertsClaims (ASSERTS, ExtractionMetadata) -> Claim"
+  final: "Chunk.assertsClaims (SUPPORTED_BY_CHUNK direction IN, DerivedSupportProperties, read-only)"
+  action: retire
+  note: "each Chunk-ASSERTS->Claim edge becomes Claim-SUPPORTED_BY_CHUNK->Chunk only if a locator and an instantiating Assertion exist (W21 seam W20-SR-14); otherwise reported, not migrated as support"
+- live: "Chunk.fromTextVersions (FROM_TEXT_VERSION, RoleMetadata)"
+  final: "Chunk.fromTextVersions (FROM_TEXT_VERSION)"
+  action: keep
+  note: "drop RoleMetadata; exactly one (W20-V07)"
+- live: "Chunk.inEpisodeSegments (OCCURS_IN_SEGMENT, OrderingMetadata)"
+  final: "Chunk.inEpisodeSegments (OCCURS_IN_SEGMENT, DerivedEdgeProperties, read-only)"
+  action: derive
+  note: "derivationRule required; delete rows whose text version has no timing"
+- live: "@fulltext ChunkSearch [text, searchText]"
+  final: "same; index on stored [text, searchText]"
+  action: keep
+  note: "D-015 (no aliased fields involved)"
+- live: "@vector ChunkSearchEmbedding (provider OPEN_AI)"
+  final: "@vector ChunkSearchEmbedding without provider (Fable merge)"
+  action: keep
+  note: "D-014; retrieval justification in 07-operations.md"
+- live: "Episode.hasTranscriptVersions (HAS_TRANSCRIPT, ExtractionMetadata)"
+  final: "null (W21 field removed); path Episode <-RENDITION_OF- Document -HAS_SNAPSHOT-> SourceSnapshot <-TEXT_OF_SNAPSHOT- DocumentTextVersion"
+  action: retire
+  note: "per edge: find or create the rendition Source (Document) of the transcript; if unknown, create Document type TRANSCRIPT_PAGE with canonicalUri from capture metadata, snapshot captureCompleteness UNKNOWN; add Activity TRANSCRIPTION only when the run transcribed audio, else TEXT_EXTRACTION (W20-SR-15)"
+- live: "ExtractionMetadata.quoteSpan"
+  final: "SourceLocator.exact (+ quoteHash, normalizationVersion NFC-WS1)"
+  action: move
+  note: "alignment migration note 2: TEXT_QUOTE (or TEXT_POSITION when the span is found in the chunk text version) on the chunk text version snapshot; locatorUid set on the shortcut"
+- live: "ExtractionMetadata.extractionMethod, extractorVersion, extractedAt"
+  final: "Activity.methodVersion, Agent.toolVersion, Activity.endedAt; activityUid on the edge"
+  action: move
+  note: ""
+- live: "ExtractionMetadata.supportType"
+  final: "relationship type (SUPPORTED_BY vs CONTRADICTED_BY on the Assertion)"
+  action: retire
+  note: "a contradicting legacy row becomes CONTRADICTED_BY -> locator; no chunk shortcut is kept for contradiction"
+- live: "ExtractionMetadata.salience, aboutness"
+  final: "RetrievalEdgeProperties.salience, aboutness"
+  action: move
+  note: "only on ABOUT/MENTIONS; dropped from support shortcuts"
+- live: "ExtractionMetadata.notes"
+  final: null
+  action: retire
+  note: "free text; no query uses it"
+- live: "ExtractionMetadata.mongoResearchRunId"
+  final: "*.mongoResearchRunId (INTERNAL) + activityUid"
+  action: keep
+  note: ""
+- live: "ExtractionMetadata (on W20 edges)"
+  final: "ChunkResolutionProperties | DerivedSupportProperties | RetrievalEdgeProperties"
+  action: split
+  note: "by edge type"
+- live: "OrderingMetadata (on HAS_CHUNK, HAS_SEGMENTATION, NEXT_CHUNK, PREV_CHUNK, OCCURS_IN_SEGMENT)"
+  final: null
+  action: retire
+  note: "order is Chunk.index"
+- live: "OrganizationSnapshot.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "OrganizationSnapshot successor (owner W01).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "OrganizationSnapshot.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "OrganizationSnapshot successor (owner W01).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "ProductSnapshot.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "ProductSnapshot successor (owner W04).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "ProductSnapshot.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "ProductSnapshot successor (owner W04).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "Procedure.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "Procedure successor (owner W06).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "Procedure.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "Procedure successor (owner W06).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "Treatment.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "Treatment successor (owner W06).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "Treatment.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "Treatment successor (owner W06).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "Lifestyle.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "Lifestyle successor (owner W05).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "Lifestyle.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "Lifestyle successor (owner W05).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "AdverseEffect.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "AdverseEffect successor (owner W17).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "AdverseEffect.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "AdverseEffect successor (owner W17).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "SafetySignal.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "SafetySignal successor (owner W17).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "SafetySignal.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "SafetySignal successor (owner W17).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "StudyOutcome.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "StudyOutcome successor (owner W09).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "StudyOutcome.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "StudyOutcome successor (owner W09).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "StudyArm.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "StudyArm successor (owner W09).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "StudyArm.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "StudyArm successor (owner W09).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "OutcomeMeasure.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "OutcomeMeasure successor (owner W09).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "OutcomeMeasure.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "OutcomeMeasure successor (owner W09).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "OutcomeResult.supportedByDocuments (SUPPORTED_BY_DOCUMENT, ExtractionMetadata)"
+  final: "OutcomeResult successor (owner W09).supportedByDocuments (SUPPORTED_BY_DOCUMENT, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid + derivedFromAssertionUids; legacy rows without a resolvable locator get a WHOLE_SNAPSHOT locator on a backfilled snapshot (V-401b reports it) and derivationRule legacy-whole-snapshot-v1, or are dropped when no assertion about the record exists"
+- live: "OutcomeResult.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "OutcomeResult successor (owner W09).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "requires locatorUid (resolving to the chunk) + derivedFromAssertionUids (W20-V01)"
+- live: "MediaAnnotation.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "MediaAnnotation (owner W22).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "GraphView is a rendered traversal, never a source: W22 may retire the field instead"
+- live: "GraphView.supportedByChunks (SUPPORTED_BY_CHUNK, ExtractionMetadata)"
+  final: "GraphView (owner W22).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: derive
+  note: "GraphView is a rendered traversal, never a source: W22 may retire the field instead"
+- live: "Mechanism.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Mechanism successor (owner W03).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "Pathway.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Pathway successor (owner W03).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "Organ.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Organ successor (owner W03).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "Condition.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Condition successor (owner W03).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "MolecularEntity.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "MolecularEntity successor (owner W03).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "AnatomicalContext.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "AnatomicalContext successor (owner W03).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "Species.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Species successor (owner W03).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "RiskFactor.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "RiskFactor successor (owner W03).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "Biomarker.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Biomarker successor (owner W07).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "Metric.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Metric successor (owner W07).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "ManufacturingProcess.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "ManufacturingProcess successor (owner W11).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "ManufacturingStep.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "ManufacturingStep successor (owner W11).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "Material.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Material successor (owner W02/W11 (CL-005)).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "Event.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Event successor (owner W18).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "NarrativeArc.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "NarrativeArc successor (owner W18).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. Entity-type start (no assertion of its own): kept only when an Assertion with this node as subject is SUPPORTED_BY the locator; otherwise migrate to Chunk -MENTIONS-> node (retrieval)."
+- live: "Claim.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "Claim successor (owner W21).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers."
+- live: "ClaimOccurrence.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "ClaimOccurrence successor (owner W21).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers. For an Assertion type the kernel field supportedBy targets SourceLocator; the chunk field must be named supportedByChunks."
+- live: "ExperienceReport.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata)"
+  final: "ExperienceReport successor (owner W21).supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only)"
+  action: rename
+  note: "relationship type SUPPORTED_BY -> Chunk relabelled SUPPORTED_BY_CHUNK (one type, one meaning); W20-V01 reports leftovers."
+- live: "ProtocolResult.supportedBy (SUPPORTED_BY -> ProvenanceSource = Chunk|Document|Organization|Study)"
+  final: "W16 ProtocolResult: SUPPORTED_BY_CHUNK / SUPPORTED_BY_DOCUMENT shortcuts (DerivedSupportProperties) + asserted edges for Organization/Study"
+  action: split
+  note: "a union mixing evidence endpoints and actors is not a support range (W20-SR-16)"
+- live: "MediaSource.sourceChunk (SOURCE_CHUNK, ExtractionMetadata)"
+  final: "W22 decision: SourceLocator via MediaSource locator fields; chunk link derived only"
+  action: retire
+  note: "Final field owned by another worker; W20 states the semantics. Chunk is never a source (W22)"
+- live: "MediaSource.sourceDocument (SOURCE_DOCUMENT, RoleMetadata)"
+  final: "W22 decision: Document (Source) + SourceSnapshot + SourceLocator"
+  action: move
+  note: "Final field owned by another worker; W20 states the semantics. "
+- live: "ProductLabelRegion.assertsClaims (ASSERTS, ExtractionMetadata)"
+  final: "ProductLabelRegion.assertsClaims (ASSERTS, DerivedSupportProperties, read-only) (field owner W22)"
+  action: derive
+  note: "requires an IMAGE_REGION locator (D-010) and the label ClaimOccurrence"
+- live: "Event.reportedIn / NarrativeArc.reportedIn (REPORTED_IN -> Document)"
+  final: "W18 decision"
+  action: keep
+  note: "Final field owned by another worker; W20 states the semantics. not support; if kept, asserted with AssertedEdgeProperties"
+- live: "Study.hasPrimarySources (HAS_PRIMARY_SOURCE -> Document, RoleMetadata)"
+  final: "W09 decision: Publication/TrialRegistration RENDITION_OF links"
+  action: keep
+  note: "Final field owned by another worker; W20 states the semantics. primary is per assertion; a study-to-document link is a rendition/registration fact"
+- live: "ExperienceReport.extractedFrom (EXTRACTED_FROM -> ExtractionSource = Document|Episode|Chunk)"
+  final: "W21: SUPPORTED_BY SourceLocator; union ExtractionSource retired"
+  action: retire
+  note: "Chunk is not a source"
+- live: "RelationshipAssertion.supportedByClaims (SUPPORTED_BY_CLAIM)"
+  final: "W21 decision (INSTANCE_OF)"
+  action: retire
+  note: "Final field owned by another worker; W20 states the semantics. listed in W20-V08 migration progress"
+- live: "enum DocumentType"
+  final: "enum DocumentType (+8 values)"
+  action: keep
+  note: "additive values CORRECTION_NOTICE, RETRACTION_NOTICE, EXPRESSION_OF_CONCERN, REINSTATEMENT_NOTICE, TRANSCRIPT_PAGE, VIDEO_PAGE, AUDIO_FEED_ITEM, NEWSLETTER_ISSUE"
+- live: "enum DocumentDomain"
+  final: "enum DocumentDomain"
+  action: keep
+  note: ""

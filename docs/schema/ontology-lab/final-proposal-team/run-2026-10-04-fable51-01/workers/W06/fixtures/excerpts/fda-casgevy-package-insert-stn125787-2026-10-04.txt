@@ -1,0 +1,9 @@
+Source: https://www.fda.gov/media/174615/download  (Package Insert - CASGEVY (STN 125787), PDF, 23 pages)
+Captured: 2026-10-04 via Firecrawl scrape with PDF parser, query mode directQuote (served from Firecrawl cache, cachedAt 2026-10-03T09:14:18Z). PARTIAL_EXCERPT: only the quoted spans below were returned; the dosing sentence requested was not returned.
+Verbatim spans returned:
+"CASGEVY (exagamglogene autotemcel), suspension for intravenous infusion"
+"Initial U.S. Approval: 2023"
+"CASGEVY is an autologous genome edited hematopoietic stem cell-based gene therapy indicated for the treatment of patients aged 2 years and older with: • sickle cell disease (SCD) with recurrent vaso-occlusive crises (VOCs). (1) • transfusion-dependent β-thalassemia (TDT)."
+"Revised: 07/2026"
+"CASGEVY (exagamglogene autotemcel) is a cellular gene therapy consisting of autologous CD34+ HSCs edited by CRISPR/Cas9-technology at the erythroid specific enhancer region of the BCL11A gene to reduce BCL11A expression in erythroid lineage cells, leading to increased fetal hemoglobin (HbF) protein production."
+"CASGEVY is prepared from the patient's own HSCs, which are obtained via apheresis procedure(s)."

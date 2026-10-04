@@ -1,0 +1,577 @@
+# =====================================================================================================================
+# W13 Regulation and jurisdictions -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W13 (Opus 5.5)   Coordinator/synthesizer: Fable 5.1
+# Canonical catalog module: regulatory_and_ip (regulatory half; catalog 0.2.0 digest 8fb50ff0...84f0;
+#                           live schema digest 86b5e0b5...f112)
+# Competency questions: CQ-MF-02, CQ-MF-03, CQ-MF-06 (registration side), CQ-AX-23, CQ-PF-03 (regulatory attachment),
+#                       CQ-PF-04 (conditions text only), CQ-TM-03 (clocks); candidates CQ-MF-C01 (inspections),
+#                       CQ-MF-C02 (legal basis in force at a date), CQ-MF-C03 (jurisdiction partition) -- see 02-cq-coverage.md
+# Invariants / validators: INV-010, INV-304, INV-501..503; V-320a/b, V-321, V-322, V-323, V-331, V-333, V-334, V-335,
+#                       V-336; proposed V-W13-01..12 in fixtures/w13-validation.cypher
+#
+# Owned here (sole writer): node types RegulatoryAgency, RegulatoryPathway, RegulatoryPathwayVersion (new, see decision
+# W13-D02), RegulatoryStep, RegulatorySubmission, RegulatoryResponse, RegulatoryStatus, OrphanDesignation, DrugApproval,
+# RegulatoryInspection (CANDIDATE, decision W13-D09); enums RegulatoryStatusKind, RegulatoryResponseKind, PathwayKind;
+# union RegulatorySubjectTarget; relationship types UNDER_PATHWAY, SUBMITTED_BY, SUBMISSION_ABOUT,
+# SUPERSEDES_SUBMISSION, SUBMISSION_HAS_RESPONSE, ISSUED_BY, STATUS_OF, RESULTS_FROM_RESPONSE, UNDER_LEGAL_BASIS,
+# UNDER_LEGAL_BASIS_VERSION (new), HAS_PATHWAY_VERSION (new), HAS_REGULATORY_STEP, OVERSEES, INSPECTED_FACILITY
+# (candidate), CONDUCTED_BY (candidate), legacy derived HAS_REGULATORY_STATUS and FOLLOWS_PATHWAY.
+# DESIGNATION_FOR and APPROVAL_FOR are NOT separate stored relationship types: they are GraphQL field names on the
+# specialization types that read the one stored STATUS_OF relationship (decision W13-D05).
+#
+# No relationship-property type is defined here; the frozen W00 types are reused by name:
+#   W00: Entity, EntityArchetype, VersionedStateArchetype, OccurrenceArchetype, InformationArtifactArchetype,
+#        PrivacyClass, NodeMaturity, AssertedEdgeProperties, StateEpisodeProperties, DerivedEdgeProperties,
+#        StructuralEdgeProperties, IdentifierLinkProperties, Identifier (HAS_IDENTIFIER)
+#   W01: Organization, Facility        W02: IngredientMaterial, MaterialMixture        W04: Product, ProductVariant
+#   W07: AlgorithmVersion, AssayVersion                                                 W09: StudyIntervention
+# Relationship class and cardinality are written in each field description and enforced by the operations/validation
+# layer, never by SDL. Derived fields are read-only (@settable false) and written only by the projection job.
+# Jurisdiction values follow the convention requested from W00 in seam request W13-SR-01 (ISO 3166-1 alpha-2,
+# ISO 3166-2 subdivision codes, and the reserved code EU); the field stays a String as in the frozen interfaces.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Enums (values frozen at catalog 0.2.0; proposed additions are in seam-requests.yaml, NOT here)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Kind of legal standing a RegulatoryStatus represents (catalog conventions.regulatoryStatusKind). Only APPROVAL is
+approval (INV-304). CLEARANCE (510(k) substantially equivalent), DE_NOVO_AUTHORIZATION, DESIGNATION (orphan and similar),
+ESTABLISHMENT_REGISTRATION (Facility only), NOTIFICATION_ON_FILE (NDI acknowledged without objection, GRAS no
+questions) and ENFORCEMENT_DISCRETION (policy, revocable) never project to approval. WITHDRAWN and REVOKED are
+end states of an earlier status kind recorded as their own status node, never as an overwrite.
+"""
+enum RegulatoryStatusKind {
+  APPROVAL
+  CLEARANCE
+  DE_NOVO_AUTHORIZATION
+  DESIGNATION
+  ESTABLISHMENT_REGISTRATION
+  NOTIFICATION_ON_FILE
+  ENFORCEMENT_DISCRETION
+  WITHDRAWN
+  REVOKED
+}
+
+"""
+What the agency answered (catalog conventions.regulatoryResponseKind). The enum is the union of the per-pathway closed
+lists; the value must belong to the list of the submission's pathway kind (V-W13-03): NDI_NOTIFICATION -> NDI_*;
+GRAS_NOTICE -> GRAS_*; PREMARKET_NOTIFICATION_510K -> SUBSTANTIALLY_EQUIVALENT | NOT_SUBSTANTIALLY_EQUIVALENT;
+DE_NOVO -> DE_NOVO_*; PMA -> PMA_*; NDA, BLA -> APPROVED | COMPLETE_RESPONSE; ORPHAN_DESIGNATION -> ORPHAN_DESIGNATION_*;
+FOOD_FACILITY_REGISTRATION, DEVICE_ESTABLISHMENT_REGISTRATION -> REGISTRATION_*. Only APPROVED and PMA_APPROVED are
+approving responses (V-336). Company wording ("no objection") is never a response kind; it is a
+CHARACTERIZES_REGULATORY_RESPONSE Assertion.
+"""
+enum RegulatoryResponseKind {
+  NDI_ACKNOWLEDGED_WITHOUT_OBJECTION
+  NDI_INCOMPLETE
+  NDI_OBJECTION
+  NDI_OTHER_REGULATORY_ISSUE
+  GRAS_NO_QUESTIONS
+  GRAS_NO_BASIS
+  GRAS_CEASED_AT_NOTIFIER_REQUEST
+  SUBSTANTIALLY_EQUIVALENT
+  NOT_SUBSTANTIALLY_EQUIVALENT
+  DE_NOVO_GRANTED
+  DE_NOVO_DECLINED
+  PMA_APPROVED
+  PMA_DENIED
+  PMA_APPROVABLE
+  PMA_NOT_APPROVABLE
+  APPROVED
+  COMPLETE_RESPONSE
+  ORPHAN_DESIGNATION_GRANTED
+  ORPHAN_DESIGNATION_DENIED
+  ORPHAN_DESIGNATION_REVOKED
+  REGISTRATION_ACTIVE
+  REGISTRATION_CANCELLED
+}
+
+"""
+Kind of regulatory program a RegulatoryPathway is, and the family a RegulatorySubmission is filed under (values from
+round 0005 and validators V-320b, V-331). Jurisdiction is NOT encoded in the value: it is the pathway's
+`jurisdiction`. Non-US program kinds (EU/GB novel food) are proposed in W13-SR-03 and are not values yet.
+"""
+enum PathwayKind {
+  NDI_NOTIFICATION
+  GRAS_NOTICE
+  PREMARKET_NOTIFICATION_510K
+  DE_NOVO
+  PMA
+  NDA
+  BLA
+  ORPHAN_DESIGNATION
+  FOOD_FACILITY_REGISTRATION
+  DEVICE_ESTABLISHMENT_REGISTRATION
+  COMPOUNDING_503B_BULKS_POLICY
+  LDT_POLICY
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Union
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+What a regulatory submission, status, designation or approval is about. Per-edge allowed members (V-W13-01):
+STATUS_OF and SUBMISSION_ABOUT -> Product | ProductVariant | IngredientMaterial | AlgorithmVersion | AssayVersion |
+Facility | MaterialMixture; a status with statusKind ESTABLISHMENT_REGISTRATION -> Facility only (INV-304, V-323), and a
+Facility carries no other status kind; OrphanDesignation / DrugApproval -> IngredientMaterial | MaterialMixture |
+StudyIntervention | Product. AssayVersion is added for laboratory-developed tests (LDT failing case, W13-D06);
+MaterialMixture for a designated combination such as "nicotinamide riboside and pterostilbene" (FDA OOPD record,
+W13-D07). A subject is never a ConsumerBrand, an Organization or a display name.
+"""
+union RegulatorySubjectTarget = Product | ProductVariant | IngredientMaterial | AlgorithmVersion | AssayVersion | Facility | MaterialMixture | StudyIntervention
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Agency, pathway, legal-basis version, step
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A public authority that runs regulatory programs and issues responses and statuses (FDA, European Commission, UK Food
+Standards Agency). It is an Organization specialization, so one agency has one organization identity (uid token `org`,
+like LegalEntity; W13-SR-02). It is NOT a jurisdiction: the agency's home jurisdiction is a property, and each record it
+issues carries its own jurisdiction. CQ-MF-02, CQ-AX-23. Module regulatory_and_ip. Archetype Entity.
+"""
+type RegulatoryAgency implements Entity & EntityArchetype
+  @node(labels: ["RegulatoryAgency", "Organization", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Agency code as used by the agency or by BellLabs normalization (FDA, EC, FSA). Not identity."
+  agencyCode: String
+  "Home jurisdiction code (W13-SR-01 convention), e.g. US, EU, GB. Records it issues carry their own jurisdiction."
+  jurisdiction: String
+  """class: structural; cardinality: many; catalog: OVERSEES (live RegulatoryAgency.overseesPathways; RoleMetadata
+  replaced by StructuralEdgeProperties because the live role fields carry no meaning on this edge)"""
+  overseesPathways: [RegulatoryPathway!]! @relationship(type: "OVERSEES", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+A regulatory program of one jurisdiction (FDA NDI notification, FDA GRAS notification, FDA 510(k), EU novel food
+authorisation once W13-SR-03 is ruled). Stable identity across legal-basis changes; the legal basis in force over time
+is carried by RegulatoryPathwayVersion states attached through HAS_PATHWAY_VERSION episodes (decision W13-D02, closes
+OPEN-QUESTIONS Priority 1 diagnostics item 4 / OQ-L3-07). It is NOT an event and NOT a status. `legalBasisCitation`,
+`effectiveFrom` and `effectiveTo` on this type are read-only current projections of the version episodes, kept for
+the catalog and live field names. CQ-MF-02, CQ-MF-C02, CQ-TM-03. Module regulatory_and_ip. Archetype Entity.
+"""
+type RegulatoryPathway implements Entity & EntityArchetype
+  @node(labels: ["RegulatoryPathway", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Program kind (closed). Live pathwayKind was free text."
+  pathwayKind: PathwayKind!
+  "Jurisdiction of the program (W13-SR-01 convention). Live jurisdictionCode is merged here."
+  jurisdiction: String!
+  "Verbatim live submissionCategory text (kept; not a filter)."
+  submissionCategory: String
+  "Derived (read-only): legalBasisCitation of the version whose current episode covers now; null when none or unknown."
+  legalBasisCitation: String @settable(onCreate: false, onUpdate: false)
+  "Derived (read-only): earliest validFrom over current version episodes."
+  effectiveFrom: DateTime @settable(onCreate: false, onUpdate: false)
+  "Derived (read-only): validTo of the latest current version episode when every episode is closed; null = unknown or open."
+  effectiveTo: DateTime @settable(onCreate: false, onUpdate: false)
+  """class: structural (bitemporal_attachment profile); cardinality: many over time, EXCLUSIVE per pathway in valid and
+  recorded time (W13-SR-05); catalog: new HAS_PATHWAY_VERSION. One edge per recorded-time episode; a vacatur or repeal
+  learned later closes the episode (recordedTo) and opens a new one with validTo (SUPERSEDES VALIDITY_BOUNDED on the
+  authorizing assertion)."""
+  versions: [RegulatoryPathwayVersion!]! @relationship(type: "HAS_PATHWAY_VERSION", direction: OUT, properties: "StateEpisodeProperties")
+  """class: structural; cardinality: many; catalog: HAS_REGULATORY_STEP (template steps, ordered by orderIndex)"""
+  hasSteps: [RegulatoryStep!]! @relationship(type: "HAS_REGULATORY_STEP", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: OVERSEES (inverse view)"""
+  overseenBy: [RegulatoryAgency!]! @relationship(type: "OVERSEES", direction: IN, properties: "StructuralEdgeProperties")
+  """class: derived (read-only legacy); cardinality: many; live Product.followsRegulatoryPathways (FOLLOWS_PATHWAY).
+  derivationRule W13-DR-02: Product p FOLLOWS_PATHWAY pathway w iff an accepted SUBMISSION_ABOUT assertion has a
+  submission UNDER_PATHWAY w as subject and p (or a variant of p) as object; derivedFromAssertionUids = those assertions.
+  Never evidence of a favourable response or of a status."""
+  legacyFollowedBy: [Product!]! @relationship(type: "FOLLOWS_PATHWAY", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+One legal-basis regime of a RegulatoryPathway: the instrument(s) under which the program operated over an interval
+(e.g. FDA LDT oversight under 21 CFR 809.3(a) as amended by 89 FR 37286, legally effective 2024-07-05 until the
+2025-03-31 vacatur; GRAS notification under proposed 21 CFR 170.36 (62 FR 18938) until the 2016-10-17 effective date of
+21 CFR part 170 subpart E). Payload is immutable (payloadHash); when the regime held is carried by the HAS_PATHWAY_VERSION
+episode (valid and recorded time), so a vacatur learned late never rewrites what was known before. Two clocks are kept
+apart: legal effect (episode valid time; payload effectiveFrom/effectiveTo as stated by the instrument) and codified text
+(codifiedTextFrom/codifiedTextTo, e.g. the CFR text reverted only on 2025-09-19). It is NOT a status of any product.
+CQ-MF-C02, CQ-MF-02, CQ-TM-03. Module regulatory_and_ip. Archetype VersionedState. NEW (W13-D02; token W13-SR-04).
+"""
+type RegulatoryPathwayVersion implements Entity & VersionedStateArchetype
+  @node(labels: ["RegulatoryPathwayVersion", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  "Start of legal effect as stated by the instrument (e.g. 'This rule is effective July 5, 2024'). Payload, not query validity."
+  effectiveFrom: DateTime
+  "End of legal effect only when the instrument itself states it (sunset). A vacatur or repeal ends the episode instead."
+  effectiveTo: DateTime
+  "Short label, e.g. 'LDT rule 2024 (vacated)'. Presentation only."
+  versionLabel: String
+  "Primary legal basis citation, e.g. '21 CFR 809.3(a) as amended by 89 FR 37286'."
+  legalBasisCitation: String!
+  "Every instrument that opens or closes this regime: FR documents, court judgments, policy pages (verbatim citations)."
+  instrumentCitations: [String!]
+  "When the codified text matching this regime took effect (may differ from legal effect)."
+  codifiedTextFrom: DateTime
+  "When the codified text was removed or changed (e.g. 2025-09-19 for the LDT reversion)."
+  codifiedTextTo: DateTime
+  jurisdiction: String!
+  """class: structural; cardinality: exactly_one (inverse); catalog: new HAS_PATHWAY_VERSION"""
+  pathway: [RegulatoryPathway!]! @relationship(type: "HAS_PATHWAY_VERSION", direction: IN, properties: "StateEpisodeProperties")
+}
+
+"""
+A template step of a pathway definition (live type kept): filing, 75-day wait, response, classification order. It is
+NOT an event; dated events are RegulatorySubmission and RegulatoryResponse. CQ-MF-02 (explanation only). Module
+regulatory_and_ip. Archetype Entity.
+"""
+type RegulatoryStep implements Entity & EntityArchetype
+  @node(labels: ["RegulatoryStep", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Free text step kind (kept from live; not a filter until a CQ needs one)."
+  stepKind: String
+  "Agency milestone code where one exists."
+  milestoneCode: String
+  """class: structural; cardinality: one_or_more (inverse); catalog: HAS_REGULATORY_STEP"""
+  ofPathways: [RegulatoryPathway!]! @relationship(type: "HAS_REGULATORY_STEP", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Submission and response (information artifacts)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+What was filed with an agency (GRAS notice GRN 000635, NDI notification 1062, 510(k) K234070, De Novo DEN200080, NDA
+217785 ORIG-1, an orphan designation request). Distinct from the agency's answer and from any resulting status (round
+0005 C3: different dates, issuers and lifecycles). Its submitter and subject are asserted edges (the agency record or
+the filer states them). Clocks: submittedAt (date on the filing), receivedAt (agency receipt), filingDate (agency
+filing date; for NDI it resets on a substantive amendment, recorded as superseding assertions, property card
+"RegulatorySubmission.filingDate"). CQ-MF-02, CQ-MF-03, CQ-PF-04, CQ-TM-03. Module regulatory_and_ip. Archetype
+InformationArtifact.
+"""
+type RegulatorySubmission implements Entity & InformationArtifactArchetype
+  @node(labels: ["RegulatorySubmission", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  "Program family the filing belongs to (equals the UNDER_PATHWAY target's pathwayKind; V-W13-04)."
+  submissionKind: PathwayKind!
+  "Verbatim agency subtype (ORIG-1, SUPPL-6, Traditional, Direct, amendment). Not a filter."
+  submissionSubtype: String
+  "Verbatim agency number as printed (GRN 000635, K234070). Authoritative identifiers are Identifier records."
+  identifier: String
+  jurisdiction: String!
+  "Date on the submission document as stated by the source (GRN 000635: notice dated 2016-03-08)."
+  submittedAt: DateTime
+  "Agency receipt date (GRN 000635: 2016-03-09; K234070: 2023-12-22)."
+  receivedAt: DateTime
+  "Agency filing date; current projection of the latest accepted filing-date assertion (history in assertions)."
+  filingDate: DateTime
+  "Conditions of use as the submitter proposed them (verbatim). The agency's conditions live on the response."
+  conditionsOfUseText: String
+  """class: structural; cardinality: exactly_one; catalog: UNDER_PATHWAY"""
+  underPathway: [RegulatoryPathway!]! @relationship(type: "UNDER_PATHWAY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: new UNDER_LEGAL_BASIS_VERSION (the regime the filing was made
+  under, e.g. GRN 000635 under proposed 21 CFR 170.36)"""
+  underLegalBasisVersion: [RegulatoryPathwayVersion!]! @relationship(type: "UNDER_LEGAL_BASIS_VERSION", direction: OUT)
+  """class: asserted; cardinality: one_or_more over time; catalog: SUBMITTED_BY (notifier; a consultant filing on behalf
+  of a notifier is not the submitter: GRN 000635 was sent by Spherix Consulting on behalf of ChromaDex)"""
+  submittedBy: [Organization!]! @relationship(type: "SUBMITTED_BY", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: one_or_more; catalog: SUBMISSION_ABOUT (range RegulatorySubjectTarget, per-edge
+  members in the union description)"""
+  submissionAbout: [RegulatorySubjectTarget!]! @relationship(type: "SUBMISSION_ABOUT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_one; catalog: SUPERSEDES_SUBMISSION (resubmission chain, e.g. NDIN 1062
+  refers to NDIN 882; GRAS inventory resubmission links)"""
+  supersedesSubmission: [RegulatorySubmission!]! @relationship(type: "SUPERSEDES_SUBMISSION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; catalog: SUBMISSION_HAS_RESPONSE"""
+  responses: [RegulatoryResponse!]! @relationship(type: "SUBMISSION_HAS_RESPONSE", direction: OUT)
+  """class: asserted (IdentifierLinkProperties); cardinality: many; W00 HAS_IDENTIFIER (scheme FDA_GRN, FDA_NDI,
+  FDA_510K, FDA_DEN, FDA_NDA, EU_NOVEL_FOOD_ENTRY ...; scheme registry is W00's)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+}
+
+"""
+What the agency answered to a submission (FDA letter, database decision): closed per-pathway responseKind, issue date,
+the agency's verbatim conditions of use and its own disclaimer text (GRN 000635: "The agency has not, however, made its
+own determination regarding the GRAS status of the subject use of NR."). It is NOT a status: whether a status follows is
+a separate record linked by RESULTS_FROM_RESPONSE. Immutable; an agency correction or a later letter is a new response.
+A company's restatement is a CHARACTERIZES_REGULATORY_RESPONSE Assertion whose subject is this node (V-335). CQ-MF-02,
+CQ-MF-03, CQ-PF-04. Module regulatory_and_ip. Archetype InformationArtifact.
+"""
+type RegulatoryResponse implements Entity & InformationArtifactArchetype
+  @node(labels: ["RegulatoryResponse", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  responseKind: RegulatoryResponseKind!
+  "Agency-stated decision code verbatim (SESE, DENG, 'FDA has no questions'). Not a filter."
+  decisionTextVerbatim: String
+  "Letter or decision date as stated by the agency (live RegulatoryStatus.decisionDate moves here)."
+  issuedAt: DateTime
+  jurisdiction: String!
+  "Agency's conditions of use, verbatim (null = not captured, V-331)."
+  conditionsOfUseText: String
+  "Agency's own disclaimer sentences, verbatim, in letter order (null = not captured)."
+  agencyDisclaimerText: String
+  """class: structural; cardinality: exactly_one; catalog: ISSUED_BY"""
+  issuedBy: [RegulatoryAgency!]! @relationship(type: "ISSUED_BY", direction: OUT)
+  """class: structural; cardinality: exactly_one (inverse); catalog: SUBMISSION_HAS_RESPONSE"""
+  submission: [RegulatorySubmission!]! @relationship(type: "SUBMISSION_HAS_RESPONSE", direction: IN)
+  """class: structural; cardinality: many (inverse); catalog: RESULTS_FROM_RESPONSE"""
+  resultingStatuses: [RegulatoryStatus!]! @relationship(type: "RESULTS_FROM_RESPONSE", direction: IN)
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Status and its specializations (versioned states)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A jurisdiction-specific regulatory standing of exactly one subject (live name kept, meaning narrowed, round 0005):
+closed statusKind, jurisdiction, scope, legal basis. Only statusKind APPROVAL is approval and it must result from an
+approving response (V-336); ESTABLISHMENT_REGISTRATION is a status of a Facility only (INV-304, V-323). A marketed
+product with no status is NOT approved, and the absence of a status node is NOT_RECORDED, never "not approved" (QS-7).
+Validity over time is the STATUS_OF episode; effectiveFrom/effectiveTo are source-stated payload. It is NOT the
+submission, NOT the response and NOT a badge on a brand. CQ-MF-02, CQ-AX-23, CQ-PF-03, CQ-MF-06. Module
+regulatory_and_ip. Archetype VersionedState.
+"""
+type RegulatoryStatus implements Entity & VersionedStateArchetype
+  @node(labels: ["RegulatoryStatus", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  "Source-stated start (live effectiveDate)."
+  effectiveFrom: DateTime
+  "Source-stated end (live expirationOrRenewalDate); null = unknown or not stated, never 'ongoing'."
+  effectiveTo: DateTime
+  statusKind: RegulatoryStatusKind!
+  "Jurisdiction (live jurisdictionCode merged). Required (V-333)."
+  jurisdiction: String!
+  "Verbatim scope (indication, intended use, food categories, project area). Answers quote it."
+  scopeText: String
+  "Agency product classification code where stated (510(k) SAF, De Novo QPN)."
+  productCode: String
+  "Whether a predetermined change control plan was authorized; null = not stated."
+  pcccAuthorized: Boolean
+  "Citation of the legal basis as stated or normalized (kept for answers; the structural link is UNDER_LEGAL_BASIS_VERSION)."
+  legalBasisCitation: String
+  "Live statusCode free text, kept verbatim for migration; never a filter (filters use statusKind)."
+  statusCodeVerbatim: String
+  """class: asserted; cardinality: exactly_one; catalog: STATUS_OF (range RegulatorySubjectTarget)"""
+  statusOf: [RegulatorySubjectTarget!]! @relationship(type: "STATUS_OF", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: RESULTS_FROM_RESPONSE (required for APPROVAL, V-336)"""
+  resultsFromResponse: [RegulatoryResponse!]! @relationship(type: "RESULTS_FROM_RESPONSE", direction: OUT)
+  """class: structural; cardinality: exactly_one; catalog: UNDER_LEGAL_BASIS"""
+  underLegalBasis: [RegulatoryPathway!]! @relationship(type: "UNDER_LEGAL_BASIS", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: new UNDER_LEGAL_BASIS_VERSION; the version must belong to the
+  UNDER_LEGAL_BASIS pathway (V-W13-05) and the status episode may not outlive the version episode (V-334r)"""
+  underLegalBasisVersion: [RegulatoryPathwayVersion!]! @relationship(type: "UNDER_LEGAL_BASIS_VERSION", direction: OUT)
+  """class: structural; cardinality: exactly_one; catalog: ISSUED_BY (live RegulatoryStatus.issuedBy; RoleMetadata dropped)"""
+  issuedBy: [RegulatoryAgency!]! @relationship(type: "ISSUED_BY", direction: OUT)
+  """class: derived (read-only legacy); cardinality: many (inverse); live Product.hasRegulatoryStatuses
+  (HAS_REGULATORY_STATUS). derivationRule W13-DR-01: Product p HAS_REGULATORY_STATUS s iff an accepted STATUS_OF
+  assertion has s as subject and p as object; derivedFromAssertionUids = [that assertion]. Never written for a Facility
+  status, never read as approval unless s.statusKind = APPROVAL."""
+  legacyHeldBy: [Product!]! @relationship(type: "HAS_REGULATORY_STATUS", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+Orphan designation as a specialization label of RegulatoryStatus (statusKind DESIGNATION, V-321). Designation is not
+approval (forbidden [HAS_ORPHAN_DESIGNATION, IS_APPROVED]); the FDA OOPD record for "nicotinamide riboside and
+pterostilbene" (designated 2018-03-19, ALS) states "Not FDA Approved for Orphan Indication". The subject is the
+designated drug (material, mixture, intervention or product), never a consumer product that shares an ingredient.
+CQ-MF-02, CQ-AX-23. Module regulatory_and_ip. Archetype VersionedState.
+"""
+type OrphanDesignation implements Entity & VersionedStateArchetype
+  @node(labels: ["OrphanDesignation", "RegulatoryStatus", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Always DESIGNATION (V-321)."
+  statusKind: RegulatoryStatusKind!
+  jurisdiction: String!
+  scopeText: String
+  legalBasisCitation: String
+  "Agency designation number where published (verbatim); identity is an Identifier record."
+  designationId: String
+  "Designated indication, verbatim (e.g. 'Treatment of Amyotrophic Lateral Sclerosis')."
+  indication: String
+  "Agency-stated designated generic name verbatim (e.g. 'nicotinamide riboside and pterostilbene')."
+  designatedNameVerbatim: String
+  """class: asserted; cardinality: exactly_one; stored type STATUS_OF (catalog DESIGNATION_FOR is this field name, not a
+  second relationship type; W13-D05). Allowed members: IngredientMaterial | MaterialMixture | StudyIntervention | Product."""
+  designationFor: [RegulatorySubjectTarget!]! @relationship(type: "STATUS_OF", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: RESULTS_FROM_RESPONSE (ORPHAN_DESIGNATION_GRANTED)"""
+  resultsFromResponse: [RegulatoryResponse!]! @relationship(type: "RESULTS_FROM_RESPONSE", direction: OUT)
+  """class: structural; cardinality: exactly_one; catalog: UNDER_LEGAL_BASIS"""
+  underLegalBasis: [RegulatoryPathway!]! @relationship(type: "UNDER_LEGAL_BASIS", direction: OUT)
+  """class: structural; cardinality: exactly_one; catalog: ISSUED_BY"""
+  issuedBy: [RegulatoryAgency!]! @relationship(type: "ISSUED_BY", direction: OUT)
+}
+
+"""
+Drug or biologic approval as a specialization label of RegulatoryStatus (statusKind APPROVAL, V-321) for an NDA/BLA
+application (Drugs@FDA NDA 217785 REZDIFFRA, ORIG-1 approval 2024-03-14). Requires an approving response (APPROVED or
+PMA_APPROVED, V-336). Scope is the application's indication and products, not every product containing the active
+ingredient. CQ-MF-02, CQ-AX-23. Module regulatory_and_ip. Archetype VersionedState.
+"""
+type DrugApproval implements Entity & VersionedStateArchetype
+  @node(labels: ["DrugApproval", "RegulatoryStatus", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Always APPROVAL (V-321)."
+  statusKind: RegulatoryStatusKind!
+  jurisdiction: String!
+  scopeText: String
+  legalBasisCitation: String
+  "Application number verbatim (NDA 217785); identity is an Identifier on the submission."
+  applicationNumber: String
+  "Approved indication verbatim when captured."
+  indication: String
+  """class: asserted; cardinality: exactly_one; stored type STATUS_OF (catalog APPROVAL_FOR is this field name, W13-D05).
+  Allowed members: IngredientMaterial | MaterialMixture | StudyIntervention | Product."""
+  approvalFor: [RegulatorySubjectTarget!]! @relationship(type: "STATUS_OF", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: exactly_one for APPROVAL (V-336); catalog: RESULTS_FROM_RESPONSE"""
+  resultsFromResponse: [RegulatoryResponse!]! @relationship(type: "RESULTS_FROM_RESPONSE", direction: OUT)
+  """class: structural; cardinality: exactly_one; catalog: UNDER_LEGAL_BASIS"""
+  underLegalBasis: [RegulatoryPathway!]! @relationship(type: "UNDER_LEGAL_BASIS", direction: OUT)
+  """class: structural; cardinality: exactly_one; catalog: ISSUED_BY"""
+  issuedBy: [RegulatoryAgency!]! @relationship(type: "ISSUED_BY", direction: OUT)
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Candidate: inspection occurrence (decision W13-D09; candidate CQ-MF-C01; failing case fixtures/w13-inspection.cypher)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+CANDIDATE. An agency inspection of a facility over an interval (FDA inspection of Nutratech, LLC, Phoenix NY,
+2025-09-22 to 2025-10-15, Form FDA 483 issued at its conclusion, warning letter CMS #723021 dated 2026-06-04). An
+Occurrence, so letters and dashboard rows that describe it can be resolved to one event even when they disagree
+(warning letter CMS #698661 states both "through October 4, 2024" and "through October 7, 2024"). Inspection
+classification (NAI, VAI, OAI) is assigned per project area after agency review, so it is an agency Assertion
+(candidate predicate INSPECTION_CLASSIFIED_AS, per-project-area valueString), never a property here; observations and
+warning-letter findings are agency Assertions supported by locators in the letter. It is NOT a status, NOT a
+certification, NOT evidence of CGMP compliance ("FDA does not issue CGMP certificates at the conclusion of an
+inspection"; candidate forbidden implication [INSPECTION_CLASSIFIED_NAI, CGMP_COMPLIANT]), and the absence of a
+dashboard row is NOT "not inspected". CQ-MF-C01, CQ-MF-06. Module regulatory_and_ip (inspection expansion; quality W12
+consumes). Archetype Occurrence.
+"""
+type RegulatoryInspection implements Entity & OccurrenceArchetype
+  @node(labels: ["RegulatoryInspection", "Occurrence"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  occurrenceType: String!
+  "First inspection day as resolved from accepted assertions (projection; conflicts stay in the assertions)."
+  startedAt: DateTime
+  "Last inspection day as resolved; null when sources conflict and no adjudication has resolved them."
+  endedAt: DateTime
+  jurisdiction: String!
+  "Verbatim scope where stated (e.g. 'CGMP for dietary supplements, 21 CFR Part 111'). Not a classification."
+  inspectionScopeText: String
+  "Whether a Form FDA 483 was issued, as stated by an agency source; null = not stated (never false by default)."
+  form483Issued: Boolean
+  "Date the Form FDA 483 was issued, as stated (Nutratech: 2025-10-15)."
+  form483IssuedAt: DateTime
+  """class: asserted; cardinality: exactly_one; candidate relationship INSPECTED_FACILITY (W13-D09)"""
+  inspectedFacility: [Facility!]! @relationship(type: "INSPECTED_FACILITY", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: exactly_one; candidate relationship CONDUCTED_BY"""
+  conductedBy: [RegulatoryAgency!]! @relationship(type: "CONDUCTED_BY", direction: OUT)
+}

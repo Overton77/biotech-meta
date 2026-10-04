@@ -12,7 +12,7 @@
 # is an external private-context-store contract in private-store-interface.md and never appears in SDL.
 #
 # Imports by name only (owners): Entity, EntityArchetype, VersionedStateArchetype, OccurrenceArchetype,
-# AssertionArchetype, EvidenceAssessmentArchetype, PrivacyClass, NodeMaturity, UseKind, Activity,
+# EvidenceAssessmentArchetype, Assertion (generic node type), PrivacyClass, NodeMaturity, UseKind, Activity,
 # StructuralEdgeProperties, AuthorizationProperties (all W00). Relationship types WAS_GENERATED_BY and
 # AUTHORIZED_BY are W00's; this fragment adds endpoint fields on its own types only (seam W23-SR-02).
 #
@@ -137,12 +137,16 @@ type AnswerRecord implements Entity & OccurrenceArchetype
   class: structural; cardinality: many (zero only when traceDepth NONE); catalog: CITES_ASSERTION.
   Each cited assertion must have recordedAt <= recordedAsOf (V-W23-02). orderIndex = ordinal of the cited answer
   sentence. A citation records use, never support: the five provenance states are read through the assertion.
+  Target is W00's generic Assertion type (labels ["Assertion"]), which every assertion node carries, so each cited
+  ClaimOccurrence or RelationshipAssertion is returned exactly once; an AssertionArchetype interface target returns
+  a ClaimOccurrence twice under @neo4j/graphql 7.6.3 (checks/roundtrip-variant-b-uid-on-archetype.json, D-W23-11).
   """
-  citesAssertions: [AssertionArchetype!]!
+  citesAssertions: [Assertion!]!
     @relationship(type: "CITES_ASSERTION", direction: OUT, properties: "StructuralEdgeProperties")
   """
   class: structural; cardinality: many; catalog: CITES_ASSESSMENT. Adjudications and evidence assessments the answer
-  relied on; each recordedAt <= recordedAsOf (V-W23-02).
+  relied on; each recordedAt <= recordedAsOf (V-W23-02). Interface target: connect and filter by uid through the API
+  need uid on EvidenceAssessmentArchetype (seam W23-SR-03); without it, reads use inline fragments per type.
   """
   citesAssessments: [EvidenceAssessmentArchetype!]!
     @relationship(type: "CITES_ASSESSMENT", direction: OUT, properties: "StructuralEdgeProperties")

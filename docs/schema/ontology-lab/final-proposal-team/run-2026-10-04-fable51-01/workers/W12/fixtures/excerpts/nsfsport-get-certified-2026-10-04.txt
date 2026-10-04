@@ -1,0 +1,5 @@
+SOURCE: https://www.nsfsport.com/get-certified.php
+CAPTURE: Tavily search extract, 2026-10-04T01:05Z; SEARCH_EXTRACT (page not fetched)
+EXCERPT (verbatim snippet):
+Once steps 1 and 2 are completed, production lots are then tested to ensure they are free from 290 banned substances. ... Lots tested will be listed online at nsfsport.com and in the Certified for Sport® app.
+Good Manufacturing Practice (GMP) certification verifies that the product is manufactured, packaged and stored in a facility that is audited annually, or bi-annually based on grade, for quality and safety in compliance with federal regulations for dietary supplements, functional foods or cosmetics/ personal care GMPs.
