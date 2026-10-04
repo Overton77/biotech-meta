@@ -1,0 +1,5518 @@
+{
+ "nodes": {
+  "Source": {
+   "module": "provenance",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "canonicalUri",
+    "title",
+    "sourceKind",
+    "publisherUid"
+   ]
+  },
+  "SourceSnapshot": {
+   "module": "provenance",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "canonicalUri",
+    "publishedAt",
+    "publishedAtPrecision",
+    "observedAt",
+    "retrievedAt",
+    "contentHash",
+    "contentHashBasis",
+    "captureCompleteness",
+    "storageUri",
+    "archiveUri",
+    "publisherRevisionNotice",
+    "mimeType",
+    "language"
+   ]
+  },
+  "SourceLocator": {
+   "module": "provenance",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "uri",
+    "selectorKind",
+    "exact",
+    "prefix",
+    "suffix",
+    "quoteHash",
+    "normalizationVersion",
+    "startOffset",
+    "endOffset",
+    "mediaStartSeconds",
+    "mediaEndSeconds",
+    "mediaTimeBasis",
+    "page",
+    "section",
+    "mediaAnnotationUid",
+    "speakerLabelInSource"
+   ]
+  },
+  "DocumentTextVersion": {
+   "module": "provenance",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "textVersionHash",
+    "source",
+    "versionLabel",
+    "normalizationVersion"
+   ]
+  },
+  "SourceRevisionEvent": {
+   "module": "provenance",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "revisionKind",
+    "occurredAt",
+    "occurredAtPrecision",
+    "recordedAt"
+   ]
+  },
+  "Adjudication": {
+   "module": "provenance",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "adjudicationKind",
+    "verdict",
+    "rationale",
+    "reviewerType",
+    "reviewedAt",
+    "recordedAt",
+    "humanReviewPending"
+   ]
+  },
+  "ResolutionHypothesis": {
+   "module": "provenance",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "resolutionType",
+    "score",
+    "rationale",
+    "resolutionStatus"
+   ]
+  },
+  "Agent": {
+   "module": "provenance",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "agentKind",
+    "model",
+    "promptVersion",
+    "toolVersion"
+   ]
+  },
+  "Activity": {
+   "module": "provenance",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "activityKind",
+    "startedAt",
+    "endedAt",
+    "methodVersion",
+    "externalRunSystem",
+    "externalRunId"
+   ]
+  },
+  "Identifier": {
+   "module": "identity_resolution",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "scheme",
+    "value",
+    "issuer",
+    "jurisdiction",
+    "validFrom",
+    "validTo",
+    "normalizationRule"
+   ]
+  },
+  "TradeItemIdentifier": {
+   "module": "identity_resolution",
+   "archetype": "Entity",
+   "parentLabel": "Identifier",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "scheme",
+    "value",
+    "issuer",
+    "jurisdiction"
+   ]
+  },
+  "Mention": {
+   "module": "identity_resolution",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "surfaceForm",
+    "mentionKind"
+   ]
+  },
+  "EquivalenceAssessment": {
+   "module": "identity_resolution",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "equivalenceKind",
+    "methodVersion",
+    "status",
+    "rationale"
+   ]
+  },
+  "Organization": {
+   "module": "organizations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "organizationKind",
+    "jurisdiction"
+   ]
+  },
+  "LegalEntity": {
+   "module": "organizations",
+   "archetype": "Entity",
+   "parentLabel": "Organization",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "legalName",
+    "registrationId",
+    "jurisdiction"
+   ]
+  },
+  "ConsumerBrand": {
+   "module": "organizations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name"
+   ]
+  },
+  "Facility": {
+   "module": "organizations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "facilityKind",
+    "address"
+   ]
+  },
+  "Person": {
+   "module": "organizations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "orcid"
+   ]
+  },
+  "PseudonymousActor": {
+   "module": "organizations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "handle"
+   ]
+  },
+  "AnonymousActor": {
+   "module": "organizations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "anonymityClass"
+   ]
+  },
+  "Product": {
+   "module": "products_and_commerce",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "productKind"
+   ]
+  },
+  "ProductVariant": {
+   "module": "products_and_commerce",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "strengthDescriptor",
+    "dosageForm",
+    "flavor",
+    "jurisdiction"
+   ]
+  },
+  "PackageConfiguration": {
+   "module": "products_and_commerce",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "packageForm",
+    "unitCount",
+    "netQuantity",
+    "netQuantityUnit"
+   ]
+  },
+  "MerchantListing": {
+   "module": "products_and_commerce",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "merchantListingId",
+    "title",
+    "canonicalUrl"
+   ]
+  },
+  "Offer": {
+   "module": "products_and_commerce",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "offerKind",
+    "currency",
+    "availability",
+    "termsText",
+    "observedAt"
+   ]
+  },
+  "PriceObservation": {
+   "module": "products_and_commerce",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "amount",
+    "currency",
+    "observedAt",
+    "priceKind",
+    "availabilityObserved"
+   ]
+  },
+  "SubscriptionPlan": {
+   "module": "products_and_commerce",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "sellingPlanId",
+    "interval",
+    "intervalCount",
+    "terms"
+   ]
+  },
+  "Bundle": {
+   "module": "products_and_commerce",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "bundleKind"
+   ]
+  },
+  "BundleComponent": {
+   "module": "products_and_commerce",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "quantity",
+    "componentRole"
+   ]
+  },
+  "InventoryItem": {
+   "module": "products_and_commerce",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "merchantInventoryId"
+   ]
+  },
+  "IndividualUnit": {
+   "module": "products_and_commerce",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "serialNumber"
+   ]
+  },
+  "AffiliateLink": {
+   "module": "products_and_commerce",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "url",
+    "trackingParameter",
+    "observedAt"
+   ]
+  },
+  "CommerceMatch": {
+   "module": "products_and_commerce",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "matchKind",
+    "score",
+    "rationale"
+   ]
+  },
+  "IngredientMaterial": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "materialKind"
+   ]
+  },
+  "BrandedIngredientMaterial": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": "IngredientMaterial",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "brandName",
+    "specificationOwnerUid"
+   ]
+  },
+  "ChemicalSubstance": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "preferredName",
+    "molecularFormula",
+    "pubchemCid",
+    "inchikey"
+   ]
+  },
+  "ChemicalForm": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "formKind",
+    "hydrationState",
+    "polymorph",
+    "grade"
+   ]
+  },
+  "BotanicalTaxon": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "scientificName",
+    "taxonRank",
+    "taxonomyId"
+   ]
+  },
+  "BotanicalPreparation": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": "IngredientMaterial",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "plantPart",
+    "preparationType",
+    "extractRatio",
+    "solvent"
+   ]
+  },
+  "MicrobialTaxon": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "scientificName",
+    "taxonomyId"
+   ]
+  },
+  "MicrobialStrain": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "strainDesignation",
+    "depositIdentifier"
+   ]
+  },
+  "MicrobialPreparation": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": "IngredientMaterial",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "preparationType",
+    "viabilityState"
+   ]
+  },
+  "MaterialMixture": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": "IngredientMaterial",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "mixtureKind"
+   ]
+  },
+  "Constituent": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "constituentKind"
+   ]
+  },
+  "Nutrient": {
+   "module": "substances_and_materials",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "nutrientKind"
+   ]
+  },
+  "FormulationVersion": {
+   "module": "products_and_formulations",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "versionName",
+    "jurisdiction",
+    "effectiveFrom",
+    "effectiveTo"
+   ]
+  },
+  "IngredientComponent": {
+   "module": "products_and_formulations",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "role",
+    "labelOrder",
+    "quantity",
+    "unitCode",
+    "quantityBasis",
+    "massBasis",
+    "amountReferent",
+    "declaredAs",
+    "isDietaryIngredient"
+   ]
+  },
+  "ManufacturingSpecification": {
+   "module": "products_and_formulations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "specificationKind"
+   ]
+  },
+  "SpecificationVersion": {
+   "module": "products_and_formulations",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "versionName",
+    "effectiveFrom",
+    "effectiveTo"
+   ]
+  },
+  "ManufacturingProcess": {
+   "module": "products_and_formulations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "processKind"
+   ]
+  },
+  "ManufacturingStep": {
+   "module": "products_and_formulations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "stepKind",
+    "environmentGrade"
+   ]
+  },
+  "Trademark": {
+   "module": "products_and_formulations",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "markText",
+    "registrationNumber",
+    "jurisdiction",
+    "status"
+   ]
+  },
+  "LabelSnapshot": {
+   "module": "labels",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "jurisdiction",
+    "language",
+    "observedAt",
+    "labelVersionText"
+   ]
+  },
+  "LabelDeclaration": {
+   "module": "labels",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "verbatimText",
+    "declarationKind",
+    "panelOrder"
+   ]
+  },
+  "ServingDefinition": {
+   "module": "labels",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "servingCount",
+    "unitDescription",
+    "servingsPerContainer"
+   ]
+  },
+  "QuantityDeclaration": {
+   "module": "labels",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "value",
+    "unitCode",
+    "basis",
+    "dailyValuePercent",
+    "amountReferent",
+    "amountReferentUid"
+   ]
+  },
+  "Study": {
+   "module": "studies_and_evidence",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "title",
+    "studyKind"
+   ]
+  },
+  "TrialRegistration": {
+   "module": "studies_and_evidence",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "registry",
+    "registrationId"
+   ]
+  },
+  "RegistrationVersion": {
+   "module": "studies_and_evidence",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "versionDate",
+    "observedAt",
+    "overallStatus",
+    "enrollmentCount",
+    "enrollmentCountType",
+    "resultsPosted",
+    "resultsFirstPostedAt",
+    "startDate",
+    "startDateType",
+    "primaryCompletionDate",
+    "primaryCompletionDateType",
+    "completionDate",
+    "completionDateType",
+    "studyType",
+    "allocation",
+    "interventionModel",
+    "masking",
+    "primaryPurpose",
+    "phase",
+    "siteCountries",
+    "fdaRegulatedDrug",
+    "fdaRegulatedDevice"
+   ]
+  },
+  "ProtocolVersion": {
+   "module": "studies_and_evidence",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "versionName",
+    "versionDate"
+   ]
+  },
+  "StudyArm": {
+   "module": "studies_and_evidence",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "armType"
+   ]
+  },
+  "StudyIntervention": {
+   "module": "studies_and_evidence",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "route",
+    "dosageForm",
+    "schedule",
+    "dosesPerDay",
+    "durationIso"
+   ]
+  },
+  "InterventionComponent": {
+   "module": "studies_and_evidence",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "quantity",
+    "unitCode",
+    "quantityBasis",
+    "massBasis",
+    "verbatimDoseText"
+   ]
+  },
+  "StudyPopulation": {
+   "module": "studies_and_evidence",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "populationKind",
+    "description",
+    "size"
+   ]
+  },
+  "OutcomeDefinition": {
+   "module": "studies_and_evidence",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "outcomeKind",
+    "measureKind",
+    "timepoint",
+    "priority"
+   ]
+  },
+  "StudyResult": {
+   "module": "studies_and_evidence",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "resultKind",
+    "estimate",
+    "estimateQualifier",
+    "unitCode",
+    "pValue",
+    "confidenceInterval",
+    "analysisPopulation",
+    "analysisKind",
+    "comparisonKind",
+    "statisticalConclusion",
+    "multiplicityAdjusted"
+   ]
+  },
+  "AdverseEventResult": {
+   "module": "studies_and_evidence",
+   "archetype": "InformationArtifact",
+   "parentLabel": "StudyResult",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "eventTerm",
+    "eventTermCode",
+    "seriousness",
+    "participantsAffected",
+    "participantsAtRisk",
+    "eventCount",
+    "collectionMethod",
+    "relatednessAssessor"
+   ]
+  },
+  "Publication": {
+   "module": "studies_and_evidence",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "title",
+    "doi",
+    "pmid",
+    "publishedAt",
+    "publicationKind"
+   ]
+  },
+  "Dataset": {
+   "module": "studies_and_evidence",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "datasetKind",
+    "accessLevel"
+   ]
+  },
+  "EvidenceApplicability": {
+   "module": "studies_and_evidence",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "summary",
+    "overallScore",
+    "recordedAt",
+    "identityMatch",
+    "doseMatch",
+    "routeMatch",
+    "scheduleMatch",
+    "durationMatch",
+    "populationMatch",
+    "outcomeMatch"
+   ]
+  },
+  "ApplicabilityDimension": {
+   "module": "studies_and_evidence",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "dimension",
+    "dimensionClass",
+    "verdict",
+    "identityLevel",
+    "evidenceCategory",
+    "targetCategory",
+    "evidenceValue",
+    "targetValue",
+    "unitCode",
+    "evidenceQuantityBasis",
+    "targetQuantityBasis",
+    "evidenceMassBasis",
+    "targetMassBasis",
+    "ratio",
+    "missingFacts",
+    "rationale"
+   ]
+  },
+  "UseContextProfile": {
+   "module": "studies_and_evidence",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "populationDescriptor",
+    "doseDescriptor",
+    "durationDescriptor"
+   ]
+  },
+  "EndpointClassification": {
+   "module": "studies_and_evidence",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "endpointClass",
+    "biomarkerCategory",
+    "surrogateValidationLevel",
+    "contextDiseaseOrUse",
+    "contextPopulation",
+    "contextInterventionMechanism",
+    "contextApprovalType",
+    "contextMatch",
+    "rationale",
+    "recordedAt"
+   ]
+  },
+  "ResultInterpretation": {
+   "module": "studies_and_evidence",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "interpretation",
+    "meaningfulnessVerdict",
+    "thresholdValue",
+    "thresholdUnit",
+    "rationale",
+    "recordedAt"
+   ]
+  },
+  "EvidenceSynthesis": {
+   "module": "studies_and_evidence",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "claimText",
+    "verdict",
+    "evidenceCutoff",
+    "recordedAt",
+    "rationale"
+   ]
+  },
+  "EvidenceStrengthAssessment": {
+   "module": "studies_and_evidence",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "scheme",
+    "level",
+    "criteria",
+    "rationale",
+    "recordedAt"
+   ]
+  },
+  "MechanismEvidenceContext": {
+   "module": "mechanisms",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "setting",
+    "modelDescriptor",
+    "sexScope",
+    "ageDescriptor",
+    "sampleSize",
+    "exposureAmount",
+    "exposureUnit",
+    "exposureBasis",
+    "route",
+    "exposureDurationIso",
+    "exposureStatus"
+   ]
+  },
+  "Mechanism": {
+   "module": "mechanisms",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "mechanismKind"
+   ]
+  },
+  "Pathway": {
+   "module": "mechanisms",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name"
+   ]
+  },
+  "MolecularEntity": {
+   "module": "mechanisms",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "entityKind"
+   ]
+  },
+  "Species": {
+   "module": "mechanisms",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "scientificName",
+    "taxonomyId"
+   ]
+  },
+  "AnatomicalContext": {
+   "module": "mechanisms",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "uberonId"
+   ]
+  },
+  "Organ": {
+   "module": "mechanisms",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name"
+   ]
+  },
+  "Outcome": {
+   "module": "mechanisms",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "outcomeKind"
+   ]
+  },
+  "Condition": {
+   "module": "mechanisms",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "icd10Code"
+   ]
+  },
+  "Biomarker": {
+   "module": "diagnostics",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "biomarkerKind"
+   ]
+  },
+  "Metric": {
+   "module": "diagnostics",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "metricKind",
+    "loincCode",
+    "propertyKind",
+    "systemKind",
+    "scaleKind",
+    "canonicalUnitCode",
+    "unitStatus",
+    "definitionText"
+   ]
+  },
+  "LabTest": {
+   "module": "diagnostics",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "localTestCode",
+    "issuerUid"
+   ]
+  },
+  "PanelDefinition": {
+   "module": "diagnostics",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "versionLabel",
+    "effectiveFrom",
+    "effectiveTo"
+   ]
+  },
+  "MeasurementMethod": {
+   "module": "diagnostics",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "methodPrinciple"
+   ]
+  },
+  "Specimen": {
+   "module": "diagnostics",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "specimenTypeCode"
+   ]
+  },
+  "ReferenceSystem": {
+   "module": "diagnostics",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "referenceSystemKind"
+   ]
+  },
+  "AssayVersion": {
+   "module": "diagnostics",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "assayKitIdentifier",
+    "softwareVersion",
+    "softwareVersionStatus",
+    "reportedUnitCode",
+    "effectiveFrom",
+    "effectiveTo"
+   ]
+  },
+  "Algorithm": {
+   "module": "diagnostics",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name"
+   ]
+  },
+  "AlgorithmVersion": {
+   "module": "diagnostics",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "versionLabel",
+    "versionBasis",
+    "outputKind",
+    "outputUnitCode",
+    "trainingPopulationText",
+    "retrievedAt"
+   ]
+  },
+  "ReferenceIntervalVersion": {
+   "module": "diagnostics",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "lowerBound",
+    "upperBound",
+    "unitCode",
+    "intervalKind",
+    "derivationKind",
+    "sexPartition",
+    "ageMinYears",
+    "ageMaxYears",
+    "fastingStatus",
+    "pregnancyStatus",
+    "partitionText",
+    "effectiveFrom",
+    "effectiveTo"
+   ]
+  },
+  "ComparabilityAssessment": {
+   "module": "diagnostics",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "verdict",
+    "measurandMatch",
+    "unitConversionRule",
+    "traceabilityMatch",
+    "interferenceProfileMatch",
+    "referenceIntervalMatch",
+    "replicateNoiseBasis",
+    "rationale"
+   ]
+  },
+  "DiagnosticResult": {
+   "module": "diagnostics",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "resultKind",
+    "valueNumber",
+    "valueString",
+    "unitCode",
+    "valueStatus",
+    "observedAt",
+    "reportedAt",
+    "privacyClass"
+   ]
+  },
+  "Device": {
+   "module": "consumer_devices",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "DeviceModel": {
+   "module": "consumer_devices",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "FirmwareVersion": {
+   "module": "consumer_devices",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "Sensor": {
+   "module": "consumer_devices",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "Modality": {
+   "module": "consumer_devices",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "DeviceObservation": {
+   "module": "consumer_devices",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "ProductLot": {
+   "module": "quality",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "lotCode",
+    "manufactureDate",
+    "expiryDate"
+   ]
+  },
+  "TestSample": {
+   "module": "quality",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "sampleCode",
+    "sampledAt",
+    "samplingMethod"
+   ]
+  },
+  "TestExecution": {
+   "module": "quality",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "executedAt",
+    "status"
+   ]
+  },
+  "TestMethod": {
+   "module": "quality",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "methodIdentifier",
+    "methodVersion"
+   ]
+  },
+  "TestingLaboratory": {
+   "module": "quality",
+   "archetype": "Entity",
+   "parentLabel": "Organization",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "accreditation"
+   ]
+  },
+  "MeasuredResult": {
+   "module": "quality",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "analyte",
+    "value",
+    "unitCode",
+    "uncertainty",
+    "limitOfDetection",
+    "qualifier"
+   ]
+  },
+  "SpecificationCriterion": {
+   "module": "quality",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "analyte",
+    "comparator",
+    "threshold",
+    "unitCode"
+   ]
+  },
+  "PassFailInterpretation": {
+   "module": "quality",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "verdict",
+    "rationale"
+   ]
+  },
+  "LotTestSummary": {
+   "module": "quality",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "title",
+    "observedAt"
+   ]
+  },
+  "CertificateOfAnalysis": {
+   "module": "quality",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "certificateNumber",
+    "signedAt",
+    "signer"
+   ]
+  },
+  "CertificationProgram": {
+   "module": "quality",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "standard"
+   ]
+  },
+  "CertificationListing": {
+   "module": "quality",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "listingId",
+    "status",
+    "effectiveFrom",
+    "effectiveTo"
+   ]
+  },
+  "CertificationScope": {
+   "module": "quality",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "scopeText"
+   ]
+  },
+  "PatentFamily": {
+   "module": "regulatory_and_ip",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "familyIdentifier",
+    "title"
+   ]
+  },
+  "PatentApplication": {
+   "module": "regulatory_and_ip",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "applicationNumber",
+    "jurisdiction",
+    "filingDate",
+    "status"
+   ]
+  },
+  "GrantedPatent": {
+   "module": "regulatory_and_ip",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "patentNumber",
+    "jurisdiction",
+    "grantDate",
+    "status"
+   ]
+  },
+  "PatentClaim": {
+   "module": "regulatory_and_ip",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "claimNumber",
+    "claimTextHash",
+    "claimKind"
+   ]
+  },
+  "PatentLicense": {
+   "module": "regulatory_and_ip",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "exclusive",
+    "fieldOfUse",
+    "territory",
+    "effectiveFrom",
+    "effectiveTo"
+   ]
+  },
+  "RegulatoryAgency": {
+   "module": "regulatory_and_ip",
+   "archetype": "Entity",
+   "parentLabel": "Organization",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "agencyCode",
+    "jurisdiction"
+   ]
+  },
+  "RegulatoryPathway": {
+   "module": "regulatory_and_ip",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "pathwayKind",
+    "jurisdiction",
+    "legalBasisCitation",
+    "effectiveFrom",
+    "effectiveTo"
+   ]
+  },
+  "RegulatoryStep": {
+   "module": "regulatory_and_ip",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "stepKind",
+    "milestoneCode"
+   ]
+  },
+  "RegulatorySubmission": {
+   "module": "regulatory_and_ip",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "submissionKind",
+    "identifier",
+    "jurisdiction",
+    "submittedAt",
+    "filingDate",
+    "conditionsOfUseText"
+   ]
+  },
+  "RegulatoryResponse": {
+   "module": "regulatory_and_ip",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "responseKind",
+    "issuedAt",
+    "jurisdiction",
+    "conditionsOfUseText",
+    "agencyDisclaimerText"
+   ]
+  },
+  "RegulatoryStatus": {
+   "module": "regulatory_and_ip",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "statusKind",
+    "jurisdiction",
+    "scopeText",
+    "productCode",
+    "pcccAuthorized",
+    "legalBasisCitation",
+    "effectiveFrom",
+    "effectiveTo"
+   ]
+  },
+  "OrphanDesignation": {
+   "module": "regulatory_and_ip",
+   "archetype": "VersionedState",
+   "parentLabel": "RegulatoryStatus",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "designationId",
+    "indication",
+    "jurisdiction"
+   ]
+  },
+  "DrugApproval": {
+   "module": "regulatory_and_ip",
+   "archetype": "VersionedState",
+   "parentLabel": "RegulatoryStatus",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "applicationNumber",
+    "indication",
+    "jurisdiction"
+   ]
+  },
+  "ManufacturingCapability": {
+   "module": "manufacturing_readiness",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "stage",
+    "capacityValue",
+    "capacityUnitCode",
+    "capacityBasis",
+    "targetOperationalDate"
+   ]
+  },
+  "Document": {
+   "module": "claims_and_documents",
+   "archetype": "Entity",
+   "parentLabel": "Source",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "documentKey",
+    "documentType",
+    "publisher",
+    "publishedAt",
+    "languageCode",
+    "isPeerReviewed",
+    "isFinancialDisclosure"
+   ]
+  },
+  "Episode": {
+   "module": "claims_and_documents",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "title",
+    "episodeNumber",
+    "publishedAt",
+    "durationSeconds"
+   ]
+  },
+  "EpisodeSegment": {
+   "module": "claims_and_documents",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "segmentType"
+   ]
+  },
+  "Channel": {
+   "module": "claims_and_documents",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "channelType"
+   ]
+  },
+  "Series": {
+   "module": "claims_and_documents",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "seriesType"
+   ]
+  },
+  "Platform": {
+   "module": "claims_and_documents",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "platformType"
+   ]
+  },
+  "Segmentation": {
+   "module": "claims_and_documents",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "segmentationHash",
+    "chunkSize",
+    "overlap",
+    "strategy"
+   ]
+  },
+  "Chunk": {
+   "module": "claims_and_documents",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "chunkIndex",
+    "text",
+    "segmentationHash",
+    "charStart",
+    "charEnd"
+   ]
+  },
+  "Claim": {
+   "module": "claims_and_documents",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "claimText",
+    "claimType",
+    "claimPolarity",
+    "isQuantitative",
+    "isCausal"
+   ]
+  },
+  "ClaimOccurrence": {
+   "module": "claims_and_documents",
+   "archetype": "Assertion",
+   "parentLabel": "Assertion",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "utteranceText",
+    "assertionBasis",
+    "speechAct",
+    "reportedSpeechAct"
+   ]
+  },
+  "RelationshipAssertion": {
+   "module": "claims_and_documents",
+   "archetype": "Assertion",
+   "parentLabel": "Assertion",
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "predicateText",
+    "relationshipType"
+   ]
+  },
+  "ClaimEvidenceAssessment": {
+   "module": "claims_and_documents",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "evidenceStrength",
+    "criteriaVersion",
+    "methodVersion",
+    "status",
+    "assessedAt"
+   ]
+  },
+  "RetellingFidelityAssessment": {
+   "module": "claims_and_documents",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "methodVersion",
+    "status",
+    "qualificationLost",
+    "lostQualificationKinds",
+    "speechActChanged",
+    "speechActFrom",
+    "speechActTo",
+    "assertionBasisChanged",
+    "scopeBroadened",
+    "addedPurposeText",
+    "quantityChanged",
+    "attributionChanged",
+    "correctionIgnored",
+    "assessedAt"
+   ]
+  },
+  "ConflictRelevanceAssessment": {
+   "module": "claims_and_documents",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "methodVersion",
+    "status",
+    "relevanceLevel",
+    "relevanceBasis",
+    "temporalOverlap",
+    "disclosureFinding",
+    "scopeAmbiguity"
+   ]
+  },
+  "Protocol": {
+   "module": "protocols",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "protocolType",
+    "publicUrl"
+   ]
+  },
+  "ProtocolEdition": {
+   "module": "protocols",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "editionLabel",
+    "payloadHash"
+   ]
+  },
+  "ProtocolStep": {
+   "module": "protocols",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "stepKey",
+    "stepKind",
+    "requirementLevel",
+    "requirementBasis",
+    "notReportedFields",
+    "payloadHash"
+   ]
+  },
+  "Constraint": {
+   "module": "protocols",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "constraintKind"
+   ]
+  },
+  "MeasurementPlan": {
+   "module": "protocols",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "planTiming",
+    "requiredForEvaluation",
+    "maxBaselineAgeDays",
+    "cadenceMinDays",
+    "cadenceMaxDays"
+   ]
+  },
+  "ProtocolAdjustmentRule": {
+   "module": "protocols",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "triggerKind",
+    "comparator",
+    "thresholdValue",
+    "thresholdUnitCode",
+    "triggerAction",
+    "ruleBasis"
+   ]
+  },
+  "Target": {
+   "module": "protocols",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "targetType"
+   ]
+  },
+  "FunctionalGoal": {
+   "module": "protocols",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "name",
+    "goalType"
+   ]
+  },
+  "Observation": {
+   "module": "protocols",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "observedAt",
+    "observationType",
+    "observedPopulation"
+   ]
+  },
+  "ProtocolResult": {
+   "module": "protocols",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "public",
+   "placement": null,
+   "properties": [
+    "resultSummary"
+   ]
+  },
+  "SafetySignal": {
+   "module": "safety_and_constraints",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "ContraindicationAssertion": {
+   "module": "safety_and_constraints",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "InteractionAssertion": {
+   "module": "safety_and_constraints",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "UseConstraint": {
+   "module": "safety_and_constraints",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "RecommendationRequest": {
+   "module": "recommendation_decisions",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "requestedAt",
+    "goalVersionUids",
+    "intendedUse"
+   ]
+  },
+  "RecommendationSnapshot": {
+   "module": "recommendation_decisions",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "decidedAt",
+    "recordedAt",
+    "requestUid",
+    "userContextVersionUid",
+    "evidenceRecordedAt",
+    "evidenceValidAt",
+    "policyVersionUid",
+    "algorithmVersion",
+    "catalogVersion",
+    "intendedUse",
+    "decisionOutcome",
+    "rationaleSummary",
+    "decisionConfidence",
+    "decisionConfidenceMethod",
+    "missingFactKeys",
+    "snapshotHash"
+   ]
+  },
+  "RecommendationOption": {
+   "module": "recommendation_decisions",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "subjectUid",
+    "subjectType",
+    "disposition",
+    "rank",
+    "rejectionReason",
+    "blockingConstraintUids",
+    "evidenceAssertionUids",
+    "adjudicationUids",
+    "applicabilityUids",
+    "stateUids",
+    "offerObservationUids"
+   ]
+  },
+  "DecisionCriterionValue": {
+   "module": "recommendation_decisions",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "criterionUid",
+    "valueNumber",
+    "valueString",
+    "methodVersion"
+   ]
+  },
+  "UserDecision": {
+   "module": "recommendation_decisions",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "decisionKind",
+    "optionUid",
+    "decidedAt"
+   ]
+  },
+  "PolicyVersion": {
+   "module": "recommendation_decisions",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "internal",
+   "placement": "shared_graph",
+   "properties": [
+    "name",
+    "payloadHash"
+   ]
+  },
+  "DecisionCriterion": {
+   "module": "recommendation_decisions",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "internal",
+   "placement": "shared_graph",
+   "properties": [
+    "name",
+    "criterionKind",
+    "methodVersion"
+   ]
+  },
+  "UserContext": {
+   "module": "private_context",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": []
+  },
+  "UserContextVersion": {
+   "module": "private_context",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "goalVersionUids",
+    "measurementUids",
+    "declaredConditionUids",
+    "declaredIntakeUids",
+    "preferenceKeys",
+    "payloadHash"
+   ]
+  },
+  "UserGoal": {
+   "module": "private_context",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": []
+  },
+  "UserGoalVersion": {
+   "module": "private_context",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "functionalGoalUid",
+    "outcomeUid",
+    "metricUid",
+    "targetValue",
+    "targetUnitCode",
+    "priority",
+    "goalStatement",
+    "payloadHash"
+   ]
+  },
+  "PersonalMeasurement": {
+   "module": "private_context",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "metricUid",
+    "labTestUid",
+    "assayVersionUid",
+    "algorithmVersionUid",
+    "deviceUid",
+    "methodUid",
+    "valueNumber",
+    "unitCode",
+    "resultQualifier",
+    "effectiveAt",
+    "recordedAt",
+    "provenanceKind",
+    "reportedReferenceRangeText",
+    "labReportUid"
+   ]
+  },
+  "PersonalLabReport": {
+   "module": "private_context",
+   "archetype": "InformationArtifact",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "reportDate",
+    "issuingLabName",
+    "fileObjectRef",
+    "contentHash",
+    "recordedAt"
+   ]
+  },
+  "ProtocolInUse": {
+   "module": "private_context",
+   "archetype": "Entity",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": []
+  },
+  "ProtocolAdoptionVersion": {
+   "module": "private_context",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "adoptedEditionUid",
+    "payloadHash"
+   ]
+  },
+  "ProtocolDeviation": {
+   "module": "private_context",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "stepKey",
+    "deviationKind",
+    "personalValueNumber",
+    "personalUnitCode",
+    "substituteSubjectUid"
+   ]
+  },
+  "SharingGrant": {
+   "module": "private_context",
+   "archetype": "VersionedState",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "granteeKind",
+    "granteeRef",
+    "dataCategories",
+    "recordUids",
+    "purpose",
+    "permittedActions",
+    "decision",
+    "payloadHash"
+   ]
+  },
+  "DisclosureEvent": {
+   "module": "private_context",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "grantUid",
+    "occurredAt",
+    "dataCategories"
+   ]
+  },
+  "PendingItem": {
+   "module": "private_context",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "pendingKind",
+    "blocksUid",
+    "openedAt",
+    "expectedBy",
+    "resolvedAt",
+    "resolvedByUid"
+   ]
+  },
+  "PurchaseEvent": {
+   "module": "private_context",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "eventKind",
+    "occurredAt",
+    "offerUid",
+    "productVariantUid",
+    "packageConfigurationUid",
+    "lotUid"
+   ]
+  },
+  "PersonalApplicabilityAssessment": {
+   "module": "private_context",
+   "archetype": "EvidenceAssessment",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "sharedApplicabilityUid",
+    "userContextVersionUid",
+    "populationMatch",
+    "doseMatch",
+    "durationMatch",
+    "methodVersion"
+   ]
+  },
+  "ErasureTombstone": {
+   "module": "private_context",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "private-personal",
+   "placement": "private_context_store",
+   "properties": [
+    "subjectKeyHash",
+    "erasedAt",
+    "scope",
+    "propagationStatus"
+   ]
+  },
+  "MediaAsset": {
+   "module": "media",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "MediaVariant": {
+   "module": "media",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "MediaAnnotation": {
+   "module": "media",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "MediaSource": {
+   "module": "media",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "GraphView": {
+   "module": "media",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "FigurePanel": {
+   "module": "media",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "ProductLabelRegion": {
+   "module": "media",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "Community": {
+   "module": "events_and_narrative",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "Conference": {
+   "module": "events_and_narrative",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "Event": {
+   "module": "events_and_narrative",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "NarrativeArc": {
+   "module": "events_and_narrative",
+   "archetype": null,
+   "ownsOnly": true
+  },
+  "AnswerRecord": {
+   "module": "access_and_answers",
+   "archetype": "Occurrence",
+   "parentLabel": null,
+   "privacyClass": "internal",
+   "placement": null,
+   "properties": [
+    "recordedAsOf",
+    "validAt",
+    "intervalStart",
+    "intervalEnd",
+    "schemaDigest",
+    "queryShapeId",
+    "queryShapeVersion",
+    "accessTier",
+    "traceDepth",
+    "publishedAt"
+   ]
+  }
+ },
+ "relationships": {
+  "HAS_SNAPSHOT": {
+   "module": "provenance",
+   "from": "Source",
+   "to": "SourceSnapshot",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_LOCATOR": {
+   "module": "provenance",
+   "from": "SourceSnapshot",
+   "to": "SourceLocator",
+   "class": "structural",
+   "cardinality": "exactly_one_snapshot_per_locator",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_TEXT_VERSION": {
+   "module": "provenance",
+   "from": "Source",
+   "to": "DocumentTextVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "TEXT_OF_SNAPSHOT": {
+   "module": "provenance",
+   "from": "DocumentTextVersion",
+   "to": "SourceSnapshot",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "LOCATOR_IN_TEXT_VERSION": {
+   "module": "provenance",
+   "from": "SourceLocator",
+   "to": "DocumentTextVersion",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "REANCHORS": {
+   "module": "provenance",
+   "from": "SourceLocator",
+   "to": "SourceLocator",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": [
+    "anchorMatch"
+   ],
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RENDITION_OF": {
+   "module": "provenance",
+   "from": "Source",
+   "to": "Episode|Publication",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_SUBJECT": {
+   "module": "provenance",
+   "from": "Assertion",
+   "to": "Entity|VersionedState|Occurrence|InformationArtifact",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_OBJECT": {
+   "module": "provenance",
+   "from": "Assertion",
+   "to": "Entity|VersionedState|Occurrence|InformationArtifact",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SUPPORTED_BY": {
+   "module": "provenance",
+   "from": "Assertion|Adjudication|EvidenceAssessment",
+   "to": "SourceLocator",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CONTRADICTED_BY": {
+   "module": "provenance",
+   "from": "Assertion|Adjudication",
+   "to": "SourceLocator",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSERTED_BY": {
+   "module": "provenance",
+   "from": "Assertion",
+   "to": "Person|Organization|Agent|PseudonymousActor|AnonymousActor",
+   "class": "structural",
+   "cardinality": "at_most_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "EVALUATES": {
+   "module": "provenance",
+   "from": "Adjudication",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CONSIDERS_ASSESSMENT": {
+   "module": "provenance",
+   "from": "Adjudication",
+   "to": "EvidenceAssessment",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SUPERSEDES": {
+   "module": "provenance",
+   "from": "Assertion|Adjudication|EvidenceAssessment",
+   "to": "Assertion|Adjudication|EvidenceAssessment",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": [
+    "supersessionKind",
+    "recordedAt",
+    "sourceRevisionEventUid"
+   ],
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "DERIVED_FROM_ASSERTION": {
+   "module": "provenance",
+   "from": "Assertion",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "REVISES_SOURCE": {
+   "module": "provenance",
+   "from": "SourceRevisionEvent",
+   "to": "Source",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PRIOR_SNAPSHOT": {
+   "module": "provenance",
+   "from": "SourceRevisionEvent",
+   "to": "SourceSnapshot",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RESULTING_SNAPSHOT": {
+   "module": "provenance",
+   "from": "SourceRevisionEvent",
+   "to": "SourceSnapshot",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ANNOUNCED_IN": {
+   "module": "provenance",
+   "from": "SourceRevisionEvent",
+   "to": "SourceSnapshot",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PROPOSES_MATCH": {
+   "module": "provenance",
+   "from": "ResolutionHypothesis",
+   "to": "Entity|VersionedState|InformationArtifact|Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "COMPETES_WITH": {
+   "module": "provenance",
+   "from": "ResolutionHypothesis",
+   "to": "ResolutionHypothesis",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "WAS_GENERATED_BY": {
+   "module": "provenance",
+   "from": "Assertion|SourceSnapshot|DocumentTextVersion|SourceLocator|EvidenceAssessment",
+   "to": "Activity",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "USED": {
+   "module": "provenance",
+   "from": "Activity",
+   "to": "SourceSnapshot|SourceLocator|Assertion|DocumentTextVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "WAS_ASSOCIATED_WITH": {
+   "module": "provenance",
+   "from": "Activity",
+   "to": "Agent|Person",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ACTED_ON_BEHALF_OF": {
+   "module": "provenance",
+   "from": "Agent",
+   "to": "Organization",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "AUTHORIZED_BY": {
+   "module": "provenance",
+   "from": "Activity",
+   "to": "PolicyVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": [
+    "useKind"
+   ],
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSESSED_BY": {
+   "module": "provenance",
+   "from": "EvidenceAssessment",
+   "to": "Agent|Person",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_STATE": {
+   "module": "temporal",
+   "from": "Entity",
+   "to": "VersionedState",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": "bitemporal_attachment",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_IDENTIFIER": {
+   "module": "identity_resolution",
+   "from": "Entity|VersionedState|InformationArtifact",
+   "to": "Identifier",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "MENTIONS": {
+   "module": "identity_resolution",
+   "from": "SourceLocator",
+   "to": "Mention",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RESOLVES_MENTION": {
+   "module": "identity_resolution",
+   "from": "ResolutionHypothesis",
+   "to": "Mention",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "COMPARES_IDENTITIES": {
+   "module": "identity_resolution",
+   "from": "EquivalenceAssessment",
+   "to": "Entity|VersionedState",
+   "class": "structural",
+   "cardinality": "exactly_two_distinct",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_VARIANT": {
+   "module": "products_and_commerce",
+   "from": "Product",
+   "to": "ProductVariant",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_PACKAGE_CONFIGURATION": {
+   "module": "products_and_commerce",
+   "from": "ProductVariant",
+   "to": "PackageConfiguration",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": "asserted_edge",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "IDENTIFIED_BY": {
+   "module": "products_and_commerce",
+   "from": "ProductVariant|PackageConfiguration|MerchantListing",
+   "to": "TradeItemIdentifier",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "LISTING_FOR": {
+   "module": "products_and_commerce",
+   "from": "MerchantListing",
+   "to": "ProductVariant|PackageConfiguration",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_OFFER": {
+   "module": "products_and_commerce",
+   "from": "MerchantListing",
+   "to": "Offer",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_PRICE_OBSERVATION": {
+   "module": "products_and_commerce",
+   "from": "Offer",
+   "to": "PriceObservation",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "USES_SUBSCRIPTION_PLAN": {
+   "module": "products_and_commerce",
+   "from": "Offer",
+   "to": "SubscriptionPlan",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HOSTS_LISTING": {
+   "module": "products_and_commerce",
+   "from": "Organization",
+   "to": "MerchantListing",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "LISTS_OFFER": {
+   "module": "products_and_commerce",
+   "from": "Organization",
+   "to": "Offer",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SELLER_OF_RECORD_FOR": {
+   "module": "products_and_commerce",
+   "from": "Organization",
+   "to": "Offer",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": "asserted_edge",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "FULFILLS_OFFER": {
+   "module": "products_and_commerce",
+   "from": "Organization",
+   "to": "Offer",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": "asserted_edge",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "AFFILIATE_FOR_OFFER": {
+   "module": "products_and_commerce",
+   "from": "Person|Organization",
+   "to": "Offer",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "LINKS_TO": {
+   "module": "products_and_commerce",
+   "from": "AffiliateLink",
+   "to": "MerchantListing|Offer",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_BUNDLE_COMPONENT": {
+   "module": "products_and_commerce",
+   "from": "Bundle",
+   "to": "BundleComponent",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "COMPONENT_PRODUCT": {
+   "module": "products_and_commerce",
+   "from": "BundleComponent",
+   "to": "Product|ProductVariant",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "INVENTORY_INSTANCE_OF": {
+   "module": "products_and_commerce",
+   "from": "InventoryItem",
+   "to": "ProductVariant|PackageConfiguration",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "UNIT_FROM_LOT": {
+   "module": "products_and_commerce",
+   "from": "IndividualUnit",
+   "to": "ProductLot",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "MATCHES_COMMERCE_ITEM": {
+   "module": "products_and_commerce",
+   "from": "CommerceMatch",
+   "to": "ProductVariant|MerchantListing|InventoryItem",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SELLS_PRODUCT": {
+   "module": "products_and_commerce",
+   "from": "Organization",
+   "to": "Product|ProductVariant",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "REALIZES_SUBSTANCE": {
+   "module": "substances_and_materials",
+   "from": "IngredientMaterial",
+   "to": "ChemicalSubstance",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_CHEMICAL_FORM": {
+   "module": "substances_and_materials",
+   "from": "IngredientMaterial",
+   "to": "ChemicalForm",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "FORM_OF_SUBSTANCE": {
+   "module": "substances_and_materials",
+   "from": "ChemicalForm",
+   "to": "ChemicalSubstance",
+   "class": "asserted",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_ACTIVE_MOIETY": {
+   "module": "substances_and_materials",
+   "from": "ChemicalSubstance",
+   "to": "ChemicalSubstance",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "DERIVED_FROM_TAXON": {
+   "module": "substances_and_materials",
+   "from": "BotanicalPreparation",
+   "to": "BotanicalTaxon",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_STRAIN": {
+   "module": "substances_and_materials",
+   "from": "MicrobialPreparation",
+   "to": "MicrobialStrain",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "STRAIN_OF": {
+   "module": "substances_and_materials",
+   "from": "MicrobialStrain",
+   "to": "MicrobialTaxon",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_MIXTURE_COMPONENT": {
+   "module": "substances_and_materials",
+   "from": "MaterialMixture",
+   "to": "IngredientMaterial",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PROVIDES_CONSTITUENT": {
+   "module": "substances_and_materials",
+   "from": "IngredientMaterial",
+   "to": "Constituent|Nutrient",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "QUANTITATIVELY_CONTAINS": {
+   "module": "substances_and_materials",
+   "from": "IngredientMaterial",
+   "to": "Constituent|Nutrient|ChemicalSubstance",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": [
+    "quantity",
+    "unitCode",
+    "basis"
+   ],
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_FORMULATION_VERSION": {
+   "module": "products_and_formulations",
+   "from": "ProductVariant",
+   "to": "FormulationVersion",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": "asserted_edge",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_INGREDIENT_COMPONENT": {
+   "module": "products_and_formulations",
+   "from": "FormulationVersion",
+   "to": "IngredientComponent",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "NESTED_COMPONENT": {
+   "module": "products_and_formulations",
+   "from": "IngredientComponent",
+   "to": "IngredientComponent",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "USES_MATERIAL": {
+   "module": "products_and_formulations",
+   "from": "IngredientComponent",
+   "to": "IngredientMaterial",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "GOVERNED_BY_SPECIFICATION": {
+   "module": "products_and_formulations",
+   "from": "IngredientMaterial",
+   "to": "SpecificationVersion",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "VERSION_OF_SPECIFICATION": {
+   "module": "products_and_formulations",
+   "from": "SpecificationVersion",
+   "to": "ManufacturingSpecification",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PRODUCED_BY_PROCESS": {
+   "module": "products_and_formulations",
+   "from": "IngredientMaterial",
+   "to": "ManufacturingProcess",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_STEP": {
+   "module": "products_and_formulations",
+   "from": "ManufacturingProcess",
+   "to": "ManufacturingStep",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "MARKETED_UNDER_MARK": {
+   "module": "products_and_formulations",
+   "from": "BrandedIngredientMaterial",
+   "to": "Trademark",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CONTAINS": {
+   "module": "products_and_formulations",
+   "from": "Product|ProductVariant",
+   "to": "IngredientMaterial",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": [
+    "derivationRule",
+    "derivedFromAssertionUids"
+   ],
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "CONTAINS_COMPOUND_FORM": {
+   "module": "products_and_formulations",
+   "from": "Product",
+   "to": "ChemicalForm",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "LABEL_FOR": {
+   "module": "labels",
+   "from": "LabelSnapshot",
+   "to": "ProductVariant|PackageConfiguration",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "DECLARES_FORMULATION": {
+   "module": "labels",
+   "from": "LabelSnapshot",
+   "to": "FormulationVersion",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_DECLARATION": {
+   "module": "labels",
+   "from": "LabelSnapshot",
+   "to": "LabelDeclaration",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "DECLARATION_IDENTIFIES_MATERIAL": {
+   "module": "labels",
+   "from": "LabelDeclaration",
+   "to": "IngredientMaterial",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_QUANTITY_DECLARATION": {
+   "module": "labels",
+   "from": "LabelDeclaration",
+   "to": "QuantityDeclaration",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "USES_SERVING_DEFINITION": {
+   "module": "labels",
+   "from": "LabelSnapshot",
+   "to": "ServingDefinition",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "REGISTERED_AS": {
+   "module": "studies_and_evidence",
+   "from": "Study",
+   "to": "TrialRegistration",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_REGISTRATION_VERSION": {
+   "module": "studies_and_evidence",
+   "from": "TrialRegistration",
+   "to": "RegistrationVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": "bitemporal_attachment",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_PROTOCOL_VERSION": {
+   "module": "studies_and_evidence",
+   "from": "Study",
+   "to": "ProtocolVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_ARM": {
+   "module": "studies_and_evidence",
+   "from": "Study",
+   "to": "StudyArm",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSIGNS_INTERVENTION": {
+   "module": "studies_and_evidence",
+   "from": "StudyArm",
+   "to": "StudyIntervention",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_INTERVENTION_COMPONENT": {
+   "module": "studies_and_evidence",
+   "from": "StudyIntervention",
+   "to": "InterventionComponent",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "USES_INTERVENTION_MATERIAL": {
+   "module": "studies_and_evidence",
+   "from": "InterventionComponent",
+   "to": "IngredientMaterial|ProductVariant|ProductLot",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_ELIGIBLE_POPULATION": {
+   "module": "studies_and_evidence",
+   "from": "Study",
+   "to": "StudyPopulation",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_ENROLLED_COHORT": {
+   "module": "studies_and_evidence",
+   "from": "Study",
+   "to": "StudyPopulation",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_ANALYZED_COHORT": {
+   "module": "studies_and_evidence",
+   "from": "StudyResult",
+   "to": "StudyPopulation",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "DEFINES_OUTCOME": {
+   "module": "studies_and_evidence",
+   "from": "Study",
+   "to": "OutcomeDefinition",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "DEFINED_IN": {
+   "module": "studies_and_evidence",
+   "from": "OutcomeDefinition",
+   "to": "RegistrationVersion|ProtocolVersion|Publication",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "MEASURES_BIOMARKER": {
+   "module": "studies_and_evidence",
+   "from": "OutcomeDefinition",
+   "to": "Biomarker",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RESULT_FOR": {
+   "module": "studies_and_evidence",
+   "from": "StudyResult",
+   "to": "OutcomeDefinition",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RESULT_FOR_ARM": {
+   "module": "studies_and_evidence",
+   "from": "StudyResult",
+   "to": "StudyArm",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "REPORTS_ON": {
+   "module": "studies_and_evidence",
+   "from": "Publication",
+   "to": "Study",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PRODUCED_DATASET": {
+   "module": "studies_and_evidence",
+   "from": "Study",
+   "to": "Dataset",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ANALYZES_DATASET": {
+   "module": "studies_and_evidence",
+   "from": "Publication",
+   "to": "Dataset",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": [
+    "analysisRole"
+   ],
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CORRECTS": {
+   "module": "studies_and_evidence",
+   "from": "Publication",
+   "to": "Publication",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RETRACTS": {
+   "module": "studies_and_evidence",
+   "from": "Publication",
+   "to": "Publication",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_EVIDENCE_TARGET": {
+   "module": "studies_and_evidence",
+   "from": "EvidenceApplicability",
+   "to": "StudyIntervention|Assertion",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSESSES_APPLICABILITY_TO": {
+   "module": "studies_and_evidence",
+   "from": "EvidenceApplicability",
+   "to": "Product|ProductVariant|FormulationVersion|ProductLot|IngredientMaterial|UseContextProfile",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "FOR_USE_CONTEXT": {
+   "module": "studies_and_evidence",
+   "from": "EvidenceApplicability",
+   "to": "UseContextProfile",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "BASED_ON_EVIDENCE": {
+   "module": "studies_and_evidence",
+   "from": "EvidenceApplicability",
+   "to": "Study|StudyResult|Publication|Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_DIMENSION": {
+   "module": "studies_and_evidence",
+   "from": "EvidenceApplicability",
+   "to": "ApplicabilityDimension",
+   "class": "structural",
+   "cardinality": "one_per_dimension",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CONSIDERS": {
+   "module": "studies_and_evidence",
+   "from": "ApplicabilityDimension",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CLASSIFIES_OUTCOME": {
+   "module": "studies_and_evidence",
+   "from": "EndpointClassification",
+   "to": "OutcomeDefinition",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CLASSIFIES_BIOMARKER": {
+   "module": "studies_and_evidence",
+   "from": "EndpointClassification",
+   "to": "Biomarker",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "COMPARED_WITH_CONTEXT": {
+   "module": "studies_and_evidence",
+   "from": "EndpointClassification",
+   "to": "EndpointClassification",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "INTERPRETS_RESULT_OF": {
+   "module": "studies_and_evidence",
+   "from": "ResultInterpretation",
+   "to": "StudyResult",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "USES_THRESHOLD_SOURCE": {
+   "module": "studies_and_evidence",
+   "from": "ResultInterpretation",
+   "to": "SourceLocator",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSESSES_CLAIM": {
+   "module": "studies_and_evidence",
+   "from": "EvidenceSynthesis",
+   "to": "Assertion|Claim",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "INCLUDES_RESULT": {
+   "module": "studies_and_evidence",
+   "from": "EvidenceSynthesis",
+   "to": "StudyResult|Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "TRIGGERED_BY": {
+   "module": "studies_and_evidence",
+   "from": "EvidenceSynthesis",
+   "to": "StudyResult|Assertion|Publication|RegistrationVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": [
+    "criterionCode",
+    "effectOnVerdict"
+   ],
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSESSES_STRENGTH_OF": {
+   "module": "studies_and_evidence",
+   "from": "EvidenceStrengthAssessment",
+   "to": "Study|StudyResult|EvidenceSynthesis",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "OBSERVED_IN_CONTEXT": {
+   "module": "mechanisms",
+   "from": "Assertion",
+   "to": "MechanismEvidenceContext",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "IN_SPECIES": {
+   "module": "mechanisms",
+   "from": "MechanismEvidenceContext",
+   "to": "Species",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "MEASURED_IN": {
+   "module": "mechanisms",
+   "from": "MechanismEvidenceContext",
+   "to": "AnatomicalContext",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "EXPOSED_TO": {
+   "module": "mechanisms",
+   "from": "MechanismEvidenceContext",
+   "to": "IngredientMaterial|ChemicalForm|ChemicalSubstance",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "IN_STUDY_ARM": {
+   "module": "mechanisms",
+   "from": "MechanismEvidenceContext",
+   "to": "StudyArm",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "MEASURED_IN_MATRIX": {
+   "module": "mechanisms",
+   "from": "Biomarker",
+   "to": "AnatomicalContext",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "AFFECTS_MECHANISM": {
+   "module": "mechanisms",
+   "from": "IngredientMaterial|ChemicalForm|ChemicalSubstance",
+   "to": "Mechanism",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "MODULATES": {
+   "module": "mechanisms",
+   "from": "ChemicalSubstance|IngredientMaterial",
+   "to": "MolecularEntity",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "APPLIES_TO_SPECIES": {
+   "module": "mechanisms",
+   "from": "Mechanism",
+   "to": "Species",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "INFLUENCES_OUTCOME": {
+   "module": "mechanisms",
+   "from": "Mechanism",
+   "to": "Outcome",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "QUANTIFIES": {
+   "module": "diagnostics",
+   "from": "Metric",
+   "to": "Biomarker",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "MEASURES_METRIC": {
+   "module": "diagnostics",
+   "from": "LabTest",
+   "to": "Metric",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PERFORMED_WITH_ASSAY_VERSION": {
+   "module": "diagnostics",
+   "from": "LabTest",
+   "to": "AssayVersion",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": "asserted_edge",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSAY_FOR_METRIC": {
+   "module": "diagnostics",
+   "from": "AssayVersion",
+   "to": "Metric",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSAY_OPERATED_BY": {
+   "module": "diagnostics",
+   "from": "AssayVersion",
+   "to": "Organization",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "USES_METHOD": {
+   "module": "diagnostics",
+   "from": "AssayVersion",
+   "to": "MeasurementMethod",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RUNS_ON_INSTRUMENT": {
+   "module": "diagnostics",
+   "from": "AssayVersion",
+   "to": "ToolOrInstrument",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ACCEPTS_SPECIMEN_TYPE": {
+   "module": "diagnostics",
+   "from": "AssayVersion",
+   "to": "Specimen",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CALIBRATION_TRACEABLE_TO": {
+   "module": "diagnostics",
+   "from": "AssayVersion",
+   "to": "ReferenceSystem",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "VERSION_OF_ALGORITHM": {
+   "module": "diagnostics",
+   "from": "AlgorithmVersion",
+   "to": "Algorithm",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "DERIVED_FROM_ALGORITHM_VERSION": {
+   "module": "diagnostics",
+   "from": "AlgorithmVersion",
+   "to": "AlgorithmVersion",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "REQUIRES_INPUT_METRIC": {
+   "module": "diagnostics",
+   "from": "AlgorithmVersion",
+   "to": "Metric",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "COMPATIBLE_WITH_ASSAY_VERSION": {
+   "module": "diagnostics",
+   "from": "AlgorithmVersion",
+   "to": "AssayVersion",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "OUTPUTS_METRIC": {
+   "module": "diagnostics",
+   "from": "AlgorithmVersion",
+   "to": "Metric",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "FOR_ASSAY_VERSION": {
+   "module": "diagnostics",
+   "from": "ReferenceIntervalVersion",
+   "to": "AssayVersion",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "FOR_METRIC": {
+   "module": "diagnostics",
+   "from": "ReferenceIntervalVersion",
+   "to": "Metric",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "COMPARES": {
+   "module": "diagnostics",
+   "from": "ComparabilityAssessment",
+   "to": "AssayVersion|AlgorithmVersion|ReferenceIntervalVersion",
+   "class": "structural",
+   "cardinality": "exactly_two",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "INCLUDES_LABTEST": {
+   "module": "diagnostics",
+   "from": "PanelDefinition",
+   "to": "LabTest",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PRODUCED_BY_ASSAY_VERSION": {
+   "module": "diagnostics",
+   "from": "DiagnosticResult",
+   "to": "AssayVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "COMPUTED_BY_ALGORITHM_VERSION": {
+   "module": "diagnostics",
+   "from": "DiagnosticResult",
+   "to": "AlgorithmVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "INTERPRETED_WITH_REFERENCE_INTERVAL_VERSION": {
+   "module": "diagnostics",
+   "from": "DiagnosticResult",
+   "to": "ReferenceIntervalVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "COMPARED_TO": {
+   "module": "diagnostics",
+   "from": "DiagnosticResult",
+   "to": "DiagnosticResult",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": [
+    "derivationRule"
+   ],
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "HAS_REFERENCE_RANGE": {
+   "module": "diagnostics",
+   "from": "Biomarker|Metric",
+   "to": "ReferenceRange",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "SAME_TEST_AS": {
+   "module": "diagnostics",
+   "from": "LabTest",
+   "to": "LabTest",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "LOT_OF": {
+   "module": "quality",
+   "from": "ProductLot",
+   "to": "ProductVariant",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "MANUFACTURED_UNDER": {
+   "module": "quality",
+   "from": "ProductLot",
+   "to": "FormulationVersion|SpecificationVersion",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SAMPLE_FROM": {
+   "module": "quality",
+   "from": "TestSample",
+   "to": "ProductLot|IndividualUnit|IngredientMaterial",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "TESTED_SAMPLE": {
+   "module": "quality",
+   "from": "TestExecution",
+   "to": "TestSample",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "USED_METHOD": {
+   "module": "quality",
+   "from": "TestExecution",
+   "to": "TestMethod",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PERFORMED_BY_LAB": {
+   "module": "quality",
+   "from": "TestExecution",
+   "to": "TestingLaboratory",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PRODUCED_RESULT": {
+   "module": "quality",
+   "from": "TestExecution",
+   "to": "MeasuredResult",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "EVALUATED_AGAINST": {
+   "module": "quality",
+   "from": "MeasuredResult",
+   "to": "SpecificationCriterion",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "INTERPRETS_RESULT": {
+   "module": "quality",
+   "from": "PassFailInterpretation",
+   "to": "MeasuredResult",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SUMMARIZES_TESTING": {
+   "module": "quality",
+   "from": "LotTestSummary",
+   "to": "ProductLot|TestExecution",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CERTIFIES_RESULTS_FOR": {
+   "module": "quality",
+   "from": "CertificateOfAnalysis",
+   "to": "ProductLot|TestExecution",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "PROGRAM_HAS_LISTING": {
+   "module": "quality",
+   "from": "CertificationProgram",
+   "to": "CertificationListing",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_CERTIFICATION_SCOPE": {
+   "module": "quality",
+   "from": "CertificationListing",
+   "to": "CertificationScope",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "COVERS": {
+   "module": "quality",
+   "from": "CertificationScope",
+   "to": "Product|ProductVariant|ProductLot|Facility|TradeItemIdentifier",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CERTIFIED_UNDER": {
+   "module": "quality",
+   "from": "Product|ProductVariant|ProductLot",
+   "to": "CertificationListing",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "FAMILY_HAS_APPLICATION": {
+   "module": "regulatory_and_ip",
+   "from": "PatentFamily",
+   "to": "PatentApplication",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "APPLICATION_GRANTED_AS": {
+   "module": "regulatory_and_ip",
+   "from": "PatentApplication",
+   "to": "GrantedPatent",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_PATENT_CLAIM": {
+   "module": "regulatory_and_ip",
+   "from": "PatentApplication|GrantedPatent",
+   "to": "PatentClaim",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "LICENSE_COVERS": {
+   "module": "regulatory_and_ip",
+   "from": "PatentLicense",
+   "to": "PatentFamily|PatentApplication|GrantedPatent|PatentClaim",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "UNDER_PATHWAY": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatorySubmission",
+   "to": "RegulatoryPathway",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SUBMITTED_BY": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatorySubmission",
+   "to": "Organization",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SUBMISSION_ABOUT": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatorySubmission",
+   "to": "IngredientMaterial|Product|ProductVariant|AlgorithmVersion|Facility",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SUPERSEDES_SUBMISSION": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatorySubmission",
+   "to": "RegulatorySubmission",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SUBMISSION_HAS_RESPONSE": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatorySubmission",
+   "to": "RegulatoryResponse",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ISSUED_BY": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatoryResponse|RegulatoryStatus",
+   "to": "RegulatoryAgency",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "STATUS_OF": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatoryStatus",
+   "to": "Product|ProductVariant|IngredientMaterial|AlgorithmVersion|Facility",
+   "class": "asserted",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RESULTS_FROM_RESPONSE": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatoryStatus",
+   "to": "RegulatoryResponse",
+   "class": "structural",
+   "cardinality": "zero_or_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "UNDER_LEGAL_BASIS": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatoryStatus",
+   "to": "RegulatoryPathway",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_REGULATORY_STEP": {
+   "module": "regulatory_and_ip",
+   "from": "RegulatoryPathway",
+   "to": "RegulatoryStep",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "DESIGNATION_FOR": {
+   "module": "regulatory_and_ip",
+   "from": "OrphanDesignation",
+   "to": "IngredientMaterial|StudyIntervention|Product",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "APPROVAL_FOR": {
+   "module": "regulatory_and_ip",
+   "from": "DrugApproval",
+   "to": "IngredientMaterial|StudyIntervention|Product",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_CAPABILITY_STATE": {
+   "module": "manufacturing_readiness",
+   "from": "Organization|Facility",
+   "to": "ManufacturingCapability",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": "asserted_edge",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CAPABILITY_FOR_PROCESS": {
+   "module": "manufacturing_readiness",
+   "from": "ManufacturingCapability",
+   "to": "ManufacturingProcess",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CAPABILITY_FOR_MATERIAL": {
+   "module": "manufacturing_readiness",
+   "from": "ManufacturingCapability",
+   "to": "IngredientMaterial",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "OCCURS_IN": {
+   "module": "claims_and_documents",
+   "from": "ClaimOccurrence",
+   "to": "Episode|Document",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "APPEARS_IN": {
+   "module": "claims_and_documents",
+   "from": "Person|PseudonymousActor",
+   "to": "Episode",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": [
+    "roleType"
+   ],
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_EPISODE": {
+   "module": "claims_and_documents",
+   "from": "Channel|Series",
+   "to": "Episode",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_SEGMENT": {
+   "module": "claims_and_documents",
+   "from": "Episode",
+   "to": "EpisodeSegment",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RESOLVES_TO_CHUNK": {
+   "module": "claims_and_documents",
+   "from": "SourceLocator",
+   "to": "Chunk",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": [
+    "derivationRule",
+    "segmentationHash"
+   ],
+   "requiredQualifiers": null,
+   "mustBeRegenerable": true,
+   "ruleOnly": null
+  },
+  "QUALIFIED_BY": {
+   "module": "claims_and_documents",
+   "from": "Assertion",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": [
+    "qualificationKind"
+   ],
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RETELLS": {
+   "module": "claims_and_documents",
+   "from": "Assertion",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": [
+    "retellingMode",
+    "linkBasis"
+   ],
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ATTRIBUTES_TO": {
+   "module": "claims_and_documents",
+   "from": "Assertion",
+   "to": "Person|Organization|PseudonymousActor|AnonymousActor",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "INSTANCE_OF": {
+   "module": "claims_and_documents",
+   "from": "Assertion",
+   "to": "Claim",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": true
+  },
+  "ASSESSES_CLAIM_EVIDENCE": {
+   "module": "claims_and_documents",
+   "from": "ClaimEvidenceAssessment",
+   "to": "Claim",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CLAIM_EVIDENCE_BASED_ON": {
+   "module": "claims_and_documents",
+   "from": "ClaimEvidenceAssessment",
+   "to": "Assertion|Study|StudyResult|Publication",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSESSES_RETELLING": {
+   "module": "claims_and_documents",
+   "from": "RetellingFidelityAssessment",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "AGAINST_ORIGINAL": {
+   "module": "claims_and_documents",
+   "from": "RetellingFidelityAssessment",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "IDENTIFIES_LOST_QUALIFICATION": {
+   "module": "claims_and_documents",
+   "from": "RetellingFidelityAssessment",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "FOR_OCCURRENCE": {
+   "module": "claims_and_documents",
+   "from": "ConflictRelevanceAssessment",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": "exactly_one",
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "ASSESSES_INTEREST": {
+   "module": "claims_and_documents",
+   "from": "ConflictRelevanceAssessment",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "SUPPORTED_BY_CHUNK": {
+   "module": "claims_and_documents",
+   "from": "Assertion|Claim|ClaimOccurrence",
+   "to": "Chunk",
+   "class": "derived",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": [
+    "locatorUid"
+   ],
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_PROTOCOL_EDITION": {
+   "module": "protocols",
+   "from": "Protocol",
+   "to": "ProtocolEdition",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": "asserted_edge",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_PROTOCOL_STEP": {
+   "module": "protocols",
+   "from": "ProtocolEdition",
+   "to": "ProtocolStep",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": [
+    "orderIndex"
+   ],
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "DEPENDS_ON": {
+   "module": "protocols",
+   "from": "ProtocolStep",
+   "to": "ProtocolStep",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": [
+    "dependencyKind"
+   ],
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_CONSTRAINT": {
+   "module": "protocols",
+   "from": "ProtocolEdition|ProtocolStep",
+   "to": "Constraint",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": [
+    "constraintRole"
+   ],
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "BASED_ON": {
+   "module": "protocols",
+   "from": "Constraint",
+   "to": "Condition|Biomarker|LabTest|Metric",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_MEASUREMENT_PLAN": {
+   "module": "protocols",
+   "from": "ProtocolEdition",
+   "to": "MeasurementPlan",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "TRACKS_METRIC": {
+   "module": "protocols",
+   "from": "MeasurementPlan",
+   "to": "Metric",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_ADJUSTMENT_RULE": {
+   "module": "protocols",
+   "from": "ProtocolEdition",
+   "to": "ProtocolAdjustmentRule",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RULE_TRIGGERED_BY": {
+   "module": "protocols",
+   "from": "ProtocolAdjustmentRule",
+   "to": "Metric",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "MODIFIES_STEP": {
+   "module": "protocols",
+   "from": "ProtocolAdjustmentRule",
+   "to": "ProtocolStep",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_FUNCTIONAL_GOAL": {
+   "module": "protocols",
+   "from": "ProtocolEdition",
+   "to": "FunctionalGoal",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "FOR_PROTOCOL": {
+   "module": "protocols",
+   "from": "ProtocolResult",
+   "to": "Protocol|ProtocolEdition",
+   "class": "asserted",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "INCLUDES_OBSERVATION": {
+   "module": "protocols",
+   "from": "ProtocolResult",
+   "to": "Observation",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_OPTION": {
+   "module": "recommendation_decisions",
+   "from": "RecommendationSnapshot",
+   "to": "RecommendationOption",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "FOR_REQUEST": {
+   "module": "recommendation_decisions",
+   "from": "RecommendationSnapshot",
+   "to": "RecommendationRequest",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "USED_CONTEXT_VERSION": {
+   "module": "recommendation_decisions",
+   "from": "RecommendationSnapshot",
+   "to": "UserContextVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_CRITERION_VALUE": {
+   "module": "recommendation_decisions",
+   "from": "RecommendationOption",
+   "to": "DecisionCriterionValue",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "RESPONDS_TO": {
+   "module": "recommendation_decisions",
+   "from": "UserDecision",
+   "to": "RecommendationSnapshot",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_CONTEXT_VERSION": {
+   "module": "private_context",
+   "from": "UserContext",
+   "to": "UserContextVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": "bitemporal_attachment",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_GOAL": {
+   "module": "private_context",
+   "from": "UserContext",
+   "to": "UserGoal",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_GOAL_VERSION": {
+   "module": "private_context",
+   "from": "UserGoal",
+   "to": "UserGoalVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": "bitemporal_attachment",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_PROTOCOL_IN_USE": {
+   "module": "private_context",
+   "from": "UserContext",
+   "to": "ProtocolInUse",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_ADOPTION_VERSION": {
+   "module": "private_context",
+   "from": "ProtocolInUse",
+   "to": "ProtocolAdoptionVersion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": "bitemporal_attachment",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_DEVIATION": {
+   "module": "private_context",
+   "from": "ProtocolAdoptionVersion",
+   "to": "ProtocolDeviation",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "HAS_SHARING_GRANT": {
+   "module": "private_context",
+   "from": "UserContext",
+   "to": "SharingGrant",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": "bitemporal_attachment",
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CITES_ASSERTION": {
+   "module": "access_and_answers",
+   "from": "AnswerRecord",
+   "to": "Assertion",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  },
+  "CITES_ASSESSMENT": {
+   "module": "access_and_answers",
+   "from": "AnswerRecord",
+   "to": "EvidenceAssessment",
+   "class": "structural",
+   "cardinality": null,
+   "temporalProfile": null,
+   "properties": null,
+   "requiredProperties": null,
+   "requiredQualifiers": null,
+   "mustBeRegenerable": null,
+   "ruleOnly": null
+  }
+ },
+ "liveSeamTypes": [
+  "ToolOrInstrument",
+  "ReferenceRange",
+  "Listing",
+  "ListingSnapshot",
+  "OrganizationSnapshot",
+  "ProductSnapshot",
+  "Device",
+  "Sensor",
+  "Modality",
+  "Conference",
+  "Event",
+  "Community",
+  "NarrativeArc",
+  "MediaAsset",
+  "MediaVariant",
+  "MediaAnnotation",
+  "MediaSource",
+  "GraphView",
+  "FigurePanel",
+  "ProductLabelRegion",
+  "Procedure",
+  "Treatment",
+  "FoodItem",
+  "Ingredient",
+  "FoodProduct",
+  "Exposure",
+  "Lifestyle",
+  "AdverseEffect",
+  "SafetySignal",
+  "RiskFactor",
+  "TechnologyPlatform",
+  "Material",
+  "CohortParticipant",
+  "ExperienceReport",
+  "Association"
+ ],
+ "uidTypeTokens": {
+  "Organization": "org",
+  "LegalEntity": "org",
+  "ConsumerBrand": "brand",
+  "Facility": "facility",
+  "Person": "person",
+  "PseudonymousActor": "pseudonymous-actor",
+  "AnonymousActor": "anonymous-actor",
+  "Agent": "agent",
+  "Activity": "activity",
+  "Product": "product",
+  "ProductVariant": "product-variant",
+  "FormulationVersion": "formulation",
+  "IngredientComponent": "component",
+  "IngredientMaterial": "material",
+  "ChemicalSubstance": "substance",
+  "ChemicalForm": "form",
+  "Source": "source",
+  "SourceSnapshot": "snapshot",
+  "SourceLocator": "locator",
+  "SourceRevisionEvent": "source-revision",
+  "Document": "document",
+  "DocumentTextVersion": "text-version",
+  "Chunk": "chunk",
+  "Claim": "claim",
+  "ClaimOccurrence": "claim-occurrence",
+  "RelationshipAssertion": "assertion",
+  "Assertion": "assertion",
+  "Adjudication": "adjudication",
+  "EvidenceApplicability": "applicability",
+  "ApplicabilityDimension": "applicability-dimension",
+  "EvidenceAssessment": "assessment",
+  "ResolutionHypothesis": "resolution",
+  "Identifier": "identifier",
+  "Study": "study",
+  "StudyArm": "arm",
+  "StudyIntervention": "intervention",
+  "Publication": "publication",
+  "AssayVersion": "assay-version",
+  "AlgorithmVersion": "algorithm-version",
+  "RegulatoryStatus": "regulatory-status",
+  "Protocol": "protocol",
+  "ProtocolEdition": "protocol-edition",
+  "AnswerRecord": "answer-record",
+  "Episode": "episode",
+  "EpisodeSegment": "episode-segment",
+  "Channel": "channel",
+  "Series": "series",
+  "algorithm": "algorithm",
+  "anatomical-context": "anatomical-context",
+  "biomarker": "biomarker",
+  "capability": "capability",
+  "chemical-form": "chemical-form",
+  "comparability": "comparability",
+  "constraint": "constraint",
+  "dataset": "dataset",
+  "endpoint-classification": "endpoint-classification",
+  "functional-goal": "functional-goal",
+  "instrument": "instrument",
+  "intervention-component": "intervention-component",
+  "lab-test": "lab-test",
+  "label-declaration": "label-declaration",
+  "listing": "listing",
+  "mech-context": "mech-context",
+  "mechanism": "mechanism",
+  "method": "method",
+  "metric": "metric",
+  "molecular-entity": "molecular-entity",
+  "offer": "offer",
+  "outcome": "outcome",
+  "policy": "policy",
+  "policy-version": "policy-version",
+  "price-obs": "price-obs",
+  "protocol-rule": "protocol-rule",
+  "protocol-step": "protocol-step",
+  "reference-system": "reference-system",
+  "reg-pathway": "reg-pathway",
+  "reg-response": "reg-response",
+  "reg-status": "reg-status",
+  "reg-submission": "reg-submission",
+  "registration-version": "registration-version",
+  "rel": "rel",
+  "result": "result",
+  "ri-version": "ri-version",
+  "species": "species",
+  "specimen-type": "specimen-type",
+  "study-arm": "study-arm",
+  "study-intervention": "study-intervention",
+  "study-result": "study-result",
+  "synthesis": "synthesis",
+  "trade-id": "trade-id",
+  "trial-registration": "trial-registration",
+  "use-profile": "use-profile"
+ }
+}

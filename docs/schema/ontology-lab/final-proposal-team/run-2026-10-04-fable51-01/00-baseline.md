@@ -95,3 +95,9 @@ Connected in this session: PubMed (`mcp__PubMed__*`), ClinicalTrials.gov v2 (`mc
 ## User-input items carried from the handoff (section 8), unchanged
 
 Fable 5.1 availability is verified for this run. Still open for the user: broad-biotech expansion scope; deployment Neo4j edition/minor and GraphQL pin (this run declares 5.26.31 Community + 7.6.3 as the test target only); worker budget (this run queues 24 packages in waves on Opus 5.5); rights/use policy vocabulary, private-data retention, aggregation thresholds, applicability calibration.
+
+## Additional library facts established after the freeze (same pins)
+
+4. **Interfaces with relationships.** An interface field annotated `@declareRelationship` with implementing types using `@relationship` builds under 7.6.3 (`probe2.graphql`): a `DiagnosticResult` interface declaring `producedByAssayVersion` implemented by an `Observation` type. The contract therefore allows the catalog's `DiagnosticResult` contract to be a GraphQL interface with declared relationships.
+5. **Provider-less vector index.** `@vector(indexes: [{indexName, embeddingProperty, queryName}])` **without** `provider:` builds with no feature configuration and generates a `search…ByVector(vector: [Float!])` query (no phrase argument). This is the form D-014 mandates; the live schema's `provider: OPEN_AI` form is the one that fails without a configured token.
+6. **Baseline suite rehearsal.** The six 0.2.0 fixtures and the 174-query validation suite run on the embedded 5.26.31 instance and reproduce the recorded informational counts; V-110 now flags three Elysium assertions because that fixture stamps `recordedAt = datetime()` against a fixed adjudication `reviewedAt` of 2026-10-04T00:00Z (details in `validation/01-baseline-rehearsal.md`).

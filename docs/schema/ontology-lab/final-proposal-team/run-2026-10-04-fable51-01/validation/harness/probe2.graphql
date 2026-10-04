@@ -1,0 +1,27 @@
+interface Entity { id: ID! uid: String! name: String description: String }
+interface InformationArtifactArchetype { artifactType: String! }
+enum DiagnosticResultKind { MEASURED CALCULATED INFERRED }
+interface DiagnosticResult {
+  resultKind: DiagnosticResultKind!
+  valueNumber: Float
+  producedByAssayVersion: [AssayVersion!]! @declareRelationship
+}
+type AssayVersion implements Entity @node(labels: ["AssayVersion", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+}
+type Observation implements Entity & InformationArtifactArchetype & DiagnosticResult @node(labels: ["Observation", "InformationArtifact"]) @fulltext(indexes: [{indexName: "ObservationSearch", fields: ["name", "description"], queryName: "searchObservations"}]) @vector(indexes: [{indexName: "ObservationEmbedding", embeddingProperty: "searchEmbedding", queryName: "searchObservationsByVector"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  artifactType: String!
+  resultKind: DiagnosticResultKind!
+  valueNumber: Float
+  searchEmbedding: [Float!]
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  producedByAssayVersion: [AssayVersion!]! @relationship(type: "PRODUCED_BY_ASSAY_VERSION", direction: OUT)
+}

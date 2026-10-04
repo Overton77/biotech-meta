@@ -1,0 +1,2974 @@
+{
+ "interfaces": [
+  "Entity",
+  "SearchIndexable",
+  "TemporalSnapshot",
+  "ActorIdentity"
+ ],
+ "nodeTypes": [
+  "Organization",
+  "OrganizationSnapshot",
+  "PhysicalLocation",
+  "Compound",
+  "CompoundForm",
+  "Product",
+  "ProductSnapshot",
+  "Procedure",
+  "Treatment",
+  "Listing",
+  "ListingSnapshot",
+  "FoodItem",
+  "Ingredient",
+  "FoodProduct",
+  "Exposure",
+  "Lifestyle",
+  "AdverseEffect",
+  "SafetySignal",
+  "Person",
+  "PseudonymousActor",
+  "AnonymousActor",
+  "CohortParticipant",
+  "Mechanism",
+  "Pathway",
+  "Organ",
+  "Condition",
+  "Outcome",
+  "Biomarker",
+  "Metric",
+  "ReferenceRange",
+  "MolecularEntity",
+  "AnatomicalContext",
+  "Species",
+  "RiskFactor",
+  "TechnologyPlatform",
+  "ToolOrInstrument",
+  "PanelDefinition",
+  "LabTest",
+  "MeasurementMethod",
+  "Specimen",
+  "Device",
+  "Modality",
+  "Sensor",
+  "ManufacturingProcess",
+  "ManufacturingStep",
+  "Material",
+  "RegulatoryPathway",
+  "RegulatoryStep",
+  "RegulatoryStatus",
+  "RegulatoryAgency",
+  "Study",
+  "StudyOutcome",
+  "StudyArm",
+  "OutcomeMeasure",
+  "OutcomeResult",
+  "Dataset",
+  "Population",
+  "Protocol",
+  "ProtocolStep",
+  "Constraint",
+  "MeasurementPlan",
+  "Target",
+  "FunctionalGoal",
+  "Observation",
+  "ProtocolAdjustmentRule",
+  "ProtocolResult",
+  "Community",
+  "Conference",
+  "Event",
+  "NarrativeArc",
+  "MediaAsset",
+  "MediaVariant",
+  "MediaAnnotation",
+  "MediaSource",
+  "GraphView",
+  "FigurePanel",
+  "ProductLabelRegion",
+  "RelationshipAssertion",
+  "Document",
+  "DocumentTextVersion",
+  "Segmentation",
+  "Chunk",
+  "Association",
+  "Claim",
+  "ClaimOccurrence",
+  "ExperienceReport",
+  "Episode",
+  "EpisodeSegment",
+  "Platform",
+  "Channel",
+  "Series"
+ ],
+ "relationshipPropertyTypes": [
+  "TemporalMetadata",
+  "OwnershipMetadata",
+  "RoleMetadata",
+  "RecommendationMetadata",
+  "UsageMetadata",
+  "ListingMetadata",
+  "OrderingMetadata",
+  "ExtractionMetadata",
+  "MeasurementMetadata",
+  "DoseMetadata",
+  "InterventionArmMetadata",
+  "TreatmentComponentMetadata",
+  "TreatmentTargetMetadata",
+  "SafetyMetadata",
+  "AssociationMetadata",
+  "MechanismLinkMetadata",
+  "MediaLinkMetadata",
+  "MediaSourceMetadata",
+  "AnnotationMetadata",
+  "RenderingMetadata",
+  "BiologicalModelMetadata",
+  "MolecularRenderingMetadata"
+ ],
+ "enums": [
+  "EvidenceStrength",
+  "AssociationPolarity",
+  "RoleType",
+  "CorporateRoleType",
+  "SeniorityLevel",
+  "MediaRelationRole",
+  "OrganizationType",
+  "FundingStage",
+  "EmployeeCountBand",
+  "LocationType",
+  "ProductStatus",
+  "TreatmentModality",
+  "SafetySeverity",
+  "OutcomeDirection",
+  "ProtocolType",
+  "SchedulePattern",
+  "CadenceUnit",
+  "TimeOfDay",
+  "DayOfWeek",
+  "ProtocolStepType",
+  "EventCategory",
+  "ImpactLevel",
+  "EventStatus",
+  "EventPhase",
+  "MediaAssetType",
+  "MediaFormat",
+  "MediaPurpose",
+  "MediaGenerationMode",
+  "MediaVariantKind",
+  "AnnotationType",
+  "MediaSourceType",
+  "GraphViewType",
+  "LabelRegionType",
+  "DocumentType",
+  "DocumentDomain",
+  "ClaimType"
+ ],
+ "unions": [
+  "Producible",
+  "Sponsorable",
+  "ContractManufacturingTarget",
+  "ProductClassification",
+  "ExposureAgent",
+  "TreatmentComponent",
+  "SafetySubject",
+  "Recommendable",
+  "StudyIntervention",
+  "StepSubstance",
+  "StepInstrument",
+  "TherapeuticTarget",
+  "ConstraintBasis",
+  "ProtocolResultMention",
+  "ProvenanceSource",
+  "EventParticipant",
+  "EventSubject",
+  "EvidenceSubject",
+  "ClaimSubject",
+  "AssociationParticipant",
+  "ClaimSpeaker",
+  "ExperienceAuthor",
+  "DocumentAuthor",
+  "OccurrenceContainer",
+  "ExtractionSource",
+  "EpisodeMentionable",
+  "MediaSubject",
+  "MediaVisualizableRelationship",
+  "ProductLabelMention"
+ ],
+ "relationshipTypes": {
+  "HAS_SNAPSHOT": [
+   {
+    "type": "Organization",
+    "field": "snapshots",
+    "target": "OrganizationSnapshot",
+    "direction": "OUT",
+    "properties": null
+   },
+   {
+    "type": "OrganizationSnapshot",
+    "field": "organization",
+    "target": "Organization",
+    "direction": "IN",
+    "properties": null
+   },
+   {
+    "type": "Product",
+    "field": "snapshots",
+    "target": "ProductSnapshot",
+    "direction": "OUT",
+    "properties": null
+   },
+   {
+    "type": "ProductSnapshot",
+    "field": "product",
+    "target": "Product",
+    "direction": "IN",
+    "properties": null
+   },
+   {
+    "type": "Listing",
+    "field": "snapshots",
+    "target": "ListingSnapshot",
+    "direction": "OUT",
+    "properties": null
+   },
+   {
+    "type": "ListingSnapshot",
+    "field": "listing",
+    "target": "Listing",
+    "direction": "IN",
+    "properties": null
+   }
+  ],
+  "LISTS": [
+   {
+    "type": "Organization",
+    "field": "listings",
+    "target": "Listing",
+    "direction": "OUT",
+    "properties": "ListingMetadata"
+   },
+   {
+    "type": "Listing",
+    "field": "offeredBy",
+    "target": "Organization",
+    "direction": "IN",
+    "properties": "ListingMetadata"
+   }
+  ],
+  "HAS_LOCATION": [
+   {
+    "type": "Organization",
+    "field": "locations",
+    "target": "PhysicalLocation",
+    "direction": "OUT",
+    "properties": "TemporalMetadata"
+   }
+  ],
+  "DEVELOPS_PLATFORM": [
+   {
+    "type": "Organization",
+    "field": "developsPlatforms",
+    "target": "TechnologyPlatform",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "USES_PLATFORM": [
+   {
+    "type": "Organization",
+    "field": "usesPlatforms",
+    "target": "TechnologyPlatform",
+    "direction": "OUT",
+    "properties": "UsageMetadata"
+   },
+   {
+    "type": "LabTest",
+    "field": "usesPlatforms",
+    "target": "TechnologyPlatform",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   },
+   {
+    "type": "ManufacturingStep",
+    "field": "usesPlatforms",
+    "target": "TechnologyPlatform",
+    "direction": "OUT",
+    "properties": "UsageMetadata"
+   }
+  ],
+  "USES": [
+   {
+    "type": "Organization",
+    "field": "usesTools",
+    "target": "ToolOrInstrument",
+    "direction": "OUT",
+    "properties": "UsageMetadata"
+   },
+   {
+    "type": "ProtocolStep",
+    "field": "uses",
+    "target": "StepSubstance",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "OFFERS": [
+   {
+    "type": "Organization",
+    "field": "offersProducts",
+    "target": "Producible",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Product",
+    "field": "offeredBy",
+    "target": "Organization",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "OFFERS_PROCEDURE": [
+   {
+    "type": "Organization",
+    "field": "offersProcedures",
+    "target": "Procedure",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Procedure",
+    "field": "offeredBy",
+    "target": "Organization",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "DEVELOPS_TREATMENT": [
+   {
+    "type": "Organization",
+    "field": "developsTreatments",
+    "target": "Treatment",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Treatment",
+    "field": "developedBy",
+    "target": "Organization",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "OFFERS_TREATMENT": [
+   {
+    "type": "Organization",
+    "field": "offersTreatments",
+    "target": "Treatment",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Treatment",
+    "field": "offeredBy",
+    "target": "Organization",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "WORKS_ON_CONDITION": [
+   {
+    "type": "Organization",
+    "field": "worksOnConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Condition",
+    "field": "workedOnBy",
+    "target": "Organization",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "MANUFACTURES": [
+   {
+    "type": "Organization",
+    "field": "manufactures",
+    "target": "Producible",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Product",
+    "field": "manufacturedBy",
+    "target": "Organization",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "PERFORMS_PROCESS": [
+   {
+    "type": "Organization",
+    "field": "performsProcesses",
+    "target": "ManufacturingProcess",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "CONTROLS": [
+   {
+    "type": "Organization",
+    "field": "controls",
+    "target": "Organization",
+    "direction": "OUT",
+    "properties": "OwnershipMetadata"
+   }
+  ],
+  "CONTRACTS_MANUFACTURING": [
+   {
+    "type": "Organization",
+    "field": "contractsManufacturing",
+    "target": "ContractManufacturingTarget",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Product",
+    "field": "contractManufacturedBy",
+    "target": "Organization",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "SPONSORS": [
+   {
+    "type": "Organization",
+    "field": "sponsors",
+    "target": "Sponsorable",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "EXHIBITS_AT": [
+   {
+    "type": "Organization",
+    "field": "exhibitsAt",
+    "target": "Conference",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "OPERATES_CHANNEL": [
+   {
+    "type": "Organization",
+    "field": "operatesChannels",
+    "target": "Channel",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "EMPLOYS": [
+   {
+    "type": "Organization",
+    "field": "employs",
+    "target": "Person",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "ProtocolStep",
+    "field": "employs",
+    "target": "StepInstrument",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_BOARD_MEMBER": [
+   {
+    "type": "Organization",
+    "field": "hasBoardMembers",
+    "target": "Person",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "FOUNDED_BY": [
+   {
+    "type": "Organization",
+    "field": "foundedBy",
+    "target": "Person",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_CEO": [
+   {
+    "type": "Organization",
+    "field": "hasCeos",
+    "target": "Person",
+    "direction": "OUT",
+    "properties": "TemporalMetadata"
+   }
+  ],
+  "SUPPORTED_BY_DOCUMENT": [
+   {
+    "type": "OrganizationSnapshot",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "ProductSnapshot",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Procedure",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Treatment",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Lifestyle",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "AdverseEffect",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "SafetySignal",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "StudyOutcome",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "StudyArm",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "OutcomeMeasure",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "OutcomeResult",
+    "field": "supportedByDocuments",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "SUPPORTED_BY_CHUNK": [
+   {
+    "type": "OrganizationSnapshot",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "ProductSnapshot",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Procedure",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Treatment",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Lifestyle",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "AdverseEffect",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "SafetySignal",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "StudyOutcome",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "StudyArm",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "OutcomeMeasure",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "OutcomeResult",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "MediaAnnotation",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "GraphView",
+    "field": "supportedByChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "HOSTS_PROCESS": [
+   {
+    "type": "PhysicalLocation",
+    "field": "hostsProcesses",
+    "target": "ManufacturingProcess",
+    "direction": "OUT",
+    "properties": "TemporalMetadata"
+   }
+  ],
+  "HOSTS_PRODUCT": [
+   {
+    "type": "PhysicalLocation",
+    "field": "hostsProducts",
+    "target": "Product",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "IS_FORM_OF": [
+   {
+    "type": "Compound",
+    "field": "forms",
+    "target": "CompoundForm",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "CompoundForm",
+    "field": "formOf",
+    "target": "Compound",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "MODULATES": [
+   {
+    "type": "Compound",
+    "field": "modulates",
+    "target": "MolecularEntity",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "HAS_SAFETY_SIGNAL": [
+   {
+    "type": "Compound",
+    "field": "hasSafetySignals",
+    "target": "SafetySignal",
+    "direction": "OUT",
+    "properties": "SafetyMetadata"
+   },
+   {
+    "type": "Product",
+    "field": "hasSafetySignals",
+    "target": "SafetySignal",
+    "direction": "OUT",
+    "properties": "SafetyMetadata"
+   },
+   {
+    "type": "Procedure",
+    "field": "hasSafetySignals",
+    "target": "SafetySignal",
+    "direction": "OUT",
+    "properties": "SafetyMetadata"
+   },
+   {
+    "type": "Treatment",
+    "field": "hasSafetySignals",
+    "target": "SafetySignal",
+    "direction": "OUT",
+    "properties": "SafetyMetadata"
+   },
+   {
+    "type": "FoodItem",
+    "field": "hasSafetySignals",
+    "target": "SafetySignal",
+    "direction": "OUT",
+    "properties": "SafetyMetadata"
+   },
+   {
+    "type": "Ingredient",
+    "field": "hasSafetySignals",
+    "target": "SafetySignal",
+    "direction": "OUT",
+    "properties": "SafetyMetadata"
+   },
+   {
+    "type": "FoodProduct",
+    "field": "hasSafetySignals",
+    "target": "SafetySignal",
+    "direction": "OUT",
+    "properties": "SafetyMetadata"
+   },
+   {
+    "type": "Lifestyle",
+    "field": "hasSafetySignals",
+    "target": "SafetySignal",
+    "direction": "OUT",
+    "properties": "SafetyMetadata"
+   },
+   {
+    "type": "SafetySignal",
+    "field": "subjects",
+    "target": "SafetySubject",
+    "direction": "IN",
+    "properties": "SafetyMetadata"
+   }
+  ],
+  "AFFECTS_MECHANISM": [
+   {
+    "type": "CompoundForm",
+    "field": "affectsMechanisms",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "Lifestyle",
+    "field": "affectsMechanisms",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "LISTS_PRODUCT": [
+   {
+    "type": "Product",
+    "field": "listedIn",
+    "target": "Listing",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Listing",
+    "field": "listsProducts",
+    "target": "Product",
+    "direction": "OUT",
+    "properties": "TemporalMetadata"
+   }
+  ],
+  "CONTAINS_COMPOUND_FORM": [
+   {
+    "type": "Product",
+    "field": "containsCompoundForms",
+    "target": "CompoundForm",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "IMPLEMENTS": [
+   {
+    "type": "Product",
+    "field": "implementsPlatforms",
+    "target": "TechnologyPlatform",
+    "direction": "OUT",
+    "properties": "UsageMetadata"
+   }
+  ],
+  "CLASSIFIED_AS": [
+   {
+    "type": "Product",
+    "field": "classifiedAs",
+    "target": "ProductClassification",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "IMPLEMENTS_PANEL": [
+   {
+    "type": "Product",
+    "field": "implementsPanels",
+    "target": "PanelDefinition",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Listing",
+    "field": "implementsPanels",
+    "target": "PanelDefinition",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "DELIVERS_LABTEST": [
+   {
+    "type": "Product",
+    "field": "deliversLabTests",
+    "target": "LabTest",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "FOLLOWS_PATHWAY": [
+   {
+    "type": "Product",
+    "field": "followsRegulatoryPathways",
+    "target": "RegulatoryPathway",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_REGULATORY_STATUS": [
+   {
+    "type": "Product",
+    "field": "hasRegulatoryStatuses",
+    "target": "RegulatoryStatus",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "LISTS_PROCEDURE": [
+   {
+    "type": "Procedure",
+    "field": "listedIn",
+    "target": "Listing",
+    "direction": "IN",
+    "properties": "TemporalMetadata"
+   },
+   {
+    "type": "Listing",
+    "field": "listsProcedures",
+    "target": "Procedure",
+    "direction": "OUT",
+    "properties": "TemporalMetadata"
+   }
+  ],
+  "TARGETS_CONDITION": [
+   {
+    "type": "Treatment",
+    "field": "targetsConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "TreatmentTargetMetadata"
+   },
+   {
+    "type": "Condition",
+    "field": "treatedBy",
+    "target": "Treatment",
+    "direction": "IN",
+    "properties": "TreatmentTargetMetadata"
+   }
+  ],
+  "USES_COMPONENT": [
+   {
+    "type": "Treatment",
+    "field": "usesComponents",
+    "target": "TreatmentComponent",
+    "direction": "OUT",
+    "properties": "TreatmentComponentMetadata"
+   }
+  ],
+  "EVALUATES": [
+   {
+    "type": "Treatment",
+    "field": "evaluatedInStudies",
+    "target": "Study",
+    "direction": "IN",
+    "properties": "InterventionArmMetadata"
+   },
+   {
+    "type": "Study",
+    "field": "evaluates",
+    "target": "StudyIntervention",
+    "direction": "OUT",
+    "properties": "InterventionArmMetadata"
+   }
+  ],
+  "AVAILABLE_IN": [
+   {
+    "type": "Listing",
+    "field": "availableIn",
+    "target": "PhysicalLocation",
+    "direction": "OUT",
+    "properties": "ListingMetadata"
+   }
+  ],
+  "VARIANT_OF": [
+   {
+    "type": "FoodItem",
+    "field": "hasVariants",
+    "target": "FoodItem",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "CONTAINS_COMPOUND": [
+   {
+    "type": "FoodItem",
+    "field": "containsCompounds",
+    "target": "Compound",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   },
+   {
+    "type": "Ingredient",
+    "field": "containsCompounds",
+    "target": "Compound",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "HAS_INGREDIENT": [
+   {
+    "type": "FoodProduct",
+    "field": "hasIngredients",
+    "target": "Ingredient",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "INVOLVES": [
+   {
+    "type": "Exposure",
+    "field": "involves",
+    "target": "ExposureAgent",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Event",
+    "field": "involves",
+    "target": "EventParticipant",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "ASSOCIATED_WITH_CONDITION": [
+   {
+    "type": "Lifestyle",
+    "field": "associatedWithConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "AdverseEffect",
+    "field": "associatedWithConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "Outcome",
+    "field": "associatedWithConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "ASSOCIATED_WITH_OUTCOME": [
+   {
+    "type": "Lifestyle",
+    "field": "associatedWithOutcomes",
+    "target": "Outcome",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "AFFECTS_ORGAN": [
+   {
+    "type": "AdverseEffect",
+    "field": "affectsOrgans",
+    "target": "Organ",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "SafetySignal",
+    "field": "affectsOrgans",
+    "target": "Organ",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "Condition",
+    "field": "affectsOrgans",
+    "target": "Organ",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "RELATES_TO_EFFECT": [
+   {
+    "type": "SafetySignal",
+    "field": "relatesToEffects",
+    "target": "AdverseEffect",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "RELATES_TO_CONDITION": [
+   {
+    "type": "SafetySignal",
+    "field": "relatesToConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "Condition",
+    "field": "relatedSafetySignals",
+    "target": "SafetySignal",
+    "direction": "IN",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "REPORTS_SAFETY_SIGNAL": [
+   {
+    "type": "SafetySignal",
+    "field": "reportedInStudies",
+    "target": "Study",
+    "direction": "IN",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "Study",
+    "field": "reportsSafetySignals",
+    "target": "SafetySignal",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "HOLDS_ROLE_AT": [
+   {
+    "type": "Person",
+    "field": "holdsRoleAt",
+    "target": "Organization",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "AFFILIATED_WITH": [
+   {
+    "type": "Person",
+    "field": "affiliatedWith",
+    "target": "Organization",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "ADVISES": [
+   {
+    "type": "Person",
+    "field": "advises",
+    "target": "Organization",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "SERVES_ON_CHANNEL": [
+   {
+    "type": "Person",
+    "field": "servesOnChannels",
+    "target": "Channel",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "APPEARS_IN": [
+   {
+    "type": "Person",
+    "field": "appearsIn",
+    "target": "Episode",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Episode",
+    "field": "personsInEpisode",
+    "target": "Person",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "RECOMMENDS": [
+   {
+    "type": "Person",
+    "field": "recommends",
+    "target": "Recommendable",
+    "direction": "OUT",
+    "properties": "RecommendationMetadata"
+   }
+  ],
+  "SPEAKS_AT": [
+   {
+    "type": "Person",
+    "field": "speaksAt",
+    "target": "Event",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "ATTENDS": [
+   {
+    "type": "Person",
+    "field": "attends",
+    "target": "Conference",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "LINKS_TO": [
+   {
+    "type": "Person",
+    "field": "linksTo",
+    "target": "PseudonymousActor",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "PseudonymousActor",
+    "field": "linkedFrom",
+    "target": "Person",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_PARTICIPANT_TOKEN": [
+   {
+    "type": "Person",
+    "field": "hasParticipantTokens",
+    "target": "CohortParticipant",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "RECORDS": [
+   {
+    "type": "Person",
+    "field": "recordsObservations",
+    "target": "Observation",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "POSTS_RESULT": [
+   {
+    "type": "Person",
+    "field": "postsResults",
+    "target": "ProtocolResult",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "ProtocolResult",
+    "field": "postedBy",
+    "target": "Person",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "AUTHORS": [
+   {
+    "type": "Person",
+    "field": "authorsReports",
+    "target": "ExperienceReport",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "PseudonymousActor",
+    "field": "authorsReports",
+    "target": "ExperienceReport",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "AnonymousActor",
+    "field": "authorsReports",
+    "target": "ExperienceReport",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "ExperienceReport",
+    "field": "authors",
+    "target": "ExperienceAuthor",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "ON_PLATFORM": [
+   {
+    "type": "PseudonymousActor",
+    "field": "onPlatforms",
+    "target": "Platform",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Episode",
+    "field": "onPlatforms",
+    "target": "Platform",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "REPORTS": [
+   {
+    "type": "CohortParticipant",
+    "field": "reportsExperiences",
+    "target": "ExperienceReport",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "ExperienceReport",
+    "field": "reportedBy",
+    "target": "CohortParticipant",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "INVOLVES_PATHWAY": [
+   {
+    "type": "Mechanism",
+    "field": "involvesPathways",
+    "target": "Pathway",
+    "direction": "OUT",
+    "properties": "MechanismLinkMetadata"
+   },
+   {
+    "type": "Condition",
+    "field": "involvesPathways",
+    "target": "Pathway",
+    "direction": "OUT",
+    "properties": "MechanismLinkMetadata"
+   }
+  ],
+  "ACTS_IN": [
+   {
+    "type": "Mechanism",
+    "field": "actsInOrgans",
+    "target": "Organ",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "Pathway",
+    "field": "actsInOrgans",
+    "target": "Organ",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "ACTS_IN_CONTEXT": [
+   {
+    "type": "Mechanism",
+    "field": "actsInContexts",
+    "target": "AnatomicalContext",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "APPLIES_TO_SPECIES": [
+   {
+    "type": "Mechanism",
+    "field": "appliesToSpecies",
+    "target": "Species",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "Condition",
+    "field": "appliesToSpecies",
+    "target": "Species",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "RiskFactor",
+    "field": "appliesToSpecies",
+    "target": "Species",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "INFLUENCES_OUTCOME": [
+   {
+    "type": "Mechanism",
+    "field": "influencesOutcomes",
+    "target": "Outcome",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "SUPPORTED_BY": [
+   {
+    "type": "Mechanism",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Pathway",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Organ",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Condition",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Biomarker",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Metric",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "MolecularEntity",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "AnatomicalContext",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Species",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "RiskFactor",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "ManufacturingProcess",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "ManufacturingStep",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Material",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "ProtocolResult",
+    "field": "supportedBy",
+    "target": "ProvenanceSource",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Event",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "NarrativeArc",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Claim",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "ClaimOccurrence",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "ExperienceReport",
+    "field": "supportedBy",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "HAS_MECHANISM": [
+   {
+    "type": "Pathway",
+    "field": "hasMechanisms",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "MechanismLinkMetadata"
+   },
+   {
+    "type": "Organ",
+    "field": "hasMechanisms",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "MechanismLinkMetadata"
+   },
+   {
+    "type": "Condition",
+    "field": "hasMechanisms",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "MechanismLinkMetadata"
+   }
+  ],
+  "MEASURED_BY_METRIC": [
+   {
+    "type": "Organ",
+    "field": "measuredByMetrics",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "OutcomeMeasure",
+    "field": "measuredByMetrics",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   }
+  ],
+  "INDICATES": [
+   {
+    "type": "Condition",
+    "field": "indicatedByBiomarkers",
+    "target": "Biomarker",
+    "direction": "IN",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "Biomarker",
+    "field": "indicatesConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "INVESTIGATES": [
+   {
+    "type": "Condition",
+    "field": "investigatedByStudies",
+    "target": "Study",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "Study",
+    "field": "investigatesConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "OPERATIONALIZED_BY": [
+   {
+    "type": "Outcome",
+    "field": "operationalizedBy",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "FunctionalGoal",
+    "field": "operationalizedByTargets",
+    "target": "Target",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "REFLECTS_MECHANISM": [
+   {
+    "type": "Outcome",
+    "field": "reflectsMechanisms",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "MechanismLinkMetadata"
+   },
+   {
+    "type": "Biomarker",
+    "field": "reflectsMechanisms",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "MechanismLinkMetadata"
+   },
+   {
+    "type": "Metric",
+    "field": "reflectsMechanisms",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "IN_PATHWAY": [
+   {
+    "type": "Biomarker",
+    "field": "inPathways",
+    "target": "Pathway",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "EXPRESSED_IN": [
+   {
+    "type": "Biomarker",
+    "field": "expressedInOrgans",
+    "target": "Organ",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "EXPRESSED_IN_CONTEXT": [
+   {
+    "type": "Biomarker",
+    "field": "expressedInContexts",
+    "target": "AnatomicalContext",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "ENCODES": [
+   {
+    "type": "Biomarker",
+    "field": "encodedByGenes",
+    "target": "MolecularEntity",
+    "direction": "IN",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "MolecularEntity",
+    "field": "encodesBiomarkers",
+    "target": "Biomarker",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "HAS_REFERENCE_RANGE": [
+   {
+    "type": "Biomarker",
+    "field": "hasReferenceRanges",
+    "target": "ReferenceRange",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "Metric",
+    "field": "hasReferenceRanges",
+    "target": "ReferenceRange",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "QUANTIFIES": [
+   {
+    "type": "Metric",
+    "field": "quantifiesBiomarkers",
+    "target": "Biomarker",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "MEASURED_IN": [
+   {
+    "type": "Metric",
+    "field": "measuredInOrgans",
+    "target": "Organ",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "PARTICIPATES_IN": [
+   {
+    "type": "MolecularEntity",
+    "field": "participatesInPathways",
+    "target": "Pathway",
+    "direction": "OUT",
+    "properties": "MechanismLinkMetadata"
+   }
+  ],
+  "CONTRIBUTES_TO": [
+   {
+    "type": "MolecularEntity",
+    "field": "contributesToMechanisms",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "MechanismLinkMetadata"
+   }
+  ],
+  "INCREASES_RISK_FOR": [
+   {
+    "type": "RiskFactor",
+    "field": "increasesRiskFor",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "MEDIATES_RISK_THROUGH": [
+   {
+    "type": "RiskFactor",
+    "field": "mediatesRiskThrough",
+    "target": "Mechanism",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "INCLUDES_LABTEST": [
+   {
+    "type": "PanelDefinition",
+    "field": "includesLabTests",
+    "target": "LabTest",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "INCLUDES_BIOMARKER": [
+   {
+    "type": "PanelDefinition",
+    "field": "includesBiomarkers",
+    "target": "Biomarker",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "MEASURES": [
+   {
+    "type": "LabTest",
+    "field": "measuresBiomarkers",
+    "target": "Biomarker",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   }
+  ],
+  "MEASURES_METRIC": [
+   {
+    "type": "LabTest",
+    "field": "measuresMetrics",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   },
+   {
+    "type": "Device",
+    "field": "measuresMetrics",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   },
+   {
+    "type": "Sensor",
+    "field": "measuresMetrics",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   },
+   {
+    "type": "Observation",
+    "field": "measuresMetrics",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   }
+  ],
+  "USES_METHOD": [
+   {
+    "type": "LabTest",
+    "field": "usesMethods",
+    "target": "MeasurementMethod",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   }
+  ],
+  "REQUIRES_SPECIMEN": [
+   {
+    "type": "LabTest",
+    "field": "requiresSpecimens",
+    "target": "Specimen",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   }
+  ],
+  "RUNS_ON_PLATFORM": [
+   {
+    "type": "MeasurementMethod",
+    "field": "runsOnPlatforms",
+    "target": "TechnologyPlatform",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   }
+  ],
+  "USES_MODALITY": [
+   {
+    "type": "Device",
+    "field": "usesModalities",
+    "target": "Modality",
+    "direction": "OUT",
+    "properties": "UsageMetadata"
+   }
+  ],
+  "HAS_SENSOR": [
+   {
+    "type": "Device",
+    "field": "hasSensors",
+    "target": "Sensor",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "IMPLEMENTS_PLATFORM": [
+   {
+    "type": "Device",
+    "field": "implementsPlatforms",
+    "target": "TechnologyPlatform",
+    "direction": "OUT",
+    "properties": "UsageMetadata"
+   }
+  ],
+  "HAS_STEP": [
+   {
+    "type": "ManufacturingProcess",
+    "field": "hasSteps",
+    "target": "ManufacturingStep",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   },
+   {
+    "type": "Protocol",
+    "field": "hasSteps",
+    "target": "ProtocolStep",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "INPUTS": [
+   {
+    "type": "ManufacturingProcess",
+    "field": "inputsMaterials",
+    "target": "Material",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "OUTPUTS": [
+   {
+    "type": "ManufacturingProcess",
+    "field": "outputsMaterials",
+    "target": "Material",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "PRODUCES": [
+   {
+    "type": "ManufacturingProcess",
+    "field": "producesMaterials",
+    "target": "Material",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "USES_EQUIPMENT": [
+   {
+    "type": "ManufacturingStep",
+    "field": "usesEquipment",
+    "target": "ToolOrInstrument",
+    "direction": "OUT",
+    "properties": "UsageMetadata"
+   }
+  ],
+  "HAS_INPUT": [
+   {
+    "type": "ManufacturingStep",
+    "field": "hasInputMaterials",
+    "target": "Material",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "HAS_OUTPUT": [
+   {
+    "type": "ManufacturingStep",
+    "field": "hasOutputMaterials",
+    "target": "Material",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "PART_OF": [
+   {
+    "type": "Material",
+    "field": "partOfProducts",
+    "target": "Product",
+    "direction": "OUT",
+    "properties": "DoseMetadata"
+   }
+  ],
+  "HAS_REGULATORY_STEP": [
+   {
+    "type": "RegulatoryPathway",
+    "field": "hasSteps",
+    "target": "RegulatoryStep",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "ISSUED_BY": [
+   {
+    "type": "RegulatoryStatus",
+    "field": "issuedBy",
+    "target": "RegulatoryAgency",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "OVERSEES": [
+   {
+    "type": "RegulatoryAgency",
+    "field": "overseesPathways",
+    "target": "RegulatoryPathway",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_PRIMARY_SOURCE": [
+   {
+    "type": "Study",
+    "field": "hasPrimarySources",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "SPONSORED_BY": [
+   {
+    "type": "Study",
+    "field": "sponsoredBy",
+    "target": "Organization",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "OPERATED_BY": [
+   {
+    "type": "Study",
+    "field": "operatedBy",
+    "target": "Organization",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "INVESTIGATED_BY": [
+   {
+    "type": "Study",
+    "field": "investigatedBy",
+    "target": "Person",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "STUDIES": [
+   {
+    "type": "Study",
+    "field": "studiesPopulations",
+    "target": "Population",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_DATASET": [
+   {
+    "type": "Study",
+    "field": "hasDatasets",
+    "target": "Dataset",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "STUDIED_IN": [
+   {
+    "type": "Study",
+    "field": "studiedInSpecies",
+    "target": "Species",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "EVALUATES_RISK_FACTOR": [
+   {
+    "type": "Study",
+    "field": "evaluatesRiskFactors",
+    "target": "RiskFactor",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_ARM": [
+   {
+    "type": "Study",
+    "field": "hasArms",
+    "target": "StudyArm",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_OUTCOME_MEASURE": [
+   {
+    "type": "Study",
+    "field": "hasOutcomeMeasures",
+    "target": "OutcomeMeasure",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_OUTCOME_RESULT": [
+   {
+    "type": "Study",
+    "field": "hasOutcomeResults",
+    "target": "OutcomeResult",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_OUTCOME": [
+   {
+    "type": "Study",
+    "field": "hasOutcomes",
+    "target": "StudyOutcome",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "REFERS_TO_OUTCOME": [
+   {
+    "type": "StudyOutcome",
+    "field": "refersToOutcomes",
+    "target": "Outcome",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   },
+   {
+    "type": "OutcomeMeasure",
+    "field": "refersToOutcomes",
+    "target": "Outcome",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "RECEIVES": [
+   {
+    "type": "StudyArm",
+    "field": "receivesInterventions",
+    "target": "StudyIntervention",
+    "direction": "OUT",
+    "properties": "InterventionArmMetadata"
+   }
+  ],
+  "FOR_MEASURE": [
+   {
+    "type": "OutcomeResult",
+    "field": "forMeasures",
+    "target": "OutcomeMeasure",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "FROM_ARM": [
+   {
+    "type": "OutcomeResult",
+    "field": "fromArms",
+    "target": "StudyArm",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_CONSTRAINT": [
+   {
+    "type": "Protocol",
+    "field": "hasConstraints",
+    "target": "Constraint",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "ProtocolStep",
+    "field": "hasConstraints",
+    "target": "Constraint",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_MEASUREMENT_PLAN": [
+   {
+    "type": "Protocol",
+    "field": "hasMeasurementPlans",
+    "target": "MeasurementPlan",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_TARGET": [
+   {
+    "type": "Protocol",
+    "field": "hasTargets",
+    "target": "Target",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_FUNCTIONAL_GOAL": [
+   {
+    "type": "Protocol",
+    "field": "hasFunctionalGoals",
+    "target": "FunctionalGoal",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_ADJUSTMENT_RULE": [
+   {
+    "type": "Protocol",
+    "field": "hasAdjustmentRules",
+    "target": "ProtocolAdjustmentRule",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "TARGETS": [
+   {
+    "type": "Protocol",
+    "field": "targets",
+    "target": "TherapeuticTarget",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "ProtocolStep",
+    "field": "targets",
+    "target": "TherapeuticTarget",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "INCLUDES_PROTOCOL": [
+   {
+    "type": "Protocol",
+    "field": "includesProtocols",
+    "target": "Protocol",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "HAS_SUBPROTOCOL": [
+   {
+    "type": "Protocol",
+    "field": "hasSubprotocols",
+    "target": "Protocol",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "FOR_PROTOCOL": [
+   {
+    "type": "Protocol",
+    "field": "results",
+    "target": "ProtocolResult",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "ProtocolResult",
+    "field": "forProtocols",
+    "target": "Protocol",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "DEPENDS_ON": [
+   {
+    "type": "ProtocolStep",
+    "field": "dependsOn",
+    "target": "ProtocolStep",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "BASED_ON": [
+   {
+    "type": "Constraint",
+    "field": "basedOn",
+    "target": "ConstraintBasis",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "TRACKS_METRIC": [
+   {
+    "type": "MeasurementPlan",
+    "field": "tracksMetrics",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "FOR_METRIC": [
+   {
+    "type": "Target",
+    "field": "forMetrics",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "COMPARED_TO_REFERENCE": [
+   {
+    "type": "Target",
+    "field": "comparedToRanges",
+    "target": "ReferenceRange",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "PART_OF_PLAN": [
+   {
+    "type": "Observation",
+    "field": "partOfPlans",
+    "target": "MeasurementPlan",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "FROM_LAB_TEST": [
+   {
+    "type": "Observation",
+    "field": "fromLabTests",
+    "target": "LabTest",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   }
+  ],
+  "FROM_DEVICE": [
+   {
+    "type": "Observation",
+    "field": "fromDevices",
+    "target": "Device",
+    "direction": "OUT",
+    "properties": "MeasurementMetadata"
+   }
+  ],
+  "ABOUT_CONDITION": [
+   {
+    "type": "Observation",
+    "field": "aboutConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "ABOUT_PROTOCOL": [
+   {
+    "type": "Observation",
+    "field": "aboutProtocols",
+    "target": "Protocol",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "TRIGGERED_BY": [
+   {
+    "type": "ProtocolAdjustmentRule",
+    "field": "triggeredByMetrics",
+    "target": "Metric",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "MODIFIES_STEP": [
+   {
+    "type": "ProtocolAdjustmentRule",
+    "field": "modifiesSteps",
+    "target": "ProtocolStep",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "MODIFIES_TARGET": [
+   {
+    "type": "ProtocolAdjustmentRule",
+    "field": "modifiesTargets",
+    "target": "Target",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "REQUIRES_CONDITION": [
+   {
+    "type": "ProtocolAdjustmentRule",
+    "field": "requiresConditions",
+    "target": "Condition",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "INCLUDES_OBSERVATION": [
+   {
+    "type": "ProtocolResult",
+    "field": "includesObservations",
+    "target": "Observation",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "CLAIMS_OUTCOME": [
+   {
+    "type": "ProtocolResult",
+    "field": "claimsOutcomes",
+    "target": "Outcome",
+    "direction": "OUT",
+    "properties": "AssociationMetadata"
+   }
+  ],
+  "MENTIONS": [
+   {
+    "type": "ProtocolResult",
+    "field": "mentions",
+    "target": "ProtocolResultMention",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "ProductLabelRegion",
+    "field": "mentions",
+    "target": "ProductLabelMention",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Chunk",
+    "field": "mentions",
+    "target": "ClaimSubject",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Episode",
+    "field": "mentions",
+    "target": "EpisodeMentionable",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HOSTS_EVENT": [
+   {
+    "type": "Community",
+    "field": "hostsEvents",
+    "target": "Event",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_EVENT": [
+   {
+    "type": "Conference",
+    "field": "hasEvents",
+    "target": "Event",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   },
+   {
+    "type": "NarrativeArc",
+    "field": "hasEvents",
+    "target": "Event",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "ABOUT": [
+   {
+    "type": "Event",
+    "field": "about",
+    "target": "EventSubject",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "NarrativeArc",
+    "field": "about",
+    "target": "EventSubject",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Document",
+    "field": "about",
+    "target": "ClaimSubject",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Chunk",
+    "field": "about",
+    "target": "ClaimSubject",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Claim",
+    "field": "about",
+    "target": "ClaimSubject",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "ExperienceReport",
+    "field": "about",
+    "target": "EvidenceSubject",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "REPORTED_IN": [
+   {
+    "type": "Event",
+    "field": "reportedIn",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "NarrativeArc",
+    "field": "reportedIn",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "CAUSED_BY": [
+   {
+    "type": "Event",
+    "field": "causedBy",
+    "target": "Event",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "FOLLOWED_BY": [
+   {
+    "type": "Event",
+    "field": "followedBy",
+    "target": "Event",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "HAS_VARIANT": [
+   {
+    "type": "MediaAsset",
+    "field": "variants",
+    "target": "MediaVariant",
+    "direction": "OUT",
+    "properties": null
+   },
+   {
+    "type": "MediaVariant",
+    "field": "derivedFrom",
+    "target": "MediaAsset",
+    "direction": "IN",
+    "properties": null
+   }
+  ],
+  "HAS_ANNOTATION": [
+   {
+    "type": "MediaAsset",
+    "field": "annotations",
+    "target": "MediaAnnotation",
+    "direction": "OUT",
+    "properties": null
+   },
+   {
+    "type": "MediaAnnotation",
+    "field": "annotatesMedia",
+    "target": "MediaAsset",
+    "direction": "IN",
+    "properties": null
+   }
+  ],
+  "DERIVED_FROM_SOURCE": [
+   {
+    "type": "MediaAsset",
+    "field": "sources",
+    "target": "MediaSource",
+    "direction": "OUT",
+    "properties": "MediaSourceMetadata"
+   },
+   {
+    "type": "MediaSource",
+    "field": "derivedAssets",
+    "target": "MediaAsset",
+    "direction": "IN",
+    "properties": "MediaSourceMetadata"
+   }
+  ],
+  "PART_OF_MEDIA": [
+   {
+    "type": "MediaAsset",
+    "field": "figurePanels",
+    "target": "FigurePanel",
+    "direction": "IN",
+    "properties": "OrderingMetadata"
+   },
+   {
+    "type": "FigurePanel",
+    "field": "partOfMedia",
+    "target": "MediaAsset",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "DEPICTS": [
+   {
+    "type": "MediaAsset",
+    "field": "depicts",
+    "target": "MediaSubject",
+    "direction": "OUT",
+    "properties": "MediaLinkMetadata"
+   },
+   {
+    "type": "FigurePanel",
+    "field": "depictsSubjects",
+    "target": "MediaSubject",
+    "direction": "OUT",
+    "properties": "MediaLinkMetadata"
+   }
+  ],
+  "EXPLAINS": [
+   {
+    "type": "MediaAsset",
+    "field": "explains",
+    "target": "MediaSubject",
+    "direction": "OUT",
+    "properties": "MediaLinkMetadata"
+   }
+  ],
+  "EVIDENCES": [
+   {
+    "type": "MediaAsset",
+    "field": "evidences",
+    "target": "MediaSubject",
+    "direction": "OUT",
+    "properties": "MediaLinkMetadata"
+   }
+  ],
+  "SUPPORTS_CLAIM": [
+   {
+    "type": "MediaAsset",
+    "field": "supportsClaims",
+    "target": "Claim",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "FigurePanel",
+    "field": "supportsClaims",
+    "target": "Claim",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "SUPPORTS_CLAIM_OCCURRENCE": [
+   {
+    "type": "MediaAsset",
+    "field": "supportsClaimOccurrences",
+    "target": "ClaimOccurrence",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "VISUALIZES": [
+   {
+    "type": "MediaAsset",
+    "field": "visualizesRelationships",
+    "target": "MediaVisualizableRelationship",
+    "direction": "OUT",
+    "properties": "MediaLinkMetadata"
+   },
+   {
+    "type": "RelationshipAssertion",
+    "field": "visualizedBy",
+    "target": "MediaAsset",
+    "direction": "IN",
+    "properties": "MediaLinkMetadata"
+   }
+  ],
+  "VISUALIZES_TRAVERSAL": [
+   {
+    "type": "MediaAsset",
+    "field": "visualizesTraversal",
+    "target": "GraphView",
+    "direction": "OUT",
+    "properties": "MediaLinkMetadata"
+   },
+   {
+    "type": "GraphView",
+    "field": "hasMediaAssets",
+    "target": "MediaAsset",
+    "direction": "IN",
+    "properties": "MediaLinkMetadata"
+   }
+  ],
+  "ANNOTATES_SUBJECT": [
+   {
+    "type": "MediaAnnotation",
+    "field": "annotatesSubjects",
+    "target": "MediaSubject",
+    "direction": "OUT",
+    "properties": "MediaLinkMetadata"
+   }
+  ],
+  "SOURCE_DOCUMENT": [
+   {
+    "type": "MediaSource",
+    "field": "sourceDocument",
+    "target": "Document",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "SOURCE_CHUNK": [
+   {
+    "type": "MediaSource",
+    "field": "sourceChunk",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "SOURCE_EPISODE": [
+   {
+    "type": "MediaSource",
+    "field": "sourceEpisode",
+    "target": "Episode",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "SOURCE_LISTING": [
+   {
+    "type": "MediaSource",
+    "field": "sourceListing",
+    "target": "Listing",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "INCLUDES_SUBJECT": [
+   {
+    "type": "GraphView",
+    "field": "includesSubjects",
+    "target": "MediaSubject",
+    "direction": "OUT",
+    "properties": "MediaLinkMetadata"
+   }
+  ],
+  "FROM_ANNOTATION": [
+   {
+    "type": "FigurePanel",
+    "field": "fromAnnotations",
+    "target": "MediaAnnotation",
+    "direction": "OUT",
+    "properties": "AnnotationMetadata"
+   },
+   {
+    "type": "ProductLabelRegion",
+    "field": "fromAnnotation",
+    "target": "MediaAnnotation",
+    "direction": "OUT",
+    "properties": "AnnotationMetadata"
+   }
+  ],
+  "ABOUT_PRODUCT": [
+   {
+    "type": "ProductLabelRegion",
+    "field": "aboutProduct",
+    "target": "Product",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "ASSERTS": [
+   {
+    "type": "ProductLabelRegion",
+    "field": "assertsClaims",
+    "target": "Claim",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   },
+   {
+    "type": "Chunk",
+    "field": "assertsClaims",
+    "target": "Claim",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "SUBJECT": [
+   {
+    "type": "RelationshipAssertion",
+    "field": "subject",
+    "target": "MediaSubject",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "OBJECT": [
+   {
+    "type": "RelationshipAssertion",
+    "field": "object",
+    "target": "MediaSubject",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "SUPPORTED_BY_CLAIM": [
+   {
+    "type": "RelationshipAssertion",
+    "field": "supportedByClaims",
+    "target": "Claim",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "HAS_TEXT_VERSION": [
+   {
+    "type": "Document",
+    "field": "hasTextVersions",
+    "target": "DocumentTextVersion",
+    "direction": "OUT",
+    "properties": null
+   }
+  ],
+  "HAS_CHUNK": [
+   {
+    "type": "Document",
+    "field": "hasChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "AUTHORED_BY": [
+   {
+    "type": "Document",
+    "field": "authoredBy",
+    "target": "DocumentAuthor",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "SOURCE_OF": [
+   {
+    "type": "Document",
+    "field": "sourceForEpisodes",
+    "target": "Episode",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_SEGMENTATION": [
+   {
+    "type": "DocumentTextVersion",
+    "field": "hasSegmentations",
+    "target": "Segmentation",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "NEXT_CHUNK": [
+   {
+    "type": "Chunk",
+    "field": "nextChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "PREV_CHUNK": [
+   {
+    "type": "Chunk",
+    "field": "previousChunks",
+    "target": "Chunk",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "FROM_TEXT_VERSION": [
+   {
+    "type": "Chunk",
+    "field": "fromTextVersions",
+    "target": "DocumentTextVersion",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "OCCURS_IN_SEGMENT": [
+   {
+    "type": "Chunk",
+    "field": "inEpisodeSegments",
+    "target": "EpisodeSegment",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   },
+   {
+    "type": "ClaimOccurrence",
+    "field": "occursInSegments",
+    "target": "EpisodeSegment",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "LEFT": [
+   {
+    "type": "Association",
+    "field": "left",
+    "target": "AssociationParticipant",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "RIGHT": [
+   {
+    "type": "Association",
+    "field": "right",
+    "target": "AssociationParticipant",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "INSTANCE_OF": [
+   {
+    "type": "Claim",
+    "field": "occurrences",
+    "target": "ClaimOccurrence",
+    "direction": "IN",
+    "properties": "RoleMetadata"
+   },
+   {
+    "type": "ClaimOccurrence",
+    "field": "instanceOf",
+    "target": "Claim",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "OCCURS_IN": [
+   {
+    "type": "ClaimOccurrence",
+    "field": "occursIn",
+    "target": "OccurrenceContainer",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "UTTERED_BY": [
+   {
+    "type": "ClaimOccurrence",
+    "field": "utteredBy",
+    "target": "ClaimSpeaker",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "EXTRACTED_FROM": [
+   {
+    "type": "ExperienceReport",
+    "field": "extractedFrom",
+    "target": "ExtractionSource",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "EXTRACTED_FROM_SEGMENT": [
+   {
+    "type": "ExperienceReport",
+    "field": "extractedFromSegments",
+    "target": "EpisodeSegment",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "HAS_SEGMENT": [
+   {
+    "type": "Episode",
+    "field": "hasSegments",
+    "target": "EpisodeSegment",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "SPONSORS_PRODUCT": [
+   {
+    "type": "Episode",
+    "field": "sponsorsProducts",
+    "target": "Product",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_TRANSCRIPT": [
+   {
+    "type": "Episode",
+    "field": "hasTranscriptVersions",
+    "target": "DocumentTextVersion",
+    "direction": "OUT",
+    "properties": "ExtractionMetadata"
+   }
+  ],
+  "HOSTS_CHANNEL": [
+   {
+    "type": "Platform",
+    "field": "hostsChannels",
+    "target": "Channel",
+    "direction": "OUT",
+    "properties": "RoleMetadata"
+   }
+  ],
+  "HAS_SERIES": [
+   {
+    "type": "Channel",
+    "field": "hasSeries",
+    "target": "Series",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "HAS_EPISODE": [
+   {
+    "type": "Channel",
+    "field": "hasEpisodes",
+    "target": "Episode",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ],
+  "INCLUDES_EPISODE": [
+   {
+    "type": "Series",
+    "field": "includesEpisodes",
+    "target": "Episode",
+    "direction": "OUT",
+    "properties": "OrderingMetadata"
+   }
+  ]
+ }
+}
