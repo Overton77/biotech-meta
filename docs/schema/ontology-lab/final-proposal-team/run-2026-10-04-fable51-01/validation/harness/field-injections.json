@@ -215,5 +215,19 @@
    "\"\"\"property; request: W05-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Minimum of the sample spread as reported (unit = unitCode); distinct from quantityLow of a stated range.\"\"\"\nminValue: Float",
    "\"\"\"property; request: W05-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Maximum of the sample spread as reported (unit = unitCode); distinct from quantityHigh of a stated range.\"\"\"\nmaxValue: Float"
   ]
+ },
+ {
+  "type": "ContraindicationAssertion",
+  "fields": [
+   "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\nmassBasis: MassBasis @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\namountReferent: AmountReferent @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "InteractionAssertion",
+  "fields": [
+   "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\nmassBasis: MassBasis @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\namountReferent: AmountReferent @settable(onCreate: false, onUpdate: false)"
+  ]
  }
 ]
