@@ -763,7 +763,7 @@ MERGE (v1:EvidenceAssessment:EvidenceSynthesis {uid: 'hu:synthesis:nr-muscle-mit
 ON CREATE SET v1.claimText = 'Oral NR improves skeletal muscle mitochondrial function in older humans',
               v1.verdict = 'INSUFFICIENT', v1.evidenceCutoff = date('2019-05-31'),
               v1.recordedAt = datetime('2026-10-03T12:00:00Z'),   // illustrative recorded time for the example
-              v1.assessmentType = 'EvidenceSynthesis', v1.methodVersion = 'synthesis-v0.1', v1.status = 'ACCEPTED', v1.createdAt = datetime()
+              v1.assessmentType = 'EvidenceSynthesis', v1.methodVersion = 'synthesis-v0.1', v1.status = 'SUPERSEDED', v1.recordedTo = datetime('2026-10-03T12:30:00Z'), v1.createdAt = datetime()
 MERGE (v1)-[:INCLUDES_RESULT {inputRole: 'SUPPORTIVE'}]->(zh)
 MERGE (v2:EvidenceAssessment:EvidenceSynthesis {uid: 'hu:synthesis:nr-muscle-mito-function-older-humans-v2'})
 ON CREATE SET v2.claimText = 'Oral NR improves skeletal muscle mitochondrial function in older humans',

@@ -63,5 +63,10 @@ for f in sorted(src.glob('*.cypher')):
     bad = set(re.findall(r":OutcomeDefinition[A-Za-z:]* \{uid: '(hu:outcome:[^']+)'", t))
     for u in sorted(bad):
         t = sub(name, t, re.escape(u), u.replace('hu:outcome:', 'hu:outcome-definition:'))
+    # Round-4 repairs (Challenger matrix defects D1, D3):
+    if name == 'recommendation-snapshot.cypher':
+        t = sub(name, t, r"ea\.identityMatch = 'UNKNOWN', ea\.doseMatch = 'MATCH', ea\.populationMatch = 'PARTIAL',", "ea.identityMatch = 'UNKNOWN', ea.doseMatch = 'UNKNOWN', ea.populationMatch = 'PARTIAL',")  # D1: flat field follows its EXPOSURE dimension (V-F5-04)
+    if name == 'study-vs-product-mismatch.cypher':
+        t = sub(name, t, r"v1\.status = 'ACCEPTED', v1\.createdAt = datetime\(\)", "v1.status = 'SUPERSEDED', v1.recordedTo = datetime('2026-10-03T12:30:00Z'), v1.createdAt = datetime()")  # D3: superseded synthesis closed at v2.recordedAt (V-F5-14)
     (dst / name).write_text(t)
 print("\n".join(log) if log else "no substitutions")

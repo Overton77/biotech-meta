@@ -289,7 +289,7 @@ SET u.name = 'Adults, evening use, sleep onset support, US', u.privacyClass = 'P
 
 MERGE (ea:EvidenceAssessment:EvidenceApplicability {uid: 'hu:applicability:synthetic-mg-glycinate-evidence-to-sleepwell-fv-a1'})
 SET ea.assessmentType = 'EVIDENCE_APPLICABILITY', ea.methodVersion = 'applicability-0.3', ea.status = 'FINAL',
-    ea.identityMatch = 'UNKNOWN', ea.doseMatch = 'MATCH', ea.populationMatch = 'PARTIAL',
+    ea.identityMatch = 'UNKNOWN', ea.doseMatch = 'UNKNOWN', ea.populationMatch = 'PARTIAL',
     ea.privacyClass = 'PUBLIC', ea.createdAt = datetime('2026-03-05T00:00:00Z'), ea.recordedAt = datetime('2026-03-05T00:00:00Z');
 
 MERGE (ea:EvidenceAssessment:EvidenceApplicability {uid: 'hu:applicability:synthetic-glycine-evidence-to-calmroot-fv-b1'})
