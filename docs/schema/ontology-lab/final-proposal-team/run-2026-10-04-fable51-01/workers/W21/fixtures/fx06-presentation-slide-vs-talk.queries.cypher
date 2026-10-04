@@ -27,3 +27,10 @@ MATCH (e:Episode {uid: 'hu:episode:merck-jpm-hc-2026-company-presentation'})
 OPTIONAL MATCH (p:Person)-[ap:APPEARS_IN]->(e)
 RETURN p.name AS person, ap.roleType AS appearanceRole, ap.roleTitleVerbatim AS titleAsPrinted
 ORDER BY person;
+
+// Q06-5 (CQ-CL-C02): from the spoken statement, find the accompanying deck and the slide that states the same claim.
+MATCH (spoken:ClaimOccurrence {uid: 'hu:claim-occurrence:w21-merck-talk-davis-70-billion'})-[:OCCURS_IN]->(talk:Episode)
+MATCH (deck:Document)-[acc:ACCOMPANIES_TALK]->(talk)
+MATCH (spoken)-[:INSTANCE_OF]->(c:Claim)<-[:INSTANCE_OF]-(slide:ClaimOccurrence)-[:OCCURS_IN]->(deck)
+MATCH (slide)-[:SUPPORTED_BY]->(l:SourceLocator)
+RETURN deck.uid AS deck, acc.assertionUid AS accompanimentAssertedBy, l.selectorKind AS slideSelector, l.page AS page, l.exact AS slideText;

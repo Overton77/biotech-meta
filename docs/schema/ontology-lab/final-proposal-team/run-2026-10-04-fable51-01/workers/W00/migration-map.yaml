@@ -1,0 +1,58 @@
+# W00 migration map (live schema 86b5e0b5…f112 and catalog 0.2.0 / repository fixtures -> final proposal).
+# action: keep | rename | move | split | merge | derive | retire. Live line numbers refer to current_biotech_schema.graphql.
+
+# --- live interfaces ---
+- {live: "interface Entity (l.1)", final: "interface Entity", action: keep, note: "adds uid: String!; name String! -> String (D-013); GraphQL interface only, not the archetype label"}
+- {live: "Entity.id", final: "Entity.id (opaque segment of uid)", action: keep, note: "Cypher ingestion must write it; Document also stores documentId (W00-SR-03)"}
+- {live: "Entity.name", final: "Entity.name (nullable)", action: keep, note: "compatibility: clients that assumed non-null must tolerate null"}
+- {live: "Entity.mongoResearchRunId", final: "Entity.mongoResearchRunId + Activity.externalRunId", action: keep, note: "operational last-writer pointer; every value needs WAS_GENERATED_BY Activity {externalRunSystem: 'mongo-research'} (V-430)"}
+- {live: "interface SearchIndexable (l.8)", final: "interface SearchIndexable", action: keep, note: "unchanged"}
+- {live: "interface TemporalSnapshot (l.15)", final: "interface TemporalSnapshot", action: keep, note: "cache of first HAS_STATE episode; ListingSnapshot implementer retired (D-007)"}
+- {live: "interface ActorIdentity (l.22)", final: "interface ActorIdentity", action: keep, note: "adds uid; name nullable (D-W00-01)"}
+
+# --- live relationship-property types in W00 scope ---
+- {live: "TemporalMetadata (l.114)", final: "AssertedEdgeProperties (or a domain successor embedding it)", action: split, note: "validFrom/validTo/recordedFrom/recordedTo kept; add relationshipUid, assertionUid, per-bound precision and basis (default UNKNOWN); confidence and notes retired (INV-407)"}
+- {live: "TemporalMetadata.confidence", final: null, action: retire, note: "a confidence without method is uninterpretable; existing values preserved only in the migration audit log"}
+- {live: "TemporalMetadata.notes", final: "StructuralEdgeProperties.notes (structural edges only)", action: retire, note: "not carried on asserted edges"}
+- {live: "ExtractionMetadata (l.189)", final: "SourceLocator + Activity + DerivedEdgeProperties / W20 DerivedSupportProperties", action: split, note: "round 0006 D9"}
+- {live: "ExtractionMetadata.quoteSpan", final: "SourceLocator.exact (+ quoteHash, normalizationVersion NFC-WS1)", action: move}
+- {live: "ExtractionMetadata.extractionMethod / extractorVersion / extractedAt", final: "Activity.methodVersion / Agent.toolVersion / Activity.endedAt", action: move}
+- {live: "ExtractionMetadata.supportType", final: "relationship type SUPPORTED_BY vs CONTRADICTED_BY", action: derive}
+- {live: "ExtractionMetadata.salience / aboutness", final: "W20/W21 derived retrieval edges (MENTIONS, ABOUT)", action: move, note: "retrieval features, never confidence"}
+- {live: "ExtractionMetadata.mongoResearchRunId", final: "Activity.externalRunId", action: move}
+- {live: "OwnershipMetadata / RoleMetadata / RecommendationMetadata / other *Metadata", final: "domain successors (W01, W21, W23, ...)", action: split, note: "each must embed every AssertedEdgeProperties field (contract B4)"}
+
+# --- live relationships and unions touching the kernel ---
+- {live: "X -[:SUPPORTED_BY {ExtractionMetadata}]-> Chunk (19 fields)", final: "Assertion -[:SUPPORTED_BY]-> SourceLocator (structural) + derived SUPPORTED_BY_CHUNK {locatorUid} (W20)", action: split, note: "KCR-4.5; V-407"}
+- {live: "ProtocolResult.supportedBy: [ProvenanceSource] (l.2038)", final: "assertions about the ProtocolResult SUPPORTED_BY SourceLocator", action: split, note: "Organization and Study are not locators; W16 owns ProtocolResult"}
+- {live: "union ProvenanceSource (l.1766)", final: null, action: retire}
+- {live: "ClaimOccurrence.utteredBy UTTERED_BY {RoleMetadata} (l.2798)", final: "ASSERTED_BY -> AsserterTarget", action: rename, note: "relabel: MATCH (a)-[r:UTTERED_BY]->(s) CREATE (a)-[:ASSERTED_BY]->(s) DELETE r; W21 writes the field"}
+- {live: "union ClaimSpeaker (l.2187)", final: "AsserterTarget", action: merge}
+- {live: "union ClaimSubject / EvidenceSubject (l.2181, 2183) as assertion subject ranges", final: "AssertionSubjectTarget", action: merge, note: "ABOUT/MENTIONS retrieval uses stay with W20/W21"}
+- {live: "Organization -[:HAS_SNAPSHOT]-> OrganizationSnapshot; Product -[:HAS_SNAPSHOT]-> ProductSnapshot (l.554, 773)", final: "HAS_STATE (StateEpisodeProperties)", action: rename, note: "seam W00-SR-08; HAS_SNAPSHOT reserved for Source -> SourceSnapshot"}
+
+# --- catalog 0.2.0 / repository fixture data (stored values the final GraphQL schema cannot read) ---
+- {live: "privacyClass 'public' | 'internal' (catalog conventions spelling, examples/*.cypher)", final: "privacyClass PUBLIC | INTERNAL", action: rename, note: "MATCH (n) WHERE n.privacyClass IN ['public','internal'] SET n.privacyClass = toUpper(n.privacyClass); 'synthetic' -> fixtureProvenance; 'private-personal' must not exist (V-521)"}
+- {live: "EvidenceAssessment.status 'FINAL' (examples/recommendation-snapshot.cypher)", final: "AssessmentStatus ACCEPTED", action: rename}
+- {live: "ResolutionHypothesis.status 'REJECTED' (examples/diagnostic-comparison.cypher l.547)", final: "status ACCEPTED + resolutionStatus 'REJECTED'", action: split, note: "W00-SR-04"}
+- {live: "Assertion.quantityBasis 'UNSPECIFIED' (examples/claim-retelling-provenance.cypher)", final: "quantityBasis null + massBasis UNSPECIFIED", action: split, note: "W00-SR-01"}
+- {live: "SourceLocator without artifactType / id / updatedAt (examples/recommendation-snapshot.cypher)", final: "artifactType 'SourceLocator', id = uid opaque segment, updatedAt = createdAt", action: keep, note: "backfill; V-W00-08"}
+- {live: "nodes without id / updatedAt (examples/*.cypher)", final: "id, createdAt, updatedAt, archetype discriminator", action: keep, note: "backfill with the uid's opaque segment and createdAt"}
+- {live: "episodes without validFromBasis / validToBasis (e.g. APPEARS_IN in claim-retelling-provenance)", final: "validFromBasis/validToBasis UNKNOWN when bounds are null", action: keep, note: "non-null in B4 types"}
+- {live: "0.1.0 SourceLocator.selector (untyped)", final: "SourceLocator.selector (read-only) + selectorKind null until re-anchored; SECTION when only `section` exists", action: keep, note: "D-W00-03; V-401 rejects null-kind support"}
+- {live: "Source.canonicalUri 'https://doi.org/<doi>' (examples/diagnostic-comparison.cypher l.49, 53)", final: "Identifier {scheme: DOI} on the Publication + captured landing/PDF Sources RENDITION_OF it", action: split, note: "CL-003 R2; V-235 join replaced by RENDITION_OF"}
+- {live: "role validTo 2018-01-01 YEAR for 'B (2011-2017)' (examples/claim-retelling-provenance.cypher)", final: "validTo 2017-01-01 YEAR", action: rename, note: "D-W00-10 first-instant rule"}
+- {live: "Adjudication.reviewedAt as the only clock (QS-1a, V-110 text)", final: "Adjudication.recordedAt (recorded clock) + reviewedAt (kept)", action: keep, note: "as-of reads use recordedAt"}
+- {live: "IDENTIFIED_BY (Metric -> Identifier, MerchantListing -> TradeItemIdentifier in fixtures)", final: "HAS_IDENTIFIER {IdentifierLinkProperties}", action: merge, note: "seam W00-SR-07 (W04/W07 decide)"}
+- {live: "EquivalenceAssessment -[:COMPARES]-> (V-432 text)", final: "COMPARES_IDENTITIES", action: rename, note: "W00-SR-12"}
+- {live: "edge property hypothesisUid on INSTANCE_OF (V-112 text)", final: "DerivedEdgeProperties.derivedFromAssessmentUids", action: move, note: "W00-SR-06"}
+- {live: "episode property projectionOfAssertionUid on attachments (property card T-14)", final: "assertionUid", action: rename, note: "D-011 / CL-009"}
+
+# --- proposed-delta.graphql Lane 4 / Lane 5 projection (superseded by the W00 fragment) ---
+- {live: "proposed-delta SourceSnapshot implements Entity @node (name!, no archetype fields)", final: "SourceSnapshot (labels SourceSnapshot, InformationArtifact)", action: keep, note: "languageCode -> language (catalog name); ofDocument -> source (Source covers Document)"}
+- {live: "proposed-delta SourceLocator (normalizationVersion!, selectorKind!)", final: "SourceLocator", action: keep, note: "normalizationVersion nullable (coarse kinds carry none); selectorKind nullable for migrated data"}
+- {live: "proposed-delta Activity / Agent", final: "Activity / Agent", action: keep, note: "archetype labels and fields added"}
+- {live: "proposed-delta EquivalenceAssessment.compares: [MediaSubject] COMPARES", final: "comparesIdentities: [AssertionSubjectTarget] COMPARES_IDENTITIES", action: rename}
+- {live: "proposed-delta StateAttachmentMetadata / StateEpisodeMetadata / AssertedTemporalMetadata", final: "StateEpisodeProperties / AssertedEdgeProperties", action: merge, note: "single validTimeBasis retired (per-bound)"}
+- {live: "proposed-delta ReanchorMetadata / AuthorizationMetadata", final: "ReanchorProperties / AuthorizationProperties", action: rename}
+- {live: "proposed-delta enums (SelectorKind 5 values, ContentHashBasis 3 values)", final: "SelectorKind 7 values, ContentHashBasis 4 values", action: keep, note: "catalog 0.2.0 values"}

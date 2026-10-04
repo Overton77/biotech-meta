@@ -102,3 +102,7 @@ class Fx:
         with open(path, "w", encoding="utf-8") as f:
             f.write("\n".join(self.out) + "\n")
         return len(self.out) - 1
+
+def known(fx, mapping):
+    """Register nodes created by an earlier fixture file (uid -> primary label)."""
+    fx.labels.update(mapping)

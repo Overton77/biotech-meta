@@ -1,8 +1,8 @@
 # =====================================================================================================================
 # W09 Studies, interventions and results -- SDL fragment (recommendation, not the merged schema)
 # Run: run-2026-10-04-fable51-01. Worker: W09 (Opus 5.5). Synthesizer: Fable 5.1.
-# Canonical module: studies_and_evidence (catalog/schema.yaml 0.2.0, digest 8fb50ff0...84f0).
-# Live baseline: current_biotech_schema.graphql 86b5e0b5...f112, lines 228-239 and 1597-1754.
+# Canonical module: studies_and_evidence (catalog/schema.yaml 0.2.0, digest `8fb50ff0…84f0`).
+# Live baseline: current_biotech_schema.graphql `86b5e0b5…f112`, lines 228-239 and 1597-1754.
 # CQs served: CQ-ST-01..10 (CQ-ST-03/10 jointly with W10), CQ-EV-03/04/05, CQ-ID-01/02, CQ-AX-05, CQ-AX-24 (pointer to W10),
 #             candidates CQ-ST-C01 (device arm), CQ-ST-C02 (procedure/protocol arm), CQ-ST-C03 (registry version identity).
 # Invariants: INV-201, INV-206..INV-209 (V-201, V-202, V-210..V-213, V-215..V-218, V-221, V-223).
@@ -239,15 +239,19 @@ enum StudyKind {
 
 """READ-ONLY LEGACY range of the live union `StudyIntervention` (D-003, CL-006). Reachable only through
 Study.evaluates (@settable false). Members are the final-schema successors of the live members: Compound ->
-ChemicalSubstance or MaterialMixture (D-002, W02), CompoundForm -> ChemicalForm or IngredientMaterial (W02),
-Product (W04), FoodItem/FoodProduct/Lifestyle (W05), Treatment/Procedure (W06), Device (W08), Protocol (W16).
-Never written; INV-201 makes every legacy EVALUATES edge to a Product a V-201 backlog row."""
-union LegacyEvaluatedIntervention = Product | ChemicalSubstance | MaterialMixture | ChemicalForm | IngredientMaterial | FoodItem | FoodProduct | Protocol | Treatment | Device | Procedure | Lifestyle
+ChemicalSubstance (D-002), CompoundForm -> ChemicalForm and IngredientMaterial (W02-SR-20), FoodItem -> IngredientMaterial
+(W05 FoodItem carries the IngredientMaterial label), FoodProduct -> Product (retired by W05), Lifestyle (W05),
+Treatment/Procedure (W06), Device (W08), Protocol (W16). Specializations that carry a member's label (MaterialMixture,
+FoodItem, MicrobialPreparation -> IngredientMaterial) are NOT listed beside their parent: under @neo4j/graphql 7.6.3 a union
+listing both returns the node twice (W05-SR-09; merge check OVERLAP). Never written; INV-201 makes every legacy EVALUATES
+edge to a Product a V-201 backlog row."""
+union LegacyEvaluatedIntervention = Product | ChemicalSubstance | ChemicalForm | IngredientMaterial | Protocol | Treatment | Device | Procedure | Lifestyle
 
 """CANDIDATE (CQ-ST-C02). Reusable definition a study intervention instantiates when what was administered is a procedure,
-a treatment regimen, a public protocol edition or a lifestyle practice rather than (or in addition to) a material or device.
-Members owned by W06 (Procedure, Treatment), W16 (ProtocolEdition), W05 (Lifestyle)."""
-union InterventionDefinitionTarget = Procedure | Treatment | ProtocolEdition | Lifestyle
+a treatment regimen, a public protocol edition, a named protocol whose edition content is unknown (W05-SR-06: DICA-NUTS
+'Brazilian cardioprotective diet prescription'), or a lifestyle practice, rather than (or in addition to) a material or device.
+Members owned by W06 (Procedure, Treatment), W16 (ProtocolEdition, Protocol), W05 (Lifestyle). Supported by W06-SR-03."""
+union InterventionDefinitionTarget = Procedure | Treatment | ProtocolEdition | Protocol | Lifestyle
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Relationship-property types (W09 sole writer). Each embeds every field of the frozen W00 type it specializes.

@@ -47,14 +47,14 @@
 - {live: Claim.isPreclinical, final: null, action: retire, note: as isClinical}
 - {live: Claim.about (ABOUT, ClaimSubject), final: null, action: retire, note: derivable from instance assertions' HAS_SUBJECT/HAS_OBJECT; W20 owns retrieval ABOUT}
 - {live: Claim.supportedBy (SUPPORTED_BY -> Chunk), final: null, action: retire, note: a Claim has no source; move support to the instance occurrences with a locator (V-407)}
-- {live: Claim.occurrences (INSTANCE_OF, RoleMetadata), final: Claim.occurrences (INSTANCE_OF, InstanceOfProperties), action: derive, note: "set derivationRule = 'legacy-instance-of' on existing edges (V-417); RoleMetadata dropped"}
+- {live: Claim.occurrences (INSTANCE_OF, RoleMetadata), final: Claim.occurrences (INSTANCE_OF, DerivedEdgeProperties), action: derive, note: "set derivationRule = 'legacy-instance-of' on existing edges (V-417); RoleMetadata dropped"}
 - {live: Claim @fulltext ClaimSearch, final: Claim @fulltext ClaimSearch, action: keep, note: operations.cypher}
 - {live: ClaimOccurrence, final: ClaimOccurrence, action: keep, note: "add label Assertion; add predicate/status/recordedAt/polarity/assertionBasis/speechAct; status from MIGRATION CAPTURE_FIDELITY adjudication"}
 - {live: ClaimOccurrence.utteranceText, final: ClaimOccurrence.utteranceText, action: keep, note: display copy; create TEXT_QUOTE locator from it when no locator exists (flag captureCompleteness UNKNOWN)}
 - {live: ClaimOccurrence.occursIn (OCCURS_IN, RoleMetadata), final: ClaimOccurrence.occursIn (OCCURS_IN), action: keep, note: exactly one; range adds Publication; split occurrences with more than one container}
 - {live: ClaimOccurrence.occursInSegments (OCCURS_IN_SEGMENT, OrderingMetadata), final: ClaimOccurrence.inSegments (OCCURS_IN_SEGMENT), action: split, note: startTime/endTime -> rendition locator when rendition known}
 - {live: ClaimOccurrence.utteredBy (UTTERED_BY), final: ClaimOccurrence.assertedBy (ASSERTED_BY), action: rename, note: "copy then delete; occurrences with several speakers split one per speaker (fx05); D-006"}
-- {live: ClaimOccurrence.instanceOf (INSTANCE_OF, RoleMetadata), final: ClaimOccurrence.instanceOf (InstanceOfProperties), action: derive, note: derivationRule legacy-instance-of}
+- {live: ClaimOccurrence.instanceOf (INSTANCE_OF, RoleMetadata), final: ClaimOccurrence.instanceOf (DerivedEdgeProperties), action: derive, note: derivationRule legacy-instance-of}
 - {live: ClaimOccurrence.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata), final: "ClaimOccurrence.supportedBy (SUPPORTED_BY -> SourceLocator) + supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties)", action: split, note: "quoteSpan -> SourceLocator.exact; locatorUid on the chunk edge (V-407); extractor fields -> Activity (round 0006 D9)"}
 - {live: RelationshipAssertion, final: RelationshipAssertion, action: keep, note: "labels [RelationshipAssertion, Assertion]"}
 - {live: RelationshipAssertion.subject (SUBJECT, MediaSubject list), final: RelationshipAssertion.subject (HAS_SUBJECT), action: split, note: one assertion per (subject, object) pair (V-420)}
@@ -87,5 +87,5 @@
 - {live: RecommendationMetadata, final: DerivedEdgeProperties, action: retire, note: CL-016, D-011}
 - {live: Organization.sponsors (SPONSORS, Sponsorable), final: SPONSORS_CONTENT, action: rename, note: "asserted; backfill assertions; Sponsorable (Conference|Channel|Episode) -> W18 SponsorableTarget (adds Series, Document)"}
 - {live: OrderingMetadata (on HAS_EPISODE, HAS_SERIES, INCLUDES_EPISODE, HAS_SEGMENT, OCCURS_IN_SEGMENT), final: "StructuralEdgeProperties + Episode fields + SourceLocator", action: split, note: see rows above}
-- {live: RoleMetadata (on APPEARS_IN, SERVES_ON_CHANNEL, OPERATES_CHANNEL, HOSTS_CHANNEL, ON_PLATFORM, OCCURS_IN, UTTERED_BY, INSTANCE_OF, AUTHORS, REPORTS), final: "AppearanceProperties | AssertedEdgeProperties | StructuralEdgeProperties | InstanceOfProperties | none", action: split, note: per relationship class}
+- {live: RoleMetadata (on APPEARS_IN, SERVES_ON_CHANNEL, OPERATES_CHANNEL, HOSTS_CHANNEL, ON_PLATFORM, OCCURS_IN, UTTERED_BY, INSTANCE_OF, AUTHORS, REPORTS), final: "AppearanceProperties | AssertedEdgeProperties | StructuralEdgeProperties | DerivedEdgeProperties | none", action: split, note: per relationship class}
 - {live: PseudonymousActor.onPlatforms (ON_PLATFORM, RoleMetadata), final: "ON_PLATFORM (StructuralEdgeProperties)", action: keep, note: W01 writes PseudonymousActor field; W21 Platform.pseudonymousAccounts is the inverse}

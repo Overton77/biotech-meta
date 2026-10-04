@@ -9,8 +9,8 @@
 // individual-unit (W15) and quantity-declaration (W04) are placeholders for those owners' tokens.
 // Status: executed on embedded Neo4j 5.26.31 Community (see 06-fixtures-and-queries.md for counts).
 
-// A. E. coli NOT_DETECTED (enumeration, LOD 10 CFU/g) on lot 70579. Lot 70918 has no E. coli execution at all: NOT MEASURED (no node is written).
-// Lot P098-01: QUALITATIVE_ABSENT (fixture 10, Lab Z). Lot T25189001: NOT_REPORTED pass (fixture 10, real COA).
+// A. E. coli BELOW_DETECTION (enumeration, LOD 10 CFU/g) on lot 70579. Lot 70918 has no E. coli execution at all: NOT MEASURED (no node is written).
+// Lot P098-01: QUALITATIVE_ABSENT, a requested shared value (fixture 10, Lab Z). Lot T25189001: NOT_REPORTED pass (fixture 10, real COA).
 MERGE (n:TestSample:Entity {uid: 'hu:test-sample:synthetic-lab-z-70579'})
 SET n.entityType = 'TEST_SAMPLE', n.privacyClass = 'PUBLIC', n.schemaVersion = 'w12-proposal-0.1', n.name = 'Lab Z sample of Basis lot 70579 (synthetic)', n.sampleCode = 'LZ-S-2026-0391', n.id = 'synthetic-lab-z-70579', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
 
@@ -51,7 +51,7 @@ MERGE (x)-[r:PERFORMED_BY_LAB {relationshipUid: 'hu:rel:w12-performed-by-lz-7057
 SET r.assertionUid = 'hu:assertion:w12-performed-by-lz-70579-ecoli', r.recordedFrom = datetime('2026-10-04T02:00:00Z'), r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN';
 
 MERGE (n:MeasuredResult:InformationArtifact {uid: 'hu:measured-result:synthetic-lab-z-70579-e-coli'})
-SET n.artifactType = 'MEASURED_RESULT', n.privacyClass = 'PUBLIC', n.schemaVersion = 'w12-proposal-0.1', n.contentHash = 'sha256:eaf330e2a47e7dca4ca09f01d1eb6e4769becec753fa8093cf4cb17ad75b2a58', n.name = 'Lab Z 70579 E. coli < 10 CFU/g', n.analyte = 'E. coli', n.valueTextVerbatim = '< 10 CFU/g', n.unitCode = '[CFU]/g', n.limitOfDetection = 10.0, n.qualifier = 'NOT_DETECTED', n.id = 'synthetic-lab-z-70579-e-coli', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
+SET n.artifactType = 'MEASURED_RESULT', n.privacyClass = 'PUBLIC', n.schemaVersion = 'w12-proposal-0.1', n.contentHash = 'sha256:eaf330e2a47e7dca4ca09f01d1eb6e4769becec753fa8093cf4cb17ad75b2a58', n.name = 'Lab Z 70579 E. coli < 10 CFU/g', n.analyte = 'E. coli', n.valueTextVerbatim = '< 10 CFU/g', n.unitCode = '[CFU]/g', n.limitOfDetection = 10.0, n.qualifier = 'BELOW_DETECTION', n.id = 'synthetic-lab-z-70579-e-coli', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
 
 MATCH (x:TestExecution {uid: 'hu:test-execution:synthetic-lab-z-70579-ecoli'}), (y:MeasuredResult {uid: 'hu:measured-result:synthetic-lab-z-70579-e-coli'})
 MERGE (x)-[r:PRODUCED_RESULT]->(y);
@@ -179,7 +179,7 @@ MERGE (x)-[r:PERFORMED_BY_LAB {relationshipUid: 'hu:rel:w12-performed-by-70064-m
 SET r.assertionUid = 'hu:assertion:w12-performed-by-70064-m18', r.recordedFrom = datetime('2026-10-04T02:00:00Z'), r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN';
 
 MERGE (n:MeasuredResult:InformationArtifact {uid: 'hu:measured-result:synthetic-lab-z-70064-m18-potency'})
-SET n.artifactType = 'MEASURED_RESULT', n.privacyClass = 'PUBLIC', n.schemaVersion = 'w12-proposal-0.1', n.contentHash = 'sha256:b81e5ecaa4aa6558d5b35a5a67561e9d83dbe9f76bb395613a9a5976a3ced1c9', n.name = 'Lot 70064 month-18 potency', n.analyte = 'Nicotinamide Riboside Chloride', n.value = 258.0, n.valueTextVerbatim = '258 mg/serving', n.unitCode = 'mg/{serving}', n.uncertainty = 9.0, n.uncertaintyKind = 'EXPANDED', n.coverageFactor = 2.0, n.qualifier = 'QUANTIFIED', n.quantityBasis = 'PER_SERVING', n.massBasis = 'SALT_FORM', n.amountReferent = 'LISTED_INGREDIENT_AS_LISTED', n.id = 'synthetic-lab-z-70064-m18-potency', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
+SET n.artifactType = 'MEASURED_RESULT', n.privacyClass = 'PUBLIC', n.schemaVersion = 'w12-proposal-0.1', n.contentHash = 'sha256:b81e5ecaa4aa6558d5b35a5a67561e9d83dbe9f76bb395613a9a5976a3ced1c9', n.name = 'Lot 70064 month-18 potency', n.analyte = 'Nicotinamide Riboside Chloride', n.value = 258.0, n.valueTextVerbatim = '258 mg/serving', n.unitCode = 'mg/{serving}', n.uncertainty = 9.0, n.uncertaintyKind = 'EXPANDED', n.coverageFactor = 2.0, n.qualifier = 'NUMERIC', n.quantityBasis = 'PER_SERVING', n.massBasis = 'SALT_FORM', n.amountReferent = 'LISTED_INGREDIENT_AS_LISTED', n.id = 'synthetic-lab-z-70064-m18-potency', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
 
 MATCH (x:TestExecution {uid: 'hu:test-execution:synthetic-lab-z-70064-m18-potency'}), (y:MeasuredResult {uid: 'hu:measured-result:synthetic-lab-z-70064-m18-potency'})
 MERGE (x)-[r:PRODUCED_RESULT]->(y);

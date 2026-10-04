@@ -32,7 +32,7 @@
   proposedRuling: "Accept (a) and (b); OPERATED_BY derives only from SERVES_AS_CRO_FOR."
 - id: W09-SR-06
   targetOwner: W04 (with W02)
-  request: "Own shared DosageForm and AdministrationRoute enums used by ProductVariant and StudyIntervention, including WHOLE_FOOD, FOOD_FRACTION, BEVERAGE, SOFTGEL, CAPSULE, DEVICE_SESSION, ORAL, TRANSCRANIAL, TOPICAL, INHALED, OTHER."
+  request: "Own a shared DosageForm enum used by ProductVariant and StudyIntervention (incl. WHOLE_FOOD, FOOD_FRACTION, BEVERAGE, SOFTGEL, CAPSULE, DEVICE_SESSION, OTHER). AdministrationRoute (ORAL, TRANSCRANIAL, TOPICAL, INHALED, ...): W09 offers to own it for StudyIntervention and W16 StepDoseProperties (W16-SR-09 asked W09 or W00); Fable rules."
   cq: [CQ-ST-01, CQ-EV-04]
   failingCase: "fixtures/04: walnut meal, pomegranate juice and a transcranial device session cannot be expressed with the 0.2.0 card list (CAPSULE, SOFTGEL, TABLET, POWDER, GUMMY, LIQUID, INJECTION, OTHER); DOSAGE_FORM/ROUTE applicability dimensions compare StudyIntervention with ProductVariant and need one vocabulary."
   proposedRuling: "W04 defines both enums once; W09 switches the two String fields to them at merge."
@@ -50,7 +50,7 @@
   proposedRuling: "Target = W08 Device (model level); sham is the arm's armType; settings stay verbatimDoseText until W08 has a FirmwareVersion/DeviceModel failing case."
 - id: W09-SR-09
   targetOwner: W06, W16, W05, W02
-  request: "(a) Keep Procedure, Treatment (W06), ProtocolEdition (W16), Lifestyle (W05) as node types so InterventionDefinitionTarget resolves; (b) W06 makes Treatment.evaluatedInStudies read-only (@settable false) with properties LegacyInterventionArmProperties; (c) W02/W05/W06/W08/W16 confirm the successor names of the live union members used by LegacyEvaluatedIntervention."
+  request: "(a) Keep Procedure, Treatment (W06), ProtocolEdition and Protocol (W16), Lifestyle (W05) as node types so InterventionDefinitionTarget resolves; (b) W06 makes Treatment.evaluatedInStudies read-only (@settable false) with properties LegacyInterventionArmProperties; (c) W02/W05/W06/W08/W16 confirm the successor names of the live union members used by LegacyEvaluatedIntervention."
   cq: [CQ-ST-C02, INV-201]
   failingCase: "Live union StudyIntervention has 10 members; any member renamed or retired breaks the legacy union at merge."
   proposedRuling: "Fable resolves LegacyEvaluatedIntervention members at merge to the surviving successor types."

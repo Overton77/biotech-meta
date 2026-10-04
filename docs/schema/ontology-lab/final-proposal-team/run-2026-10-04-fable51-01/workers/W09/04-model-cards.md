@@ -189,7 +189,7 @@
 | HAS_INTERVENTION_COMPONENT | StudyIntervention → InterventionComponent | structural | one_or_more | StructuralEdgeProperties | |
 | USES_INTERVENTION_MATERIAL | InterventionComponent → IngredientMaterial \| ProductVariant \| ProductLot | asserted | exactly one target overall | InterventionMaterialProperties | FI USES_INTERVENTION_MATERIAL → EVALUATES_PRODUCT |
 | USES_INTERVENTION_DEVICE (CANDIDATE) | InterventionComponent → Device | asserted | zero_or_one | InterventionMaterialProperties | CQ-ST-C01 |
-| FOLLOWS_INTERVENTION_DEFINITION (CANDIDATE) | StudyIntervention → InterventionDefinitionTarget | asserted | zero_or_more | AssertedEdgeProperties | CQ-ST-C02 |
+| FOLLOWS_INTERVENTION_DEFINITION (CANDIDATE; W06 asks promotion) | StudyIntervention → InterventionDefinitionTarget | asserted | zero_or_more | AssertedEdgeProperties | CQ-ST-C02 |
 | HAS_ELIGIBLE_POPULATION, HAS_ENROLLED_COHORT | Study → StudyPopulation | structural | many | StructuralEdgeProperties | |
 | HAS_ANALYZED_COHORT | StudyResult → StudyPopulation | structural | zero_or_one | StructuralEdgeProperties | |
 | DEFINES_OUTCOME | Study → OutcomeDefinition | structural | many | StructuralEdgeProperties | |
@@ -259,8 +259,8 @@
 
 | Union | Members | Status |
 |---|---|---|
-| LegacyEvaluatedIntervention | Product, ChemicalSubstance, MaterialMixture, ChemicalForm, IngredientMaterial, FoodItem, FoodProduct, Protocol, Treatment, Device, Procedure, Lifestyle | Read-only legacy. Members follow D-002/W05/W06/W08/W16 survival (W09-SR-09). |
-| InterventionDefinitionTarget | Procedure, Treatment, ProtocolEdition, Lifestyle | CANDIDATE (CQ-ST-C02) |
+| LegacyEvaluatedIntervention | Product, ChemicalSubstance, ChemicalForm, IngredientMaterial, Protocol, Treatment, Device, Procedure, Lifestyle | Read-only legacy (W02-SR-20, W05-SR-06 accepted). Specializations carrying a member's label (FoodItem, MaterialMixture, MicrobialPreparation → IngredientMaterial) are not listed (duplicate rows under 7.6.3). FoodProduct retired into Product (W05). |
+| InterventionDefinitionTarget | Procedure, Treatment, ProtocolEdition, Protocol, Lifestyle | CANDIDATE (CQ-ST-C02); Protocol added for a named regimen without edition content (W05-SR-06); promotion supported by W06-SR-03 |
 
 ## F. Asserted predicates (Assertion-only, no edge)
 

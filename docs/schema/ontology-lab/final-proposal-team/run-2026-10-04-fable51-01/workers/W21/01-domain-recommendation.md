@@ -58,7 +58,7 @@ Live line numbers refer to `current_biotech_schema.graphql`. "Catalog" refers to
 | `Claim.isClinical`, `isPreclinical` | live | retire from Claim (evidence setting belongs to W03 `MechanismEvidenceContext` / W09 study design) | they describe evidence, not the proposition |
 | `Claim.about` (`ABOUT`, ClaimSubject) | live | retire (derivable from instance assertions' subjects/objects) | a Claim has no source; aboutness from extraction belongs on locator-level retrieval (W20) |
 | `Claim.supportedBy` (`SUPPORTED_BY` -> Chunk) | live | retire | a Claim has no source support; support flows through occurrences (V-407) |
-| `Claim.occurrences` (`INSTANCE_OF`) | live | keep; derived ruleOnly with `InstanceOfProperties` | V-417 needs `hypothesisUid` or `derivationRule` |
+| `Claim.occurrences` (`INSTANCE_OF`) | live | keep; derived ruleOnly with W00 `DerivedEdgeProperties` (`derivationRule` always set; an accepted ResolutionHypothesis uid goes in `derivedFromAssessmentUids`, W00 D-W00-18) | V-417 needs `derivationRule` or `hypothesisUid` |
 | `ClaimOccurrence` (2787) | live + cat | keep; refine to `["ClaimOccurrence","Assertion"]` implementing `AssertionArchetype` | D-006, CL-004; fx05 two-speaker split |
 | `ClaimOccurrence.utteranceText` | live | keep as display copy; locator authoritative | |
 | `ClaimOccurrence.occursIn` (`OccurrenceContainer`) | live | keep; exactly one; range adds `Publication` | W21-D05 failing case |
@@ -83,7 +83,7 @@ Live line numbers refer to `current_biotech_schema.graphql`. "Catalog" refers to
 | `Recommendable` union (1070) | live | seam: no registry owner; proposed `RecommendableTarget` (W21-SR-18) | `Compound` no longer exists (D-002) |
 | `RecommendationMetadata` (151) | live | retire; `RECOMMENDS` uses `DerivedEdgeProperties` | CL-016, D-011; fx07 |
 | `OrderingMetadata` (176) on narrative edges | live | split: orderIndex -> `StructuralEdgeProperties`; season/episode numbers -> `Episode`; startTime/endTime -> `SourceLocator` media seconds on a rendition; `rhetoricalRole` -> `EpisodeSegment.segmentType` | a time string without a rendition is not reproducible |
-| `RoleMetadata` on `APPEARS_IN`, `SERVES_ON_CHANNEL`, `OPERATES_CHANNEL`, `HOSTS_CHANNEL`, `ON_PLATFORM`, `OCCURS_IN`, `INSTANCE_OF` | live | split per class: asserted -> `AppearanceProperties`/`AssertedEdgeProperties`; structural -> `StructuralEdgeProperties` or none; derived -> `InstanceOfProperties` | contract B4 |
+| `RoleMetadata` on `APPEARS_IN`, `SERVES_ON_CHANNEL`, `OPERATES_CHANNEL`, `HOSTS_CHANNEL`, `ON_PLATFORM`, `OCCURS_IN`, `INSTANCE_OF` | live | split per class: asserted -> `AppearanceProperties`/`AssertedEdgeProperties`; structural -> `StructuralEdgeProperties` or none; derived -> `DerivedEdgeProperties` | contract B4 |
 | `Organization.sponsors` (`SPONSORS`, Sponsorable) | live (W01 side) | migrate to `SPONSORS_CONTENT` | bare `SPONSORS` collides with `SPONSORS_STUDY` |
 | `Person.recommends` (`RECOMMENDS`) | live (W01 side) | derived projection (CL-016) with `DerivedEdgeProperties` | V-423 amendment needed (W21-SR-07; fx07) |
 | `SPONSORS_CONTENT` | cat predicate | asserted edge Organization/ConsumerBrand -> Episode/Series/Channel/Document/Conference | V-W21-07 |
@@ -118,4 +118,4 @@ Live line numbers refer to `current_biotech_schema.graphql`. "Catalog" refers to
 
 ## 6. Smallest recommended model
 
-Ten node types (`Platform`, `Channel`, `Series`, `Episode`, `EpisodeSegment`, `Claim`, `ClaimOccurrence`, `RelationshipAssertion`, three assessments), one enum (`ClaimType`), three unions, four relationship-property types (`QualificationProperties`, `RetellingProperties`, `AppearanceProperties`, `InstanceOfProperties`), the registry's narrative relationships, and three new structural relationships (`IN_RENDITION`, `DELIMITED_BY`, `DISTRIBUTES_RENDITION`). `ExperienceReport` and six live relationship types are retired. No new archetype, no kernel field change, no Presentation node. Eleven candidate validation queries (V-W21-01..11) are proposed for the shared suite.
+Ten node types (`Platform`, `Channel`, `Series`, `Episode`, `EpisodeSegment`, `Claim`, `ClaimOccurrence`, `RelationshipAssertion`, three assessments), one enum (`ClaimType`), three unions, three relationship-property types (`QualificationProperties`, `RetellingProperties`, `AppearanceProperties`), the registry's narrative relationships, and three new structural relationships (`IN_RENDITION`, `DELIMITED_BY`, `DISTRIBUTES_RENDITION`). `ExperienceReport` and six live relationship types are retired. No new archetype, no kernel field change, no Presentation node. Eleven candidate validation queries (V-W21-01..11) are proposed for the shared suite.

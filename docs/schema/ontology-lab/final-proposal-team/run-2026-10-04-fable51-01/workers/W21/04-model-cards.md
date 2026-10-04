@@ -43,19 +43,20 @@ Conventions: every node type carries the B2 skeleton fields (`id`, `uid`, `name`
 - Meaning: proposition identity; no source, asserter, truth or evidence strength.
 - Archetype Entity; labels `["Claim","Entity"]`; uid token `claim`; `@fulltext ClaimSearch`.
 - Properties: `claimText` String (I, BellLabs normalized wording); `claimType` ClaimType (I); `claimPolarity` AssociationPolarity (I; direction inside the proposition); `isQuantitative`, `isCausal`, `isMechanistic` Boolean (I); `searchEmbedding` (C).
-- Edges: `INSTANCE_OF` <- ClaimOccurrence/RelationshipAssertion (derived ruleOnly, `InstanceOfProperties`); `ASSESSES_CLAIM_EVIDENCE` <- ClaimEvidenceAssessment.
+- Edges: `INSTANCE_OF` <- ClaimOccurrence/RelationshipAssertion (derived ruleOnly, W00 `DerivedEdgeProperties`; hypothesis uid in `derivedFromAssessmentUids`); `ASSESSES_CLAIM_EVIDENCE` <- ClaimEvidenceAssessment.
 - Removed: `evidenceStrength` (V-418), `isClinical`, `isPreclinical`, `about`, `supportedBy`.
 
 ### ClaimOccurrence
 - Meaning: one asserter's act of asserting in one container, supported by locators in that container's renditions.
 - Archetype Assertion; labels `["ClaimOccurrence","Assertion"]`; uid token `claim-occurrence`; implements `AssertionArchetype` (all kernel fields; W00 owns their meaning).
 - W21 properties: `utteranceText` String (display copy, O); `roleTitleVerbatim` String (O); `statedTense` String (PAST, PRESENT, FUTURE; O); `segmentKind` String (denormalized SPONSOR_READ etc.; I; must agree with segment).
+- Immutability: `@mutation(operations: [CREATE, UPDATE])` (no delete) and `@settable(onCreate: true, onUpdate: false)` on every kernel and W21 payload field and on HAS_SUBJECT/HAS_OBJECT/ASSERTED_BY/OCCURS_IN, mirroring W00's generic `Assertion`; `recordedTo` writable once on update; `massBasis`, `amountReferent`, `roleCodeVerbatim` mirror W00 (W00 seam request on A11).
 - Edges: `HAS_SUBJECT` (exactly_one), `HAS_OBJECT` (zero_or_one, xor literal), `ASSERTED_BY` -> ClaimSpeakerTarget (exactly_one), `OCCURS_IN` -> OccurrenceContainerTarget (exactly_one), `OCCURS_IN_SEGMENT` -> EpisodeSegment, `SUPPORTED_BY` -> SourceLocator, `SUPPORTED_BY_CHUNK` -> Chunk (derived, W20 `DerivedSupportProperties`), `WAS_GENERATED_BY` -> Activity, `INSTANCE_OF` -> Claim, `QUALIFIED_BY` <-> ClaimOccurrence (`QualificationProperties`), `RETELLS` -> Assertion (`RetellingProperties`), `ATTRIBUTES_TO` -> ClaimSpeakerTarget, `SUPERSEDES` <-> ClaimOccurrence (`SupersessionProperties`).
 - Rules: INV-402, V-410, V-411, V-412, V-416, V-417, V-W21-02/04/08/11. Status is capture fidelity only.
 
 ### RelationshipAssertion
 - Meaning: a structured relational assertion from a non-utterance span. Labels `["RelationshipAssertion","Assertion"]`; uid token `assertion`.
-- Properties: kernel fields; `predicateText` String (O, verbatim); `relationshipType` String (deprecated verbatim); `subjectLabel`, `objectLabel` String (O, surface forms).
+- Properties: kernel fields (same immutability as ClaimOccurrence); `roleTitleVerbatim`, `roleCodeVerbatim` String (O; structured role sources such as a disclosure page); `predicateText` String (O, verbatim); `relationshipType` String (deprecated verbatim); `subjectLabel`, `objectLabel` String (O, surface forms).
 - Edges: `HAS_SUBJECT` (exactly_one), `HAS_OBJECT` (zero_or_one), `ASSERTED_BY` -> AsserterTarget (at_most_one), `SUPPORTED_BY`, `WAS_GENERATED_BY`, `INSTANCE_OF`, `SUPERSEDES`, `VISUALIZES` <- MediaAsset (W22 `MediaLinkProperties`).
 - Rules: V-419, V-420.
 
@@ -102,7 +103,7 @@ Conventions: every node type carries the B2 skeleton fields (`id`, `uid`, `name`
 | QUALIFIED_BY | Assertion -> Assertion (SDL: ClaimOccurrence) | structural | many; same container | QualificationProperties | V-416 |
 | RETELLS | Assertion -> Assertion | structural | many; acyclic | RetellingProperties | V-412, V-413 |
 | ATTRIBUTES_TO | Assertion -> Person / Organization / PseudonymousActor / AnonymousActor | structural | zero_or_one | none | never the asserter (V-W21-04) |
-| INSTANCE_OF | Assertion -> Claim | derived (ruleOnly) | zero_or_one | InstanceOfProperties | V-417 |
+| INSTANCE_OF | Assertion -> Claim | derived (ruleOnly) | zero_or_one | DerivedEdgeProperties (W00) | V-417; hypothesis-backed edges set `derivationRule` and put the hypothesis uid in `derivedFromAssessmentUids` (W00 D-W00-18) |
 | ASSESSES_CLAIM_EVIDENCE | ClaimEvidenceAssessment -> Claim | structural | exactly_one | none | |
 | CLAIM_EVIDENCE_BASED_ON | ClaimEvidenceAssessment -> Assertion / Study / StudyResult / Publication | structural | many | none | |
 | ASSESSES_RETELLING / AGAINST_ORIGINAL | RetellingFidelityAssessment -> Assertion | structural | exactly_one each | none | V-415 |
@@ -120,7 +121,6 @@ Conventions: every node type carries the B2 skeleton fields (`id`, `uid`, `name`
 | QualificationProperties | StructuralEdgeProperties | `relationshipUid` String!, `qualificationKind` QualificationKind! | QUALIFIED_BY |
 | RetellingProperties | StructuralEdgeProperties | `relationshipUid` String!, `retellingMode` RetellingMode!, `linkBasis` RetellingLinkBasis!, `hypothesisUid`, `citationLocatorUid` | RETELLS |
 | AppearanceProperties | AssertedEdgeProperties | `roleType` RoleType!, `roleTitleVerbatim` | APPEARS_IN, SERVES_ON_CHANNEL |
-| InstanceOfProperties (registry admission W21-SR-12) | DerivedEdgeProperties | `hypothesisUid` | INSTANCE_OF |
 
 ## D. Enum and unions
 

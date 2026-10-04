@@ -190,6 +190,28 @@ MERGE (p)-[r:APPEARS_IN {assertionUid: row.a}]->(e)
 SET r.relationshipUid = row.rel, r.roleType = row.role, r.roleTitleVerbatim = row.t, r.validFrom = datetime('2026-01-12T00:00:00Z'), r.validFromPrecision = 'DAY',
     r.validFromBasis = 'STATED_BY_SOURCE', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T01:00:00Z');
 
+// The event page asserts which deck accompanied the talk (ACCOMPANIES_TALK, asserted; predicate registration W21-SR-15/22).
+MATCH (s:SourceSnapshot {uid: 'hu:snapshot:merck-event-jpm-hc-2026-2026-10-04'})
+MERGE (l:InformationArtifact:SourceLocator {uid: 'hu:locator:w21-merck-event-page-presentation-link'})
+SET l.id = 'w21-merck-event-page-presentation-link', l.artifactType = 'SourceLocator', l.uri = s.canonicalUri, l.selectorKind = 'TEXT_QUOTE',
+    l.exact = 'Presentation https://s21.q4cdn.com/488056881/files/doc_events/2026/Jan/12/MRK-2026-JP-Morgan-Presentation.pdf',
+    l.quoteHash = 'sha256:4964412a70c8ad3c60242d4b5070a0d9655fcb3e50cc49824e3fa25fc2f723de',
+    l.normalizationVersion = 'NFC-WS1', l.createdAt = datetime('2026-10-04T01:00:00Z')
+MERGE (s)-[:HAS_LOCATOR]->(l);
+
+MATCH (o:Organization {uid: 'hu:org:merck-and-co'}), (d:Document {uid: 'hu:source:merck-jpm-2026-presentation-pdf'}), (e:Episode {uid: 'hu:episode:merck-jpm-hc-2026-company-presentation'}),
+      (l:SourceLocator {uid: 'hu:locator:w21-merck-event-page-presentation-link'}), (act:Activity {uid: 'hu:activity:w21-extraction-2026-10-04'})
+MERGE (a:Assertion {uid: 'hu:assertion:w21-merck-deck-accompanies-jpm-2026-talk'})
+SET a.id = 'w21-merck-deck-accompanies-jpm-2026-talk', a.predicate = 'ACCOMPANIES_TALK', a.status = 'PROPOSED', a.polarity = 'POSITIVE',
+    a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.recordedAt = datetime('2026-10-04T01:00:00Z'), a.createdAt = datetime('2026-10-04T01:00:00Z')
+MERGE (a)-[:HAS_SUBJECT]->(d)
+MERGE (a)-[:HAS_OBJECT]->(e)
+MERGE (a)-[:ASSERTED_BY]->(o)
+MERGE (a)-[:SUPPORTED_BY]->(l)
+MERGE (a)-[:WAS_GENERATED_BY]->(act)
+MERGE (d)-[r:ACCOMPANIES_TALK {assertionUid: 'hu:assertion:w21-merck-deck-accompanies-jpm-2026-talk'}]->(e)
+SET r.relationshipUid = 'hu:rel:w21-accompanies-talk-merck-jpm-2026', r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T01:00:00Z');
+
 // ---- Part B (SYNTHETIC): slide PDF_PAGE versus talk MEDIA_TIME, same speaker, qualifier dropped in speech ------
 MERGE (n:Entity:Person {uid: 'hu:person:synthetic-conference-speaker'})
 SET n.id = 'synthetic-conference-speaker', n.entityType = 'Person', n.name = 'Synthetic Conference Speaker (fixture only)', n.fixtureProvenance = 'SYNTHETIC', n.createdAt = datetime('2026-10-04T01:00:00Z');

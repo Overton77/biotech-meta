@@ -7,13 +7,13 @@
 # CQs served: CQ-CL-01..06, CQ-CL-08, CQ-CL-09 (disposal), CQ-PV-01, CQ-PV-02, CQ-PV-05, CQ-EC-03, CQ-CM-04 (seam),
 # CQ-AX-05, CQ-AX-18, CQ-RC-05; candidates CQ-CL-C01..C04 (see 02-cq-coverage.md).
 #
-# Contains ONLY the elements the ownership registry assigns to W21 (plus the two new structural relationship types
-# DELIMITED_BY, IN_RENDITION, DISTRIBUTES_RENDITION, each requested for
-# registry admission in seam-requests.yaml W21-SR-03/04/05). Every other name (Source, SourceSnapshot,
+# Contains ONLY the elements the ownership registry assigns to W21 (plus the new relationship types
+# DELIMITED_BY, IN_RENDITION, DISTRIBUTES_RENDITION, ACCOMPANIES_TALK, each requested for
+# registry admission in seam-requests.yaml W21-SR-03/04/05/22). Every other name (Source, SourceSnapshot,
 # SourceLocator, Assertion, Activity, Agent, Person, Organization, ConsumerBrand, PseudonymousActor,
 # AnonymousActor, Document, Publication, Chunk, Study, StudyResult, MediaAsset, Event, TechnologyPlatform,
 # ToolOrInstrument, ManufacturingProcess, ManufacturingStep, IngredientMaterial, Treatment, Procedure,
-# SafetySignal, the shared interfaces, kernel enums, RoleType, EvidenceStrength, AssociationPolarity,
+# SafetySignal, the shared interfaces, kernel enums (incl. Polarity), RoleType, EvidenceStrength,
 # AssertionSubjectTarget, AsserterTarget, MassBasis, AmountReferent and the W00/W20/W22 relationship-property types) is imported by name.
 #
 # Relationship class and cardinality are written in each relationship field's description and are enforced by
@@ -198,6 +198,8 @@ type Episode implements Entity & EntityArchetype & SearchIndexable
   sponsoringBrands: [ConsumerBrand!]! @relationship(type: "SPONSORS_CONTENT", direction: IN, properties: "AssertedEdgeProperties")
   """class: structural; cardinality: many (each ClaimOccurrence has exactly one container); catalog: OCCURS_IN"""
   claimOccurrences: [ClaimOccurrence!]! @relationship(type: "OCCURS_IN", direction: IN)
+  """class: asserted (asserted_edge); cardinality: many; catalog: ACCOMPANIES_TALK (NEW, W19-SR-07, W21-SR-22) -- a slide deck or handout Document that accompanied this talk, as asserted by a source (for example the organizer's or company's event page); the Document stays its own container and is never a rendition"""
+  accompanyingDocuments: [Document!]! @relationship(type: "ACCOMPANIES_TALK", direction: IN, properties: "AssertedEdgeProperties")
   """class: derived (legacy retrieval projection, read-only; name collision with catalog MENTIONS SourceLocator->Mention is seam W21-SR-10); cardinality: many; catalog: none (live Episode.mentions)"""
   mentions: [EpisodeMentionableTarget!]! @relationship(type: "MENTIONS", direction: OUT) @settable(onCreate: false, onUpdate: false)
 }
@@ -278,8 +280,8 @@ type Claim implements Entity & EntityArchetype & SearchIndexable
   """Normalized proposition text written by BellLabs; never a quotation (quotations live on SourceLocator.exact)."""
   claimText: String
   claimType: ClaimType
-  """Direction inside the proposition (live AssociationPolarity; owner seam W21-SR-11)."""
-  claimPolarity: AssociationPolarity
+  """Direction inside the proposition ("raises" POSITIVE vs "lowers" NEGATIVE). Uses W00 Polarity (live AssociationPolarity retired per W03-SR-13; live NEUTRAL migrates to UNKNOWN with review). Affirmation vs denial is Assertion.polarity."""
+  claimPolarity: Polarity
   isQuantitative: Boolean
   isCausal: Boolean
   isMechanistic: Boolean
@@ -291,6 +293,8 @@ type Claim implements Entity & EntityArchetype & SearchIndexable
   relationshipAssertions: [RelationshipAssertion!]! @relationship(type: "INSTANCE_OF", direction: IN, properties: "DerivedEdgeProperties")
   """class: structural; cardinality: many (each assessment targets exactly one Claim); catalog: ASSESSES_CLAIM_EVIDENCE"""
   evidenceAssessments: [ClaimEvidenceAssessment!]! @relationship(type: "ASSESSES_CLAIM_EVIDENCE", direction: IN)
+  """class: derived, read-only (W20 DerivedSupportProperties: derivedFromAssertionUids = the instantiating assertions, locatorUid required; W20-SR-14); cardinality: many; catalog: SUPPORTED_BY_CHUNK. A Claim has no source of its own: this is a retrieval shortcut through its occurrences, never support."""
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
 }
 
 """
@@ -479,6 +483,8 @@ type RelationshipAssertion implements Entity & AssertionArchetype @node(labels: 
   generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
   """class: derived (ruleOnly); cardinality: zero_or_one; catalog: INSTANCE_OF"""
   instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "DerivedEdgeProperties")
+  """class: structural; cardinality: many; qualifier located in the same snapshot when there is no container (V-W21-12, amends V-416; W08-SR-10); catalog: QUALIFIED_BY"""
+  qualifiedBy: [Assertion!]! @relationship(type: "QUALIFIED_BY", direction: OUT, properties: "QualificationProperties")
   """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00)"""
   supersedes: [RelationshipAssertion!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
   """class: structural (media seam W22); cardinality: many; catalog: VISUALIZES (live, kept)"""

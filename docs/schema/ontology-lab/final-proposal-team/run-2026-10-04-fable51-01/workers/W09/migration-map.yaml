@@ -6,7 +6,7 @@ worker: W09
 run: run-2026-10-04-fable51-01
 entries:
   # ---- union and relationship-property type ----------------------------------------------------------------------
-  - {live: "union StudyIntervention", final: "union LegacyEvaluatedIntervention", action: rename, note: "D-003/CL-006. Members map to successors: Compound->ChemicalSubstance|MaterialMixture (D-002), CompoundForm->ChemicalForm|IngredientMaterial, others unchanged. Read-only through Study.evaluates."}
+  - {live: "union StudyIntervention", final: "union LegacyEvaluatedIntervention", action: rename, note: "D-003/CL-006. Members map to successors: Compound->ChemicalSubstance (D-002; a Compound node that W02 relabels MaterialMixture is still read through the IngredientMaterial member), CompoundForm->ChemicalForm|IngredientMaterial (W02-SR-20), FoodItem->IngredientMaterial member (W05 label), FoodProduct->Product (W05 retirement), others unchanged. Read-only through Study.evaluates."}
   - {live: "InterventionArmMetadata", final: "LegacyInterventionArmProperties", action: rename, note: "Stored names unchanged so legacy EVALUATES edges stay readable; never written. Its fields split onto arm/intervention/component for new data (below)."}
   - {live: "InterventionArmMetadata.armLabel", final: "StudyArm.name", action: move, note: "new data"}
   - {live: "InterventionArmMetadata.interventionRole", final: "StudyArm.armType", action: move, note: "free text mapped to ArmType; unmapped -> OTHER plus description"}

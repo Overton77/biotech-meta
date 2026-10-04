@@ -1,0 +1,591 @@
+# =====================================================================================================================
+# W17 Safety and use constraints -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01. Worker: W17 (Opus 5.5). Synthesizer: Fable 5.1.
+# Canonical module: safety_and_constraints (catalog/schema.yaml 0.2.0, digest 8fb50ff0...84f0, maturity candidate).
+# Live baseline: current_biotech_schema.graphql 86b5e0b5...f112, lines 262-272 (SafetyMetadata), 694 (SafetySubject),
+#   720-727 (SafetySeverity), 1021-1068 (AdverseEffect, SafetySignal), 1648 (Study.reportsSafetySignals).
+# CQs served: CQ-ST-06, CQ-RC-06, CQ-AX-02, CQ-AX-04 (QS-7), CQ-AX-24, CQ-PR-03/CQ-PR-04 (constraint facts only);
+#   candidates CQ-SF-C01..C05 (02-cq-coverage.md).
+# Invariants: INV-007, INV-207 (with W09), INV-209, INV-404, INV-506; validators V-W17-01..V-W17-12 (fixtures/w17-validation.cypher).
+# Decisions: SafetySignal is an EvidenceAssessment (D-W17-01); HAS_SAFETY_SIGNAL, RELATES_TO_EFFECT, RELATES_TO_CONDITION are
+#   structural assessment-target edges, not asserted edges (D-W17-02); UseConstraint is the shared scoped identity a
+#   private RecommendationOption blocks on (D-W17-04); ContraindicationAssertion and InteractionAssertion are Assertion
+#   specializations (D-W17-03).
+# Contract: section B of 01-shared-contract.md. No `extend`. Only W17-owned types, enums, unions and relationship-property
+# types are defined here. Imported by name (registry owners): Entity, SearchIndexable, EntityArchetype,
+# AssertionArchetype, EvidenceAssessmentArchetype, PrivacyClass, NodeMaturity, AssertionStatus, AssessmentStatus,
+# Polarity, BasisKind, PredicateClass, AssertionBasis, SpeechAct, TimePrecision, ValidTimeBasis, QuantityBasis, MassBasis,
+# ReportedStatus, StructuralEdgeProperties, DerivedEdgeProperties, SupersessionProperties, IdentifierLinkProperties,
+# SourceLocator, Activity, Identifier, AssertionSubjectTarget, AsserterTarget (W00); ChemicalSubstance,
+# IngredientMaterial (W02); Organ, Condition, MechanismLinkProperties, AssociationProjectionProperties, MechanismSetting (W03);
+# Product, ProductVariant (W04); Lifestyle, Exposure (W05); Treatment, Procedure (W06); Study, StudyResult (W09);
+# UseContextProfile, EvidenceStrength (W10); ThresholdComparator (W16); Document, Chunk, DerivedSupportProperties (W20).
+# New relationship types, property types, enums and unions beyond the registry row are requested in seam-requests.yaml
+# (W17-SR-01); each maps to a CQ and a fixture failing case.
+# Relationship class and cardinality are in each field description and are enforced by operations/validation, not SDL.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Enums (W17 sole writer)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Assessed severity (intensity) of an adverse effect as characterized by one SafetySignal assessment. Live values kept
+for compatibility (live lines 720-727). Severity is NOT seriousness: regulatory seriousness of a reported event is
+AdverseEventResult.seriousness (W09 AeSeriousness). SERIOUS is a legacy mixed-axis value: readable, never written by
+new assessments (V-W17-10). UNKNOWN = assessed and not determinable; null = not assessed. CQ-ST-06, CQ-AX-24.
+"""
+enum SafetySeverity {
+  MILD
+  MODERATE
+  SEVERE
+  SERIOUS
+  LIFE_THREATENING
+  UNKNOWN
+}
+
+"""
+Lifecycle state a SafetySignal assessment assigns to a subject-effect signal. A signal is a hypothesis that warrants
+evaluation; only CONFIRMED_ASSOCIATION states an association, and even that is not a causal or personal conclusion.
+POTENTIAL = identified, evaluation not started; UNDER_EVALUATION = the assessor (or an imported agency) states it is
+being evaluated (FDA AEMS "FDA is evaluating the need for regulatory action"); CONFIRMED_ASSOCIATION = evaluation
+concluded an association (for an agency import: a labeling change adding the risk); CLOSED_NO_ACTION = evaluated,
+no action taken "at the time based on available information" (never "no risk", FI-W17-04); NOT_SUPPORTED = evaluated
+against the inputs, association not supported; INSUFFICIENT_DATA = evaluated, inputs cannot decide; NOT_EVALUATED =
+migrated live SafetySignal row with no method (methodVersion live-migration/*). CQ-SF-C01, CQ-AX-24.
+"""
+enum SignalStatus {
+  POTENTIAL
+  UNDER_EVALUATION
+  CONFIRMED_ASSOCIATION
+  CLOSED_NO_ACTION
+  NOT_SUPPORTED
+  INSUFFICIENT_DATA
+  NOT_EVALUATED
+}
+
+"""
+Directive strength a SOURCE states for a use restriction (ContraindicationAssertion.constraintLevel), mapped from its
+own wording; levelVerbatim keeps the words. Ordered from strongest. Whether a level BLOCKS or merely lowers a score is
+decided by the private ranking policy (PolicyVersion RECOMMENDATION_RANKING, W23), never by this enum; the shared graph
+only keeps the level distinct (FI-W17-02: USE_WITH_CAUTION is not CONTRAINDICATED). Grounding: CONTRAINDICATED and
+DO_NOT_EXCEED_DOSE (ZOCOR label sections 4, 2.5); AVOID (ZOCOR 7 grapefruit; AFP 2017 St. John's wort);
+NOT_RECOMMENDED (ZOCOR 7 niacin in Chinese patients); USE_WITH_CAUTION (ZOCOR 7 niacin "consider if the benefit
+... outweighs"); MONITOR (AFP 2017 kava, ginseng); MAINTAIN_CONSISTENT_INTAKE (NIH ODS vitamin K and warfarin);
+CONSULT_CLINICIAN (NIH ODS). CQ-RC-06.
+"""
+enum ConstraintLevel {
+  CONTRAINDICATED
+  DO_NOT_EXCEED_DOSE
+  AVOID
+  NOT_RECOMMENDED
+  USE_WITH_CAUTION
+  MONITOR
+  MAINTAIN_CONSISTENT_INTAKE
+  CONSULT_CLINICIAN
+}
+
+"""
+Role of one scope member of a UseConstraint (CONSTRAINT_SCOPE edge). CONDITION_PRESENT = the constrained use is in
+people with this Condition (acute liver failure); POPULATION = a non-personal UseContextProfile (pregnant patients,
+patients of Chinese descent); CO_EXPOSURE = concurrent use of this substance, material, product, treatment or
+lifestyle (verapamil, niacin at >= 1 g/day, grapefruit juice). CQ-RC-06, CQ-SF-C03.
+"""
+enum ConstraintScopeRole {
+  CONDITION_PRESENT
+  POPULATION
+  CO_EXPOSURE
+}
+
+"""
+Role of a subject in one SafetySignal (HAS_SAFETY_SIGNAL edge). PRIMARY = the exposure the signal is about (exactly
+one); CO_EXPOSURE = a second exposure for an interaction signal (FDA AEMS rows titled "Drug interaction").
+CQ-SF-C01.
+"""
+enum SafetySubjectRole {
+  PRIMARY
+  CO_EXPOSURE
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Unions (W17 sole writer). Parent-only rule (W00 D-W00-05): IngredientMaterial covers FoodItem, BotanicalPreparation,
+# MaterialMixture, BrandedIngredientMaterial; Product covers live FoodProduct (W05).
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Things whose use can carry a safety signal or a use constraint (successor of live SafetySubject, line 694). Live
+Compound -> ChemicalSubstance (D-002); Ingredient, FoodItem -> IngredientMaterial (W02/W05); FoodProduct -> Product
+(W05-SR-12); ProductVariant added because dose and composition differ by variant (W04-SR-10); Exposure added for
+environmental exposures (W05-SR-12). CQ-ST-06, CQ-RC-06.
+"""
+union SafetySubjectTarget = ChemicalSubstance | IngredientMaterial | Product | ProductVariant | Treatment | Procedure | Lifestyle | Exposure
+
+"""
+Inputs a SafetySignal assessment is based on: StudyResult (covers AdverseEventResult by label, parent-only rule) for
+reported counts and measured safety labs; Study for a study considered whose AE reporting status is recorded on the
+edge (NOT_REPORTED never becomes a zero, INV-207); Assertion for a source statement such as an agency's
+potential-signal listing. CQ-ST-06, CQ-SF-C01.
+"""
+union SafetySignalInputTarget = StudyResult | Study | Assertion
+
+"""
+Scope members of a UseConstraint (CONSTRAINT_SCOPE): conditions, non-personal populations, and co-exposures. Never a
+person, a private record or a private uid (INV-506). CQ-RC-06.
+"""
+union UseConstraintScopeTarget = Condition | UseContextProfile | ChemicalSubstance | IngredientMaterial | Product | ProductVariant | Treatment | Procedure | Lifestyle | Exposure
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Relationship-property types (W17 sole writer)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+HAS_SAFETY_SIGNAL (structural: subject -> SafetySignal assessment, written in the assessment's commit and immutable
+with it). Specializes StructuralEdgeProperties (orderIndex, notes, mongoResearchRunId, all kept) and adds the exposure
+scope of THIS subject inside the signal (live SafetyMetadata.doseText, route, frequency, exposureContext,
+populationSubset). Live SafetyMetadata.evidenceStrength and confidence are removed: strength is the assessment's own
+method-versioned content (INV-209); a migrated value is kept only as SafetySignal.legacyEvidenceStrengthHint (V-W17-07).
+Not an asserted-edge profile: no Assertion has a BellLabs assessment as its object (D-W17-02, fixture N4). Dose text is
+verbatim; normalized dose bounds live on UseConstraint/ContraindicationAssertion, not here. CQ-ST-06, CQ-SF-C01.
+"""
+type SafetyEdgeProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  "Stable audit id hu:rel:<opaque> (MERGE key)."
+  relationshipUid: String!
+  "PRIMARY exactly once per SafetySignal; CO_EXPOSURE for interaction signals."
+  subjectRole: SafetySubjectRole!
+  "Verbatim exposure context (live SafetyMetadata.exposureContext)."
+  exposureContext: String
+  "Verbatim dose text as reported by the inputs ('500 mg NR + 100 mg PT daily'); never parsed into a threshold here."
+  doseText: String
+  route: String
+  frequency: String
+  "Verbatim population subset (live SafetyMetadata.populationSubset); a non-personal descriptor only."
+  populationSubset: String
+}
+
+"""
+SIGNAL_BASED_ON (structural: SafetySignal -> StudyResult | Study | Assertion). Specializes StructuralEdgeProperties
+(orderIndex, notes, mongoResearchRunId) and adds aeReportedStatus (kernel ReportedStatus) so a considered study whose
+publication has no AE report is recorded as NOT_REPORTED instead of being dropped or read as zero (INV-207, CQ-ST-06),
+and inputRole (controlled string: INDEX_ARM, COMPARATOR_ARM, AGENCY_LISTING, MEASURED_LAB, NOT_REPORTED_STUDY).
+"""
+type SignalInputProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  "REPORTED for AE rows and listings; NOT_REPORTED for a Study input whose sources report no AEs; NOT_APPLICABLE for non-AE inputs."
+  aeReportedStatus: ReportedStatus!
+  inputRole: String
+}
+
+"""
+CONSTRAINT_SCOPE (structural, part of UseConstraint identity). Specializes StructuralEdgeProperties (orderIndex, notes,
+mongoResearchRunId) and adds scopeRole and an optional dose band for a CO_EXPOSURE member ("lipid-modifying dosages
+of niacin (>= 1 gram/day)"). A dose band needs comparator, value, unit and quantity basis together (V-W17-08).
+CQ-RC-06, CQ-SF-C03.
+"""
+type ConstraintScopeProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  scopeRole: ConstraintScopeRole!
+  doseComparator: ThresholdComparator
+  doseValue: Float
+  "UCUM unit of doseValue."
+  doseUnitCode: String
+  doseQuantityBasis: QuantityBasis
+  doseMassBasis: MassBasis
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Node types
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+AdverseEffect: a reference concept for a kind of harm (myopathy, rhabdomyolysis, nausea, tumor lysis syndrome, LDL
+cholesterol increased) that safety signals, interaction statements and use constraints concern. It is NOT an event
+that happened to anyone (that is a W09 AdverseEventResult count, or private data), NOT a signal (SafetySignal), NOT a
+severity verdict, and NOT the same identity as a W03 Condition with a similar name: a harm concept that is also a
+disease keeps two nodes and no merge by name (FI SIMILAR_NAME -> SAME_IDENTITY). MedDRA or other terminology codes are
+Identifier records (HAS_IDENTIFIER); names are never identity. Live type kept (line 1021). CQ-ST-06, CQ-SF-C01.
+Canonical module: safety_and_constraints (candidate). Archetype Entity. uid token `adverse-effect` (W17-SR-02).
+"""
+type AdverseEffect implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["AdverseEffect", "Entity"])
+  @fulltext(indexes: [{indexName: "AdverseEffectSearch", fields: ["name", "description", "searchText", "effectCategory"], queryName: "searchAdverseEffects"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "constant ADVERSE_EFFECT"
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Controlled string (candidate values SYMPTOM, LAB_ABNORMALITY, DIAGNOSIS, INJURY, MEDICATION_ERROR, OTHER); live field kept."
+  effectCategory: String
+  "Display grouping text (e.g. MedDRA SOC name); not identity and not a link to Organ (live field kept)."
+  organSystem: String
+  "DEPRECATED (live): a timeless severity summary is not evidence; severity lives on SafetySignal.severity. Read-only."
+  severitySummary: String @settable(onCreate: false, onUpdate: false)
+
+  """class: structural; cardinality: many; catalog: HAS_IDENTIFIER (W00) -- MedDRA PT/LLT or other terminology codes with issuer and version."""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: structural (curated reference involvement); cardinality: many; catalog: AFFECTS_ORGAN (one meaning shared with W03 Condition.affectsOrgans, W03-SR-08 ruling)"""
+  affectsOrgans: [Organ!]! @relationship(type: "AFFECTS_ORGAN", direction: OUT, properties: "MechanismLinkProperties")
+  """class: derived (W03 one-to-one projection of an ASSOCIATED_WITH_CONDITION assertion); cardinality: many; read-only"""
+  associatedWithConditions: [Condition!]! @relationship(type: "ASSOCIATED_WITH_CONDITION", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (inverse); catalog: RELATES_TO_EFFECT -- signals about this effect"""
+  safetySignals: [SafetySignal!]! @relationship(type: "RELATES_TO_EFFECT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural (inverse); catalog: RELATES_TO_EFFECT -- directives naming this harm as their reason"""
+  contraindicationAssertions: [ContraindicationAssertion!]! @relationship(type: "RELATES_TO_EFFECT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural (inverse); catalog: RELATES_TO_EFFECT -- interaction statements naming this harm"""
+  interactionAssertions: [InteractionAssertion!]! @relationship(type: "RELATES_TO_EFFECT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: derived (W20 DerivedSupportProperties; INV-404); read-only"""
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (W20 DerivedSupportProperties; a chunk is never a locator, INV-404); read-only"""
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+SafetySignal: one immutable, method-versioned BellLabs evaluation that a subject-effect pair (optionally with a
+co-exposure) shows a reported or measured pattern warranting attention, with its lifecycle state (signalStatus), its
+exact inputs (AdverseEventResults and other StudyResults, Studies considered with their AE reporting status, and source
+assertions such as an FDA AEMS potential-signal listing) and its scope. A re-evaluation is a new SafetySignal that
+SUPERSEDES the old (KCR-2a); the old stays replayable at its recordedAt. It is NOT a fact that the subject causes the
+effect (an agency listing "does not mean that FDA has concluded that the drug has the listed risk"), NOT an adverse
+event, NOT an agency's own statement (that is an Assertion input), and NOT a use constraint (a signal never blocks a
+recommendation by itself; a UseConstraint does). Live type kept and re-founded (line 1041; round 0002 OQ-L2-10 closed
+as proposed by D-W17-01). Live evidenceStrength becomes legacyEvidenceStrengthHint, never a verdict (INV-209).
+CQ-ST-06, CQ-AX-24, CQ-SF-C01, CQ-SF-C02. Canonical module: safety_and_constraints (candidate). Archetype
+EvidenceAssessment. uid token `safety-signal` (W17-SR-02).
+"""
+type SafetySignal implements Entity & EvidenceAssessmentArchetype & SearchIndexable
+  @node(labels: ["SafetySignal", "EvidenceAssessment"])
+  @fulltext(indexes: [{indexName: "SafetySignalSearch", fields: ["name", "description", "searchText", "signalType", "interactionSummary"], queryName: "searchSafetySignals"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "constant SafetySignal"
+  assessmentType: String!
+  "Method and version that produced this assessment (bl-safety-signal/0.1, agency-signal-import/0.1, live-migration/0)."
+  methodVersion: String!
+  "Workflow state of the record (kernel AssessmentStatus); never the signal state."
+  status: AssessmentStatus!
+  "Service-assigned commit time; never backdated."
+  recordedAt: DateTime!
+  "Written once from null when superseded."
+  recordedTo: DateTime
+  summary: String
+  "Must stay null: no composite score is defined for safety signals (INV-204)."
+  overallScore: Float
+  "DEPRECATED generic confidence (INV-407); never written."
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Lifecycle state assigned by this assessment."
+  signalStatus: SignalStatus!
+  "Controlled string (candidate values NEW_EFFECT, INCREASED_FREQUENCY, DOSE_RELATED_TOLERABILITY, LAB_ABNORMALITY, INTERACTION); live field kept."
+  signalType: String
+  "Assessed severity of the effect in this assessment; null = not assessed. SERIOUS is legacy (V-W17-10)."
+  severity: SafetySeverity
+  "Evaluation cutoff: inputs recorded after this instant were not considered."
+  evidenceCutoff: DateTime
+  frequencyText: String
+  latencyText: String
+  reversibility: String
+  mechanismSummary: String
+  populationSummary: String
+  "Legacy display text (live); interactions are InteractionAssertions, never parsed from this text."
+  interactionSummary: String
+  """
+  Live SafetySignal.evidenceStrength kept as an extraction-time hint (INV-209, CQ-AX-24). Never a verdict: a signal
+  whose only support is this hint has signalStatus NOT_EVALUATED (V-W17-02). Enum owned by W10 (legacy hint enum).
+  """
+  legacyEvidenceStrengthHint: EvidenceStrength
+
+  """class: structural (assessment target); cardinality: one_or_more (exactly one PRIMARY); catalog: HAS_SAFETY_SIGNAL (live direction subject -> signal kept)"""
+  subjects: [SafetySubjectTarget!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: IN, properties: "SafetyEdgeProperties")
+  """class: structural (assessment object); cardinality: exactly_one; catalog: RELATES_TO_EFFECT"""
+  relatesToEffects: [AdverseEffect!]! @relationship(type: "RELATES_TO_EFFECT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: RELATES_TO_CONDITION -- a pre-existing condition that scopes the signal (risk modifier), never the effect itself"""
+  relatesToConditions: [Condition!]! @relationship(type: "RELATES_TO_CONDITION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: one_or_more; catalog: SIGNAL_BASED_ON (new, W17-SR-01)"""
+  basedOn: [SafetySignalInputTarget!]! @relationship(type: "SIGNAL_BASED_ON", direction: OUT, properties: "SignalInputProperties")
+  """class: derived (rule ss-study/v1 over SIGNAL_BASED_ON inputs; derivedFromAssessmentUids = [this uid]); cardinality: many; catalog: REPORTS_SAFETY_SIGNAL (live Study.reportsSafetySignals); read-only"""
+  reportedInStudies: [Study!]! @relationship(type: "REPORTS_SAFETY_SIGNAL", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (newer -> older SafetySignal; KCR-2a)"""
+  supersedes: [SafetySignal!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural (inverse); catalog: SUPERSEDES"""
+  supersededBy: [SafetySignal!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties")
+  """class: structural; cardinality: many; catalog: SUPPORTED_BY (W00) -- locators an imported agency status was read from"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (W00) -- the assessment Activity (method run)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: derived (W20 DerivedSupportProperties); read-only"""
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (W20 DerivedSupportProperties); read-only"""
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+ContraindicationAssertion: one source's directive restricting the use of its subject (a substance, material, product,
+variant, treatment, procedure, lifestyle or exposure) in a condition or population (predicate USE_CONSTRAINED_IN,
+object Condition or UseContextProfile) or together with a co-exposure (predicate USE_CONSTRAINED_WITH, object the
+co-exposure), at a stated level (constraintLevel, levelVerbatim) and optional dose band, route and jurisdiction. Full
+kernel Assertion contract: one subject, one object, at most one asserter, status = capture fidelity, polarity
+(NEGATIVE = the source states the restriction does not apply or is removed, e.g. FDA 2021 statin pregnancy), bitemporal.
+It is NOT an interaction fact (InteractionAssertion), NOT the shared constraint identity (UseConstraint, reached by the
+derived RESOLVES_TO_CONSTRAINT), NOT a block (the private policy decides), and NOT evidence of safety when absent.
+Named after the catalog element; covers every directive level, including those weaker than a contraindication.
+CQ-RC-06, CQ-PR-03, CQ-SF-C03. Canonical module: safety_and_constraints (candidate). Archetype Assertion (labels
+ContraindicationAssertion:Assertion). uid token `assertion` (as RelationshipAssertion; W17-SR-02).
+"""
+type ContraindicationAssertion implements Entity & AssertionArchetype
+  @node(labels: ["ContraindicationAssertion", "Assertion"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "USE_CONSTRAINED_IN | USE_CONSTRAINED_WITH (candidate predicates, W17-SR-03)."
+  predicate: String! @settable(onCreate: true, onUpdate: false)
+  status: AssertionStatus!
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  contentHash: String @settable(onCreate: true, onUpdate: false)
+  "POSITIVE = restriction stated; NEGATIVE = stated not to apply / removed; UNKNOWN = source says it cannot tell. Required (V-W17-04)."
+  polarity: Polarity @settable(onCreate: true, onUpdate: false)
+  basisKind: BasisKind @settable(onCreate: true, onUpdate: false)
+  predicateClass: PredicateClass @settable(onCreate: true, onUpdate: false)
+  assertionBasis: AssertionBasis @settable(onCreate: true, onUpdate: false)
+  "Normally CAUTIONS (directive) or STATES."
+  speechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  reportedSpeechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  "Never written: the object is a node (kernel object XOR literal)."
+  valueString: String @settable(onCreate: false, onUpdate: false)
+  valueNumber: Float @settable(onCreate: false, onUpdate: false)
+  valueBoolean: Boolean @settable(onCreate: false, onUpdate: false)
+  unitCode: String @settable(onCreate: false, onUpdate: false)
+  quantityBasis: QuantityBasis @settable(onCreate: false, onUpdate: false)
+  validFrom: DateTime @settable(onCreate: true, onUpdate: false)
+  validTo: DateTime @settable(onCreate: true, onUpdate: false)
+  validFromPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validToPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validFromBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  validToBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  "Jurisdiction of the source's directive (US for an FDA label); a US label constraint is not asserted for other jurisdictions."
+  jurisdiction: String @settable(onCreate: true, onUpdate: false)
+  derivationRule: String @settable(onCreate: true, onUpdate: false)
+  extractionMethod: String @settable(onCreate: true, onUpdate: false)
+  extractionConfidence: Float @settable(onCreate: true, onUpdate: false)
+  agentRunUid: String @settable(onCreate: false, onUpdate: false)
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "Source-stated directive strength (required, V-W17-04)."
+  constraintLevel: ConstraintLevel! @settable(onCreate: true, onUpdate: false)
+  "The source's own words for the level ('is contraindicated', 'Do not exceed', 'is not recommended', 'should be closely monitored ... or instructed not to use')."
+  levelVerbatim: String @settable(onCreate: true, onUpdate: false)
+  "Dose band of the CONSTRAINED SUBJECT ('do not exceed ZOCOR 10 mg once daily' = GT 10 mg PER_DAY is restricted). All five or none (V-W17-08)."
+  doseComparator: ThresholdComparator @settable(onCreate: true, onUpdate: false)
+  doseValue: Float @settable(onCreate: true, onUpdate: false)
+  doseUnitCode: String @settable(onCreate: true, onUpdate: false)
+  doseQuantityBasis: QuantityBasis @settable(onCreate: true, onUpdate: false)
+  doseMassBasis: MassBasis @settable(onCreate: true, onUpdate: false)
+  "Verbatim dose band of the co-exposure when the source states one ('lipid-modifying dosages (>= 1 gram/day)'); normalized on the UseConstraint scope edge."
+  coExposureDoseText: String @settable(onCreate: true, onUpdate: false)
+  route: String @settable(onCreate: true, onUpdate: false)
+  "Verbatim population qualifier ('Chinese patients', 'all pregnant patients')."
+  populationScopeText: String @settable(onCreate: true, onUpdate: false)
+  "Verbatim exception carved out by the source ('a small group of very high-risk pregnant patients')."
+  scopeExceptionText: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural; cardinality: exactly_one; catalog: HAS_SUBJECT (W00)"""
+  subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: exactly_one (Condition | UseContextProfile for USE_CONSTRAINED_IN; the co-exposure for USE_CONSTRAINED_WITH); catalog: HAS_OBJECT (W00)"""
+  object: [AssertionSubjectTarget!]! @relationship(type: "HAS_OBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: at_most_one; catalog: ASSERTED_BY (W00)"""
+  assertedBy: [AsserterTarget!]! @relationship(type: "ASSERTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: one_or_more for ACCEPTED (INV-002); catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; cardinality: many; catalog: SUPERSEDES (W00 SupersessionProperties)"""
+  supersedes: [ContraindicationAssertion!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural (inverse); catalog: SUPERSEDES"""
+  supersededBy: [ContraindicationAssertion!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties")
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (W00)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; cardinality: many; catalog: RELATES_TO_EFFECT -- the harm the source names as the reason (myopathy)"""
+  relatesToEffects: [AdverseEffect!]! @relationship(type: "RELATES_TO_EFFECT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: derived (ruleOnly uc-match/v1, DerivedEdgeProperties.derivationRule + derivedFromAssertionUids = [this uid]); cardinality: zero_or_one; catalog: RESOLVES_TO_CONSTRAINT (new, W17-SR-01)"""
+  useConstraint: [UseConstraint!]! @relationship(type: "RESOLVES_TO_CONSTRAINT", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+InteractionAssertion: one source's statement that concurrent exposure to its subject (the perpetrator: St. John's wort,
+kava, green tea extract, grapefruit juice, verapamil) changes the exposure to or effect of its object (the affected
+substance, material or product), with polarity POSITIVE (interaction stated), NEGATIVE (studied and not found, needs a
+measurement basis, V-W17-05), UNKNOWN (predicted or possible, e.g. from in vitro data only) or MIXED, an evidence
+setting (W03 MechanismSetting), a mechanism and effect (controlled strings) and the source's own evidence grade when it
+gives one (reportedEvidenceGrade; never a BellLabs strength, FI-W17-06). It is NOT a directive (that is a
+ContraindicationAssertion, possibly from the same sentence), NOT a block, and its absence is NOT "no interaction"
+(QS-7 NOT_RECORDED). An UNKNOWN interaction still resolves to a UseConstraint so a private policy can block on it
+(CQ-RC-06). CQ-RC-06, CQ-SF-C04. Canonical module: safety_and_constraints (candidate). Archetype Assertion (labels
+InteractionAssertion:Assertion). uid token `assertion` (W17-SR-02).
+"""
+type InteractionAssertion implements Entity & AssertionArchetype
+  @node(labels: ["InteractionAssertion", "Assertion"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "INTERACTS_WITH (candidate predicate, W17-SR-03); subject = perpetrator, object = affected."
+  predicate: String! @settable(onCreate: true, onUpdate: false)
+  status: AssertionStatus!
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  contentHash: String @settable(onCreate: true, onUpdate: false)
+  "Required (V-W17-05): UNKNOWN is explicit, never null."
+  polarity: Polarity @settable(onCreate: true, onUpdate: false)
+  "DIRECT_MEASUREMENT (human PK/clinical study), INFERRED_FROM_MEASUREMENT (in vitro or mechanism extrapolation), CITED_FROM_PRIOR_WORK, HYPOTHESIS."
+  basisKind: BasisKind @settable(onCreate: true, onUpdate: false)
+  predicateClass: PredicateClass @settable(onCreate: true, onUpdate: false)
+  assertionBasis: AssertionBasis @settable(onCreate: true, onUpdate: false)
+  speechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  reportedSpeechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  valueString: String @settable(onCreate: false, onUpdate: false)
+  valueNumber: Float @settable(onCreate: false, onUpdate: false)
+  valueBoolean: Boolean @settable(onCreate: false, onUpdate: false)
+  unitCode: String @settable(onCreate: false, onUpdate: false)
+  quantityBasis: QuantityBasis @settable(onCreate: false, onUpdate: false)
+  validFrom: DateTime @settable(onCreate: true, onUpdate: false)
+  validTo: DateTime @settable(onCreate: true, onUpdate: false)
+  validFromPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validToPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validFromBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  validToBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  jurisdiction: String @settable(onCreate: true, onUpdate: false)
+  derivationRule: String @settable(onCreate: true, onUpdate: false)
+  extractionMethod: String @settable(onCreate: true, onUpdate: false)
+  extractionConfidence: Float @settable(onCreate: true, onUpdate: false)
+  agentRunUid: String @settable(onCreate: false, onUpdate: false)
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "Setting of the evidence the source cites (IN_VITRO_CELL, HUMAN_INTERVENTIONAL ...); required unless basisKind is HYPOTHESIS or CITED_FROM_PRIOR_WORK (V-W17-05)."
+  evidenceSetting: MechanismSetting @settable(onCreate: true, onUpdate: false)
+  "Controlled string (candidate: CYP3A4_INHIBITION, CYP3A4_INDUCTION, CYP2C9_INHIBITION, P_GP_INHIBITION, P_GP_INDUCTION, OATP_INHIBITION, VITAMIN_K_ANTAGONISM, PHARMACODYNAMIC_ADDITIVE, NOT_STATED)."
+  interactionMechanism: String @settable(onCreate: true, onUpdate: false)
+  "Controlled string (candidate: INCREASES_OBJECT_EXPOSURE, DECREASES_OBJECT_EXPOSURE, ALTERS_OBJECT_EFFECT, INCREASES_ADVERSE_EFFECT_RISK, NOT_STATED)."
+  interactionEffect: String @settable(onCreate: true, onUpdate: false)
+  "Verbatim magnitude ('approximately doubled'); null = not reported."
+  exposureChangeText: String @settable(onCreate: true, onUpdate: false)
+  "Verbatim dose of the perpetrator when stated ('lipid-modifying dosages (>= 1 gram/day)')."
+  subjectDoseText: String @settable(onCreate: true, onUpdate: false)
+  "Verbatim dose of the affected object when stated."
+  objectDoseText: String @settable(onCreate: true, onUpdate: false)
+  "Verbatim population qualifier ('The risk of myopathy is greater in Chinese patients')."
+  populationScopeText: String @settable(onCreate: true, onUpdate: false)
+  "The SOURCE's own evidence grade for its statement (e.g. 'C'); what the source said, never a BellLabs assessment (FI-W17-06)."
+  reportedEvidenceGrade: String @settable(onCreate: true, onUpdate: false)
+  "Scheme of reportedEvidenceGrade ('SORT (AFP)'); required with the grade."
+  reportedEvidenceGradeScheme: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural; cardinality: exactly_one; catalog: HAS_SUBJECT (W00) -- the perpetrator"""
+  subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: exactly_one; catalog: HAS_OBJECT (W00) -- the affected exposure"""
+  object: [AssertionSubjectTarget!]! @relationship(type: "HAS_OBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: at_most_one; catalog: ASSERTED_BY (W00)"""
+  assertedBy: [AsserterTarget!]! @relationship(type: "ASSERTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: one_or_more for ACCEPTED (INV-002); catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  """class: structural; cardinality: many; catalog: SUPERSEDES (W00 SupersessionProperties)"""
+  supersedes: [InteractionAssertion!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
+  """class: structural (inverse); catalog: SUPERSEDES"""
+  supersededBy: [InteractionAssertion!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties")
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (W00)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; cardinality: many; catalog: RELATES_TO_EFFECT -- the harm the interaction is said to raise (myopathy, rhabdomyolysis)"""
+  relatesToEffects: [AdverseEffect!]! @relationship(type: "RELATES_TO_EFFECT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: derived (ruleOnly uc-match/v1); cardinality: zero_or_one; catalog: RESOLVES_TO_CONSTRAINT (new, W17-SR-01)"""
+  useConstraint: [UseConstraint!]! @relationship(type: "RESOLVES_TO_CONSTRAINT", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+UseConstraint: the shared, stable identity of one scoped use concern -- "use of S (optionally above a dose band, by a
+route, in a jurisdiction) together with these scope members (conditions, non-personal populations, co-exposures with
+optional dose bands)". It is the identity a private RecommendationOption names in blockingConstraintUids (W23
+private-store contract, R-18) and the grouping key for every ContraindicationAssertion and InteractionAssertion about
+that scope (derived RESOLVES_TO_CONSTRAINT, rule uc-match/v1). Like a Claim it carries NO truth value, NO level and NO
+in-force flag: whether it is stated, removed, unknown or unrecorded at a viewpoint is computed from its live
+assertions (QS-W17-03). It is NOT a protocol Constraint (W16: a reusable condition a protocol step tests), NOT a
+person's condition or medication (private), NOT a block (the policy decides), and its absence for a pair is NOT
+evidence of safety. Never created to represent a person's undeclared-interaction gap (that block cites the policy's
+DecisionCriterion and missingFactKeys, W17-SR-07). Identity key: subject uid + subject dose band + route +
+jurisdiction + the set of (scopeRole, member uid, member dose band); identityKeyHash = sha256 of that canonical tuple.
+CQ-RC-06, CQ-RC-07 (which decisions cite a changed constraint), CQ-SF-C03. Canonical module: safety_and_constraints
+(candidate). Archetype Entity. uid token `use-constraint` (W17-SR-02).
+"""
+type UseConstraint implements Entity & EntityArchetype
+  @node(labels: ["UseConstraint", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  "Display label written by BellLabs ('simvastatin above 10 mg/day with verapamil'); never identity."
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "constant USE_CONSTRAINT"
+  entityType: String!
+  "sha256:<hex> over the canonical identity tuple (uc-key/v1); unique (operations.cypher)."
+  identityKeyHash: String! @settable(onCreate: true, onUpdate: false)
+  "Version of the identity-key canonicalization."
+  identityKeyVersion: String! @settable(onCreate: true, onUpdate: false)
+  "Dose band of the constrained subject; all five or none (V-W17-08)."
+  doseComparator: ThresholdComparator @settable(onCreate: true, onUpdate: false)
+  doseValue: Float @settable(onCreate: true, onUpdate: false)
+  doseUnitCode: String @settable(onCreate: true, onUpdate: false)
+  doseQuantityBasis: QuantityBasis @settable(onCreate: true, onUpdate: false)
+  doseMassBasis: MassBasis @settable(onCreate: true, onUpdate: false)
+  route: String @settable(onCreate: true, onUpdate: false)
+  "Jurisdiction the constraint scope is drawn from; null = not jurisdiction-specific."
+  jurisdiction: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural (identity); cardinality: exactly_one; catalog: CONSTRAINS_USE_OF (new, W17-SR-01)"""
+  constrainsUseOf: [SafetySubjectTarget!]! @relationship(type: "CONSTRAINS_USE_OF", direction: OUT, properties: "StructuralEdgeProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural (identity); cardinality: one_or_more; catalog: CONSTRAINT_SCOPE (new, W17-SR-01)"""
+  scope: [UseConstraintScopeTarget!]! @relationship(type: "CONSTRAINT_SCOPE", direction: OUT, properties: "ConstraintScopeProperties") @settable(onCreate: true, onUpdate: false)
+  """class: derived (inverse of RESOLVES_TO_CONSTRAINT); read-only"""
+  contraindicationAssertions: [ContraindicationAssertion!]! @relationship(type: "RESOLVES_TO_CONSTRAINT", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (inverse of RESOLVES_TO_CONSTRAINT); read-only"""
+  interactionAssertions: [InteractionAssertion!]! @relationship(type: "RESOLVES_TO_CONSTRAINT", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}

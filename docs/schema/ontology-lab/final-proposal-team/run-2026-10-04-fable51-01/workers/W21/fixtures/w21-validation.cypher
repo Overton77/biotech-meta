@@ -105,3 +105,14 @@ RETURN r.uid AS retellingWithoutAttributionToOriginalAsserter, x.uid AS original
 MATCH (a:Assertion)-[:INSTANCE_OF]->(c:Claim)
 WHERE a.speechAct = 'QUESTIONS'
 RETURN a.uid AS questionCountedAsInstance, c.uid AS claimUid;
+
+// V-W21-12 (amends V-416 for qualifiers on assertions without a container, W08-SR-10): QUALIFIED_BY names its kind;
+// when either side has a container both share it; when neither has one, both are supported by locators on the same
+// SourceSnapshot (the qualifier is printed in the same captured record).
+MATCH (a:Assertion)-[q:QUALIFIED_BY]->(b:Assertion)
+WHERE q.qualificationKind IS NULL
+   OR ((EXISTS { (a)-[:OCCURS_IN]->() } OR EXISTS { (b)-[:OCCURS_IN]->() })
+       AND NOT EXISTS { MATCH (a)-[:OCCURS_IN]->(c)<-[:OCCURS_IN]-(b) })
+   OR (NOT EXISTS { (a)-[:OCCURS_IN]->() } AND NOT EXISTS { (b)-[:OCCURS_IN]->() }
+       AND NOT EXISTS { MATCH (a)-[:SUPPORTED_BY]->(:SourceLocator)<-[:HAS_LOCATOR]-(:SourceSnapshot)-[:HAS_LOCATOR]->(:SourceLocator)<-[:SUPPORTED_BY]-(b) })
+RETURN a.uid AS qualifiedUid, b.uid AS qualifierUid;
