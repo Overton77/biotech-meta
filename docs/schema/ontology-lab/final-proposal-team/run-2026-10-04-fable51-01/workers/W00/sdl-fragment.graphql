@@ -1221,6 +1221,10 @@ type Assertion implements Entity & AssertionArchetype
   proposedInHypotheses: [ResolutionHypothesis!]! @relationship(type: "PROPOSES_MATCH", direction: IN)
   """class: structural; cardinality: zero_or_one; catalog: OBSERVED_IN_CONTEXT (relationship owned by W03; exactly one for DIRECT_MEASUREMENT mechanism assertions, INV-210)."""
   observedInContext: [MechanismEvidenceContext!]! @relationship(type: "OBSERVED_IN_CONTEXT", direction: OUT)
+  """class: structural; cardinality: many; catalog: QUALIFIED_BY (relationship and QualificationProperties owned by W21; W00-R-40 on W21-SR-23 / W08-SR-10). Same container, or the same SourceSnapshot when neither side has a container (V-416r)."""
+  qualifiedBy: [Assertion!]! @relationship(type: "QUALIFIED_BY", direction: OUT, properties: "QualificationProperties")
+  """class: structural (inverse); catalog: QUALIFIED_BY."""
+  qualifies: [Assertion!]! @relationship(type: "QUALIFIED_BY", direction: IN, properties: "QualificationProperties")
   """class: derived (ruleOnly); cardinality: zero_or_one; catalog: INSTANCE_OF (Assertion → Claim; relationship owned by W21). hypothesisUid is carried in derivedFromAssessmentUids."""
   instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "DerivedEdgeProperties")
 }
