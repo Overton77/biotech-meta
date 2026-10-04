@@ -4,7 +4,7 @@
  "executedAt": "2026-10-04",
  "engine": "Neo4j 5.26.31 community (embedded, org.neo4j.test:neo4j-harness 5.26.31, OpenJDK 21)",
  "driver": "neo4j-driver 6.2.0 via validation/harness/run-cypher.mjs (one transaction per statement)",
- "sequence": "combined: wipe; mp1..mp6; v-media-validation; docs/schema/neo4j/validation.cypher (params harness validation-params.json). solo: wipe; <fixture>; v-media-validation (for mp5, mp6, mp3)",
+ "sequence": "combined: wipe; mp1..mp6; v-media-validation; docs/schema/neo4j/validation.cypher (params harness validation-params.json). solo: wipe; <fixture>; v-media-validation (for mp3, mp5, mp6)",
  "files": {
   "all-mp1-product-asset-selection": {
    "statements": 78,
@@ -435,8 +435,8 @@
    ]
   },
   "all-mp5-label-crop-region-provenance": {
-   "statements": 39,
-   "ok": 39,
+   "statements": 40,
+   "ok": 40,
    "errors": 0,
    "results": [
     {
@@ -986,13 +986,8 @@
     },
     {
      "id": "V-607",
-     "rows": 1,
-     "sample": [
-      {
-       "asset": "hu:media-asset:elysium-basis-carousel-supplement-facts",
-       "renditionWithoutLineage": "hu:media-variant:elysium-basis-supplement-facts-w416"
-      }
-     ]
+     "rows": 0,
+     "sample": []
     },
     {
      "id": "V-608",
@@ -1042,8 +1037,8 @@
    ]
   },
   "solo-mp5-label-crop-region-provenance": {
-   "statements": 39,
-   "ok": 39,
+   "statements": 40,
+   "ok": 40,
    "errors": 0,
    "results": [
     {
