@@ -98,8 +98,9 @@ RETURN v.uid AS specVersion, g.validFrom AS validFrom, g.recordedFrom AS recorde
 // Q-05d: exactly one NIAGEN material identity across both specification versions.
 // status: executed
 MATCH (m:BrandedIngredientMaterial) WHERE toLower(m.brandName) = 'niagen'
-RETURN count(m) AS niagenMaterials,
-       COLLECT { MATCH (m)-[:GOVERNED_BY_SPECIFICATION]->(v) RETURN v.uid ORDER BY v.uid } AS specVersions;
+OPTIONAL MATCH (m)-[:GOVERNED_BY_SPECIFICATION]->(v:SpecificationVersion)
+WITH collect(DISTINCT m.uid) AS materials, collect(DISTINCT v.uid) AS specVersions
+RETURN size(materials) AS niagenMaterials, materials, specVersions;
 
 // Q-06 (CQ-ID-C03 candidate; CQ-ST-01 material part): strain, deposits, current species, preparation viability.
 // status: executed

@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/05-orphan-designation-not-approval.cypher",
- "uri": "bolt://127.0.0.1:37117/",
+ "uri": "bolt://127.0.0.1:40297/",
  "db": "neo4j",
  "explain": false,
  "total": 9,
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 553,
+   "ms": 165,
    "sample": [],
    "header": "// =====================================================================================================================\n// W06 fixture 05: orphan designation text that must not read as approval.\n//   - exa-cel: OOPD \"Orphan Designation Status: Designated/Approved\" is SPLIT into an OrphanDesignation"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 226,
+   "ms": 26,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 382,
+   "ms": 69,
    "sample": [],
    "header": ""
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 445,
+   "ms": 158,
    "sample": [],
    "header": ""
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 472,
+   "ms": 391,
    "sample": [],
    "header": ""
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 235,
+   "ms": 119,
    "sample": [],
    "header": ""
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 285,
+   "ms": 192,
    "sample": [],
    "header": ""
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 588,
+   "ms": 167,
    "sample": [],
    "header": ""
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 305,
+   "ms": 58,
    "sample": [],
    "header": "// ---- Treatment display projection of the exa-cel designation (read-only field, written by the projection job) ----"
   }

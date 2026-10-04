@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/03-procedure-definition-offering-step.cypher",
- "uri": "bolt://127.0.0.1:37117/",
+ "uri": "bolt://127.0.0.1:40297/",
  "db": "neo4j",
  "explain": false,
  "total": 20,
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 496,
+   "ms": 131,
    "sample": [],
    "header": "// =====================================================================================================================\n// W06 fixture 03: procedure DEFINITION versus an organization OFFERING it versus a protocol STEP EMPLOYING it versus a\n// study intervention INSTANTIATING it; plus a classificati"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 37,
+   "ms": 48,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 37,
+   "ms": 34,
    "sample": [],
    "header": ""
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1513,
+   "ms": 169,
    "sample": [],
    "header": ""
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 678,
+   "ms": 136,
    "sample": [],
    "header": "// ---- OFFERS_PROCEDURE: the offerer's own page; offering is not performing, not approval, not recommendation ----"
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 358,
+   "ms": 57,
    "sample": [],
    "header": "// ---- W15 commerce records from the same page (referenced shapes; W15 owns them) ----"
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1287,
+   "ms": 84,
    "sample": [],
    "header": ""
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 275,
+   "ms": 76,
    "sample": [],
    "header": ""
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 284,
+   "ms": 48,
    "sample": [],
    "header": ""
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 179,
+   "ms": 49,
    "sample": [],
    "header": ""
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 575,
+   "ms": 116,
    "sample": [],
    "header": ""
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 238,
+   "ms": 58,
    "sample": [],
    "header": "// ---- W16 public practice protocol (SYNTHETIC) whose step employs the procedure definition ----"
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 446,
+   "ms": 43,
    "sample": [],
    "header": ""
   },
@@ -311,7 +311,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 189,
+   "ms": 59,
    "sample": [],
    "header": ""
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 156,
+   "ms": 96,
    "sample": [],
    "header": ""
   },
@@ -355,7 +355,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 691,
+   "ms": 92,
    "sample": [],
    "header": ""
   },
@@ -377,7 +377,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1294,
+   "ms": 111,
    "sample": [],
    "header": ""
   },
@@ -399,7 +399,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 294,
+   "ms": 85,
    "sample": [],
    "header": "// EMPLOYS -> Procedure is the requested W16 range extension (W06-SR-04); structural part of the immutable step payload."
   },
@@ -421,7 +421,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 493,
+   "ms": 194,
    "sample": [],
    "header": "// ---- Circulate: B2B service statement known only from a search snippet -> EXTRACTED, not projected ----"
   },
@@ -443,7 +443,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 303,
+   "ms": 152,
    "sample": [],
    "header": "// ---- Performance volume: a literal about the organization, reported by trade press; no occurrence nodes ----"
   }

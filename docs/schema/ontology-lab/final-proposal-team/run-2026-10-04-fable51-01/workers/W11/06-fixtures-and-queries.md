@@ -45,7 +45,7 @@ Every statement binds its own nodes by uid; nodes carry primary and archetype la
 
 | Query | CQ | Expected | Observed | Tag |
 |---|---|---|---|---|
-| Q-MF04-a | CQ-MF-04 | 4 current episodes ordered: PLANNED 2021-08-20..2023-04-01, OPERATING 2023-04..2023-10, SUSPENDED 2023-10..2024-05, OPERATING 2024-05..null; source kinds per episode | run 3 (after alias fix) | run |
+| Q-MF04-a | CQ-MF-04 | 4 current episodes ordered: PLANNED 2021-08-20..2023-04-01, OPERATING 2023-04..2023-10, SUSPENDED 2023-10..2024-05, OPERATING 2024-05..null; source kinds per episode | as expected (run 5; PLANNED cites PRESS_RELEASE + SECURITIES_FILING after the bound) | run |
 | Q-MF04-b | CQ-MF-04 | `SUSPENDED` (hu:rel:nai-carlsbad-suspended-2023) | SUSPENDED | run |
 | Q-MF04-c | CQ-MF-04 (as recorded at 01:15Z) | `PLANNED`, openEnded true (the pre-10-K belief; possible, not fact) | PLANNED, e1, openEnded true | run |
 | Q-MF05 | CQ-MF-05 | filing-backed OPERATING/SUSPENDED/PLANNED attached; DISCONTINUED (FUTURE, filing) not attached; OPERATING from MARKETING_PAGE not attached with verdict PARTIALLY_SUPPORTED | as expected (plus the superseded PLANNED capture, PRESS_RELEASE, not attached now) | run |
@@ -58,6 +58,12 @@ Every statement binds its own nodes by uid; nodes carry primary and archetype la
 | Q-MF-C04 | CQ-MF-C04 | step 0: 4 inputs (3 ChemicalSubstance, nicotinamide IngredientMaterial) + 1 intermediate output; step 1: 4 inputs | as expected | run |
 | Q-MF-C05 | CQ-MF-C05 | usedAsProcessInput 1, usedAsComponentMaterial 1, duplicateLiveMaterialNodes 0 | 1, 1, 0 | run |
 | Q-PF01-w11 | CQ-PF-01 (lineage) | 2015 RANGE 95 % NOT_STATED; 2019 GE 90 % SHELF_LIFE | as expected | run |
+
+## Idempotence and API round trip
+
+- Reload of fixtures 01-04 on top of the loaded graph: 203 nodes / 343 relationships before and after (run 5). Each fixture also loads alone with zero failing baseline rows and zero W11 rows (V-W11-07b's informational row for fixture 03 only).
+- GraphQL round trip (`@neo4j/graphql` 7.6.3): reads, connections with W11 edge properties, a create-and-connect mutation and enum rejection succeed; reads projecting any `DateTime` fail without APOC (`apoc.date.convertFormat`). See `07-operations.md` 4b.
+- Run 5 adds informational V-118 rows (uid backfill progress per label: W11 fixture nodes now carry the live `id` projection).
 
 ## Mandatory cases (brief) and where they live
 

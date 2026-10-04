@@ -1,0 +1,78 @@
+{
+"c15": [
+{
+"analyte": "nicotinamide riboside chloride (purity)",
+"comparator": "RANGE_INCLUSIVE",
+"threshold": 95,
+"thresholdUpper": 102,
+"unitCode": "%",
+"methodText": "HPLC (99.1-CD-3.0-000591)",
+"limitStage": "NOT_STATED"
+},
+{
+"analyte": "water",
+"comparator": "LE",
+"threshold": 1,
+"thresholdUpper": null,
+"unitCode": "%",
+"methodText": "99.1-CD-6.0-000094",
+"limitStage": "NOT_STATED"
+},
+{
+"analyte": "acetone",
+"comparator": "LE",
+"threshold": 3000,
+"thresholdUpper": null,
+"unitCode": "mg/kg",
+"methodText": "99.1-CD-7.0-000115",
+"limitStage": "NOT_STATED"
+},
+{
+"analyte": "methanol",
+"comparator": "LE",
+"threshold": 740,
+"thresholdUpper": null,
+"unitCode": "mg/kg",
+"methodText": "99.1-CD-7.0-000115",
+"limitStage": "NOT_STATED"
+}
+],
+"c19": [
+{
+"analyte": "nicotinamide riboside chloride",
+"comparator": "GE",
+"threshold": 90,
+"thresholdUpper": null,
+"unitCode": "%",
+"methodText": "HPLC-UV",
+"limitStage": "SHELF_LIFE"
+},
+{
+"analyte": "water",
+"comparator": "LE",
+"threshold": 2.0,
+"thresholdUpper": null,
+"unitCode": "%",
+"methodText": "Karl Fischer titration (USP <921>)",
+"limitStage": "NOT_STATED"
+},
+{
+"analyte": "acetone",
+"comparator": "LE",
+"threshold": 5000,
+"thresholdUpper": null,
+"unitCode": "mg/kg",
+"methodText": "GC headspace (USP <467>)",
+"limitStage": "NOT_STATED"
+},
+{
+"analyte": "methanol",
+"comparator": "LE",
+"threshold": 1000,
+"thresholdUpper": null,
+"unitCode": "mg/kg",
+"methodText": "GC headspace (USP <467>)",
+"limitStage": "NOT_STATED"
+}
+]
+}

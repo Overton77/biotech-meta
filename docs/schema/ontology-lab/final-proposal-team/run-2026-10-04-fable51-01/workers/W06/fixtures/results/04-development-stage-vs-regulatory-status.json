@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/04-development-stage-vs-regulatory-status.cypher",
- "uri": "bolt://127.0.0.1:37117/",
+ "uri": "bolt://127.0.0.1:40297/",
  "db": "neo4j",
  "explain": false,
  "total": 8,
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 365,
+   "ms": 163,
    "sample": [],
    "header": "// =====================================================================================================================\n// W06 fixture 04: Treatment.developmentStage display text versus W13 RegulatoryStatus{APPROVAL} (V-322-style guard,\n// V-W06-01) and an indication change over valid time (late fa"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 2259,
+   "ms": 424,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1607,
+   "ms": 425,
    "sample": [],
    "header": "// ---- W13 approving responses (letters listed on the CBER page; OOPD gives the matching marketing approval dates).\n// The 2024 approval (aged 12+) is NOT ended by the 2026 approval (aged 2+): the indication was broadened, so both stay\n// in force with unknown end. ----"
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 2121,
+   "ms": 180,
    "sample": [],
    "header": "// ---- exa-cel developmentStage: CALCULATED display assertion naming its input ----"
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 571,
+   "ms": 74,
    "sample": [],
    "header": "// ---- edaravone concept (migrated legacy text, no assertion) ----"
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 984,
+   "ms": 296,
    "sample": [],
    "header": ""
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 470,
+   "ms": 54,
    "sample": [],
    "header": "// RADICAVA approval: known only from a search extract (no reproducible locator) -> status EXTRACTED; date not established."
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 685,
+   "ms": 118,
    "sample": [],
    "header": ""
   }

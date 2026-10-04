@@ -1,13 +1,13 @@
 # W06 operations recommendation
 
-The target is Neo4j 5.26 (tested on 5.26.31 Community, embedded) and `@neo4j/graphql` 7.6.3. There is no `@unique` directive, so uniqueness comes only from Cypher constraints. `operations.cypher` holds the executable statements, and all 17 ran on Community on 2026-10-04 (results in `fixtures/results/operations.json`).
+The target is Neo4j 5.26 (tested on 5.26.31 Community, embedded) and `@neo4j/graphql` 7.6.3. There is no `@unique` directive, so uniqueness comes only from Cypher constraints. `operations.cypher` holds the executable statements, and all 16 ran on Community on 2026-10-04 (results in `fixtures/results/operations.json`).
 
 ## 1. Uniqueness and indexes (stored property names)
 
 | Statement | Purpose | Edition | Verified |
 |---|---|---|---|
 | `Treatment.uid`, `Treatment.id`, `Procedure.uid`, `Procedure.id` UNIQUE | Canonical identity and live projection id (INV-001, INV-106) | Community | 4 UNIQUENESS constraints ONLINE |
-| `relationshipUid` UNIQUE on `TARGETS_CONDITION`, `USES_COMPONENT`, `DEVELOPS_TREATMENT`, `OFFERS_TREATMENT`, `OFFERS_PROCEDURE` (and W09's `FOLLOWS_INTERVENTION_DEFINITION`, recommended to W09) | One edge per recorded-time episode (`asserted_edge` profile). Makes retries idempotent. | Community (relationship property uniqueness, 5.7+) | 7 RELATIONSHIP_UNIQUENESS constraints ONLINE on the first run (5 W06 types + 2 since-withdrawn relationship types; rerun with the final file, see 08). A duplicate `CREATE` with an existing `relationshipUid` was rejected ("Relationship(54) already exists with type `USES_COMPONENT` and property `relationshipUid` …"). |
+| `relationshipUid` UNIQUE on `TARGETS_CONDITION`, `USES_COMPONENT`, `DEVELOPS_TREATMENT`, `OFFERS_TREATMENT`, `OFFERS_PROCEDURE` (and W09's `FOLLOWS_INTERVENTION_DEFINITION`, recommended to W09) | One edge per recorded-time episode (`asserted_edge` profile). Makes retries idempotent. | Community (relationship property uniqueness, 5.7+) | 6 RELATIONSHIP_UNIQUENESS constraints ONLINE in the final rerun (5 W06 types plus W09's `FOLLOWS_INTERVENTION_DEFINITION`; `fixtures/results/constraints-summary.txt`). In the earlier run, a duplicate `CREATE` with an existing `relationshipUid` was rejected ("Relationship(54) already exists with type `USES_COMPONENT` and property `relationshipUid` …"). |
 | Range index on `USES_COMPONENT.assertionUid` and `TARGETS_CONDITION.assertionUid` | Assertion-to-edge joins (QS-4a, V-W06-08, supersession closing `recordedTo`) | Community | ONLINE |
 | Range index on `USES_COMPONENT.componentRole` | CQ-AX-23 / V-W06-01 path filter `{componentRole: 'ADMINISTERED_PRODUCT'}` | Community | ONLINE |
 | Fulltext `TreatmentSearch` (name, description, searchText, treatmentClass, orphanDrugDesignation); `ProcedureSearch` (name, description, searchText, procedureType, setting) | Live index and query names retained (D-015) | Community | ONLINE. `db.index.fulltext.queryNodes('TreatmentSearch','beta-thalassemia')` returned exa-cel (score 0.81), found through the designation display text. This is the documented "a hit is a candidate, not an answer" case. |

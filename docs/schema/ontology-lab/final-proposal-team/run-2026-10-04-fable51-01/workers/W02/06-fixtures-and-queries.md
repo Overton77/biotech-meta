@@ -75,7 +75,7 @@ Every statement binds its own nodes by uid, and every node has its primary label
 | Q-05a | CQ-ID-05 | valid 2016-06-01, recorded now: 1 row, GRN 635 version, END_UNKNOWN | run ✔ |
 | Q-05b | CQ-ID-05 | valid 2020-06-01, recorded now: 2 rows (2015, 2019) → spec unresolved | run ✔ |
 | Q-05c | CQ-ID-05 (late arrival) | valid 2020-06-01, recorded as of 2026-10-04T02:30Z: 1 row (2015 only) | run ✔ |
-| Q-05d | CQ-ID-05 | niagenMaterials **1**, specVersions [2015, 2019] | run ✔ |
+| Q-05d | CQ-ID-05 | positives only: niagenMaterials **1**, specVersions [2015, 2019]; with fx-90 loaded: niagenMaterials **2** (N10 duplicate surfaces; V-W02-05 also reports it) | run ✔ |
 | Q-06 | CQ-ID-C03, CQ-ST-01 | strain GG; currentSpecies Lacticaseibacillus rhamnosus (47715); identifiers [568703, ATCC 53103, ATCC BAA-3227, CCUG 34291, LMG 18243]; viability NOT_STATED; allRecordedSpeciesAssignments [L. rhamnosus, L. acidophilus] | run ✔ |
 | Q-07 | CL-001 | nrptSubstances **0**; disposition PROPOSED; denotes the two StudyInterventions | run ✔ |
 | Q-08 | CL-002 | exactly 1 row: `[Entity, ChemicalSubstance]` hu:substance:nad-plus (positives only); with fx-90 loaded, a second row (the N8 MolecularEntity) shows the duplicate | run ✔ |

@@ -30,10 +30,10 @@ WHERE e.startedAt IS NOT NULL OR e.endedAt IS NOT NULL OR e.observedAt IS NOT NU
    OR EXISTS { MATCH (e)--(p) WHERE p:Person OR p:CohortParticipant OR p:PseudonymousActor OR p:AnonymousActor OR p:PrivateRecord }
 RETURN 'V-W05-06' AS id, e.uid AS uid;
 
-// V-W05-07: a food composition edge whose zero or value has no stated derivation, or whose per-mass basis lacks its reference amount.
+// V-W05-07: a food composition edge whose value has no stated derivation or no portion basis (W02 QuantitativeContentProperties
+// + the W05-SR-04 qualifiers; the reference mass itself is the UCUM denominator, e.g. ug/hg = per 100 g).
 MATCH (f:FoodItem)-[r:QUANTITATIVELY_CONTAINS]->(x)
-WHERE r.valueDerivation IS NULL
-   OR (r.basis STARTS WITH 'PER_100' AND (r.referenceAmount IS NULL OR r.referenceUnitCode IS NULL))
+WHERE r.valueDerivation IS NULL OR r.portionBasis IS NULL
 RETURN 'V-W05-07' AS id, f.uid AS foodUid, x.uid AS targetUid, r.quantity AS quantity, r.relationshipUid AS rel;
 
 // V-W05-08: VARIANT_OF without its authorizing assertion, or a self loop / two-cycle.

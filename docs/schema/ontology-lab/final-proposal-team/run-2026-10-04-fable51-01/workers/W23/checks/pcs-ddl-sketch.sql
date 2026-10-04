@@ -67,6 +67,8 @@ CREATE TABLE pcs.personal_measurement (
   unit_code text,
   result_qualifier text NOT NULL CHECK (result_qualifier IN ('NUMERIC', 'BELOW_DETECTION', 'ABOVE_QUANTIFICATION', 'NOT_MEASURED', 'INVALID_SPECIMEN')),
   effective_at timestamptz,
+  reported_at timestamptz,
+  reference_interval_version_uids pcs.shared_uid[] NOT NULL DEFAULT '{}',
   provenance_kind text NOT NULL CHECK (provenance_kind IN ('LAB_REPORT_UPLOAD', 'DEVICE_IMPORT', 'MANUAL_ENTRY')),
   reported_reference_range_text text,
   lab_report_uid pcs.private_uid,

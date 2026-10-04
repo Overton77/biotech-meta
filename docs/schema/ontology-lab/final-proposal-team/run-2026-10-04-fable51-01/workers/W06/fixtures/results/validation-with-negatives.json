@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/w06-validation.cypher",
- "uri": "bolt://127.0.0.1:37117/",
+ "uri": "bolt://127.0.0.1:40297/",
  "db": "neo4j",
  "explain": false,
  "total": 11,
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1045,
+   "ms": 174,
    "sample": [
     {
      "check": "V-W06-01",
@@ -66,7 +66,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 123,
+   "ms": 7,
    "sample": [
     {
      "check": "V-W06-02",
@@ -112,7 +112,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 12,
+   "ms": 6,
    "sample": [
     {
      "check": "V-W06-03",
@@ -141,7 +141,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 561,
+   "ms": 52,
    "sample": [
     {
      "check": "V-W06-04",
@@ -150,12 +150,12 @@
      "productUid": "hu:product:casgevy",
      "citedPredicates": [
       "USES_COMPONENT",
-      "INSTANTIATES_TREATMENT"
+      "FOLLOWS_INTERVENTION_DEFINITION"
      ],
      "viaTreatmentConcept": true
     }
    ],
-   "header": "// V-W06-04: INV-201 through the concept: any edge from a study-side record to a commercial identity, or any edge whose\n// derivation cites INSTANTIATES_TREATMENT / USES_COMPONENT assertions and ends at a Product."
+   "header": "// V-W06-04: INV-201 through the concept: any edge from a study-side record to a commercial identity, or any edge whose\n// derivation cites FOLLOWS_INTERVENTION_DEFINITION / USES_COMPONENT assertions and ends at a Product."
   },
   {
    "n": 5,
@@ -175,7 +175,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 53,
+   "ms": 6,
    "sample": [
     {
      "check": "V-W06-05",
@@ -203,7 +203,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 82,
+   "ms": 8,
    "sample": [
     {
      "check": "V-W06-06",
@@ -235,7 +235,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 323,
+   "ms": 46,
    "sample": [
     {
      "check": "V-W06-07",
@@ -264,7 +264,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 73,
+   "ms": 6,
    "sample": [
     {
      "check": "V-W06-07i",
@@ -305,7 +305,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 250,
+   "ms": 61,
    "sample": [
     {
      "check": "V-W06-08",
@@ -351,7 +351,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 57,
+   "ms": 7,
    "sample": [
     {
      "check": "V-W06-08b",
@@ -379,7 +379,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 111,
+   "ms": 5,
    "sample": [
     {
      "check": "QS-4a/W06",

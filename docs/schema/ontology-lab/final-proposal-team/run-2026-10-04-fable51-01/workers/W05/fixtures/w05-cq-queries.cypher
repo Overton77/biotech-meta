@@ -1,13 +1,12 @@
 // W05 CQ queries (read-only). Parameters are inlined as literals so the file runs as-is.
 
-// Q-ST-01-food: what did each arm take (material components and practice-definition components)?
-MATCH (:Study {uid: 'hu:study:dica-nuts-nct03728127'})-[:HAS_ARM]->(arm)-[:ASSIGNS_INTERVENTION]->(si)-[:HAS_INTERVENTION_COMPONENT]->(ic)
-OPTIONAL MATCH (ic)-[um:USES_INTERVENTION_MATERIAL]->(m:IngredientMaterial)
-OPTIONAL MATCH (ic)-[up:USES_PRACTICE_DEFINITION]->(pd)
-RETURN arm.name AS arm, si.durationIso AS duration, si.registryInterventionType AS registryType,
-       ic.quantity AS qty, ic.unitCode AS unit, ic.quantityBasis AS qBasis,
-       coalesce(m.name, pd.name) AS component, CASE WHEN m:FoodItem THEN 'FOOD' WHEN pd IS NOT NULL THEN 'PRACTICE_DEFINITION' ELSE 'OTHER' END AS componentKind
-ORDER BY arm, component;
+// Q-ST-01-food: what did each arm take (followed definitions and material components)?
+MATCH (:Study {uid: 'hu:study:dica-nuts-nct03728127'})-[:HAS_ARM]->(arm)-[:ASSIGNS_INTERVENTION]->(si)
+OPTIONAL MATCH (si)-[:FOLLOWS_INTERVENTION_DEFINITION]->(pd)
+OPTIONAL MATCH (si)-[:HAS_INTERVENTION_COMPONENT]->(ic)-[:USES_INTERVENTION_MATERIAL]->(m:IngredientMaterial)
+RETURN arm.name AS arm, si.durationIso AS duration, si.registryInterventionType AS registryType, pd.name AS followsDefinition,
+       collect(m.name + ' ' + toString(ic.quantity) + ' ' + ic.unitCode + ' ' + ic.quantityBasis) AS materialComponents
+ORDER BY arm;
 
 // Q-FL-C01: composition of the food a study used, by preparation variant, with source, derivation and spread.
 MATCH (:InterventionComponent {uid: 'hu:intervention-component:subranut-brazil-nut-1-per-day'})-[:USES_INTERVENTION_MATERIAL]->(base:FoodItem)
@@ -15,7 +14,7 @@ MATCH (v:FoodItem)-[vo:VARIANT_OF]->(base)
 MATCH (v)-[q:QUANTITATIVELY_CONTAINS]->(x {uid: 'hu:substance:selenium'})
 MATCH (a:Assertion {uid: q.assertionUid})-[:SUPPORTED_BY]->(l:SourceLocator)<-[:HAS_LOCATOR]-(sn:SourceSnapshot)
 RETURN base.name AS studiedFood, v.descriptionVerbatim AS variant, vo.variantKind AS variantKind, q.quantity AS amount, q.unitCode AS unit,
-       q.basis AS basis, q.portionBasis AS portion, q.valueDerivation AS derivation, q.minValue AS min, q.maxValue AS max, q.dataPoints AS n,
+       q.basis AS basis, q.contentStatementKind AS statementKind, q.portionBasis AS portion, q.valueDerivation AS derivation, q.minValue AS min, q.maxValue AS max, q.dataPoints AS n,
        sn.canonicalUri AS source, sn.publishedAt AS publishedAt, a.recordedAt AS recordedAt
 ORDER BY recordedAt;
 
@@ -58,7 +57,9 @@ ORDER BY speechAct;
 MATCH (f:FoodItem {uid: 'hu:material:food-brazil-nut'})<-[:USES_MATERIAL]-(:IngredientComponent)<-[:HAS_INGREDIENT_COMPONENT]-(fv:FormulationVersion)<-[:HAS_FORMULATION_VERSION]-(v:ProductVariant)<-[:HAS_VARIANT]-(p:Product)
 RETURN p.uid AS productUid, p.productKind AS kind, labels(p) AS labels, v.name AS variant, fv.uid AS formulation;
 
-// Q-FL-C04: practice definitions behind diet arms, and what the registry leaves unstated.
-MATCH (ic:InterventionComponent)-[r:USES_PRACTICE_DEFINITION]->(pd:Protocol)
+// Q-FL-C04: definitions behind diet arms, which component distinguishes the arms, and what the registry leaves unstated.
+MATCH (si:StudyIntervention)-[:FOLLOWS_INTERVENTION_DEFINITION]->(pd:Protocol)
 OPTIONAL MATCH (pd)-[:HAS_PROTOCOL_EDITION]->(ed)
-RETURN pd.name AS practiceDefinition, count(DISTINCT ic) AS components, count(ed) AS knownEditions, pd.notReportedFields AS notReported;
+OPTIONAL MATCH (si)-[:HAS_INTERVENTION_COMPONENT]->(ic)
+RETURN pd.name AS definition, si.name AS intervention, count(DISTINCT ic) AS materialComponents, count(DISTINCT ed) AS knownEditions, pd.notReportedFields AS notReported
+ORDER BY intervention;

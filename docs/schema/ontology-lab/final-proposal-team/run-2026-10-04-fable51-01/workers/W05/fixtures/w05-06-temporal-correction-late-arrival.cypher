@@ -45,6 +45,6 @@ SET a.predicate = 'QUANTITATIVELY_CONTAINS', a.status = 'ACCEPTED', a.polarity =
     a.recordedAt = datetime('2026-10-05T09:00:00Z'), a.privacyClass = 'PUBLIC', a.contentHash = 'synthetic:hu:assertion:synthetic-2025-brazil-nut-selenium'
 MERGE (a)-[:HAS_SUBJECT]->(f) MERGE (a)-[:HAS_OBJECT]->(se) MERGE (a)-[:SUPPORTED_BY]->(l)
 MERGE (f)-[r:QUANTITATIVELY_CONTAINS {relationshipUid: 'hu:rel:qc-synthetic-2025-selenium'}]->(se)
-SET r.assertionUid = a.uid, r.quantity = 1520.0, r.unitCode = 'ug', r.basis = 'PER_100_G',
-    r.referenceAmount = 100.0, r.referenceUnitCode = 'g', r.portionBasis = 'EDIBLE_PORTION', r.valueDerivation = 'ANALYTICAL', r.dataPoints = 6,
+SET r.assertionUid = a.uid, r.quantity = 1520.0, r.unitCode = 'ug/hg', r.basis = 'AMOUNT_PER_MASS_OF_MATERIAL',
+    r.comparator = 'EQ', r.contentStatementKind = 'TYPICAL_COMPOSITION_REPORTED', r.portionBasis = 'EDIBLE_PORTION', r.valueDerivation = 'ANALYTICAL', r.dataPoints = 6,
     r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-05T09:00:00Z');

@@ -1,0 +1,18 @@
+# SCRATCH STUBS (not a deliverable): stand-ins for other owners' types so the W11 fragment can be built.
+interface Entity { id: ID!  uid: String!  name: String  description: String  mongoResearchRunId: String }
+interface EntityArchetype { entityType: String! }
+interface VersionedStateArchetype { stateType: String!  payloadHash: String!  effectiveFrom: DateTime  effectiveTo: DateTime }
+enum PrivacyClass { PUBLIC INTERNAL }
+enum NodeMaturity { CANDIDATE PROVISIONAL ACCEPTED DEPRECATED }
+enum TimePrecision { INSTANT DAY MONTH QUARTER YEAR DECADE }
+enum ValidTimeBasis { STATED_BY_SOURCE PUBLICATION_PROXY OBSERVATION_ONLY INFERRED UNKNOWN }
+enum CaptureCompleteness { COMPLETE PARTIAL_EXCERPT UNKNOWN }
+type StructuralEdgeProperties @relationshipProperties { orderIndex: Int  notes: String  mongoResearchRunId: String }
+type AssertedEdgeProperties @relationshipProperties { relationshipUid: String!  assertionUid: String!  validFrom: DateTime  validTo: DateTime  validFromPrecision: TimePrecision  validToPrecision: TimePrecision  validFromBasis: ValidTimeBasis!  validToBasis: ValidTimeBasis!  recordedFrom: DateTime!  recordedTo: DateTime  mongoResearchRunId: String }
+type UsageEdgeProperties @relationshipProperties { relationshipUid: String  assertionUid: String  usageContext: String }
+type Organization implements Entity @node(labels: ["Organization", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Facility implements Entity @node(labels: ["Facility", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type IngredientMaterial implements Entity @node(labels: ["IngredientMaterial", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type ChemicalSubstance implements Entity @node(labels: ["ChemicalSubstance", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type ToolOrInstrument implements Entity @node(labels: ["ToolOrInstrument", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type TechnologyPlatform implements Entity @node(labels: ["TechnologyPlatform", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }

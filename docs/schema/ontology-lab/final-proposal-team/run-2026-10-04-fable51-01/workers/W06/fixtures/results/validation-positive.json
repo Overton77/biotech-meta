@@ -1,6 +1,6 @@
 {
  "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/w06-validation.cypher",
- "uri": "bolt://127.0.0.1:37117/",
+ "uri": "bolt://127.0.0.1:40297/",
  "db": "neo4j",
  "explain": false,
  "total": 11,
@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 6278,
+   "ms": 1308,
    "sample": [
     {
      "check": "V-W06-01",
@@ -54,7 +54,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1416,
+   "ms": 519,
    "sample": [
     {
      "check": "V-W06-02",
@@ -85,7 +85,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 619,
+   "ms": 468,
    "sample": [],
    "header": "// V-W06-03: orphan designation text read as approval: designation text present, stage text reads approved, and only\n// DESIGNATION states (no APPROVAL state of any capture status) are reachable."
   },
@@ -107,9 +107,9 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1704,
+   "ms": 339,
    "sample": [],
-   "header": "// V-W06-04: INV-201 through the concept: any edge from a study-side record to a commercial identity, or any edge whose\n// derivation cites INSTANTIATES_TREATMENT / USES_COMPONENT assertions and ends at a Product."
+   "header": "// V-W06-04: INV-201 through the concept: any edge from a study-side record to a commercial identity, or any edge whose\n// derivation cites FOLLOWS_INTERVENTION_DEFINITION / USES_COMPONENT assertions and ends at a Product."
   },
   {
    "n": 5,
@@ -129,7 +129,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 716,
+   "ms": 125,
    "sample": [],
    "header": "// V-W06-05: COMBINATION requires at least two USES_COMPONENT edges."
   },
@@ -151,7 +151,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1899,
+   "ms": 607,
    "sample": [],
    "header": "// V-W06-06 (warning): a preparatory/collection/co-intervention component whose authorizing assertion rests only on\n// trial-registration locators (a study-specific regimen promoted to the concept)."
   },
@@ -173,7 +173,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 552,
+   "ms": 148,
    "sample": [],
    "header": "// V-W06-07: procedure or treatment identities equated on a shared classification code alone."
   },
@@ -195,7 +195,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 371,
+   "ms": 157,
    "sample": [
     {
      "check": "V-W06-07i",
@@ -236,7 +236,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1162,
+   "ms": 339,
    "sample": [],
    "header": "// V-W06-08: W06 asserted edges must cite a live assertion of the same predicate, subject and object (INV-101, QS-4a core)."
   },
@@ -258,7 +258,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 131,
+   "ms": 411,
    "sample": [],
    "header": "// V-W06-08b: no private-personal content on W06 shared types (INV-506; companion of V-113..V-116)."
   },
@@ -280,7 +280,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1622,
+   "ms": 702,
    "sample": [],
    "header": "// QS-4a instantiated with W06 forbidden-implication pairs (zero rows = valid)."
   }

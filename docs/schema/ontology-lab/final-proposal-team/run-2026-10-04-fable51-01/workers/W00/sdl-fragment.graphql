@@ -774,6 +774,13 @@ enum AmountReferent {
   NOT_STATED
 }
 
+"CANDIDATE (W19-SR-02): share of a work's content a rendition Source carries. A COMPLETE capture of a PARTIAL rendition (a PubMed abstract record) never supports NOT_DISCLOSED or 'not reported' for the work."
+enum RenditionCoverage {
+  FULL
+  PARTIAL
+  UNKNOWN
+}
+
 "Whether a source reported a value; NOT_REPORTED is never zero or absent."
 enum ReportedStatus {
   REPORTED
@@ -818,6 +825,8 @@ type Source implements Entity & EntityArchetype
   title: String
   "Kind of endpoint (classification only)."
   sourceKind: SourceKind
+  "CANDIDATE (W19-SR-02, ruled by W00): how much of its work this rendition carries (FULL, PARTIAL, UNKNOWN); null when the Source is not RENDITION_OF a work. Distinct from SourceSnapshot.captureCompleteness (how much of the endpoint was captured)."
+  renditionCoverage: RenditionCoverage
   "uid of the publishing Organization when known (reference by uid; no asserted edge in 0.2.0)."
   publisherUid: String
   """class: structural; cardinality: many; catalog: HAS_SNAPSHOT (Source → SourceSnapshot). One per capture."""

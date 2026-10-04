@@ -1,0 +1,10 @@
+[
+ {
+  "type": "RELATIONSHIP_UNIQUENESS",
+  "n": 6
+ },
+ {
+  "type": "UNIQUENESS",
+  "n": 4
+ }
+]

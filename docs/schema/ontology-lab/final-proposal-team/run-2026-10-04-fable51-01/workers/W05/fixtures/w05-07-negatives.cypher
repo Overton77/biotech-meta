@@ -25,7 +25,7 @@ SET r.assertionUid = 'hu:claim-occurrence:synthetic-w05-guest-reports-sauna', r.
 // N6 -> V-W05-07: an underived zero projected as a composition edge.
 MATCH (f:FoodItem {uid: 'hu:material:food-brazil-nut-dried-unblanched'}), (d:ChemicalSubstance {uid: 'hu:substance:docosahexaenoic-acid'})
 MERGE (f)-[r:QUANTITATIVELY_CONTAINS]->(d)
-SET r.relationshipUid = 'hu:rel:neg-w05-dha', r.assertionUid = 'hu:assertion:fdc-170569-dha-zero-underived', r.quantity = 0.0, r.unitCode = 'g', r.basis = 'PER_100_G';
+SET r.relationshipUid = 'hu:rel:neg-w05-dha', r.assertionUid = 'hu:assertion:fdc-170569-dha-zero-underived', r.quantity = 0.0, r.unitCode = 'g/hg', r.basis = 'AMOUNT_PER_MASS_OF_MATERIAL';
 
 // N7 -> V-W05-10: a protocol step turned into a characterized exposure.
 MATCH (st:ProtocolStep {uid: 'hu:protocol-step:synthetic-brazil-nut-daily-eat-two'}), (e:Exposure {uid: 'hu:exposure:selenium-oral-chronic-dietary'})

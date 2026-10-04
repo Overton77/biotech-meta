@@ -1,11 +1,11 @@
 // =====================================================================================================================
 // W05 fixture 02: dietary-pattern arm versus diet-plus-food arm (DICA-NUTS, NCT03728127). Composite intervention:
-// one practice-definition component (the "Brazilian cardioprotective diet prescription", a W16 Protocol whose content
-// the registry does not give) plus three food components of 10 g/day each (peanuts, cashew nuts, Brazil nuts; the
-// registry states no preparation, so components target the base FoodItems). The registry's intervention type
-// DIETARY_SUPPLEMENT is kept verbatim on the StudyIntervention and creates no Product (forbidden implication
-// REGISTRY_INTERVENTION_TYPE -> PRODUCT_KIND). Practice components use the requested W09 edge USES_PRACTICE_DEFINITION
-// (W05-SR-06; pending). Public facts: ClinicalTrials.gov API v2 armsInterventionsModule via Firecrawl, 2026-10-04.
+// the StudyIntervention FOLLOWS_INTERVENTION_DEFINITION (W09) the "Brazilian cardioprotective diet prescription" (a W16
+// Protocol whose content the registry does not give) and has three material components of 10 g/day each (peanuts,
+// cashew nuts, Brazil nuts; no preparation stated, so components target the base FoodItems). The comparator arm follows
+// the same definition and has no material component. The registry's intervention type DIETARY_SUPPLEMENT is kept
+// verbatim and creates no Product (forbidden implication REGISTRY_INTERVENTION_TYPE -> PRODUCT_KIND).
+// Public facts: ClinicalTrials.gov API v2 armsInterventionsModule via Firecrawl, 2026-10-04.
 // Every statement binds its own nodes by uid; MERGE of shared nodes repeats full labels so the file runs alone.
 // =====================================================================================================================
 
@@ -96,21 +96,19 @@ MERGE (a:Assertion {uid: 'hu:assertion:dcb-assigns'})
 SET a.predicate = 'ASSIGNS_INTERVENTION', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.basisKind = 'CITED_FROM_PRIOR_WORK', a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.privacyClass = 'PUBLIC', a.contentHash = 'sha256:synthetic-w05-b02'
 MERGE (a)-[:HAS_SUBJECT]->(arm) MERGE (a)-[:HAS_OBJECT]->(si) MERGE (a)-[:SUPPORTED_BY]->(l) MERGE (a)-[:WAS_GENERATED_BY]->(act);
 
-// ---- practice components (both arms) -> Protocol through the requested W09 edge ----
-UNWIND [['hu:intervention:dica-nuts-diet-plus-nuts', 'hu:intervention-component:dcbn-diet', 'hu:locator:nct03728127-dcbn-intervention', 'b03'],
-        ['hu:intervention:dica-nuts-diet-only', 'hu:intervention-component:dcb-diet', 'hu:locator:nct03728127-dcb-intervention', 'b04']] AS row
+// ---- the diet prescription is followed by both interventions (W09 FOLLOWS_INTERVENTION_DEFINITION, asserted) ----
+// W09's InterventionDefinitionTarget lists ProtocolEdition but not Protocol; the registry gives no edition content, so the
+// target is the Protocol identity (W05-SR-06 asks W09 to admit Protocol when no edition is known).
+UNWIND [['hu:intervention:dica-nuts-diet-plus-nuts', 'hu:locator:nct03728127-dcbn-intervention', 'b03'],
+        ['hu:intervention:dica-nuts-diet-only', 'hu:locator:nct03728127-dcb-intervention', 'b04']] AS row
 MATCH (si:StudyIntervention {uid: row[0]}), (p:Protocol {uid: 'hu:protocol:dicabr-brazilian-cardioprotective-diet'}),
-      (l:SourceLocator {uid: row[2]}), (act:Activity {uid: 'hu:activity:w05-curation-2026-10-04'})
-MERGE (ic:InterventionComponent:VersionedState {uid: row[1]})
-SET ic.stateType = 'InterventionComponent', ic.verbatimDoseText = 'Brazilian cardioprotective diet prescription', ic.quantity = NULL,
-    ic.payloadHash = 'sha256:synthetic-w05-' + row[3], ic.createdAt = datetime('2026-10-04T02:00:00Z'), ic.privacyClass = 'PUBLIC'
-MERGE (si)-[:HAS_INTERVENTION_COMPONENT]->(ic)
-MERGE (a:Assertion {uid: 'hu:assertion:' + row[3] + '-uses-dicabr'})
-SET a.predicate = 'USES_PRACTICE_DEFINITION', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.basisKind = 'CITED_FROM_PRIOR_WORK',
-    a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.privacyClass = 'PUBLIC', a.contentHash = 'sha256:synthetic-w05-' + row[3] + '-a'
-MERGE (a)-[:HAS_SUBJECT]->(ic) MERGE (a)-[:HAS_OBJECT]->(p) MERGE (a)-[:SUPPORTED_BY]->(l) MERGE (a)-[:WAS_GENERATED_BY]->(act)
-MERGE (ic)-[r:USES_PRACTICE_DEFINITION]->(p)
-SET r.relationshipUid = 'hu:rel:uses-practice-' + row[3], r.assertionUid = a.uid, r.asReportedName = 'Brazilian cardioprotective diet',
+      (l:SourceLocator {uid: row[1]}), (act:Activity {uid: 'hu:activity:w05-curation-2026-10-04'})
+MERGE (a:Assertion {uid: 'hu:assertion:' + row[2] + '-follows-dicabr'})
+SET a.predicate = 'FOLLOWS_INTERVENTION_DEFINITION', a.status = 'ACCEPTED', a.polarity = 'POSITIVE', a.basisKind = 'CITED_FROM_PRIOR_WORK',
+    a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.privacyClass = 'PUBLIC', a.contentHash = 'sha256:synthetic-w05-' + row[2] + '-a'
+MERGE (a)-[:HAS_SUBJECT]->(si) MERGE (a)-[:HAS_OBJECT]->(p) MERGE (a)-[:SUPPORTED_BY]->(l) MERGE (a)-[:WAS_GENERATED_BY]->(act)
+MERGE (si)-[r:FOLLOWS_INTERVENTION_DEFINITION]->(p)
+SET r.relationshipUid = 'hu:rel:follows-definition-' + row[2], r.assertionUid = a.uid,
     r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
 
 // ---- food components (DCBN only): 10 g/day each, preparation unresolved ----

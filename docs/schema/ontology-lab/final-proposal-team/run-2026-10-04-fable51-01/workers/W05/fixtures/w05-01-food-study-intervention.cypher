@@ -145,7 +145,7 @@ SET a.predicate = 'QUANTITATIVELY_CONTAINS', a.status = 'ACCEPTED', a.polarity =
 MERGE (a)-[:HAS_SUBJECT]->(f) MERGE (a)-[:HAS_OBJECT]->(se) MERGE (a)-[:SUPPORTED_BY]->(l) MERGE (a)-[:WAS_GENERATED_BY]->(act) MERGE (a)-[:ASSERTED_BY]->(o)
 MERGE (f)-[r:QUANTITATIVELY_CONTAINS {relationshipUid: 'hu:rel:qc-fdc-170569-selenium'}]->(se)
 SET r.assertionUid = a.uid,
-    r.quantity = 1917.0, r.unitCode = 'ug', r.basis = 'PER_100_G', r.referenceAmount = 100.0, r.referenceUnitCode = 'g',
+    r.quantity = 1917.0, r.unitCode = 'ug/hg', r.basis = 'AMOUNT_PER_MASS_OF_MATERIAL', r.comparator = 'EQ', r.contentStatementKind = 'TYPICAL_COMPOSITION_REPORTED',
     r.portionBasis = 'EDIBLE_PORTION', r.valueDerivation = 'ANALYTICAL', r.sourceDerivationCode = 'A',
     r.dataPoints = 15, r.minValue = 136.0, r.maxValue = 2740.0,
     r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
@@ -162,7 +162,7 @@ SET a.predicate = 'QUANTITATIVELY_CONTAINS', a.status = 'ACCEPTED', a.polarity =
 MERGE (a)-[:HAS_SUBJECT]->(f) MERGE (a)-[:HAS_OBJECT]->(fa) MERGE (a)-[:SUPPORTED_BY]->(l) MERGE (a)-[:WAS_GENERATED_BY]->(act) MERGE (a)-[:ASSERTED_BY]->(o)
 MERGE (f)-[r:QUANTITATIVELY_CONTAINS {relationshipUid: 'hu:rel:qc-fdc-170569-folic-acid'}]->(fa)
 SET r.assertionUid = a.uid,
-    r.quantity = 0.0, r.unitCode = 'ug', r.basis = 'PER_100_G', r.referenceAmount = 100.0, r.referenceUnitCode = 'g',
+    r.quantity = 0.0, r.unitCode = 'ug/hg', r.basis = 'AMOUNT_PER_MASS_OF_MATERIAL', r.comparator = 'EQ', r.contentStatementKind = 'TYPICAL_COMPOSITION_REPORTED',
     r.portionBasis = 'EDIBLE_PORTION', r.valueDerivation = 'ASSUMED_ZERO', r.sourceDerivationCode = 'Z', r.dataPoints = 0,
     r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-10-04T02:00:00Z');
 

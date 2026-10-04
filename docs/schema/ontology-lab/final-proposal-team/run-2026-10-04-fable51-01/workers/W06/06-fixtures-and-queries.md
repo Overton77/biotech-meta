@@ -7,9 +7,9 @@ All tags below are **run**: executed, not EXPLAIN-only.
 | What | How | Result |
 |---|---|---|
 | Database | In-process Neo4j **5.26.31 Community** (`CALL dbms.components()` → edition `community`), started from the run harness (`EmbeddedNeo4j`, neo4j-harness 5.26.31) in a fresh directory. Statements were split by the harness `run-cypher.mjs` and each ran in its own transaction; no variable crosses a `;`. | run |
-| Load order | 00 → 01 → 02 → 03 → 04 → 05 → 98, then `w06-validation.cypher` and `w06-queries.cypher` (positive state), then the baseline suite `docs/schema/neo4j/validation.cypher` (174 statements). Then 99 (negatives), `w06-validation.cypher` again, and the baseline suite again. Finally `operations.cypher`. | every statement ok (00: 9, 01: 20, 02: 10, 03: 20, 04: 8, 05: 9, 98: 1, 99: 14, validation 11, queries 9, baseline 174, operations 17) |
+| Load order | 00 → 01 → 02 → 03 → 04 → 05 → 98, then `w06-validation.cypher` and `w06-queries.cypher` (positive state), then the baseline suite `docs/schema/neo4j/validation.cypher` (174 statements). Then 99 (negatives), `w06-validation.cypher` again, and the baseline suite again. Finally `operations.cypher`. | every statement ok (00: 9, 01: 20, 02: 10, 03: 20, 04: 8, 05: 9, 98: 1, 99: 14, validation 11, queries 9, baseline 174, operations 16). The final rerun (after aligning with W09 and W05) used a fresh instance; `dbms-components.txt` records the edition. |
 | Raw results | `fixtures/results/*.json` (rows, counters, timings per statement) | — |
-| SDL | `sdl-fragment.graphql` parsed with graphql-js 16.14.2 and built with `@neo4j/graphql` 7.6.3 against scratch stubs for other owners' types. Build OK: 734 generated types, 45 queries, 54 mutations. Read-only fields are absent from `TreatmentCreateInput`. | parser + library build (stub-based, not the merged schema) |
+| SDL | `sdl-fragment.graphql` parsed with graphql-js 16.14.2 and built with `@neo4j/graphql` 7.6.3 against scratch stubs for other owners' types. Build OK: 714 generated types, 43 queries, 51 mutations. Read-only fields are absent from `TreatmentCreateInput`. | parser + library build (stub-based, not the merged schema) |
 
 Fixture conventions:
 
