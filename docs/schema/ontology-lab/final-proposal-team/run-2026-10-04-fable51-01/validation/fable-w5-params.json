@@ -1,0 +1,57 @@
+{
+  "_about": "Wave 5 additions to validation/validation-params.json (run-2026-10-04-fable51-01). Merge rule: list keys are UNIONED into the existing list (order kept, duplicates dropped); map and scalar keys are ADDED (none of them exists yet). Every key has a _why_<key> sibling. Consumed by validation/fable-w5-validators.cypher and validation/query-shapes-privacy-corrected.cypher.",
+
+  "assertedTypes": ["ABOUT_CONDITION", "RECORDS", "POSTS_RESULT", "CLAIMS_OUTCOME"],
+  "_why_assertedTypes": "CH-R-16: W16 asserted edges must reach V-101/V-101r/V-505r; already present in the FINAL validation-params.json at the time of testing, kept here so the union is idempotent if the file is regenerated from the catalog.",
+
+  "derivedTypes": ["SPONSORED_BY", "OPERATED_BY", "INVESTIGATED_BY", "REPORTS_SAFETY_SIGNAL"],
+  "_why_derivedTypes": "CH-S-11: derived study-role and safety-signal projections must reach V-112/V-112r; already present in the FINAL validation-params.json at the time of testing, kept for an idempotent union.",
+
+  "implicationPairs": [
+    ["ADOPTED_PROTOCOL_EDITION", "ADHERENT_TO"],
+    ["ADOPTED_PROTOCOL_EDITION", "NON_ADHERENT_TO"],
+    ["ADOPTED_PROTOCOL_EDITION", "DEVIATED_FROM"],
+    ["OUTSIDE_REFERENCE_RANGE_TRIGGER", "ABOUT_CONDITION"],
+    ["OUTSIDE_REFERENCE_INTERVAL", "ABOUT_CONDITION"]
+  ],
+  "_why_implicationPairs": "CH-R-01/CH-R-09: adherence and deviation synonyms are forbidden conclusions of adoption (alias of [ADOPTED_PROTOCOL_EDITION, FOLLOWS_ALL_STEPS]); CH-R-08: a threshold trigger never licenses ABOUT_CONDITION, so V-112r and V-F5-33 see the premise.",
+
+  "derivedEdgePremises": {"SPONSORED_BY": "SPONSORS_STUDY", "OPERATED_BY": "SERVES_AS_CRO_FOR", "INVESTIGATED_BY": "HOLDS_STUDY_ROLE"},
+  "_why_derivedEdgePremises": "CH-S-11 (V-F5-10): the only premise predicate each inverse-of rule may cite (SDL Study.sponsoredBy/operatedBy/investigatedBy; INVESTIGATED_BY premise per W09-SR-05). REPORTS_SAFETY_SIGNAL uses rule ss-study/v1 and is checked structurally.",
+
+  "privateUidTokens": ["hu:private-", "urn:hu:private", "hu:pcs-", "pcs-user-", "pcs:", "hu:user-context:", "hu:user-context-version:", "hu:user-goal:", "hu:user-goal-version:", "hu:personal-measurement:", "hu:personal-lab-report:", "hu:protocol-in-use:", "hu:protocol-adoption-version:", "hu:protocol-deviation:", "hu:sharing-grant:", "hu:disclosure-event:", "hu:pending-item:", "hu:purchase-event:", "hu:personal-applicability:", "hu:erasure-tombstone:", "hu:recommendation-request:", "hu:recommendation-snapshot:", "hu:recommendation-option:", "hu:decision-criterion-value:", "hu:user-decision:"],
+  "_why_privateUidTokens": "CH-S-16, CH-P-05, CH-P-07, CH-R-07: literal private-store uid tokens (W23 private-store-interface section 9 type list, with and without the private- prefix, plus PCS token shapes); V-F5-18/19/26 escape them and build one case-insensitive word-bounded regex in Cypher, so any embedded occurrence (mid-string, JSON, list element, upper case) is found.",
+
+  "personalDataPatterns": ["(?is).*\\b(dob|date of birth|born( on)?)\\b\\W{0,3}\\d{1,4}[-/.]\\d{1,2}[-/.]\\d{1,4}.*", "(?is).*\\b(ssn|social security|mrn|medical record (no|number))\\b.*"],
+  "_why_personalDataPatterns": "CH-S-16, CH-R-07a: free-text descriptors that carry a birth date or a medical/social identifier are personal data even without a private uid (V-F5-18); regexes, full-match form.",
+
+  "privateOnlyPropertyNames": ["goalVersionUids", "measurementUids", "declaredConditionUids", "declaredIntakeUids", "preferenceKeys", "goalStatement", "personalValueNumber", "personalUnitCode", "granteeKind", "granteeRef", "subjectKeyHash", "userContextVersionUid", "decisionConfidenceMethod", "missingFactKeys", "blockingConstraintUids", "adoptedEditionUid", "deviationKind", "reportedReferenceRangeText", "labReportUid", "issuingLabName", "fileObjectRef", "sharedApplicabilityUid", "substituteSubjectUid", "offerObservationUids", "pcsMeasurementRef", "userContextVersionRef", "sourceMeasurementUid", "ownerUid", "userUid", "questionText"],
+  "_why_privateOnlyPropertyNames": "CH-R-07b, CH-P-03: property names that exist only in the private store (W23 private-store-interface section 9, generic names such as dataCategories/decisionOutcome dropped to avoid collisions with shared fields) plus the PCS linkage keys the Challenger used; V-F5-20 rejects them on every shared node and V-F5-24 rejects them in searchFields.",
+
+  "observationAllowedKeys": ["id", "uid", "name", "description", "mongoResearchRunId", "createdAt", "updatedAt", "privacyClass", "maturity", "schemaVersion", "artifactType", "publishedAt", "observedAt", "contentHash", "observationType", "observedPopulation", "resultKind", "valueNumber", "valueString", "unitCode", "valueStatus", "reportedAt", "valueText"],
+  "_why_observationAllowedKeys": "CH-R-07b (V-F5-20): stored-property allow-list for the public Observation, generated from the final SDL scalar fields of type Observation.",
+
+  "protocolResultAllowedKeys": ["id", "uid", "name", "description", "mongoResearchRunId", "createdAt", "updatedAt", "privacyClass", "maturity", "schemaVersion", "artifactType", "publishedAt", "observedAt", "contentHash", "resultSummary"],
+  "_why_protocolResultAllowedKeys": "CH-R-07b (V-F5-20): stored-property allow-list for ProtocolResult, generated from the final SDL scalar fields of type ProtocolResult.",
+
+  "publicSearchFields": ["name", "description", "bio", "title", "legalName", "displayName", "canonicalTicker", "sector", "preferredName", "commonName", "casNumber", "mondoId", "icd11Code", "orphaCode", "omimId", "productType", "productClass", "primaryRegulatoryIdentifier", "regulatoryAuthorizationId", "foodGroup", "lifestyleClass", "treatmentClass", "orphanDrugDesignation", "procedureType", "setting", "effectCategory", "signalType", "interactionSummary", "summaryText", "themeSummary", "url", "text", "claimText", "listingType", "status", "canonicalUrl", "availabilityStatus", "commercialTermsSummary", "altText", "caption", "transcriptText", "ocrText", "queryText", "aliases", "synonyms"],
+  "_why_publicSearchFields": "CH-P-03/CH-P-04 (V-F5-24): searchFields may only name shared, public properties; the list is the union of the property names the operations file's fulltext indexes already cover (section 4, searchText excluded) plus aliases/synonyms.",
+
+  "privateSourceUriPatterns": ["(?i)^urn:(belllabs|bellabs|hu):.*", "(?i)^https?://([a-z0-9-]+\\.)*app\\.bel+labs\\.[a-z.]+(/.*)?$", "(?i)^https?://([a-z0-9-]+\\.)*bel+labs\\.(internal|local)(/.*)?$", "(?i)^(s3|gs|file)://.*"],
+  "_why_privateSourceUriPatterns": "CH-R-06, CH-P-10, CH-M-02: a Source on the operator's own application, upload or media store is never public-source support; RECORDS/POSTS_RESULT, Person existence and EVIDENCES must rest on a public-web Source (V-F5-21, V-F5-22, V-F5-41).",
+
+  "privateUploadSourceKinds": ["PRIVATE_UPLOAD", "OPERATOR_STORE"],
+  "_why_privateUploadSourceKinds": "CH-R-06 (V-F5-22): SourceKind values the private pipeline must use for member uploads and operator storage (proposed enum additions; no such value exists yet, so the branch is dormant until Fable adds them).",
+
+  "publicAnswerExcludedLabels": ["PolicyVersion", "DecisionCriterion", "Activity", "AnswerRecord", "ResolutionHypothesis", "Agent", "PrivateRecord"],
+  "_why_publicAnswerExcludedLabels": "CH-P-01, CH-P-06, CH-P-15 (V-F5-23, V-F5-25, QS-5b/QS-6a/QS-8 corrected): W23 04 section 6 closure, the types a PUBLIC_ANSWER trace may never cite or traverse even when a row is mislabelled PUBLIC.",
+
+  "abstractOnlyUriPatterns": ["(?i)^https?://(www\\.)?pubmed\\.ncbi\\.nlm\\.nih\\.gov/.*", "(?i)^https?://(www\\.)?ncbi\\.nlm\\.nih\\.gov/pubmed/.*", "(?i)^https?://(www\\.)?europepmc\\.org/abstract/.*", "(?i)^https?://.*/abstract([/?#].*)?$"],
+  "_why_abstractOnlyUriPatterns": "CH-M-13 (V-F5-50): heuristic for abstract-only renditions that may never claim renditionCoverage FULL.",
+
+  "numberWords": ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"],
+  "_why_numberWords": "CH-R-03 (V-F5-31) and CH-M-12 (V-F5-49): number words indexed by value, so the validators can match 'three to six' and detect quantity changes written in words.",
+
+  "quantityWords": ["half", "quarter", "third", "dozen", "hundred", "thousand", "million", "double", "twice", "once", "thrice"],
+  "_why_quantityWords": "CH-M-12 (V-F5-49): extra quantity words compared between a cited span and its fuzzy re-anchor ('a gram' vs 'half a gram')."
+}

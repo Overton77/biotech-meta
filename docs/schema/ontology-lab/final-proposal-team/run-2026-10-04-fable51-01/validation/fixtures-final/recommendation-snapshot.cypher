@@ -481,7 +481,7 @@ MERGE (a)-[:SUPPORTED_BY]->(pl);
 
 MATCH (host:Person {uid: 'hu:person:synthetic-podcast-host'}), (p:Product {uid: 'hu:product:synthetic-nightcue-melatonin'})
 MERGE (host)-[r:RECOMMENDS]->(p)
-SET r.assertionUid = 'hu:assertion:synthetic-host-recommends-nightcue', r.validFrom = datetime('2026-02-01T00:00:00Z'),
+SET r.projectionOfAssertionUid = 'hu:assertion:synthetic-host-recommends-nightcue', r.derivationRule = 'recommends-speech-act/v1', r.derivedFromAssertionUids = ['hu:assertion:synthetic-host-recommends-nightcue'], r.validFrom = datetime('2026-02-01T00:00:00Z'),
     r.validFromPrecision = 'DAY', r.validFromBasis = 'STATED_BY_SOURCE', r.validToBasis = 'UNKNOWN', r.recordedFrom = datetime('2026-02-02T00:00:00Z'), r.relationshipUid = 'hu:rel:synthetic-host-recommends-nightcue';
 
 // Intentionally absent (shared graph):

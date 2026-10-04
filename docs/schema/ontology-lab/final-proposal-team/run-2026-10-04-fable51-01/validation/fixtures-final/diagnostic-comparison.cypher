@@ -241,8 +241,8 @@ SET lt.name = 'HbA1c (IFCC)', lt.localTestCode = 'HBA1C-IFCC', lt.issuerUid = 'h
 MATCH (m1:Metric {uid: 'hu:metric:hba1c-mfr-bld'}), (m2:Metric {uid: 'hu:metric:hba1c-ifcc-sfr-bld'}), (b:Biomarker {uid: 'hu:biomarker:hba1c'}), (i1:Identifier {uid: 'hu:identifier:loinc-4548-4'}), (i2:Identifier {uid: 'hu:identifier:loinc-59261-8'})
 MERGE (m1)-[:QUANTIFIES]->(b)
 MERGE (m2)-[:QUANTIFIES]->(b)
-MERGE (m1)-[:IDENTIFIED_BY]->(i1)
-MERGE (m2)-[:IDENTIFIED_BY]->(i2);
+MERGE (m1)-[:HAS_IDENTIFIER]->(i1)
+MERGE (m2)-[:HAS_IDENTIFIER]->(i2);
 
 // status: statically-checked
 MATCH (ta:LabTest {uid: 'hu:lab-test:synthetic-lab-a-hba1c'}), (tb:LabTest {uid: 'hu:lab-test:synthetic-lab-b-hba1c-ifcc'}), (m1:Metric {uid: 'hu:metric:hba1c-mfr-bld'}), (m2:Metric {uid: 'hu:metric:hba1c-ifcc-sfr-bld'})
@@ -425,7 +425,7 @@ MERGE (x)-[:HAS_SUBJECT]->(v2)
 MERGE (x)-[:HAS_OBJECT]->(v1)
 MERGE (x)-[:SUPPORTED_BY]->(l)
 MERGE (v2)-[d:DERIVED_FROM_ALGORITHM_VERSION]->(v1)
-SET d.assertionUid = 'hu:assertion:grimage2-derived-from-grimage-v1', d.recordedFrom = datetime('2026-10-03T00:00:00Z'), d.relationshipUid = 'hu:rel:grimage2-derived-from-grimage-v1';
+SET d.assertionUid = 'hu:assertion:grimage2-derived-from-grimage-v1', d.recordedFrom = datetime('2026-10-03T00:00:00Z'), d.validFrom = datetime('2022-12-14T00:00:00Z'), d.validFromPrecision = 'DAY', d.validFromBasis = 'PUBLICATION_PROXY', d.relationshipUid = 'hu:rel:grimage2-derived-from-grimage-v1';
 
 // Model-derived feature from an unversioned service endpoint.
 // status: statically-checked
@@ -467,63 +467,63 @@ MERGE (ca)-[:SUPPORTED_BY]->(l);
 // ---------------------------------------------------------------------------
 
 // status: statically-checked
-MERGE (r:InformationArtifact:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-a-2025-01-10'})
-SET r.resultKind = 'MEASURED', r.valueNumber = 5.4, r.unitCode = '%', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-01-10T08:00:00Z'), r.reportedAt = datetime('2025-01-11T00:00:00Z'), r.privacyClass = 'synthetic', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
+MERGE (r:Observation:DiagnosticResult:InformationArtifact {uid: 'hu:observation:synthetic-hba1c-lab-a-2025-01-10'})
+SET r.resultKind = 'MEASURED', r.valueNumber = 5.4, r.unitCode = '%', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-01-10T08:00:00Z'), r.reportedAt = datetime('2025-01-11T00:00:00Z'), r.privacyClass = 'INTERNAL', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
 
 // status: statically-checked
-MERGE (r:InformationArtifact:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-a-2025-09-10'})
-SET r.resultKind = 'MEASURED', r.valueNumber = 5.7, r.unitCode = '%', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-09-10T08:00:00Z'), r.reportedAt = datetime('2025-09-11T00:00:00Z'), r.privacyClass = 'synthetic', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
+MERGE (r:Observation:DiagnosticResult:InformationArtifact {uid: 'hu:observation:synthetic-hba1c-lab-a-2025-09-10'})
+SET r.resultKind = 'MEASURED', r.valueNumber = 5.7, r.unitCode = '%', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-09-10T08:00:00Z'), r.reportedAt = datetime('2025-09-11T00:00:00Z'), r.privacyClass = 'INTERNAL', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
 
 // status: statically-checked
-MERGE (r:InformationArtifact:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-b-2025-01-20'})
-SET r.resultKind = 'MEASURED', r.valueNumber = 36.0, r.unitCode = 'mmol/mol', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-01-20T08:00:00Z'), r.reportedAt = datetime('2025-01-21T00:00:00Z'), r.privacyClass = 'synthetic', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
+MERGE (r:Observation:DiagnosticResult:InformationArtifact {uid: 'hu:observation:synthetic-hba1c-lab-b-2025-01-20'})
+SET r.resultKind = 'MEASURED', r.valueNumber = 36.0, r.unitCode = 'mmol/mol', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-01-20T08:00:00Z'), r.reportedAt = datetime('2025-01-21T00:00:00Z'), r.privacyClass = 'INTERNAL', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
 
 // status: statically-checked
-MERGE (r:InformationArtifact:DiagnosticResult {uid: 'hu:result:synthetic-grimage-v1-2024-03-01'})
-SET r.resultKind = 'INFERRED', r.valueNumber = 52.0, r.unitCode = 'a', r.valueStatus = 'REPORTED', r.observedAt = datetime('2024-03-01T00:00:00Z'), r.privacyClass = 'synthetic', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
+MERGE (r:Observation:DiagnosticResult:InformationArtifact {uid: 'hu:observation:synthetic-grimage-v1-2024-03-01'})
+SET r.resultKind = 'INFERRED', r.valueNumber = 52.0, r.unitCode = 'a', r.valueStatus = 'REPORTED', r.observedAt = datetime('2024-03-01T00:00:00Z'), r.privacyClass = 'INTERNAL', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
 
 // status: statically-checked
-MERGE (r:InformationArtifact:DiagnosticResult {uid: 'hu:result:synthetic-grimage2-2025-03-01'})
-SET r.resultKind = 'INFERRED', r.valueNumber = 49.0, r.unitCode = 'a', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-03-01T00:00:00Z'), r.privacyClass = 'synthetic', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
+MERGE (r:Observation:DiagnosticResult:InformationArtifact {uid: 'hu:observation:synthetic-grimage2-2025-03-01'})
+SET r.resultKind = 'INFERRED', r.valueNumber = 49.0, r.unitCode = 'a', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-03-01T00:00:00Z'), r.privacyClass = 'INTERNAL', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
 
 // Vendor report labelled only "GrimAge": version unresolved, so no COMPUTED_BY_ALGORITHM_VERSION edge yet.
 // status: statically-checked
-MERGE (r:InformationArtifact:DiagnosticResult {uid: 'hu:result:synthetic-vendor-grimage-unresolved-2025-11-01'})
-SET r.resultKind = 'INFERRED', r.valueNumber = 50.5, r.unitCode = 'a', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-11-01T00:00:00Z'), r.privacyClass = 'synthetic', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
+MERGE (r:Observation:DiagnosticResult:InformationArtifact {uid: 'hu:observation:synthetic-vendor-grimage-unresolved-2025-11-01'})
+SET r.resultKind = 'INFERRED', r.valueNumber = 50.5, r.unitCode = 'a', r.valueStatus = 'REPORTED', r.observedAt = datetime('2025-11-01T00:00:00Z'), r.privacyClass = 'INTERNAL', r.artifactType = 'DIAGNOSTIC_RESULT', r.createdAt = datetime();
 
 // status: statically-checked
-MATCH (r:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-a-2025-01-10'}), (a:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-tosoh-g8-5-24'}), (ri:ReferenceIntervalVersion {uid: 'hu:ri-version:synthetic-lab-a-hba1c-a1-adult'})
+MATCH (r:DiagnosticResult {uid: 'hu:observation:synthetic-hba1c-lab-a-2025-01-10'}), (a:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-tosoh-g8-5-24'}), (ri:ReferenceIntervalVersion {uid: 'hu:ri-version:synthetic-lab-a-hba1c-a1-adult'})
 MERGE (r)-[:PRODUCED_BY_ASSAY_VERSION]->(a)
 MERGE (r)-[:INTERPRETED_WITH_REFERENCE_INTERVAL_VERSION]->(ri);
 
 // status: statically-checked
-MATCH (r:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-a-2025-09-10'}), (a:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-cobas-c513'}), (ri:ReferenceIntervalVersion {uid: 'hu:ri-version:synthetic-lab-a-hba1c-a2-adult'})
+MATCH (r:DiagnosticResult {uid: 'hu:observation:synthetic-hba1c-lab-a-2025-09-10'}), (a:AssayVersion {uid: 'hu:assay-version:synthetic-lab-a-hba1c-cobas-c513'}), (ri:ReferenceIntervalVersion {uid: 'hu:ri-version:synthetic-lab-a-hba1c-a2-adult'})
 MERGE (r)-[:PRODUCED_BY_ASSAY_VERSION]->(a)
 MERGE (r)-[:INTERPRETED_WITH_REFERENCE_INTERVAL_VERSION]->(ri);
 
 // status: statically-checked
-MATCH (r:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-b-2025-01-20'}), (a:AssayVersion {uid: 'hu:assay-version:synthetic-lab-b-hba1c-cobas-c513-ifcc'}), (ri:ReferenceIntervalVersion {uid: 'hu:ri-version:synthetic-lab-b-hba1c-b1-adult'})
+MATCH (r:DiagnosticResult {uid: 'hu:observation:synthetic-hba1c-lab-b-2025-01-20'}), (a:AssayVersion {uid: 'hu:assay-version:synthetic-lab-b-hba1c-cobas-c513-ifcc'}), (ri:ReferenceIntervalVersion {uid: 'hu:ri-version:synthetic-lab-b-hba1c-b1-adult'})
 MERGE (r)-[:PRODUCED_BY_ASSAY_VERSION]->(a)
 MERGE (r)-[:INTERPRETED_WITH_REFERENCE_INTERVAL_VERSION]->(ri);
 
 // status: statically-checked
-MATCH (r:DiagnosticResult {uid: 'hu:result:synthetic-grimage-v1-2024-03-01'}), (v:AlgorithmVersion {uid: 'hu:algorithm-version:grimage-v1-lu-2019'})
+MATCH (r:DiagnosticResult {uid: 'hu:observation:synthetic-grimage-v1-2024-03-01'}), (v:AlgorithmVersion {uid: 'hu:algorithm-version:grimage-v1-lu-2019'})
 MERGE (r)-[:COMPUTED_BY_ALGORITHM_VERSION]->(v);
 
 // status: statically-checked
-MATCH (r:DiagnosticResult {uid: 'hu:result:synthetic-grimage2-2025-03-01'}), (v:AlgorithmVersion {uid: 'hu:algorithm-version:grimage2-lu-2022'})
+MATCH (r:DiagnosticResult {uid: 'hu:observation:synthetic-grimage2-2025-03-01'}), (v:AlgorithmVersion {uid: 'hu:algorithm-version:grimage2-lu-2022'})
 MERGE (r)-[:COMPUTED_BY_ALGORITHM_VERSION]->(v);
 
 // Licensed comparison: Lab A assay v1 vs Lab B, covered by the ComparabilityAssessment above.
 // status: statically-checked
-MATCH (r1:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-a-2025-01-10'}), (r2:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-b-2025-01-20'})
+MATCH (r1:DiagnosticResult {uid: 'hu:observation:synthetic-hba1c-lab-a-2025-01-10'}), (r2:DiagnosticResult {uid: 'hu:observation:synthetic-hba1c-lab-b-2025-01-20'})
 MERGE (r1)-[c:COMPARED_TO]->(r2)
 SET c.derivationRule = 'INV-301 comparability-licensed comparison', c.derivedFromAssessmentUids = ['hu:comparability:lab-a-a1-vs-lab-b-b1-hba1c'];
 
 // Competing proposals for the vendor "GrimAge" label: two UNRESOLVED assertions of the result-to-version link,
 // each backed by a competing ResolutionHypothesis. No COMPUTED_BY_ALGORITHM_VERSION edge until one is accepted.
 // status: statically-checked
-MATCH (r:DiagnosticResult {uid: 'hu:result:synthetic-vendor-grimage-unresolved-2025-11-01'}), (v1:AlgorithmVersion {uid: 'hu:algorithm-version:grimage-v1-lu-2019'}), (v2:AlgorithmVersion {uid: 'hu:algorithm-version:grimage2-lu-2022'})
+MATCH (r:DiagnosticResult {uid: 'hu:observation:synthetic-vendor-grimage-unresolved-2025-11-01'}), (v1:AlgorithmVersion {uid: 'hu:algorithm-version:grimage-v1-lu-2019'}), (v2:AlgorithmVersion {uid: 'hu:algorithm-version:grimage2-lu-2022'})
 MERGE (x1:Assertion {uid: 'hu:assertion:vendor-grimage-result-computed-by-v1'})
 SET x1.predicate = 'COMPUTED_BY_ALGORITHM_VERSION', x1.status = 'UNRESOLVED', x1.recordedAt = datetime('2025-11-02T00:00:00Z')
 MERGE (x1)-[:HAS_SUBJECT]->(r)
@@ -562,11 +562,11 @@ MERGE (h)-[:PROPOSES_MATCH]->(tb);
 // MERGE (a)-[:ASSAY_OPERATED_BY]->(lab);
 
 // ABSENT 3 (V-302): trend across Lab A assay v1 and v2 without an assessment
-// MATCH (r1:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-a-2025-01-10'}), (r2:DiagnosticResult {uid: 'hu:result:synthetic-hba1c-lab-a-2025-09-10'})
+// MATCH (r1:DiagnosticResult {uid: 'hu:observation:synthetic-hba1c-lab-a-2025-01-10'}), (r2:DiagnosticResult {uid: 'hu:observation:synthetic-hba1c-lab-a-2025-09-10'})
 // MERGE (r1)-[:COMPARED_TO]->(r2);
 
 // ABSENT 4 (V-304): "biological age improved by 3 years" across GrimAge v1 and GrimAge2
-// MATCH (r1:DiagnosticResult {uid: 'hu:result:synthetic-grimage-v1-2024-03-01'}), (r2:DiagnosticResult {uid: 'hu:result:synthetic-grimage2-2025-03-01'})
+// MATCH (r1:DiagnosticResult {uid: 'hu:observation:synthetic-grimage-v1-2024-03-01'}), (r2:DiagnosticResult {uid: 'hu:observation:synthetic-grimage2-2025-03-01'})
 // MERGE (r1)-[:COMPARED_TO]->(r2);
 
 // ABSENT 5 (V-305b): reference interval attached to the biomarker instead of an assay version
@@ -686,8 +686,8 @@ RETURN r.uid AS resultUid, collect(v.uid) AS candidateVersions;
 // snapshot it was read from, and the edge carries assertionUid, recordedFrom and relationshipUid.
 // status: statically-checked, executed
 UNWIND [
-  {pred: 'IDENTIFIED_BY', s: 'hu:metric:hba1c-mfr-bld', o: 'hu:identifier:loinc-4548-4', loc: 'hu:locator:loinc-4548-4-part-model'},
-  {pred: 'IDENTIFIED_BY', s: 'hu:metric:hba1c-ifcc-sfr-bld', o: 'hu:identifier:loinc-59261-8', loc: 'hu:locator:loinc-59261-8-names'},
+  {pred: 'HAS_IDENTIFIER', s: 'hu:metric:hba1c-mfr-bld', o: 'hu:identifier:loinc-4548-4', loc: 'hu:locator:loinc-4548-4-part-model'},
+  {pred: 'HAS_IDENTIFIER', s: 'hu:metric:hba1c-ifcc-sfr-bld', o: 'hu:identifier:loinc-59261-8', loc: 'hu:locator:loinc-59261-8-names'},
   {pred: 'MEASURES_METRIC', s: 'hu:lab-test:synthetic-lab-a-hba1c', o: 'hu:metric:hba1c-mfr-bld', loc: 'hu:locator:synthetic-lab-a-notice-v2-body'},
   {pred: 'MEASURES_METRIC', s: 'hu:lab-test:synthetic-lab-b-hba1c-ifcc', o: 'hu:metric:hba1c-ifcc-sfr-bld', loc: 'hu:locator:ngsp-master-equation-table-2'}
 ] AS row

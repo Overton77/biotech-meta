@@ -305,7 +305,7 @@ MERGE (resp:InformationArtifact:RegulatoryResponse {uid: 'hu:reg-response:us-fda
 SET resp.responseKind = 'GRAS_NO_QUESTIONS', resp.jurisdiction = 'US', resp.issuedAt = null, resp.conditionsOfUseText = 'as a source of vitamin B3 in vitamin waters, protein shakes, nutrition bars, gum, chews, and powdered beverages at a maximum level of 0.0057% by weight as consumed', resp.agencyDisclaimerText = 'The agency has not, however, made its own determination regarding the GRAS status of the subject use of NR.', resp.artifactType = 'REGULATORY_RESPONSE', resp.createdAt = datetime();
 
 // status: statically-checked
-MERGE (st:VersionedState:RegulatoryStatus {uid: 'hu:reg-status:us-nrc-gras-notice-on-file'})
+MERGE (st:VersionedState:RegulatoryStatus {uid: 'hu:regulatory-status:us-nrc-gras-notice-on-file'})
 SET st.statusKind = 'NOTIFICATION_ON_FILE', st.jurisdiction = 'US', st.scopeText = 'GRAS notice GRN 000635, FDA no questions, intended food uses only', st.effectiveFrom = null, st.effectiveTo = null, st.stateType = 'REGULATORY_STATUS', st.createdAt = datetime();
 
 // status: statically-checked
@@ -317,7 +317,7 @@ MERGE (ndir:InformationArtifact:RegulatoryResponse {uid: 'hu:reg-response:us-fda
 SET ndir.responseKind = 'NDI_ACKNOWLEDGED_WITHOUT_OBJECTION', ndir.jurisdiction = 'US', ndir.issuedAt = null, ndir.conditionsOfUseText = null, ndir.artifactType = 'REGULATORY_RESPONSE', ndir.createdAt = datetime();
 
 // status: statically-checked
-MATCH (sub:RegulatorySubmission {uid: 'hu:reg-submission:us-fda-grn-000635'}), (resp:RegulatoryResponse {uid: 'hu:reg-response:us-fda-grn-000635'}), (st:RegulatoryStatus {uid: 'hu:reg-status:us-nrc-gras-notice-on-file'}), (pw:RegulatoryPathway {uid: 'hu:reg-pathway:us-fda-gras-notice'}), (fda:RegulatoryAgency {uid: 'hu:org:us-fda'}), (nrc:IngredientMaterial {uid: 'hu:material:niagen-nrc'}), (niagen:Organization {uid: 'hu:org:niagen-bioscience-inc'}), (l:SourceLocator {uid: 'hu:locator:fda-grn-000635-response-body'})
+MATCH (sub:RegulatorySubmission {uid: 'hu:reg-submission:us-fda-grn-000635'}), (resp:RegulatoryResponse {uid: 'hu:reg-response:us-fda-grn-000635'}), (st:RegulatoryStatus {uid: 'hu:regulatory-status:us-nrc-gras-notice-on-file'}), (pw:RegulatoryPathway {uid: 'hu:reg-pathway:us-fda-gras-notice'}), (fda:RegulatoryAgency {uid: 'hu:org:us-fda'}), (nrc:IngredientMaterial {uid: 'hu:material:niagen-nrc'}), (niagen:Organization {uid: 'hu:org:niagen-bioscience-inc'}), (l:SourceLocator {uid: 'hu:locator:fda-grn-000635-response-body'})
 MERGE (sub)-[:UNDER_PATHWAY]->(pw)
 MERGE (sub)-[:SUBMISSION_HAS_RESPONSE]->(resp)
 MERGE (resp)-[:ISSUED_BY]->(fda)
@@ -376,11 +376,11 @@ MERGE (a)-[:ASSERTED_BY]->(niagen);
 // ---------------------------------------------------------------------------
 
 // status: statically-checked
-MERGE (st:VersionedState:RegulatoryStatus {uid: 'hu:reg-status:synthetic-plant-ffr-active'})
+MERGE (st:VersionedState:RegulatoryStatus {uid: 'hu:regulatory-status:synthetic-plant-ffr-active'})
 SET st.statusKind = 'ESTABLISHMENT_REGISTRATION', st.jurisdiction = 'US', st.scopeText = 'food facility registration (synthetic)', st.effectiveFrom = datetime('2024-11-01T00:00:00Z'), st.effectiveTo = null, st.stateType = 'REGULATORY_STATUS', st.createdAt = datetime();
 
 // status: statically-checked
-MATCH (st:RegulatoryStatus {uid: 'hu:reg-status:synthetic-plant-ffr-active'}), (f:Facility {uid: 'hu:facility:synthetic-supplement-plant'}), (pw:RegulatoryPathway {uid: 'hu:reg-pathway:us-fda-food-facility-registration'}), (fda:RegulatoryAgency {uid: 'hu:org:us-fda'}), (l:SourceLocator {uid: 'hu:locator:synthetic-ffr-confirmation'})
+MATCH (st:RegulatoryStatus {uid: 'hu:regulatory-status:synthetic-plant-ffr-active'}), (f:Facility {uid: 'hu:facility:synthetic-supplement-plant'}), (pw:RegulatoryPathway {uid: 'hu:reg-pathway:us-fda-food-facility-registration'}), (fda:RegulatoryAgency {uid: 'hu:org:us-fda'}), (l:SourceLocator {uid: 'hu:locator:synthetic-ffr-confirmation'})
 MERGE (st)-[:UNDER_LEGAL_BASIS]->(pw)
 MERGE (st)-[:ISSUED_BY]->(fda)
 MERGE (a:Assertion {uid: 'hu:assertion:synthetic-plant-ffr-status'})
@@ -414,7 +414,7 @@ SET po.amount = 49.00, po.currency = 'USD', po.observedAt = datetime('2026-10-03
 
 // status: statically-checked
 MATCH (ml:MerchantListing {uid: 'hu:listing:amazon-us-b0fs82b35k'}), (i:TradeItemIdentifier {uid: 'hu:trade-id:asin-b0fs82b35k'}), (off:Offer {uid: 'hu:offer:amazon-us-b0fs82b35k-new-one-time-2026-10-03'}), (po:PriceObservation {uid: 'hu:price-obs:amazon-us-b0fs82b35k-2026-10-03-one-time'}), (v:ProductVariant {uid: 'hu:product-variant:tru-niagen-beauty-us-30ct'}), (l:SourceLocator {uid: 'hu:locator:amazon-b0fs82b35k-buybox'})
-MERGE (ml)-[:IDENTIFIED_BY]->(i)
+MERGE (ml)-[:HAS_IDENTIFIER]->(i)
 MERGE (ml)-[:HAS_OFFER]->(off)
 MERGE (off)-[:HAS_PRICE_OBSERVATION]->(po)
 MERGE (a:Assertion {uid: 'hu:assertion:amazon-b0fs82b35k-listing-for-variant'})
@@ -475,13 +475,13 @@ MERGE (h)-[:PROPOSES_MATCH]->(niagen);
 
 // ABSENT 2 (V-320): GRAS "no questions" projected as approval
 // MATCH (resp:RegulatoryResponse {uid: 'hu:reg-response:us-fda-grn-000635'}), (nrc:IngredientMaterial {uid: 'hu:material:niagen-nrc'})
-// MERGE (bad:VersionedState:RegulatoryStatus {uid: 'hu:reg-status:forbidden-nrc-approval'})
+// MERGE (bad:VersionedState:RegulatoryStatus {uid: 'hu:regulatory-status:forbidden-nrc-approval'})
 // SET bad.statusKind = 'APPROVAL', bad.jurisdiction = 'US'
 // MERGE (bad)-[:RESULTS_FROM_RESPONSE]->(resp)
 // MERGE (bad)-[:STATUS_OF]->(nrc);
 
 // ABSENT 3 (V-323): facility registration attached to a product ("made in an FDA-registered facility")
-// MATCH (st:RegulatoryStatus {uid: 'hu:reg-status:synthetic-plant-ffr-active'}), (p:Product {uid: 'hu:product:tru-niagen-beauty'})
+// MATCH (st:RegulatoryStatus {uid: 'hu:regulatory-status:synthetic-plant-ffr-active'}), (p:Product {uid: 'hu:product:tru-niagen-beauty'})
 // MERGE (st)-[:STATUS_OF]->(p);
 
 // ABSENT 4 (V-322): live projection Product.status = 'APPROVED' with no approval status behind it
@@ -599,7 +599,7 @@ RETURN a.uid AS unadjudicatedCharacterization;
 // status: statically-checked, executed
 UNWIND [
   {pred: 'HOSTS_LISTING', s: 'hu:org:amazon-marketplace-us', o: 'hu:listing:amazon-us-b0fs82b35k', loc: 'hu:locator:amazon-b0fs82b35k-buybox'},
-  {pred: 'IDENTIFIED_BY', s: 'hu:listing:amazon-us-b0fs82b35k', o: 'hu:trade-id:asin-b0fs82b35k', loc: 'hu:locator:amazon-b0fs82b35k-buybox'},
+  {pred: 'HAS_IDENTIFIER', s: 'hu:listing:amazon-us-b0fs82b35k', o: 'hu:trade-id:asin-b0fs82b35k', loc: 'hu:locator:amazon-b0fs82b35k-buybox'},
   {pred: 'LISTING_FOR', s: 'hu:listing:amazon-us-b0fs82b35k', o: 'hu:product-variant:tru-niagen-beauty-us-30ct', loc: 'hu:locator:amazon-b0fs82b35k-buybox'},
   {pred: 'SUBMITTED_BY', s: 'hu:reg-submission:us-fda-grn-000635', o: 'hu:org:niagen-bioscience-inc', loc: 'hu:locator:fda-grn-000635-response-body'}
 ] AS row

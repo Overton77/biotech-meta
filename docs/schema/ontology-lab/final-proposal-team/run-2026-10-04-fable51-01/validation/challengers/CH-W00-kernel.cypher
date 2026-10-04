@@ -492,3 +492,21 @@ CREATE (a)-[n:HAS_PROTOCOL_STEP]->(b) SET n = properties(r), n.orderIndex = coal
 MATCH (s:ProtocolStep {uid: 'hu:protocol-step:synthetic-wind-down-screen-free-hour'}) SET s.stepKey = 'fixed-bedtime';
 // CH-K-18d UNDO
 MATCH (s:ProtocolStep {uid: 'hu:protocol-step:synthetic-wind-down-screen-free-hour'}) SET s.stepKey = 'screen-free-hour';
+
+// ---------------------------------------------------------------------------------------------------------------------
+// CH-K-19 PROBE (no mutation): kernel records ALREADY in the loaded final fixtures that the frozen GraphQL contract (B3/B4) cannot
+// read and that no validator of the compiled suite flags. Observed counts after 99-normalize-live-ids: 3 asserted edges without
+// relationshipUid (SUPPLIES_INGREDIENT_MATERIAL, FULFILLS_OFFER, SELLER_OF_RECORD_FOR); 54 EvidenceAssessments without recordedAt
+// (42 ApplicabilityDimension, 7 ResolutionHypothesis, 3 ConflictRelevanceAssessment, 1 RetellingFidelityAssessment,
+// 1 ComparabilityAssessment); 46 VersionedStates without payloadHash; EvidenceApplicability.status 'FINAL' (not an AssessmentStatus).
+// GraphQL reads through the final SDL (@neo4j/graphql 7.6.3) fail with "Cannot return null for non-nullable field ..." /
+// 'Enum "AssessmentStatus" cannot represent value: "FINAL"' (operations in CH-W00-kernel.md, section C).
+MATCH ()-[r]->() WHERE r.assertionUid IS NOT NULL AND r.relationshipUid IS NULL
+RETURN 'ASSERTED_EDGE_WITHOUT_RELATIONSHIP_UID' AS gap, type(r) AS item, count(*) AS n
+UNION ALL
+MATCH (e:EvidenceAssessment) WHERE e.recordedAt IS NULL OR e.methodVersion IS NULL OR e.assessmentType IS NULL
+   OR NOT e.status IN ['PROPOSED','ACCEPTED','SUPERSEDED','WITHDRAWN']
+RETURN 'EVIDENCE_ASSESSMENT_ARCHETYPE_FIELDS' AS gap, [l IN labels(e) WHERE l <> 'EvidenceAssessment'][0] AS item, count(*) AS n
+UNION ALL
+MATCH (v:VersionedState) WHERE v.payloadHash IS NULL OR v.stateType IS NULL
+RETURN 'VERSIONED_STATE_ARCHETYPE_FIELDS' AS gap, [l IN labels(v) WHERE l <> 'VersionedState'][0] AS item, count(*) AS n;

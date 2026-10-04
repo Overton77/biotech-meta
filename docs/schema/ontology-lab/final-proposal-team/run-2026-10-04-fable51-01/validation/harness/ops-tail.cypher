@@ -26,7 +26,9 @@ CREATE (a)-[n:HAS_STATE]->(b) SET n = properties(r) DELETE r;
 // PriceObservation by the W15 migration (M-03/M-04/M-06); the old node is kept as LegacyListingSnapshot for audit.
 MATCH (n:ListingSnapshot) WHERE NOT n:LegacyListingSnapshot SET n:LegacyListingSnapshot;
 MATCH (a:Study)-[r:EVALUATES]->(b) CREATE (a)-[n:LEGACY_EVALUATES]->(b) SET n = properties(r) DELETE r;
-MATCH (a:ClaimOccurrence)-[r:UTTERED_BY]->(b) CREATE (a)-[n:ASSERTED_BY]->(b) SET n = properties(r) DELETE r;
+MATCH (a:ClaimOccurrence)-[r:UTTERED_BY]->(b)
+FOREACH (_ IN CASE WHEN EXISTS { (a)-[:ASSERTED_BY]->(b) } THEN [] ELSE [1] END | CREATE (a)-[n:ASSERTED_BY]->(b) SET n = properties(r))
+DELETE r;
 MATCH (a:MediaAsset)-[r:HAS_VARIANT]->(b) CREATE (a)-[n:HAS_MEDIA_VARIANT]->(b) SET n = properties(r) DELETE r;
 // Live Protocol -[:HAS_STEP]-> ProtocolStep becomes one legacy ProtocolEdition per protocol (D-004, CL-013; CH-R-13): steps hang
 // from the edition, never from the Protocol. The edition is SNAPSHOT_DIFF of the live record; its HAS_PROTOCOL_EDITION episode is

@@ -98,7 +98,7 @@ MERGE (nrc:Entity:ChemicalSubstance {uid: 'hu:substance:nicotinamide-riboside-ch
 ON CREATE SET nrc.preferredName = 'Nicotinamide riboside chloride', nrc.entityType = 'ChemicalSubstance', nrc.createdAt = datetime()
 MERGE (pts:Entity:ChemicalSubstance {uid: 'hu:substance:pterostilbene'})
 ON CREATE SET pts.preferredName = 'Pterostilbene', pts.entityType = 'ChemicalSubstance', pts.createdAt = datetime()
-MERGE (crystal:Entity:ChemicalForm {uid: 'hu:chemical-form:nr-chloride-crystal-niagen'})
+MERGE (crystal:Entity:ChemicalForm {uid: 'hu:form:nr-chloride-crystal-niagen'})
 ON CREATE SET crystal.formKind = 'CRYSTAL_FORM', crystal.grade = 'NIAGEN specification (version unknown)', crystal.entityType = 'ChemicalForm', crystal.createdAt = datetime()
 MERGE (crystal)-[:FORM_OF_SUBSTANCE]->(nrc);
 
@@ -290,7 +290,7 @@ MERGE (a)-[:SUPPORTED_BY]->(loc);
 // Conze / NIAGEN study (300 mg arm only).
 // status: statically-checked
 MATCH (niagen:IngredientMaterial {uid: 'hu:material:chromadex-niagen'}),
-      (crystal:ChemicalForm {uid: 'hu:chemical-form:nr-chloride-crystal-niagen'}),
+      (crystal:ChemicalForm {uid: 'hu:form:nr-chloride-crystal-niagen'}),
       (armLoc:SourceLocator {uid: 'hu:locator:ctgov-nct02712593-arms'}),
       (absLoc:SourceLocator {uid: 'hu:locator:pmid31278280-abstract'})
 MERGE (study:Entity:Study {uid: 'hu:study:nct02712593-niagen'})
@@ -450,7 +450,7 @@ MATCH (study:Study {uid: 'hu:study:nct02712593-niagen'}),
       (arm:StudyArm {uid: 'hu:arm:nct02712593-niagen-300'}),
       (bm:Biomarker {uid: 'hu:biomarker:nad-plus-whole-blood'}),
       (loc:SourceLocator {uid: 'hu:locator:pmid31278280-abstract'})
-MERGE (od:VersionedState:OutcomeDefinition {uid: 'hu:outcome:nct02712593-nad-whole-blood'})
+MERGE (od:VersionedState:OutcomeDefinition {uid: 'hu:outcome-definition:nct02712593-nad-whole-blood'})
 ON CREATE SET od.name = 'Whole-blood NAD+', od.measureKind = 'BIOMARKER', od.stateType = 'OutcomeDefinition', od.createdAt = datetime()
 MERGE (study)-[:DEFINES_OUTCOME]->(od)
 MERGE (od)-[:MEASURES_BIOMARKER]->(bm)
@@ -762,13 +762,13 @@ MATCH (zh:Assertion {uid: 'hu:assertion:zhang-nr-improves-mito-function-aged-mic
 MERGE (v1:EvidenceAssessment:EvidenceSynthesis {uid: 'hu:synthesis:nr-muscle-mito-function-older-humans-v1'})
 ON CREATE SET v1.claimText = 'Oral NR improves skeletal muscle mitochondrial function in older humans',
               v1.verdict = 'INSUFFICIENT', v1.evidenceCutoff = date('2019-05-31'),
-              v1.recordedAt = datetime('2019-06-01T00:00:00Z'),   // illustrative recorded time for the example
+              v1.recordedAt = datetime('2026-10-03T12:00:00Z'),   // illustrative recorded time for the example
               v1.assessmentType = 'EvidenceSynthesis', v1.methodVersion = 'synthesis-v0.1', v1.status = 'ACCEPTED', v1.createdAt = datetime()
 MERGE (v1)-[:INCLUDES_RESULT {inputRole: 'SUPPORTIVE'}]->(zh)
 MERGE (v2:EvidenceAssessment:EvidenceSynthesis {uid: 'hu:synthesis:nr-muscle-mito-function-older-humans-v2'})
 ON CREATE SET v2.claimText = 'Oral NR improves skeletal muscle mitochondrial function in older humans',
               v2.verdict = 'INSUFFICIENT', v2.evidenceCutoff = date('2019-08-31'),
-              v2.recordedAt = datetime('2019-09-15T00:00:00Z'),
+              v2.recordedAt = datetime('2026-10-03T12:30:00Z'),
               v2.rationale = 'Verdict label unchanged; first human direct measurement (1 g/day, 21 days, 12 aged men) found respiration, citrate synthase, and mtDNA unchanged. Small and short; weakens, does not refute.',
               v2.assessmentType = 'EvidenceSynthesis', v2.methodVersion = 'synthesis-v0.1', v2.status = 'ACCEPTED', v2.createdAt = datetime()
 MERGE (v2)-[:INCLUDES_RESULT {inputRole: 'SUPPORTIVE'}]->(zh)
@@ -889,8 +889,8 @@ UNWIND [
   {pred: 'PRODUCED_DATASET', s: 'hu:study:nct02678611-basis-nrpt', o: 'hu:dataset:nct02678611-participant-data', loc: 'hu:locator:pmid29184669-results-trial-overview'},
   {pred: 'ANALYZES_DATASET', s: 'hu:publication:pmid-29184669', o: 'hu:dataset:nct02678611-participant-data', loc: 'hu:locator:pmid29184669-results-trial-overview'},
   {pred: 'CORRECTS', s: 'hu:publication:pmid-30155270', o: 'hu:publication:pmid-29184669', loc: 'hu:locator:pmid30155270-intervention-source'},
-  {pred: 'FORM_OF_SUBSTANCE', s: 'hu:chemical-form:nr-chloride-crystal-niagen', o: 'hu:substance:nicotinamide-riboside-chloride', loc: 'hu:locator:pmid31278280-abstract'},
-  {pred: 'HAS_CHEMICAL_FORM', s: 'hu:material:chromadex-niagen', o: 'hu:chemical-form:nr-chloride-crystal-niagen', loc: 'hu:locator:pmid31278280-abstract'}
+  {pred: 'FORM_OF_SUBSTANCE', s: 'hu:form:nr-chloride-crystal-niagen', o: 'hu:substance:nicotinamide-riboside-chloride', loc: 'hu:locator:pmid31278280-abstract'},
+  {pred: 'HAS_CHEMICAL_FORM', s: 'hu:material:chromadex-niagen', o: 'hu:form:nr-chloride-crystal-niagen', loc: 'hu:locator:pmid31278280-abstract'}
 ] AS row
 MATCH (s {uid: row.s}), (o {uid: row.o}), (l:SourceLocator {uid: row.loc})
 MERGE (a:Assertion {uid: 'hu:assertion:' + toLower(replace(row.pred, '_', '-')) + '-' + split(row.s, ':')[2] + '-' + split(row.o, ':')[2]})

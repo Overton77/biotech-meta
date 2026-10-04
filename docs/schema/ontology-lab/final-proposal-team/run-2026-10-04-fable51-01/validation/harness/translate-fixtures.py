@@ -43,5 +43,25 @@ for f in sorted(src.glob('*.cypher')):
         # CH-S-18: uid tokens follow the W00 registry (arm, intervention) so W09/W10 fixtures attach to the same identities.
         t = sub(name, t, r"hu:study-arm:", "hu:arm:")
         t = sub(name, t, r"hu:study-intervention:", "hu:intervention:")
+    # Round-2 repairs from the W00 corrections run on the translated set (decision report D, Wave 5):
+    t = sub(name, t, r'\bIDENTIFIED_BY\b', 'HAS_IDENTIFIER')                       # W00-R-20 / V-W00-15
+    t = sub(name, t, r"hu:reg-status:", "hu:regulatory-status:")                      # V-W00-16 registry token
+    t = sub(name, t, r"hu:chemical-form:", "hu:form:")                                # V-W00-16 registry token
+    if name == 'diagnostic-comparison.cypher':
+        t = sub(name, t, r"\(r:InformationArtifact:DiagnosticResult \{uid: 'hu:result:", "(r:Observation:DiagnosticResult:InformationArtifact {uid: 'hu:observation:")  # CL-008 / V-W00-16
+        t = sub(name, t, r"hu:result:", "hu:observation:")
+        t = sub(name, t, r"privacyClass = 'synthetic'", "privacyClass = 'INTERNAL'")   # 'synthetic' is not a shared-graph class (V-313r/V-521r); fail closed
+        t = sub(name, t, r"(d\.assertionUid = 'hu:assertion:grimage2-derived-from-grimage-v1', d\.recordedFrom = datetime\('2026-10-03T00:00:00Z'\))", r"\1, d.validFrom = datetime('2022-12-14T00:00:00Z'), d.validFromPrecision = 'DAY', d.validFromBasis = 'PUBLICATION_PROXY'")  # V-505r
+    if name == 'recommendation-snapshot.cypher':
+        t = sub(name, t, r"SET r\.assertionUid = 'hu:assertion:synthetic-host-recommends-nightcue'", "SET r.projectionOfAssertionUid = 'hu:assertion:synthetic-host-recommends-nightcue'")  # D-011 / V-W00-02r
+    if name == 'study-vs-product-mismatch.cypher':
+        t = sub(name, t, r"v1\.recordedAt = datetime\('2019-06-01T00:00:00Z'\)", "v1.recordedAt = datetime('2026-10-03T12:00:00Z')")  # V-504a: recorded after the cited snapshot
+        t = sub(name, t, r"v2\.recordedAt = datetime\('2019-09-15T00:00:00Z'\)", "v2.recordedAt = datetime('2026-10-03T12:30:00Z')")
+    # Round-3 repairs (V-423r, V-W00-16 assertion/outcome tokens):
+    if name == 'recommendation-snapshot.cypher':
+        t = sub(name, t, r"SET r\.projectionOfAssertionUid = 'hu:assertion:synthetic-host-recommends-nightcue'", "SET r.projectionOfAssertionUid = 'hu:assertion:synthetic-host-recommends-nightcue', r.derivationRule = 'recommends-speech-act/v1', r.derivedFromAssertionUids = ['hu:assertion:synthetic-host-recommends-nightcue']")
+    bad = set(re.findall(r":OutcomeDefinition[A-Za-z:]* \{uid: '(hu:outcome:[^']+)'", t))
+    for u in sorted(bad):
+        t = sub(name, t, re.escape(u), u.replace('hu:outcome:', 'hu:outcome-definition:'))
     (dst / name).write_text(t)
 print("\n".join(log) if log else "no substitutions")
