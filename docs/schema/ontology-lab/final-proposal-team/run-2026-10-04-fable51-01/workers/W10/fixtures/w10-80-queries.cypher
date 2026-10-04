@@ -170,6 +170,6 @@ MATCH (p:Product {uid: 'hu:product:elysium-basis'})-[:HAS_VARIANT]->(:ProductVar
 MATCH (ea:EvidenceApplicability)-[:ASSESSES_APPLICABILITY_TO]->(f)
 MATCH (ea)-[:HAS_EVIDENCE_TARGET]->(t)
 OPTIONAL MATCH (s:Study)-[direct]->(p)
-RETURN ea.uid AS applicability, labels(t)[0] AS evidenceTargetKind, t.uid AS evidenceTarget,
+RETURN ea.uid AS applicability, head([l IN labels(t) WHERE l IN ['StudyIntervention', 'Assertion']]) AS evidenceTargetKind, t.uid AS evidenceTarget,
        EXISTS { MATCH (:EvidenceApplicability)-[:SUPERSEDES]->(ea) } AS superseded, count(direct) AS directStudyEdges
 ORDER BY applicability;
