@@ -1,0 +1,82 @@
+[
+ {
+  "enum": "OrganizationType",
+  "add": [
+   "CORPORATE_GROUP"
+  ],
+  "request": "W01-SR-09"
+ },
+ {
+  "enum": "RoleType",
+  "add": [
+   "MODERATOR"
+  ],
+  "request": "W21-SR-09"
+ },
+ {
+  "enum": "CadenceUnit",
+  "add": [
+   "YEAR",
+   "MINUTE"
+  ],
+  "request": "W16-SR-07"
+ },
+ {
+  "enum": "ConstraintRole",
+  "add": [
+   "REPEAT_UNTIL"
+  ],
+  "request": "W16-SR-08"
+ },
+ {
+  "enum": "ReferenceIntervalDerivation",
+  "add": [
+   "ADOPTED_FROM_GUIDELINE"
+  ],
+  "request": "W07-SR-06"
+ },
+ {
+  "enum": "RegulatoryResponseKind",
+  "add": [
+   "NDI_FILING_ACKNOWLEDGED"
+  ],
+  "request": "W13-SR-06"
+ },
+ {
+  "enum": "ResultQualifier",
+  "add": [
+   "BELOW_REPORTING_LIMIT",
+   "QUALITATIVE_ABSENT",
+   "QUALITATIVE_PRESENT"
+  ],
+  "request": "W12-SR-12"
+ },
+ {
+  "enum": "MaterialKind",
+  "add": [
+   "FOOD"
+  ],
+  "request": "W05-SR-02"
+ },
+ {
+  "enum": "PathwayKind",
+  "add": [
+   "NOVEL_FOOD_AUTHORISATION"
+  ],
+  "request": "W13-SR-03"
+ },
+ {
+  "enum": "RegulatoryResponseKind",
+  "add": [
+   "NOVEL_FOOD_AUTHORISED"
+  ],
+  "request": "W13-SR-03"
+ },
+ {
+  "enum": "RegulatoryStatusKind",
+  "add": [
+   "DESIGNATION_ENDED_UNSPECIFIED"
+  ],
+  "request": "W06-SR-05"
+ }
+]

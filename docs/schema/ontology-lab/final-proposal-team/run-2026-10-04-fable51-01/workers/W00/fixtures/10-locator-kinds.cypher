@@ -2,8 +2,9 @@
 // a TEXT_POSITION without its text version, and a migrated untyped 0.1.0 selector (selectorKind null). Load 00-common-base.cypher first.
 // Expected rows: V-W00-03 = 1 (hu:locator:w00-region-without-edge), V-403 = 1 (hu:locator:w00-offsets-without-text-version),
 // V-401 = 1 (hu:assertion:w00-rests-on-legacy-locators). Everything else zero. SYNTHETIC_FIXTURE.
-// Token notes: 'media-annotation' is not a registered uid token (W22 seam, W00-SR-09); IMAGE_REGION normalizationVersion
-// 'IMG-REL-XYWH-1' (relative x,y,w,h of the captured rendition) is a CANDIDATE registry entry (W00-SR-10).
+// Token notes: 'media-annotation' is registered by W00-R-01 (W22-SR-01, W00-SR-09). IMAGE_REGION normalizationVersion:
+// 'IMG-PX1' (pixel x,y,w,h on the decoded raster after EXIF orientation; W22-SR-05) is the registered image normalization (W00-R-24;
+// the earlier candidate IMG-REL-XYWH-1 of W00-SR-10 is withdrawn).
 
 // Label photo capture and its region annotation.
 MERGE (src:Source:Entity {uid: 'hu:source:w00-label-photo'})
@@ -27,7 +28,7 @@ UNWIND [
 MATCH (s:SourceSnapshot {uid: 'hu:snapshot:w00-loc-label-photo-2026-01-01'}), (m:MediaAnnotation {uid: 'hu:media-annotation:w00-label-front-supplement-facts'})
 MERGE (l:SourceLocator:InformationArtifact {uid: row.uid})
 ON CREATE SET l.id = row.id, l.artifactType = 'SourceLocator', l.uri = s.canonicalUri, l.selectorKind = 'IMAGE_REGION', l.mediaAnnotationUid = m.uid,
-  l.normalizationVersion = 'IMG-REL-XYWH-1', l.privacyClass = 'PUBLIC', l.createdAt = s.createdAt, l.updatedAt = s.createdAt
+  l.normalizationVersion = 'IMG-PX1', l.privacyClass = 'PUBLIC', l.createdAt = s.createdAt, l.updatedAt = s.createdAt
 MERGE (s)-[:HAS_LOCATOR]->(l)
 FOREACH (_ IN CASE WHEN row.edge THEN [1] ELSE [] END | MERGE (l)-[:LOCATES_REGION]->(m));
 
