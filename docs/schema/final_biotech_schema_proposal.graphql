@@ -5907,7 +5907,7 @@ type ComparabilityAssessment implements Entity & EvidenceAssessmentArchetype
   methodVersion: String!
   status: AssessmentStatus!
   recordedAt: DateTime!
-  recordedTo: DateTime
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: false)
   summary: String
   overallScore: Float
   "Deprecated (contract A4); never written by this assessment."
@@ -8874,7 +8874,7 @@ type PassFailInterpretation implements Entity & EvidenceAssessmentArchetype
   methodVersion: String!
   status: AssessmentStatus!
   recordedAt: DateTime!
-  recordedTo: DateTime
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: false)
   summary: String
   overallScore: Float
   "Deprecated kernel field (contract A4); never written by W12."
@@ -10952,7 +10952,7 @@ union ProtocolResultMentionTarget = ChemicalSubstance | IngredientMaterial | Pro
 
 """HAS_PROTOCOL_STEP edge (structural; specializes StructuralEdgeProperties: orderIndex, notes, mongoResearchRunId). Order belongs to the edge, so one unchanged step shared by two editions may sit at different positions (protocols.io V1 step 1 is V2 step 2)."""
 type StepOrderProperties @relationshipProperties {
-  orderIndex: Int
+  orderIndex: Int!
   notes: String
   mongoResearchRunId: String
   "Source's own step label or number as printed (\"2\", \"1.10.15\"); display and locator aid, never identity."
@@ -11775,7 +11775,7 @@ type SafetySignal implements Entity & EvidenceAssessmentArchetype & SearchIndexa
   "Service-assigned commit time; never backdated."
   recordedAt: DateTime!
   "Written once from null when superseded."
-  recordedTo: DateTime
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: false)
   summary: String
   "Must stay null: no composite score is defined for safety signals (INV-204)."
   overallScore: Float
@@ -12681,7 +12681,7 @@ type SourceAuthorityAssessment implements Entity & EvidenceAssessmentArchetype
   methodVersion: String!
   status: AssessmentStatus!
   recordedAt: DateTime!
-  recordedTo: DateTime
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: false)
   summary: String
   "Never written for this type (a composite authority score would be a global truth score)."
   overallScore: Float
@@ -14305,7 +14305,7 @@ type MediaSuitabilityAssessment implements Entity & EvidenceAssessmentArchetype
   methodVersion: String!
   status: AssessmentStatus!
   recordedAt: DateTime!
-  recordedTo: DateTime
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: false)
   summary: String
   "Score on the method's scale; meaningful only with methodVersion and scoreScale. Not a probability of truth."
   overallScore: Float

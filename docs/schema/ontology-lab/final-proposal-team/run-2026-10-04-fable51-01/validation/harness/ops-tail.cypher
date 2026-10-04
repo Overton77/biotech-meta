@@ -21,15 +21,15 @@ MATCH (n:ExperienceReport) WHERE NOT n:ClaimOccurrence SET n:ClaimOccurrence:Ass
 // ---- 6a. Relationship type renames (MR-04, MR-05, D-004, D-006, CL-014). Properties are copied verbatim; the old edge is
 //          deleted in the same statement, so a re-run finds nothing. ----
 MATCH (a)-[r:HAS_SNAPSHOT]->(b) WHERE NOT a:Source AND (b:OrganizationSnapshot OR b:ProductSnapshot)
-CREATE (a)-[n:HAS_STATE]->(b) SET n = properties(r) DELETE r;
+CREATE (a)-[n:HAS_STATE]->(b) SET n = properties(r), n.migrationRunId = 'final-proposal-6a', n.migratedAt = datetime() DELETE r;
 // Listing -[:HAS_SNAPSHOT]-> ListingSnapshot is detached, not renamed: the capture becomes a SourceSnapshot + Offer +
 // PriceObservation by the W15 migration (M-03/M-04/M-06); the old node is kept as LegacyListingSnapshot for audit.
 MATCH (n:ListingSnapshot) WHERE NOT n:LegacyListingSnapshot SET n:LegacyListingSnapshot;
-MATCH (a:Study)-[r:EVALUATES]->(b) CREATE (a)-[n:LEGACY_EVALUATES]->(b) SET n = properties(r) DELETE r;
+MATCH (a:Study)-[r:EVALUATES]->(b) CREATE (a)-[n:LEGACY_EVALUATES]->(b) SET n = properties(r), n.migrationRunId = 'final-proposal-6a', n.migratedAt = datetime(), n.status = coalesce(n.status, 'LEGACY_UNDATED') DELETE r;
 MATCH (a:ClaimOccurrence)-[r:UTTERED_BY]->(b)
 FOREACH (_ IN CASE WHEN EXISTS { (a)-[:ASSERTED_BY]->(b) } THEN [] ELSE [1] END | CREATE (a)-[n:ASSERTED_BY]->(b) SET n = properties(r))
 DELETE r;
-MATCH (a:MediaAsset)-[r:HAS_VARIANT]->(b) CREATE (a)-[n:HAS_MEDIA_VARIANT]->(b) SET n = properties(r) DELETE r;
+MATCH (a:MediaAsset)-[r:HAS_VARIANT]->(b) CREATE (a)-[n:HAS_MEDIA_VARIANT]->(b) SET n = properties(r), n.migrationRunId = 'final-proposal-6a', n.migratedAt = datetime() DELETE r;
 // Live Protocol -[:HAS_STEP]-> ProtocolStep becomes one legacy ProtocolEdition per protocol (D-004, CL-013; CH-R-13): steps hang
 // from the edition, never from the Protocol. The edition is SNAPSHOT_DIFF of the live record; its HAS_PROTOCOL_EDITION episode is
 // LEGACY_UNDATED until the ingestion service back-fills the authorizing assertion (QS-2b).

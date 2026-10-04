@@ -1,6 +1,6 @@
 // =====================================================================================================================
 // fable-w5-validators.cypher -- Wave 5 validator corrections compiled from the Challenger reports
-// (validation/challengers/CH-W09W10-study-transfer, CH-W23-privacy, CH-W16-protocols, CH-W21W22-media; CH-W00-kernel see
+// (validation/challengers/CH-W09W10-study-transfer, CH-W23-privacy, CH-W16-protocols, CH-W21W22-media, CH-W00-kernel; dispositions in
 // reports/08-challenger-resolution-matrix.md), run-2026-10-04-fable51-01, Opus 5.5 worker, 2026-10-04.
 //
 // Contract: one statement per correction; each statement returns rows ONLY on violations (zero rows = valid). Statements
@@ -10,7 +10,8 @@
 // Parameters: validation/validation-params.json merged with validation/fable-w5-params.json (list keys unioned).
 // Not covered here, because Fable fixes them in the SDL / operations / fixtures (cross-reference only): CH-P-02, CH-P-04
 // (vector indexes), CH-P-12 (operations section 7), CH-P-16, CH-P-17/CH-R-12 (DiagnosticResult label), CH-P-18, CH-R-04,
-// CH-R-05 (DERIVED_FROM_PROTOCOL field), CH-R-13 (HAS_STEP migration and fixture), CH-S-18.
+// CH-R-05 (DERIVED_FROM_PROTOCOL field), CH-R-13 (HAS_STEP migration and fixture), CH-S-18, and the kernel items CH-K-08a/09 (gen-params),
+// CH-K-10b/13 (generated-label-checks.cypher), CH-K-16a/b (operations 5b), CH-K-18a-d (operations 6a/7), CH-K-19 (99-normalize).
 // Retired by this file: kernel V-423 (superseded by V-W21-06 and now by V-F5-47, CL-016), V-201 (-> V-F5-01),
 // V-218 (-> V-F5-08), V-215r (-> V-F5-07), V-203 (-> V-F5-05, in addition to the count check), W10-V08 (-> V-F5-06),
 // W10-V14 (-> V-F5-18 + V-F5-20), V-604 (-> V-F5-43), V-605 (-> V-F5-41 + V-F5-42), V-W21-06 (-> V-F5-47).

@@ -343,6 +343,11 @@
    "from": "interface SearchIndexable {\n",
    "to": "interface SearchIndexable {\n  \"Access class (F-W5-11): search results are filtered to PUBLIC before ranking.\"\n  privacyClass: PrivacyClass\n",
    "ruling": "F-W5-11"
+  },
+  {
+   "from": "type StepOrderProperties @relationshipProperties {\n  orderIndex: Int\n",
+   "to": "type StepOrderProperties @relationshipProperties {\n  orderIndex: Int!\n",
+   "ruling": "F-W5-16 (CH-R-11: every HAS_PROTOCOL_STEP edge carries an orderIndex; duplicates within an edition are V-F5-36)"
   }
  ],
  "typeDirectiveAdditions": [
@@ -360,6 +365,14 @@
    "type": "TechnologyPlatform",
    "directive": "@vector(indexes: [{indexName: \"TechnologyPlatformSearchVector\", embeddingProperty: \"searchEmbedding\", queryName: \"technologyPlatformsBySearchVector\"}])",
    "ruling": "F-W5-12"
+  }
+ ],
+ "fieldDirectiveAdditions": [
+  {
+   "label": "EvidenceAssessment",
+   "field": "recordedTo",
+   "add": "@settable(onCreate: false, onUpdate: false)",
+   "ruling": "F-W5-15 (CH-S-15: an assessment's recorded interval is closed by the service on supersession, never by an API update)"
   }
  ]
 }

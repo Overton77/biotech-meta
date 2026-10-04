@@ -57,6 +57,16 @@ for (const r of R.typeDirectiveAdditions || []) {
   if (!m) { console.log("typeDirectiveAddition: type not found", r.type); continue; }
   body = body.replace(m[0], `${m[1]}\n  ${r.directive}${m[2]}`); console.log(`type ${r.type}: +${r.directive.slice(0, 40)}`);
 }
+for (const r of R.fieldDirectiveAdditions || []) {
+  let n = 0;
+  body = body.replace(/^type (\w+)([^{]*?@node\(labels: \[([^\]]*)\]\)[\s\S]*?)\n\}/gm, (blk, name, rest, labels) => {
+    if (!labels.includes(`"${r.label}"`)) return blk;
+    const re = new RegExp(`^(\\s+${r.field}:\\s*[^\\n@]+?)(\\s*(?:@[^\\n]*)?)$`, "m");
+    if (!re.test(blk) || blk.match(re)[0].includes(r.add.split("(")[0])) return blk;
+    n++; return blk.replace(re, (m, head, tail) => `${head} ${r.add}${tail}`);
+  });
+  console.log(`fieldDirectiveAddition ${r.label}.${r.field}: ${n} types`);
+}
 for (const r of R.textReplacements || []) { const before = body; body = body.split(r.from).join(r.to); if (before === body) console.log("text replacement: no match", r.from.slice(0, 60)); }
 // union and enum additions (seam closure files next to the injections file, optional)
 const sidecar = name => { try { return JSON.parse(readFileSync(injPath.replace(/field-injections\.json$/, name), "utf8")); } catch { return []; } };
