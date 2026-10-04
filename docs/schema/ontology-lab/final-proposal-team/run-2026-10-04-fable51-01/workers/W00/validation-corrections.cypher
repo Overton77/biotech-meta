@@ -239,12 +239,12 @@ WITH x, y, r, citedUid, cited,
         CASE WHEN r.derivationRule IS NOT NULL AND size(coalesce(r.derivedFromAssertionUids, [])) >
                size([u IN coalesce(r.derivedFromAssertionUids, []) WHERE EXISTS { MATCH (:Assertion {uid: u}) }])
              THEN 'DERIVATION_INPUT_MISSING' END
-     ] WHERE v IS NOT NULL] AS v1
-WITH x, y, r, v1 + [v IN [
+     ] WHERE v IS NOT NULL] AS firstViolations
+WITH x, y, r, noInputs, firstViolations + [v IN [
         CASE WHEN r.derivationRule IS NOT NULL AND noInputs AND NOT type(r) IN $ruleOnlyDerivedTypes THEN 'DERIVATION_WITHOUT_SOURCE_ASSERTIONS' END,
         CASE WHEN type(r) = 'COMPARED_TO' AND r.derivationRule IS NOT NULL AND noInputs AND (
-               EXISTS { MATCH (x)-[:PRODUCED_BY_ASSAY_VERSION]->(v1), (y)-[:PRODUCED_BY_ASSAY_VERSION]->(v2) WHERE v1 <> v2 }
-            OR EXISTS { MATCH (x)-[:COMPUTED_BY_ALGORITHM_VERSION]->(v1), (y)-[:COMPUTED_BY_ALGORITHM_VERSION]->(v2) WHERE v1 <> v2 })
+               EXISTS { MATCH (x)-[:PRODUCED_BY_ASSAY_VERSION]->(av1), (y)-[:PRODUCED_BY_ASSAY_VERSION]->(av2) WHERE av1 <> av2 }
+            OR EXISTS { MATCH (x)-[:COMPUTED_BY_ALGORITHM_VERSION]->(gv1), (y)-[:COMPUTED_BY_ALGORITHM_VERSION]->(gv2) WHERE gv1 <> gv2 })
              THEN 'RULE_ONLY_ACROSS_VERSIONS' END
      ] WHERE v IS NOT NULL] AS violations
 WHERE size(violations) > 0

@@ -26,3 +26,7 @@ Workers append structured requests to their own `seam-requests.yaml`; Fable copi
 | CL-016 | `Person.recommends` / `RECOMMENDS` | timeless edge vs projection of a RECOMMENDS speech-act occurrence | round 0008; V-423 | W21 with W01 | RULED (catalog): derived projection with `assertionUid`; W21 writes the SDL |
 | CL-017 | `Study.evaluates` legacy edge | INV-201 | read-only legacy | W09 | RULED: `@settable(onCreate:false,onUpdate:false)` |
 | CL-018 | `Observation` edges `Person.recordsObservations`, `CohortParticipant` | private-data risk inside shared graph | round 0008 | W16/W01 with W23 | OPEN: W23 states the public-person-only rule and the leak fixture |
+
+## Status update at Wave 5 (Fable)
+
+All eighteen seeded records are RULED; the rulings and evidence are in `reports/02-ownership-and-seams.md` section 1, the transfer placeholders in its section 2. Worker-raised seam requests (389) are indexed in `validation/inventories/seam-requests-consolidated.json`; those addressed to W00 are ruled in `workers/W00/09-kernel-reconciliation.md` and `seam-rulings.yaml`, those addressed to Fable in `reports/03-decision-report.md`, and cross-owner slot requests in `reports/04-seam-closure-ledger.md`.
