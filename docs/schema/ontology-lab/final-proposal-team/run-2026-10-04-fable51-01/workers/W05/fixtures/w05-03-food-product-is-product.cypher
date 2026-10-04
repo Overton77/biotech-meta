@@ -33,7 +33,7 @@ REMOVE ing:Ingredient;
 
 // ---- Part B: the product backbone (W04 types) ----
 MERGE (f:FoodItem:IngredientMaterial:Entity {uid: 'hu:material:food-brazil-nut'})
-SET f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
+SET f.id = 'food-brazil-nut', f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
 
 MATCH (p:Product {uid: 'hu:product:7b2f4c1e-0d9a-4e55-9b61-2f0a8c3d5e71'})
 MERGE (v:ProductVariant:Entity {uid: 'hu:product-variant:synthetic-grove-brazil-nuts-16oz-us'})

@@ -85,11 +85,11 @@ MERGE (sn)-[:HAS_LOCATOR]->(l);
 // ---- 3. food identities --------------------------------------------------------------------------------------------
 // Base food: preparation not resolved (what the trial registry names). Variant: the FDC SR Legacy food.
 MERGE (f:FoodItem:IngredientMaterial:Entity {uid: 'hu:material:food-brazil-nut'})
-SET f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)',
+SET f.id = 'food-brazil-nut', f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)',
     f.scientificNameVerbatim = 'Bertholletia excelsa', f.processingMethods = NULL, f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
 
 MERGE (f:FoodItem:IngredientMaterial:Entity {uid: 'hu:material:food-brazil-nut-dried-unblanched'})
-SET f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nuts, dried, unblanched',
+SET f.id = 'food-brazil-nut-dried-unblanched', f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nuts, dried, unblanched',
     f.descriptionVerbatim = 'Nuts, brazilnuts, dried, unblanched', f.foodGroup = 'Nut and Seed Products', f.foodGroupSystem = 'SR_FOOD_CATEGORY',
     f.processingMethods = ['dried', 'unblanched'], f.scientificNameVerbatim = 'Bertholletia excelsa', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
 

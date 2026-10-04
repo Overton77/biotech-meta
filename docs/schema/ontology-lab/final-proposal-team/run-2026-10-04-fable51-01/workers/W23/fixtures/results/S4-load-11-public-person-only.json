@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 274,
+   "ms": 213,
    "sample": [],
    "header": "// W23 fixture 11: public-person-only rule for RECORDS, POSTS_RESULT, HAS_PARTICIPANT_TOKEN, REPORTS (CL-018, CL-008).\n// Load 00-shared-base.cypher first. Part P is POSITIVE (must pass V-W23-05/06). Part N is NEGATIVE (each defect is\n// expected to be reported; expected rows in 06-fixtures-and-quer"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 55,
+   "ms": 27,
    "sample": [],
    "header": ""
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 386,
+   "ms": 101,
    "sample": [],
    "header": ""
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 278,
+   "ms": 32,
    "sample": [],
    "header": ""
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 1020,
+   "ms": 98,
    "sample": [],
    "header": ""
   },
@@ -135,7 +135,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 196,
+   "ms": 204,
    "sample": [],
    "header": ""
   },
@@ -157,7 +157,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 531,
+   "ms": 101,
    "sample": [],
    "header": ""
   },
@@ -179,7 +179,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 209,
+   "ms": 41,
    "sample": [],
    "header": ""
   },
@@ -201,7 +201,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 82,
+   "ms": 40,
    "sample": [],
    "header": ""
   },
@@ -223,7 +223,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 308,
+   "ms": 75,
    "sample": [],
    "header": ""
   },
@@ -245,7 +245,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 471,
+   "ms": 83,
    "sample": [],
    "header": ""
   },
@@ -267,7 +267,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 46,
+   "ms": 27,
    "sample": [],
    "header": "// ===== Part N (negative) =====\n// N1, the subtle leak: a BellLabs user modelled as a Person, with a lab value copied from the private store into a public\n// Observation. No hu:private- value anywhere and a 'PUBLIC' class, so V-521, V-520 and V-524 see nothing."
   },
@@ -289,7 +289,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 236,
+   "ms": 39,
    "sample": [],
    "header": ""
   },
@@ -311,7 +311,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 118,
+   "ms": 55,
    "sample": [],
    "header": ""
   },
@@ -333,7 +333,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 87,
+   "ms": 37,
    "sample": [],
    "header": "// N2, the marked leak: the same copy keeping its private source uid (V-521 sees this one)."
   },
@@ -355,7 +355,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 101,
+   "ms": 5,
    "sample": [],
    "header": ""
   },
@@ -377,7 +377,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 140,
+   "ms": 17,
    "sample": [],
    "header": "// N3: a user's private protocol outcome posted as a ProtocolResult with no class and no source."
   },
@@ -399,7 +399,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 484,
+   "ms": 27,
    "sample": [],
    "header": ""
   },
@@ -421,7 +421,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 282,
+   "ms": 42,
    "sample": [],
    "header": "// N4: participant tokens that are internal identifiers, with no sourced edge (a private-store id and a hash-like linkage token;\n// the second value is sha256('synthetic-linkage-token'), standing for an HMAC contribution token)."
   },
@@ -443,7 +443,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 441,
+   "ms": 28,
    "sample": [],
    "header": "// N5: re-identification by inference: a public person linked to a case-series participant with no source naming both."
   }

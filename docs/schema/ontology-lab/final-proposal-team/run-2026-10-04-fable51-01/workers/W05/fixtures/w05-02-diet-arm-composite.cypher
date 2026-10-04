@@ -44,13 +44,13 @@ MERGE (sn)-[:HAS_LOCATOR]->(l);
 
 // ---- foods (base concepts; preparation not stated by the registry) ----
 MERGE (f:FoodItem:IngredientMaterial:Entity {uid: 'hu:material:food-brazil-nut'})
-SET f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
+SET f.id = 'food-brazil-nut', f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
 
 MERGE (f:FoodItem:IngredientMaterial:Entity {uid: 'hu:material:food-peanut'})
-SET f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Peanut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
+SET f.id = 'food-peanut', f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Peanut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
 
 MERGE (f:FoodItem:IngredientMaterial:Entity {uid: 'hu:material:food-cashew-nut'})
-SET f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Cashew nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
+SET f.id = 'food-cashew-nut', f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Cashew nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
 
 // ---- the diet prescription is a defined regimen (W16 Protocol); its content is not in the registry ----
 MERGE (p:Protocol:Entity {uid: 'hu:protocol:dicabr-brazilian-cardioprotective-diet'})

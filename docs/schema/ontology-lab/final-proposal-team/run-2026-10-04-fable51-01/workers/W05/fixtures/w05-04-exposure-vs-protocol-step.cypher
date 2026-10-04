@@ -21,7 +21,7 @@ MERGE (s:ChemicalSubstance:Entity {uid: 'hu:substance:selenium'})
 SET s.entityType = 'ChemicalSubstance', s.preferredName = 'selenium', s.name = 'selenium', s.createdAt = datetime('2026-10-04T02:00:00Z'), s.privacyClass = 'PUBLIC';
 
 MERGE (f:FoodItem:IngredientMaterial:Entity {uid: 'hu:material:food-brazil-nut'})
-SET f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
+SET f.id = 'food-brazil-nut', f.entityType = 'FoodItem', f.materialKind = 'FOOD', f.name = 'Brazil nut (preparation not specified)', f.createdAt = datetime('2026-10-04T02:00:00Z'), f.privacyClass = 'PUBLIC';
 
 MERGE (s:Source:Entity {uid: 'hu:source:epa-iris-0472-summary'})
 SET s.entityType = 'Source', s.canonicalUri = 'https://iris.epa.gov/static/pdfs/0472_summary.pdf', s.sourceKind = 'REGULATORY_RECORD',
@@ -50,7 +50,7 @@ MERGE (sn)-[:HAS_LOCATOR]->(l);
 // ---- E1: characterization without intensity ----
 MATCH (se:ChemicalSubstance {uid: 'hu:substance:selenium'})
 MERGE (e:Exposure:Entity {uid: 'hu:exposure:selenium-oral-chronic-dietary'})
-SET e.entityType = 'Exposure', e.name = 'Selenium, chronic oral (dietary) exposure', e.setting = 'DIETARY', e.route = 'ORAL', e.mediumText = 'diet',
+SET e.id = 'selenium-oral-chronic-dietary', e.entityType = 'Exposure', e.name = 'Selenium, chronic oral (dietary) exposure', e.setting = 'DIETARY', e.route = 'ORAL', e.mediumText = 'diet',
     e.durationCategory = 'CHRONIC', e.durationText = 'Reference Dose for Chronic Oral Exposure', e.durationIso = NULL,
     e.intensityValue = NULL, e.intensityUnitCode = NULL, e.intensityBasis = NULL,
     e.characterizationHash = 'sha256:synthetic-exposure-tuple-e1', e.createdAt = datetime('2026-10-04T02:00:00Z'), e.privacyClass = 'PUBLIC'
@@ -60,7 +60,7 @@ SET r.orderIndex = 0;
 // ---- E2: characterization with intensity (study population summarized by IRIS) ----
 MATCH (se:ChemicalSubstance {uid: 'hu:substance:selenium'})
 MERGE (e:Exposure:Entity {uid: 'hu:exposure:selenium-dietary-high-se-area-adult-male-1438ugd'})
-SET e.entityType = 'Exposure', e.name = 'Selenium dietary intake, high-selenium area of China, adult males (Yang 1989b)', e.setting = 'DIETARY', e.route = 'ORAL',
+SET e.id = 'selenium-dietary-high-se-area-adult-male-1438ugd', e.entityType = 'Exposure', e.name = 'Selenium dietary intake, high-selenium area of China, adult males (Yang 1989b)', e.setting = 'DIETARY', e.route = 'ORAL',
     e.mediumText = 'diet (area with unusually high environmental selenium)', e.durationCategory = 'LIFETIME', e.durationText = 'based on lifetime exposure',
     e.intensityValue = 1438.0, e.intensityUnitCode = 'ug/d', e.intensityBasis = 'ABSOLUTE_PER_DAY',
     e.intensityText = 'daily average Se intake 1438 ug for adult males in the high-selenium area',

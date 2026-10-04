@@ -173,9 +173,10 @@ MATCH (sub:ChemicalSubstance {uid: $substanceUid})
 MATCH (v:ProductVariant)-[h:HAS_FORMULATION_VERSION]->(f:FormulationVersion)-[:HAS_INGREDIENT_COMPONENT]->(c:IngredientComponent)-[:USES_MATERIAL]->(m:IngredientMaterial)
 WHERE h.recordedFrom <= $recordedAsOf AND (h.recordedTo IS NULL OR $recordedAsOf < h.recordedTo)
   AND (h.validFrom IS NULL OR h.validFrom <= $validAt) AND (h.validTo IS NULL OR $validAt < h.validTo)
-  AND EXISTS { MATCH (ra:Assertion {predicate: 'REALIZES_SUBSTANCE'})-[:HAS_SUBJECT]->(m) WHERE EXISTS { (ra)-[:HAS_OBJECT]->(sub) } AND ra.recordedAt <= $recordedAsOf }
   AND c.quantity >= $minAmount AND c.unitCode = $unitCode
-RETURN v.uid AS variantUid, f.uid AS formulationUid, c.declaredAs AS declaredAs, c.quantity AS quantity, c.unitCode AS unit,
+MATCH (ra:Assertion {predicate: 'REALIZES_SUBSTANCE'})-[:HAS_SUBJECT]->(m), (ra)-[:HAS_OBJECT]->(sub)
+WHERE ra.recordedAt <= $recordedAsOf AND NOT EXISTS { MATCH (sup:Assertion)-[:SUPERSEDES]->(ra) WHERE sup.recordedAt <= $recordedAsOf }
+RETURN v.uid AS variantUid, ra.status AS materialRealizesSubstanceStatus, f.uid AS formulationUid, c.declaredAs AS declaredAs, c.quantity AS quantity, c.unitCode AS unit,
        c.quantityBasis AS quantityBasis, c.massBasis AS massBasis, c.amountReferent AS amountReferent,
        CASE WHEN h.validFrom IS NULL THEN 'VALID_START_UNKNOWN' ELSE 'VALID_START_KNOWN' END AS validity
 ORDER BY quantity DESC;

@@ -5,7 +5,6 @@
 - {live: "DocumentType.PATENT_APPLICATION", final: "DocumentType.PATENT_APPLICATION (W20)", action: keep, note: "Rendition of a PatentApplication publication; W20 owns the enum."}
 - {live: "DocumentDomain.PATENT_IP", final: "DocumentDomain.PATENT_IP (W20)", action: keep, note: "Document classification only."}
 - {live: "MediaSourceType.PATENT_FIGURE", final: "MediaSourceType.PATENT_FIGURE (W22)", action: keep, note: "Figure crop from a patent document; W22 owns."}
-- {live: "MediaSourceType.PATENT / PATENT_APPLICATION", final: "unchanged (W22)", action: keep, note: "Media source kinds; not IP rights."}
 - {live: "EventCategory.LICENSING_EVENT", final: "EventCategory.LICENSING_EVENT (W18)", action: keep, note: "An event category is not a license record; a licensing event that is ingested yields PatentLicense + LICENSES_PATENT assertions."}
 - {live: "MediaAsset.license", final: "W22 rights fields", action: keep, note: "Copyright/usage license of a media asset; unrelated to patent licensing (no merge)."}
 # catalog 0.2.0 -> final proposal

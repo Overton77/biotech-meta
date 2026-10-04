@@ -10,12 +10,12 @@ SET n.entityType = 'Product', n.name = 'Synthetic Grove Brazil Nuts 16 oz (dupli
 // N2 -> V-W05-06: an Exposure used as a person's exposure occurrence.
 MATCH (p:Person {uid: 'hu:person:synthetic-guest-w05'})
 MERGE (x:Exposure:Entity {uid: 'hu:exposure:neg-w05-guest-sauna-history'})
-SET x.entityType = 'Exposure', x.route = 'EXTERNAL_PHYSICAL', x.startedAt = datetime('2026-01-01T00:00:00Z'), x.createdAt = datetime('2026-10-04T03:00:00Z')
+SET x.id = 'neg-w05-guest-sauna-history', x.entityType = 'Exposure', x.route = 'EXTERNAL_PHYSICAL', x.startedAt = datetime('2026-01-01T00:00:00Z'), x.createdAt = datetime('2026-10-04T03:00:00Z')
 MERGE (x)-[:EXPOSED_PERSON]->(p);
 
 // N3 -> V-W05-03: intensity without unit or basis.  N4 -> V-W05-04: no agent.
 MERGE (x:Exposure:Entity {uid: 'hu:exposure:neg-w05-intensity-no-unit'})
-SET x.entityType = 'Exposure', x.route = 'ORAL', x.intensityValue = 2.0, x.createdAt = datetime('2026-10-04T03:00:00Z');
+SET x.id = 'neg-w05-intensity-no-unit', x.entityType = 'Exposure', x.route = 'ORAL', x.intensityValue = 2.0, x.createdAt = datetime('2026-10-04T03:00:00Z');
 
 // N5 -> V-423 and V-W05-09: a practice report projected as a recommendation.
 MATCH (p:Person {uid: 'hu:person:synthetic-guest-w05'}), (lf:Lifestyle {uid: 'hu:lifestyle:sauna-bathing'})
@@ -43,7 +43,7 @@ MERGE (f)-[:IDENTIFIED_BY]->(t);
 
 // N10 -> V-W05-05: food group without its category system.  N11 -> V-W05-08: unasserted VARIANT_OF.  N12 -> V-W05-02: FoodItem without the IngredientMaterial label.
 MERGE (f:FoodItem:Entity {uid: 'hu:food:neg-w05-roasted-peanut'})
-SET f.entityType = 'FoodItem', f.foodGroup = 'Legumes and Legume Products', f.createdAt = datetime('2026-10-04T03:00:00Z');
+SET f.id = 'neg-w05-roasted-peanut', f.entityType = 'FoodItem', f.foodGroup = 'Legumes and Legume Products', f.createdAt = datetime('2026-10-04T03:00:00Z');
 
 MATCH (v:FoodItem {uid: 'hu:food:neg-w05-roasted-peanut'}), (b:FoodItem {uid: 'hu:material:food-peanut'})
 MERGE (v)-[r:VARIANT_OF]->(b)

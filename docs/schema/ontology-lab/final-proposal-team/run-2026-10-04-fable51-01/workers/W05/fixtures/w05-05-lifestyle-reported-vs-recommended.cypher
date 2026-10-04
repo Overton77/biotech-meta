@@ -13,7 +13,7 @@
 // =====================================================================================================================
 
 MERGE (l:Lifestyle:Entity {uid: 'hu:lifestyle:sauna-bathing'})
-SET l.entityType = 'Lifestyle', l.name = 'Sauna bathing', l.lifestyleDomain = 'thermal', l.createdAt = datetime('2026-10-04T02:00:00Z'), l.privacyClass = 'PUBLIC';
+SET l.id = 'sauna-bathing', l.entityType = 'Lifestyle', l.name = 'Sauna bathing', l.lifestyleDomain = 'thermal', l.createdAt = datetime('2026-10-04T02:00:00Z'), l.privacyClass = 'PUBLIC';
 
 MERGE (p:Person:Entity {uid: 'hu:person:synthetic-guest-w05'})
 SET p.entityType = 'Person', p.name = 'Synthetic Guest (W05 fixture)', p.createdAt = datetime('2026-10-04T02:00:00Z'), p.privacyClass = 'PUBLIC';
@@ -77,7 +77,7 @@ SET r.assertionUid = 'hu:claim-occurrence:synthetic-w05-host-recommends-sauna', 
 // Characterized exposure of the practice as reported (reusable characterization; not the guest's history).
 MATCH (lf:Lifestyle {uid: 'hu:lifestyle:sauna-bathing'})
 MERGE (x:Exposure:Entity {uid: 'hu:exposure:sauna-80c-20min-4-per-week'})
-SET x.entityType = 'Exposure', x.name = 'Sauna bathing, about 80 degrees, about 20 minutes, 4 sessions per week', x.setting = 'BEHAVIORAL_PRACTICE',
+SET x.id = 'sauna-80c-20min-4-per-week', x.entityType = 'Exposure', x.name = 'Sauna bathing, about 80 degrees, about 20 minutes, 4 sessions per week', x.setting = 'BEHAVIORAL_PRACTICE',
     x.route = 'EXTERNAL_PHYSICAL', x.mediumText = 'hot air (sauna)', x.durationCategory = 'NOT_STATED', x.durationIso = 'PT20M',
     x.durationText = 'about 20 minutes per session', x.frequencyText = 'four times a week', x.intensityValue = NULL, x.intensityUnitCode = NULL,
     x.intensityBasis = NULL, x.intensityText = 'about 80 degrees (unit not stated; no ExposureBasis value fits an ambient physical level, W05-SR-07)',

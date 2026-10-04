@@ -25,7 +25,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 394,
+   "ms": 153,
    "sample": [],
    "header": "// W23 fixture 12: AnswerRecord negatives (load 00-shared-base.cypher first). Each record carries a deliberate defect.\n// Expected detector rows: 06-fixtures-and-queries.md (V-121, V-W23-01a, V-W23-01b, V-W23-02, V-W23-03).\n// N1: an answer log that names the asker and stores the question (the C-4 f"
   },
@@ -47,7 +47,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 267,
+   "ms": 367,
    "sample": [],
    "header": "// N2: an owner-private answer written into the shared graph, computed with private context, marked PUBLIC."
   },
@@ -69,7 +69,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 69,
+   "ms": 355,
    "sample": [],
    "header": "// N3: a citation recorded after the answer's viewpoint (A2 recorded 2026-06-15; viewpoint 2026-04-10): not replayable."
   },
@@ -91,7 +91,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 44,
+   "ms": 373,
    "sample": [],
    "header": "// N4: a citation already superseded at the viewpoint (A1 superseded 2026-06-15; viewpoint 2026-07-01)."
   },
@@ -113,7 +113,7 @@
     "constraintsAdded": 0,
     "constraintsRemoved": 0
    },
-   "ms": 212,
+   "ms": 72,
    "sample": [],
    "header": "// N5: a traced answer without citations, without a schema digest, with a session key V-121 does not name (minimal pair to N1)."
   }
