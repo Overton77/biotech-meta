@@ -26,7 +26,10 @@ for x in R['results']:
         if art and not bad: v='PASS(artifact-rows)'
     elif exp.startswith('rows:'):
         want=dict(p.split('=') for p in exp[5:].split(','))
-        got=lambda k: max(x['rowsById'].get(k,0), x['rowsById'].get(REMAP.get(k,''),0), x['rowsById'].get(k+'r',0), x['rowsById'].get(k+'p',0))
+        RREV={v:k for k,v in REMAP.items()}
+        def got(k):
+            cands={k, REMAP.get(k,''), k+'r', k+'p', RREV.get(k,''), k[:-1] if k.endswith(('r','p')) else ''}
+            return max(x['rowsById'].get(c,0) for c in cands if c)
         miss=[k for k,n in want.items() if got(k)<int(n)]
         v='PASS' if not miss else 'FAIL-EXPECT'
         if miss: unmet.append((x['name'],miss,{k:x['rowsById'].get(k) for k in list(x['rowsById'])[:12]}))

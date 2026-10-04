@@ -1,0 +1,37 @@
+rescored verdicts {'PASS': 448, 'recorded': 5, 'FAIL-ROWS': 29, 'FAIL-EXPECT': 13, 'FAIL-LOAD': 16, 'PASS(artifact-rows)': 1}
+
+unmet rows: expectations
+ - W00: validation-corrections after 13 (N1-N9) missing ['#39', '#40']
+ - W02: final suite after fx-91 missing ['V-003', 'V-006']
+ - W02: final suite after fx-90 missing ['V-006']
+ - W03: w03-validation after negatives missing ['#19']
+ - W03: final suite after negatives missing ['V-203']
+ - W06: final suite after negatives missing ['V-432']
+ - W07: final suite after 90 missing ['V-112', 'V-231']
+ - W10: final suite after negatives missing ['V-203']
+ - W17: final suite after negatives missing ['V-217']
+ - W18: final suite (w18 params) after negatives missing ['V-112']
+ - W19: final suite after 90 missing ['V-409']
+ - W21: final suite after fx02a.neg missing ['V-504']
+ - W23: final suite (params-leak) after leak probe missing ['V-521']
+
+non-informational rows per block (fixture defects or real findings):
+  W00 {'V-W00-04 (informational)': 1}
+  W01 {'V-F5-27': 2, 'V-504b': 1, 'V-F5-55': 1}
+  W02 {'V-F5-62': 2, 'V-F5-ARCH-1': 2}
+  W04 {'V-108r': 2, 'V-509r': 2, 'V-504': 2, 'V-F5-54': 2, 'V-W00-15': 1, 'V-F5-62': 1}
+  W05 {'V-514c': 3, 'V-F5-64': 3, 'V-101': 1, 'V-W00-02r': 1}
+  W06 {'V-W06-01': 1, 'V-W06-02': 1, 'V-221r': 1, 'V-333r': 1, 'V-119': 1, 'V-F5-24': 1}
+  W07 {'V-532p': 12, 'V-F5-28': 12}
+  W10 {'V-F5-62': 53}
+  W11 {'V-F5-62': 8}
+  W12 {'V-F5-62': 4, 'V-402b': 1, 'V-F5-60': 1}
+  W13 {'V-W13-02': 5, 'V-W13-03': 2}
+  W14 {'V-W14-11': 2, 'V-W14-13': 1}
+  W15 {'V-W15-05 (informational)': 6, 'V-W15-11 (informational)': 2, 'V-W00-15': 1, 'V-W15-08': 1, 'V-F5-ARCH-1': 1}
+  W17 {'V-101r': 5}
+  W19 {'V-F5-62': 7, 'V-514c': 5, 'V-F5-64': 5, 'V-F5-50': 2}
+  W21 {'V-112r': 8, 'V-521r': 7, 'V-514c': 4, 'V-F5-64': 4, 'V-101r': 2}
+  W22 {'V-112r': 1, 'V-505r': 1, 'V-605': 1, 'V-F5-41': 1, 'V-F5-42': 1, 'V-604': 1, 'V-F5-43': 1}
+  W23 {'V-432r': 1}
+  global {'V-110': 52, 'V-F5-62': 33, 'V-514c': 27, 'V-F5-64': 27, 'V-508': 18, 'V-003r': 18, 'V-532p': 12, 'V-F5-28': 12, 'V-402b': 10, 'V-F5-60': 10, 'V-102': 8, 'V-F5-63': 8}
