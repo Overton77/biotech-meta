@@ -1,0 +1,91 @@
+# W21 migration map: live current_biotech_schema.graphql (digest 86b5e0b5…f112) -> W21 proposal.
+# action: keep | rename | move | split | merge | derive | retire
+# Every node gains uid (hu:<token>:<opaque>), the archetype label, and archetype fields; not repeated per row.
+- {live: Platform, final: Platform, action: keep, note: "labels [Platform, Entity]; uid token platform REQUESTED (W21-SR-01)"}
+- {live: Platform.platformType, final: Platform.platformType, action: keep, note: controlled string; enum candidate W21-SR-02}
+- {live: Platform.url, final: Platform.url, action: keep, note: display only; never identity}
+- {live: Platform.hostsChannels (HOSTS_CHANNEL, RoleMetadata), final: Platform.hostsChannels (HOSTS_CHANNEL, StructuralEdgeProperties), action: keep, note: structural; RoleMetadata fields dropped (confidence/notes not written)}
+- {live: Channel, final: Channel, action: keep, note: "labels [Channel, Entity]"}
+- {live: Channel.channelType, final: Channel.channelType, action: keep, note: controlled string}
+- {live: Channel.hasSeries (HAS_SERIES, OrderingMetadata), final: Channel.hasSeries (StructuralEdgeProperties), action: keep, note: orderIndex kept; other OrderingMetadata fields not used}
+- {live: Channel.hasEpisodes (HAS_EPISODE, OrderingMetadata), final: Channel.hasEpisodes (StructuralEdgeProperties), action: split, note: "orderIndex -> edge; seasonNumber/episodeNumber -> Episode; publishedAt -> Episode.publishedAt; startTime/endTime -> SourceLocator media seconds on a rendition"}
+- {live: Organization.operatesChannels (OPERATES_CHANNEL, RoleMetadata), final: Channel.operators (OPERATES_CHANNEL, AssertedEdgeProperties), action: keep, note: asserted; needs backing Assertion (predicate OPERATES_CHANNEL registration W21-SR-15); W01 writes the Organization-side field}
+- {live: Person.servesOnChannels (SERVES_ON_CHANNEL, RoleMetadata), final: Channel.hosts (SERVES_ON_CHANNEL, AppearanceProperties), action: keep, note: asserted; roleType HOST/CO_HOST; W01 writes Person-side field}
+- {live: Series, final: Series, action: keep, note: "labels [Series, Entity]"}
+- {live: Series.seriesType, final: Series.seriesType, action: keep, note: controlled string}
+- {live: Series.includesEpisodes (INCLUDES_EPISODE), final: Series.includesEpisodes (HAS_EPISODE), action: merge, note: "relabel: MATCH (s:Series)-[r:INCLUDES_EPISODE]->(e) MERGE (s)-[n:HAS_EPISODE]->(e) SET n.orderIndex = r.orderIndex DELETE r"}
+- {live: Episode, final: Episode, action: keep, note: "labels [Episode, Entity]; work identity (D-005)"}
+- {live: Episode.episodeType, final: Episode.episodeType, action: keep, note: controlled string incl. CONFERENCE_TALK}
+- {live: Episode.title, final: Episode.title, action: keep, note: null}
+- {live: Episode.durationSeconds, final: Episode.durationSeconds, action: keep, note: nominal duration; rendition durations differ}
+- {live: Episode.publishedAt, final: Episode.publishedAt, action: keep, note: add publishedAtPrecision; source = feed/directory snapshot}
+- {live: Episode.summaryText, final: Episode.summaryText, action: keep, note: null}
+- {live: Episode.searchEmbedding, final: Episode.searchEmbedding, action: keep, note: "@vector only if Fable keeps a retrieval justification; no provider (D-014)"}
+- {live: Episode @fulltext EpisodeSearch, final: Episode @fulltext EpisodeSearch, action: keep, note: created by operations.cypher on stored names}
+- {live: Episode.personsInEpisode (APPEARS_IN, RoleMetadata), final: Episode.personsInEpisode (APPEARS_IN, AppearanceProperties), action: keep, note: "asserted: backfill one Assertion per edge (predicate APPEARS_IN, MIGRATION adjudication, validFromBasis UNKNOWN); RoleMetadata.roleType -> roleType; title/role -> roleTitleVerbatim; confidence dropped"}
+- {live: Episode.hasSegments (HAS_SEGMENT, OrderingMetadata), final: Episode.segments (HAS_SEGMENT, StructuralEdgeProperties), action: split, note: "orderIndex kept; startTime/endTime -> DELIMITED_BY SourceLocator only when the rendition is known, else delimitationBasis NOT_DELIMITED and the strings are kept as description text; rhetoricalRole -> EpisodeSegment.segmentType"}
+- {live: Episode.onPlatforms (ON_PLATFORM), final: null, action: retire, note: "derivable via RENDITION_OF/DISTRIBUTES_RENDITION/HOSTS_CHANNEL; when the rendition is unknown, create a Source with captureCompleteness UNKNOWN only if a canonical URI exists, else keep as review item"}
+- {live: Episode.sponsorsProducts (SPONSORS_PRODUCT), final: "SPONSORS_CONTENT (Organization|ConsumerBrand -> Episode) + ClaimOccurrence", action: retire, note: "for each edge create a SPONSORS_CONTENT assertion (subject = brand owning/marketing the product, resolved by W01/W04; status PROPOSED, MIGRATION adjudication); never ENDORSES_PRODUCT"}
+- {live: Episode.mentions (MENTIONS, RoleMetadata), final: Episode.mentions (read-only legacy), action: keep, note: "@settable false; name collision with catalog MENTIONS (W21-SR-10); Material targets relabelled per D-008"}
+- {live: Episode.hasTranscriptVersions (HAS_TRANSCRIPT), final: "Source -HAS_TEXT_VERSION-> DocumentTextVersion -TEXT_OF_SNAPSHOT-> SourceSnapshot", action: retire, note: "W20 disposes; W21 requires a rendition Source per transcript (sourceKind PODCAST_TRANSCRIPT_PAGE or VIDEO_RENDITION) and a TRANSCRIPTION Activity"}
+- {live: EpisodeSegment, final: EpisodeSegment, action: keep, note: "labels [EpisodeSegment, InformationArtifact]; add artifactType"}
+- {live: EpisodeSegment.segmentType, final: EpisodeSegment.segmentType, action: keep, note: values include SPONSOR_READ, DYNAMIC_AD}
+- {live: null, final: EpisodeSegment.chapterTitleVerbatim, action: keep, note: new property}
+- {live: null, final: EpisodeSegment.delimitationBasis, action: keep, note: new property}
+- {live: null, final: IN_RENDITION, action: keep, note: new structural relationship (W21-SR-04)}
+- {live: null, final: DELIMITED_BY, action: keep, note: new structural relationship (W21-SR-03)}
+- {live: null, final: DISTRIBUTES_RENDITION, action: keep, note: new structural relationship (W21-SR-05)}
+- {live: Claim, final: Claim, action: keep, note: "labels [Claim, Entity]"}
+- {live: Claim.claimText, final: Claim.claimText, action: keep, note: null}
+- {live: Claim.claimType, final: Claim.claimType, action: keep, note: null}
+- {live: Claim.claimPolarity, final: Claim.claimPolarity, action: keep, note: definition refined (direction inside proposition)}
+- {live: Claim.isQuantitative, final: Claim.isQuantitative, action: keep, note: null}
+- {live: Claim.isCausal, final: Claim.isCausal, action: keep, note: null}
+- {live: Claim.isMechanistic, final: Claim.isMechanistic, action: keep, note: null}
+- {live: Claim.evidenceStrength, final: ClaimEvidenceAssessment.evidenceStrength, action: move, note: "one assessment per non-null value: status PROPOSED, methodVersion legacy-unspecified, recordedAt = migration commit; then REMOVE c.evidenceStrength (V-418)"}
+- {live: Claim.isClinical, final: null, action: retire, note: evidence setting belongs to W03 MechanismEvidenceContext / W09 design; values kept in migration archive}
+- {live: Claim.isPreclinical, final: null, action: retire, note: as isClinical}
+- {live: Claim.about (ABOUT, ClaimSubject), final: null, action: retire, note: derivable from instance assertions' HAS_SUBJECT/HAS_OBJECT; W20 owns retrieval ABOUT}
+- {live: Claim.supportedBy (SUPPORTED_BY -> Chunk), final: null, action: retire, note: a Claim has no source; move support to the instance occurrences with a locator (V-407)}
+- {live: Claim.occurrences (INSTANCE_OF, RoleMetadata), final: Claim.occurrences (INSTANCE_OF, InstanceOfProperties), action: derive, note: "set derivationRule = 'legacy-instance-of' on existing edges (V-417); RoleMetadata dropped"}
+- {live: Claim @fulltext ClaimSearch, final: Claim @fulltext ClaimSearch, action: keep, note: operations.cypher}
+- {live: ClaimOccurrence, final: ClaimOccurrence, action: keep, note: "add label Assertion; add predicate/status/recordedAt/polarity/assertionBasis/speechAct; status from MIGRATION CAPTURE_FIDELITY adjudication"}
+- {live: ClaimOccurrence.utteranceText, final: ClaimOccurrence.utteranceText, action: keep, note: display copy; create TEXT_QUOTE locator from it when no locator exists (flag captureCompleteness UNKNOWN)}
+- {live: ClaimOccurrence.occursIn (OCCURS_IN, RoleMetadata), final: ClaimOccurrence.occursIn (OCCURS_IN), action: keep, note: exactly one; range adds Publication; split occurrences with more than one container}
+- {live: ClaimOccurrence.occursInSegments (OCCURS_IN_SEGMENT, OrderingMetadata), final: ClaimOccurrence.inSegments (OCCURS_IN_SEGMENT), action: split, note: startTime/endTime -> rendition locator when rendition known}
+- {live: ClaimOccurrence.utteredBy (UTTERED_BY), final: ClaimOccurrence.assertedBy (ASSERTED_BY), action: rename, note: "copy then delete; occurrences with several speakers split one per speaker (fx05); D-006"}
+- {live: ClaimOccurrence.instanceOf (INSTANCE_OF, RoleMetadata), final: ClaimOccurrence.instanceOf (InstanceOfProperties), action: derive, note: derivationRule legacy-instance-of}
+- {live: ClaimOccurrence.supportedBy (SUPPORTED_BY -> Chunk, ExtractionMetadata), final: "ClaimOccurrence.supportedBy (SUPPORTED_BY -> SourceLocator) + supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties)", action: split, note: "quoteSpan -> SourceLocator.exact; locatorUid on the chunk edge (V-407); extractor fields -> Activity (round 0006 D9)"}
+- {live: RelationshipAssertion, final: RelationshipAssertion, action: keep, note: "labels [RelationshipAssertion, Assertion]"}
+- {live: RelationshipAssertion.subject (SUBJECT, MediaSubject list), final: RelationshipAssertion.subject (HAS_SUBJECT), action: split, note: one assertion per (subject, object) pair (V-420)}
+- {live: RelationshipAssertion.object (OBJECT, MediaSubject list), final: RelationshipAssertion.object (HAS_OBJECT), action: split, note: as subject}
+- {live: RelationshipAssertion.relationshipType, final: RelationshipAssertion.predicate (+ relationshipType kept deprecated), action: split, note: map to a registered predicate or status UNRESOLVED}
+- {live: RelationshipAssertion.predicateText, final: RelationshipAssertion.predicateText, action: keep, note: null}
+- {live: RelationshipAssertion.subjectLabel, final: RelationshipAssertion.subjectLabel, action: keep, note: surface form}
+- {live: RelationshipAssertion.objectLabel, final: RelationshipAssertion.objectLabel, action: keep, note: surface form}
+- {live: RelationshipAssertion.confidence, final: RelationshipAssertion.extractionConfidence, action: rename, note: read as extractionConfidence with unknown method; new writes need WAS_GENERATED_BY (V-428)}
+- {live: RelationshipAssertion.supportedByClaims (SUPPORTED_BY_CLAIM), final: "INSTANCE_OF or ClaimEvidenceAssessment", action: retire, note: cross-claim syntheses become ClaimEvidenceAssessments}
+- {live: RelationshipAssertion.visualizedBy (VISUALIZES, MediaLinkMetadata), final: RelationshipAssertion.visualizedBy (VISUALIZES, MediaLinkProperties), action: keep, note: W22 property type}
+- {live: ExperienceReport, final: ClaimOccurrence, action: merge, note: "relabel :ExperienceReport -> :ClaimOccurrence:Assertion; assertionBasis PERSONAL_EXPERIENCE; speechAct REPORTS_PRACTICE or STATES by review; status PROPOSED"}
+- {live: ExperienceReport.reportText, final: ClaimOccurrence.utteranceText, action: rename, note: plus TEXT_QUOTE locator}
+- {live: ExperienceReport.about (ABOUT, EvidenceSubject), final: "HAS_SUBJECT / HAS_OBJECT", action: split, note: one occurrence per proposition}
+- {live: ExperienceReport.supportedBy (SUPPORTED_BY -> Chunk), final: "SUPPORTED_BY SourceLocator + SUPPORTED_BY_CHUNK", action: split, note: as ClaimOccurrence}
+- {live: ExperienceReport.extractedFrom (EXTRACTED_FROM, ExtractionSource), final: "OCCURS_IN container + SUPPORTED_BY locator", action: retire, note: Chunk targets resolve to their text version's Source}
+- {live: ExperienceReport.extractedFromSegments (EXTRACTED_FROM_SEGMENT), final: OCCURS_IN_SEGMENT, action: rename, note: null}
+- {live: ExperienceReport.authors (AUTHORS <- ExperienceAuthor), final: ASSERTED_BY, action: rename, note: exactly one; reports with several authors split}
+- {live: ExperienceReport.reportedBy (REPORTS <- CohortParticipant), final: null, action: retire, note: "private-context data: moved to the private store contract (W23); never copied into the shared graph (INV-506)"}
+- {live: "Person/PseudonymousActor/AnonymousActor.authorsReports (AUTHORS)", final: null, action: retire, note: replaced by ASSERTED_BY on the folded occurrences}
+- {live: CohortParticipant.reportsExperiences (REPORTS), final: null, action: retire, note: W23 private boundary}
+- {live: ClaimType, final: ClaimType, action: keep, note: values unchanged}
+- {live: ClaimSpeaker, final: ClaimSpeakerTarget, action: rename, note: adds Organization}
+- {live: ExperienceAuthor, final: ClaimSpeakerTarget, action: merge, note: null}
+- {live: OccurrenceContainer, final: OccurrenceContainerTarget, action: rename, note: adds Publication}
+- {live: ExtractionSource, final: null, action: retire, note: a Chunk is not a source}
+- {live: EpisodeMentionable, final: EpisodeMentionableTarget, action: rename, note: Material -> IngredientMaterial (D-008)}
+- {live: Recommendable, final: RecommendableTarget, action: rename, note: "owner seam W21-SR-18; Compound -> ChemicalSubstance (D-002)"}
+- {live: Person.recommends (RECOMMENDS, RecommendationMetadata), final: "Person.recommends (RECOMMENDS, DerivedEdgeProperties)", action: derive, note: "keep only edges whose originating occurrence has speechAct RECOMMENDS by that person; others become occurrences with REPORTS_PRACTICE or STATES (alignment migration note 7); strength/context/confidence dropped; W01 writes the field"}
+- {live: RecommendationMetadata, final: DerivedEdgeProperties, action: retire, note: CL-016, D-011}
+- {live: Organization.sponsors (SPONSORS, Sponsorable), final: SPONSORS_CONTENT, action: rename, note: "asserted; backfill assertions; Sponsorable (Conference|Channel|Episode) -> W18 SponsorableTarget (adds Series, Document)"}
+- {live: OrderingMetadata (on HAS_EPISODE, HAS_SERIES, INCLUDES_EPISODE, HAS_SEGMENT, OCCURS_IN_SEGMENT), final: "StructuralEdgeProperties + Episode fields + SourceLocator", action: split, note: see rows above}
+- {live: RoleMetadata (on APPEARS_IN, SERVES_ON_CHANNEL, OPERATES_CHANNEL, HOSTS_CHANNEL, ON_PLATFORM, OCCURS_IN, UTTERED_BY, INSTANCE_OF, AUTHORS, REPORTS), final: "AppearanceProperties | AssertedEdgeProperties | StructuralEdgeProperties | InstanceOfProperties | none", action: split, note: per relationship class}
+- {live: PseudonymousActor.onPlatforms (ON_PLATFORM, RoleMetadata), final: "ON_PLATFORM (StructuralEdgeProperties)", action: keep, note: W01 writes PseudonymousActor field; W21 Platform.pseudonymousAccounts is the inverse}

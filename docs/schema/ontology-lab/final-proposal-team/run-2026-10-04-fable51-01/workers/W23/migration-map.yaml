@@ -1,0 +1,76 @@
+# W23 migration map (live schema, proposed-delta 0.2.0 and catalog 0.2.0 elements in W23's scope).
+# Live file: docs/schema/current_biotech_schema.graphql (86b5e0b5…f112). The live schema has no AnswerRecord, PolicyVersion,
+# DecisionCriterion or private-context type; the private catalog records were never live ("There is no private user graph",
+# round 0008), so most rows below move catalog/delta elements, and the data-migration rows are checks that expect zero rows.
+# Elements owned by other workers are listed only where W23 rules a condition (CL-018, CL-008); their owners' maps govern names.
+
+# ---- access_and_answers (proposed-delta.graphql lines 67-85 and catalog) ----
+- {live: "AnswerRecord (proposed-delta; catalog access_and_answers)", final: AnswerRecord, action: keep, note: "labels [AnswerRecord, Occurrence]; implements Entity & OccurrenceArchetype; @mutation(operations: [CREATE]); node privacyClass INTERNAL with PUBLIC reproducibility allow-list (D-W23-02)"}
+- {live: AnswerRecord.id, final: AnswerRecord.id, action: keep, note: "opaque segment of uid; constraint answer_record_id"}
+- {live: AnswerRecord.name, final: AnswerRecord.name, action: keep, note: "String! in the delta becomes String (D-013)"}
+- {live: AnswerRecord.uid, final: AnswerRecord.uid, action: keep, note: "String (nullable) in the delta becomes String! @settable(onCreate: true, onUpdate: false)"}
+- {live: "AnswerRecord.description/mongoResearchRunId/createdAt/updatedAt", final: same, action: keep, note: "mongoResearchRunId is an INTERNAL field (04 section 6)"}
+- {live: AnswerRecord.recordedAsOf, final: AnswerRecord.recordedAsOf, action: keep}
+- {live: AnswerRecord.validAt, final: AnswerRecord.validAt, action: keep}
+- {live: "AnswerRecord.intervalStart/intervalEnd", final: same, action: keep, note: "half-open; exclusive with validAt (V-W23-02)"}
+- {live: AnswerRecord.schemaDigest, final: AnswerRecord.schemaDigest, action: keep}
+- {live: "AnswerRecord.queryShapeId/queryShapeVersion", final: same, action: keep}
+- {live: "AnswerRecord.accessTier: String!", final: "AnswerRecord.accessTier: AccessTier!", action: rename, note: "type String -> enum; stored values unchanged when they are enum names; any other value is reported by V-W23-01a"}
+- {live: "AnswerRecord.traceDepth: String", final: "AnswerRecord.traceDepth: TraceDepth", action: rename, note: "type String -> enum"}
+- {live: AnswerRecord.publishedAt, final: AnswerRecord.publishedAt, action: keep}
+- {live: null, final: AnswerRecord.privateContext, action: derive, note: "new, required; backfill EXCLUDED for every existing record (a shared record can only have been EXCLUDED); K-3"}
+- {live: null, final: "AnswerRecord.occurrenceType/startedAt/endedAt", action: derive, note: "archetype fields; occurrenceType = ANSWER_PUBLICATION"}
+- {live: null, final: "AnswerRecord.privacyClass/maturity/schemaVersion", action: derive, note: "contract B2 skeleton; privacyClass = INTERNAL"}
+- {live: "CITES_ASSERTION (catalog)", final: "AnswerRecord.citesAssertions -> Assertion (CITES_ASSERTION, StructuralEdgeProperties)", action: keep, note: "orderIndex zero-based cited-sentence ordinal"}
+- {live: "CITES_ASSESSMENT (catalog)", final: "AnswerRecord.citesAssessments -> EvidenceAssessmentArchetype (CITES_ASSESSMENT, StructuralEdgeProperties)", action: keep}
+- {live: null, final: "AnswerRecord.generatedBy -> Activity (WAS_GENERATED_BY)", action: derive, note: "domain extension requested of W00 (W23-SR-02)"}
+
+# ---- recommendation_decisions, shared INTERNAL part (catalog) ----
+- {live: "PolicyVersion (catalog; examples/recommendation-snapshot.cypher)", final: PolicyVersion, action: keep, note: "labels [PolicyVersion, VersionedState]; @mutation(operations: [CREATE])"}
+- {live: PolicyVersion.name, final: PolicyVersion.name, action: keep}
+- {live: PolicyVersion.payloadHash, final: PolicyVersion.payloadHash, action: keep, note: "sha256:<hex> (D-016)"}
+- {live: null, final: "PolicyVersion.policyKey/versionLabel", action: derive, note: "new required; the example fixture's hu:policy-version:sleep-support-ranking-v3 lacks both (V-W23-08 POLICY_VERSION_MALFORMED on that fixture); backfill policyKey 'sleep-support-ranking', versionLabel 'v3' from its name"}
+- {live: null, final: PolicyVersion.policyKind, action: derive, note: "candidate enum PolicyKind; example fixture value RECOMMENDATION_RANKING"}
+- {live: null, final: "PolicyVersion.permittedUseKinds/requiredFactKeys/effectiveFrom/effectiveTo/stateType", action: derive}
+- {live: "DecisionCriterion (catalog)", final: DecisionCriterion, action: keep, note: "labels [DecisionCriterion, Entity]; identity includes methodVersion"}
+- {live: "DecisionCriterion.name/criterionKind/methodVersion", final: same, action: keep, note: "criterionKind stays a controlled String"}
+- {live: null, final: "DecisionCriterion.criterionKey/valueUnitCode/entityType", action: derive}
+- {live: null, final: "DECLARES_CRITERION (PolicyVersion -> DecisionCriterion)", action: derive, note: "CANDIDATE relationship (W23-SR-04)"}
+
+# ---- access vocabulary (projection-contract.yaml K-3) ----
+- {live: "projection request accessTier (string)", final: "enum AccessTier", action: keep}
+- {live: "projection request traceDepth (string)", final: "enum TraceDepth", action: keep}
+- {live: "projection request privateContext (string)", final: "enum PrivateContextMode", action: rename, note: "enum name PrivateContextMode; field name privateContext unchanged"}
+
+# ---- privacy class values (data migration; examples/*.cypher write lower-case values) ----
+- {live: "privacyClass = 'public' (stored)", final: "privacyClass = 'PUBLIC'", action: rename, note: "relabel: MATCH (n) WHERE n.privacyClass = 'public' SET n.privacyClass = 'PUBLIC'; recommendation-snapshot.cypher alone has 84 such nodes (V-W23-09)"}
+- {live: "privacyClass = 'internal' (stored)", final: "privacyClass = 'INTERNAL'", action: rename, note: "9 nodes in recommendation-snapshot.cypher"}
+- {live: "privacyClass = 'private-personal' (stored on :PrivateRecord fixture nodes only)", final: null, action: retire, note: "value exists only in the private store's own records; any shared node carrying it is a leak (V-521, V-W23-09)"}
+- {live: "privacyClass = 'synthetic' (accepted by V-313)", final: null, action: retire, note: "synthetic is fixture provenance, not a privacy class (catalog conventions comment); V-313 list to be amended (W23-SR-08)"}
+
+# ---- private catalog records -> external private-store contract (no SDL) ----
+- {live: "UserContext, UserContextVersion, UserGoal, UserGoalVersion (catalog private_context)", final: null, action: move, note: "private-store-interface.md section 3"}
+- {live: "PersonalMeasurement, PersonalLabReport (catalog private_context)", final: null, action: move, note: "section 3; PersonalMeasurement implements W07's DiagnosticResult contract by uid columns"}
+- {live: "ProtocolInUse, ProtocolAdoptionVersion, ProtocolDeviation (catalog private_context)", final: null, action: move, note: "section 4"}
+- {live: "RecommendationRequest, RecommendationSnapshot, RecommendationOption, DecisionCriterionValue, UserDecision (catalog recommendation_decisions)", final: null, action: move, note: "section 5; 0.1.0 RecommendationDecision/RecommendationCandidate were already renamed in catalog 0.2.0"}
+- {live: "SharingGrant, DisclosureEvent, PendingItem, PurchaseEvent, PersonalApplicabilityAssessment, ErasureTombstone (catalog private_context)", final: null, action: move, note: "section 8"}
+- {live: "HAS_CONTEXT_VERSION, HAS_GOAL, HAS_GOAL_VERSION, HAS_PROTOCOL_IN_USE, HAS_ADOPTION_VERSION, HAS_DEVIATION, HAS_SHARING_GRANT, HAS_OPTION, FOR_REQUEST, USED_CONTEXT_VERSION, HAS_CRITERION_VALUE, RESPONDS_TO", final: null, action: move, note: "private-store foreign keys; never shared relationships"}
+
+# ---- CL-018 / CL-008 conditions on live elements owned by others ----
+- {live: "Person.recordsObservations (RECORDS -> Observation), live line 1107", final: "RECORDS (owner W16, asserted)", action: keep, note: "W23 condition: public persons and source-attributed self-reports only; endpoints PUBLIC; V-W23-05. Live edges without assertionUid are reported, not silently kept"}
+- {live: "Person.postsResults (POSTS_RESULT -> ProtocolResult), live line 1108", final: "POSTS_RESULT (owner W16, asserted)", action: keep, note: "same condition; V-W23-05"}
+- {live: "Person.hasParticipantTokens (HAS_PARTICIPANT_TOKEN -> CohortParticipant), live line 1106", final: null, action: retire, note: "agrees with W01: re-identification link. Live edges are DELETED (count recorded in the migration log), NOT exported to the private store: no consenting owner exists for a third-party link (D-W23-14)"}
+- {live: "CohortParticipant.participantToken, live line 1143", final: "CohortParticipant.participantToken (owner W01)", action: keep, note: "token printed by a public source + issuer-scoped Identifier; never hu:/pcs ids or hash-like linkage tokens (V-W23-06)"}
+- {live: "CohortParticipant nodes derived from BellLabs users", final: null, action: retire, note: "expected count zero (no private user graph); if found: export to the owner's PCS record only when the mapping to a UserContext is known, then delete; otherwise delete; never kept in the shared graph"}
+- {live: "ExperienceReport.reportedBy (REPORTS from CohortParticipant), live line 2816", final: null, action: move, note: "owner W21 (ClaimOccurrence asserted by the participant); until migrated, legacy REPORTS edges are audited by V-W23-05"}
+- {live: "mongoResearchRunId (all live types)", final: "mongoResearchRunId (all final types)", action: keep, note: "INTERNAL field: OPERATOR_AUDIT and AGENT_PROJECTION only"}
+
+# ---- validators (proposed successors; Fable numbers them) ----
+- {live: "V-121", final: "V-W23-01a + V-W23-01b", action: split, note: "tier/class/privateContext rule plus key allow-list (V-121 misses askerSessionId and OWNER_PRIVATE tier: fixture 12 N2, N5)"}
+- {live: null, final: "V-W23-02, V-W23-03, V-W23-03b", action: derive, note: "citation visibility at viewpoint; endpoints; lineage"}
+- {live: "V-115 (node-based)", final: "V-115 + V-W23-04 (index metadata)", action: derive, note: "S3a: index over private label/property with no private node yet"}
+- {live: "V-521", final: "V-521 + V-W23-09 + V-W23-10", action: derive, note: "upper-case class-only leak and list-valued relationship property leak"}
+- {live: "V-313 (lower-case list incl. 'private-personal', 'synthetic')", final: "V-313 amended to ['PUBLIC','INTERNAL']", action: rename, note: "W23-SR-08 (owner W07/Fable)"}
+- {live: null, final: "V-W23-05, V-W23-06", action: derive, note: "public-person-only rule (CL-018)"}
+- {live: "V-429", final: "V-429 + V-W23-07", action: derive, note: "authorization kind, permitted use, effective period, recorded before use"}
+- {live: null, final: "V-W23-08", action: derive, note: "policy layer hygiene"}
