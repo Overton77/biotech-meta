@@ -29,14 +29,14 @@ UNWIND [
    section: 'Methods: Adverse Events, Compliance, and Plasma Collection', exact: 'Adverse events (AEs) were recorded and coded according to the Medical Dictionary for Regulatory Activities.'}
 ] AS r
 MERGE (src:Source:Entity {uid: r.src})
-  ON CREATE SET src.id = split(r.src, ':')[2], src.entityType = 'Source', src.canonicalUri = r.uri, src.sourceKind = 'PEER_REVIEWED_PUBLICATION', src.createdAt = datetime('2026-10-04T01:10:00Z')
+  ON CREATE SET src.id = split(r.src, ':')[2], src.entityType = 'Source', src.canonicalUri = r.uri, src.sourceKind = 'PEER_REVIEWED_PUBLICATION', src.createdAt = datetime('2026-10-04T01:10:00Z'), src.privacyClass = 'PUBLIC'
 MERGE (snap:SourceSnapshot:InformationArtifact {uid: r.snap})
   ON CREATE SET snap.id = split(r.snap, ':')[2], snap.artifactType = 'SourceSnapshot', snap.canonicalUri = r.uri, snap.retrievedAt = datetime('2026-10-04T01:00:00Z'),
                 snap.observedAt = datetime('2026-10-04T01:00:00Z'), snap.contentHash = 'synthetic:' + r.snap, snap.contentHashBasis = 'SYNTHETIC_FIXTURE',
-                snap.captureCompleteness = 'PARTIAL_EXCERPT', snap.createdAt = datetime('2026-10-04T01:10:00Z')
+                snap.captureCompleteness = 'PARTIAL_EXCERPT', snap.createdAt = datetime('2026-10-04T01:10:00Z'), snap.privacyClass = 'PUBLIC'
 MERGE (loc:SourceLocator:InformationArtifact {uid: r.loc})
   ON CREATE SET loc.id = split(r.loc, ':')[2], loc.artifactType = 'SourceLocator', loc.uri = r.uri, loc.selectorKind = 'TEXT_QUOTE', loc.section = r.section, loc.exact = r.exact,
-                loc.createdAt = datetime('2026-10-04T01:10:00Z')
+                loc.createdAt = datetime('2026-10-04T01:10:00Z'), loc.privacyClass = 'PUBLIC'
 MERGE (src)-[:HAS_SNAPSHOT]->(snap)
 MERGE (snap)-[:HAS_LOCATOR]->(loc);
 
@@ -49,11 +49,11 @@ UNWIND [
 MATCH (st:Study {uid: 'hu:study:nct02678611-basis-nrpt'})
 MERGE (arm:StudyArm:VersionedState {uid: 'hu:arm:nct02678611-' + r.k})
   ON CREATE SET arm.id = 'nct02678611-' + r.k, arm.stateType = 'StudyArm', arm.payloadHash = 'sha256:synthetic-arm-nct02678611-' + r.k, arm.name = r.name, arm.armType = r.type,
-                arm.plannedSize = 40, arm.createdAt = datetime('2026-10-04T01:10:00Z')
+                arm.plannedSize = 40, arm.createdAt = datetime('2026-10-04T01:10:00Z'), arm.privacyClass = 'PUBLIC'
 MERGE (st)-[:HAS_ARM]->(arm)
 MERGE (pop:StudyPopulation:VersionedState {uid: 'hu:study-population:nct02678611-itt-' + r.k})
   ON CREATE SET pop.id = 'nct02678611-itt-' + r.k, pop.stateType = 'StudyPopulation', pop.payloadHash = 'sha256:synthetic-pop-nct02678611-itt-' + r.k,
-                pop.populationKind = 'ANALYZED', pop.analysisSet = 'INTENTION_TO_TREAT', pop.size = r.itt, pop.name = 'ITT ' + r.name, pop.createdAt = datetime('2026-10-04T01:10:00Z');
+                pop.populationKind = 'ANALYZED', pop.analysisSet = 'INTENTION_TO_TREAT', pop.size = r.itt, pop.name = 'ITT ' + r.name, pop.createdAt = datetime('2026-10-04T01:10:00Z'), pop.privacyClass = 'PUBLIC';
 
 // 3. Basis AE rows: any-AE counts per arm, and the serious-AE zeros (per-arm zero deduced from the study-level statement).
 UNWIND [
@@ -71,7 +71,7 @@ MERGE (ae:AdverseEventResult:StudyResult:InformationArtifact {uid: 'hu:study-res
                 ae.analysisKind = 'SAFETY', ae.comparisonKind = 'ARM_DESCRIPTIVE', ae.statisticalConclusion = 'NOT_TESTED',
                 ae.eventTerm = r.term, ae.eventTermCode = null, ae.seriousness = r.ser, ae.participantsAffected = r.aff, ae.eventCount = r.ev,
                 ae.participantsAtRisk = pop.size, ae.collectionMethod = 'NOT_DESCRIBED', ae.collectionMethodText = 'self-reported AEs',
-                ae.relatednessAssessor = 'NOT_REPORTED', ae.timeFrameText = '8 weeks', ae.createdAt = datetime('2026-10-04T01:10:00Z')
+                ae.relatednessAssessor = 'NOT_REPORTED', ae.timeFrameText = '8 weeks', ae.createdAt = datetime('2026-10-04T01:10:00Z'), ae.privacyClass = 'PUBLIC'
 MERGE (ae)-[:RESULT_FOR_ARM {armRole: 'INTERVENTION'}]->(arm)
 MERGE (ae)-[:HAS_ANALYZED_COHORT]->(pop)
 MERGE (ae)-[:SUPPORTED_BY]->(loc)
@@ -83,14 +83,14 @@ UNWIND [{k: 'ua', name: 'Mitopure', type: 'EXPERIMENTAL'}, {k: 'placebo', name: 
 MATCH (st:Study {uid: 'hu:study:nct03283462-energize'}), (loc:SourceLocator {uid: 'hu:locator:pmc8777576-adverse-events'}), (mloc:SourceLocator {uid: 'hu:locator:pmc8777576-methods-ae-recording'})
 MERGE (arm:StudyArm:VersionedState {uid: 'hu:arm:nct03283462-' + r.k})
   ON CREATE SET arm.id = 'nct03283462-' + r.k, arm.stateType = 'StudyArm', arm.payloadHash = 'sha256:synthetic-arm-nct03283462-' + r.k, arm.name = r.name, arm.armType = r.type,
-                arm.createdAt = datetime('2026-10-04T01:10:00Z')
+                arm.createdAt = datetime('2026-10-04T01:10:00Z'), arm.privacyClass = 'PUBLIC'
 MERGE (st)-[:HAS_ARM]->(arm)
 MERGE (ae:AdverseEventResult:StudyResult:InformationArtifact {uid: 'hu:study-result:nct03283462-ae-serious-' + r.k})
   ON CREATE SET ae.id = 'nct03283462-ae-serious-' + r.k, ae.artifactType = 'AdverseEventResult', ae.resultKind = 'ADVERSE_EVENT_COUNT', ae.analysisKind = 'SAFETY',
                 ae.comparisonKind = 'ARM_DESCRIPTIVE', ae.statisticalConclusion = 'NOT_TESTED', ae.eventTerm = 'Serious adverse event', ae.eventTermVocabulary = 'MedDRA',
                 ae.seriousness = 'SERIOUS', ae.participantsAffected = 0, ae.eventCount = 0, ae.participantsAtRisk = null, ae.collectionMethod = 'NOT_DESCRIBED',
                 ae.collectionMethodText = 'recorded and coded according to the Medical Dictionary for Regulatory Activities', ae.relatednessAssessor = 'NOT_REPORTED',
-                ae.createdAt = datetime('2026-10-04T01:10:00Z')
+                ae.createdAt = datetime('2026-10-04T01:10:00Z'), ae.privacyClass = 'PUBLIC'
 MERGE (ae)-[:RESULT_FOR_ARM {armRole: 'INTERVENTION'}]->(arm)
 MERGE (ae)-[:SUPPORTED_BY]->(loc)
 MERGE (ae)-[:SUPPORTED_BY]->(mloc);
@@ -98,15 +98,15 @@ MERGE (ae)-[:SUPPORTED_BY]->(mloc);
 // 5. SYNTHETIC systematically collected zero (illustrative only; not from any source).
 MERGE (st:Study:Entity {uid: 'hu:study:synthetic-ae-systematic-demo'})
   ON CREATE SET st.id = 'synthetic-ae-systematic-demo', st.entityType = 'Study', st.name = 'SYNTHETIC: systematic AE checklist demo', st.studyKind = 'INTERVENTIONAL_RANDOMIZED',
-                st.createdAt = datetime('2026-10-04T01:10:00Z')
+                st.createdAt = datetime('2026-10-04T01:10:00Z'), st.privacyClass = 'PUBLIC'
 MERGE (arm:StudyArm:VersionedState {uid: 'hu:arm:synthetic-ae-systematic-demo-active'})
   ON CREATE SET arm.id = 'synthetic-ae-systematic-demo-active', arm.stateType = 'StudyArm', arm.payloadHash = 'sha256:synthetic-arm-ae-demo', arm.name = 'Active',
-                arm.armType = 'EXPERIMENTAL', arm.createdAt = datetime('2026-10-04T01:10:00Z')
+                arm.armType = 'EXPERIMENTAL', arm.createdAt = datetime('2026-10-04T01:10:00Z'), arm.privacyClass = 'PUBLIC'
 MERGE (st)-[:HAS_ARM]->(arm)
 MERGE (ae:AdverseEventResult:StudyResult:InformationArtifact {uid: 'hu:study-result:synthetic-ae-systematic-demo-serious-active'})
   ON CREATE SET ae.id = 'synthetic-ae-systematic-demo-serious-active', ae.artifactType = 'AdverseEventResult', ae.resultKind = 'ADVERSE_EVENT_COUNT', ae.analysisKind = 'SAFETY',
                 ae.comparisonKind = 'ARM_DESCRIPTIVE', ae.statisticalConclusion = 'NOT_TESTED', ae.eventTerm = 'Serious adverse event', ae.seriousness = 'SERIOUS',
                 ae.participantsAffected = 0, ae.eventCount = 0, ae.participantsAtRisk = 25, ae.collectionMethod = 'SYSTEMATIC',
                 ae.collectionMethodText = 'SYNTHETIC: structured AE checklist administered at every scheduled visit', ae.relatednessAssessor = 'INVESTIGATOR',
-                ae.createdAt = datetime('2026-10-04T01:10:00Z')
+                ae.createdAt = datetime('2026-10-04T01:10:00Z'), ae.privacyClass = 'PUBLIC'
 MERGE (ae)-[:RESULT_FOR_ARM {armRole: 'INTERVENTION'}]->(arm);

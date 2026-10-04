@@ -34,12 +34,12 @@
     {
      "privateUid": "hu:private-user-context:w23-leak-0001",
      "relType": "INTERESTED_IN",
-     "sharedUid": "hu:product-variant:w23-sleepwell-us-capsule"
+     "sharedUid": "hu:product:w23-calmroot"
     },
     {
      "privateUid": "hu:private-user-context:w23-leak-0001",
      "relType": "INTERESTED_IN",
-     "sharedUid": "hu:product:w23-calmroot"
+     "sharedUid": "hu:product-variant:w23-sleepwell-us-capsule"
     }
    ]
   },
@@ -93,9 +93,21 @@
    "error": null,
    "sample": [
     {
+     "label": "Occurrence",
+     "nodes": 4,
+     "withUid": 4,
+     "missingUid": 0
+    },
+    {
      "label": "Entity",
      "nodes": 10,
      "withUid": 10,
+     "missingUid": 0
+    },
+    {
+     "label": "EvidenceAssessment",
+     "nodes": 4,
+     "withUid": 4,
      "missingUid": 0
     },
     {
@@ -106,18 +118,6 @@
     },
     {
      "label": "InformationArtifact",
-     "nodes": 4,
-     "withUid": 4,
-     "missingUid": 0
-    },
-    {
-     "label": "Assertion",
-     "nodes": 3,
-     "withUid": 3,
-     "missingUid": 0
-    },
-    {
-     "label": "EvidenceAssessment",
      "nodes": 4,
      "withUid": 4,
      "missingUid": 0

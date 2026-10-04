@@ -59,6 +59,23 @@ MERGE (x)-[r:PRODUCED_RESULT]->(y);
 MATCH (x:MeasuredResult {uid: 'hu:measured-result:synthetic-lab-z-70579-e-coli'}), (y:SourceLocator {uid: 'hu:locator:synthetic-lab-z-70579-ecoli'})
 MERGE (x)-[r:SUPPORTED_BY]->(y);
 
+// Criterion printed with the enumeration result (found missing by V-W12-01 on the first run)
+MERGE (n:SpecificationCriterion:VersionedState {uid: 'hu:spec-criterion:synthetic-lz-basis-e-coli-enumeration-nmt-10'})
+SET n.stateType = 'SPECIFICATION_CRITERION', n.payloadHash = 'sha256:d7c83ffc0c891376b5732a1a11993a8c34e4f03c24c3de01a0a7297add0f22a5', n.privacyClass = 'PUBLIC', n.schemaVersion = 'w12-proposal-0.1', n.analyte = 'E. coli', n.comparator = 'NOT_MORE_THAN', n.threshold = 10.0, n.unitCode = '[CFU]/g', n.criterionText = 'E. coli (enumeration): < 10 CFU/g', n.criterionPurpose = 'RELEASE_AND_SHELF_LIFE', n.criterionBasis = 'INTERNAL', n.id = 'synthetic-lz-basis-e-coli-enumeration-nmt-10', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
+
+MATCH (x:SpecificationCriterion {uid: 'hu:spec-criterion:synthetic-lz-basis-e-coli-enumeration-nmt-10'}), (y:SpecificationVersion {uid: 'hu:spec-version:synthetic-lab-z-client-criteria-basis'})
+MERGE (x)-[r:CRITERION_OF_SPECIFICATION]->(y);
+
+MATCH (x:MeasuredResult {uid: 'hu:measured-result:synthetic-lab-z-70579-e-coli'}), (y:SpecificationCriterion {uid: 'hu:spec-criterion:synthetic-lz-basis-e-coli-enumeration-nmt-10'}), (who:TestingLaboratory {uid: 'hu:org:synthetic-lab-z'}), (l0:SourceLocator {uid: 'hu:locator:synthetic-lab-z-70579-ecoli'})
+MERGE (a:Assertion {uid: 'hu:assertion:w12-evaluated-against-lz-70579-ecoli'})
+SET a.predicate = 'EVALUATED_AGAINST', a.status = 'ACCEPTED', a.recordedAt = datetime('2026-10-04T02:00:00Z'), a.polarity = 'POSITIVE', a.contentHash = 'sha256:b45e6be4bd40998d87aa9fde9e056d3574d5b319ffad64d076d696d1115bbffa', a.validFromBasis = 'UNKNOWN', a.validToBasis = 'UNKNOWN', a.speechAct = 'STATES', a.privacyClass = 'PUBLIC', a.createdAt = datetime('2026-10-04T02:00:00Z'), a.updatedAt = datetime('2026-10-04T02:00:00Z')
+MERGE (a)-[:HAS_SUBJECT]->(x)
+MERGE (a)-[:HAS_OBJECT]->(y)
+MERGE (a)-[:ASSERTED_BY]->(who)
+MERGE (a)-[:SUPPORTED_BY]->(l0)
+MERGE (x)-[r:EVALUATED_AGAINST {relationshipUid: 'hu:rel:w12-evaluated-against-lz-70579-ecoli'}]->(y)
+SET r.assertionUid = 'hu:assertion:w12-evaluated-against-lz-70579-ecoli', r.recordedFrom = datetime('2026-10-04T02:00:00Z'), r.validFromBasis = 'UNKNOWN', r.validToBasis = 'UNKNOWN';
+
 MERGE (n:CertificateOfAnalysis:InformationArtifact {uid: 'hu:coa:synthetic-lab-z-lz-2026-0415-00'})
 SET n.artifactType = 'CERTIFICATE_OF_ANALYSIS', n.privacyClass = 'PUBLIC', n.schemaVersion = 'w12-proposal-0.1', n.contentHash = 'sha256:5dec6f7c262f16f94be533b44835bc2a76908128ff710b43064a911650bf6bd7', n.name = 'Certificate LZ-2026-0415-00 (synthetic)', n.certificateNumber = 'LZ-2026-0415-00', n.revisionNumber = '00', n.reportDate = datetime('2026-04-22T00:00:00Z'), n.reportDatePrecision = 'DAY', n.documentTitleVerbatim = 'Certificate of Analysis', n.signatureEvidence = 'ELECTRONIC_APPROVAL_STATEMENT', n.signer = 'Microbiology Lead (synthetic)', n.id = 'synthetic-lab-z-lz-2026-0415-00', n.createdAt = datetime('2026-10-04T02:00:00Z'), n.updatedAt = datetime('2026-10-04T02:00:00Z');
 
