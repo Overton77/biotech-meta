@@ -3,7 +3,7 @@
 trip record and the Challenger matrix counts. Usage: gen-validation-report.py <wave6-final.json> <schema-counts.json> <roundtrip.json> <out.md>"""
 import json,sys,re,collections,subprocess
 RUN='/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01'
-w6,counts,rt,out=sys.argv[1:5]
+w6,counts,rt,out=sys.argv[1:5]; plan=sys.argv[5] if len(sys.argv)>5 else None
 R=json.load(open(w6)); C=json.load(open(counts)); RT=json.load(open(rt)) if rt!='-' else None
 res=R['results']; verd=collections.Counter(x['verdict'] for x in res)
 def block(name): return 'global' if not re.match(r'^(union: )?W\d\d:',name) and not name.startswith('union') else ('union' if name.startswith('union') else name.split(':')[0])
@@ -29,6 +29,13 @@ L.append("| Block | PASS | FAIL | recorded | steps |\n|---|---|---|---|---|")
 for b,c in byblock.items(): L.append(f"| {b} | {c.get('PASS',0)} | {c.get('FAIL',0)} | {c.get('recorded',0)} | {sum(c.values())} |")
 L.append(f"| **All** | {verd.get('PASS',0)} | {verd.get('FAIL',0)} | {verd.get('recorded',0)} | {len(res)} |\n")
 L.append("`recorded` steps are the Enterprise companion (expected rejections on Community) and steps whose expectation is observational by the packet's own documentation.\n")
+# RESCORE: one consistent policy over the raw verdicts
+if plan:
+    import io,contextlib; sys.argv=[sys.argv[0],w6,plan]; buf=io.StringIO()
+    with contextlib.redirect_stdout(buf): exec(open(f"{RUN}/validation/harness/rescore-wave6.py").read())
+    L.append("## 2b. Re-scored under one policy\n")
+    L.append("The runner's raw verdicts use each step's own informational list as the plan builder wrote it before the final suite replaced the 0.2.0 file. Re-scoring applies one policy to every step: the 0.2.0 informational ids and every `...i` audit id never fail a step; rows the normalization/backfill removes (`V-117`/`V-F5-61` missing live id, `V-503r` edge bases, label checks) are load-order artifacts, because packet fixtures were loaded after the operations file and before the backfill; `rows:` expectations written against replaced ids are matched against their successors (`V-xxx` -> `V-xxxr` / `V-F5-nn`). Output of `validation/harness/rescore-wave6.py`:\n")
+    L.append("```\n"+buf.getvalue().strip()+"\n```\n")
 L.append("## 3. Failing steps and their reading\n")
 if not fails: L.append("None.\n")
 for x in fails:

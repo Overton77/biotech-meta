@@ -1,0 +1,4263 @@
+{
+  "uriFile": "/tmp/claude-0/-home-user-biotech-meta/c83435a6-8371-518c-961a-6504ccbc2c3e/scratchpad/neo4j-embedded/run5/bolt.uri",
+  "steps": [
+    {
+      "name": "operations baseline",
+      "file": "docs/schema/neo4j/final_biotech_schema_operations.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "operations enterprise companion (expected rejections on Community)",
+      "file": "docs/schema/neo4j/final_biotech_schema_operations.enterprise.cypher",
+      "expect": "errors-ok"
+    },
+    {
+      "name": "translated 0.2.0 fixture claim-retelling-provenance",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/claim-retelling-provenance.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "translated 0.2.0 fixture diagnostic-comparison",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/diagnostic-comparison.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "translated 0.2.0 fixture elysium-basis",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/elysium-basis.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "translated 0.2.0 fixture filing-vs-capability",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/filing-vs-capability.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "translated 0.2.0 fixture recommendation-snapshot",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/recommendation-snapshot.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "translated 0.2.0 fixture study-vs-product-mismatch",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/study-vs-product-mismatch.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "translated 0.2.0 fixture 99-normalize-live-ids",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/99-normalize-live-ids.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "generated label checks on translated fixtures",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/generated-label-checks.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "final suite on translated fixtures",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "kernel CQ queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/kernel-cq-queries.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/kcq-params.json",
+      "expect": "all-ok"
+    },
+    {
+      "name": "QS-1..QS-8 EXPLAIN",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/query-shapes-extracted.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/qs-params.json",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: load 00-common-base",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/00-common-base.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W00: load 01-correction-vs-validity-bounded",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/01-correction-vs-validity-bounded.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: load 02-late-arriving-fact",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/02-late-arriving-fact.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: load 03-year-precision",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/03-year-precision.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: load 08-identifier-across-issuers (statement F08-dup rejected by identifier_scheme_issuer_value)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/08-identifier-across-issuers.cypher",
+      "expect": "errors-ok"
+    },
+    {
+      "name": "W00: load 09-retraction-and-provenance-states",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/09-retraction-and-provenance-states.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: validation-w00 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/validation-w00.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#31",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-509",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W00: EXPLAIN 01-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/01-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: EXPLAIN 02-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/02-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: EXPLAIN 03-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/03-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: EXPLAIN 08-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/08-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: EXPLAIN 09-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/09-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: load negative 04-two-asserters-must-fail",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/04-two-asserters-must-fail.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: validation-w00 after 04-two-asserters-must-fail",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/validation-w00.cypher",
+      "expect": "rows:#5=1"
+    },
+    {
+      "name": "W00: load negative 05-claim-occurrence-without-container-must-fail",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/05-claim-occurrence-without-container-must-fail.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: validation-w00 after 05-claim-occurrence-without-container-must-fail",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/validation-w00.cypher",
+      "expect": "rows:V-410=1"
+    },
+    {
+      "name": "W00: load negative 06-two-archetype-labels-must-fail",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/06-two-archetype-labels-must-fail.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: validation-w00 after 06-two-archetype-labels-must-fail",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/validation-w00.cypher",
+      "expect": "rows:V-000b=1,#35=1"
+    },
+    {
+      "name": "W00: load negative 07-derived-edge-forbidden-premise-must-fail",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/07-derived-edge-forbidden-premise-must-fail.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: validation-w00 after 07-derived-edge-forbidden-premise-must-fail",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/validation-w00.cypher",
+      "expect": "rows:V-112r=3,V-505r=1"
+    },
+    {
+      "name": "W00: load negative 10-locator-kinds",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/10-locator-kinds.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: validation-w00 after 10-locator-kinds",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/validation-w00.cypher",
+      "expect": "rows:V-401=1,V-403=1,#25=1"
+    },
+    {
+      "name": "W00: load negative 12-legacy-shapes-graphql-readability",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/12-legacy-shapes-graphql-readability.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: validation-w00 after 12-legacy-shapes-graphql-readability",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/validation-w00.cypher",
+      "expect": "rows:#35=3,#36=3"
+    },
+    {
+      "name": "W00: load 13-reconciliation-rulings (P1-P6 positives + N1-N9 negatives)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/13-reconciliation-rulings.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: validation-corrections after 13 (N1-N9)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/validation-corrections.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/validation-params-w00.json",
+      "expect": "rows:V-432r=1,#39=1,V-314=1,V-503r=1,#40=3,V-505r=1,#42=1,#41=1,#43=1,V-521r=1"
+    },
+    {
+      "name": "W00: EXPLAIN 13-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/13-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W00: load 11-write-guards (recorded only: needs 11-write-guard-harness.mjs for per-bundle rollback)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/11-write-guards.cypher",
+      "expect": "errors-ok"
+    },
+    {
+      "name": "W01: load w01-01-role-time-precision",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-01-role-time-precision.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W01: load w01-02-advises-not-endorses",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-02-advises-not-endorses.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W01: load w01-03-brand-vs-legal-entity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-03-brand-vs-legal-entity.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W01: load w01-04-investor-vs-parent",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-04-investor-vs-parent.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W01: load w01-05-facility-label-roles",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-05-facility-label-roles.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W01: load w01-06-cohort-participant-identity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-06-cohort-participant-identity.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W01: normalize after load (ids, labels, edge bases)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/99-normalize-live-ids.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W01: final suite on W01 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W01: V-W01-01..12 (w01-queries; Q-W01-01..09 informational) on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-queries.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#1",
+        "#2",
+        "#3",
+        "#4",
+        "#5",
+        "#6",
+        "#7",
+        "#8",
+        "#9",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W01: EXPLAIN w01-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W01: load negative w01-90-negative-forbidden-implications",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-90-negative-forbidden-implications.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W01: V-W01 after 90",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-queries.cypher",
+      "expect": "rows:#10=1,#11=1,V-433=1,#13=1,#16=1"
+    },
+    {
+      "name": "W01: final suite after 90",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-007=1,V-112r=4,V-422=1,V-433=1,V-434=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W01: load negative w01-91-negative-privacy-leak",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-91-negative-privacy-leak.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W01: V-W01 after 91",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-queries.cypher",
+      "expect": "rows:#14=2"
+    },
+    {
+      "name": "W01: final suite after 91",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-F5-26=1,V-522=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W02: load fx-01-nr-salt-vs-moiety",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-01-nr-salt-vs-moiety.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W02: load fx-02-mosaic-provides-not-contains",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-02-mosaic-provides-not-contains.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: load fx-03-niagen-two-spec-versions",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-03-niagen-two-spec-versions.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: load fx-04-botanical-ginkgo-preparation",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-04-botanical-ginkgo-preparation.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: load fx-05-lgg-strain-deposits",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-05-lgg-strain-deposits.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: load fx-06-nrpt-not-a-substance",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-06-nrpt-not-a-substance.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: load fx-07-nad-chemical-vs-molecular-entity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-07-nad-chemical-vs-molecular-entity.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: normalize after load (ids, labels, edge bases)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/99-normalize-live-ids.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: final suite on W02 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W02: V-W02-01..13 (operations.cypher validators) on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/operations.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#17",
+        "#24",
+        "#25",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W02: EXPLAIN queries-W02",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/queries-W02.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: load failing cases fx-91-kernel-quantity-failing-cases",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-91-kernel-quantity-failing-cases.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: final suite after fx-91",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-003r=1,V-006r=2",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W02: load negative fx-90-negative-violations",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-90-negative-violations.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W02: V-W02 after fx-90",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/operations.cypher",
+      "expect": "rows:QS-4a=1,#14=1,#15=1,#16=1,#17=1,#18=1,#19=1,#20=1,#21=1,V-006r=1,#23=1"
+    },
+    {
+      "name": "W02: final suite after fx-90",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-112r=1,V-006r=3,V-222=1,V-222b=2",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W03: load w03-positive",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-positive.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W03: load w03-projection-job",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-projection-job.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W03: w03-validation on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#15",
+        "#23",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-233",
+        "V-234",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W03: final suite on W03 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-233",
+        "V-234",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W03: EXPLAIN w03-cq-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-cq-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W03: load negative w03-negative (N1-N15)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-negative.cypher",
+      "expect": "errors-ok"
+    },
+    {
+      "name": "W03: w03-validation after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-validation.cypher",
+      "expect": "rows:V-112r=2,V-232=1,V-233r=8,V-234r=3,V-236=1,V-237=1,V-239=1,V-233r=3,V-234r=1,#14=1,#16=1,#17=1,#18=1,#19=2,#21=1,#22=1,#23=1"
+    },
+    {
+      "name": "W03: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-522=1,V-F5-05=1,V-002=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W04: load dependency fixtures-final/elysium-basis",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/elysium-basis.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W04: load w04-01-correction-vs-fact-ending",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-01-correction-vs-fact-ending.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W04: load w04-02-package-vs-formulation-change",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-02-package-vs-formulation-change.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W04: load w04-03-declared-calculated-measured",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-03-declared-calculated-measured.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W04: load w04-04-basis-history-and-trial",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-04-basis-history-and-trial.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W04: load w04-06-elysium-basis-compat",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-06-elysium-basis-compat.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W04: V-W04-01..12 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#9",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W04: final suite on W04 positives (scenario A)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-108",
+        "V-110",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-409",
+        "V-505i",
+        "V-509",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W04: EXPLAIN w04-queries [params:fallback]",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-queries.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W04: load negative w04-05-negatives (N01-N13)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-05-negatives.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W04: V-W04 after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-validation.cypher",
+      "expect": "rows:V-004=2,#2=2,V-322r=1,#4=1,#5=1,#6=1,#7=1,#8=1,#10=5,#11=2"
+    },
+    {
+      "name": "W04: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-004=1,V-005=3,V-011=1,V-112r=1,V-231r=1,V-322r=1,V-330=1,V-508r=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W05: load w05-01-food-study-intervention",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-01-food-study-intervention.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W05: load w05-02-diet-arm-composite",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-02-diet-arm-composite.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W05: load w05-03-food-product-is-product",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-03-food-product-is-product.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W05: load w05-04-exposure-vs-protocol-step",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-04-exposure-vs-protocol-step.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W05: load w05-05-lifestyle-reported-vs-recommended",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-05-lifestyle-reported-vs-recommended.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W05: load w05-06-temporal-correction-late-arrival",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-06-temporal-correction-late-arrival.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W05: load w05-08-capture-adjudications",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-08-capture-adjudications.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W05: V-W05-01..12 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W05: final suite on W05 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-221",
+        "V-223",
+        "V-231",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W05: EXPLAIN w05-cq-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-cq-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W05: load negative w05-07-negatives (N1-N12)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-07-negatives.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W05: V-W05 after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-validation.cypher",
+      "expect": "rows:#1=1,#2=1,#3=1,#4=2,#5=1,#6=1,#7=1,#8=1,V-F5-47=1,#10=1,#11=1,#12=1"
+    },
+    {
+      "name": "W05: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-112r=1,V-F5-47=1,V-101r=1,V-522=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W05: load constraint probe w05-09 (P1-P3 must be rejected at load)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-09-constraint-probe.cypher",
+      "expect": "errors-ok"
+    },
+    {
+      "name": "W06: load 00-shared-sources-and-referenced-identities",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/00-shared-sources-and-referenced-identities.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W06: load 01-three-identities-exa-cel",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/01-three-identities-exa-cel.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W06: load 02-modality-vs-registry-type-horizon",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/02-modality-vs-registry-type-horizon.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W06: load 03-procedure-definition-offering-step",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/03-procedure-definition-offering-step.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W06: load 04-development-stage-vs-regulatory-status",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/04-development-stage-vs-regulatory-status.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W06: load 05-orphan-designation-not-approval",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/05-orphan-designation-not-approval.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W06: load 98-capture-fidelity-adjudications",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/98-capture-fidelity-adjudications.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W06: V-W06 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/w06-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#2",
+        "#8",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-322",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W06: final suite on W06 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-333",
+        "V-336",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W06: EXPLAIN w06-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/w06-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W06: load negative 99-negative-cases (N1-N9)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/99-negative-cases.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W06: V-W06 after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/w06-validation.cypher",
+      "expect": "rows:V-322r=3,#2=3,#3=1,#4=1,#5=1,#6=1,#7=1,V-F5-26=1,QS-4a=1"
+    },
+    {
+      "name": "W06: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-333r=1,V-432r=1,V-521r=1,V-522=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W07: load w07-00-sources",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-00-sources.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W07: load w07-01-measurands-tests-assays",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-01-measurands-tests-assays.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W07: load w07-02-reference-intervals",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-02-reference-intervals.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W07: load w07-03-algorithms",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-03-algorithms.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W07: load w07-04-results-and-comparability",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-04-results-and-comparability.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W07: w07-validation on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#26",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-303",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W07: final suite on W07 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-112",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-303",
+        "V-313",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W07: EXPLAIN w07-cq-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-cq-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W07: load negative w07-90-negative-overlays",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-90-negative-overlays.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W07: w07-validation after 90",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-validation.cypher",
+      "expect": "rows:V-301b=1,V-302r=1,V-302r=1,V-303r=2,V-303r=1,V-304r=2,V-304r=2,V-305c=1,V-306=1,V-307=1,V-312=2,V-310a=1,V-313r=1,V-314=1,V-315=1,V-316=1,V-317=1,V-318=1"
+    },
+    {
+      "name": "W07: final suite after 90",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-112r=6,V-114=1,V-231r=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W07: load negative w07-91-negative-masking",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-91-negative-masking.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W07: w07-validation after 91",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-validation.cypher",
+      "expect": "rows:V-311=1,V-302r=1"
+    },
+    {
+      "name": "W08: load w08-platform-vs-instrument",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-platform-vs-instrument.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W08: load w08-device-firmware-assay",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-device-firmware-assay.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W08: load w08-clearance-and-performance-claim",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-clearance-and-performance-claim.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W08: V-W08 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "#7",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W08: final suite on W08 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W08: EXPLAIN w08-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W08: load negative w08-negatives (N1-N11)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-negatives.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W08: V-W08 after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-validation.cypher",
+      "expect": "rows:#1=1,#2=1,#3=1,#4=1,#5=1,#6=1,#8=1,V-F5-26=2,#10=1,#11=1"
+    },
+    {
+      "name": "W08: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-101r=1,V-F5-26=1,V-301b=2,V-320a=1,V-336=1,V-333r=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W09: load 01-registry-versions",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/01-registry-versions.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W09: load 02-null-primary-favorable-secondary",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/02-null-primary-favorable-secondary.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W09: load 03-shared-dataset-vs-replication",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/03-shared-dataset-vs-replication.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W09: load 04-cross-domain-interventions",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/04-cross-domain-interventions.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W09: load 05-adverse-events-zero",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/05-adverse-events-zero.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W09: load 06-publication-correction",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/06-publication-correction.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W09: load 07-historical-label-gap",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/07-historical-label-gap.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W09: V-2xx / V-W09 validators in 80-queries on positives (QS-W09 queries informational)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/80-queries.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#26",
+        "#29",
+        "#30",
+        "#31",
+        "#32",
+        "#33",
+        "#34",
+        "#35",
+        "#36",
+        "#38",
+        "#39",
+        "QS-2b-interval",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-211",
+        "V-212",
+        "V-217",
+        "V-217i",
+        "V-221",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W09: final suite on W09 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-211",
+        "V-212",
+        "V-217",
+        "V-217i",
+        "V-221",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W09: EXPLAIN 80-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/80-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W09: load negative 90-negative-cases (N01-N23)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/90-negative-cases.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W09: 80-queries validators after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/80-queries.cypher",
+      "expect": "rows:V-202=1,V-210=1,V-211r=2,V-211r=1,V-213=1,V-F5-07=1,V-F5-07=3,V-216=3,V-217r=6,V-217r=1,V-F5-08=1,V-221r=5,V-221r=1,#18=1,#19=1,#20=1,#21=1,#22=1,#23=1,#24=1,#25=1,#27=1,#28=1"
+    },
+    {
+      "name": "W09: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-002=1,V-003r=1,V-012=1,V-101r=1,V-108r=1,V-202=1,V-210=1,V-213=1,V-F5-07=1,V-216=1,V-F5-08=1,V-506=1,V-507b=1,V-509r=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W10: load dependency fixtures-final/study-vs-product-mismatch",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/study-vs-product-mismatch.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W10: load w10-01-applicability-basis-13dim",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-01-applicability-basis-13dim.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W10: load w10-02-dose-ratio-minimal-pair",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-02-dose-ratio-minimal-pair.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W10: load w10-03-surrogate-context",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-03-surrogate-context.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W10: load w10-04-null-primary-synthesis",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-04-null-primary-synthesis.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W10: load w10-05-synthesis-versioning",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-05-synthesis-versioning.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W10: normalize after load (ids, labels, edge bases)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/99-normalize-live-ids.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W10: final suite on W10 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W10: W10-V01..V16b (operations.cypher Part B) on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/operations.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "#27",
+        "#30",
+        "#31",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W10: EXPLAIN w10-80-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-80-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W10: load negative w10-90-negatives (N01-N22)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-90-negatives.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W10: W10 validators after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/operations.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-params.json",
+      "expect": "rows:#15=1,#16=1,#17=1,V-207b=1,#21=1,#22=1,#23=1,V-F5-07=1,#25=1,#28=1,#31=1"
+    },
+    {
+      "name": "W10: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-F5-26=1,V-524=1,V-520=1,V-521r=1,V-207b=1,V-204=1,V-206=1,V-207=1,V-214b=1,V-F5-07=1,V-219b=1,V-219c=1,V-F5-05=1,V-209=1,V-237=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W11: load dependency fixtures-final/filing-vs-capability",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/filing-vs-capability.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W11: load 01-capability-promotion-filing-operating",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/01-capability-promotion-filing-operating.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W11: load 02-capacity-basis-nameplate-vs-utilized",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/02-capacity-basis-nameplate-vs-utilized.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W11: load 03-specification-versions-and-process-inputs",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/03-specification-versions-and-process-inputs.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W11: load 04-cgmp-claim-vs-certification-registration-inspection",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/04-cgmp-claim-vs-certification-registration-inspection.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W11: V-324r + V-W11 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/w11-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "#4",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W11: final suite on W11 positives (with inherited filing fixture)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W11: EXPLAIN w11-cq-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/w11-cq-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W11: load negative 05-negative-mutations (N1-N10 then cleanup statements)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/05-negative-mutations.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W11: V-W11 after 05 + its cleanup (state restored; per-mutation rows need one-mutation-at-a-time runs)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/w11-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "#4",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W12: load w12-00-base",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-00-base.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W12: load w12-10-coa-vs-summary",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-10-coa-vs-summary.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W12: load w12-20-lot-measured-vs-label",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-20-lot-measured-vs-label.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W12: load w12-30-certification-scope",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-30-certification-scope.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W12: load w12-40-missingness-and-spec",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-40-missingness-and-spec.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W12: load w12-90-capture-fidelity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-90-capture-fidelity.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W12: V-W12 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#13",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W12: final suite on W12 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W12: EXPLAIN w12-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-queries.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-query-params.json",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W12: load negative w12-negatives (N01-N19)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-negatives.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W12: V-W12 after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-validation.cypher",
+      "expect": "rows:V-008=1,#2=1,#3=1,#4=1,#5=1,#6=1,V-332=1,#8=1,#10=1,#11=1,#12=1"
+    },
+    {
+      "name": "W12: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-009=1,V-332=1,V-112r=1,V-008=1,V-011=1,V-F5-26=1,V-114=1,V-124=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W13: load w13-regulatory-kinds",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-regulatory-kinds.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W13: load w13-inspection",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-inspection.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W13: load w13-jurisdiction-and-pending-values",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-jurisdiction-and-pending-values.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W13: w13-validation on positives (scenario B: pending enum values)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#15",
+        "#16",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-333",
+        "V-336",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W13: EXPLAIN w13-cq-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-cq-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W13: load negative w13-negative (N-01..N-14)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-negative.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W13: w13-validation after negatives (scenario C)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-validation.cypher",
+      "expect": "rows:V-320a=3,V-320b=2,V-322r=1,V-323=1,V-333r=2,V-333r=1,V-334r=2,V-335=1,V-336=6,#15=5,#16=3,#17=1,#18=1,#19=2,#21=1,#25=5"
+    },
+    {
+      "name": "W14: load w14-ip-core",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-ip-core.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W14: load w14-ip-minimal-pairs",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-ip-minimal-pairs.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W14: V-W14 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#11",
+        "#13",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W14: final suite on W14 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W14: EXPLAIN w14-cq-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-cq-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W14: load negative w14-ip-negative (N-1..N-7)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-ip-negative.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W14: V-W14 after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-validation.cypher",
+      "expect": "rows:#1=1,#2=1,V-101r=1,#5=1,#7=1,#8=1,#9=1,#12=1"
+    },
+    {
+      "name": "W14: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-112r=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W15: load w15-00-common",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-00-common.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W15: load w15-01-amazon-host-seller-fulfiller",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-01-amazon-host-seller-fulfiller.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W15: load w15-02-listing-merge-four-offers",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-02-listing-merge-four-offers.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W15: load w15-03-dtc-subscription-and-bundles",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-03-dtc-subscription-and-bundles.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W15: load w15-04-walmart-price-conflict-open-end-unresolved",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-04-walmart-price-conflict-open-end-unresolved.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W15: load w15-05-affiliate-and-title-amounts",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-05-affiliate-and-title-amounts.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W15: load w15-06-recall-and-unauthorized-channel-candidates",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-06-recall-and-unauthorized-channel-candidates.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W15: V-W15 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#11",
+        "#5",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W15: final suite on W15 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W15: W00 validation-w00 on W15 positives (documented by W15)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/validation-w00.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#31",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-509",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W15: EXPLAIN w15-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W15: load negative w15-07-negatives-must-fail (N1-N11)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-07-negatives-must-fail.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W15: V-W15 after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-validation.cypher",
+      "expect": "rows:V-326a=4,V-101r=2,V-329=1,#4=2,V-112r=3,#7=2,#8=2"
+    },
+    {
+      "name": "W15: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-326a=1,V-326b=1,V-326c=2,V-327=1,V-101r=2,V-112r=3,V-328=2,V-329=1,V-007=1,V-422=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W15: load w15-08-legacy-listing-migration (alone, fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-08-legacy-listing-migration.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W15: V-W15 on 08 alone",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#5",
+        "#8",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W15: final suite on W15 08 alone",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W16: load 01-edition-diff-by-stepkey (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/01-edition-diff-by-stepkey.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 01",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W16: load 02-source-change-same-identity (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/02-source-change-same-identity.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 02",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-509r=1,V-530p=1"
+    },
+    {
+      "name": "W16: load 03-repeated-step-plus-prerequisite (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/03-repeated-step-plus-prerequisite.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 03",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-527p=1,V-528p=1"
+    },
+    {
+      "name": "W16: load 04-conditional-branch-missing-condition (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/04-conditional-branch-missing-condition.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 04",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-525p=1"
+    },
+    {
+      "name": "W16: load 05-parallel-steps-concurrent (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/05-parallel-steps-concurrent.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 05",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-531p=2"
+    },
+    {
+      "name": "W16: load 06-optional-step-no-nonadherence (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/06-optional-step-no-nonadherence.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 06",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-534p=2"
+    },
+    {
+      "name": "W16: load 07-public-vs-private-leak-probe (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/07-public-vs-private-leak-probe.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 07",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-F5-26=1,V-520=2,V-521r=3,V-524=1,V-532p=1,V-534p=1"
+    },
+    {
+      "name": "W16: load 08-device-assay-formulation-version-change (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/08-device-assay-formulation-version-change.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 08",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-509r=1"
+    },
+    {
+      "name": "W16: load 09-assertion-backed-role-evidence (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/09-assertion-backed-role-evidence.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 09",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-538p=1"
+    },
+    {
+      "name": "W16: load 10-cadence-range-3-to-6-months (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/10-cadence-range-3-to-6-months.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 10",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-529p=1,V-529b=2"
+    },
+    {
+      "name": "W16: load 11-wait-for-lab-result (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/11-wait-for-lab-result.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 11",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-531p=1,V-533p=1"
+    },
+    {
+      "name": "W16: load 12-mutually-exclusive-steps (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/12-mutually-exclusive-steps.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 12",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "rows:V-531p=3"
+    },
+    {
+      "name": "W16: load 13-subprotocol-edition-binding (fresh graph; includes its NEGATIVE block and Q-W16 queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/13-subprotocol-edition-binding.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W16: 00-w16-validators after 13",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W16/fixtures/00-w16-validators.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W17: load 00-w17-base",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/00-w17-base.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W17: load 01-ae-zero-vs-not-reported",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/01-ae-zero-vs-not-reported.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: load 02-safety-signal-assessments",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/02-safety-signal-assessments.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: load 03-constraints-block-vs-lower",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/03-constraints-block-vs-lower.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: load 04-interactions-unknown-blocks",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/04-interactions-unknown-blocks.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: load 05-statin-pregnancy-validity-bounded",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/05-statin-pregnancy-validity-bounded.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: V-W17 on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/w17-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W17: EXPLAIN w17-cq-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/w17-cq-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: normalize after load (ids, labels, edge bases)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/99-normalize-live-ids.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: final suite on W17 positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W17: load composition: W09 01-registry-versions (documented by W17)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/01-registry-versions.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: load composition: W09 05-adverse-events-zero (documented by W17)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/05-adverse-events-zero.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: V-W17 after W09 composition",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/w17-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W17: load negative 90-negative-must-fail (N1-N14)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/90-negative-must-fail.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W17: V-W17 after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/w17-validation.cypher",
+      "expect": "rows:#1=2,#2=1,V-217r=2,#4=1,QS-7=1,#6=2,V-213b=1,#8=1,#9=1,#10=1,#11=1,V-521r=1,#13=1"
+    },
+    {
+      "name": "W17: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-213b=1,V-217r=5,V-521r=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W18: load w18-01-rezdiffra-milestone-clocks",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-01-rezdiffra-milestone-clocks.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W18: load w18-02-readout-causal-retelling",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-02-readout-causal-retelling.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W18: load w18-03-conference-sessions-sponsorship",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-03-conference-sessions-sponsorship.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W18: load w18-04-narrative-arc",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-04-narrative-arc.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W18: W18-V01..V13 (operations.cypher validators) on positives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/operations.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W18: EXPLAIN w18-80-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-80-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W18: load negative w18-90-negatives (N1-N17)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-90-negatives.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W18: W18 validators after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/operations.cypher",
+      "expect": "rows:#31=4,#32=1,#33=2,#34=3,#35=1,#36=1,#37=1,#38=1,V-101r=1,#40=1,#41=1,#42=1,#43=4"
+    },
+    {
+      "name": "W18: final suite (w18 params) after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-101r=2,V-112r=4,V-422=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W19: load 01-cl003-work-rendition-identity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/01-cl003-work-rendition-identity.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W19: load 02-primary-vs-retelling",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/02-primary-vs-retelling.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load 03-partial-capture-not-found",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/03-partial-capture-not-found.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load 04-source-revision-reanchor",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/04-source-revision-reanchor.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load 05-coverage-discovery-authority",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/05-coverage-discovery-authority.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: normalize after load (ids, labels, edge bases)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/99-normalize-live-ids.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: final suite on W19 positives (scenario A)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-409",
+        "V-505i",
+        "V-512",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W19: EXPLAIN 80-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/80-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load negative 90-negative-mutations (scenario B, N1-N11)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/90-negative-mutations.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: final suite after 90",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-402=1,V-409r=4,V-110=1,V-426=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W19: 80-queries detection rows after 90",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/80-queries.cypher",
+      "expect": "rows:#3=1,#4=1,#5=1,V-426=1,#14=1,V-409r=3,#19=1,#21=1,#25=2"
+    },
+    {
+      "name": "W19: load 01-cl003-work-rendition-identity (scenario C reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/01-cl003-work-rendition-identity.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W19: load 02-primary-vs-retelling (scenario C reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/02-primary-vs-retelling.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load 03-partial-capture-not-found (scenario C reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/03-partial-capture-not-found.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load 04-source-revision-reanchor (scenario C reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/04-source-revision-reanchor.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load 05-coverage-discovery-authority (scenario C reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/05-coverage-discovery-authority.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load negative 91-negative-isolated-n1a (scenario C)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/91-negative-isolated-n1a.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: final suite after 91",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-411=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W19: load 01-cl003-work-rendition-identity (scenario D reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/01-cl003-work-rendition-identity.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W19: load 02-primary-vs-retelling (scenario D reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/02-primary-vs-retelling.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load 03-partial-capture-not-found (scenario D reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/03-partial-capture-not-found.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load 04-source-revision-reanchor (scenario D reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/04-source-revision-reanchor.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load 05-coverage-discovery-authority (scenario D reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/05-coverage-discovery-authority.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: load negative 92-negative-isolated-n7 (scenario D)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/92-negative-isolated-n7.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W19: final suite after 92",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-411=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W20: load w20-01-resegmentation-vs-correction",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/fixtures/w20-01-resegmentation-vs-correction.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W20: W20-V01..V10 (operations.cypher part C) on fixture 01",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/operations.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W20: load w20-03-alias-roundtrip",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/fixtures/w20-03-alias-roundtrip.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W20: load w20-04-text-version-pairs",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/fixtures/w20-04-text-version-pairs.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W20: EXPLAIN w20-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/fixtures/w20-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W20: load negative w20-02-negative-chunk-support (N1-N14)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/fixtures/w20-02-negative-chunk-support.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W20: W20 validators after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/operations.cypher",
+      "expect": "rows:V-407r=4,#17=1,#18=1,#19=1,#20=2,#21=1,#25=1"
+    },
+    {
+      "name": "W20: final suite after negatives",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-402=1,V-403=1,V-404=1,V-405=1,V-406=1,V-407r=1,V-408=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: load fx01-dynamic-ads-renditions (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx01-dynamic-ads-renditions.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W21: w21-validation on fx01",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: final suite on fx01",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: EXPLAIN fx01-dynamic-ads-renditions.queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx01-dynamic-ads-renditions.queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: load negative fx01-dynamic-ads-renditions.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx01-dynamic-ads-renditions.neg.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: w21-validation after fx01.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "rows:#1=1,#5=1,#7=1"
+    },
+    {
+      "name": "W21: final suite after fx01.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-422=1,V-112r=1,V-007=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: load fx02a-transcript-correction-cosmetic (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx02a-transcript-correction-cosmetic.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W21: w21-validation on fx02a",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: final suite on fx02a",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: EXPLAIN fx02a-transcript-correction-cosmetic.queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx02a-transcript-correction-cosmetic.queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: load negative fx02a-transcript-correction-cosmetic.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx02a-transcript-correction-cosmetic.neg.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: final suite after fx02a.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-404=1,V-504=1,V-409r=2",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: load fx02b-transcript-correction-substantive (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx02b-transcript-correction-substantive.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W21: w21-validation on fx02b",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: final suite on fx02b",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: EXPLAIN fx02b-transcript-correction-substantive.queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx02b-transcript-correction-substantive.queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: load negative fx02b-transcript-correction-substantive.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx02b-transcript-correction-substantive.neg.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: w21-validation after fx02b.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "rows:#8=1"
+    },
+    {
+      "name": "W21: load fx03-sponsor-read-vs-practice-report (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx03-sponsor-read-vs-practice-report.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W21: w21-validation on fx03",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: final suite on fx03",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: EXPLAIN fx03-sponsor-read-vs-practice-report.queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx03-sponsor-read-vs-practice-report.queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: load negative fx03-sponsor-read-vs-practice-report.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx03-sponsor-read-vs-practice-report.neg.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: w21-validation after fx03.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "rows:#9=1,#2=1"
+    },
+    {
+      "name": "W21: final suite after fx03.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-424=1,V-422=1,V-112r=1,V-007=1,V-426=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: load fx04-practice-qualified-vs-recommends-retelling (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx04-practice-qualified-vs-recommends-retelling.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W21: w21-validation on fx04",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: final suite on fx04",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: EXPLAIN fx04-practice-qualified-vs-recommends-retelling.queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx04-practice-qualified-vs-recommends-retelling.queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: load negative fx04-practice-qualified-vs-recommends-retelling.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx04-practice-qualified-vs-recommends-retelling.neg.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: w21-validation after fx04.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "rows:V-F5-47=1,#10=2"
+    },
+    {
+      "name": "W21: final suite after fx04.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-F5-47=1,V-414=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: load fx05-two-speakers-one-utterance (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx05-two-speakers-one-utterance.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W21: w21-validation on fx05",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: final suite on fx05",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: EXPLAIN fx05-two-speakers-one-utterance.queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx05-two-speakers-one-utterance.queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: load negative fx05-two-speakers-one-utterance.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx05-two-speakers-one-utterance.neg.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: w21-validation after fx05.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "rows:#11=1,#4=1"
+    },
+    {
+      "name": "W21: load fx06-presentation-slide-vs-talk (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx06-presentation-slide-vs-talk.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W21: w21-validation on fx06",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: final suite on fx06",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: EXPLAIN fx06-presentation-slide-vs-talk.queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx06-presentation-slide-vs-talk.queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: load negative fx06-presentation-slide-vs-talk.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx06-presentation-slide-vs-talk.neg.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W21: w21-validation after fx06.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "rows:V-411=1,#1=1,V-416r=1"
+    },
+    {
+      "name": "W21: final suite after fx06.neg",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-411=1,V-416r=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: load fx07-recommends-derived-projection (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx07-recommends-derived-projection.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W21: w21-validation on fx07",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/w21-validation.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "#10",
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: final suite on fx07",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-423",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W21: EXPLAIN fx07-recommends-derived-projection.queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W21/fixtures/fx07-recommends-derived-projection.queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W22: load mp1-product-asset-selection (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp1-product-asset-selection.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W22: load mp2-concept-asset-selection (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp2-concept-asset-selection.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W22: load mp3-illustration-vs-microscopy-evidence (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp3-illustration-vs-microscopy-evidence.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W22: load mp4-rights-excellent-vs-licensed (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp4-rights-excellent-vs-licensed.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W22: load mp5-label-crop-region-provenance (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp5-label-crop-region-provenance.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W22: load mp6-edited-figure-vs-original-capture (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp6-edited-figure-vs-original-capture.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W22: V-601..V-615 on combined MP1-MP6 (embedded negative members must fire)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/v-media-validation.cypher",
+      "expect": "rows:V-601=1,V-602=2,V-604=1,V-605=1,V-606=2,V-608=1,V-608b=1,V-610=2"
+    },
+    {
+      "name": "W22: final suite on combined MP1-MP6",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W22: load mp3-illustration-vs-microscopy-evidence solo (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp3-illustration-vs-microscopy-evidence.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W22: V-6xx on mp3 solo",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/v-media-validation.cypher",
+      "expect": "rows:V-604=1,V-605=1"
+    },
+    {
+      "name": "W22: load mp5-label-crop-region-provenance solo (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp5-label-crop-region-provenance.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W22: V-6xx on mp5 solo",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/v-media-validation.cypher",
+      "expect": "rows:V-601=1,V-602=1,V-606=1"
+    },
+    {
+      "name": "W22: load mp6-edited-figure-vs-original-capture solo (fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp6-edited-figure-vs-original-capture.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W22: V-6xx on mp6 solo",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/v-media-validation.cypher",
+      "expect": "rows:V-602=1,V-606=1"
+    },
+    {
+      "name": "W23: load reset.cypher (scenario S1)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/reset.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "W23: load 00-shared-base",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/00-shared-base.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: normalize after load (ids, labels, edge bases)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/99-normalize-live-ids.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: final suite S1 on 00",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W23: V-W23 S1 on 00",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W23: EXPLAIN 01-answer-record-replay",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/01-answer-record-replay.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: EXPLAIN 02-public-projection",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/02-public-projection.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: EXPLAIN 03-decision-replay-after-correction",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/03-decision-replay-after-correction.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/replay-params.json",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load reset.cypher (scenario S2)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/reset.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load 00-shared-base (S2)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/00-shared-base.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load 04-uid-redirect (data + queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/04-uid-redirect.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: normalize after load (ids, labels, edge bases)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/99-normalize-live-ids.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: final suite S2 on 00+04",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-432",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W23: V-W23 S2 on 00+04",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W23: load reset.cypher (scenario S3)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/reset.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load 00-shared-base (S3)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/00-shared-base.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load negative 10-leak-probe-qs6 (QS-6 leak probe)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/10-leak-probe-qs6.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: final suite (params-leak) after leak probe",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-F5-26=1,V-114=2,V-F5-26=2,V-F5-26=1,V-520=3,V-521r=7,V-524=2",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W23: V-W23 after leak probe",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+      "expect": "rows:V-F5-26=1,V-521r=1"
+    },
+    {
+      "name": "W23: EXPLAIN 10-leak-probe-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/10-leak-probe-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load reset.cypher (scenario S4)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/reset.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load 00-shared-base (S4)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/00-shared-base.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load negative 11-public-person-only (P pass, N1-N5 fail)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/11-public-person-only.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: V-W23 after 11",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+      "expect": "rows:#7=4,#8=2"
+    },
+    {
+      "name": "W23: final suite after 11",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-521r=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W23: load reset.cypher (scenario S5)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/reset.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load 00-shared-base (S5)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/00-shared-base.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load negative 12-answer-record-negative",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/12-answer-record-negative.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: V-W23 after 12",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+      "expect": "rows:#1=1,V-F5-23=2,#3=2,#4=1,#5=5"
+    },
+    {
+      "name": "W23: final suite after 12",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-F5-23=2,V-521r=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W23: load reset.cypher (scenario S6)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/reset.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load 00-shared-base (S6)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/00-shared-base.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: load negative 13-use-authorization-negative",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/13-use-authorization-negative.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "W23: V-W23 after 13",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+      "expect": "rows:V-429=3,#10=2"
+    },
+    {
+      "name": "W23: final suite after 13",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "rows:V-429=1",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    },
+    {
+      "name": "W23: EXPLAIN 13-fail-open-queries",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/13-fail-open-queries.cypher",
+      "explain": true,
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W00: load 00-common-base",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/00-common-base.cypher",
+      "expect": "all-ok",
+      "reset": true
+    },
+    {
+      "name": "union: W00: load 01-correction-vs-validity-bounded",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/01-correction-vs-validity-bounded.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W00: load 02-late-arriving-fact",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/02-late-arriving-fact.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W00: load 03-year-precision",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/03-year-precision.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W00: load 08-identifier-across-issuers (statement F08-dup rejected by identifier_scheme_issuer_value)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/08-identifier-across-issuers.cypher",
+      "expect": "errors-ok"
+    },
+    {
+      "name": "union: W00: load 09-retraction-and-provenance-states",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/09-retraction-and-provenance-states.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W01: load w01-01-role-time-precision",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-01-role-time-precision.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W01: load w01-02-advises-not-endorses",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-02-advises-not-endorses.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W01: load w01-03-brand-vs-legal-entity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-03-brand-vs-legal-entity.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W01: load w01-04-investor-vs-parent",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-04-investor-vs-parent.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W01: load w01-05-facility-label-roles",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-05-facility-label-roles.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W01: load w01-06-cohort-participant-identity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W01/fixtures/w01-06-cohort-participant-identity.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W02: load fx-01-nr-salt-vs-moiety",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-01-nr-salt-vs-moiety.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W02: load fx-02-mosaic-provides-not-contains",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-02-mosaic-provides-not-contains.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W02: load fx-03-niagen-two-spec-versions",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-03-niagen-two-spec-versions.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W02: load fx-04-botanical-ginkgo-preparation",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-04-botanical-ginkgo-preparation.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W02: load fx-05-lgg-strain-deposits",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-05-lgg-strain-deposits.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W02: load fx-06-nrpt-not-a-substance",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-06-nrpt-not-a-substance.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W02: load fx-07-nad-chemical-vs-molecular-entity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W02/fixtures/fx-07-nad-chemical-vs-molecular-entity.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W03: load w03-positive",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-positive.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W03: load w03-projection-job",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-projection-job.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W04: load dependency fixtures-final/elysium-basis",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/elysium-basis.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W04: load w04-01-correction-vs-fact-ending",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-01-correction-vs-fact-ending.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W04: load w04-02-package-vs-formulation-change",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-02-package-vs-formulation-change.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W04: load w04-03-declared-calculated-measured",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-03-declared-calculated-measured.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W04: load w04-04-basis-history-and-trial",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-04-basis-history-and-trial.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W04: load w04-06-elysium-basis-compat",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W04/fixtures/w04-06-elysium-basis-compat.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W05: load w05-01-food-study-intervention",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-01-food-study-intervention.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W05: load w05-02-diet-arm-composite",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-02-diet-arm-composite.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W05: load w05-03-food-product-is-product",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-03-food-product-is-product.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W05: load w05-04-exposure-vs-protocol-step",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-04-exposure-vs-protocol-step.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W05: load w05-05-lifestyle-reported-vs-recommended",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-05-lifestyle-reported-vs-recommended.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W05: load w05-06-temporal-correction-late-arrival",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-06-temporal-correction-late-arrival.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W05: load w05-08-capture-adjudications",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W05/fixtures/w05-08-capture-adjudications.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W06: load 00-shared-sources-and-referenced-identities",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/00-shared-sources-and-referenced-identities.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W06: load 01-three-identities-exa-cel",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/01-three-identities-exa-cel.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W06: load 02-modality-vs-registry-type-horizon",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/02-modality-vs-registry-type-horizon.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W06: load 03-procedure-definition-offering-step",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/03-procedure-definition-offering-step.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W06: load 04-development-stage-vs-regulatory-status",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/04-development-stage-vs-regulatory-status.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W06: load 05-orphan-designation-not-approval",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/05-orphan-designation-not-approval.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W06: load 98-capture-fidelity-adjudications",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/98-capture-fidelity-adjudications.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W07: load w07-00-sources",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-00-sources.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W07: load w07-01-measurands-tests-assays",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-01-measurands-tests-assays.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W07: load w07-02-reference-intervals",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-02-reference-intervals.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W07: load w07-03-algorithms",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-03-algorithms.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W07: load w07-04-results-and-comparability",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W07/fixtures/w07-04-results-and-comparability.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W08: load w08-platform-vs-instrument",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-platform-vs-instrument.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W08: load w08-device-firmware-assay",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-device-firmware-assay.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W08: load w08-clearance-and-performance-claim",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-clearance-and-performance-claim.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W09: load 01-registry-versions",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/01-registry-versions.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W09: load 02-null-primary-favorable-secondary",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/02-null-primary-favorable-secondary.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W09: load 03-shared-dataset-vs-replication",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/03-shared-dataset-vs-replication.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W09: load 04-cross-domain-interventions",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/04-cross-domain-interventions.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W09: load 05-adverse-events-zero",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/05-adverse-events-zero.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W09: load 06-publication-correction",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/06-publication-correction.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W09: load 07-historical-label-gap",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/07-historical-label-gap.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W10: load dependency fixtures-final/study-vs-product-mismatch",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/study-vs-product-mismatch.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W10: load w10-01-applicability-basis-13dim",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-01-applicability-basis-13dim.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W10: load w10-02-dose-ratio-minimal-pair",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-02-dose-ratio-minimal-pair.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W10: load w10-03-surrogate-context",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-03-surrogate-context.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W10: load w10-04-null-primary-synthesis",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-04-null-primary-synthesis.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W10: load w10-05-synthesis-versioning",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-05-synthesis-versioning.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W11: load dependency fixtures-final/filing-vs-capability",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/filing-vs-capability.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W11: load 01-capability-promotion-filing-operating",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/01-capability-promotion-filing-operating.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W11: load 02-capacity-basis-nameplate-vs-utilized",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/02-capacity-basis-nameplate-vs-utilized.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W11: load 03-specification-versions-and-process-inputs",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/03-specification-versions-and-process-inputs.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W11: load 04-cgmp-claim-vs-certification-registration-inspection",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W11/fixtures/04-cgmp-claim-vs-certification-registration-inspection.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W12: load w12-00-base",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-00-base.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W12: load w12-10-coa-vs-summary",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-10-coa-vs-summary.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W12: load w12-20-lot-measured-vs-label",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-20-lot-measured-vs-label.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W12: load w12-30-certification-scope",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-30-certification-scope.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W12: load w12-40-missingness-and-spec",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-40-missingness-and-spec.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W12: load w12-90-capture-fidelity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W12/fixtures/w12-90-capture-fidelity.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W13: load w13-regulatory-kinds",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-regulatory-kinds.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W13: load w13-inspection",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-inspection.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W13: load w13-jurisdiction-and-pending-values",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-jurisdiction-and-pending-values.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W14: load w14-ip-core",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-ip-core.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W14: load w14-ip-minimal-pairs",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W14/fixtures/w14-ip-minimal-pairs.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W15: load w15-00-common",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-00-common.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W15: load w15-01-amazon-host-seller-fulfiller",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-01-amazon-host-seller-fulfiller.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W15: load w15-02-listing-merge-four-offers",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-02-listing-merge-four-offers.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W15: load w15-03-dtc-subscription-and-bundles",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-03-dtc-subscription-and-bundles.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W15: load w15-04-walmart-price-conflict-open-end-unresolved",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-04-walmart-price-conflict-open-end-unresolved.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W15: load w15-05-affiliate-and-title-amounts",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-05-affiliate-and-title-amounts.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W15: load w15-06-recall-and-unauthorized-channel-candidates",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-06-recall-and-unauthorized-channel-candidates.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W15: load w15-08-legacy-listing-migration (alone, fresh graph)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W15/fixtures/w15-08-legacy-listing-migration.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W17: load 00-w17-base",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/00-w17-base.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W17: load 01-ae-zero-vs-not-reported",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/01-ae-zero-vs-not-reported.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W17: load 02-safety-signal-assessments",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/02-safety-signal-assessments.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W17: load 03-constraints-block-vs-lower",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/03-constraints-block-vs-lower.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W17: load 04-interactions-unknown-blocks",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/04-interactions-unknown-blocks.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W17: load 05-statin-pregnancy-validity-bounded",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W17/fixtures/05-statin-pregnancy-validity-bounded.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W18: load w18-01-rezdiffra-milestone-clocks",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-01-rezdiffra-milestone-clocks.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W18: load w18-02-readout-causal-retelling",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-02-readout-causal-retelling.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W18: load w18-03-conference-sessions-sponsorship",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-03-conference-sessions-sponsorship.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W18: load w18-04-narrative-arc",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W18/fixtures/w18-04-narrative-arc.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W19: load 01-cl003-work-rendition-identity",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/01-cl003-work-rendition-identity.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W19: load 02-primary-vs-retelling",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/02-primary-vs-retelling.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W19: load 03-partial-capture-not-found",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/03-partial-capture-not-found.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W19: load 04-source-revision-reanchor",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/04-source-revision-reanchor.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W19: load 05-coverage-discovery-authority",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W19/fixtures/05-coverage-discovery-authority.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W20: load w20-01-resegmentation-vs-correction",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/fixtures/w20-01-resegmentation-vs-correction.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W20: load w20-03-alias-roundtrip",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/fixtures/w20-03-alias-roundtrip.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W20: load w20-04-text-version-pairs",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W20/fixtures/w20-04-text-version-pairs.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W22: load mp1-product-asset-selection (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp1-product-asset-selection.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W22: load mp2-concept-asset-selection (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp2-concept-asset-selection.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W22: load mp3-illustration-vs-microscopy-evidence (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp3-illustration-vs-microscopy-evidence.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W22: load mp4-rights-excellent-vs-licensed (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp4-rights-excellent-vs-licensed.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W22: load mp5-label-crop-region-provenance (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp5-label-crop-region-provenance.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W22: load mp6-edited-figure-vs-original-capture (positive + embedded negative members)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W22/fixtures/mp6-edited-figure-vs-original-capture.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W23: load 00-shared-base",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/00-shared-base.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "union: W23: load 04-uid-redirect (data + queries)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/04-uid-redirect.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "final suite on the union of all worker positives (reload): normalize after load (ids, labels, edge bases)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/fixtures-final/99-normalize-live-ids.cypher",
+      "expect": "all-ok"
+    },
+    {
+      "name": "final suite on the union of all worker positives (reload)",
+      "file": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/final-validation-suite.cypher",
+      "params": "docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/validation/validation-params.json",
+      "expect": "zero-rows",
+      "informational": [
+        "V-111b",
+        "V-118",
+        "V-120",
+        "V-212",
+        "V-217i",
+        "V-223",
+        "V-331",
+        "V-401b",
+        "V-505i",
+        "V-514b",
+        "V-522",
+        "V-F5-16",
+        "V-W00-19"
+      ]
+    }
+  ]
+}

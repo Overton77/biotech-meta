@@ -1,0 +1,75 @@
+[
+ {
+  "name": "create product via API (uid supplied by client)",
+  "ok": true,
+  "ms": 991,
+  "data": {
+   "createProducts": {
+    "products": [
+     {
+      "id": "79a25763-1d93-45fd-9554-8a66c006f09e",
+      "uid": "hu:product:rt-0001",
+      "name": "Roundtrip Product",
+      "createdAt": "2026-10-04T03:33:23.472Z",
+      "privacyClass": "PUBLIC"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "read product back with DateTime (needs APOC)",
+  "ok": true,
+  "ms": 92,
+  "data": {
+   "products": [
+    {
+     "id": "79a25763-1d93-45fd-9554-8a66c006f09e",
+     "uid": "hu:product:rt-0001",
+     "name": "Roundtrip Product",
+     "createdAt": "2026-10-04T03:33:23.472Z",
+     "updatedAt": "2026-10-04T03:33:23.472Z"
+    }
+   ]
+  }
+ },
+ {
+  "name": "update attempt on uid (should be rejected if settable rules apply, else succeed)",
+  "ok": true,
+  "ms": 77,
+  "data": {
+   "updateProducts": {
+    "products": [
+     {
+      "uid": "hu:product:rt-0001",
+      "name": "Renamed"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "name": "read Cypher-ingested assertion (created below by driver) through generic Assertion type",
+  "ok": true,
+  "ms": 48,
+  "data": {
+   "assertions": []
+  }
+ },
+ {
+  "name": "enum rejection: invalid status value",
+  "ok": false,
+  "ms": 14,
+  "errors": [
+   "Value \"SECRET\" does not exist in \"PrivacyClass\" enum."
+  ]
+ },
+ {
+  "name": "read Document created by Cypher with stored names (alias check)",
+  "ok": true,
+  "ms": 51,
+  "data": {
+   "documents": []
+  }
+ }
+]

@@ -1,0 +1,23 @@
+{
+ "objectTypes": 239,
+ "nodeTypes": 192,
+ "relationshipPropertyTypes": 47,
+ "interfaces": 11,
+ "unions": 39,
+ "enums": 183,
+ "enumValues": 1418,
+ "fields": 5640,
+ "relationshipFields": 1082,
+ "relationshipTypes": 393,
+ "fulltext": 31,
+ "vector": 3,
+ "byArchetype": {
+  "Entity": 91,
+  "InformationArtifact": 34,
+  "Occurrence": 9,
+  "Assertion": 5,
+  "EvidenceAssessment": 20,
+  "VersionedState": 33
+ },
+ "lines": 15019
+}
