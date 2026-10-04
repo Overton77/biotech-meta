@@ -8,13 +8,13 @@
 # CQ-AX-05, CQ-AX-18, CQ-RC-05; candidates CQ-CL-C01..C04 (see 02-cq-coverage.md).
 #
 # Contains ONLY the elements the ownership registry assigns to W21 (plus the two new structural relationship types
-# DELIMITED_BY, IN_RENDITION, DISTRIBUTES_RENDITION and the property type InstanceOfProperties, each requested for
-# registry admission in seam-requests.yaml W21-SR-03/04/05/12). Every other name (Source, SourceSnapshot,
+# DELIMITED_BY, IN_RENDITION, DISTRIBUTES_RENDITION, each requested for
+# registry admission in seam-requests.yaml W21-SR-03/04/05). Every other name (Source, SourceSnapshot,
 # SourceLocator, Assertion, Activity, Agent, Person, Organization, ConsumerBrand, PseudonymousActor,
 # AnonymousActor, Document, Publication, Chunk, Study, StudyResult, MediaAsset, Event, TechnologyPlatform,
 # ToolOrInstrument, ManufacturingProcess, ManufacturingStep, IngredientMaterial, Treatment, Procedure,
 # SafetySignal, the shared interfaces, kernel enums, RoleType, EvidenceStrength, AssociationPolarity,
-# AssertionSubjectTarget, AsserterTarget and the W00/W20/W22 relationship-property types) is imported by name.
+# AssertionSubjectTarget, AsserterTarget, MassBasis, AmountReferent and the W00/W20/W22 relationship-property types) is imported by name.
 #
 # Relationship class and cardinality are written in each relationship field's description and are enforced by
 # the operations/validation layer (07-operations.md), never by SDL.
@@ -38,13 +38,14 @@ asserts nothing; hosting a channel is never selling, sponsoring or endorsing. Se
 which platform) and CQ-CL-08 (platform-level dynamic ad insertion). Module claims_and_documents; archetype Entity.
 uid token `platform` is REQUESTED (seam W21-SR-01); it is not yet in conventions.uidTypeTokens.
 """
-type Platform implements Entity & EntityArchetype @node(labels: ["Platform", "Entity"]) {
+type Platform implements Entity & EntityArchetype @node(labels: ["Platform", "Entity"])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
@@ -67,13 +68,14 @@ an Organization linked by the asserted OPERATES_CHANNEL), and not a rendition (r
 distributes). Serves CQ-CL-01, CQ-CL-05 (sponsorship and operator ties of the channel), CQ-CL-08 (which channel's
 rendition carried which ads). Module claims_and_documents; archetype Entity; uid token `channel`.
 """
-type Channel implements Entity & EntityArchetype @node(labels: ["Channel", "Entity"]) {
+type Channel implements Entity & EntityArchetype @node(labels: ["Channel", "Entity"])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
@@ -105,13 +107,14 @@ A named series of works that persists across platforms and channels (a podcast s
 (an interpretation, W18) and not a Conference (W18). Serves CQ-CL-01 and identity collisions between a series'
 original and re-edited episodes. Module claims_and_documents; archetype Entity; uid token `series`.
 """
-type Series implements Entity & EntityArchetype @node(labels: ["Series", "Entity"]) {
+type Series implements Entity & EntityArchetype @node(labels: ["Series", "Entity"])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
@@ -145,13 +148,14 @@ Module claims_and_documents; archetype Entity; uid token `episode`.
 """
 type Episode implements Entity & EntityArchetype & SearchIndexable
   @node(labels: ["Episode", "Entity"])
-  @fulltext(indexes: [{indexName: "EpisodeSearch", fields: ["name", "title", "summaryText"], queryName: "searchEpisodes"}]) {
+  @fulltext(indexes: [{indexName: "EpisodeSearch", fields: ["name", "title", "summaryText"], queryName: "searchEpisodes"}])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
@@ -207,13 +211,14 @@ names that rendition (IN_RENDITION). A segment without IN_RENDITION is claimed t
 segmentType SPONSOR_READ answers CQ-CL-08; it never makes a statement an endorsement. Serves CQ-CL-08, CQ-PV-02.
 Module claims_and_documents; archetype InformationArtifact; uid token `episode-segment`.
 """
-type EpisodeSegment implements Entity & InformationArtifactArchetype @node(labels: ["EpisodeSegment", "InformationArtifact"]) {
+type EpisodeSegment implements Entity & InformationArtifactArchetype @node(labels: ["EpisodeSegment", "InformationArtifact"])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
@@ -253,13 +258,14 @@ Assertion.polarity. Serves CQ-CL-06, CQ-AX-05, CQ-EV-03. Module claims_and_docum
 """
 type Claim implements Entity & EntityArchetype & SearchIndexable
   @node(labels: ["Claim", "Entity"])
-  @fulltext(indexes: [{indexName: "ClaimSearch", fields: ["name", "description", "searchText"], queryName: "searchClaims"}]) {
+  @fulltext(indexes: [{indexName: "ClaimSearch", fields: ["name", "description", "searchText"], queryName: "searchClaims"}])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
@@ -279,10 +285,10 @@ type Claim implements Entity & EntityArchetype & SearchIndexable
   isMechanistic: Boolean
   """Derived retrieval vector (INV-107); @vector added only by Fable at merge."""
   searchEmbedding: [Float!]
-  """class: derived (ruleOnly; InstanceOfProperties: derivationRule or hypothesisUid); cardinality: many; catalog: INSTANCE_OF (live field name kept)"""
-  occurrences: [ClaimOccurrence!]! @relationship(type: "INSTANCE_OF", direction: IN, properties: "InstanceOfProperties")
+  """class: derived (ruleOnly; DerivedEdgeProperties: derivationRule, plus the accepted ResolutionHypothesis uid in derivedFromAssessmentUids when hypothesis-backed, per W00 D-W00-18); cardinality: many; catalog: INSTANCE_OF (live field name kept)"""
+  occurrences: [ClaimOccurrence!]! @relationship(type: "INSTANCE_OF", direction: IN, properties: "DerivedEdgeProperties")
   """class: derived (ruleOnly); cardinality: many; catalog: INSTANCE_OF"""
-  relationshipAssertions: [RelationshipAssertion!]! @relationship(type: "INSTANCE_OF", direction: IN, properties: "InstanceOfProperties")
+  relationshipAssertions: [RelationshipAssertion!]! @relationship(type: "INSTANCE_OF", direction: IN, properties: "DerivedEdgeProperties")
   """class: structural; cardinality: many (each assessment targets exactly one Claim); catalog: ASSESSES_CLAIM_EVIDENCE"""
   evidenceAssessments: [ClaimEvidenceAssessment!]! @relationship(type: "ASSESSES_CLAIM_EVIDENCE", direction: IN)
 }
@@ -298,63 +304,73 @@ are two ClaimOccurrences. A practice report (speechAct REPORTS_PRACTICE) never p
 CQ-CL-01..06, CQ-CL-08, CQ-PV-01, CQ-PV-02, CQ-PV-05, CQ-AX-05, CQ-RC-05. Module claims_and_documents; archetype
 Assertion; uid token `claim-occurrence`. Live ExperienceReport is folded in (assertionBasis PERSONAL_EXPERIENCE).
 """
-type ClaimOccurrence implements Entity & AssertionArchetype @node(labels: ["ClaimOccurrence", "Assertion"]) {
+type ClaimOccurrence implements Entity & AssertionArchetype @node(labels: ["ClaimOccurrence", "Assertion"])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
   schemaVersion: String
-  predicate: String!
+  predicate: String! @settable(onCreate: true, onUpdate: false)
+  "Capture-fidelity projection; updated only by the status projection job (never truth)."
   status: AssertionStatus!
-  recordedAt: DateTime!
-  recordedTo: DateTime
-  contentHash: String
-  polarity: Polarity
-  basisKind: BasisKind
-  predicateClass: PredicateClass
-  assertionBasis: AssertionBasis
-  speechAct: SpeechAct
-  reportedSpeechAct: SpeechAct
-  valueString: String
-  valueNumber: Float
-  valueBoolean: Boolean
-  unitCode: String
-  quantityBasis: QuantityBasis
-  validFrom: DateTime
-  validTo: DateTime
-  validFromPrecision: TimePrecision
-  validToPrecision: TimePrecision
-  validFromBasis: ValidTimeBasis
-  validToBasis: ValidTimeBasis
-  jurisdiction: String
-  derivationRule: String
-  extractionMethod: String
-  extractionConfidence: Float
+  "Service-assigned at commit (API: @timestamp; Cypher ingestion: datetime.transaction())."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  "Written once from null by the supersession transaction."
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  contentHash: String @settable(onCreate: true, onUpdate: false)
+  polarity: Polarity @settable(onCreate: true, onUpdate: false)
+  basisKind: BasisKind @settable(onCreate: true, onUpdate: false)
+  predicateClass: PredicateClass @settable(onCreate: true, onUpdate: false)
+  assertionBasis: AssertionBasis @settable(onCreate: true, onUpdate: false)
+  speechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  reportedSpeechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  valueString: String @settable(onCreate: true, onUpdate: false)
+  valueNumber: Float @settable(onCreate: true, onUpdate: false)
+  valueBoolean: Boolean @settable(onCreate: true, onUpdate: false)
+  unitCode: String @settable(onCreate: true, onUpdate: false)
+  quantityBasis: QuantityBasis @settable(onCreate: true, onUpdate: false)
+  "Mass basis of a quantity literal (contract A11; mirrors W00 Assertion); UNSPECIFIED for a spoken 'a gram'."
+  massBasis: MassBasis @settable(onCreate: true, onUpdate: false)
+  "What a quantity literal refers to (contract A11; mirrors W00 Assertion)."
+  amountReferent: AmountReferent @settable(onCreate: true, onUpdate: false)
+  validFrom: DateTime @settable(onCreate: true, onUpdate: false)
+  validTo: DateTime @settable(onCreate: true, onUpdate: false)
+  validFromPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validToPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validFromBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  validToBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  jurisdiction: String @settable(onCreate: true, onUpdate: false)
+  derivationRule: String @settable(onCreate: true, onUpdate: false)
+  extractionMethod: String @settable(onCreate: true, onUpdate: false)
+  extractionConfidence: Float @settable(onCreate: true, onUpdate: false)
   """Deprecated (KCR-4.4): new writes link WAS_GENERATED_BY an Activity."""
-  agentRunUid: String
+  agentRunUid: String @settable(onCreate: false, onUpdate: false)
   """Deprecated (INV-407): never written for new records."""
-  confidence: Float
+  confidence: Float @settable(onCreate: false, onUpdate: false)
   """Display copy of the primary locator's exact text; the locator is authoritative (live field kept)."""
-  utteranceText: String
+  utteranceText: String @settable(onCreate: true, onUpdate: false)
   """Role title or code exactly as spoken or printed (kernel optional; for on-air role disclosures)."""
-  roleTitleVerbatim: String
+  roleTitleVerbatim: String @settable(onCreate: true, onUpdate: false)
+  """Role code exactly as printed (for example 'B', 'I,A,IP'); mirrors W00 Assertion."""
+  roleCodeVerbatim: String @settable(onCreate: true, onUpdate: false)
   """Tense in which a role or practice was stated: PAST, PRESENT, FUTURE (kernel optional)."""
-  statedTense: String
+  statedTense: String @settable(onCreate: true, onUpdate: false)
   """Denormalized segment kind (kernel optional), for example SPONSOR_READ; must agree with OCCURS_IN_SEGMENT (V-W21-02)."""
-  segmentKind: String
+  segmentKind: String @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_one; catalog: HAS_SUBJECT (W00)"""
-  subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT)
+  subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: zero_or_one (xor typed literal); catalog: HAS_OBJECT (W00)"""
-  object: [AssertionSubjectTarget!]! @relationship(type: "HAS_OBJECT", direction: OUT)
+  object: [AssertionSubjectTarget!]! @relationship(type: "HAS_OBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_one (KCR-4.3, V-410); catalog: ASSERTED_BY (W00; range narrowed for occurrences: no Agent)"""
-  assertedBy: [ClaimSpeakerTarget!]! @relationship(type: "ASSERTED_BY", direction: OUT)
+  assertedBy: [ClaimSpeakerTarget!]! @relationship(type: "ASSERTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_one (V-410, V-411); catalog: OCCURS_IN"""
-  occursIn: [OccurrenceContainerTarget!]! @relationship(type: "OCCURS_IN", direction: OUT)
+  occursIn: [OccurrenceContainerTarget!]! @relationship(type: "OCCURS_IN", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: many; catalog: OCCURS_IN_SEGMENT"""
   inSegments: [EpisodeSegment!]! @relationship(type: "OCCURS_IN_SEGMENT", direction: OUT)
   """class: structural; cardinality: one_or_more when ACCEPTED (V-401), all in renditions of the container (V-411); catalog: SUPPORTED_BY (W00)"""
@@ -363,8 +379,8 @@ type ClaimOccurrence implements Entity & AssertionArchetype @node(labels: ["Clai
   supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties")
   """class: structural; cardinality: one_or_more for new writes; catalog: WAS_GENERATED_BY (W00)"""
   generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
-  """class: derived (ruleOnly: derivationRule or hypothesisUid, V-417); cardinality: zero_or_one; catalog: INSTANCE_OF"""
-  instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "InstanceOfProperties")
+  """class: derived (ruleOnly: derivationRule always set; hypothesis uid in derivedFromAssessmentUids; V-417); cardinality: zero_or_one; catalog: INSTANCE_OF"""
+  instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "DerivedEdgeProperties")
   """class: structural; cardinality: many; same container (V-416); catalog: QUALIFIED_BY"""
   qualifiedBy: [ClaimOccurrence!]! @relationship(type: "QUALIFIED_BY", direction: OUT, properties: "QualificationProperties")
   """class: structural; cardinality: many; catalog: QUALIFIED_BY (inverse)"""
@@ -390,67 +406,79 @@ ClaimOccurrence (V-419). Multi-subject live instances split one per proposition 
 move to ClaimEvidenceAssessment. Serves CQ-EV-02, CQ-CL-06. Module claims_and_documents; archetype Assertion;
 uid token `assertion`.
 """
-type RelationshipAssertion implements Entity & AssertionArchetype @node(labels: ["RelationshipAssertion", "Assertion"]) {
+type RelationshipAssertion implements Entity & AssertionArchetype @node(labels: ["RelationshipAssertion", "Assertion"])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
   schemaVersion: String
-  predicate: String!
+  predicate: String! @settable(onCreate: true, onUpdate: false)
+  "Capture-fidelity projection; updated only by the status projection job (never truth)."
   status: AssertionStatus!
-  recordedAt: DateTime!
-  recordedTo: DateTime
-  contentHash: String
-  polarity: Polarity
-  basisKind: BasisKind
-  predicateClass: PredicateClass
-  assertionBasis: AssertionBasis
-  speechAct: SpeechAct
-  reportedSpeechAct: SpeechAct
-  valueString: String
-  valueNumber: Float
-  valueBoolean: Boolean
-  unitCode: String
-  quantityBasis: QuantityBasis
-  validFrom: DateTime
-  validTo: DateTime
-  validFromPrecision: TimePrecision
-  validToPrecision: TimePrecision
-  validFromBasis: ValidTimeBasis
-  validToBasis: ValidTimeBasis
-  jurisdiction: String
-  derivationRule: String
-  extractionMethod: String
-  extractionConfidence: Float
+  "Service-assigned at commit (API: @timestamp; Cypher ingestion: datetime.transaction())."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  "Written once from null by the supersession transaction."
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  contentHash: String @settable(onCreate: true, onUpdate: false)
+  polarity: Polarity @settable(onCreate: true, onUpdate: false)
+  basisKind: BasisKind @settable(onCreate: true, onUpdate: false)
+  predicateClass: PredicateClass @settable(onCreate: true, onUpdate: false)
+  assertionBasis: AssertionBasis @settable(onCreate: true, onUpdate: false)
+  speechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  reportedSpeechAct: SpeechAct @settable(onCreate: true, onUpdate: false)
+  valueString: String @settable(onCreate: true, onUpdate: false)
+  valueNumber: Float @settable(onCreate: true, onUpdate: false)
+  valueBoolean: Boolean @settable(onCreate: true, onUpdate: false)
+  unitCode: String @settable(onCreate: true, onUpdate: false)
+  quantityBasis: QuantityBasis @settable(onCreate: true, onUpdate: false)
+  "Mass basis of a quantity literal (contract A11; mirrors W00 Assertion); UNSPECIFIED for a spoken 'a gram'."
+  massBasis: MassBasis @settable(onCreate: true, onUpdate: false)
+  "What a quantity literal refers to (contract A11; mirrors W00 Assertion)."
+  amountReferent: AmountReferent @settable(onCreate: true, onUpdate: false)
+  validFrom: DateTime @settable(onCreate: true, onUpdate: false)
+  validTo: DateTime @settable(onCreate: true, onUpdate: false)
+  validFromPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validToPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  validFromBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  validToBasis: ValidTimeBasis @settable(onCreate: true, onUpdate: false)
+  jurisdiction: String @settable(onCreate: true, onUpdate: false)
+  derivationRule: String @settable(onCreate: true, onUpdate: false)
+  extractionMethod: String @settable(onCreate: true, onUpdate: false)
+  extractionConfidence: Float @settable(onCreate: true, onUpdate: false)
   """Deprecated (KCR-4.4)."""
-  agentRunUid: String
+  agentRunUid: String @settable(onCreate: false, onUpdate: false)
   """Deprecated (INV-407): never written for new records."""
-  confidence: Float
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  """Role title exactly as printed (structured role sources such as a disclosure page)."""
+  roleTitleVerbatim: String @settable(onCreate: true, onUpdate: false)
+  """Role code exactly as printed (for example 'B', 'I,A,IP')."""
+  roleCodeVerbatim: String @settable(onCreate: true, onUpdate: false)
   """Verbatim relation wording in the source; the controlled form is predicate."""
-  predicateText: String
+  predicateText: String @settable(onCreate: true, onUpdate: false)
   """Deprecated live uncontrolled relation label; mapped to predicate or left with status UNRESOLVED at migration."""
-  relationshipType: String
+  relationshipType: String @settable(onCreate: true, onUpdate: false)
   """Display surface form of the subject as printed (not identity)."""
-  subjectLabel: String
+  subjectLabel: String @settable(onCreate: true, onUpdate: false)
   """Display surface form of the object as printed (not identity)."""
-  objectLabel: String
+  objectLabel: String @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_one; catalog: HAS_SUBJECT (W00)"""
-  subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT)
+  subject: [AssertionSubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: zero_or_one; catalog: HAS_OBJECT (W00)"""
-  object: [AssertionSubjectTarget!]! @relationship(type: "HAS_OBJECT", direction: OUT)
+  object: [AssertionSubjectTarget!]! @relationship(type: "HAS_OBJECT", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: at_most_one; catalog: ASSERTED_BY (W00 range)"""
-  assertedBy: [AsserterTarget!]! @relationship(type: "ASSERTED_BY", direction: OUT)
+  assertedBy: [AsserterTarget!]! @relationship(type: "ASSERTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: one_or_more when ACCEPTED; catalog: SUPPORTED_BY (W00)"""
   supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
   """class: structural; catalog: WAS_GENERATED_BY (W00)"""
   generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
   """class: derived (ruleOnly); cardinality: zero_or_one; catalog: INSTANCE_OF"""
-  instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "InstanceOfProperties")
+  instanceOf: [Claim!]! @relationship(type: "INSTANCE_OF", direction: OUT, properties: "DerivedEdgeProperties")
   """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00)"""
   supersedes: [RelationshipAssertion!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties")
   """class: structural (media seam W22); cardinality: many; catalog: VISUALIZES (live, kept)"""
@@ -468,32 +496,35 @@ capture-fidelity status. It coordinates with W10's EvidenceSynthesis/EvidenceStr
 Serves CQ-EV-03, CQ-AX-24, CQ-PV-01 (state 3). Module claims_and_documents; archetype EvidenceAssessment; uid token
 `assessment`.
 """
-type ClaimEvidenceAssessment implements Entity & EvidenceAssessmentArchetype @node(labels: ["ClaimEvidenceAssessment", "EvidenceAssessment"]) {
+type ClaimEvidenceAssessment implements Entity & EvidenceAssessmentArchetype @node(labels: ["ClaimEvidenceAssessment", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
   schemaVersion: String
-  assessmentType: String!
-  methodVersion: String!
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  "PROPOSED/ACCEPTED/SUPERSEDED/WITHDRAWN; a re-assessment is a new node linked by SUPERSEDES."
   status: AssessmentStatus!
-  recordedAt: DateTime!
-  recordedTo: DateTime
-  summary: String
-  overallScore: Float
+  "Service-assigned commit time."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  overallScore: Float @settable(onCreate: true, onUpdate: false)
   """Deprecated (INV-407)."""
-  confidence: Float
+  confidence: Float @settable(onCreate: false, onUpdate: false)
   """Grade under criteriaVersion (live EvidenceStrength, W10 legacy hint enum); null = not graded."""
-  evidenceStrength: EvidenceStrength
-  criteriaVersion: String
-  assessedAt: DateTime
+  evidenceStrength: EvidenceStrength @settable(onCreate: true, onUpdate: false)
+  criteriaVersion: String @settable(onCreate: true, onUpdate: false)
+  assessedAt: DateTime @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_one; catalog: ASSESSES_CLAIM_EVIDENCE"""
-  claim: [Claim!]! @relationship(type: "ASSESSES_CLAIM_EVIDENCE", direction: OUT)
+  claim: [Claim!]! @relationship(type: "ASSESSES_CLAIM_EVIDENCE", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: many; catalog: CLAIM_EVIDENCE_BASED_ON (Assertion range)"""
   basedOnAssertions: [Assertion!]! @relationship(type: "CLAIM_EVIDENCE_BASED_ON", direction: OUT)
   """class: structural; cardinality: many; catalog: CLAIM_EVIDENCE_BASED_ON (Study range)"""
@@ -517,43 +548,46 @@ correction. Loss is a property of the comparison, never of either assertion (V-4
 means "not assessed" (for example because the retelling capture is partial), never "faithful". Serves CQ-CL-04,
 CQ-CL-06, CQ-PV-05. Module claims_and_documents; archetype EvidenceAssessment; uid token `assessment`.
 """
-type RetellingFidelityAssessment implements Entity & EvidenceAssessmentArchetype @node(labels: ["RetellingFidelityAssessment", "EvidenceAssessment"]) {
+type RetellingFidelityAssessment implements Entity & EvidenceAssessmentArchetype @node(labels: ["RetellingFidelityAssessment", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
   schemaVersion: String
-  assessmentType: String!
-  methodVersion: String!
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  "PROPOSED/ACCEPTED/SUPERSEDED/WITHDRAWN; a re-assessment is a new node linked by SUPERSEDES."
   status: AssessmentStatus!
-  recordedAt: DateTime!
-  recordedTo: DateTime
-  summary: String
-  overallScore: Float
+  "Service-assigned commit time."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  overallScore: Float @settable(onCreate: true, onUpdate: false)
   """Deprecated (INV-407)."""
-  confidence: Float
-  qualificationLost: Boolean
-  lostQualificationKinds: [QualificationKind!]
-  speechActChanged: Boolean
-  speechActFrom: SpeechAct
-  speechActTo: SpeechAct
-  assertionBasisChanged: Boolean
-  scopeBroadened: Boolean
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  qualificationLost: Boolean @settable(onCreate: true, onUpdate: false)
+  lostQualificationKinds: [QualificationKind!] @settable(onCreate: true, onUpdate: false)
+  speechActChanged: Boolean @settable(onCreate: true, onUpdate: false)
+  speechActFrom: SpeechAct @settable(onCreate: true, onUpdate: false)
+  speechActTo: SpeechAct @settable(onCreate: true, onUpdate: false)
+  assertionBasisChanged: Boolean @settable(onCreate: true, onUpdate: false)
+  scopeBroadened: Boolean @settable(onCreate: true, onUpdate: false)
   """Purpose or outcome wording the retelling adds, verbatim (for example "to slow aging")."""
-  addedPurposeText: String
-  quantityChanged: Boolean
-  attributionChanged: Boolean
-  correctionIgnored: Boolean
-  assessedAt: DateTime
+  addedPurposeText: String @settable(onCreate: true, onUpdate: false)
+  quantityChanged: Boolean @settable(onCreate: true, onUpdate: false)
+  attributionChanged: Boolean @settable(onCreate: true, onUpdate: false)
+  correctionIgnored: Boolean @settable(onCreate: true, onUpdate: false)
+  assessedAt: DateTime @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_one; catalog: ASSESSES_RETELLING"""
-  retelling: [Assertion!]! @relationship(type: "ASSESSES_RETELLING", direction: OUT)
+  retelling: [Assertion!]! @relationship(type: "ASSESSES_RETELLING", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_one; catalog: AGAINST_ORIGINAL"""
-  original: [Assertion!]! @relationship(type: "AGAINST_ORIGINAL", direction: OUT)
+  original: [Assertion!]! @relationship(type: "AGAINST_ORIGINAL", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: many; catalog: IDENTIFIES_LOST_QUALIFICATION"""
   lostQualifications: [Assertion!]! @relationship(type: "IDENTIFIES_LOST_QUALIFICATION", direction: OUT)
   """class: structural; catalog: ASSESSED_BY (W00)"""
@@ -572,35 +606,38 @@ answer disclosure; it never sets a truth verdict (V-424, INV-405) and "not found
 "not disclosed" (V-426). The disclosure span, when found, is SUPPORTED_BY. Serves CQ-CL-05, CQ-EC-03, CQ-AX-18.
 Module claims_and_documents; archetype EvidenceAssessment; uid token `assessment`.
 """
-type ConflictRelevanceAssessment implements Entity & EvidenceAssessmentArchetype @node(labels: ["ConflictRelevanceAssessment", "EvidenceAssessment"]) {
+type ConflictRelevanceAssessment implements Entity & EvidenceAssessmentArchetype @node(labels: ["ConflictRelevanceAssessment", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
   id: ID! @id
-  uid: String!
+  uid: String! @settable(onCreate: true, onUpdate: false)
   name: String
   description: String
   mongoResearchRunId: String
-  createdAt: DateTime! @timestamp(operations: [CREATE])
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
   updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
   privacyClass: PrivacyClass
   maturity: NodeMaturity
   schemaVersion: String
-  assessmentType: String!
-  methodVersion: String!
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  "PROPOSED/ACCEPTED/SUPERSEDED/WITHDRAWN; a re-assessment is a new node linked by SUPERSEDES."
   status: AssessmentStatus!
-  recordedAt: DateTime!
-  recordedTo: DateTime
-  summary: String
-  overallScore: Float
+  "Service-assigned commit time."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  overallScore: Float @settable(onCreate: true, onUpdate: false)
   """Deprecated (INV-407)."""
-  confidence: Float
-  relevanceLevel: RelevanceLevel
-  relevanceBasis: RelevanceBasis
-  temporalOverlap: TemporalOverlap
-  disclosureFinding: DisclosureFinding
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  relevanceLevel: RelevanceLevel @settable(onCreate: true, onUpdate: false)
+  relevanceBasis: RelevanceBasis @settable(onCreate: true, onUpdate: false)
+  temporalOverlap: TemporalOverlap @settable(onCreate: true, onUpdate: false)
+  disclosureFinding: DisclosureFinding @settable(onCreate: true, onUpdate: false)
   """Free-text statement of any scope ambiguity (for example group-level role codes)."""
-  scopeAmbiguity: String
-  assessedAt: DateTime
+  scopeAmbiguity: String @settable(onCreate: true, onUpdate: false)
+  assessedAt: DateTime @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: exactly_one; catalog: FOR_OCCURRENCE"""
-  forOccurrence: [Assertion!]! @relationship(type: "FOR_OCCURRENCE", direction: OUT)
+  forOccurrence: [Assertion!]! @relationship(type: "FOR_OCCURRENCE", direction: OUT) @settable(onCreate: true, onUpdate: false)
   """class: structural; cardinality: one_or_more (FINANCIAL_INTEREST predicates); catalog: ASSESSES_INTEREST"""
   interests: [Assertion!]! @relationship(type: "ASSESSES_INTEREST", direction: OUT)
   """class: structural; cardinality: many; the disclosure span(s); catalog: SUPPORTED_BY (W00)"""
@@ -689,15 +726,4 @@ type AppearanceProperties @relationshipProperties {
   mongoResearchRunId: String
   roleType: RoleType!
   roleTitleVerbatim: String
-}
-
-"""INSTANCE_OF (derived, ruleOnly): specializes DerivedEdgeProperties (every field) and adds hypothesisUid (catalog oneOf: derivationRule or hypothesisUid; V-417). Registry admission requested W21-SR-12."""
-type InstanceOfProperties @relationshipProperties {
-  projectionOfAssertionUid: String
-  derivationRule: String
-  derivedFromAssertionUids: [String!]
-  derivedFromAssessmentUids: [String!]
-  derivedAt: DateTime
-  mongoResearchRunId: String
-  hypothesisUid: String
 }
