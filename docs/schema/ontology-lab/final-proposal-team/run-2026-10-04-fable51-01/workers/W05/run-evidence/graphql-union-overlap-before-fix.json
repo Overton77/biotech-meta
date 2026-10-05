@@ -1,0 +1,174 @@
+{
+ "data": {
+  "exposures": [
+   {
+    "uid": "hu:exposure:gql-test-brazil-nut-oral",
+    "route": "ORAL",
+    "durationCategory": null,
+    "intensityValue": null,
+    "intensityUnitCode": null,
+    "intensityBasis": null,
+    "agents": [
+     {
+      "__typename": "FoodItem",
+      "uid": "hu:material:food-brazil-nut",
+      "name": "Brazil nut (preparation not specified)"
+     },
+     {
+      "__typename": "IngredientMaterial",
+      "uid": "hu:material:food-brazil-nut",
+      "name": "Brazil nut (preparation not specified)"
+     }
+    ]
+   },
+   {
+    "uid": "hu:exposure:neg-w05-guest-sauna-history",
+    "route": "EXTERNAL_PHYSICAL",
+    "durationCategory": null,
+    "intensityValue": null,
+    "intensityUnitCode": null,
+    "intensityBasis": null,
+    "agents": []
+   },
+   {
+    "uid": "hu:exposure:neg-w05-intensity-no-unit",
+    "route": "ORAL",
+    "durationCategory": null,
+    "intensityValue": 2,
+    "intensityUnitCode": null,
+    "intensityBasis": null,
+    "agents": []
+   },
+   {
+    "uid": "hu:exposure:sauna-80c-20min-4-per-week",
+    "route": "EXTERNAL_PHYSICAL",
+    "durationCategory": "NOT_STATED",
+    "intensityValue": null,
+    "intensityUnitCode": null,
+    "intensityBasis": null,
+    "agents": [
+     {
+      "__typename": "Lifestyle",
+      "uid": "hu:lifestyle:sauna-bathing",
+      "name": "Sauna bathing"
+     }
+    ]
+   },
+   {
+    "uid": "hu:exposure:selenium-dietary-high-se-area-adult-male-1438ugd",
+    "route": "ORAL",
+    "durationCategory": "LIFETIME",
+    "intensityValue": 1438,
+    "intensityUnitCode": "ug/d",
+    "intensityBasis": "ABSOLUTE_PER_DAY",
+    "agents": [
+     {
+      "__typename": "ChemicalSubstance",
+      "uid": "hu:substance:selenium",
+      "name": "selenium"
+     }
+    ]
+   },
+   {
+    "uid": "hu:exposure:selenium-oral-chronic-dietary",
+    "route": "ORAL",
+    "durationCategory": "CHRONIC",
+    "intensityValue": null,
+    "intensityUnitCode": null,
+    "intensityBasis": null,
+    "agents": [
+     {
+      "__typename": "ChemicalSubstance",
+      "uid": "hu:substance:selenium",
+      "name": "selenium"
+     }
+    ]
+   }
+  ],
+  "foodItems": [
+   {
+    "uid": "hu:material:food-brazil-nut-dried-unblanched",
+    "descriptionVerbatim": "Nuts, brazilnuts, dried, unblanched",
+    "foodGroup": "Nut and Seed Products",
+    "foodGroupSystem": "SR_FOOD_CATEGORY",
+    "processingMethods": [
+     "dried",
+     "unblanched"
+    ],
+    "variantOf": [
+     {
+      "uid": "hu:material:food-brazil-nut",
+      "name": "Brazil nut (preparation not specified)"
+     }
+    ],
+    "variantOfConnection": {
+     "edges": [
+      {
+       "properties": {
+        "variantKind": "PREPARATION",
+        "assertionUid": "hu:assertion:brazil-nut-dried-unblanched-variant-of-brazil-nut"
+       }
+      }
+     ]
+    },
+    "quantifiedSubstancesConnection": {
+     "edges": [
+      {
+       "properties": {
+        "quantity": 0,
+        "unitCode": "g",
+        "basis": "PER_100_G"
+       },
+       "node": {
+        "name": "DHA"
+       }
+      },
+      {
+       "properties": {
+        "quantity": 1520,
+        "unitCode": "ug",
+        "basis": "PER_100_G"
+       },
+       "node": {
+        "name": "selenium"
+       }
+      },
+      {
+       "properties": {
+        "quantity": 0,
+        "unitCode": "ug",
+        "basis": "PER_100_G"
+       },
+       "node": {
+        "name": "folic acid"
+       }
+      },
+      {
+       "properties": {
+        "quantity": 1917,
+        "unitCode": "ug",
+        "basis": "PER_100_G"
+       },
+       "node": {
+        "name": "selenium"
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "lifestyles": [
+   {
+    "uid": "hu:lifestyle:sauna-bathing",
+    "name": "Sauna bathing",
+    "characterizedExposures": [
+     {
+      "uid": "hu:exposure:sauna-80c-20min-4-per-week",
+      "route": "EXTERNAL_PHYSICAL",
+      "frequencyText": "four times a week"
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,176 @@
+# W02 seam requests (run-2026-10-04-fable51-01). Fable copies these into 03-conflict-ledger.md and assigns resolvers.
+- id: W02-SR-01
+  targetOwner: W00
+  request: "Kernel change: allow an object assertion whose predicateClass is QUANTITY to carry valueNumber/unitCode/quantityBasis as qualifiers of the object (amend INV-003 and V-003: objects = 1 and literals <= 1 when predicateClass = QUANTITY; objects + literals = 1 otherwise). Asserted QUANTITATIVELY_CONTAINS edges then equal their assertion, and CALCULATED amounts name the substance they refer to."
+  cq: [CQ-PF-01, CQ-ID-03, CQ-ID-C02]
+  failingCase: "fx-91: one label component 'NR chloride 250 mg' yields two CALCULATED literal-only assertions (219.5 mg NR cation; 105.0 mg nicotinamide molar equivalent) with the same subject and predicate; Q-10 returns refersTo = null for both (AMBIGUOUS_UNDER_FROZEN_INV_003). The object form names the substance directly but V-003 reports objects 1 + literals 1. Separately, the Ph. Eur. Ginkgo QUANTITATIVELY_CONTAINS edges carry 22.0-27.0 % while their assertions cannot hold a number, so the edge is not a projection of its assertion (contract A5)."
+  proposedRuling: "Accept for predicateClass QUANTITY only; V-003 amended; asserted_edge profile rule added: quantity qualifiers on the edge equal those of the assertion."
+  primarySource: "M-06 (EFSA 2019 Table 2 '>= 90 wt %'), M-12 (Ph. Eur. ranges), M-03/M-04 (MW inputs)"
+- id: W02-SR-02
+  targetOwner: W00
+  request: "Validator change V-006 -> V-006r: QUANTITATIVELY_CONTAINS requires unitCode, basis, comparator, contentStatementKind; quantity for EQ/APPROX/GE/GT/LE/LT; quantityLow < quantityHigh (and quantity null) for BETWEEN. Implemented as V-W02-10."
+  cq: [CQ-ID-C02, CQ-ID-03]
+  failingCase: "fx-91: Ph. Eur. 10.0 Ginkgo standardization '22.0%-27.0% ... 5.4%-6.6% terpene lactones' (M-12) as BETWEEN edges -> frozen V-006 returns 2 rows (quantity null) although the statement is complete; V-W02-10 returns 0 rows. Interim fallback without the ruling: two assertions (GE low, LE high) per range."
+  proposedRuling: "Replace V-006 by V-006r; keep the catalog requiredQualifiers wording as [quantity shape, unitCode, basis]."
+  primarySource: "M-11, M-12, M-06"
+- id: W02-SR-03
+  targetOwner: W00
+  request: "Register uid tokens: BrandedIngredientMaterial, BotanicalPreparation, MicrobialPreparation, MaterialMixture -> material (same token as IngredientMaterial); BotanicalTaxon -> botanical-taxon; MicrobialTaxon -> microbial-taxon; MicrobialStrain -> microbial-strain; Constituent -> constituent; Nutrient -> nutrient."
+  cq: [CQ-ID-03, CQ-ID-C02, CQ-ID-C03]
+  failingCase: "fx-02: 'Tomato [fruit] extract' is first ingested as a generic IngredientMaterial from a listing and later recognised as a BotanicalPreparation from the label; a specialization-specific token would force a uid change and a redirect for a reclassification that is not an identity change."
+  proposedRuling: "Specializations of IngredientMaterial share token material; the five new primary labels get the listed tokens."
+  primarySource: "catalog conventions.uidTypeTokens (absent entries)"
+- id: W02-SR-04
+  targetOwner: W00
+  request: "Register asserted predicates: HAS_MOLECULAR_WEIGHT (predicateClass QUANTITY, literal valueNumber + unitCode g/mol, subject ChemicalSubstance); confirm QUANTITATIVELY_CONTAINS with basisKind CALCULATED may take an IngredientComponent subject; add an ActivityKind for calculations (for example CALCULATION) so CALCULATED assertions can name a WAS_GENERATED_BY Activity."
+  cq: [CQ-PF-01]
+  failingCase: "fx-01: live Compound.molecularWeight has no home once identifiers become records; the 263.4 mg NR cation calculation needs MW 290.70 and 255.25 as citable inputs (PubChem snapshots) and today can name only an Agent, because ActivityKind has no calculation value."
+  proposedRuling: "Register both predicates and add ActivityKind CALCULATION."
+  primarySource: "M-03, M-04"
+- id: W02-SR-05
+  targetOwner: W00
+  request: "Add predicateExclusivity STRAIN_OF: {mode: EXCLUSIVE, scope: subject}."
+  cq: [CQ-ID-C03, CQ-ST-01]
+  failingCase: "fx-05: strain GG is recorded as L. acidophilus (patent era, M-16) and L. rhamnosus (BacDive/ATCC, M-13, M-14); two current projected STRAIN_OF edges would make species-level answers ambiguous. fx-90 N13 -> V-W02-09 row."
+  proposedRuling: "EXCLUSIVE per subject in valid time; the superseded assignment stays as an unprojected or closed assertion."
+  primarySource: "M-13, M-14, M-16"
+- id: W02-SR-06
+  targetOwner: W03
+  request: "Shared taxon identity: a taxon that is both a mechanism Species and a BotanicalTaxon/MicrobialTaxon is one node carrying both labels (archetype Entity, one uid); NCBI taxonomy id is the shared key (no second node per role)."
+  cq: [CQ-ID-C03, CQ-MX-01]
+  failingCase: "Saccharomyces cerevisiae is a model organism for NR/NAD+ lifespan mechanism contexts (W03 Species) and the source taxon of yeast-derived ingredient materials (W02 MicrobialTaxon); two nodes for one NCBI taxon break 'is the organism in the mechanism study the one in the ingredient?'"
+  proposedRuling: "Allow co-labelling; uniqueness of taxonomyId checked across Species|BotanicalTaxon|MicrobialTaxon by a validation query."
+  primarySource: "M-13 (taxonomy ids as identity keys)"
+- id: W02-SR-07
+  targetOwner: W03
+  request: "Accept the CL-002 rule: MolecularEntity is the gene/protein-authority identity (genes, transcripts, proteins, enzymes, receptors) and carries no chemical keys; metabolites and other structure-authority entities are ChemicalSubstance; mechanism assertions may take a ChemicalSubstance object (NR INCREASES_LEVEL_OF NAD+). Confirm the derived MODULATES/AFFECTS_MECHANISM fields on W02 types use DerivedEdgeProperties and are read-only. Note CANDIDATE REALIZES_MOLECULAR_ENTITY for protein/enzyme ingredient materials."
+  cq: [CQ-ID-C04, CQ-MX-01, CQ-ID-06]
+  failingCase: "fx-90 N8: a MolecularEntity 'NAD+' with InChIKey BAWFJGJZGIEFAR-NNYOXOHSSA-O duplicates ChemicalSubstance NAD+ (ChEBI 15846, M-18) -> V-W02-06 row; live MolecularEntity has no chemical key, so without the rule the duplicate is invisible."
+  proposedRuling: "Rule accepted; CL-002 closed for small molecules; protein ingredients deferred as CANDIDATE."
+  primarySource: "M-18"
+- id: W02-SR-08
+  targetOwner: W07
+  request: "The analyte link of a Biomarker/Metric (QUANTIFIES or the W07 equivalent) accepts ChemicalSubstance as target, so 'whole-blood NAD+' quantifies the same NAD+ substance that is an ingredient or mechanism object."
+  cq: [CQ-ID-C04, CQ-ST-03]
+  failingCase: "fx-07: without it, NAD+ as measurand needs a MolecularEntity copy (V-W02-06)."
+  proposedRuling: "Range includes ChemicalSubstance."
+  primarySource: "M-18"
+- id: W02-SR-09
+  targetOwner: W10
+  request: "Use the W02 identity facts (Q-04: sameExact, sameMoiety, sameForm, moietyOnly) as inputs to MATERIAL_IDENTITY; when one side is stated only at active-moiety level, the level is SAME_SUBSTANCE_MATERIAL_UNRESOLVED (verdict UNKNOWN), not SAME_SUBSTANCE_DIFFERENT_FORM (MISMATCH). SAME_BRANDED_MATERIAL_SAME_SPEC requires exactly one governing SpecificationVersion at the evidence date (Q-05); two candidates -> SAME_BRANDED_MATERIAL_SPEC_UNRESOLVED."
+  cq: [CQ-ID-06, CQ-ST-02, CQ-EV-04]
+  failingCase: "Q-04: NCT02678611 'NR' (moiety only, M-29) vs NIAGEN (NR chloride): treating the moiety statement as a different form yields MISMATCH although the salt is merely unknown. Q-05b: at 2020-06-01 NIAGEN has two candidate spec versions."
+  proposedRuling: "Adopt as method applicability-v0.2 inputs; W10 keeps ownership of levels and verdicts."
+  primarySource: "M-01, M-02, M-29, M-05, M-06"
+- id: W02-SR-10
+  targetOwner: W11
+  request: "CL-005: produce a process-input case IngredientMaterial cannot carry or accept retirement of live Material (D-008). Retarget INPUTS/OUTPUTS/PRODUCES/HAS_INPUT/HAS_OUTPUT to IngredientMaterial with process role on the W11 edge properties. Confirm GOVERNED_BY_SPECIFICATION and PRODUCED_BY_PROCESS fields on W02 types use AssertedEdgeProperties. Register tokens for ManufacturingSpecification/SpecificationVersion (fixtures use 'specification', 'spec-version'). Decide predicateExclusivity for GOVERNED_BY_SPECIFICATION (per jurisdiction?). ContractManufacturingTarget successor: IngredientMaterial replaces CompoundForm."
+  cq: [CQ-ID-05, CQ-MF-01]
+  failingCase: "GRN 635 manufacture (M-21): D-ribofuranose tetra-acetate + gaseous HCl -> triacetate chloride; deacetylation with ammonium hydroxide. Each input is a material identity with a role in a process; no property found that needs a separate ProcessMaterial type."
+  proposedRuling: "Retire Material; one material identity type."
+  primarySource: "M-21"
+- id: W02-SR-11
+  targetOwner: W04
+  request: "USES_MATERIAL / DECLARATION_IDENTIFIES_MATERIAL target IngredientMaterial (all specializations carry the label). QuantityDeclaration.amountReferentUid may point at Nutrient/Constituent/ChemicalSubstance/IngredientMaterial uids. CONTAINS_COMPOUND_FORM stays derived Product -> ChemicalForm. A CALCULATED amount assertion uses the IngredientComponent as subject (fx-01). Note: repo fixture study-vs-product-mismatch.cypher creates hu:component:tru-niagen-300mg-niagen without amountReferent (Q-01 returns null in composition)."
+  cq: [CQ-PF-01, CQ-ID-03]
+  failingCase: "fx-01 composition run: Q-01 amountReferent null when the repo fixture creates the component first."
+  proposedRuling: "Confirm targets; add amountReferent LISTED_INGREDIENT_AS_LISTED to the repo fixture component."
+  primarySource: "M-30, M-31"
+- id: W02-SR-12
+  targetOwner: W05
+  request: "ExposureAgentTarget replaces Ingredient and Compound members with IngredientMaterial and ChemicalSubstance; FoodItem CONTAINS_COMPOUND and FoodProduct HAS_INGREDIENT dispositions retarget to ChemicalSubstance/IngredientMaterial or to PROVIDES_CONSTITUENT/QUANTITATIVELY_CONTAINS on a material."
+  cq: [CQ-ST-01]
+  failingCase: "Live union ExposureAgent = FoodItem | FoodProduct | Ingredient | Compound | Lifestyle references two retired types."
+  proposedRuling: "Member replacement as stated."
+  primarySource: "current_biotech_schema.graphql union ExposureAgent"
+- id: W02-SR-19
+  targetOwner: W06
+  request: "TreatmentComponentTarget: Compound -> ChemicalSubstance; CompoundForm -> ChemicalForm and IngredientMaterial."
+  cq: [CQ-ST-01]
+  failingCase: "Live TreatmentComponent includes Compound | CompoundForm."
+  proposedRuling: "Member replacement."
+  primarySource: "live union TreatmentComponent"
+- id: W02-SR-20
+  targetOwner: W09
+  request: "LegacyEvaluatedIntervention (read-only) members: Compound -> ChemicalSubstance; CompoundForm -> ChemicalForm and IngredientMaterial. USES_INTERVENTION_MATERIAL target IngredientMaterial (incl. MicrobialPreparation for LGG)."
+  cq: [CQ-ST-01, CQ-ST-02]
+  failingCase: "Live union StudyIntervention includes Compound | CompoundForm."
+  proposedRuling: "Member replacement."
+  primarySource: "live union StudyIntervention"
+- id: W02-SR-21
+  targetOwner: W16
+  request: "StepSubstanceTarget and ProtocolResultMentionTarget: Compound -> ChemicalSubstance; CompoundForm -> ChemicalForm and IngredientMaterial."
+  cq: [CQ-PR-03]
+  failingCase: "Live unions StepSubstance and ProtocolResultMention reference Compound/CompoundForm."
+  proposedRuling: "Member replacement; no worker recreates Compound as a rival substance (media-protocol review)."
+  primarySource: "live unions"
+- id: W02-SR-22
+  targetOwner: W21
+  request: "EpisodeMentionableTarget: Material -> IngredientMaterial; Recommendable successor (if W21 owns it): Compound -> ChemicalSubstance | IngredientMaterial."
+  cq: [CQ-CL-01]
+  failingCase: "Live unions EpisodeMentionable (Material) and Recommendable (Compound)."
+  proposedRuling: "Member replacement."
+  primarySource: "live unions"
+- id: W02-SR-23
+  targetOwner: W18
+  request: "EventParticipantTarget/EventSubjectTarget: Compound -> ChemicalSubstance."
+  cq: []
+  failingCase: "Live unions EventParticipant/EventSubject reference Compound."
+  proposedRuling: "Member replacement."
+  primarySource: "live unions"
+- id: W02-SR-24
+  targetOwner: W00
+  request: "AssertionSubjectTarget (successor of EvidenceSubject/ClaimSubject) includes ChemicalSubstance, ChemicalForm, IngredientMaterial (specializations covered by label), BotanicalTaxon, MicrobialTaxon, MicrobialStrain, Constituent, Nutrient; Compound/CompoundForm/Ingredient/Material removed. W03 disposes AssociationParticipant the same way."
+  cq: [CQ-ID-03, CQ-ID-04]
+  failingCase: "Every W02 assertion in fx-01..fx-07 has a W02 subject; live EvidenceSubject lacks all of them."
+  proposedRuling: "Members added."
+  primarySource: "live unions EvidenceSubject, ClaimSubject, AssociationParticipant"
+- id: W02-SR-25
+  targetOwner: W22
+  request: "MediaSubjectTarget and ProductLabelMentionTarget: Compound|CompoundForm|Ingredient|Material -> ChemicalSubstance|ChemicalForm|IngredientMaterial."
+  cq: []
+  failingCase: "Live unions MediaSubject and ProductLabelMention reference retired types."
+  proposedRuling: "Member replacement."
+  primarySource: "live unions"
+- id: W02-SR-13
+  targetOwner: W14
+  request: "Confirm MARKETED_UNDER_MARK (BrandedIngredientMaterial -> Trademark) property type AssertedEdgeProperties; the field is written on the W02 type."
+  cq: [CQ-ID-06]
+  failingCase: "NIAGEN is a material brand distinct from the Tru Niagen product brand (round 0002); without the mark edge the two are confused by name."
+  proposedRuling: "Confirm."
+  primarySource: "round 0002 identification table"
+- id: W02-SR-14
+  targetOwner: W17
+  request: "State HAS_SAFETY_SIGNAL property type and SafetySubjectTarget members (ChemicalSubstance, IngredientMaterial) so the live Compound.hasSafetySignals/Ingredient.hasSafetySignals fields can be re-added on W02 types."
+  cq: [CQ-ST-06]
+  failingCase: "Live Compound.hasSafetySignals uses SafetyMetadata (evidenceStrength, confidence) that the contract retires."
+  proposedRuling: "W17 defines SafetyEdgeProperties; Fable adds the fields at merge."
+  primarySource: "live Compound, Ingredient"
+- id: W02-SR-15
+  targetOwner: W20
+  request: "Live Material.supportedBy (SUPPORTED_BY Chunk) is not carried on W02 types; chunk support is derived per INV-404 under W20's DerivedSupportProperties."
+  cq: [CQ-EV-01]
+  failingCase: "A chunk is never a locator (INV-404)."
+  proposedRuling: "Confirm."
+  primarySource: "live Material"
+- id: W02-SR-16
+  targetOwner: W19
+  request: "Add registry entries for GSRS substance records, PubChem PUG REST, ChEBI, BacDive, EMA HMPC monographs, EFSA opinions and FDA GRAS notices with authorityFor/notAuthorityFor as in 03-source-manifest.md (M-01..M-24)."
+  cq: [CQ-ID-04]
+  failingCase: "source-registry.yaml has no chemical-identity authority entry although CQ-ID-04 depends on them."
+  proposedRuling: "Add entries; authority is claim-specific."
+  primarySource: "M-01, M-03, M-13, M-18"
+- id: W02-SR-17
+  targetOwner: W00
+  request: "Repo fixture docs/schema/examples/elysium-basis.cypher sets assertion recordedAt = datetime() while its CAPTURE_FIDELITY adjudication has reviewedAt 2026-10-04T00:00Z; on any load after that instant V-110 reports 3 rows (observed in the W02 composition run on 2026-10-04 ~01:10Z). Use a fixed recordedAt."
+  cq: [CQ-TM-01]
+  failingCase: "W02 composition run: V-110 rows for hu:assertion:basis-has-us-variant-2026-07-10 and two others."
+  proposedRuling: "Fix the fixture's clock dependence (not a W02 change)."
+  primarySource: "execution log 06-fixtures-and-queries.md section 4"
+- id: W02-SR-18
+  targetOwner: W12
+  request: "Model the NIAGEN 2015 (GRN 635 Table 2) and 2019 (EFSA Table 2) acceptance limits as SpecificationCriterion records under the two W11 SpecificationVersions used in fx-03; specification limits are not QUANTITATIVELY_CONTAINS (D-W02-07). A certificate-of-analysis pair under the two versions would close OPEN-QUESTIONS P1-1 evidence."
+  cq: [CQ-ID-05]
+  failingCase: "fx-03 carries the versions but deliberately no criteria."
+  proposedRuling: "W12 fixture reuses hu:spec-version:chromadex-niagen-grn635-2015-12-21 and hu:spec-version:chromadex-nrc-efsa-2019."
+  primarySource: "M-05, M-06"

@@ -1,0 +1,617 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W13/fixtures/w13-validation.cypher",
+ "uri": "bolt://127.0.0.1:44793/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 25,
+ "ok": 25,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "V-320a",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 193,
+   "sample": [],
+   "header": "// W13 validation suite: catalog regulatory validators (verbatim where unchanged, \"r\" suffix where W13 proposes a\n// revision) plus proposed V-W13-01..12. Every query returns zero rows on a valid committed graph. Read-only.\n// Run status per query is recorded in 06-fixtures-and-queries.md (embedded "
+  },
+  {
+   "n": 2,
+   "id": "V-320b",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 18,
+   "sample": [],
+   "header": "// V-320b (catalog, verbatim): an approval status may not sit under a non-approval legal basis."
+  },
+  {
+   "n": 3,
+   "id": "V-321",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 10,
+   "sample": [],
+   "header": "// V-321 (catalog, verbatim): regulatory record kinds never share one node."
+  },
+  {
+   "n": 4,
+   "id": "V-322",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 9,
+   "sample": [],
+   "header": "// V-322 (catalog, verbatim): live projection Product.status = 'APPROVED' requires an APPROVAL status of that product."
+  },
+  {
+   "n": 5,
+   "id": "V-322r",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 13,
+   "sample": [],
+   "header": "// V-322r (proposed revision, W13-D12): Product.status = 'APPROVED' requires a current APPROVAL status of that product that\n// itself results from an approving response; V-322 as written is satisfied by an unbacked APPROVAL status (fixture N-07)."
+  },
+  {
+   "n": 6,
+   "id": "V-323",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 7,
+   "sample": [],
+   "header": "// V-323 (catalog, verbatim): establishment or facility registration is a status of a Facility only."
+  },
+  {
+   "n": 7,
+   "id": "V-333",
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 18,
+   "sample": [
+    {
+     "check": "V-333",
+     "statusUid": "hu:regulatory-status:us-synthetic-ldt-ed-v2",
+     "statusKind": "ENFORCEMENT_DISCRETION",
+     "subjects": 2
+    },
+    {
+     "check": "V-333",
+     "statusUid": "hu:regulatory-status:neg-inspection-as-status",
+     "statusKind": "INSPECTED_OAI",
+     "subjects": 1
+    }
+   ],
+   "header": "// V-333 (catalog, verbatim): regulatory statuses carry a known status kind, a jurisdiction, and exactly one subject.\n// W13-D11: counts STATUS_OF edges, so it fires on a status with two recorded-time episodes; see V-333r."
+  },
+  {
+   "n": 8,
+   "id": "V-333r",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 8,
+   "sample": [
+    {
+     "check": "V-333r",
+     "statusUid": "hu:regulatory-status:neg-inspection-as-status",
+     "statusKind": "INSPECTED_OAI",
+     "subjects": 1,
+     "currentEpisodes": 1
+    }
+   ],
+   "header": "// V-333r (proposed revision): exactly one distinct subject over all STATUS_OF episodes; at most one current episode."
+  },
+  {
+   "n": 9,
+   "id": "V-334",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 8,
+   "sample": [],
+   "header": "// V-334 (catalog, verbatim): a status cannot outlive the legal basis it depends on."
+  },
+  {
+   "n": 10,
+   "id": "V-334r",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 15,
+   "sample": [],
+   "header": "// V-334r (proposed revision): the current STATUS_OF episode of a status under a legal-basis version neither starts before\n// nor ends after the current HAS_PATHWAY_VERSION episode of that version (null validTo on the status = may outlive)."
+  },
+  {
+   "n": 11,
+   "id": "V-335",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 10,
+   "sample": [],
+   "header": "// V-335 (catalog, verbatim): an accepted company characterization of an agency action requires a BellLabs adjudication."
+  },
+  {
+   "n": 12,
+   "id": "V-336",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 7,
+   "sample": [],
+   "header": "// V-336 (catalog, verbatim; INV-304): an APPROVAL status results from an approving agency response."
+  },
+  {
+   "n": 13,
+   "id": "V-331",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 7,
+   "sample": [],
+   "header": "// V-331 (catalog, verbatim; informational): NDI and GRAS responses keep the agency's conditions of use."
+  },
+  {
+   "n": 14,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 15,
+   "sample": [
+    {
+     "check": "V-W13-01",
+     "fromUid": "hu:regulatory-status:neg-inspection-as-status",
+     "edge": "STATUS_OF",
+     "target": [
+      "Entity",
+      "Facility"
+     ],
+     "targetUid": "hu:facility:nutratech-phoenix-ny"
+    }
+   ],
+   "header": "// V-W13-01: STATUS_OF / SUBMISSION_ABOUT targets are RegulatorySubjectTarget members; ESTABLISHMENT_REGISTRATION <-> Facility\n// in both directions; OrphanDesignation / DrugApproval subjects are material, mixture, intervention or product."
+  },
+  {
+   "n": 15,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 113,
+   "sample": [
+    {
+     "check": "V-W13-02",
+     "nodeUid": "hu:regulatory-status:neg-inspection-as-status",
+     "label": "RegulatoryStatus",
+     "value": "INSPECTED_OAI"
+    }
+   ],
+   "header": "// V-W13-02: closed enum values (service-enforced in GraphQL; this detects Cypher writes)."
+  },
+  {
+   "n": 16,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 99,
+   "sample": [],
+   "header": "// V-W13-03: the response kind belongs to the closed list of its submission's pathway kind."
+  },
+  {
+   "n": 17,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 6,
+   "sample": [],
+   "header": "// V-W13-04: exactly one UNDER_PATHWAY per submission, and submissionKind equals that pathway's pathwayKind; jurisdictions agree."
+  },
+  {
+   "n": 18,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 91,
+   "sample": [],
+   "header": "// V-W13-05: a legal-basis version used by a status or submission belongs to that record's pathway."
+  },
+  {
+   "n": 19,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 121,
+   "sample": [],
+   "header": "// V-W13-06: HAS_PATHWAY_VERSION is EXCLUSIVE per pathway: no two current episodes to different versions overlap in valid\n// time, and one version has at most one current episode (null bounds are unknown and treated as possibly overlapping)."
+  },
+  {
+   "n": 20,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 223,
+   "sample": [
+    {
+     "check": "V-W13-07",
+     "edge": "STATUS_OF",
+     "fromUid": "hu:regulatory-status:neg-inspection-as-status",
+     "toUid": "hu:facility:nutratech-phoenix-ny",
+     "cited": "hu:assertion:none"
+    }
+   ],
+   "header": "// V-W13-07: asserted regulatory edges carry the asserted_edge profile and cite an assertion with the same predicate, subject and object."
+  },
+  {
+   "n": 21,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 152,
+   "sample": [],
+   "header": "// V-W13-08: legacy derived HAS_REGULATORY_STATUS / FOLLOWS_PATHWAY carry a rule and only matching input assertions."
+  },
+  {
+   "n": 22,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 66,
+   "sample": [
+    {
+     "check": "V-W13-09",
+     "nodeUid": "hu:regulatory-status:neg-inspection-as-status",
+     "label": "RegulatoryStatus",
+     "issuers": 0,
+     "submissions": 0,
+     "bases": 0
+    }
+   ],
+   "header": "// V-W13-09: every response has exactly one submission and one issuer; every status has exactly one issuer and one legal basis."
+  },
+  {
+   "n": 23,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 65,
+   "sample": [],
+   "header": "// V-W13-10: jurisdiction partition: a status's jurisdiction equals its legal-basis pathway's; a response's equals its submission's."
+  },
+  {
+   "n": 24,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 54,
+   "sample": [],
+   "header": "// V-W13-11 (candidate): an inspection has exactly one inspected Facility and one conducting agency; it never yields a status."
+  },
+  {
+   "n": 25,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 111,
+   "sample": [],
+   "header": "// V-W13-12: forbidden regulatory implications used as derivation premises (12 catalog pairs, premise read from the input\n// assertion's predicate, or the statusKind / responseKind of its subject)."
+  }
+ ]
+}

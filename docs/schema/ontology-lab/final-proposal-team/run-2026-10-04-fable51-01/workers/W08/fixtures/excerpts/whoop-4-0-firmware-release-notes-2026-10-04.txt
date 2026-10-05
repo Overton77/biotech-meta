@@ -1,0 +1,21 @@
+Source: https://support.whoop.com/s/article/WHOOP-4-0-Firmware-Release-Notes (rendered as ?language=en_US)
+Retrieved: 2026-10-04 via Firecrawl scrape (cacheState: miss; waitFor 5000 ms; onlyMainContent). Tavily extract of the same URL returned only a "CSS Error" shell (BLOCKED-equivalent).
+Capture: PARTIAL_EXCERPT (main article body only; no per-release dates exist on the page).
+---
+WHOOP 4.0 Firmware Release Notes
+- May 23, 2025
+Last Published Date
+5/23/2025 8:15 PM
+At WHOOP, we strive to continuously improve our product. We deliver these improvements via regular firmware updates. Each release contains various minor bug fixes and improvements, detailed in the release notes below.
+Release notes for the device's core firmware and Bluetooth firmware are listed below.
+Note: we release firmware updates in phases, allowing us to monitor the performance of new releases. This allows us to make any necessary changes before all members receive an update. If you see new release notes but do not see a prompt to update your firmware, please be patient and check your app for an available update at a later time. It may take 1-2 weeks before all of our members receive the update.
+Firmware version 41.17.4.0 (current version) - Improved system stability - Improved wear detection - Bug fixes and platform improvements
+Firmware version 41.17.2.0 - Enhancements to Heart Rate accuracy - Enhancements to Wear Detection - Bug Fixes - Improved error reporting
+Firmware version 41.16.4.0 - Improved strap stability - Improved error reporting - Bug Fixes
+Firmware version 41.16.2.0 - Improved strap stability and issue reporting - Bug fixes
+Firmware version 41.16.1.0 - Improved heart rate estimation algorithm
+Firmware version 41.15.3.0 - Improved strap stability and issue reporting - Bug fixes
+Firmware version 41.13.2.0 - Bug fixes and general enhancements - Optimizations to improve battery life | Bluetooth firmware 17.2.2.0 - Current version - Minor bug fixes and performance improvements
+Firmware version 41.11.7.0 - Improved HR estimation during sleep - Bug fixes and improvements
+Firmware version 41.10.1.0 - Major update to Wear Detection algorithms. ... - Improvements to SpO2 (Blood Oxygen) measurements
+(The table repeats rows 41.13.2.0 to 41.16.3.0 a second time in ascending order after 41.8.0.29; 41.16.3.0 appears only in the repeated block.)

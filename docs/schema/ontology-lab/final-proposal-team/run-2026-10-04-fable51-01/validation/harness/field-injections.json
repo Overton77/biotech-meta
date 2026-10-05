@@ -1,0 +1,271 @@
+[
+ {
+  "type": "Organization",
+  "fields": [
+   "\"\"\"class: asserted; cardinality: many; catalog: DEVELOPS_PLATFORM (registry: W08); request: W08-SR-07, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse of TechnologyPlatform.developedBy.\"\"\"\ndevelopsPlatforms: [TechnologyPlatform!]! @relationship(type: \"DEVELOPS_PLATFORM\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: USES_PLATFORM (registry: W08); request: W08-SR-07, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Use never implies operating capability (FI [USES_PLATFORM, OPERATING_CAPABILITY]).\"\"\"\nusesPlatforms: [TechnologyPlatform!]! @relationship(type: \"USES_PLATFORM\", direction: OUT, properties: \"UsageEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: USES_EQUIPMENT (registry: W08); request: W08-SR-07, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Successor of live usesTools (USES), renamed so USES keeps the W16 step meaning; never implies operating capability.\"\"\"\nusesEquipment: [ToolOrInstrument!]! @relationship(type: \"USES_EQUIPMENT\", direction: OUT, properties: \"UsageEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: PERFORMS_PROCESS (registry: W11); request: W11-SR-06, W01-SR-13, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Owning a specification never implies performing (FI [OWNS_SPECIFICATION, PERFORMS_PROCESS]).\"\"\"\nperformsProcesses: [ManufacturingProcess!]! @relationship(type: \"PERFORMS_PROCESS\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: HAS_CAPABILITY_STATE (registry: W11); request: W11-SR-06, W01-SR-13, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). predicateExclusivity EXCLUSIVE per CAPABILITY_FOR_PROCESS/CAPABILITY_FOR_MATERIAL path (W00-R-07).\"\"\"\ncapabilityStates: [ManufacturingCapability!]! @relationship(type: \"HAS_CAPABILITY_STATE\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: HOSTS_LISTING (registry: W15); request: W15-SR-01(c), W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Never implies SELLS_PRODUCT.\"\"\"\nhostsListings: [MerchantListing!]! @relationship(type: \"HOSTS_LISTING\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: LISTS_OFFER (registry: W15); request: W15-SR-01(c), W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Never implies SELLS_PRODUCT.\"\"\"\nlistsOffers: [Offer!]! @relationship(type: \"LISTS_OFFER\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: SELLER_OF_RECORD_FOR (registry: W15); request: W15-SR-01(c), W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Sole premise of SELLS_PRODUCT.\"\"\"\nsellerOfRecordFor: [Offer!]! @relationship(type: \"SELLER_OF_RECORD_FOR\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: FULFILLS_OFFER (registry: W15); request: W15-SR-01(c), W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Never implies SELLS_PRODUCT.\"\"\"\nfulfillsOffers: [Offer!]! @relationship(type: \"FULFILLS_OFFER\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: AFFILIATE_FOR_OFFER (registry: W15); request: W15-SR-01(c), W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). FINANCIAL_INTEREST member; never implies ENDORSES_PRODUCT or SELLS_PRODUCT.\"\"\"\naffiliateForOffers: [Offer!]! @relationship(type: \"AFFILIATE_FOR_OFFER\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: derived read-only; cardinality: many; catalog: SELLS_PRODUCT (registry: W15); request: W15-SR-01(c); injected at merge (reports/04-seam-closure-ledger.md). From ACCEPTED SELLER_OF_RECORD_FOR only (INV-306, V-326a/b/c, V-W15-01).\"\"\"\nsellsProductVariants: [ProductVariant!]! @relationship(type: \"SELLS_PRODUCT\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"class: derived read-only; cardinality: many; catalog: SELLS_PRODUCT (registry: W15); request: W15-SR-01(c); injected at merge (reports/04-seam-closure-ledger.md). Product-level SELLS_PRODUCT projection (INV-306, V-W15-01).\"\"\"\nsellsProducts: [Product!]! @relationship(type: \"SELLS_PRODUCT\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"class: asserted; cardinality: many; catalog: SPONSORS_CONTENT (registry: W21); request: W21-SR-08, W18-SR-06(b), W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). FINANCIAL_INTEREST member; replaces live SPONSORS; never implies ENDORSES_PRODUCT; V-W21-07 enforces endpoints.\"\"\"\nsponsorsContent: [SponsorableTarget!]! @relationship(type: \"SPONSORS_CONTENT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: OPERATES_CHANNEL (registry: W21); request: W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse of Channel.operators.\"\"\"\noperatesChannels: [Channel!]! @relationship(type: \"OPERATES_CHANNEL\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: HOSTS_EVENT (registry: W18); request: W18-SR-05, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Hosting never implies ENDORSES_PRODUCT.\"\"\"\nhostsEvents: [Event!]! @relationship(type: \"HOSTS_EVENT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: HOSTS_EVENT (registry: W18); request: W18-SR-05, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Conference half of the hostsEvents slot (same relationship type HOSTS_EVENT).\"\"\"\nhostsConferences: [Conference!]! @relationship(type: \"HOSTS_EVENT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: EXHIBITS_AT (registry: W18); request: W18-SR-05, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). participantRole required; exhibiting never implies ENDORSES_PRODUCT.\"\"\"\nexhibitsAt: [Conference!]! @relationship(type: \"EXHIBITS_AT\", direction: OUT, properties: \"EventRoleEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: INVOLVES (registry: W18); request: W18-SR-05; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Event.involves (participants are actors).\"\"\"\ninvolvedInEvents: [Event!]! @relationship(type: \"INVOLVES\", direction: IN, properties: \"EventRoleEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: SUBMITTED_BY (registry: W13); request: W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of RegulatorySubmission.submittedBy; a submission is never approval.\"\"\"\nsubmittedRegulatorySubmissions: [RegulatorySubmission!]! @relationship(type: \"SUBMITTED_BY\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: derived read-only; cardinality: many; catalog: SPONSORED_BY (registry: W09); request: W01-SR-17, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Study.sponsoredBy (rule inverse-of:SPONSORS_STUDY@1); the authoritative record is the SPONSORS_STUDY Assertion; sponsorship never implies execution.\"\"\"\nsponsorsStudies: [Study!]! @relationship(type: \"SPONSORED_BY\", direction: IN, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"class: derived read-only; cardinality: many; catalog: OPERATED_BY (registry: W09); request: W01-SR-17, W01-SR-20, W09-SR-05; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Study.operatedBy (rule inverse-of:SERVES_AS_CRO_FOR@1); a registry collaborator is not a CRO.\"\"\"\nservesAsCroFor: [Study!]! @relationship(type: \"OPERATED_BY\", direction: IN, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"class: asserted; cardinality: many; catalog: DEVELOPS_TREATMENT (registry: W06); request: W06-SR-06; injected at merge (reports/04-seam-closure-ledger.md). Sponsorship or manufacture never implies development (FI [SPONSORS_STUDY, DEVELOPS_TREATMENT], [MANUFACTURES_PRODUCT, DEVELOPS_TREATMENT]).\"\"\"\ndevelopsTreatments: [Treatment!]! @relationship(type: \"DEVELOPS_TREATMENT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: OFFERS_TREATMENT (registry: W06); request: W06-SR-06; injected at merge (reports/04-seam-closure-ledger.md).\"\"\"\noffersTreatments: [Treatment!]! @relationship(type: \"OFFERS_TREATMENT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: OFFERS_PROCEDURE (registry: W06); request: W06-SR-06; injected at merge (reports/04-seam-closure-ledger.md). Offering never implies performing (FI [OFFERS_PROCEDURE, PERFORMS_PROCEDURE]).\"\"\"\noffersProcedures: [Procedure!]! @relationship(type: \"OFFERS_PROCEDURE\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: OWNS_TRADEMARK (registry: W14); request: W14-SR-03(c); injected at merge (reports/04-seam-closure-ledger.md). Never implies OWNS_BRAND, MARKETS_PRODUCT, MANUFACTURES_PRODUCT or SUPPLIES_INGREDIENT_MATERIAL (INV-009, W14-D11).\"\"\"\nownsTrademarks: [Trademark!]! @relationship(type: \"OWNS_TRADEMARK\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: ASSIGNED_PATENT (registry: W14); request: W14-SR-03(c); injected at merge (reports/04-seam-closure-ledger.md). Assignee; never implies GRANTS_PATENT_LICENSE or LICENSES_PATENT.\"\"\"\nassignedPatentFamilies: [PatentFamily!]! @relationship(type: \"ASSIGNED_PATENT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: ASSIGNED_PATENT (registry: W14); request: W14-SR-03(c); injected at merge (reports/04-seam-closure-ledger.md). Assignee; never implies GRANTS_PATENT_LICENSE or LICENSES_PATENT.\"\"\"\nassignedPatentApplications: [PatentApplication!]! @relationship(type: \"ASSIGNED_PATENT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: ASSIGNED_PATENT (registry: W14); request: W14-SR-03(c); injected at merge (reports/04-seam-closure-ledger.md). Assignee; never implies GRANTS_PATENT_LICENSE or LICENSES_PATENT.\"\"\"\nassignedGrantedPatents: [GrantedPatent!]! @relationship(type: \"ASSIGNED_PATENT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: LICENSES_PATENT (registry: W14); request: W14-SR-03(c); injected at merge (reports/04-seam-closure-ledger.md). Licensee -> license terms (W14-D05).\"\"\"\nlicensesPatents: [PatentLicense!]! @relationship(type: \"LICENSES_PATENT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: GRANTS_PATENT_LICENSE (registry: W14); request: W14-SR-03(a)(c); injected at merge (reports/04-seam-closure-ledger.md). Licensor; never inferred from the assignee (W14-D05).\"\"\"\ngrantsPatentLicenses: [PatentLicense!]! @relationship(type: \"GRANTS_PATENT_LICENSE\", direction: OUT, properties: \"AssertedEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "Facility",
+  "fields": [
+   "\"\"\"class: asserted; cardinality: many; catalog: HOSTS_PROCESS (registry: W11); request: W11-SR-06, W01-SR-13, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Successor of live PhysicalLocation.hostsProcesses.\"\"\"\nhostsProcesses: [ManufacturingProcess!]! @relationship(type: \"HOSTS_PROCESS\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: HAS_CAPABILITY_STATE (registry: W11); request: W11-SR-06, W01-SR-13, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). predicateExclusivity EXCLUSIVE per CAPABILITY_FOR_PROCESS/CAPABILITY_FOR_MATERIAL path (W00-R-07).\"\"\"\ncapabilityStates: [ManufacturingCapability!]! @relationship(type: \"HAS_CAPABILITY_STATE\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: STATUS_OF (registry: W13); request: W01-SR-20, W13-SR-10; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of RegulatoryStatus.statusOf (e.g. ESTABLISHMENT_REGISTRATION); registration is never approval.\"\"\"\nregulatoryStatuses: [RegulatoryStatus!]! @relationship(type: \"STATUS_OF\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: COVERS (registry: W12); request: W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of CertificationScope.covers; facility certification is not lot certification.\"\"\"\ncertificationScopes: [CertificationScope!]! @relationship(type: \"COVERS\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: AVAILABLE_IN (registry: W15); request: W15-SR-01(c); injected at merge (reports/04-seam-closure-ledger.md). Live AVAILABLE_IN re-ranged from PhysicalLocation (W01-SR-15a).\"\"\"\navailableListings: [MerchantListing!]! @relationship(type: \"AVAILABLE_IN\", direction: IN, properties: \"ListingEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "Person",
+  "fields": [
+   "\"\"\"class: asserted; cardinality: many; catalog: APPEARS_IN (registry: W21); request: W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse of Episode.personsInEpisode; an appearance is never an endorsement.\"\"\"\nappearsIn: [Episode!]! @relationship(type: \"APPEARS_IN\", direction: OUT, properties: \"AppearanceProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: SERVES_ON_CHANNEL (registry: W21); request: W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse of Channel.hosts.\"\"\"\nservesOnChannels: [Channel!]! @relationship(type: \"SERVES_ON_CHANNEL\", direction: OUT, properties: \"AppearanceProperties\")",
+   "\"\"\"class: derived read-only; cardinality: many; catalog: RECOMMENDS (registry: W21); request: W21-SR-07, W21-SR-18, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Rule mode: derivationRule + exactly one derivedFromAssertionUids whose assertion has speechAct RECOMMENDS by this person (W00-R-25, V-W21-06); never assertionUid.\"\"\"\nrecommends: [RecommendableTarget!]! @relationship(type: \"RECOMMENDS\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"class: asserted; cardinality: many; catalog: SPEAKS_AT (registry: W18); request: W18-SR-05, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Public persons only; participantRole required; an event role title never creates EMPLOYED_BY.\"\"\"\nspeaksAt: [Event!]! @relationship(type: \"SPEAKS_AT\", direction: OUT, properties: \"EventRoleEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: ATTENDS (registry: W18); request: W18-SR-05, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Public persons only.\"\"\"\nattends: [Conference!]! @relationship(type: \"ATTENDS\", direction: OUT, properties: \"EventRoleEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: INVOLVES (registry: W18); request: W18-SR-05; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Event.involves; public persons only.\"\"\"\ninvolvedInEvents: [Event!]! @relationship(type: \"INVOLVES\", direction: IN, properties: \"EventRoleEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: RECORDS (registry: W16); request: W16-SR-05, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Public persons and published self-reports only (CL-018, V-532p, V-W23-05).\"\"\"\nrecordsObservations: [Observation!]! @relationship(type: \"RECORDS\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: POSTS_RESULT (registry: W16); request: W16-SR-05, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Public persons and published self-reports only (CL-018, V-532p, V-W23-05).\"\"\"\npostsResults: [ProtocolResult!]! @relationship(type: \"POSTS_RESULT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: AUTHORED_BY (registry: W20); request: W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Document.authoredBy.\"\"\"\nauthoredDocuments: [Document!]! @relationship(type: \"AUTHORED_BY\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: AFFILIATE_FOR_OFFER (registry: W15); request: W15-SR-01(c), W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). FINANCIAL_INTEREST member; public persons only.\"\"\"\naffiliateForOffers: [Offer!]! @relationship(type: \"AFFILIATE_FOR_OFFER\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: derived read-only; cardinality: many; catalog: INVESTIGATED_BY (registry: W09); request: W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Study.investigatedBy.\"\"\"\ninvestigatedStudies: [Study!]! @relationship(type: \"INVESTIGATED_BY\", direction: IN, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "PseudonymousActor",
+  "fields": [
+   "\"\"\"class: structural; cardinality: many; catalog: ON_PLATFORM (registry: W21); request: W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse of Platform.pseudonymousAccounts (account on platform; the Episode-level ON_PLATFORM is retired).\"\"\"\nonPlatforms: [Platform!]! @relationship(type: \"ON_PLATFORM\", direction: OUT, properties: \"StructuralEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "ConsumerBrand",
+  "fields": [
+   "\"\"\"class: asserted; cardinality: many; catalog: SPONSORS_CONTENT (registry: W21); request: W21-SR-08, W01-SR-20; injected at merge (reports/04-seam-closure-ledger.md). FINANCIAL_INTEREST member; never implies ENDORSES_PRODUCT.\"\"\"\nsponsorsContent: [SponsorableTarget!]! @relationship(type: \"SPONSORS_CONTENT\", direction: OUT, properties: \"AssertedEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "Product",
+  "fields": [
+   "\"\"\"class: asserted (candidate); cardinality: many; catalog: EMBODIES_MODEL (registry: W08); request: W08-SR-03, W04-SR-08; injected at merge (reports/04-seam-closure-ledger.md). Successor of live CLASSIFIED_AS (the two legacy read-only fields stay for migration); regulatory classification stays on W13 RegulatoryStatus.\"\"\"\nembodiesModels: [EquipmentModelTarget!]! @relationship(type: \"EMBODIES_MODEL\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (candidate); cardinality: many; catalog: RUNS_ON_DEVICE (registry: W08); request: W08-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Software products that run on a device model; asserter normally the applicant or the vendor.\"\"\"\nrunsOnDevices: [Device!]! @relationship(type: \"RUNS_ON_DEVICE\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: derived read-only; cardinality: many; catalog: CERTIFIED_UNDER (registry: W12); request: W12-SR-05; injected at merge (reports/04-seam-closure-ledger.md). Written only when a CertificationScope COVERS the product itself (FI [LOT_COVERED, PRODUCT_CERTIFIED]).\"\"\"\ncertifiedUnder: [CertificationListing!]! @relationship(type: \"CERTIFIED_UNDER\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: COMPONENT_PRODUCT (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md). Product-level kit component.\"\"\"\nbundleComponents: [BundleComponent!]! @relationship(type: \"COMPONENT_PRODUCT\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: derived read-only (inverse view); cardinality: many; catalog: SELLS_PRODUCT (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of SELLS_PRODUCT (INV-306).\"\"\"\nsoldBy: [Organization!]! @relationship(type: \"SELLS_PRODUCT\", direction: IN, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "ProductVariant",
+  "fields": [
+   "\"\"\"class: derived read-only; cardinality: many; catalog: CERTIFIED_UNDER (registry: W12); request: W12-SR-05; injected at merge (reports/04-seam-closure-ledger.md). Written only when a CertificationScope COVERS the variant itself.\"\"\"\ncertifiedUnder: [CertificationListing!]! @relationship(type: \"CERTIFIED_UNDER\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: LISTING_FOR (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md). A listing is never the item's identity.\"\"\"\nlistedIn: [MerchantListing!]! @relationship(type: \"LISTING_FOR\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: INVENTORY_INSTANCE_OF (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md).\"\"\"\ninventoryItems: [InventoryItem!]! @relationship(type: \"INVENTORY_INSTANCE_OF\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: COMPONENT_PRODUCT (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md).\"\"\"\nbundleComponents: [BundleComponent!]! @relationship(type: \"COMPONENT_PRODUCT\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: derived read-only (inverse view); cardinality: many; catalog: SELLS_PRODUCT (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of SELLS_PRODUCT (INV-306).\"\"\"\nsoldBy: [Organization!]! @relationship(type: \"SELLS_PRODUCT\", direction: IN, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md). Same property-less form as W15's own MATCHES_COMMERCE_ITEM fields.\"\"\"\ncommerceMatches: [CommerceMatch!]! @relationship(type: \"MATCHES_COMMERCE_ITEM\", direction: IN)"
+  ]
+ },
+ {
+  "type": "PackageConfiguration",
+  "fields": [
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: LISTING_FOR (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md). A listing is never the item's identity.\"\"\"\nlistedIn: [MerchantListing!]! @relationship(type: \"LISTING_FOR\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: INVENTORY_INSTANCE_OF (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md).\"\"\"\ninventoryItems: [InventoryItem!]! @relationship(type: \"INVENTORY_INSTANCE_OF\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: COMPONENT_PRODUCT (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md).\"\"\"\nbundleComponents: [BundleComponent!]! @relationship(type: \"COMPONENT_PRODUCT\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM (registry: W15); request: W15-SR-02; injected at merge (reports/04-seam-closure-ledger.md). Same property-less form as W15's own MATCHES_COMMERCE_ITEM fields.\"\"\"\ncommerceMatches: [CommerceMatch!]! @relationship(type: \"MATCHES_COMMERCE_ITEM\", direction: IN)"
+  ]
+ },
+ {
+  "type": "LabelDeclaration",
+  "fields": [
+   "\"\"\"class: structural (inverse view); cardinality: many; catalog: REGION_HAS_DECLARATION (registry: W22); request: W22-SR-07(b); injected at merge (reports/04-seam-closure-ledger.md). Image regions that locate this declaration; the declaration stays the W04 record (D-010).\"\"\"\nlabelRegions: [ProductLabelRegion!]! @relationship(type: \"REGION_HAS_DECLARATION\", direction: IN, properties: \"StructuralEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "IngredientMaterial",
+  "fields": [
+   "\"\"\"class: structural (inverse view); cardinality: many; catalog: CAPABILITY_FOR_MATERIAL (registry: W11); request: W11-SR-05; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of ManufacturingCapability.forMaterial.\"\"\"\ncapabilityStates: [ManufacturingCapability!]! @relationship(type: \"CAPABILITY_FOR_MATERIAL\", direction: IN, properties: \"StructuralEdgeProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: INPUTS (registry: W11); request: W11-SR-05; injected at merge (reports/04-seam-closure-ledger.md). Process role on the edge (D-008: no ProcessMaterial); input never implies containment (FI [INPUTS, CONTAINS]).\"\"\"\nusedAsProcessInput: [ManufacturingStep!]! @relationship(type: \"INPUTS\", direction: IN, properties: \"ProcessIoProperties\")",
+   "\"\"\"class: structural; cardinality: many; catalog: HAS_SAFETY_SIGNAL (registry: W17); request: W02-SR-14, W17-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Subject attachment of an immutable SafetySignal assessment (D-W17-02); successor of live Ingredient.hasSafetySignals.\"\"\"\nhasSafetySignals: [SafetySignal!]! @relationship(type: \"HAS_SAFETY_SIGNAL\", direction: OUT, properties: \"SafetyEdgeProperties\")",
+   "\"\"\"class: asserted; cardinality: many; catalog: DERIVED_FROM_TAXON (registry: W02); request: W05-SR-03; injected at merge (reports/04-seam-closure-ledger.md). Domain widened from BotanicalPreparation to IngredientMaterial so a reference food can name its taxon.\"\"\"\nderivedFromTaxa: [BotanicalTaxon!]! @relationship(type: \"DERIVED_FROM_TAXON\", direction: OUT, properties: \"AssertedEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "ChemicalSubstance",
+  "fields": [
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: INPUTS (registry: W11); request: W11-SR-05; injected at merge (reports/04-seam-closure-ledger.md).\"\"\"\nusedAsProcessInput: [ManufacturingStep!]! @relationship(type: \"INPUTS\", direction: IN, properties: \"ProcessIoProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: OUTPUTS (registry: W11); request: W11-SR-05; injected at merge (reports/04-seam-closure-ledger.md).\"\"\"\nproducedAsProcessOutput: [ManufacturingStep!]! @relationship(type: \"OUTPUTS\", direction: IN, properties: \"ProcessIoProperties\")",
+   "\"\"\"class: structural; cardinality: many; catalog: HAS_SAFETY_SIGNAL (registry: W17); request: W02-SR-14, W17-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Subject attachment of an immutable SafetySignal assessment (D-W17-02); successor of live Compound.hasSafetySignals.\"\"\"\nhasSafetySignals: [SafetySignal!]! @relationship(type: \"HAS_SAFETY_SIGNAL\", direction: OUT, properties: \"SafetyEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "FoodItem",
+  "fields": [
+   "\"\"\"class: asserted; cardinality: many; catalog: DERIVED_FROM_TAXON (registry: W02); request: W05-SR-03; injected at merge (reports/04-seam-closure-ledger.md). FoodItem is an IngredientMaterial specialization; FoodItem.scientificNameVerbatim stays the verbatim string.\"\"\"\nderivedFromTaxa: [BotanicalTaxon!]! @relationship(type: \"DERIVED_FROM_TAXON\", direction: OUT, properties: \"AssertedEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "Condition",
+  "fields": [
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: TARGETS_CONDITION (registry: W06); request: W06-SR-11, W03-SR-12(d); injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Treatment.targetsConditions; intent is not result.\"\"\"\ntreatedBy: [Treatment!]! @relationship(type: \"TARGETS_CONDITION\", direction: IN, properties: \"TreatmentTargetProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: INVESTIGATES (registry: W09); request: W03-SR-12(d); injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Study.investigatesConditions.\"\"\"\ninvestigatedByStudies: [Study!]! @relationship(type: \"INVESTIGATES\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: structural (inverse view); cardinality: many; catalog: RELATES_TO_CONDITION (registry: W17); request: W03-SR-12(d), W17-SR-10; injected at merge (reports/04-seam-closure-ledger.md). Pre-existing condition that scopes the signal.\"\"\"\nrelatedSafetySignals: [SafetySignal!]! @relationship(type: \"RELATES_TO_CONDITION\", direction: IN, properties: \"StructuralEdgeProperties\")",
+   "\"\"\"class: derived read-only (inverse view); cardinality: many; catalog: INDICATES (registry: W07); request: W03-SR-12(d), W07-SR-07; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Biomarker.indicatesConditions.\"\"\"\nindicatedByBiomarkers: [Biomarker!]! @relationship(type: \"INDICATES\", direction: IN, properties: \"AssociationProjectionProperties\") @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "Species",
+  "fields": [
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: STUDIED_IN (registry: W09); request: W03-SR-12(d) (D-W03-13); injected at merge (reports/04-seam-closure-ledger.md). Human studies only (W03-SR-09); preclinical species come from MechanismEvidenceContext IN_SPECIES.\"\"\"\nstudiedIn: [Study!]! @relationship(type: \"STUDIED_IN\", direction: IN, properties: \"AssertedEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "PanelDefinition",
+  "fields": [
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: IMPLEMENTS_PANEL (registry: W15); request: W15-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Live IMPLEMENTS_PANEL from MerchantListing.\"\"\"\nimplementedByListings: [MerchantListing!]! @relationship(type: \"IMPLEMENTS_PANEL\", direction: IN, properties: \"AssertedEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "AssayVersion",
+  "fields": [
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: PERFORMED_WITH_ASSAY_VERSION (registry: W07); request: W08-SR-01; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of Device.performedWithAssayVersions (domain widened LabTest|Device).\"\"\"\nusedByDevices: [Device!]! @relationship(type: \"PERFORMED_WITH_ASSAY_VERSION\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: structural (candidate); cardinality: zero_or_one; catalog: RUNS_FIRMWARE_VERSION (registry: W08); request: W08-SR-05; injected at merge (reports/04-seam-closure-ledger.md). softwareVersion = FirmwareVersion.versionLabel when the edge exists (V-W08-05); softwareVersion stays identity-defining.\"\"\"\nrunsFirmwareVersion: [FirmwareVersion!]! @relationship(type: \"RUNS_FIRMWARE_VERSION\", direction: OUT, properties: \"StructuralEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "Study",
+  "fields": [
+   "\"\"\"class: derived read-only; cardinality: many; catalog: REPORTS_SAFETY_SIGNAL (registry: W17); request: W17-SR-08(b), W09-SR-10; injected at merge (reports/04-seam-closure-ledger.md). Rule ss-study/v1 over the signal's AE inputs; the authoritative path is SIGNAL_BASED_ON -> AdverseEventResult -> RESULT_FOR_ARM -> arm -> Study.\"\"\"\nreportsSafetySignals: [SafetySignal!]! @relationship(type: \"REPORTS_SAFETY_SIGNAL\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "SpecificationVersion",
+  "fields": [
+   "\"\"\"class: structural (inverse view); cardinality: many; catalog: CRITERION_OF_SPECIFICATION (registry: W12); request: W12-SR-10, W11-SR-03; injected at merge (reports/04-seam-closure-ledger.md). Inverse view of SpecificationCriterion.criterionOf (D-009).\"\"\"\ncriteria: [SpecificationCriterion!]! @relationship(type: \"CRITERION_OF_SPECIFICATION\", direction: IN, properties: \"StructuralEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "ProductLot",
+  "fields": [
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: UNIT_FROM_LOT (registry: W15); request: W15-SR-03; injected at merge (reports/04-seam-closure-ledger.md). A printed code is not lot identity.\"\"\"\nunits: [IndividualUnit!]! @relationship(type: \"UNIT_FROM_LOT\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM (registry: W15); request: W15-SR-03; injected at merge (reports/04-seam-closure-ledger.md). RECALL_SCOPE candidates (V-W15-07); no recall property on ProductLot.\"\"\"\ncommerceMatches: [CommerceMatch!]! @relationship(type: \"MATCHES_COMMERCE_ITEM\", direction: IN)"
+  ]
+ },
+ {
+  "type": "PriceObservation",
+  "fields": [
+   "\"\"\"class: structural; cardinality: zero_or_one; catalog: SUPPORTED_BY (registry: W00); request: W15-SR-09(b) (ruling W00-R-22); injected at merge (reports/04-seam-closure-ledger.md). The span that showed the price; sourceLocatorUid stays only as a denormalized cache checked by V-W15-08 (W15 fallback).\"\"\"\nsupportedBy: [SourceLocator!]! @relationship(type: \"SUPPORTED_BY\", direction: OUT)"
+  ]
+ },
+ {
+  "type": "AffiliateLink",
+  "fields": [
+   "\"\"\"class: structural; cardinality: zero_or_one; catalog: SUPPORTED_BY (registry: W00); request: W15-SR-09(b) (ruling W00-R-22); injected at merge (reports/04-seam-closure-ledger.md). The span that carried the link; sourceLocatorUid stays only as a denormalized cache checked by V-W15-08 (W15 fallback).\"\"\"\nsupportedBy: [SourceLocator!]! @relationship(type: \"SUPPORTED_BY\", direction: OUT)"
+  ]
+ },
+ {
+  "type": "Document",
+  "fields": [
+   "\"\"\"class: asserted; cardinality: many; catalog: PRESENTED_AT (registry: W18); request: W18-SR-07; injected at merge (reports/04-seam-closure-ledger.md). A deck is never a rendition of a talk (W00 R4); the occurrence link works for unrecorded sessions.\"\"\"\npresentedAt: [Event!]! @relationship(type: \"PRESENTED_AT\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: SPONSORS_CONTENT (registry: W21); request: W21-SR-08; injected at merge (reports/04-seam-closure-ledger.md). Document is a SponsorableTarget member.\"\"\"\nsponsoringOrganizations: [Organization!]! @relationship(type: \"SPONSORS_CONTENT\", direction: IN, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (inverse view); cardinality: many; catalog: SPONSORS_CONTENT (registry: W21); request: W21-SR-08; injected at merge (reports/04-seam-closure-ledger.md). Document is a SponsorableTarget member.\"\"\"\nsponsoringBrands: [ConsumerBrand!]! @relationship(type: \"SPONSORS_CONTENT\", direction: IN, properties: \"AssertedEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "Episode",
+  "fields": [
+   "\"\"\"class: asserted; cardinality: zero_or_one; catalog: RECORDING_OF (registry: W18); request: W18-SR-06(a), W21-SR-20; injected at merge (reports/04-seam-closure-ledger.md). Inverse of Event.recordings.\"\"\"\nrecordingOf: [Event!]! @relationship(type: \"RECORDING_OF\", direction: OUT, properties: \"RecordingEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "Claim",
+  "fields": [
+   "\"\"\"class: derived (inverse view); cardinality: many; catalog: INSTANCE_OF (registry: W21); request: W00-SR-15; injected at merge (reports/04-seam-closure-ledger.md). Generic Assertion instances (W00 Assertion.instanceOf); ClaimOccurrence/RelationshipAssertion nodes also carry the Assertion label and are returned here as well as by occurrences/relationshipAssertions.\"\"\"\nassertionInstances: [Assertion!]! @relationship(type: \"INSTANCE_OF\", direction: IN, properties: \"DerivedEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "ClaimEvidenceAssessment",
+  "fields": [
+   "\"\"\"class: structural; cardinality: many; catalog: CLAIM_EVIDENCE_BASED_ON (registry: W21); request: W10-SR-02; injected at merge (reports/04-seam-closure-ledger.md). Cites an existing EvidenceSynthesis for the same Claim (range extended to EvidenceSynthesis; same property-less form as the other CLAIM_EVIDENCE_BASED_ON fields).\"\"\"\nbasedOnSyntheses: [EvidenceSynthesis!]! @relationship(type: \"CLAIM_EVIDENCE_BASED_ON\", direction: OUT)"
+  ]
+ },
+ {
+  "type": "QuantitativeContentProperties",
+  "fields": [
+   "\"\"\"property; request: W05-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Food composition portion basis; controlled values EDIBLE_PORTION | AS_PURCHASED | DRY_WEIGHT | AS_PREPARED | NOT_STATED (String until an enum is registered).\"\"\"\nportionBasis: String",
+   "\"\"\"property; request: W05-SR-04; injected at merge (reports/04-seam-closure-ledger.md). How the source derived the value; controlled values ANALYTICAL | CALCULATED | IMPUTED | ASSUMED_ZERO | BELOW_LOQ | NOT_STATED (String until an enum is registered).\"\"\"\nvalueDerivation: String",
+   "\"\"\"property; request: W05-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Verbatim source derivation code (e.g. FDC 'A', 'Z').\"\"\"\nsourceDerivationCode: String",
+   "\"\"\"property; request: W05-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Number of analytical data points reported by the source (0 is a value, null is not reported).\"\"\"\ndataPoints: Int",
+   "\"\"\"property; request: W05-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Minimum of the sample spread as reported (unit = unitCode); distinct from quantityLow of a stated range.\"\"\"\nminValue: Float",
+   "\"\"\"property; request: W05-SR-04; injected at merge (reports/04-seam-closure-ledger.md). Maximum of the sample spread as reported (unit = unitCode); distinct from quantityHigh of a stated range.\"\"\"\nmaxValue: Float"
+  ]
+ },
+ {
+  "type": "ContraindicationAssertion",
+  "fields": [
+   "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\nmassBasis: MassBasis @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\namountReferent: AmountReferent @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "InteractionAssertion",
+  "fields": [
+   "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\nmassBasis: MassBasis @settable(onCreate: false, onUpdate: false)",
+   "\"\"\"property; request: W00-SR-01 (ruling W00-R-12); injected at merge (reports/04-seam-closure-ledger.md). Interface field required by AssertionArchetype (contract A11: every implementer carries it; MR-03 exact name and type); read-only like the type's other literal fields.\"\"\"\namountReferent: AmountReferent @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "Observation",
+  "fields": [
+   "\"\"\"class: derived; cardinality: many; catalog: COMPARED_TO (W07 D-W07 projection rule; DiagnosticResult -> DiagnosticResult; rule-only when same AssayVersion, else licensed by a ComparabilityAssessment via derivedFromAssessmentUids; V-302r, V-304r, V-312). Fable injection at Wave 5: W16 omitted the field W07's model card places on Observation.\"\"\"\ncomparedTo: [Observation!]! @relationship(type: \"COMPARED_TO\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false)"
+  ]
+ },
+ {
+  "type": "Biomarker",
+  "fields": [
+   "\"\"\"class: structural (candidate); cardinality: zero_or_one; catalog: HAS_ANALYTE (registry: W07, admitted by Fable ruling F-W5-01); request: W03-SR-03, W02-SR-08.\"\"\"\nanalyteSubstances: [ChemicalSubstance!]! @relationship(type: \"HAS_ANALYTE\", direction: OUT, properties: \"StructuralEdgeProperties\")",
+   "\"\"\"class: structural (candidate); cardinality: zero_or_one; catalog: HAS_ANALYTE (registry: W07, admitted by Fable ruling F-W5-01); request: W03-SR-03, W02-SR-08.\"\"\"\nanalyteMolecularEntities: [MolecularEntity!]! @relationship(type: \"HAS_ANALYTE\", direction: OUT, properties: \"StructuralEdgeProperties\")"
+  ]
+ },
+ {
+  "type": "MeasurementPlan",
+  "fields": [
+   "\"Anchor instant of the cadence window as the source states it (first dose, enrolment, previous draw); windows are [anchor + cadenceMinDays, anchor + cadenceMaxDays], never a midpoint. Null when the source states only a frequency (F-W5-13, CH-R-04).\"\ncadenceAnchorAt: DateTime",
+   "\"What the anchor is measured from, as stated: FIRST_DOSE, ENROLMENT, PREVIOUS_MEASUREMENT, CALENDAR (controlled string; F-W5-13).\"\ncadenceAnchorBasis: String"
+  ]
+ },
+ {
+  "type": "Protocol",
+  "fields": [
+   "\"\"\"class: asserted; cardinality: many; catalog: DERIVED_FROM_PROTOCOL (W16; admitted F-W5-14, CH-R-05). A protocol another party built from this one is its own Protocol linked here; it is NEVER an edition of the original (editions are the original author's versions or snapshot diffs of the original source; a third-party description of someone else's protocol is a THIRD_PARTY_REPORTED edition only when it reports the original, not a variant).\"\"\"\nderivedFromProtocols: [Protocol!]! @relationship(type: \"DERIVED_FROM_PROTOCOL\", direction: OUT, properties: \"AssertedEdgeProperties\")",
+   "\"\"\"class: asserted (inverse); catalog: DERIVED_FROM_PROTOCOL\"\"\"\nderivedProtocols: [Protocol!]! @relationship(type: \"DERIVED_FROM_PROTOCOL\", direction: IN, properties: \"AssertedEdgeProperties\")"
+  ]
+ }
+]

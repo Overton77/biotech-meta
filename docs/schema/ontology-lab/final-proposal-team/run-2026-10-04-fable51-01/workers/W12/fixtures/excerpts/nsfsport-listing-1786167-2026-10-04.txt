@@ -1,0 +1,15 @@
+SOURCE: https://www.nsfsport.com/certified-products/listing-detail.php?id=1786167
+CAPTURE: Firecrawl scrape (onlyMainContent, maxAge 0), 2026-10-04T01:04Z; COMPLETE for the Product Details table
+EXCERPT (verbatim):
+## Basis
+### Product Details
+| Brand | Elysium Health |
+| Country of Sale | United States |
+| Product Type | Cellular Support/Men/Senior/Vitamin/Women |
+| Purpose / Goal | Energy Enhancement Post-Workout Pre-Workout Recovery |
+| Lot # | P098-01 70579 70918 70969 70064 |
+| Product Form | Capsules |
+| Flavor | Other |
+| Package Size | 60 |
+| Serving Size | 2 capsules |
+Image path segment: info.nsf.org/Certified/Common/cfs/C0364723/C0848973/Elysium Health/Basis/1786167/

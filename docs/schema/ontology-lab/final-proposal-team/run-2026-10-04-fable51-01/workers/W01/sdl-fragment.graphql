@@ -1,0 +1,762 @@
+# =====================================================================================================
+# W01 Actors and institutional ecosystem -- SDL fragment (run-2026-10-04-fable51-01)
+# Worker: W01 (Opus 5.5). Coordinator/synthesizer: Fable 5.1.
+# Canonical catalog module: organizations (catalog 0.2.0, digest 8fb50ff0...84f0).
+# CQs served: CQ-EC-01, CQ-EC-02, CQ-EC-03, CQ-EC-04, CQ-CL-05, CQ-CL-07, CQ-MF-01, CQ-AX-18, CQ-TM-04,
+#             candidates CQ-EC-C01 (legal name / ticker as of a date), CQ-EC-C02 (control versus investment).
+# Contains ONLY the elements the ownership registry assigns to W01. Kernel interfaces, kernel enums,
+# W00 relationship-property types (AssertedEdgeProperties, StateEpisodeProperties, IdentifierLinkProperties)
+# and other owners' node types (Product, IngredientMaterial, Identifier, ...) are referenced by name only.
+# Fields on W01 types for relationships OWNED BY OTHER WORKERS (SPONSORS_CONTENT, OPERATES_CHANNEL, APPEARS_IN,
+# RECOMMENDS, AUTHORS, REPORTS, HOSTS_LISTING, STATUS_OF, HAS_CAPABILITY_STATE, ...) are NOT written here: they are
+# reserved as field slots in seam-requests.yaml (W01-SR-20) so that the relationship owner supplies the
+# definition and Fable inserts it into the W01 type at merge.
+# No `extend`, no @cypher/@customResolver/@populatedBy/@jwt/@subscription, no @unique, no @vector.
+# Checked: graphql-js parse OK; @neo4j/graphql 7.6.3 build OK together with kernel stubs (see 08-completion-report.md).
+# =====================================================================================================
+
+# -----------------------------------------------------------------------------------------------------
+# Enums (W01 sole writer). Values frozen at the live/catalog values; additions are ledger requests.
+# -----------------------------------------------------------------------------------------------------
+
+"""
+Coarse organization classification (catalog property organizationKind; live name organizationType kept).
+A classification, never a role: role-like values (MANUFACTURER, DISTRIBUTOR, INVESTOR, MARKETPLACE, RETAILER,
+EMPLOYER, CONTRACT_*) never imply the corresponding asserted relationship (INV-009). Lifecycle-like values
+(STARTUP, PUBLIC_COMPANY, PRIVATE_COMPANY, SUBSIDIARY) are state and are authoritative only on OrganizationSnapshot.
+"""
+enum OrganizationType {
+  COMPANY
+  PUBLIC_COMPANY
+  PRIVATE_COMPANY
+  STARTUP
+  SUBSIDIARY
+  HOLDING_COMPANY
+  OPERATING_COMPANY
+  CONTRACT_RESEARCH_ORGANIZATION
+  CONTRACT_DEVELOPMENT_AND_MANUFACTURING_ORGANIZATION
+  MANUFACTURER
+  BIOTECH_COMPANY
+  PHARMACEUTICAL_COMPANY
+  DIAGNOSTICS_COMPANY
+  MEDICAL_DEVICE_COMPANY
+  DIGITAL_HEALTH_COMPANY
+  CLINIC
+  HOSPITAL
+  HEALTH_SYSTEM
+  LABORATORY
+  RESEARCH_INSTITUTE
+  UNIVERSITY
+  NONPROFIT
+  FOUNDATION
+  GOVERNMENT_AGENCY
+  REGULATORY_AGENCY
+  INVESTOR
+  VENTURE_CAPITAL_FIRM
+  PRIVATE_EQUITY_FIRM
+  ACCELERATOR
+  INCUBATOR
+  DISTRIBUTOR
+  MARKETPLACE
+  RETAILER
+  INSURER
+  EMPLOYER
+  PROFESSIONAL_ASSOCIATION
+  STANDARDS_BODY
+  UNKNOWN
+}
+
+"""Funding stage as stated by a source at the time of an OrganizationSnapshot episode (state, not identity)."""
+enum FundingStage {
+  BOOTSTRAPPED
+  GRANT_FUNDED
+  PRE_SEED
+  SEED
+  SEED_EXTENSION
+  SERIES_A
+  SERIES_B
+  SERIES_C
+  SERIES_D_PLUS
+  GROWTH_EQUITY
+  PRIVATE_EQUITY_BACKED
+  PRE_IPO
+  IPO
+  PUBLIC
+  ACQUIRED
+  POST_MERGER
+  BANKRUPTCY_RESTRUCTURING
+  UNKNOWN
+}
+
+"""Employee head-count band as stated by a source for one OrganizationSnapshot episode."""
+enum EmployeeCountBand {
+  SOLO
+  MICRO_2_10
+  SMALL_11_50
+  SMALL_MID_51_200
+  MID_201_500
+  MID_LARGE_501_1000
+  LARGE_1001_5000
+  VERY_LARGE_5001_10000
+  ENTERPRISE_10001_PLUS
+  UNKNOWN
+}
+
+"""
+Kind of physical site (Facility.facilityKind) or the role a site plays for an operating organization
+(FacilityEdgeProperties.facilityRole). REMOTE and VIRTUAL are kept for live compatibility but are never written
+on a Facility (a Facility is a physical site; V-W01-04).
+"""
+enum LocationType {
+  HEADQUARTERS
+  REGISTERED_OFFICE
+  CORPORATE_OFFICE
+  ADMINISTRATIVE_OFFICE
+  RESEARCH_SITE
+  LABORATORY
+  CLINIC
+  HOSPITAL
+  MANUFACTURING_SITE
+  GMP_FACILITY
+  PILOT_PLANT
+  WAREHOUSE
+  DISTRIBUTION_CENTER
+  RETAIL_SITE
+  TESTING_SITE
+  COLLECTION_SITE
+  DATA_CENTER
+  CAMPUS
+  REMOTE
+  VIRTUAL
+  OTHER
+  UNKNOWN
+}
+
+"""
+Normalized role kind carried on a role edge as a qualifier of the edge type, never as a substitute for it:
+the edge type (BOARD_MEMBER_OF, ADVISES_ORGANIZATION, ...) is the predicate; roleType refines it
+(for example SCIENTIFIC_ADVISOR on ADVISES_ORGANIZATION). HOST, CO_HOST, GUEST are the catalog additions for
+APPEARS_IN (round 0006). BOARD_OBSERVER is never projected as BOARD_MEMBER_OF (an observer has no vote).
+"""
+enum RoleType {
+  FOUNDER
+  CO_FOUNDER
+  CEO
+  PRESIDENT
+  COO
+  CFO
+  CTO
+  CMO
+  CSO
+  BOARD_MEMBER
+  BOARD_OBSERVER
+  CHAIRPERSON
+  ADVISOR
+  SCIENTIFIC_ADVISOR
+  CLINICAL_ADVISOR
+  INVESTOR
+  LEAD_INVESTOR
+  EMPLOYEE
+  OPERATOR
+  SPONSOR
+  MANUFACTURER
+  DISTRIBUTOR
+  PARTNER
+  PRINCIPAL_INVESTIGATOR
+  AUTHOR
+  REVIEWER
+  SPEAKER
+  EXHIBITOR
+  HOST
+  CO_HOST
+  GUEST
+  UNKNOWN
+}
+
+"""Corporate office or board seat kind as printed in governance sources (proxy statements, annual reports)."""
+enum CorporateRoleType {
+  DIRECTOR
+  INDEPENDENT_DIRECTOR
+  EXECUTIVE_DIRECTOR
+  NON_EXECUTIVE_DIRECTOR
+  CHAIR
+  LEAD_INDEPENDENT_DIRECTOR
+  CEO
+  PRESIDENT
+  CFO
+  COO
+  CTO
+  CMO
+  CSO
+  GENERAL_COUNSEL
+  CORPORATE_SECRETARY
+  TREASURER
+  FOUNDER
+  CO_FOUNDER
+  MANAGING_PARTNER
+  PARTNER
+  PRINCIPAL
+  ASSOCIATE
+  UNKNOWN
+}
+
+"""Seniority band of a role as stated or normalized from a stated title."""
+enum SeniorityLevel {
+  BOARD
+  C_SUITE
+  SVP
+  VP
+  DIRECTOR
+  HEAD
+  MANAGER
+  INDIVIDUAL_CONTRIBUTOR
+  ADVISOR
+  UNKNOWN
+}
+
+"""
+Kind of compensation on RECEIVES_COMPENSATION_FROM (catalog organizations.assertedPredicates qualifier;
+values frozen at the catalog comment: FTC 16 CFR 255.5 material connections).
+"""
+enum CompensationKind {
+  PAYMENT
+  FREE_PRODUCT
+  COMMISSION
+  OTHER
+}
+
+# -----------------------------------------------------------------------------------------------------
+# Relationship-property types (W01 sole writer). Each embeds every field of the frozen
+# AssertedEdgeProperties (contract B4, asserted_edge profile) and adds domain qualifiers only.
+# -----------------------------------------------------------------------------------------------------
+
+"""
+asserted_edge profile + role qualifiers. Specializes AssertedEdgeProperties (all its fields are present with the
+same names, types and nullability). Used by BOARD_MEMBER_OF, EMPLOYED_BY, ADVISES_ORGANIZATION,
+FOUNDED_ORGANIZATION, HAS_IP_INTEREST_IN, RECEIVES_COMPENSATION_FROM, AFFILIATED_WITH, MARKETS_PRODUCT,
+MANUFACTURES_PRODUCT, DISTRIBUTES_PRODUCT, CONTRACT_MANUFACTURES_FOR, SUPPLIES_INGREDIENT_MATERIAL.
+One edge per recorded-time episode; valid bounds, precisions and bases equal those of the authorizing Assertion
+(V-505); projected only from an ACCEPTED assertion whose predicate equals the edge type (V-W01-02, V-W01-07).
+Replaces live RoleMetadata (role, title, corporateRole -> roleTitleVerbatim; confidence and notes retired).
+"""
+type RoleEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  "Normalized role kind refining the edge type; null when the source gives none."
+  roleType: RoleType
+  "Role title or code exactly as the source printed it (copy of Assertion.roleTitleVerbatim), e.g. 'B', 'Director Since', 'scientific lead guy'."
+  roleTitleVerbatim: String
+  corporateRoleType: CorporateRoleType
+  seniorityLevel: SeniorityLevel
+  "Only on RECEIVES_COMPENSATION_FROM (V-W01-10)."
+  compensationKind: CompensationKind
+}
+
+"""
+asserted_edge profile + ownership qualifiers. Specializes AssertedEdgeProperties. Used by PARENT_OF (control),
+HOLDS_EQUITY_IN (a stake of any size) and INVESTED_IN (having invested). Control, equity and investment are
+three predicates (forbidden implications [INVESTED_IN, HOLDS_EQUITY_IN] and candidate [HOLDS_EQUITY_IN, PARENT_OF]).
+Replaces live OwnershipMetadata (stakePercent kept; confidence and notes retired).
+"""
+type OwnershipEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  "Percent of the class or of total interest as stated by the source (0-100); null when not stated. Never computed silently: a computed share is a CALCULATED assertion."
+  stakePercent: Float
+  "Verbatim description of the stake (class of security, share count, voting and dispositive power, 'wholly owned')."
+  stakeClassVerbatim: String
+  "Role title or phrase exactly as printed (copy of Assertion.roleTitleVerbatim)."
+  roleTitleVerbatim: String
+}
+
+"""
+asserted_edge profile + the role a physical site plays for the operating organization. Specializes
+AssertedEdgeProperties. Used by OPERATES_FACILITY. Replaces live TemporalMetadata on HAS_LOCATION.
+"""
+type FacilityEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  "Role of the site for this organization as stated (HEADQUARTERS, MANUFACTURING_SITE, LABORATORY ...)."
+  facilityRole: LocationType
+  roleTitleVerbatim: String
+}
+
+# -----------------------------------------------------------------------------------------------------
+# Union (W01 sole writer)
+# -----------------------------------------------------------------------------------------------------
+
+"""
+Holder side of a person-or-organization role toward an organization (ADVISES_ORGANIZATION, FOUNDED_ORGANIZATION,
+INVESTED_IN, HOLDS_EQUITY_IN, HAS_IP_INTEREST_IN, RECEIVES_COMPENSATION_FROM, AFFILIATED_WITH, ENDORSES_PRODUCT).
+LegalEntity nodes resolve as Organization (they carry the Organization label).
+"""
+union RoleHolderTarget = Person | Organization
+
+# -----------------------------------------------------------------------------------------------------
+# Node types (W01 sole writer)
+# -----------------------------------------------------------------------------------------------------
+
+"""
+An organized body as an enduring identity: company, corporate group, division, university, institute, fund,
+clinic operator, agency (agencies specialize it as RegulatoryAgency, W13; laboratories as TestingLaboratory,
+W12). It is NOT a consumer brand (ConsumerBrand), NOT a physical site (Facility), NOT a trademark (Trademark,
+W14), NOT a seller display account (W15 seam). An Organization without the LegalEntity label is an organization
+whose registered legal identity is not established or that is not one legal person (for example a corporate
+group printed once on a disclosure page). Time-varying facts (legal name, ticker, stage, size, sector) are
+OrganizationSnapshot episodes; the few such fields kept here are current display projections. Roles are
+asserted, time-bounded edges (architecture section 9); no field here is a role.
+CQ: CQ-EC-01, CQ-EC-02, CQ-EC-03, CQ-CL-05, CQ-MF-01, CQ-AX-18. Module: organizations. Archetype: Entity.
+"""
+type Organization implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Organization", "Entity"])
+  @fulltext(indexes: [{indexName: "OrganizationName", fields: ["name", "searchText", "legalName", "displayName", "canonicalTicker"], queryName: "searchOrganizationsByName"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Derived search vector (regenerable; never evidence). @vector is added by Fable at merge without provider."
+  searchEmbedding: [Float!]
+  "Display name preferred by the organization (presentation only; never identity)."
+  displayName: String
+  "Current legal name; display projection of the latest OrganizationSnapshot episode; non-null only on LegalEntity nodes (V-W01-11). History: OrganizationSnapshot.legalName."
+  legalName: String
+  "Current listing ticker; display projection. Authoritative: Identifier (scheme TICKER, issuer exchange, validity) and OrganizationSnapshot.canonicalTicker."
+  canonicalTicker: String
+  "Instant at which legalName/canonicalTicker were last materialized from the current state episode."
+  currentAsOf: DateTime
+  "Coarse classification (catalog organizationKind). Never a role (INV-009)."
+  organizationType: OrganizationType
+  "Jurisdiction of formation (LegalEntity) or of authority (agency); ISO 3166 code or registry jurisdiction string."
+  jurisdiction: String
+
+  """class: asserted (bitemporal_attachment); cardinality: many; catalog: HAS_STATE (W00) to OrganizationSnapshot"""
+  states: [OrganizationSnapshot!]! @relationship(type: "HAS_STATE", direction: OUT, properties: "StateEpisodeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00) -- registry numbers, SEC CIK, LEI, DUNS, ticker"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+
+  """class: asserted; cardinality: many; catalog: PARENT_OF (control; a stake alone is HOLDS_EQUITY_IN)"""
+  subsidiaries: [Organization!]! @relationship(type: "PARENT_OF", direction: OUT, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PARENT_OF (inverse reading; SUBSIDIARY_OF assertions are canonicalized to PARENT_OF)"""
+  parentOrganizations: [Organization!]! @relationship(type: "PARENT_OF", direction: IN, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: OWNS_BRAND"""
+  ownsBrands: [ConsumerBrand!]! @relationship(type: "OWNS_BRAND", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: OPERATES_FACILITY (replaces live HAS_LOCATION)"""
+  operatesFacilities: [Facility!]! @relationship(type: "OPERATES_FACILITY", direction: OUT, properties: "FacilityEdgeProperties")
+
+  """class: asserted; cardinality: many; catalog: MARKETS_PRODUCT (NONEXCLUSIVE)"""
+  marketsProducts: [Product!]! @relationship(type: "MARKETS_PRODUCT", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: MANUFACTURES_PRODUCT (NONEXCLUSIVE; never from DISTRIBUTES_PRODUCT or SUPPLIES_INGREDIENT_MATERIAL)"""
+  manufacturesProducts: [Product!]! @relationship(type: "MANUFACTURES_PRODUCT", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: DISTRIBUTES_PRODUCT ('Distributed by' on a label, 21 CFR 101.5(c))"""
+  distributesProducts: [Product!]! @relationship(type: "DISTRIBUTES_PRODUCT", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: CONTRACT_MANUFACTURES_FOR (manufacturer -> client organization)"""
+  contractManufacturesFor: [Organization!]! @relationship(type: "CONTRACT_MANUFACTURES_FOR", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: CONTRACT_MANUFACTURES_FOR (inverse reading)"""
+  contractManufacturers: [Organization!]! @relationship(type: "CONTRACT_MANUFACTURES_FOR", direction: IN, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: SUPPLIES_INGREDIENT_MATERIAL (not ingredient manufacture, not investigational-product provision)"""
+  suppliesIngredientMaterials: [IngredientMaterial!]! @relationship(type: "SUPPLIES_INGREDIENT_MATERIAL", direction: OUT, properties: "RoleEdgeProperties")
+
+  """class: asserted; cardinality: many; catalog: ADVISES_ORGANIZATION (FINANCIAL_INTEREST; never ENDORSES_PRODUCT)"""
+  advisesOrganizations: [Organization!]! @relationship(type: "ADVISES_ORGANIZATION", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: FOUNDED_ORGANIZATION (FINANCIAL_INTEREST)"""
+  foundedOrganizations: [Organization!]! @relationship(type: "FOUNDED_ORGANIZATION", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: INVESTED_IN (FINANCIAL_INTEREST; never HOLDS_EQUITY_IN)"""
+  investedIn: [Organization!]! @relationship(type: "INVESTED_IN", direction: OUT, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HOLDS_EQUITY_IN (FINANCIAL_INTEREST; never PARENT_OF)"""
+  holdsEquityIn: [Organization!]! @relationship(type: "HOLDS_EQUITY_IN", direction: OUT, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IP_INTEREST_IN (FINANCIAL_INTEREST)"""
+  hasIpInterestIn: [Organization!]! @relationship(type: "HAS_IP_INTEREST_IN", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: RECEIVES_COMPENSATION_FROM (FINANCIAL_INTEREST; compensationKind)"""
+  receivesCompensationFrom: [Organization!]! @relationship(type: "RECEIVES_COMPENSATION_FROM", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: AFFILIATED_WITH (unnormalized or membership tie; not FINANCIAL_INTEREST, not FUNDS_STUDY)"""
+  affiliatedWith: [Organization!]! @relationship(type: "AFFILIATED_WITH", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: ENDORSES_PRODUCT (only from an explicit ENDORSES_PRODUCT assertion; V-007, V-422)"""
+  endorsesProducts: [Product!]! @relationship(type: "ENDORSES_PRODUCT", direction: OUT, properties: "AssertedEdgeProperties")
+
+  """class: asserted; cardinality: many; catalog: BOARD_MEMBER_OF (inverse reading; replaces live HAS_BOARD_MEMBER)"""
+  boardMembers: [Person!]! @relationship(type: "BOARD_MEMBER_OF", direction: IN, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: EMPLOYED_BY (inverse reading; replaces live EMPLOYS and HAS_CEO)"""
+  employees: [Person!]! @relationship(type: "EMPLOYED_BY", direction: IN, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: ADVISES_ORGANIZATION (inverse reading)"""
+  advisors: [RoleHolderTarget!]! @relationship(type: "ADVISES_ORGANIZATION", direction: IN, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: FOUNDED_ORGANIZATION (inverse reading; replaces live FOUNDED_BY)"""
+  founders: [RoleHolderTarget!]! @relationship(type: "FOUNDED_ORGANIZATION", direction: IN, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: INVESTED_IN (inverse reading)"""
+  investors: [RoleHolderTarget!]! @relationship(type: "INVESTED_IN", direction: IN, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HOLDS_EQUITY_IN (inverse reading)"""
+  equityHolders: [RoleHolderTarget!]! @relationship(type: "HOLDS_EQUITY_IN", direction: IN, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IP_INTEREST_IN (inverse reading)"""
+  ipInterestHolders: [RoleHolderTarget!]! @relationship(type: "HAS_IP_INTEREST_IN", direction: IN, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: RECEIVES_COMPENSATION_FROM (inverse reading)"""
+  compensationRecipients: [RoleHolderTarget!]! @relationship(type: "RECEIVES_COMPENSATION_FROM", direction: IN, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: AFFILIATED_WITH (inverse reading)"""
+  affiliates: [RoleHolderTarget!]! @relationship(type: "AFFILIATED_WITH", direction: IN, properties: "RoleEdgeProperties")
+}
+
+"""
+An organization registered as one legal person in a jurisdiction's registry (corporation, LLC, limited company,
+trust). Specializes Organization (labels LegalEntity, Organization, Entity) and keeps the same uid token `org`.
+Identity is the registered entity, not its name: a legal-name change (ChromaDex Corporation -> Niagen Bioscience,
+Inc., effective 2025-03-19) is a new OrganizationSnapshot episode on the same node; two entities with similar
+names (ChromaDex Corporation, the parent, and ChromaDex, Inc., its wholly owned subsidiary) are two nodes.
+Never also a ConsumerBrand (V-433). Role traversal uses the Organization type (LegalEntity nodes appear there).
+CQ: CQ-EC-02, CQ-MF-01, CQ-EC-C01. Module: organizations. Archetype: Entity.
+"""
+type LegalEntity implements Entity & EntityArchetype
+  @node(labels: ["LegalEntity", "Organization", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  displayName: String
+  "Current legal name (display projection; history in OrganizationSnapshot.legalName)."
+  legalName: String
+  canonicalTicker: String
+  currentAsOf: DateTime
+  organizationType: OrganizationType
+  "Jurisdiction of formation as stated by the formation registry (for example US-DE)."
+  jurisdiction: String
+  "Display mirror of the primary formation-registry Identifier (HAS_IDENTIFIER isPrimary); the Identifier record is authoritative."
+  registrationId: String
+  "Source-stated incorporation date (registry); identity lifecycle bound, not a role."
+  incorporatedOn: Date
+  "Source-stated dissolution date (registry); null = unknown, never 'still active'."
+  dissolvedOn: Date
+
+  """class: asserted (bitemporal_attachment); cardinality: many; catalog: HAS_STATE (W00) to OrganizationSnapshot"""
+  states: [OrganizationSnapshot!]! @relationship(type: "HAS_STATE", direction: OUT, properties: "StateEpisodeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: PARENT_OF"""
+  subsidiaries: [Organization!]! @relationship(type: "PARENT_OF", direction: OUT, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PARENT_OF (inverse reading)"""
+  parentOrganizations: [Organization!]! @relationship(type: "PARENT_OF", direction: IN, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: OWNS_BRAND"""
+  ownsBrands: [ConsumerBrand!]! @relationship(type: "OWNS_BRAND", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: OPERATES_FACILITY"""
+  operatesFacilities: [Facility!]! @relationship(type: "OPERATES_FACILITY", direction: OUT, properties: "FacilityEdgeProperties")
+}
+
+"""
+A consumer-facing brand identity (a name under which products or services are presented to consumers, such as
+'Tru Niagen' or 'InsideTracker'). It is NOT the legal entity that owns or uses it (OWNS_BRAND, asserted), NOT a
+registered trademark (Trademark, W14; a mark registration is evidence about a brand, not the brand), and NOT an
+Organization: it carries no Organization label, cannot employ, has no board and holds no equity, so person-to-
+company FINANCIAL_INTEREST edges never target it (V-W01-01). It may be the subject of SPONSORS_CONTENT (W21)
+because sponsor reads name brands. CQ: CQ-EC-02, CQ-CL-05. Module: organizations. Archetype: Entity.
+"""
+type ConsumerBrand implements Entity & EntityArchetype
+  @node(labels: ["ConsumerBrand", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+
+  """class: asserted; cardinality: many; catalog: OWNS_BRAND (inverse reading)"""
+  ownedBy: [Organization!]! @relationship(type: "OWNS_BRAND", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+}
+
+"""
+An identified physical site: a plant, laboratory site, clinic, office, warehouse or campus at an address. It
+absorbs the live PhysicalLocation type (CL-015/T-004 ruling proposed: merge). A Facility is the subject of
+establishment registrations (RegulatoryStatus STATUS_OF, W13; INV-304), capability states (HAS_CAPABILITY_STATE,
+W11) and certification scope (COVERS, W12). It is NOT the organization that operates it (OPERATES_FACILITY,
+asserted, time-bounded; operators change), NOT a laboratory organization (TestingLaboratory, W12, the certified
+laboratory unit that operates one or more sites; CLIA certifies each laboratory location, 42 CFR 493.35(a)), NOT
+a label's 'place of business' (21 CFR 101.5(e) allows the principal place of business instead of the plant), and
+NOT a market or jurisdiction (geographic availability is W15's). REMOTE/VIRTUAL are never facility kinds.
+CQ: CQ-MF-01, CQ-MF-04, CQ-AX-23. Module: organizations. Archetype: Entity.
+"""
+type Facility implements Entity & EntityArchetype
+  @node(labels: ["Facility", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Kind of site (catalog facilityKind; live PhysicalLocation.locationType). Never REMOTE or VIRTUAL."
+  facilityKind: LocationType
+  "Street address as stated (catalog address; live addressText)."
+  addressText: String
+  city: String
+  region: String
+  "ISO 3166-1 alpha-2 where known."
+  country: String
+  postalCode: String
+  "WGS84 decimal degrees."
+  latitude: Float
+  "WGS84 decimal degrees."
+  longitude: Float
+
+  """class: asserted; cardinality: many; catalog: OPERATES_FACILITY (inverse reading)"""
+  operatedBy: [Organization!]! @relationship(type: "OPERATES_FACILITY", direction: IN, properties: "FacilityEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00) -- FEI, DUNS, CLIA-site numbers"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+}
+
+"""
+One source-attributed state of an Organization's profile (legal name, ticker, stage, size, sector, summaries) as a
+VersionedState payload, attached by HAS_STATE episodes (bitemporal_attachment). Payload fields never change
+after commit; corrections and endings are new episodes (round 0007 section 12). Node-level validFrom/validTo/
+recordedFrom/recordedTo are the TemporalSnapshot cache of the first episode only. It is NOT the organization's
+identity and NOT evidence: its payload is supported through the Assertions named in assertionUids.
+Live HAS_SNAPSHOT (Organization -> OrganizationSnapshot) is retired because HAS_SNAPSHOT is the provenance
+Source -> SourceSnapshot edge (one relationship type, one meaning; W01-SR-03).
+CQ: CQ-EC-C01, CQ-TM-01, CQ-TM-07. Module: organizations (time rules: temporal). Archetype: VersionedState.
+"""
+type OrganizationSnapshot implements Entity & VersionedStateArchetype & TemporalSnapshot & SearchIndexable
+  @node(labels: ["OrganizationSnapshot", "VersionedState"])
+  @fulltext(indexes: [{indexName: "OrganizationSnapshotSearch", fields: ["name", "description", "sector", "searchText"], queryName: "searchOrganizationSnapshots"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "State kind (live snapshotType), e.g. ORGANIZATION_PROFILE, LEGAL_NAME."
+  stateType: String!
+  "sha256:<hex> over the canonical payload (D-016)."
+  payloadHash: String!
+  "Source-stated effective bounds of the payload (for example a name change 'effective March 19, 2025'); query validity comes from the HAS_STATE episode."
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "TemporalSnapshot cache of the first HAS_STATE episode (read-only projection)."
+  validFrom: DateTime
+  validTo: DateTime
+  recordedFrom: DateTime
+  recordedTo: DateTime
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  "Uids of the Assertions whose content this payload projects (round 0007 seam)."
+  assertionUids: [String!]
+  legalName: String
+  displayName: String
+  canonicalTicker: String
+  organizationType: OrganizationType
+  active: Boolean
+  foundedYear: Int
+  fundingStage: FundingStage
+  "US dollars as stated by the source."
+  totalFundingUsd: Float
+  employeeCountMin: Int
+  employeeCountMax: Int
+  employeeCountEstimate: Int
+  employeeCountBand: EmployeeCountBand
+  employeeCountRaw: String
+  revenueModel: String
+  valueChainStages: [String!]
+  sector: String
+  "Display link; a URL is never identity (the site is a Source)."
+  websiteUrl: String
+  headquarters: String
+  headquartersSummary: String
+  operatingSummary: String
+  "US dollars as stated by the source at the episode's valid time."
+  marketCapUsd: Float
+  pipelineSummary: String
+  competitivePositionSummary: String
+  isPublicCompany: Boolean
+
+  """class: asserted (bitemporal_attachment); cardinality: exactly_one subject; catalog: HAS_STATE (W00), inverse reading"""
+  organization: [Organization!]! @relationship(type: "HAS_STATE", direction: IN, properties: "StateEpisodeProperties")
+}
+
+"""
+A natural person who is a public actor in sourced material (author, investigator, executive, director, advisor,
+speaker, host, guest). Identity is by Identifier (ORCID, SEC filer id, NPI) or ResolutionHypothesis, never by name.
+A BellLabs user is never a Person node (private context lives outside the shared graph, contract A9); personal
+data with no CQ (birth date and place, death date) is not stored. Roles are asserted, time-bounded edges; title
+and bio are display text only. It is NOT a software Agent (catalog Agent) and NOT a pseudonymous handle.
+CQ: CQ-CL-01, CQ-CL-05, CQ-EC-01, CQ-EC-03, CQ-EC-04, CQ-AX-18. Module: organizations. Archetype: Entity.
+"""
+type Person implements Entity & EntityArchetype & SearchIndexable & ActorIdentity
+  @node(labels: ["Person", "Entity"])
+  @fulltext(indexes: [{indexName: "PersonSearch", fields: ["name", "description", "bio", "title", "searchText"], queryName: "searchPeople"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  "Display headline only; never a role fact (roles are edges with roleTitleVerbatim)."
+  title: String
+  "Display biography text; facts in it are not queryable until asserted."
+  bio: String
+  "Display mirror of the primary ORCID Identifier; the Identifier record is authoritative."
+  orcid: String
+
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00) -- ORCID, profile handles"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: BOARD_MEMBER_OF (FINANCIAL_INTEREST)"""
+  boardMemberOf: [Organization!]! @relationship(type: "BOARD_MEMBER_OF", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: EMPLOYED_BY (FINANCIAL_INTEREST; officers with corporateRoleType)"""
+  employedBy: [Organization!]! @relationship(type: "EMPLOYED_BY", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: ADVISES_ORGANIZATION (FINANCIAL_INTEREST; never ENDORSES_PRODUCT)"""
+  advisesOrganizations: [Organization!]! @relationship(type: "ADVISES_ORGANIZATION", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: FOUNDED_ORGANIZATION (FINANCIAL_INTEREST)"""
+  foundedOrganizations: [Organization!]! @relationship(type: "FOUNDED_ORGANIZATION", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: INVESTED_IN (FINANCIAL_INTEREST)"""
+  investedIn: [Organization!]! @relationship(type: "INVESTED_IN", direction: OUT, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HOLDS_EQUITY_IN (FINANCIAL_INTEREST)"""
+  holdsEquityIn: [Organization!]! @relationship(type: "HOLDS_EQUITY_IN", direction: OUT, properties: "OwnershipEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IP_INTEREST_IN (FINANCIAL_INTEREST)"""
+  hasIpInterestIn: [Organization!]! @relationship(type: "HAS_IP_INTEREST_IN", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: RECEIVES_COMPENSATION_FROM (FINANCIAL_INTEREST)"""
+  receivesCompensationFrom: [Organization!]! @relationship(type: "RECEIVES_COMPENSATION_FROM", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: AFFILIATED_WITH (verbatim role kept when the kind cannot be normalized)"""
+  affiliatedWith: [Organization!]! @relationship(type: "AFFILIATED_WITH", direction: OUT, properties: "RoleEdgeProperties")
+  """class: asserted; cardinality: many; catalog: ENDORSES_PRODUCT (only from an explicit ENDORSES_PRODUCT assertion)"""
+  endorsesProducts: [Product!]! @relationship(type: "ENDORSES_PRODUCT", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+A speaker or author identity known only by a handle on a platform (podcast forum name, social handle). A link to
+a Person is a ResolutionHypothesis (PROPOSES_MATCH), never a structural edge (live LINKS_TO retired). It is in the
+ASSERTED_BY range (KCR-4.3). CQ: CQ-CL-07. Module: organizations. Archetype: Entity.
+"""
+type PseudonymousActor implements Entity & EntityArchetype & ActorIdentity
+  @node(labels: ["PseudonymousActor", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Handle exactly as displayed on its platform (display mirror; the platform-scoped Identifier is authoritative)."
+  handle: String
+
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00) -- platform handle, participant token"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+}
+
+"""
+An asserter with no identity beyond a class ('anonymous commenter', 'unnamed employee'), kept so that ASSERTED_BY
+can name who said something without inventing identity. CQ: CQ-CL-07. Module: organizations. Archetype: Entity.
+"""
+type AnonymousActor implements Entity & EntityArchetype & ActorIdentity
+  @node(labels: ["AnonymousActor", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Free-text anonymity class as stated or curated (no controlled vocabulary exists; candidate)."
+  anonymityClass: String
+}
+
+"""
+A study or dataset participant known only by a token that a PUBLIC source (publication, public dataset, registry
+results page) issued, specialized from PseudonymousActor (labels CohortParticipant, PseudonymousActor, Entity).
+The token is unique only within its issuer, so identity is an Identifier with scheme PARTICIPANT_TOKEN and the
+issuing study/dataset as issuer: 'P03' in two datasets is two participants. It is NEVER created from BellLabs user
+data, NEVER linked to a Person in the shared graph (live HAS_PARTICIPANT_TOKEN retired: a person-to-token link is
+re-identification; W23 owns the policy, CL-018), and carries an explicit privacyClass. Privacy seam with W23.
+CQ: CQ-CL-09 (Expansion), CQ-PC-08. Module: organizations (placement: private_context policy). Archetype: Entity.
+"""
+type CohortParticipant implements Entity & EntityArchetype & ActorIdentity
+  @node(labels: ["CohortParticipant", "PseudonymousActor", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Token exactly as the issuing public source prints it (display mirror of the issuer-scoped Identifier)."
+  participantToken: String
+
+  """class: asserted; cardinality: one_or_more; catalog: HAS_IDENTIFIER (W00) -- scheme PARTICIPANT_TOKEN, issuer = study or dataset uid"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+}

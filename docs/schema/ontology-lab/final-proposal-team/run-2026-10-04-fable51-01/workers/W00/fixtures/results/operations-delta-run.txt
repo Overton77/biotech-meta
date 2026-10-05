@@ -1,0 +1,24 @@
+# operations-delta.cypher execution, 2026-10-04T02:58:31Z, fresh embedded Neo4j 5.26.31 Community + APOC 5.26.31
+/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/operations.cypher: 53 statements, 53 ok, 0 error
+/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/00-common-base.cypher: 6 statements, 6 ok, 0 error
+/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/12-legacy-shapes-graphql-readability.cypher: 4 statements, 4 ok, 0 error
+/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/13-reconciliation-rulings.cypher: 24 statements, 24 ok, 0 error
+## before delta: legacy shapes and non-final privacy classes
+[{"t":"HAS_SNAPSHOT","n":1},{"t":"IDENTIFIED_BY","n":1},{"t":"MENTIONS","n":1}]
+[{"c":"PRIVATE_PERSONAL","n":1},{"c":"internal","n":1},{"c":"public","n":2}]
+[{"constraintsBefore":35}]
+## delta
+/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/operations-delta.cypher: 290 statements, 290 ok, 0 error
+  #283 {"created":1,"deleted":1,"props":4} // D1 (W00-R-16): entity state caches leave HAS_SNAPSHOT for H
+  #285 {"created":1,"deleted":1,"props":2} // D3 (W00-R-19): entity-level retrieval links leave MENTIONS.
+  #287 {"created":1,"deleted":1,"props":4} // D4 (W00-R-20): IDENTIFIED_BY becomes HAS_IDENTIFIER (asserted; assertions back-filled a
+  #288 {"created":0,"deleted":0,"props":3} // D5 (W00-R-06): stored privacy classes take the final spelling; private-personal never s
+## after delta
+[]
+[{"t":"HAS_IDENTIFIER","n":3},{"t":"HAS_STATE","n":1},{"t":"MENTIONS_ENTITY","n":1}]
+[{"c":"PRIVATE_PERSONAL","n":1}]
+[{"constraintsAfter":296}]
+[{"indexesAfter":335}]
+## rerun of the delta (idempotence)
+/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/operations-delta.cypher: 290 statements, 290 ok, 0 error
+statements with writes or schema changes on rerun: 0

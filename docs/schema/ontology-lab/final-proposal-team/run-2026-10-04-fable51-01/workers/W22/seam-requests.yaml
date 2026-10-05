@@ -1,0 +1,146 @@
+# W22 seam requests (run-2026-10-04-fable51-01). Fable copies these into 03-conflict-ledger.md and assigns resolvers.
+- id: W22-SR-01
+  targetOwner: W00
+  request: >
+    Register uid type tokens: MediaAsset media-asset, MediaVariant media-variant, MediaAnnotation media-annotation,
+    GraphView graph-view, FigurePanel figure-panel, ProductLabelRegion label-region, MediaSuitabilityAssessment
+    media-assessment, MediaRightsRecord media-rights. Also Pathway pathway (owner W03; used by MP4) if W03 does not.
+    MediaSource is retired and needs no token.
+  cq: [CQ-MD-C01, CQ-MD-C03, CQ-MD-C04]
+  failingCase: "conventions.uidTypeTokens has no media token; INV-106 cannot check any media uid (fixtures mp1..mp6 use the proposed tokens)"
+  proposedRuling: register the eight tokens (and pathway) in the catalog conventions.
+
+- id: W22-SR-02
+  targetOwner: W00
+  request: >
+    Add useKind DISPLAY_MEDIA ("show a rendition of a media asset in an answer, page or export") to the frozen UseKind
+    enum. Optionally add DERIVE_MEDIA ("create a crop, overlay or other derivative rendition for display"); W23 decides
+    whether derivation is a separate permission. The current values (QUOTE_IN_ANSWER, SUMMARIZE_IN_ANSWER,
+    USE_AS_RECOMMENDATION_EVIDENCE, SHARE_EXTERNALLY) do not name display of an image.
+  cq: [CQ-PV-06, CQ-PV-01, CQ-MD-C03]
+  failingCase: "mp4 Q-MP4-3 / V-608: the display activity's AUTHORIZED_BY needs a useKind; QUOTE_IN_ANSWER would misstate the use (an image is not quoted text)"
+  proposedRuling: add DISPLAY_MEDIA (required); DERIVE_MEDIA deferred to W23.
+
+- id: W22-SR-03
+  targetOwner: W00
+  request: >
+    Extend the domains and ranges of PROV relationships to media nodes: WAS_GENERATED_BY from MediaAsset, MediaVariant,
+    MediaAnnotation, MediaSuitabilityAssessment (already EvidenceAssessment) to Activity; USED from Activity to
+    MediaVariant, MediaAnnotation, MediaAsset. The catalog currently lists WAS_GENERATED_BY from
+    Assertion|SourceSnapshot|DocumentTextVersion|SourceLocator|EvidenceAssessment and USED to
+    SourceSnapshot|SourceLocator|Assertion|DocumentTextVersion.
+  cq: [CQ-PV-03, CQ-MD-C04]
+  failingCase: "mp5 Q-MP5-1 (crop lineage) and mp6 Q-MP6-1 (edited rendition lineage) traverse Activity-USED->MediaVariant/MediaAnnotation; V-607/V-614 depend on it"
+  proposedRuling: extend both relationship ranges; no new relationship type.
+
+- id: W22-SR-04
+  targetOwner: W00
+  request: >
+    Add activityKind values MEDIA_GENERATION (a model or renderer produced media bytes), MEDIA_TRANSFORMATION (crop,
+    resize, overlay, transcode of existing bytes by BellLabs) and MEDIA_ASSESSMENT (a suitability assessment run).
+    CAPTURE, EXTRACTION (figure extraction) and TEXT_EXTRACTION (OCR) are reused.
+  cq: [CQ-PV-03, CQ-MD-C04, CQ-MD-C05]
+  failingCase: "mp3/mp6: a GENERATED illustration and a BellLabs overlay must be distinguishable from a CAPTURE in lineage queries (V-607 accepts CAPTURE or MEDIA_TRANSFORMATION only)"
+  proposedRuling: add the three values to ActivityKind.
+
+- id: W22-SR-05
+  targetOwner: W00
+  request: >
+    Register an image-coordinate normalization version for IMAGE_REGION locators and MediaAnnotation coordinates:
+    IMG-PX1 = "x, y, width, height in pixels on the decoded raster of the rendition's raw bytes after applying EXIF
+    orientation; origin top-left; x rightwards, y downwards; the region is [x, x+width) x [y, y+height)". The catalog's
+    requiredBySelectorKind.IMAGE_REGION demands normalizationVersion but conventions.normalizationVersions only defines
+    the text normalization NFC-WS1.
+  cq: [CQ-PV-02]
+  failingCase: "mp5: the same region is (310,240,1320,1180) on the 1946 px rendition and would be rescaled by 416/1946 on the 416 px rendition; without a named frame the IMAGE_REGION locator is not reproducible (V-601, V-602)"
+  proposedRuling: add IMG-PX1 to conventions.normalizationVersions; IMAGE_REGION locators must use a registered image normalization.
+
+- id: W22-SR-06
+  targetOwner: W00
+  request: >
+    Add sourceKind values MEDIA_FILE (a retrievable media file endpoint such as a CDN or repository file URL) and
+    MEDIA_REPOSITORY_RECORD (a media repository's description record such as a Wikimedia Commons file page or API
+    record); consider DATA_REPOSITORY_RECORD (BioImage Archive / BioStudies study record, Reactome ContentService
+    record). W19 may propose the final wording (SourceKind is W00-owned).
+  cq: [CQ-MD-C03, CQ-MD-C04, CQ-PV-05]
+  failingCase: "mp1..mp6 Sources for upload.wikimedia.org, cdn.ncbi.nlm.nih.gov, elysiumhealth.com/cdn, Commons API, BioStudies API have no fitting SourceKind value"
+  proposedRuling: add MEDIA_FILE, MEDIA_REPOSITORY_RECORD and DATA_REPOSITORY_RECORD.
+
+- id: W22-SR-07
+  targetOwner: W04
+  request: >
+    Confirm the label seam: (a) a label IMAGE capture is a LabelSnapshot (SourceSnapshot specialisation) like the HTML
+    Supplement Facts page; (b) LabelDeclarations read from an image are HAS_DECLARATION of that LabelSnapshot and are
+    located by W22's REGION_HAS_DECLARATION from the ProductLabelRegion (W22 writes this new structural edge); (c)
+    W04's LABEL_FOR is the authoritative product link and W22's ABOUT_PRODUCT is only derived from it
+    (LABEL-REGION-PRODUCT-1). Also confirm declarationKind value used in mp5 ('INGREDIENT_AMOUNT') or supply the W04 value.
+  cq: [CQ-MD-C04, CQ-PF family]
+  failingCase: "Elysium states the Supplement Facts both as HTML text (S10) and as carousel image 5 (S09); declarations from the two captures must stay distinct LabelSnapshots with their own locators"
+  proposedRuling: accept (a)-(c); W04 owns LabelDeclaration fields and DeclarationKind values.
+
+- id: W22-SR-08
+  targetOwner: W00
+  request: >
+    Admit the media validation family V-601..V-615 (fixtures/v-media-validation.cypher) into docs/schema/neo4j/
+    validation.cypher (ids are candidates; renumber if needed), and add to the provenance module the forbidden
+    implications [DEPICTS, SUPPORTED_BY], [MEDIA_PURPOSE_EVIDENCE, EVIDENCES], [GENERATED_ILLUSTRATION, SOURCE_SUPPORT],
+    [PUBLICLY_ACCESSIBLE, REUSE_PERMITTED], [NO_STATEMENT_FOUND, PERMISSION], [PERCEPTUAL_HASH_MATCH, SAME_BYTES]
+    (or to a new media module section).
+  cq: [CQ-MD-C05, CQ-PV-01, CQ-PV-06]
+  failingCase: "mp3 n1/n2, mp4 BAD-1/BAD-2, mp5 n1/n2, mp6 n1 produce rows only in V-601/602/604/605/606/608/608b; the kernel suite returns no violation for them"
+  proposedRuling: admit as statically-checked validators; V-608b and V-610 informational.
+
+- id: W22-SR-09
+  targetOwner: W07
+  request: >
+    Retire live Metric.mediaUrl and Metric.mediaType (live line 1291) in favour of MediaAsset -EXPLAINS|DEPICTS-> Metric
+    with rights and suitability (live-schema-alignment line 233 deferred them to the media module).
+  cq: [CQ-MD-C02]
+  failingCase: "a URL string on Metric has no rights record, no rendition hash and no assessment; mp2 Q-MP2-3 selects the Metric explainer through EXPLAINS"
+  proposedRuling: W07 drops both fields; migration creates a MediaAsset + EXPLAINS assertion per non-null mediaUrl.
+
+- id: W22-SR-10
+  targetOwner: W23
+  request: >
+    Own the PolicyVersion contents that decide media display: which MediaRightsStatus values permit DISPLAY_MEDIA,
+    how attribution / share-alike / indicate-changes duties are honoured, whether DERIVE_MEDIA is separate, how fair-use
+    or quotation exceptions are recorded (as a recorded legal decision, never inferred), and whether BellLabs captures
+    from sites whose terms prohibit automated access (Elysium terms, S11) are allowed. W22's fixtures inline the
+    allow-list ['OPEN_LICENSE','PUBLIC_DOMAIN','PERMISSION_GRANTED','HELD_BY_OPERATOR'] as an assumption.
+  cq: [CQ-PV-06, CQ-MD-C03]
+  failingCase: "mp4 V-608b: an authorized display of an ALL_RIGHTS_RESERVED figure needs a recorded decision; the graph cannot decide fair use"
+  proposedRuling: W23 publishes media-display policy content (outside the graph) and confirms the allow-list or replaces it; ODRL review stays open (OPEN-QUESTIONS P2-1).
+
+- id: W22-SR-11
+  targetOwner: W21
+  request: >
+    Confirm that W21 Source renditions (video, audio feed, transcript page) and W22 MediaAssets share bytes only via
+    contentHash equality and DERIVED_FROM_SOURCE{captureRelation}; a thumbnail or frame from a MEDIA_TIME range is a
+    MediaAsset with captureRelation FRAME_FROM_TIME_RANGE, never a locator of the episode; podcast covers DEPICT a
+    Series/Channel and imply no sponsorship (CQ-CL-08 stays W21's).
+  cq: [CQ-CL-08, CQ-PV-02]
+  failingCase: "a sponsor-read thumbnail used as the sponsor read's locator would lose the rendition timeline (round 0006 O-4)"
+  proposedRuling: accept; no W21 field change needed beyond RelationshipAssertion.visualizedBy inverse.
+
+- id: W22-SR-12
+  targetOwner: W03
+  request: >
+    Keep the live Association type or tell W22 to drop it from MediaVisualizableRelationshipTarget; confirm Pathway
+    token and that Mechanism/Pathway/MolecularEntity/Species/AnatomicalContext/Organ/Outcome/Condition/RiskFactor stay
+    @node types (MediaSubjectTarget members). Also confirm the mp3 mechanism-assertion shape (INDUCES_PROCESS +
+    OBSERVED_IN_CONTEXT + IN_SPECIES + EXPOSED_TO).
+  cq: [CQ-MD-C02, CQ-MD-C05]
+  failingCase: "union members must exist in the merged schema (B6)"
+  proposedRuling: W03 answers; Fable prunes.
+
+- id: W22-SR-13
+  targetOwner: W00
+  request: >
+    In W00's AssertionSubjectTarget (sdl-fragment line ~1623, "# W22" members) remove MediaSource (retired by W22-D01;
+    otherwise the merged schema has an undefined union member) and add MediaRightsRecord (VersionedState, promoted
+    from candidate with failing cases mp1/mp2/mp4): it is the HAS_OBJECT of every HAS_RIGHTS_RECORD assertion.
+    W00's SourceLocator.regionAnnotation (LOCATES_REGION OUT -> MediaAnnotation) matches W22's inverse field
+    MediaAnnotation.locatedBy; no change needed there.
+  cq: [CQ-MD-C03, CQ-PV-06]
+  failingCase: "merge-fragments.mjs over all worker fragments reports 'UNDEF MediaSource <- W00'; mp1/mp2/mp4 HAS_RIGHTS_RECORD assertions have a MediaRightsRecord object that the current union cannot type"
+  proposedRuling: drop MediaSource, add MediaRightsRecord to AssertionSubjectTarget.

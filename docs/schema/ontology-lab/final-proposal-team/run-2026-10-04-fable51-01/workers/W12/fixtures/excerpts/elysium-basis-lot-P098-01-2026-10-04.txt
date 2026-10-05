@@ -1,0 +1,34 @@
+SOURCE: https://www.elysiumhealth.com/pages/basis-lot-info?lotNumber=P098-01
+CAPTURE: Firecrawl scrape (onlyMainContent, maxAge 0), 2026-10-04T00:58Z; PARTIAL_EXCERPT (page chrome and most of the "Previous Lots" list omitted here)
+EXCERPT (verbatim):
+# Label Claims & Testing
+Lot #P098-01 - Expiration date 12/2027
+## Active Ingredients
+### Basis
+| Nicotinamide Riboside Chloride (NR) | Internal Specifications ≥ 250 mg/dose | Results* Conforms to internal specs |
+| Pterostilbene (PT) | Internal Specifications ≥ 50mg/dose | Results* Conforms to internal specs |
+## Quality Testing
+### Basis
+| Heavy Metals | Internal Specifications ≤ 0.5 ppm | Results* Conforms to internal specs |
+| Residual Solvents | Internal Specifications ICH/USP guidelines | Results* Conforms to internal specs |
+| Total Plate Count MICRO | Internal Specifications ≤ 1000 CFU/g | Results* Conforms to internal specs |
+| Yeast and Mold MICRO | Internal Specifications ≤ 100 CFU/g | Results* Conforms to internal specs |
+| Objectionable USP Organisms MICRO | Internal Specifications Absent | Results* Conforms to internal specs |
+In our continued effort to deliver the highest quality product possible, we have set internal guidelines that meet or exceed ICH/USP guidelines.
+Basis is NSF Certified for Sport. Please confirm the certification of each lot here [https://www.nsfsport.com/certified-products/search-results.php?keyword=elysium+health].
+*As confirmed by a third-party testing lab.
+## Previous Lots (selected lines, verbatim)
+#P098-01 Exp. 12/2027
+#70918 Exp. 12/2027
+#70579A Exp. 10/2027
+#70579 Exp. 10/2027
+#P043-01 Exp. 09/2027
+#70064 Exp. 07/2027
+#R212-01 Exp. 05/2027
+#R173-01 Exp. 01/2027
+#R110-01 Exp. 11/2026
+#M259-01 Manuf. 11/2024
+#M099-01 Manuf. 05/2024
+#M062-01 Manuf. 03/2024
+#231202 Manuf. 12/2023
+NOTES: the unparameterized page https://www.elysiumhealth.com/pages/basis-lot-info (captured 2026-10-04T00:57Z) shows the same two tables without a lot header. Lot 70969 (NSF listing 1786167) does not appear in the "Previous Lots" list at capture time.

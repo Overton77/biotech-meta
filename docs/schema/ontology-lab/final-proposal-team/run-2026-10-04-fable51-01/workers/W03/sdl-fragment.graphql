@@ -1,0 +1,575 @@
+# =====================================================================================================================
+# W03 Biology and mechanisms -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W03 (Opus 5.5)   Coordinator/synthesizer: Fable 5.1
+# Canonical catalog module: mechanisms (catalog 0.2.0, digest 8fb50ff0...84f0; live schema digest 86b5e0b5...f112)
+# Competency questions: CQ-MX-01..06, CQ-ST-03 (biological referents only), CQ-AX-20, CQ-EV-04 (EXPOSURE inputs),
+#                       candidates CQ-MX-C01..C04 (see 02-cq-coverage.md)
+# Invariants: INV-004, INV-007, INV-104, INV-106, INV-210..213; validators V-112, V-230..V-239 (+ proposed V-233r/V-234r,
+#             V-W03-01..10 in fixtures/w03-validation.cypher)
+#
+# Owned here (sole writer): node types Mechanism, Pathway, MolecularEntity, Species, AnatomicalContext, Organ, Outcome,
+# Condition, RiskFactor, MechanismEvidenceContext; enums MechanismSetting, ExposureBasis, AnatomicalContextKind,
+# RegulatorySign; relationship-property types MechanismLinkProperties, AssociationProjectionProperties.
+# Live `Association` (and its `AssociationParticipant` union, `AssociationMetadata`, `MechanismLinkMetadata`) are retired;
+# see migration-map.yaml. No `extend`. Other owners' types are referenced by name only:
+#   W00: Entity, EntityArchetype, OccurrenceArchetype, SearchIndexable, PrivacyClass, NodeMaturity, Polarity, Assertion,
+#        Identifier, IdentifierLinkProperties, StructuralEdgeProperties (fields embedded below are copied verbatim from
+#        DerivedEdgeProperties / StructuralEdgeProperties as contract B4 requires)
+#   W02: ChemicalSubstance, ChemicalForm, IngredientMaterial          W07: Biomarker, Metric          W09: StudyArm
+# Relationship class and cardinality are stated in each field description and are enforced by the operations/validation
+# layer, never by SDL. Derived fields are read-only (@settable false): they are written only by the projection job.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Enums (frozen at catalog 0.2.0 values; AnatomicalContextKind and RegulatorySign are the refinements named in
+# live-schema-alignment.md rounds 0002/0003)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""Experimental setting of a MechanismEvidenceContext (catalog conventions.mechanismSetting). IN_VITRO_CELL_FREE and
+IN_SILICO are the only settings that may lack a species (INV-210, V-231)."""
+enum MechanismSetting {
+  IN_VITRO_CELL_FREE
+  IN_VITRO_CELL
+  EX_VIVO
+  IN_VIVO_NONMAMMAL
+  IN_VIVO_MAMMAL
+  HUMAN_INTERVENTIONAL
+  HUMAN_OBSERVATIONAL
+  IN_SILICO
+}
+
+"""Basis of MechanismEvidenceContext.exposureAmount (catalog conventions.exposureBasis). A ratio between two exposures
+exists only when the bases match (INV-203)."""
+enum ExposureBasis {
+  PER_KG_BODY_WEIGHT_PER_DAY
+  ABSOLUTE_PER_DAY
+  SINGLE_DOSE
+  MEDIUM_CONCENTRATION
+  DIET_CONCENTRATION
+}
+
+"""What kind of anatomical or biological compartment an AnatomicalContext is. ORGAN is carried by nodes that also have
+the Organ label (Organ is a specialization of AnatomicalContext, so one organ never has two identities)."""
+enum AnatomicalContextKind {
+  TISSUE
+  CELL_TYPE
+  CELL_LINE
+  SPECIMEN_MATRIX
+  ORGAN
+  SUBCELLULAR
+}
+
+"""Sign of a curated reference link (refinement of live MechanismLinkMetadata.regulatorySign free text). It describes
+reference topology (for example a Reactome reaction role), never a measured effect."""
+enum RegulatorySign {
+  ACTIVATES
+  INHIBITS
+  NEUTRAL
+  UNKNOWN
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Relationship-property types
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Curated reference structure (class: structural). Successor of live MechanismLinkMetadata. Contains every field of the
+frozen StructuralEdgeProperties (orderIndex, notes, mongoResearchRunId) plus reference qualifiers. Used on
+INVOLVES_PATHWAY, HAS_MECHANISM, PARTICIPATES_IN, CONTRIBUTES_TO, ENCODES, REFLECTS_MECHANISM and Condition AFFECTS_ORGAN.
+A curated link records what a reference resource (Reactome, HGNC, MONDO ...) states at a captured revision; it is never
+experimental evidence and never a premise for a measured mechanism step (FI HYPOTHESIZED_STEP -> MEASURED_STEP,
+PROXY_MARKER_CHANGED -> PROCESS_FLUX_CHANGED). referenceSnapshotUid names the SourceSnapshot of the authority record;
+referenceRecordId is the unversioned authority id (for example R-HSA-196807) and referenceRevision the revision read
+(for example "8" from stIdVersion R-HSA-196807.8); referenceRelease the authority release (for example Reactome "97").
+"""
+type MechanismLinkProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  regulatorySign: RegulatorySign
+  enzymeRole: String
+  stoichiometryNote: String
+  upstreamDownstream: String
+  referenceSnapshotUid: String
+  referenceRecordId: String
+  referenceRevision: String
+  referenceRelease: String
+}
+
+"""
+Derived association projection (class: derived). Successor of live AssociationMetadata on the derived mechanism and
+risk edges (AFFECTS_MECHANISM, MODULATES, APPLIES_TO_SPECIES, INFLUENCES_OUTCOME, ACTS_IN, INCREASES_RISK_FOR,
+MEDIATES_RISK_THROUGH, ASSOCIATED_WITH_CONDITION, ASSOCIATED_WITH_OUTCOME). Contains every field of the frozen
+DerivedEdgeProperties (projectionOfAssertionUid, derivationRule, derivedFromAssertionUids, derivedFromAssessmentUids,
+derivedAt, mongoResearchRunId) plus regenerable display qualifiers.
+Citation rule (INV-004, D-011): rule-mode edges (AFFECTS_MECHANISM, MODULATES, APPLIES_TO_SPECIES, INFLUENCES_OUTCOME,
+ACTS_IN) carry derivationRule 'mx-proj/v1' and a non-empty derivedFromAssertionUids, because their input predicates
+(INCREASES_ACTIVITY_OF, INDUCES_PROCESS, IMPROVES ...) differ from the edge type; one-to-one edges (INCREASES_RISK_FOR,
+MEDIATES_RISK_THROUGH, ASSOCIATED_WITH_*) carry projectionOfAssertionUid of an assertion whose predicate equals the edge
+type. Never assertionUid. Every cited assertion is ACCEPTED, basisKind DIRECT_MEASUREMENT, polarity POSITIVE, current
+(recordedTo null) and has exactly one MechanismEvidenceContext (INV-211).
+projectedPredicate is the shared predicate of the cited assertions (one edge per subject, object and predicate, so IMPROVES
+and IMPAIRS never merge). projectedPolarity is always POSITIVE in mx-proj/v1 (a null or mixed measurement never produces a shortcut edge; it stays
+an assertion answerable by CQ-MX-03). speciesUids / settings / anatomicalContextUids are the union over the cited
+assertions' contexts so that a consumer of the shortcut sees where the effect was measured. associationShape,
+specificity and effectSummary are live display strings, never truth-bearing.
+"""
+type AssociationProjectionProperties @relationshipProperties {
+  projectionOfAssertionUid: String
+  derivationRule: String
+  derivedFromAssertionUids: [String!]
+  derivedFromAssessmentUids: [String!]
+  derivedAt: DateTime
+  mongoResearchRunId: String
+  projectedPolarity: Polarity
+  projectedPredicate: String
+  speciesUids: [String!]
+  settings: [MechanismSetting!]
+  anatomicalContextUids: [String!]
+  associationShape: String
+  specificity: String
+  effectSummary: String
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Occurrence: the reported exposure-and-measurement event
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+One reported exposure group measured in one compartment (round 0003 M3). It is the Occurrence that a DIRECT_MEASUREMENT
+mechanism Assertion points at through OBSERVED_IN_CONTEXT: setting, species and model, compartment, tested material at
+the most specific level the source supports, and exposure (amount, UCUM unit, basis, route, ISO 8601 duration), or the
+StudyArm when the context is a human study already modeled (then exposure is read from the arm and the exposure fields
+stay null, V-238). It is NOT a Study (preclinical cohorts are not studies, round 0003 C3-03), NOT a VersionedState (no
+enduring identity, C3-02), NOT a private measurement, and NOT a product dose. hedValue/hedMethod are derived (INV-213):
+a human-equivalent dose is never an asserted context property, even when the source itself states a body-surface-area
+conversion. Several step assertions from one exposure group share the node; a group measured in two compartments is two
+nodes. CQ-MX-01, CQ-MX-02, CQ-MX-03, CQ-MX-04, CQ-MX-06. Module mechanisms. Archetype Occurrence.
+"""
+type MechanismEvidenceContext implements Entity & OccurrenceArchetype
+  @node(labels: ["MechanismEvidenceContext", "Occurrence"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  occurrenceType: String!
+  startedAt: DateTime
+  endedAt: DateTime
+  "Experimental setting; required (V-231)."
+  setting: MechanismSetting!
+  "Verbatim model system as reported (strain, genotype, disease model, cell line, population words); null = not reported."
+  modelDescriptor: String
+  "Controlled string MALE | FEMALE | BOTH | UNKNOWN (candidate enum SexScope); null = not reported, UNKNOWN = reported as unknown or not extracted."
+  sexScope: String
+  ageDescriptor: String
+  "Number of animals, participants or replicate units in this exposure group; null = not reported."
+  sampleSize: Int
+  "Exposure amount as reported; null with exposureStatus when unknown, or null when IN_STUDY_ARM is present. Never 0 for unknown (V-232)."
+  exposureAmount: Float
+  "UCUM unit of exposureAmount (mg/d, mg/kg/d, mg/kg, umol/L); required with exposureAmount."
+  exposureUnit: String
+  exposureBasis: ExposureBasis
+  "Controlled string ORAL | GAVAGE | DIET | IP | IV | IN_MEDIUM | TOPICAL (candidate enum ExposureRoute)."
+  route: String
+  "ISO 8601 duration of exposure, for example P21D; PT6H for a single dose measured six hours later."
+  exposureDurationIso: String
+  "Controlled string NOT_EXTRACTED | NOT_REPORTED | NOT_APPLICABLE (candidate enum ExposureStatus): why exposure fields are null."
+  exposureStatus: String
+  "Derived human-equivalent dose (INV-213); regenerable; requires hedMethod (V-236)."
+  hedValue: Float
+  hedUnitCode: String
+  "Method id of the HED derivation, for example 'BSA-Km/FDA-2005' or 'BSA-factor-as-stated-in-source'."
+  hedMethod: String
+  """class: structural; cardinality: zero_or_one (required unless setting is IN_VITRO_CELL_FREE or IN_SILICO); catalog: IN_SPECIES"""
+  species: [Species!]! @relationship(type: "IN_SPECIES", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: MEASURED_IN (compartment where the measurand was sampled; must equal the measurand's MEASURED_IN_MATRIX for level-change steps, V-239)"""
+  measuredIn: [AnatomicalContext!]! @relationship(type: "MEASURED_IN", direction: OUT)
+  """class: structural; cardinality: zero_or_one across the three EXPOSED_TO fields; catalog: EXPOSED_TO (tested material at the most specific level supported)"""
+  exposedToMaterials: [IngredientMaterial!]! @relationship(type: "EXPOSED_TO", direction: OUT)
+  """class: structural; cardinality: zero_or_one across the three EXPOSED_TO fields; catalog: EXPOSED_TO"""
+  exposedToForms: [ChemicalForm!]! @relationship(type: "EXPOSED_TO", direction: OUT)
+  """class: structural; cardinality: zero_or_one across the three EXPOSED_TO fields; catalog: EXPOSED_TO"""
+  exposedToSubstances: [ChemicalSubstance!]! @relationship(type: "EXPOSED_TO", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: IN_STUDY_ARM (human study arm; exposure fields then null)"""
+  studyArm: [StudyArm!]! @relationship(type: "IN_STUDY_ARM", direction: OUT)
+  """class: structural (inverse view); cardinality: many; catalog: OBSERVED_IN_CONTEXT (Assertion -> context, zero_or_one per assertion)"""
+  observedAssertions: [Assertion!]! @relationship(type: "OBSERVED_IN_CONTEXT", direction: IN)
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Entities: biological reference concepts and referents
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A biological mechanism or process concept (mitophagy, NAD+ turnover flux, mitochondrial oxidative function, sirtuin
+deacylation). Species-neutral reference identity: whether the process was shown, where and in which species lives on
+mechanism Assertions with basisKind and MechanismEvidenceContext, never on this node (round 0003 C3-04). It is NOT a
+measured result, NOT a pathway record (Pathway), NOT a biomarker (a proxy marker of a process is a Biomarker linked by
+curated REFLECTS_MECHANISM). Shortcut edges APPLIES_TO_SPECIES, INFLUENCES_OUTCOME, ACTS_IN and incoming
+AFFECTS_MECHANISM are derived projections (mx-proj/v1) and read-only. CQ-MX-01, CQ-MX-03, CQ-MX-05. Module mechanisms.
+Archetype Entity.
+"""
+type Mechanism implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Mechanism", "Entity"])
+  @fulltext(indexes: [{indexName: "MechanismSearch", fields: ["name", "description", "searchText"], queryName: "searchMechanisms"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  "Live name kept (catalog property mechanismKind maps here; no alias introduced). Classification label, display; not truth."
+  mechanismClass: String
+  regulatoryMode: String
+  biologicalLayer: String
+  "Display only; not queryable truth."
+  keyEntitiesSummary: String
+  """class: structural (curated reference); cardinality: many; catalog: INVOLVES_PATHWAY"""
+  involvesPathways: [Pathway!]! @relationship(type: "INVOLVES_PATHWAY", direction: OUT, properties: "MechanismLinkProperties")
+  """class: derived (mx-proj/v1, read-only); cardinality: many; catalog: ACTS_IN (compartments of projected contexts)"""
+  actsIn: [AnatomicalContext!]! @relationship(type: "ACTS_IN", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (mx-proj/v1, read-only); cardinality: many; catalog: APPLIES_TO_SPECIES (only species of projected contexts, V-234r)"""
+  appliesToSpecies: [Species!]! @relationship(type: "APPLIES_TO_SPECIES", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (mx-proj/v1, read-only); cardinality: many; catalog: INFLUENCES_OUTCOME"""
+  influencesOutcomes: [Outcome!]! @relationship(type: "INFLUENCES_OUTCOME", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (mx-proj/v1, read-only; inverse view); cardinality: many; catalog: AFFECTS_MECHANISM"""
+  affectedBySubstances: [ChemicalSubstance!]! @relationship(type: "AFFECTS_MECHANISM", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (mx-proj/v1, read-only; inverse view); cardinality: many; catalog: AFFECTS_MECHANISM"""
+  affectedByForms: [ChemicalForm!]! @relationship(type: "AFFECTS_MECHANISM", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (mx-proj/v1, read-only; inverse view); cardinality: many; catalog: AFFECTS_MECHANISM"""
+  affectedByMaterials: [IngredientMaterial!]! @relationship(type: "AFFECTS_MECHANISM", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (curated reference; inverse view); cardinality: many; catalog: CONTRIBUTES_TO"""
+  contributingMolecularEntities: [MolecularEntity!]! @relationship(type: "CONTRIBUTES_TO", direction: IN, properties: "MechanismLinkProperties")
+  """class: structural (curated reference; inverse view); cardinality: many; catalog: HAS_MECHANISM (Condition -> Mechanism)"""
+  conditions: [Condition!]! @relationship(type: "HAS_MECHANISM", direction: IN, properties: "MechanismLinkProperties")
+  """class: derived (one-to-one projection, read-only; inverse view); cardinality: many; catalog: MEDIATES_RISK_THROUGH"""
+  mediatedRiskFactors: [RiskFactor!]! @relationship(type: "MEDIATES_RISK_THROUGH", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A reference pathway record from a pathway authority (Reactome, KEGG, WikiPathways), identified by the authority's
+UNVERSIONED stable id (externalId, for example R-HSA-196807) inside one scheme. Reactome pathway records are species
+specific (R-HSA-196807 human, curated; R-MMU-196807 mouse, isInferred true), so speciesTaxonId and orthologyInferred are
+carried from the record. pathwayRevision is a derived cache of the revision observed at the latest capture (Reactome
+stIdVersion suffix "8", release 97, observed 2026-10-04); the authoritative revision travels on the SourceSnapshot and on
+each curated link's MechanismLinkProperties.referenceRevision, because the record changes revision without changing
+identity (its DOI 10.3180/R-HSA-196807.7 names revision 7 while the current record is revision 8). Pathway topology is
+reference knowledge, not experimental causal evidence. CQ-MX-01, CQ-MX-C02. Module mechanisms. Archetype Entity.
+"""
+type Pathway implements Entity & EntityArchetype
+  @node(labels: ["Pathway", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  pathwayClass: String
+  "Authority scheme label, materialized from the primary Identifier (REACTOME, KEGG, WIKIPATHWAYS)."
+  sourceDatabase: String
+  "Materialized key: unversioned stable id (Reactome ^R-[A-Z]{3}-[0-9]+$, no .version suffix); the Identifier record is authoritative."
+  externalId: String
+  "Derived cache: revision observed at the latest capture (for Reactome the stIdVersion suffix). Never identity."
+  pathwayRevision: String
+  "Authority release of the latest capture (Reactome database version, for example 97)."
+  pathwayRelease: String
+  revisionObservedAt: DateTime
+  "NCBI taxonomy id of the species the record is defined for (9606 for R-HSA); null for species-neutral records."
+  speciesTaxonId: String
+  "True when the authority marks the record as computationally inferred from another species (Reactome isInferred)."
+  orthologyInferred: Boolean
+  """class: asserted; cardinality: one_or_more; catalog: HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: structural (curated reference; inverse view of Mechanism.involvesPathways; replaces live Pathway.hasMechanisms/HAS_MECHANISM); catalog: INVOLVES_PATHWAY"""
+  mechanisms: [Mechanism!]! @relationship(type: "INVOLVES_PATHWAY", direction: IN, properties: "MechanismLinkProperties")
+  """class: structural (curated reference; inverse view); catalog: PARTICIPATES_IN"""
+  participants: [MolecularEntity!]! @relationship(type: "PARTICIPATES_IN", direction: IN, properties: "MechanismLinkProperties")
+  """class: structural (curated reference; inverse view of Condition.involvesPathways); catalog: INVOLVES_PATHWAY"""
+  conditions: [Condition!]! @relationship(type: "INVOLVES_PATHWAY", direction: IN, properties: "MechanismLinkProperties")
+}
+
+"""
+A genome-encoded molecular actor: gene, transcript, protein, protein complex, protein family or non-coding RNA (SIRT1,
+the sirtuin family, NAMPT, NMRK1). Identity comes from HGNC/MGI/UniProt/Ensembl Identifier records and is species
+specific when the authority is (HGNC:14929 human SIRT1 vs MGI:2135607 mouse Sirt1); a family node is species-neutral
+(speciesTaxonId null). It is NOT a small molecule or metabolite: NAD+, NR, NAAD are ChemicalSubstance (W02) identities
+keyed by structure (PubChem CID 5892 "Nadide" / NAD+ share one InChIKey), and a compartment-specific level of a small
+molecule is a Biomarker (W07) (ruling proposed for CL-002). Incoming MODULATES edges are derived (mx-proj/v1).
+CQ-MX-01. Module mechanisms. Archetype Entity.
+"""
+type MolecularEntity implements Entity & EntityArchetype
+  @node(labels: ["MolecularEntity", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Controlled string GENE | TRANSCRIPT | PROTEIN | PROTEIN_COMPLEX | PROTEIN_FAMILY | NONCODING_RNA (candidate enum MolecularEntityKind). METABOLITE and SMALL_MOLECULE are invalid (V-W03-05)."
+  entityKind: String
+  geneSymbol: String
+  "Materialized key (HGNC:<digits>); Identifier record authoritative."
+  hgncId: String
+  "Materialized key (UniProtKB accession); Identifier record authoritative."
+  uniprotId: String
+  "Materialized key (ENSG...); Identifier record authoritative."
+  ensemblId: String
+  "NCBI taxonomy id when the identity is species specific; null for species-neutral families."
+  speciesTaxonId: String
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: structural (curated reference: gene encodes the protein measured as a biomarker); catalog: ENCODES"""
+  encodesBiomarkers: [Biomarker!]! @relationship(type: "ENCODES", direction: OUT, properties: "MechanismLinkProperties")
+  """class: structural (curated reference); catalog: PARTICIPATES_IN"""
+  participatesInPathways: [Pathway!]! @relationship(type: "PARTICIPATES_IN", direction: OUT, properties: "MechanismLinkProperties")
+  """class: structural (curated reference); catalog: CONTRIBUTES_TO"""
+  contributesToMechanisms: [Mechanism!]! @relationship(type: "CONTRIBUTES_TO", direction: OUT, properties: "MechanismLinkProperties")
+  """class: derived (mx-proj/v1, read-only; inverse view); catalog: MODULATES"""
+  modulatedBySubstances: [ChemicalSubstance!]! @relationship(type: "MODULATES", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (mx-proj/v1, read-only; inverse view); catalog: MODULATES"""
+  modulatedByMaterials: [IngredientMaterial!]! @relationship(type: "MODULATES", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A biological species or model organism taxon (Homo sapiens 9606, Mus musculus 10090). Identity is the NCBI taxonomy id
+(materialized key ncbiTaxonomyId, normalization ^[0-9]+$). It is NOT a strain or disease model (those are the verbatim
+MechanismEvidenceContext.modelDescriptor) and NOT a microbial taxon used as an ingredient (W02 MicrobialTaxon).
+APPLIES_TO_SPECIES edges into it are derived from measured contexts only. CQ-MX-02, CQ-MX-03. Module mechanisms.
+Archetype Entity.
+"""
+type Species implements Entity & EntityArchetype
+  @node(labels: ["Species", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Materialized identity key (NCBI Taxonomy); unique (operations file)."
+  ncbiTaxonomyId: String
+  scientificName: String
+  """class: derived (read-only; inverse view); catalog: APPLIES_TO_SPECIES"""
+  mechanismsMeasuredIn: [Mechanism!]! @relationship(type: "APPLIES_TO_SPECIES", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (inverse view); catalog: IN_SPECIES"""
+  evidenceContexts: [MechanismEvidenceContext!]! @relationship(type: "IN_SPECIES", direction: IN)
+}
+
+"""
+A compartment in which something is measured or acts: tissue (skeletal muscle), cell type (muscle stem cell), cell line,
+specimen matrix (whole blood, plasma, serum), organ, or subcellular compartment (mitochondrion). It is the joinable
+compartment that makes measurands compartment specific (round 0003 M1): NAD+ in whole blood and NAD+ in liver are two
+Biomarkers whose MEASURED_IN_MATRIX targets differ. Identity: UBERON / CL / Cellosaurus Identifier records (uberonId is
+materialized). Organ nodes carry this label too (Organ specialization), so an organ has one identity. It is NOT a
+specimen type of an assay (W07 Specimen) and NOT a measured value. CQ-MX-02. Module mechanisms. Archetype Entity.
+"""
+type AnatomicalContext implements Entity & EntityArchetype
+  @node(labels: ["AnatomicalContext", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  contextKind: AnatomicalContextKind
+  "Materialized key (UBERON:<7 digits>) when the compartment is anatomical; Identifier record authoritative."
+  uberonId: String
+  """class: asserted; catalog: HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: structural (inverse view); catalog: MEASURED_IN"""
+  evidenceContexts: [MechanismEvidenceContext!]! @relationship(type: "MEASURED_IN", direction: IN)
+  """class: structural (inverse view; the outgoing field is W07's Biomarker.measuredInMatrix); catalog: MEASURED_IN_MATRIX"""
+  measurands: [Biomarker!]! @relationship(type: "MEASURED_IN_MATRIX", direction: IN)
+  """class: derived (read-only; inverse view); catalog: ACTS_IN"""
+  actingMechanisms: [Mechanism!]! @relationship(type: "ACTS_IN", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+An organ (liver, heart, skeletal muscle as an organ system member) kept as a live GraphQL type for compatibility and
+stored as a specialization of AnatomicalContext (labels Organ, AnatomicalContext, Entity; contextKind ORGAN), so the
+same organ never exists twice. organSystem is display classification. Live Organ.measuredByMetrics and
+Organ.hasMechanisms are retired (measurement compartment is Biomarker MEASURED_IN_MATRIX; mechanism location is derived
+ACTS_IN). CQ-MX-02. Module mechanisms. Archetype Entity.
+"""
+type Organ implements Entity & EntityArchetype
+  @node(labels: ["Organ", "AnatomicalContext", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Always ORGAN for Organ nodes (V-W03-06)."
+  contextKind: AnatomicalContextKind
+  uberonId: String
+  organSystem: String
+  """class: asserted; catalog: HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: structural (inverse view); catalog: MEASURED_IN"""
+  evidenceContexts: [MechanismEvidenceContext!]! @relationship(type: "MEASURED_IN", direction: IN)
+  """class: derived (read-only; inverse view; replaces live Organ.hasMechanisms); catalog: ACTS_IN"""
+  actingMechanisms: [Mechanism!]! @relationship(type: "ACTS_IN", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (curated reference; inverse view); catalog: AFFECTS_ORGAN (Condition -> Organ)"""
+  affectedByConditions: [Condition!]! @relationship(type: "AFFECTS_ORGAN", direction: IN, properties: "MechanismLinkProperties")
+}
+
+"""
+A biological or clinical outcome concept (muscle strength, insulin sensitivity, life span). It is the biological referent
+that study OutcomeDefinitions (W09) and EndpointClassification contexts (W10) point at; it is NOT an outcome definition
+(what a study planned to measure, with timepoint and priority), NOT a result, and carries no endpoint role or surrogate
+status (INV-205). outcomeClass, outcomeDomain, timeframeText are display. INFLUENCES_OUTCOME edges into it are derived.
+CQ-ST-03, CQ-MX-01. Module mechanisms. Archetype Entity.
+"""
+type Outcome implements Entity & EntityArchetype
+  @node(labels: ["Outcome", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Live name kept (catalog property outcomeKind maps here; no alias introduced). Display classification."
+  outcomeClass: String
+  outcomeDomain: String
+  timeframeText: String
+  """class: structural (curated: the concept is measured by this metric); catalog: OPERATIONALIZED_BY (shared name with W16, seam W03-SR-07)"""
+  operationalizedBy: [Metric!]! @relationship(type: "OPERATIONALIZED_BY", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural (curated readout-of link; never a premise for a measured mechanism step); catalog: REFLECTS_MECHANISM"""
+  reflectsMechanisms: [Mechanism!]! @relationship(type: "REFLECTS_MECHANISM", direction: OUT, properties: "MechanismLinkProperties")
+  """class: derived (one-to-one projection, read-only); catalog: ASSOCIATED_WITH_CONDITION"""
+  associatedWithConditions: [Condition!]! @relationship(type: "ASSOCIATED_WITH_CONDITION", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (read-only; inverse view); catalog: INFLUENCES_OUTCOME"""
+  influencedByMechanisms: [Mechanism!]! @relationship(type: "INFLUENCES_OUTCOME", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A disease, disorder or phenotype concept (sarcopenia, insulin resistance, insulin-resistance syndrome type A). Identity
+is the BellLabs uid; external codes are Identifier records with scheme, issuer, value and validity (MONDO, HP, Orphanet,
+OMIM, ICD-11, ICD-10-CM). Ontology ids that name one concept (mondoId, orphaCode, omimId) are materialized lookup keys
+with normalization; classification codes are NOT keys: ICD-10-CM E88.81 was a billable leaf in FY2022 and is a header
+in FY2027 (split into E88.810..E88.819), so an ICD code lives only on an Identifier with validFrom/validTo per fiscal
+year, never as a node property (catalog icd10Code is not carried; live icd11Code is read-only legacy). Absence of a
+MONDO id is not absence of the condition (sarcopenia has ICD-10-CM M62.84 and no MONDO term in OLS on 2026-10-04;
+"insulin resistance" resolves in MONDO only to imported phenotype HP:0000855). A condition is never inferred from a
+value outside a reference interval (diagnostics FI). CQ-ST-03, CQ-MX-C03. Module mechanisms. Archetype Entity.
+"""
+type Condition implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Condition", "Entity"])
+  @fulltext(indexes: [{indexName: "ConditionSearch", fields: ["name", "description", "searchText", "mondoId", "icd11Code", "orphaCode", "omimId"], queryName: "searchConditions"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  conditionClass: String
+  "Materialized key MONDO:<7 digits>; null = no MONDO concept recorded (never 'not a disease')."
+  mondoId: String
+  "Legacy read-only projection; ICD-11 codes are Identifier records with release validity."
+  icd11Code: String @settable(onCreate: false, onUpdate: false)
+  "Materialized key ORPHA:<digits>."
+  orphaCode: String
+  "Materialized key (OMIM MIM number)."
+  omimId: String
+  "Display hint derived from a rare-disease subset membership (for example MONDO subset orphanet_rare); not an assessment."
+  isRare: Boolean
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00; ICD-10-CM codes carry fiscal-year validity)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: structural (curated reference: anatomical involvement); catalog: AFFECTS_ORGAN (shared name with W17, seam W03-SR-08)"""
+  affectsOrgans: [Organ!]! @relationship(type: "AFFECTS_ORGAN", direction: OUT, properties: "MechanismLinkProperties")
+  """class: structural (curated reference pathophysiology); catalog: HAS_MECHANISM"""
+  hasMechanisms: [Mechanism!]! @relationship(type: "HAS_MECHANISM", direction: OUT, properties: "MechanismLinkProperties")
+  """class: structural (curated reference); catalog: INVOLVES_PATHWAY"""
+  involvesPathways: [Pathway!]! @relationship(type: "INVOLVES_PATHWAY", direction: OUT, properties: "MechanismLinkProperties")
+  """class: derived (one-to-one projection, read-only; inverse view); catalog: INCREASES_RISK_FOR"""
+  riskFactors: [RiskFactor!]! @relationship(type: "INCREASES_RISK_FOR", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (one-to-one projection, read-only; inverse view); catalog: ASSOCIATED_WITH_CONDITION"""
+  associatedOutcomes: [Outcome!]! @relationship(type: "ASSOCIATED_WITH_CONDITION", direction: IN, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A risk factor concept (smoking, obesity, physical inactivity, an APOE genotype class). Reference identity only; the
+association with a condition and the mechanism mediating it are one-to-one derived projections of ACCEPTED
+DIRECT_MEASUREMENT assertions with predicates INCREASES_RISK_FOR and MEDIATES_RISK_THROUGH (candidate registration as
+mechanism-module assertedPredicates), and APPLIES_TO_SPECIES follows the mechanism rule. riskClass, modifiable and
+exposureCategory are display classifications. It is NOT an Exposure occurrence (W05) and NOT a person's risk (private).
+CQ-MX-05, CQ-MX-C04. Module mechanisms. Archetype Entity.
+"""
+type RiskFactor implements Entity & EntityArchetype
+  @node(labels: ["RiskFactor", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  riskClass: String
+  modifiable: Boolean
+  exposureCategory: String
+  """class: derived (one-to-one projection, read-only); catalog: INCREASES_RISK_FOR"""
+  increasesRiskFor: [Condition!]! @relationship(type: "INCREASES_RISK_FOR", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (one-to-one projection, read-only); catalog: MEDIATES_RISK_THROUGH"""
+  mediatesRiskThrough: [Mechanism!]! @relationship(type: "MEDIATES_RISK_THROUGH", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (mx-proj/v1, read-only); catalog: APPLIES_TO_SPECIES"""
+  appliesToSpecies: [Species!]! @relationship(type: "APPLIES_TO_SPECIES", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+}

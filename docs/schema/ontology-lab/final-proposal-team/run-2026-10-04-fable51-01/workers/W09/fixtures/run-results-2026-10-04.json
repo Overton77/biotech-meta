@@ -1,0 +1,1857 @@
+{
+ "runAt": "2026-10-04",
+ "neo4j": "5.26.31 community (embedded harness, W09 scratch instance)",
+ "fixturesLoaded": [
+  "01",
+  "02",
+  "03",
+  "04",
+  "05",
+  "06",
+  "07"
+ ],
+ "negativesFile": "90",
+ "suiteErrors": [
+  0,
+  0
+ ],
+ "w09Queries": [
+  {
+   "query": "V-201",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 2,
+   "withNegativesSample": [
+    {
+     "studySide": "hu:arm:nct02678611-nrpt-1x",
+     "rel": "RECEIVES",
+     "commercialTarget": "hu:product-variant:basis-us-capsule-standard"
+    },
+    {
+     "studySide": "hu:study:nct02678611-basis-nrpt",
+     "rel": "EVALUATES",
+     "commercialTarget": "hu:product:neg-elysium-basis"
+    }
+   ]
+  },
+  {
+   "query": "V-202",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "component": "hu:intervention-component:neg-variant-without-name",
+     "variantWithoutReportedName": "hu:product-variant:basis-us-capsule-standard"
+    }
+   ]
+  },
+  {
+   "query": "V-210",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "studyWithMisplacedFields": "hu:study:neg-registry-fields-on-study"
+    }
+   ]
+  },
+  {
+   "query": "V-211",
+   "positiveRows": 1,
+   "positiveSample": [
+    {
+     "registrationVersion": "hu:registration-version:synthetic-demo-001-v1",
+     "owners": 2
+    }
+   ],
+   "withNegativesRows": 2,
+   "withNegativesSample": [
+    {
+     "registrationVersion": "hu:registration-version:synthetic-demo-001-v1",
+     "owners": 2
+    },
+    {
+     "registrationVersion": "hu:registration-version:neg-shared-unobserved",
+     "owners": 2
+    }
+   ]
+  },
+  {
+   "query": "V-211r",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "registrationVersion": "hu:registration-version:neg-shared-unobserved",
+     "owners": 2
+    }
+   ]
+  },
+  {
+   "query": "V-212",
+   "positiveRows": 1,
+   "positiveSample": [
+    {
+     "study": "hu:study:nct02678611-basis-nrpt",
+     "observedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 0,
+      "minute": 55,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "resultsArticle": "29184669"
+    }
+   ],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "study": "hu:study:nct02678611-basis-nrpt",
+     "observedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 0,
+      "minute": 55,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "resultsArticle": "29184669"
+    }
+   ]
+  },
+  {
+   "query": "V-213",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "resultWithUnattributedMeaningfulness": "hu:study-result:atlas-hamstring-ua500-vs-placebo"
+    }
+   ]
+  },
+  {
+   "query": "V-215",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "synthesis": "hu:synthesis:neg-secondary-as-confirmatory",
+     "nonPrimaryConfirmatory": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120"
+    }
+   ]
+  },
+  {
+   "query": "V-215r",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 3,
+   "withNegativesSample": [
+    {
+     "synthesis": "hu:synthesis:neg-secondary-as-replication",
+     "nonPrimaryInput": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "role": "INDEPENDENT_REPLICATION",
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120"
+    },
+    {
+     "synthesis": "hu:synthesis:neg-secondary-as-confirmatory",
+     "nonPrimaryInput": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "role": "CONFIRMATORY",
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120"
+    },
+    {
+     "synthesis": "hu:synthesis:neg-within-arm-as-replication",
+     "nonPrimaryInput": "hu:study-result:atlas-hamstring-ua500-within-arm",
+     "role": "INDEPENDENT_REPLICATION",
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120"
+    }
+   ]
+  },
+  {
+   "query": "V-216",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 3,
+   "withNegativesSample": [
+    {
+     "synthesis": "hu:synthesis:neg-within-arm-as-replication",
+     "withinArmResult": "hu:study-result:atlas-hamstring-ua500-within-arm",
+     "role": "INDEPENDENT_REPLICATION"
+    },
+    {
+     "synthesis": "hu:synthesis:neg-shared-dataset-as-replication",
+     "withinArmResult": "hu:study-result:berryman-2013-skins-rhi-within",
+     "role": "INDEPENDENT_REPLICATION"
+    },
+    {
+     "synthesis": "hu:synthesis:neg-shared-dataset-as-replication",
+     "withinArmResult": "hu:study-result:zhang-2011-postprandial-sera-efflux",
+     "role": "INDEPENDENT_REPLICATION"
+    }
+   ]
+  },
+  {
+   "query": "V-217",
+   "positiveRows": 5,
+   "positiveSample": [
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-placebo",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct03283462-ae-serious-ua",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct03283462-ae-serious-placebo",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    }
+   ],
+   "withNegativesRows": 6,
+   "withNegativesSample": [
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-placebo",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct03283462-ae-serious-ua",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct03283462-ae-serious-placebo",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    }
+   ]
+  },
+  {
+   "query": "V-217r",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "aeResultWithoutCollectionMethod": "hu:study-result:neg-silence-as-zero",
+     "eventCount": 0,
+     "affected": 0
+    }
+   ]
+  },
+  {
+   "query": "V-217i",
+   "positiveRows": 5,
+   "positiveSample": [
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-placebo",
+     "sourceWording": "self-reported AEs"
+    },
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+     "sourceWording": "self-reported AEs"
+    },
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+     "sourceWording": "self-reported AEs"
+    },
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct03283462-ae-serious-ua",
+     "sourceWording": "recorded and coded according to the Medical Dictionary for Regulatory Activities"
+    },
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct03283462-ae-serious-placebo",
+     "sourceWording": "recorded and coded according to the Medical Dictionary for Regulatory Activities"
+    }
+   ],
+   "withNegativesRows": 5,
+   "withNegativesSample": [
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-placebo",
+     "sourceWording": "self-reported AEs"
+    },
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+     "sourceWording": "self-reported AEs"
+    },
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+     "sourceWording": "self-reported AEs"
+    },
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct03283462-ae-serious-ua",
+     "sourceWording": "recorded and coded according to the Medical Dictionary for Regulatory Activities"
+    },
+    {
+     "zeroWithUndescribedCollection": "hu:study-result:nct03283462-ae-serious-placebo",
+     "sourceWording": "recorded and coded according to the Medical Dictionary for Regulatory Activities"
+    }
+   ]
+  },
+  {
+   "query": "V-218",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "synthesis": "hu:synthesis:neg-shared-dataset-as-replication",
+     "result1": "hu:study-result:berryman-2013-skins-rhi-within",
+     "result2": "hu:study-result:zhang-2011-postprandial-sera-efflux"
+    }
+   ]
+  },
+  {
+   "query": "V-221",
+   "positiveRows": 4,
+   "positiveSample": [
+    {
+     "intervention": "hu:intervention:nct02582593-real",
+     "incompleteComponent": "hu:intervention-component:nct02582593-real"
+    },
+    {
+     "intervention": "hu:intervention:nct02582593-sham",
+     "incompleteComponent": "hu:intervention-component:nct02582593-sham"
+    },
+    {
+     "intervention": "hu:intervention:synthetic-sauna-demo-sauna",
+     "incompleteComponent": null
+    },
+    {
+     "intervention": "hu:intervention:nct04985630-pomegranate-juice",
+     "incompleteComponent": "hu:intervention-component:nct04985630-pomegranate-juice"
+    }
+   ],
+   "withNegativesRows": 5,
+   "withNegativesSample": [
+    {
+     "intervention": "hu:intervention:nct02582593-real",
+     "incompleteComponent": "hu:intervention-component:nct02582593-real"
+    },
+    {
+     "intervention": "hu:intervention:nct02582593-sham",
+     "incompleteComponent": "hu:intervention-component:nct02582593-sham"
+    },
+    {
+     "intervention": "hu:intervention:synthetic-sauna-demo-sauna",
+     "incompleteComponent": null
+    },
+    {
+     "intervention": "hu:intervention:nct04985630-pomegranate-juice",
+     "incompleteComponent": "hu:intervention-component:nct04985630-pomegranate-juice"
+    },
+    {
+     "intervention": "hu:intervention:neg-missing-mass-basis",
+     "incompleteComponent": "hu:intervention-component:neg-missing-mass-basis"
+    }
+   ]
+  },
+  {
+   "query": "V-221r",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "intervention": "hu:intervention:neg-missing-mass-basis",
+     "incompleteComponent": "hu:intervention-component:neg-missing-mass-basis"
+    }
+   ]
+  },
+  {
+   "query": "V-223",
+   "positiveRows": 1,
+   "positiveSample": [
+    {
+     "outcome": "hu:outcome:nct02678611-nad-whole-blood",
+     "priorities": [
+      "SECONDARY",
+      "PRIMARY"
+     ]
+    }
+   ],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "outcome": "hu:outcome:nct02678611-nad-whole-blood",
+     "priorities": [
+      "SECONDARY",
+      "PRIMARY"
+     ]
+    }
+   ]
+  },
+  {
+   "query": "V-W09-01",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "resultWithInconsistentDerivedSignificance": "hu:study-result:neg-inconsistent-significance",
+     "conclusion": "NOT_REPORTED",
+     "stored": false
+    }
+   ]
+  },
+  {
+   "query": "V-W09-02",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "studyWithStaleOrForeignRegistryCache": "hu:study:neg-foreign-cache"
+    }
+   ]
+  },
+  {
+   "query": "V-W09-03",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "componentWithSeveralTargets": "hu:intervention-component:neg-variant-without-name",
+     "targets": 2
+    }
+   ]
+  },
+  {
+   "query": "V-W09-04",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "notice": "hu:publication:neg-correction-without-event",
+     "rel": "CORRECTS",
+     "target": "hu:publication:pmid-35584623",
+     "namedEvent": "hu:source-revision:neg-missing"
+    }
+   ]
+  },
+  {
+   "query": "V-W09-05",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "unpublishedInferredFromRegistryOnly": "hu:assertion:neg-results-unpublished"
+    }
+   ]
+  },
+  {
+   "query": "V-W09-06",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "newer": "hu:assertion:neg-erratum-as-fact-ending",
+     "older": "hu:assertion:pmid-29184669-reference-20-original",
+     "revision": "ERRATUM"
+    }
+   ]
+  },
+  {
+   "query": "V-W09-07",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "outcomeWithUngroundedPriority": "hu:outcome:atlas-isokinetic-strength-d120"
+    }
+   ]
+  },
+  {
+   "query": "V-W09-08",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "aeResultArmCount": "hu:study-result:nct02678611-ae-any-nrpt-1x",
+     "n": 2
+    }
+   ]
+  },
+  {
+   "query": "V-W09-09",
+   "positiveRows": 4,
+   "positiveSample": [
+    {
+     "publicationWithoutDoiIdentifier": "hu:publication:pmid-35584623"
+    },
+    {
+     "publicationWithoutDoiIdentifier": "hu:publication:pmid-35050355"
+    },
+    {
+     "publicationWithoutDoiIdentifier": "hu:publication:pmid-29184669"
+    },
+    {
+     "publicationWithoutDoiIdentifier": "hu:publication:pmid-30155270"
+    }
+   ],
+   "withNegativesRows": 4,
+   "withNegativesSample": [
+    {
+     "publicationWithoutDoiIdentifier": "hu:publication:pmid-35584623"
+    },
+    {
+     "publicationWithoutDoiIdentifier": "hu:publication:pmid-35050355"
+    },
+    {
+     "publicationWithoutDoiIdentifier": "hu:publication:pmid-29184669"
+    },
+    {
+     "publicationWithoutDoiIdentifier": "hu:publication:pmid-30155270"
+    }
+   ]
+  },
+  {
+   "query": "V-W09-10",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "rel": "REPORTS_ON",
+     "edge": "hu:rel:neg-bare-reports-on"
+    }
+   ]
+  },
+  {
+   "query": "V-W09-11",
+   "positiveRows": 0,
+   "positiveSample": [],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "rel": "OPERATED_BY",
+     "rule": null
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-01",
+   "positiveRows": 1,
+   "positiveSample": [
+    {
+     "version": "hu:registration-version:synthetic-demo-001-v1",
+     "status": "RECRUITING",
+     "resultsPosted": false,
+     "enrollment": 60,
+     "enrollmentType": "ESTIMATED",
+     "validityClass": "UNKNOWN_START",
+     "observedAt": {
+      "year": 2026,
+      "month": 5,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "versionDate": null
+    }
+   ],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "version": "hu:registration-version:synthetic-demo-001-v1",
+     "status": "RECRUITING",
+     "resultsPosted": false,
+     "enrollment": 60,
+     "enrollmentType": "ESTIMATED",
+     "validityClass": "UNKNOWN_START",
+     "observedAt": {
+      "year": 2026,
+      "month": 5,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "versionDate": null
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-02",
+   "positiveRows": 2,
+   "positiveSample": [
+    {
+     "arm": "Real NIR stimulation",
+     "armType": "EXPERIMENTAL",
+     "route": "TRANSCRANIAL",
+     "form": "DEVICE_SESSION",
+     "schedule": "six sessions over a 2-week period",
+     "duration": "P2W",
+     "quantity": null,
+     "unit": null,
+     "quantityBasis": null,
+     "massBasis": null,
+     "quantityStatus": "NOT_APPLICABLE",
+     "verbatim": "transcranial near-infrared (808-904 nm), six sessions over 2 weeks",
+     "targetKind": "Device",
+     "target": "MedX 1116 Rehab Console",
+     "asReported": "MedX 1116 Rehab Console",
+     "definition": null
+    },
+    {
+     "arm": "Sham NIR stimulation",
+     "armType": "SHAM_COMPARATOR",
+     "route": "TRANSCRANIAL",
+     "form": "DEVICE_SESSION",
+     "schedule": "six sessions over a 2-week period",
+     "duration": "P2W",
+     "quantity": null,
+     "unit": null,
+     "quantityBasis": null,
+     "massBasis": null,
+     "quantityStatus": "NOT_APPLICABLE",
+     "verbatim": "sham stimulation, six sessions over 2 weeks",
+     "targetKind": "Device",
+     "target": "MedX 1116 Rehab Console",
+     "asReported": "Sham MedX 1116 Rehab Console",
+     "definition": null
+    }
+   ],
+   "withNegativesRows": 2,
+   "withNegativesSample": [
+    {
+     "arm": "Real NIR stimulation",
+     "armType": "EXPERIMENTAL",
+     "route": "TRANSCRANIAL",
+     "form": "DEVICE_SESSION",
+     "schedule": "six sessions over a 2-week period",
+     "duration": "P2W",
+     "quantity": null,
+     "unit": null,
+     "quantityBasis": null,
+     "massBasis": null,
+     "quantityStatus": "NOT_APPLICABLE",
+     "verbatim": "transcranial near-infrared (808-904 nm), six sessions over 2 weeks",
+     "targetKind": "Device",
+     "target": "MedX 1116 Rehab Console",
+     "asReported": "MedX 1116 Rehab Console",
+     "definition": null
+    },
+    {
+     "arm": "Sham NIR stimulation",
+     "armType": "SHAM_COMPARATOR",
+     "route": "TRANSCRANIAL",
+     "form": "DEVICE_SESSION",
+     "schedule": "six sessions over a 2-week period",
+     "duration": "P2W",
+     "quantity": null,
+     "unit": null,
+     "quantityBasis": null,
+     "massBasis": null,
+     "quantityStatus": "NOT_APPLICABLE",
+     "verbatim": "sham stimulation, six sessions over 2 weeks",
+     "targetKind": "Device",
+     "target": "MedX 1116 Rehab Console",
+     "asReported": "Sham MedX 1116 Rehab Console",
+     "definition": null
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-03",
+   "positiveRows": 3,
+   "positiveSample": [
+    {
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120",
+     "outcome": "Change in isokinetic lower body muscle strength (Biodex), baseline to day 120",
+     "favorableResult": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "analysisKind": "SECONDARY_PRESPECIFIED",
+     "comparisonKind": "BETWEEN_ARM",
+     "multiplicityAdjusted": false,
+     "synthesis": "hu:synthesis:ua-muscle-performance-replication-v1",
+     "inputRole": "SUPPORTIVE"
+    },
+    {
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120",
+     "outcome": "Change in isokinetic lower body muscle strength (Biodex), baseline to day 120",
+     "favorableResult": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "analysisKind": "SECONDARY_PRESPECIFIED",
+     "comparisonKind": "BETWEEN_ARM",
+     "multiplicityAdjusted": false,
+     "synthesis": "hu:synthesis:ua-improves-muscle-function-middle-aged-v1",
+     "inputRole": "SUPPORTIVE"
+    },
+    {
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120",
+     "outcome": "Change in exercise tolerance: power output on cycle ergometer, baseline to day 120",
+     "favorableResult": "hu:study-result:atlas-synthetic-subgroup-low-vo2max",
+     "analysisKind": "SUBGROUP_POST_HOC",
+     "comparisonKind": "BETWEEN_ARM",
+     "multiplicityAdjusted": false,
+     "synthesis": "hu:synthesis:ua-improves-muscle-function-middle-aged-v1",
+     "inputRole": "HYPOTHESIS_GENERATING"
+    }
+   ],
+   "withNegativesRows": 5,
+   "withNegativesSample": [
+    {
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120",
+     "outcome": "Change in isokinetic lower body muscle strength (Biodex), baseline to day 120",
+     "favorableResult": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "analysisKind": "SECONDARY_PRESPECIFIED",
+     "comparisonKind": "BETWEEN_ARM",
+     "multiplicityAdjusted": false,
+     "synthesis": "hu:synthesis:neg-secondary-as-replication",
+     "inputRole": "INDEPENDENT_REPLICATION"
+    },
+    {
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120",
+     "outcome": "Change in isokinetic lower body muscle strength (Biodex), baseline to day 120",
+     "favorableResult": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "analysisKind": "SECONDARY_PRESPECIFIED",
+     "comparisonKind": "BETWEEN_ARM",
+     "multiplicityAdjusted": false,
+     "synthesis": "hu:synthesis:neg-secondary-as-confirmatory",
+     "inputRole": "CONFIRMATORY"
+    },
+    {
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120",
+     "outcome": "Change in isokinetic lower body muscle strength (Biodex), baseline to day 120",
+     "favorableResult": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "analysisKind": "SECONDARY_PRESPECIFIED",
+     "comparisonKind": "BETWEEN_ARM",
+     "multiplicityAdjusted": false,
+     "synthesis": "hu:synthesis:ua-muscle-performance-replication-v1",
+     "inputRole": "SUPPORTIVE"
+    },
+    {
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120",
+     "outcome": "Change in isokinetic lower body muscle strength (Biodex), baseline to day 120",
+     "favorableResult": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "analysisKind": "SECONDARY_PRESPECIFIED",
+     "comparisonKind": "BETWEEN_ARM",
+     "multiplicityAdjusted": false,
+     "synthesis": "hu:synthesis:ua-improves-muscle-function-middle-aged-v1",
+     "inputRole": "SUPPORTIVE"
+    },
+    {
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120",
+     "outcome": "Change in exercise tolerance: power output on cycle ergometer, baseline to day 120",
+     "favorableResult": "hu:study-result:atlas-synthetic-subgroup-low-vo2max",
+     "analysisKind": "SUBGROUP_POST_HOC",
+     "comparisonKind": "BETWEEN_ARM",
+     "multiplicityAdjusted": false,
+     "synthesis": "hu:synthesis:ua-improves-muscle-function-middle-aged-v1",
+     "inputRole": "HYPOTHESIS_GENERATING"
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-04",
+   "positiveRows": 6,
+   "positiveSample": [
+    {
+     "outcome": "Blood NAD+",
+     "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5701244/",
+     "sourceKind": "PEER_REVIEWED_PUBLICATION",
+     "declaredPriority": "PRIMARY",
+     "derivedRegisteredPriority": "SECONDARY"
+    },
+    {
+     "outcome": "Blood NAD+",
+     "source": "https://clinicaltrials.gov/study/NCT02678611",
+     "sourceKind": "REGULATORY_RECORD",
+     "declaredPriority": "SECONDARY",
+     "derivedRegisteredPriority": "SECONDARY"
+    },
+    {
+     "outcome": "Change in 6-minute walk distance, baseline to day 120",
+     "source": "https://clinicaltrials.gov/study/NCT03464500",
+     "sourceKind": "REGULATORY_RECORD",
+     "declaredPriority": "SECONDARY",
+     "derivedRegisteredPriority": "SECONDARY"
+    },
+    {
+     "outcome": "Change in exercise tolerance: power output on cycle ergometer, baseline to day 120",
+     "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9133463/",
+     "sourceKind": "PEER_REVIEWED_PUBLICATION",
+     "declaredPriority": "PRIMARY",
+     "derivedRegisteredPriority": "PRIMARY"
+    },
+    {
+     "outcome": "Change in exercise tolerance: power output on cycle ergometer, baseline to day 120",
+     "source": "https://clinicaltrials.gov/study/NCT03464500",
+     "sourceKind": "REGULATORY_RECORD",
+     "declaredPriority": "PRIMARY",
+     "derivedRegisteredPriority": "PRIMARY"
+    }
+   ],
+   "withNegativesRows": 6,
+   "withNegativesSample": [
+    {
+     "outcome": "Blood NAD+",
+     "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5701244/",
+     "sourceKind": "PEER_REVIEWED_PUBLICATION",
+     "declaredPriority": "PRIMARY",
+     "derivedRegisteredPriority": "SECONDARY"
+    },
+    {
+     "outcome": "Blood NAD+",
+     "source": "https://clinicaltrials.gov/study/NCT02678611",
+     "sourceKind": "REGULATORY_RECORD",
+     "declaredPriority": "SECONDARY",
+     "derivedRegisteredPriority": "SECONDARY"
+    },
+    {
+     "outcome": "Change in 6-minute walk distance, baseline to day 120",
+     "source": "https://clinicaltrials.gov/study/NCT03464500",
+     "sourceKind": "REGULATORY_RECORD",
+     "declaredPriority": "SECONDARY",
+     "derivedRegisteredPriority": "SECONDARY"
+    },
+    {
+     "outcome": "Change in exercise tolerance: power output on cycle ergometer, baseline to day 120",
+     "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9133463/",
+     "sourceKind": "PEER_REVIEWED_PUBLICATION",
+     "declaredPriority": "PRIMARY",
+     "derivedRegisteredPriority": "PRIMARY"
+    },
+    {
+     "outcome": "Change in exercise tolerance: power output on cycle ergometer, baseline to day 120",
+     "source": "https://clinicaltrials.gov/study/NCT03464500",
+     "sourceKind": "REGULATORY_RECORD",
+     "declaredPriority": "PRIMARY",
+     "derivedRegisteredPriority": "PRIMARY"
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-05",
+   "positiveRows": 8,
+   "positiveSample": [
+    {
+     "study": "hu:study:nct00938340-walnut-components",
+     "aeReporting": "NO_AE_RECORD_CAPTURED",
+     "aeRows": 0,
+     "seriousRows": []
+    },
+    {
+     "study": "hu:study:nct02582593-tnirs-older-adults",
+     "aeReporting": "NO_AE_RECORD_CAPTURED",
+     "aeRows": 0,
+     "seriousRows": []
+    },
+    {
+     "study": "hu:study:nct02678611-basis-nrpt",
+     "aeReporting": "AE_ROWS_CAPTURED",
+     "aeRows": 6,
+     "seriousRows": [
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "self-reported AEs",
+       "atRisk": 40,
+       "arm": "Placebo",
+       "affected": 0,
+       "events": 0
+      },
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "self-reported AEs",
+       "atRisk": 38,
+       "arm": "NRPT 2X",
+       "affected": 0,
+       "events": 0
+      },
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "self-reported AEs",
+       "atRisk": 40,
+       "arm": "NRPT 1X",
+       "affected": 0,
+       "events": 0
+      }
+     ]
+    },
+    {
+     "study": "hu:study:nct03283462-energize",
+     "aeReporting": "AE_ROWS_CAPTURED",
+     "aeRows": 2,
+     "seriousRows": [
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "recorded and coded according to the Medical Dictionary for Regulatory Activities",
+       "atRisk": null,
+       "arm": "Placebo",
+       "affected": 0,
+       "events": 0
+      },
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "recorded and coded according to the Medical Dictionary for Regulatory Activities",
+       "atRisk": null,
+       "arm": "Mitopure",
+       "affected": 0,
+       "events": 0
+      }
+     ]
+    },
+    {
+     "study": "hu:study:nct03464500-atlas",
+     "aeReporting": "NO_AE_RECORD_CAPTURED",
+     "aeRows": 0,
+     "seriousRows": []
+    }
+   ],
+   "withNegativesRows": 11,
+   "withNegativesSample": [
+    {
+     "study": "hu:study:nct00938340-walnut-components",
+     "aeReporting": "AE_ROWS_CAPTURED",
+     "aeRows": 1,
+     "seriousRows": []
+    },
+    {
+     "study": "hu:study:nct02582593-tnirs-older-adults",
+     "aeReporting": "NO_AE_RECORD_CAPTURED",
+     "aeRows": 0,
+     "seriousRows": []
+    },
+    {
+     "study": "hu:study:nct02678611-basis-nrpt",
+     "aeReporting": "AE_ROWS_CAPTURED",
+     "aeRows": 7,
+     "seriousRows": [
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "self-reported AEs",
+       "atRisk": 40,
+       "arm": "Placebo",
+       "affected": 0,
+       "events": 0
+      },
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "self-reported AEs",
+       "atRisk": 38,
+       "arm": "NRPT 2X",
+       "affected": 0,
+       "events": 0
+      },
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "self-reported AEs",
+       "atRisk": 40,
+       "arm": "NRPT 1X",
+       "affected": 0,
+       "events": 0
+      }
+     ]
+    },
+    {
+     "study": "hu:study:nct03283462-energize",
+     "aeReporting": "AE_ROWS_CAPTURED",
+     "aeRows": 2,
+     "seriousRows": [
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "recorded and coded according to the Medical Dictionary for Regulatory Activities",
+       "atRisk": null,
+       "arm": "Placebo",
+       "affected": 0,
+       "events": 0
+      },
+      {
+       "method": "NOT_DESCRIBED",
+       "seriousness": "SERIOUS",
+       "term": "Serious adverse event",
+       "wording": "recorded and coded according to the Medical Dictionary for Regulatory Activities",
+       "atRisk": null,
+       "arm": "Mitopure",
+       "affected": 0,
+       "events": 0
+      }
+     ]
+    },
+    {
+     "study": "hu:study:nct03464500-atlas",
+     "aeReporting": "NO_AE_RECORD_CAPTURED",
+     "aeRows": 0,
+     "seriousRows": []
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-06",
+   "positiveRows": 1,
+   "positiveSample": [
+    {
+     "notice": "30155270",
+     "noticeKind": "AUTHOR_CORRECTION",
+     "rel": "CORRECTS",
+     "revisionKind": "ERRATUM",
+     "announcedAt": {
+      "year": 2018,
+      "month": 8,
+      "day": 20,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "learnedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 1,
+      "minute": 15,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "supersededAssertion": "hu:assertion:pmid-29184669-reference-20-original",
+     "supersession": "SOURCE_CORRECTION",
+     "replacingAssertion": "hu:assertion:pmid-29184669-reference-20-corrected"
+    }
+   ],
+   "withNegativesRows": 2,
+   "withNegativesSample": [
+    {
+     "notice": "30155270",
+     "noticeKind": "AUTHOR_CORRECTION",
+     "rel": "CORRECTS",
+     "revisionKind": "ERRATUM",
+     "announcedAt": {
+      "year": 2018,
+      "month": 8,
+      "day": 20,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "learnedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 1,
+      "minute": 15,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "supersededAssertion": "hu:assertion:pmid-29184669-reference-20-original",
+     "supersession": "SOURCE_CORRECTION",
+     "replacingAssertion": "hu:assertion:pmid-29184669-reference-20-corrected"
+    },
+    {
+     "notice": "30155270",
+     "noticeKind": "AUTHOR_CORRECTION",
+     "rel": "CORRECTS",
+     "revisionKind": "ERRATUM",
+     "announcedAt": {
+      "year": 2018,
+      "month": 8,
+      "day": 20,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "learnedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 1,
+      "minute": 15,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "supersededAssertion": "hu:assertion:pmid-29184669-reference-20-original",
+     "supersession": "VALIDITY_BOUNDED",
+     "replacingAssertion": "hu:assertion:neg-erratum-as-fact-ending"
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-07",
+   "positiveRows": 1,
+   "positiveSample": [
+    {
+     "pub1": "21871057",
+     "pub2": "23616506",
+     "sharedThrough": [
+      "Study",
+      "Dataset"
+     ]
+    }
+   ],
+   "withNegativesRows": 2,
+   "withNegativesSample": [
+    {
+     "pub1": "21871057",
+     "pub2": "23616506",
+     "sharedThrough": [
+      "Study",
+      "Dataset"
+     ]
+    },
+    {
+     "pub1": "29184669",
+     "pub2": "30155270",
+     "sharedThrough": [
+      "Study"
+     ]
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-08",
+   "positiveRows": 1,
+   "positiveSample": [
+    {
+     "synthesis": "hu:synthesis:ua-muscle-performance-replication-v1",
+     "independentLinesLowerBound": 2,
+     "studies": [
+      "hu:study:nct03464500-atlas",
+      "hu:study:nct03283462-energize"
+     ],
+     "sharedSponsors": [
+      "Amazentis SA"
+     ]
+    }
+   ],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "synthesis": "hu:synthesis:ua-muscle-performance-replication-v1",
+     "independentLinesLowerBound": 2,
+     "studies": [
+      "hu:study:nct03464500-atlas",
+      "hu:study:nct03283462-energize"
+     ],
+     "sharedSponsors": [
+      "Amazentis SA"
+     ]
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-09",
+   "positiveRows": 2,
+   "positiveSample": [
+    {
+     "variant": "hu:product-variant:basis-us-capsule-standard",
+     "formulation": "hu:formulation:basis-us-current-2026-07-10",
+     "overlapClass": "OVERLAP_START_UNKNOWN",
+     "formulationFrom": null,
+     "fromBasis": "OBSERVATION_ONLY",
+     "iStart": {
+      "year": 2016,
+      "month": 1,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "iEnd": {
+      "year": 2016,
+      "month": 7,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    },
+    {
+     "variant": "hu:product-variant:synthetic-known-start-variant",
+     "formulation": "hu:formulation:synthetic-known-start-2015-06",
+     "overlapClass": "COVERS_INTERVAL_IF_STILL_TRUE",
+     "formulationFrom": {
+      "year": 2015,
+      "month": 6,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "fromBasis": "STATED_BY_SOURCE",
+     "iStart": {
+      "year": 2016,
+      "month": 1,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "iEnd": {
+      "year": 2016,
+      "month": 7,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    }
+   ],
+   "withNegativesRows": 2,
+   "withNegativesSample": [
+    {
+     "variant": "hu:product-variant:basis-us-capsule-standard",
+     "formulation": "hu:formulation:basis-us-current-2026-07-10",
+     "overlapClass": "OVERLAP_START_UNKNOWN",
+     "formulationFrom": null,
+     "fromBasis": "OBSERVATION_ONLY",
+     "iStart": {
+      "year": 2016,
+      "month": 1,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "iEnd": {
+      "year": 2016,
+      "month": 7,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    },
+    {
+     "variant": "hu:product-variant:synthetic-known-start-variant",
+     "formulation": "hu:formulation:synthetic-known-start-2015-06",
+     "overlapClass": "COVERS_INTERVAL_IF_STILL_TRUE",
+     "formulationFrom": {
+      "year": 2015,
+      "month": 6,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "fromBasis": "STATED_BY_SOURCE",
+     "iStart": {
+      "year": 2016,
+      "month": 1,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "iEnd": {
+      "year": 2016,
+      "month": 7,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-10",
+   "positiveRows": 1,
+   "positiveSample": [
+    {
+     "intervention": "hu:intervention:nct02678611-nrpt-1x",
+     "reportedCommercialName": "Basis",
+     "quote": "a repeat dose of NRPT (commercially known as Basis)",
+     "hasDirectCommercialEdge": false
+    }
+   ],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "intervention": "hu:intervention:nct02678611-nrpt-1x",
+     "reportedCommercialName": "Basis",
+     "quote": "a repeat dose of NRPT (commercially known as Basis)",
+     "hasDirectCommercialEdge": false
+    }
+   ]
+  },
+  {
+   "query": "QS-W09-12",
+   "positiveRows": 1,
+   "positiveSample": [
+    {
+     "kind": "INTERVENTIONAL_RANDOMIZED",
+     "studyCount": 3,
+     "studies": [
+      "hu:study:nct00938340-walnut-components",
+      "hu:study:nct03464500-atlas",
+      "hu:study:nct03283462-energize"
+     ]
+    }
+   ],
+   "withNegativesRows": 1,
+   "withNegativesSample": [
+    {
+     "kind": "INTERVENTIONAL_RANDOMIZED",
+     "studyCount": 3,
+     "studies": [
+      "hu:study:nct00938340-walnut-components",
+      "hu:study:nct03464500-atlas",
+      "hu:study:nct03283462-energize"
+     ]
+    }
+   ]
+  }
+ ],
+ "inheritedSuiteNonZero": [
+  {
+   "n": 4,
+   "id": "V-002",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "assertionUid": "hu:assertion:neg-erratum-as-fact-ending",
+     "subjects": 0
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "id": "V-003",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "assertionUid": "hu:assertion:neg-erratum-as-fact-ending",
+     "objects": 0,
+     "literals": 0
+    }
+   ]
+  },
+  {
+   "n": 14,
+   "id": "V-012",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "collapsedStudyArtifact": "hu:study:neg-study-is-publication"
+    }
+   ]
+  },
+  {
+   "n": 16,
+   "id": null,
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "relType": "REPORTS_ON",
+     "edgeId": "5:40b659f9-47c7-42d5-becf-71c428bd86fc:469",
+     "recordedFrom": null,
+     "assertionUid": null
+    }
+   ]
+  },
+  {
+   "n": 23,
+   "id": "V-108",
+   "positiveRows": 0,
+   "withNegativesRows": 2,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "relType": "HAS_REGISTRATION_VERSION",
+     "subjectUid": "hu:trial-registration:ctgov-nct00938340",
+     "objectUid1": "hu:registration-version:nct00938340-observed-2026-10-04",
+     "objectUid2": "hu:registration-version:neg-shared-unobserved",
+     "edge1": "5:40b659f9-47c7-42d5-becf-71c428bd86fc:13",
+     "edge2": "5:40b659f9-47c7-42d5-becf-71c428bd86fc:456"
+    },
+    {
+     "relType": "HAS_REGISTRATION_VERSION",
+     "subjectUid": "hu:trial-registration:ctgov-nct02678611",
+     "objectUid1": "hu:registration-version:neg-shared-unobserved",
+     "objectUid2": "hu:registration-version:nct02678611-observed-2026-10-04",
+     "edge1": "5:40b659f9-47c7-42d5-becf-71c428bd86fc:455",
+     "edge2": "5:40b659f9-47c7-42d5-becf-71c428bd86fc:7"
+    }
+   ]
+  },
+  {
+   "n": 34,
+   "id": "V-118",
+   "positiveRows": 10,
+   "withNegativesRows": 10,
+   "positiveSample": [
+    {
+     "label": "Source",
+     "nodes": 17,
+     "withUid": 17,
+     "missingUid": 0
+    },
+    {
+     "label": "SourceSnapshot",
+     "nodes": 15,
+     "withUid": 15,
+     "missingUid": 0
+    },
+    {
+     "label": "InformationArtifact",
+     "nodes": 61,
+     "withUid": 61,
+     "missingUid": 0
+    }
+   ],
+   "withNegativesSample": [
+    {
+     "label": "Source",
+     "nodes": 17,
+     "withUid": 17,
+     "missingUid": 0
+    },
+    {
+     "label": "SourceSnapshot",
+     "nodes": 15,
+     "withUid": 15,
+     "missingUid": 0
+    },
+    {
+     "label": "InformationArtifact",
+     "nodes": 65,
+     "withUid": 65,
+     "missingUid": 0
+    }
+   ]
+  },
+  {
+   "n": 40,
+   "id": null,
+   "positiveRows": 0,
+   "withNegativesRows": 2,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "studySide": "hu:arm:nct02678611-nrpt-1x",
+     "rel": "RECEIVES",
+     "commercialTarget": "hu:product-variant:basis-us-capsule-standard"
+    },
+    {
+     "studySide": "hu:study:nct02678611-basis-nrpt",
+     "rel": "EVALUATES",
+     "commercialTarget": "hu:product:neg-elysium-basis"
+    }
+   ]
+  },
+  {
+   "n": 41,
+   "id": "V-202",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "component": "hu:intervention-component:neg-variant-without-name",
+     "variantWithoutReportedName": "hu:product-variant:basis-us-capsule-standard"
+    }
+   ]
+  },
+  {
+   "n": 51,
+   "id": "V-210",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "studyWithMisplacedFields": "hu:study:neg-registry-fields-on-study"
+    }
+   ]
+  },
+  {
+   "n": 52,
+   "id": "V-211",
+   "positiveRows": 1,
+   "withNegativesRows": 2,
+   "positiveSample": [
+    {
+     "registrationVersion": "hu:registration-version:synthetic-demo-001-v1",
+     "owners": 2
+    }
+   ],
+   "withNegativesSample": [
+    {
+     "registrationVersion": "hu:registration-version:synthetic-demo-001-v1",
+     "owners": 2
+    },
+    {
+     "registrationVersion": "hu:registration-version:neg-shared-unobserved",
+     "owners": 2
+    }
+   ]
+  },
+  {
+   "n": 53,
+   "id": "V-212",
+   "positiveRows": 1,
+   "withNegativesRows": 1,
+   "positiveSample": [
+    {
+     "study": "hu:study:nct02678611-basis-nrpt",
+     "observedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 0,
+      "minute": 55,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "resultsArticle": "29184669"
+    }
+   ],
+   "withNegativesSample": [
+    {
+     "study": "hu:study:nct02678611-basis-nrpt",
+     "observedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 0,
+      "minute": 55,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "resultsArticle": "29184669"
+    }
+   ]
+  },
+  {
+   "n": 54,
+   "id": "V-213",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "resultWithUnattributedMeaningfulness": "hu:study-result:atlas-hamstring-ua500-vs-placebo"
+    }
+   ]
+  },
+  {
+   "n": 58,
+   "id": "V-215",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "synthesis": "hu:synthesis:neg-secondary-as-confirmatory",
+     "nonPrimaryConfirmatory": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120"
+    }
+   ]
+  },
+  {
+   "n": 59,
+   "id": "V-216",
+   "positiveRows": 0,
+   "withNegativesRows": 3,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "synthesis": "hu:synthesis:neg-within-arm-as-replication",
+     "withinArmResult": "hu:study-result:atlas-hamstring-ua500-within-arm",
+     "role": "INDEPENDENT_REPLICATION"
+    },
+    {
+     "synthesis": "hu:synthesis:neg-shared-dataset-as-replication",
+     "withinArmResult": "hu:study-result:berryman-2013-skins-rhi-within",
+     "role": "INDEPENDENT_REPLICATION"
+    },
+    {
+     "synthesis": "hu:synthesis:neg-shared-dataset-as-replication",
+     "withinArmResult": "hu:study-result:zhang-2011-postprandial-sera-efflux",
+     "role": "INDEPENDENT_REPLICATION"
+    }
+   ]
+  },
+  {
+   "n": 60,
+   "id": "V-217",
+   "positiveRows": 5,
+   "withNegativesRows": 6,
+   "positiveSample": [
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-placebo",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    }
+   ],
+   "withNegativesSample": [
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-placebo",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    },
+    {
+     "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+     "affected": 0,
+     "method": "NOT_DESCRIBED"
+    }
+   ]
+  },
+  {
+   "n": 61,
+   "id": "V-218",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "synthesis": "hu:synthesis:neg-shared-dataset-as-replication",
+     "result1": "hu:study-result:berryman-2013-skins-rhi-within",
+     "result2": "hu:study-result:zhang-2011-postprandial-sera-efflux"
+    }
+   ]
+  },
+  {
+   "n": 66,
+   "id": "V-221",
+   "positiveRows": 4,
+   "withNegativesRows": 5,
+   "positiveSample": [
+    {
+     "intervention": "hu:intervention:nct02582593-real",
+     "incompleteComponent": "hu:intervention-component:nct02582593-real"
+    },
+    {
+     "intervention": "hu:intervention:nct02582593-sham",
+     "incompleteComponent": "hu:intervention-component:nct02582593-sham"
+    },
+    {
+     "intervention": "hu:intervention:synthetic-sauna-demo-sauna",
+     "incompleteComponent": null
+    }
+   ],
+   "withNegativesSample": [
+    {
+     "intervention": "hu:intervention:nct02582593-real",
+     "incompleteComponent": "hu:intervention-component:nct02582593-real"
+    },
+    {
+     "intervention": "hu:intervention:nct02582593-sham",
+     "incompleteComponent": "hu:intervention-component:nct02582593-sham"
+    },
+    {
+     "intervention": "hu:intervention:synthetic-sauna-demo-sauna",
+     "incompleteComponent": null
+    }
+   ]
+  },
+  {
+   "n": 69,
+   "id": "V-223",
+   "positiveRows": 1,
+   "withNegativesRows": 1,
+   "positiveSample": [
+    {
+     "outcome": "hu:outcome:nct02678611-nad-whole-blood",
+     "priorities": [
+      "SECONDARY",
+      "PRIMARY"
+     ]
+    }
+   ],
+   "withNegativesSample": [
+    {
+     "outcome": "hu:outcome:nct02678611-nad-whole-blood",
+     "priorities": [
+      "SECONDARY",
+      "PRIMARY"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 117,
+   "id": "V-401b",
+   "positiveRows": 1,
+   "withNegativesRows": 1,
+   "positiveSample": [
+    {
+     "acceptedAssertionsWithOnlyCoarseLocators": 19
+    }
+   ],
+   "withNegativesSample": [
+    {
+     "acceptedAssertionsWithOnlyCoarseLocators": 19
+    }
+   ]
+  },
+  {
+   "n": 156,
+   "id": "V-506",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "violation": "CLOSURE_MISMATCH",
+     "item": "hu:assertion:pmid-29184669-reference-20-original"
+    }
+   ]
+  },
+  {
+   "n": 158,
+   "id": "V-507b",
+   "positiveRows": 0,
+   "withNegativesRows": 1,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "boundingAssertion": "hu:assertion:neg-erratum-as-fact-ending",
+     "boundedAssertion": "hu:assertion:pmid-29184669-reference-20-original"
+    }
+   ]
+  },
+  {
+   "n": 160,
+   "id": "V-509",
+   "positiveRows": 0,
+   "withNegativesRows": 2,
+   "positiveSample": [],
+   "withNegativesSample": [
+    {
+     "subjectUid": "hu:trial-registration:ctgov-nct02678611",
+     "relType": "HAS_REGISTRATION_VERSION",
+     "state1": "hu:registration-version:neg-shared-unobserved",
+     "state2": "hu:registration-version:nct02678611-observed-2026-10-04",
+     "action": "POSSIBLE_OVERLAP_REVIEW"
+    },
+    {
+     "subjectUid": "hu:trial-registration:ctgov-nct00938340",
+     "relType": "HAS_REGISTRATION_VERSION",
+     "state1": "hu:registration-version:nct00938340-observed-2026-10-04",
+     "state2": "hu:registration-version:neg-shared-unobserved",
+     "action": "POSSIBLE_OVERLAP_REVIEW"
+    }
+   ]
+  },
+  {
+   "n": 166,
+   "id": "V-514b",
+   "positiveRows": 1,
+   "withNegativesRows": 1,
+   "positiveSample": [
+    {
+     "assertionsWithoutContentHash": 0
+    }
+   ],
+   "withNegativesSample": [
+    {
+     "assertionsWithoutContentHash": 2
+    }
+   ]
+  }
+ ]
+}

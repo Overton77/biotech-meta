@@ -1,0 +1,85 @@
+# W06 seam and kernel-change requests (run-2026-10-04-fable51-01). Fable copies them into 03-conflict-ledger.md.
+- id: W06-SR-01
+  targetOwner: Fable (ownership registry)
+  request: "Add to the W06 row: enums TreatmentComponentRole, TreatmentIntentKind, TreatmentIntentBasis; relationship-property type TreatmentTargetProperties (successor of live TreatmentTargetMetadata, used only by TARGETS_CONDITION). (W06 withdrew its earlier request for separate relationship types for treatments and procedures in favour of W09's FOLLOWS_INTERVENTION_DEFINITION.) Record candidate module `interventions` (T-005) as the home of Treatment and Procedure."
+  cq: [CQ-ST-01, CQ-IV-C01, CQ-IV-C02, CQ-IV-C04]
+  failingCase: "Without a typed intent basis, the CASGEVY label restatement (TARGETS_CONDITION, REGULATORY_LABEL_RESTATEMENT) and a clinic's practice offering are indistinguishable; without a concept link the NCT03745287 'Exa-cel' intervention cannot be reached from the exa-cel concept except through the read-only legacy Study.evaluates (fixtures 01, 02, Q-02)."
+  proposedRuling: "Accept; included in W06 sdl-fragment.graphql already."
+- id: W06-SR-02
+  targetOwner: W00
+  request: "Register uid type tokens `treatment` (Treatment) and `procedure` (Procedure) in conventions.uidTypeTokens."
+  cq: [CQ-ST-01, CQ-IV-C02]
+  failingCase: "INV-106 / uid token checks cannot pass for any Treatment or Procedure node; fixtures use hu:treatment:* and hu:procedure:*."
+  proposedRuling: "Accept (primary-label token rule)."
+- id: W06-SR-03
+  targetOwner: W09
+  request: "Promote the candidate FOLLOWS_INTERVENTION_DEFINITION (StudyIntervention.definitions -> InterventionDefinitionTarget incl. Treatment and Procedure, AssertedEdgeProperties); W06 adopts it and declares inverse views Treatment/Procedure.instantiatedByStudyInterventions (W06 withdraws its own two-type proposal). Keep StudyIntervention.registryInterventionType (already in the W09 fragment) documented as never mapped onto TreatmentModality; let InterventionComponent carry a reportedStatus (kernel ReportedStatus) for dose so NOT_REPORTED differs from an unknown capture; keep Treatment and Procedure as members of LegacyEvaluatedIntervention."
+  cq: [CQ-ST-01, CQ-IV-C01, CQ-IV-C03]
+  failingCase: "NCT03745287 registry type BIOLOGICAL vs FDA label 'autologous genome edited hematopoietic stem cell-based gene therapy'; NCT06597656 has two interventions (GENETIC + PROCEDURE) in one arm, the plasmapheresis being a study-specific preparatory step that must not become a concept component (V-W06-06)."
+  proposedRuling: "Accept; one relationship type (W09) for the concept link; W06 inverse views only."
+- id: W06-SR-04
+  targetOwner: W16
+  request: "Extend the ProtocolStep EMPLOYS range (StepInstrumentTarget, live StepInstrument = Device | LabTest | Exposure) to include Procedure, so a public protocol step can employ a procedure definition; the step payload (cadence, optionality) stays on the step."
+  cq: [CQ-IV-C02, CQ-PR-02]
+  failingCase: "A practice protocol step 'TPE every 6 months' (fixture 03, SYNTHETIC; W16's Blueprint corpus has device-based procedure steps such as monopolar RF skin treatment) cannot reference the TPE definition in the live union; it would otherwise be free text."
+  proposedRuling: "Accept (additive union member)."
+- id: W06-SR-05
+  targetOwner: W13
+  request: "(a) Confirm that Treatment is NOT added to STATUS_OF / DESIGNATION_FOR / APPROVAL_FOR ranges (concepts reach regulatory states only through their Products). (b) RegulatoryStatusKind cannot express 'withdrawn or revoked, source does not distinguish' (OOPD 465514 'Designated/Designation Withdrawn or Revoked'): add a value or a documented null-plus-scopeText convention. (c) Baseline V-333 counts only STATUS_OF although DESIGNATION_FOR and APPROVAL_FOR are catalog aliases: count aliases or require STATUS_OF. (d) OOPD 'Designated/Approved' is two facts (designation state + approval states) and must be split at ingestion. (e) Register forbidden implication [DESIGNATION_SCOPE, APPROVED_INDICATION] (exa-cel designated 'Treatment of beta-thalassemia'; approved for TDT, age-bounded)."
+  cq: [CQ-MF-02, CQ-AX-23]
+  failingCase: "edaravone/ALS: Treeway designation withdrawn or revoked, not approved; RADICAVA NDA 209176 approved (search extract). A concept-level status would merge two sponsors' facts. Baseline V-333 reports hu:reg-status:us-oopd-465514-treeway-designation-ended (statusKind null)."
+  proposedRuling: "(a) accept; (b) add statusKind DESIGNATION_ENDED_UNSPECIFIED or allow null with scopeText; (c) count aliases; (d)(e) accept."
+- id: W06-SR-06
+  targetOwner: W01
+  request: "Register asserted predicates DEVELOPS_TREATMENT, OFFERS_TREATMENT, OFFERS_PROCEDURE under organizations.assertedPredicates (relationship types remain W06's because their range and meaning are W06 identities); keep Organization fields developsTreatments, offersTreatments, offersProcedures with AssertedEdgeProperties (not RoleEdgeProperties: corporate-role fields do not apply); add forbidden implications [SPONSORS_STUDY, DEVELOPS_TREATMENT], [MANUFACTURES_PRODUCT, DEVELOPS_TREATMENT], [OFFERS_PROCEDURE, PERFORMS_PROCEDURE], [HOSTS_LISTING, OFFERS_PROCEDURE]. Consider candidate qualifier offeringRole {DIRECT_PROVIDER, SERVICE_OPERATOR_FOR_PARTNER, VENUE_HOST, REFERRAL_ONLY}."
+  cq: [CQ-IV-C02, CQ-IV-C04, CQ-EC-01]
+  failingCase: "Vertex is sponsor of NCT03745287 and manufacturer of CASGEVY yet no captured source states it develops exa-cel (Q-05 NOT_RECORDED); Circulate 'partners with clinics to deliver TPE as a turnkey service' (search extract) vs Next Health offering TPE directly."
+  proposedRuling: "Predicates registered in organizations; relationship types stay W06; offeringRole stays CANDIDATE until a captured page."
+- id: W06-SR-07
+  targetOwner: W05
+  request: "Confirm the FoodProduct disposition used by W06: live FoodProduct members of TreatmentComponentTarget re-point to the W04 Product W05 creates (productKind CONVENTIONAL_FOOD); Lifestyle stays a member (W05 defines it). W06 dropped FoodProduct from the union after reading the W05 fragment."
+  cq: [CQ-IV-C03]
+  failingCase: "Live TreatmentComponent union (line 692) includes FoodProduct; the W05 fragment does not define it (merge check reports FoodProduct undefined for W06, W09, W16, W22, W00)."
+  proposedRuling: "Accepted by W06 in the fragment; W05 confirms the migration path."
+- id: W06-SR-08
+  targetOwner: W15
+  request: "Keep LISTS_PROCEDURE (MerchantListing -> Procedure, asserted) with ListingEdgeProperties; note that procedure session bundles ('3 Sessions: Therapeutic Plasma Exchange Bundle $24,000') do not fit BundleComponent -> Product|ProductVariant; offer terms that bundle tests ('includes a Baseline Test and a Total Tox Burden Test before each session') are Offer.termsText, not Procedure definition."
+  cq: [CQ-IV-C02, CQ-CM-02]
+  failingCase: "Next Health TPE page (S9)."
+  proposedRuling: "W15 decides bundle range (add Procedure to COMPONENT_PRODUCT range or a service-bundle component)."
+- id: W06-SR-09
+  targetOwner: W17
+  request: "Keep Treatment and Procedure in SafetySubjectTarget and confirm the HAS_SAFETY_SIGNAL property type name (W06 fragment references SafetyEdgeProperties)."
+  cq: [CQ-ST-06]
+  failingCase: "Live Treatment.hasSafetySignals / Procedure.hasSafetySignals (lines 845, 873)."
+  proposedRuling: "Accept."
+- id: W06-SR-10
+  targetOwner: W10
+  request: "Live TreatmentTargetMetadata.evidenceStrength migrates to TreatmentTargetProperties.legacyEvidenceStrengthHint (hint, INV-209). If an assessment is wanted, ASSESSES_STRENGTH_OF must accept an Assertion (the TARGETS_CONDITION assertion); register forbidden implication [FOLLOWS_INTERVENTION_DEFINITION + USES_COMPONENT(ADMINISTERED_PRODUCT), EVIDENCE_APPLIES_TO_PRODUCT]."
+  cq: [CQ-EV-04, CQ-AX-24]
+  failingCase: "Negative N3: StudyIntervention -[:EVIDENCE_APPLIES_TO]-> CASGEVY derived from FOLLOWS_INTERVENTION_DEFINITION and USES_COMPONENT assertions (reported by V-W06-04 and baseline V-201)."
+  proposedRuling: "Keep the hint; extend ASSESSES_STRENGTH_OF range only if W10 has a CQ."
+- id: W06-SR-11
+  targetOwner: W03
+  request: "Optionally keep Condition.treatedBy as a read-only inverse of TARGETS_CONDITION (properties TreatmentTargetProperties); TARGETS_CONDITION range stays Condition only (no Outcome)."
+  cq: [CQ-IV-C04]
+  failingCase: "Live Condition.treatedBy (line 1224) is absent from the W03 fragment; offerer benefit claims ('accelerated aging') must not widen the range (they are W21 claims)."
+  proposedRuling: "W03 decides; no W06 dependency if omitted."
+- id: W06-SR-12
+  targetOwner: W00
+  request: "Register asserted predicates TARGETS_CONDITION, USES_COMPONENT (relationship names; FOLLOWS_INTERVENTION_DEFINITION is W09's) and candidate literal predicates DECLARES_DEVELOPMENT_STAGE (valueString + jurisdiction), HAS_TREATMENT_MODALITY (valueString in TreatmentModality), REPORTS_PROCEDURE_VOLUME (valueNumber); register W06 forbidden implications FI-W06-01..15 (05-decision-seam-ledger.md); note SourceKind lacks a news/trade-press value (GeekWire filed as PRESS_RELEASE)."
+  cq: [CQ-MF-02, CQ-IV-C02, CQ-IV-C03]
+  failingCase: "Fixtures 01, 03, 04 use these predicate strings; unregistered predicates are candidates only (contract A3)."
+  proposedRuling: "Accept relationship predicates; literal predicates as candidates."
+- id: W06-SR-13
+  targetOwner: W02 (with W03)
+  request: "Informational scope candidate: no material identity exists for cell- and gene-therapy actives (autologous CRISPR-edited CD34+ cells; AAVrh74 vector). No current CQ fails; a dedicated round is needed before adding types (large-biotech horizon)."
+  cq: []
+  failingCase: "CASGEVY label section 11; HORIZON AAVrh74 eligibility. Current model expresses them only as Treatment concept + description."
+  proposedRuling: "Defer (scope candidate SC-W06-02)."
+- id: W06-SR-14
+  targetOwner: W21 / W23
+  request: "Recommendable union (live line 1070) includes Treatment and Procedure: under INV-508 no timeless recommendation edge; a practice offerer's benefit wording ('remove particles that are known contributors to disease and accelerated aging') is a ClaimOccurrence, never TARGETS_CONDITION or RECOMMENDS."
+  cq: [CQ-RC-05, CQ-AX-26]
+  failingCase: "Next Health TPE page (S9)."
+  proposedRuling: "Owners decide union survival; W06 forbids FI-W06-15."

@@ -1,0 +1,134 @@
+# W03 seam requests (run-2026-10-04-fable51-01). Fixture and query references are under workers/W03/fixtures/.
+- id: W03-SR-01
+  targetOwner: W00
+  request: >
+    Amend V-233 and V-234 (and INV-211 wording) so mechanism projections may cite inputs through derivationRule
+    'mx-proj/v1' + derivedFromAssertionUids, as catalog relationshipClasses.derived already allows; adopt V-233r/V-234r
+    from w03-validation.cypher. Register 'mx-proj/v1' as a catalog derivation rule.
+  cq: [CQ-MX-05, CQ-MX-03]
+  failingCase: >
+    Positive fixture: six valid rule-mode edges (AFFECTS_MECHANISM x2, APPLIES_TO_SPECIES x2, ACTS_IN x2) pass V-112 but
+    verbatim V-233 returns 4 rows and V-234 returns 2 rows (run 2026-10-04). Negative N12: the same edge encoded with
+    projectionOfAssertionUid passes V-233 but fails V-112 CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE (INDUCES_PROCESS vs
+    AFFECTS_MECHANISM). No encoding satisfies V-112 and verbatim V-233/V-234 together.
+  proposedRuling: "Replace V-233/V-234 by V-233r/V-234r; keep V-112 unchanged; mechanism projections use rule mode."
+- id: W03-SR-02
+  targetOwner: W00
+  request: >
+    Add to the W00 Assertion types the outgoing field observedInContext: [MechanismEvidenceContext!]!
+    @relationship(type: "OBSERVED_IN_CONTEXT", direction: OUT) (structural, zero_or_one) and widen the catalog note of
+    DERIVED_FROM_ASSERTION to "inputs of a CALCULATED assertion or premises of an INFERRED_FROM_MEASUREMENT assertion".
+  cq: [CQ-MX-01, CQ-MX-02]
+  failingCase: >
+    W00 sdl-fragment has no OBSERVED_IN_CONTEXT field, so GraphQL clients cannot reach a step's context from the
+    assertion. Fixture assertion hu:assertion:trammell-nr-nad-synthesis-heart-inferred names its measured premise only
+    through DERIVED_FROM_ASSERTION; V-231 forbids it a context; V-W03-04 (negative N14) requires the premise.
+  proposedRuling: "Accept; W03 keeps the inverse field MechanismEvidenceContext.observedAssertions."
+- id: W03-SR-03
+  targetOwner: W07
+  request: >
+    Add a candidate structural edge Biomarker -HAS_ANALYTE-> ChemicalSubstance | MolecularEntity (zero_or_one) so that
+    compartment-specific measurands of one analyte are joinable (NAD+ in whole blood, liver, heart).
+  cq: [CQ-MX-03, CQ-MX-C04]
+  failingCase: >
+    Fixture measurands hu:biomarker:nad-plus-whole-blood (human), nad-plus-liver and nad-plus-heart (mouse) share no
+    edge except by name; CQ-MX-C04 query returns 5 rows only through HAS_ANALYTE. Without it a level step in one
+    compartment cannot be located in another (round 0003 M1) and Biomarker.inPathways cannot be derived.
+  proposedRuling: "W07 defines HAS_ANALYTE as CANDIDATE; W03 meaning: the analyte identity of a compartment-specific measurand."
+- id: W03-SR-04
+  targetOwner: W00
+  request: >
+    Register uid tokens: Pathway -> 'pathway', Condition -> 'condition', RiskFactor -> 'risk-factor', and Organ ->
+    'anatomical-context' (specialization shares the parent identity space, as LegalEntity shares 'org').
+  cq: [CQ-MX-C01, CQ-MX-C03]
+  failingCase: "Fixture nodes hu:pathway:reactome-r-hsa-196807, hu:condition:sarcopenia use unregistered tokens; liver is hu:anatomical-context:liver with labels Organ, AnatomicalContext."
+  proposedRuling: "Accept the four tokens."
+- id: W03-SR-05
+  targetOwner: W02
+  request: >
+    CL-002 boundary: MolecularEntity = genome-encoded actors (gene, transcript, protein, complex, family, ncRNA);
+    every small molecule including endogenous metabolites (NAD+, NAAD, NMN) is ChemicalSubstance keyed by structure.
+    Add read-only derived fields on W02 types: ChemicalSubstance.affectsMechanisms (AFFECTS_MECHANISM OUT) and
+    .modulates (MODULATES OUT); ChemicalForm.affectsMechanisms; IngredientMaterial.affectsMechanisms and .modulates;
+    all with properties AssociationProjectionProperties and @settable(onCreate:false,onUpdate:false). Optionally
+    ChemicalSubstance.participatesInPathways (PARTICIPATES_IN OUT, MechanismLinkProperties) for metabolite participants.
+  cq: [CQ-MX-01, CQ-MX-05]
+  failingCase: >
+    PubChem CID 5892 "Nadide" (InChIKey BAWFJGJZGIEFAR-NNYOXOHSSA-N) is NAD+ as metabolite and as supplement substance;
+    negative N8 creates MolecularEntity "NAD+ (Nadide)" with entityKind METABOLITE and V-W03-05 reports it.
+  proposedRuling: "Rule CL-002 with this boundary; W02 adds the derived fields."
+- id: W03-SR-06
+  targetOwner: W07
+  request: >
+    Rulings for W07-SR-07: retire Biomarker.inPathways (IN_PATHWAY) in favour of analyte PARTICIPATES_IN (after
+    W03-SR-03); merge Biomarker.expressedInOrgans (EXPRESSED_IN) into EXPRESSED_IN_CONTEXT (Organ is an
+    AnatomicalContext); retire live Metric.measuredInOrgans (relationship type MEASURED_IN Metric -> Organ), whose name
+    collides with MechanismEvidenceContext -MEASURED_IN-> AnatomicalContext; compartment of a measurand is
+    Biomarker MEASURED_IN_MATRIX and Metric.systemKind.
+  cq: [CQ-MX-02]
+  failingCase: "One relationship type MEASURED_IN would carry two meanings (context compartment vs metric organ); V-239 joins on MEASURED_IN and would read a Metric edge as a context."
+  proposedRuling: "Accept; W07 drops or renames Metric.measuredInOrgans."
+- id: W03-SR-07
+  targetOwner: W16
+  request: >
+    OPERATIONALIZED_BY is used by W03 Outcome -> Metric (structural, StructuralEdgeProperties: an outcome concept is
+    measured by a metric) and by W16 for Target/goal links. Confirm one meaning ("a concept is made measurable by")
+    and the same property type, or rename one.
+  cq: [CQ-ST-03]
+  failingCase: "Live Outcome.operationalizedBy (line 1240) and W16 sdl-fragment line 685 both declare OPERATIONALIZED_BY."
+  proposedRuling: "Keep one type with StructuralEdgeProperties; both fragments already agree on the property type."
+- id: W03-SR-08
+  targetOwner: W17
+  request: >
+    AFFECTS_ORGAN is used by Condition (W03: curated anatomical involvement, MechanismLinkProperties) and by
+    AdverseEffect/SafetySignal (W17). Confirm a shared meaning and property type, or W17 renames its safety edge.
+  cq: [CQ-ST-03]
+  failingCase: "Live lines 1218, 1035, 1064 use AFFECTS_ORGAN with AssociationMetadata on three types with different epistemic status."
+  proposedRuling: "Condition keeps AFFECTS_ORGAN as curated structural; W17 decides whether its edge is asserted and renames if so."
+- id: W03-SR-09
+  targetOwner: W09
+  request: >
+    Keep Study.studiedInSpecies (STUDIED_IN) for human studies only; preclinical species come from
+    MechanismEvidenceContext IN_SPECIES; OutcomeDefinition -> Outcome (live REFERS_TO_OUTCOME) points at the W03 Outcome
+    concept; StudyArm is the IN_STUDY_ARM target and holds dose truth for human-trial contexts (V-238).
+  cq: [CQ-MX-02, CQ-ST-03]
+  failingCase: "Fixture context hu:mech-context:dellinger-2017-nrpt-1x-whole-blood reads exposure from hu:study-arm:nct02678611-nrpt-1x; duplicating it fails V-238."
+  proposedRuling: "Accept as stated."
+- id: W03-SR-10
+  targetOwner: W05
+  request: >
+    Ruling on W05-SR-05: Lifestyle is accepted as an AFFECTS_MECHANISM subject under mx-proj/v1 (assertion subject a
+    Lifestyle, same gates); ASSOCIATED_WITH_CONDITION and ASSOCIATED_WITH_OUTCOME on Lifestyle are one-to-one
+    projections (projectionOfAssertionUid, predicate equals edge type, ACCEPTED DIRECT_MEASUREMENT POSITIVE).
+  cq: [CQ-MX-05]
+  failingCase: "W05 sdl-fragment lines 303-306 declare these derived fields citing W03 rules."
+  proposedRuling: "Accept; w03-projection-job.cypher step 1 includes Lifestyle."
+- id: W03-SR-11
+  targetOwner: W10
+  request: >
+    EXPOSURE dimension consumes MechanismEvidenceContext exposure fields. Basis mapping for ratio eligibility
+    (INV-203): ABSOLUTE_PER_DAY <-> QuantityBasis PER_DAY; PER_KG_BODY_WEIGHT_PER_DAY <-> PER_KG_BODY_WEIGHT_PER_DAY;
+    SINGLE_DOSE <-> SINGLE_DOSE only when exposureUnit and target unit agree on per-kg vs absolute; MEDIUM_CONCENTRATION
+    and DIET_CONCENTRATION never ratio against a product amount. A derived hedValue never counts as human exposure evidence.
+  cq: [CQ-MX-04, CQ-EV-04, CQ-AX-20]
+  failingCase: "Trammell context: 185 mg/kg SINGLE_DOSE with derived HED 15.04 mg/kg; a product label states mg per serving; negative N13 shows MATCH without human exposure evidence (V-237)."
+  proposedRuling: "W10 states the mapping in its EXPOSURE dimension card; V-237 unchanged."
+- id: W03-SR-12
+  targetOwner: W00
+  request: >
+    Registry and catalog updates for Fable: (a) add to W03's row the relationship types ACTS_IN, REFLECTS_MECHANISM,
+    ASSOCIATED_WITH_CONDITION, ASSOCIATED_WITH_OUTCOME, and Condition AFFECTS_ORGAN; (b) register mechanisms
+    assertedPredicates INCREASES_RISK_FOR, MEDIATES_RISK_THROUGH, ASSOCIATED_WITH_CONDITION, ASSOCIATED_WITH_OUTCOME
+    (predicateClass MECHANISM, basisKind required); (c) candidate enums SexScope, ExposureRoute, ExposureStatus,
+    MolecularEntityKind (owner W03) with the values in 04-model-cards.md; (d) Fable may add inverse read fields on
+    Condition (treatedBy, workedOnBy, investigatedByStudies, relatedSafetySignals, indicatedByBiomarkers) once the
+    owners' property types are fixed; W03 omitted them to avoid redefining others' edges.
+  cq: [CQ-MX-05, CQ-MX-02]
+  failingCase: "Live Outcome.reflectsMechanisms and Mechanism.actsInOrgans are on W03 types but not in W03's registry row; predicates for the one-to-one projections are unregistered."
+  proposedRuling: "Accept (a)-(c); (d) at merge."
+- id: W03-SR-13
+  targetOwner: W21
+  request: "Retire live enum AssociationPolarity in favour of W00 Polarity; map Claim.claimPolarity NEUTRAL explicitly (W03 uses NEGATIVE for measured null, else UNKNOWN)."
+  cq: [CQ-MX-01]
+  failingCase: "AssociationPolarity has NEUTRAL, absent from Polarity; a silent drop would turn a measured null into UNKNOWN."
+  proposedRuling: "W21 records the mapping in its migration map."

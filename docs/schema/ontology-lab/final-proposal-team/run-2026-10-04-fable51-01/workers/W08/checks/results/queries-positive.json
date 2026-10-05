@@ -1,0 +1,433 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-queries.cypher",
+ "uri": "bolt://127.0.0.1:38413/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 10,
+ "ok": 10,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 126,
+   "sample": [
+    {
+     "assayVersion": "hu:assay-version:synthetic-lab-c-epic-v2-iscan",
+     "kit": "20087706",
+     "methodPrinciple": "Methylation array (bisulfite conversion + array hybridization)",
+     "instrumentKind": "ToolOrInstrument",
+     "instrumentModel": "Illumina iScan System",
+     "platforms": [
+      "Illumina Infinium BeadChip array"
+     ]
+    },
+    {
+     "assayVersion": "hu:assay-version:synthetic-lab-c-epic-v2-nextseq550",
+     "kit": "20087706",
+     "methodPrinciple": "Methylation array (bisulfite conversion + array hybridization)",
+     "instrumentKind": "ToolOrInstrument",
+     "instrumentModel": "Illumina NextSeq 550 System",
+     "platforms": [
+      "Illumina Infinium BeadChip array"
+     ]
+    }
+   ],
+   "header": "// W08 competency-question queries (run against fixtures 1-3; expected rows in 06-fixtures-and-queries.md).\n// Each statement is self-contained. Parameters are inlined as literals so the file runs without a parameter map.\n// Q-W08-01 (CQ-DX-01, CQ-DX-C03): for each assay version, the instrument mode"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 18,
+   "sample": [
+    {
+     "sameKit": true,
+     "samePlatform": true,
+     "sameInstrument": false,
+     "comparabilityVerdict": null,
+     "trendDecision": "SEPARATE_SERIES"
+    }
+   ],
+   "header": "// Q-W08-02 (CQ-DX-03): may two assay versions share a trend axis? Same platform and kit do not decide it; an assessment does."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 24,
+   "sample": [
+    {
+     "device": "WHOOP 4.0",
+     "metric": "Heart rate",
+     "assayVersion": "hu:assay-version:whoop-4-0-heart-rate-fw-41-15-3-0",
+     "softwareVersion": "41.15.3.0",
+     "firmware": "41.15.3.0",
+     "component": "core firmware",
+     "validFrom": null,
+     "validFromBasis": "UNKNOWN"
+    },
+    {
+     "device": "WHOOP 4.0",
+     "metric": "Heart rate",
+     "assayVersion": "hu:assay-version:whoop-4-0-heart-rate-fw-41-16-1-0",
+     "softwareVersion": "41.16.1.0",
+     "firmware": "41.16.1.0",
+     "component": "core firmware",
+     "validFrom": null,
+     "validFromBasis": "UNKNOWN"
+    }
+   ],
+   "header": "// Q-W08-03 (CQ-DX-09, CQ-DX-C01): which firmware and which assay version produced a WHOOP 4.0 heart-rate value, per firmware."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 4,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 7,
+   "sample": [
+    {
+     "component": "Bluetooth firmware",
+     "version": "17.2.2.0",
+     "releasedFrom": null,
+     "releaseNotes": [],
+     "asserters": []
+    },
+    {
+     "component": "core firmware",
+     "version": "41.11.7.0",
+     "releasedFrom": null,
+     "releaseNotes": [
+      "Improved HR estimation during sleep"
+     ],
+     "asserters": [
+      "WHOOP, Inc."
+     ]
+    },
+    {
+     "component": "core firmware",
+     "version": "41.15.3.0",
+     "releasedFrom": null,
+     "releaseNotes": [
+      "Improved strap stability and issue reporting; Bug fixes"
+     ],
+     "asserters": [
+      "WHOOP, Inc."
+     ]
+    },
+    {
+     "component": "core firmware",
+     "version": "41.16.1.0",
+     "releasedFrom": null,
+     "releaseNotes": [
+      "Improved heart rate estimation algorithm"
+     ],
+     "asserters": [
+      "WHOOP, Inc."
+     ]
+    }
+   ],
+   "header": "// Q-W08-04 (CQ-DX-C01): firmware lineage of a device model with the vendor's release-note statements (believed now)."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 4,
+   "sample": [
+    {
+     "sameDevice": true,
+     "before": "41.15.3.0",
+     "after": "41.16.1.0",
+     "sameAssayVersion": false,
+     "trendDecision": "SEPARATE_SERIES"
+    }
+   ],
+   "header": "// Q-W08-05 (CQ-DX-03 minimal pair): the two WHOOP 4.0 heart-rate assay versions differ only in softwareVersion."
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 13,
+   "sample": [
+    {
+     "device": "WHOOP MG",
+     "productLink": "RUNS_ON_DEVICE",
+     "product": "WHOOP ECG (electrocardiogram) Feature",
+     "statusKind": "CLEARANCE",
+     "isApproval": false,
+     "productCode": "QDA",
+     "pcccAuthorized": false,
+     "submission": "K243236",
+     "response": "SUBSTANTIALLY_EQUIVALENT",
+     "validFrom": {
+      "year": 2025,
+      "month": 4,
+      "day": 4,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "recordedFrom": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 2,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "statusesOnDeviceItself": 0
+    }
+   ],
+   "header": "// Q-W08-06 (CQ-MF-02, CQ-MF-03, CQ-DX-C02): \"Is WHOOP MG FDA cleared or approved?\" Statuses reachable from the device\n// through products that run on it or embody it, with the device's own status count (always 0 by V-W08-03)."
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 3,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 7,
+   "sample": [
+    {
+     "predicate": "REPORTS_INCONCLUSIVE_RATE",
+     "value": 11,
+     "unit": "%",
+     "qualifiers": "share of recordings classified inconclusive in the clinical study; excluded from the sensitivity/specificity denominators",
+     "assertedBy": "WHOOP, Inc.",
+     "basis": "STUDY_RESULT",
+     "sourceKind": "REGULATORY_RECORD",
+     "pdfPage": 9
+    },
+    {
+     "predicate": "REPORTS_SENSITIVITY",
+     "value": 96.2,
+     "unit": "%",
+     "qualifiers": "AFib classification, HR 50-150 bpm, classifiable recordings only; reference: cardiologist-read 12-lead ECG; approx. 540 subjects (NCT06622265)",
+     "assertedBy": "WHOOP, Inc.",
+     "basis": "STUDY_RESULT",
+     "sourceKind": "REGULATORY_RECORD",
+     "pdfPage": 9
+    },
+    {
+     "predicate": "REPORTS_SPECIFICITY",
+     "value": 99.4,
+     "unit": "%",
+     "qualifiers": "sinus rhythm classification, HR 50-150 bpm, classifiable recordings only",
+     "assertedBy": "WHOOP, Inc.",
+     "basis": "STUDY_RESULT",
+     "sourceKind": "REGULATORY_RECORD",
+     "pdfPage": 9
+    }
+   ],
+   "header": "// Q-W08-07 (CQ-MF-03, V-W08-11): performance statements about the cleared software product, with asserter and basis."
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 4,
+   "sample": [
+    {
+     "device": "WHOOP 4.0",
+     "metric": "Heart rate",
+     "vendorAssertion": "hu:assertion:whoop-4-0-measures-heart-rate",
+     "assayVersionsOnRecord": 2
+    }
+   ],
+   "header": "// Q-W08-08 (CQ-DX-02): what a device \"measures\" per its maker versus how results are produced (assay vs unresolved claim)."
+  },
+  {
+   "n": 9,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 26,
+   "sample": [
+    {
+     "device": "WHOOP 4.0",
+     "firmwareVersions": 4,
+     "firmwareWithReleaseDate": 0,
+     "assayEpisodesWithUnknownStart": 2,
+     "assayEpisodes": 2
+    },
+    {
+     "device": "WHOOP MG",
+     "firmwareVersions": 0,
+     "firmwareWithReleaseDate": 0,
+     "assayEpisodesWithUnknownStart": 0,
+     "assayEpisodes": 0
+    }
+   ],
+   "header": "// Q-W08-09 (CQ-PR-03 support): which equipment facts are missing for a device (no firmware with a release date, no\n// assay version with a reported software version, no validFrom on its assay episodes)."
+  },
+  {
+   "n": 10,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 7,
+   "sample": [
+    {
+     "organization": "Synthetic Lab C (methylation service)",
+     "relation": "USES_EQUIPMENT",
+     "equipmentOrPlatform": "Illumina NextSeq 550 System",
+     "isPrimary": false,
+     "assertedBy": "Synthetic Lab C (methylation service)",
+     "hasCapabilityState": false
+    },
+    {
+     "organization": "Synthetic Lab C (methylation service)",
+     "relation": "USES_EQUIPMENT",
+     "equipmentOrPlatform": "Illumina iScan System",
+     "isPrimary": true,
+     "assertedBy": "Synthetic Lab C (methylation service)",
+     "hasCapabilityState": false
+    }
+   ],
+   "header": "// Q-W08-10 (CQ-MF-04): use of a platform or equipment is reported with its asserter, never as an operating capability."
+  }
+ ]
+}

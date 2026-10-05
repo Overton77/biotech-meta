@@ -1,0 +1,1 @@
+{"nct_id":"NCT02678611","status":"COMPLETED","sponsor":"Elysium Health","collaborators":["KGK Science Inc."],"enrollment":120,"start_date":"2016-01","primary_completion_date":"2016-07","completion_date":null,"locations":[{"facility":"KGK Synergize Inc.","city":"London","state":"Ontario","country":"Canada"}],"url":"https://clinicaltrials.gov/study/NCT02678611","has_results":false}

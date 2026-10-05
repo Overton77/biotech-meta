@@ -1,0 +1,30 @@
+# W14 migration map. The live schema (digest 86b5e0b5...f112) defines NO patent, license or trademark type, field or
+# relationship; live entries below are the enum values and the free-text field that touch IP, with their owners.
+# Catalog 0.2.0 elements are listed so the catalog -> final proposal change is explicit. No live data migrates.
+- {live: "DocumentType.PATENT", final: "DocumentType.PATENT (W20)", action: keep, note: "A captured patent document is a rendition Source/Document about a GrantedPatent (W14-SR-07); not a W14 type."}
+- {live: "DocumentType.PATENT_APPLICATION", final: "DocumentType.PATENT_APPLICATION (W20)", action: keep, note: "Rendition of a PatentApplication publication; W20 owns the enum."}
+- {live: "DocumentDomain.PATENT_IP", final: "DocumentDomain.PATENT_IP (W20)", action: keep, note: "Document classification only."}
+- {live: "MediaSourceType.PATENT_FIGURE", final: "MediaSourceType.PATENT_FIGURE (W22)", action: keep, note: "Figure crop from a patent document; W22 owns."}
+- {live: "EventCategory.LICENSING_EVENT", final: "EventCategory.LICENSING_EVENT (W18)", action: keep, note: "An event category is not a license record; a licensing event that is ingested yields PatentLicense + LICENSES_PATENT assertions."}
+- {live: "MediaAsset.license", final: "W22 rights fields", action: keep, note: "Copyright/usage license of a media asset; unrelated to patent licensing (no merge)."}
+# catalog 0.2.0 -> final proposal
+- {live: "catalog:PatentFamily", final: PatentFamily, action: keep, note: "Adds required familyDefinition, entityType; familyIdentifier nullable materialized key."}
+- {live: "catalog:PatentApplication", final: PatentApplication, action: keep, note: "Adds officeKey, applicationKind, title, applicantNamesVerbatim, inventorNamesVerbatim."}
+- {live: "catalog:PatentApplication.status", final: "IpRightStatus via IP_STATUS_OF", action: move, note: "Status is an asserted bounded episode (W14-D01)."}
+- {live: "catalog:GrantedPatent", final: GrantedPatent, action: keep, note: "Adds kindCode, officeKey, title, assigneeNamesVerbatim, inventorNamesVerbatim."}
+- {live: "catalog:GrantedPatent.status", final: "IpRightStatus via IP_STATUS_OF", action: move, note: "Patent-level only; claim validity is a claim-level IpRightStatus."}
+- {live: "catalog:PatentClaim", final: PatentClaim, action: keep, note: "Adds claimText, dependsOnClaimNumbers, claimTextNormalization; claimKind closed vocabulary."}
+- {live: "catalog:PatentLicense", final: PatentLicense, action: keep, note: "Adds agreementTitle, *ReportedStatus, territoryJurisdictions, sublicensable, coverageRuleText, termText."}
+- {live: "catalog:Trademark", final: Trademark, action: keep, note: "Module products_and_formulations unchanged (T-001); adds applicationSerialNumber, officeKey, markDrawingKind."}
+- {live: "catalog:Trademark.status", final: "IpRightStatus via IP_STATUS_OF", action: move, note: "Registration, renewal, scope amendment, cancellation are episodes."}
+- {live: "catalog:FAMILY_HAS_APPLICATION", final: FAMILY_HAS_APPLICATION, action: keep, note: "structural; StructuralEdgeProperties."}
+- {live: "catalog:APPLICATION_GRANTED_AS", final: APPLICATION_GRANTED_AS, action: keep, note: "asserted; AssertedEdgeProperties."}
+- {live: "catalog:HAS_PATENT_CLAIM", final: HAS_PATENT_CLAIM, action: keep, note: "structural; exactly one parent per claim."}
+- {live: "catalog:LICENSE_COVERS", final: LICENSE_COVERS, action: keep, note: "asserted; range union PatentLicenseTarget; never derived from family membership."}
+- {live: "catalog:MARKETED_UNDER_MARK", final: MARKETED_UNDER_MARK, action: keep, note: "asserted; outgoing field on BrandedIngredientMaterial requested from W02."}
+- {live: "catalog:organizations.OWNS_TRADEMARK", final: "OWNS_TRADEMARK (Organization -> Trademark)", action: keep, note: "Projection defined by W14; predicate stays W01."}
+- {live: "catalog:organizations.ASSIGNED_PATENT", final: "ASSIGNED_PATENT (Organization -> PatentFamily|PatentApplication|GrantedPatent)", action: keep, note: "Range made explicit."}
+- {live: "catalog:organizations.LICENSES_PATENT", final: "LICENSES_PATENT (Organization licensee -> PatentLicense)", action: keep, note: "Object is the license terms state."}
+- {live: null, final: "GRANTS_PATENT_LICENSE (Organization licensor -> PatentLicense)", action: split, note: "CANDIDATE; licensor side split from the single catalog predicate (W14-SR-03)."}
+- {live: null, final: "IpRightStatus + IP_STATUS_OF + IpRightStatusSubjectTarget", action: split, note: "CANDIDATE; split out of the three catalog `status` properties (W14-SR-02)."}
+- {live: "catalog:forbiddenImplications [PATENT_CLAIMS, PROVES_EFFICACY]", final: "PATENT_CLAIMS asserted predicate (assertion-only) + V-W14-02", action: keep, note: "Premise registered as a predicate (W14-SR-04)."}

@@ -1,0 +1,23 @@
+{
+ "build": "ok",
+ "leakedInternalTypes": [],
+ "mutationFields": [],
+ "queryFields": [
+  "entitiesConnection",
+  "entities",
+  "assertionArchetypesConnection",
+  "assertionArchetypes",
+  "evidenceAssessmentArchetypesConnection",
+  "evidenceAssessmentArchetypes",
+  "assertionsConnection",
+  "assertions",
+  "claimOccurrencesConnection",
+  "claimOccurrences",
+  "adjudicationsConnection",
+  "adjudications",
+  "evidenceApplicabilitiesConnection",
+  "evidenceApplicabilities"
+ ],
+ "privacyClassFieldPresent": false,
+ "mongoResearchRunIdPresent": false
+}

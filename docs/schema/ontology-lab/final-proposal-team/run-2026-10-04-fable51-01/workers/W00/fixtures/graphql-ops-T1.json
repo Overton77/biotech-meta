@@ -1,0 +1,10 @@
+[
+ {
+  "name": "T1 assertions over fixture 01 (Cypher-ingested; unions, relationship properties, enums)",
+  "query": "{ assertions(where: {predicate: {eq: \"HAS_FORMULATION_VERSION\"}}, sort: [{recordedAt: ASC}]) {\n uid id status recordedAt recordedTo validFrom validFromPrecision validFromBasis validToBasis privacyClass\n subject { __typename ... on ProductVariant { uid } }\n object { __typename ... on FormulationVersion { uid } }\n supersedesConnection { edges { properties { supersessionKind recordedAt sourceRevisionEventUid } node { uid } } }\n evaluatedBy { adjudicationKind verdict reviewerType status recordedAt }\n supportedBy { selectorKind quoteHash normalizationVersion snapshot { contentHashBasis captureCompleteness retrievedAt source { canonicalUri sourceKind } } }\n generatedBy { activityKind methodVersion associatedWithAgents { agentKind } } } }"
+ },
+ {
+  "name": "T1b source revision event",
+  "query": "{ sourceRevisionEvents { uid revisionKind occurredAt occurredAtPrecision recordedAt revisesSource { uid } priorSnapshot { uid } resultingSnapshot { uid } announcedIn { uid } } }"
+ }
+]

@@ -1,0 +1,23 @@
+Source: https://www.fda.gov/vaccines-blood-biologics/casgevy
+Captured: 2026-10-04 via Firecrawl scrape (markdown, onlyMainContent); WebFetch BLOCKED by egress proxy; Tavily extract returned collapsed accordions only.
+Page metadata: article:modified_time "Thu, 07/02/2026 - 12:57"; dcterms.creator "Center for Biologics Evaluation and Research";
+meta description: "CASGEVY indicated for the treatment of sickle cell disease (SCD) and transfusion dependent β-thalassemia (TDT) in patients 12 years and older."
+Body (verbatim excerpt):
+**STN:** 125787
+**Proper Name:** exagamglogene autotemcel
+**Tradename:** CASGEVY
+**Manufacturer:** Vertex Pharmaceuticals Incorporated
+## Indication
+- STN 125787 - For the treatment of patients aged 2 years and older with:
+  - Sickle cell disease (SCD) with recurrent vaso-occlusive crises (VOCs).
+  - Transfusion-dependent β-thalassemia (TDT).
+- STN 125785 - Indicated for the treatment of patients aged 12 years and older with sickle cell disease (SCD) with recurrent vaso occlusive crises (VOCs) and transfusion-dependent ß-thalassemia (TDT).
+## Supporting Documents
+- July 1, 2026 Approval Letter - CASGEVY (125787)
+- June 15, 2026 Approval Letter - CASGEVY (125787)
+- March 18, 2026 Approval Letter - CASGEVY (125787)
+- January 16, 2024 Approval Letter - CASGEVY (STN 125785)
+- January 16, 2024 Summary Basis for Regulatory Action - CASGEVY (STN125785)
+- December 8, 2023 Approval Letter - CASGEVY
+- December 8, 2023 Summary Basis for Regulatory Action - CASGEVY
+Content current as of: 07/02/2026

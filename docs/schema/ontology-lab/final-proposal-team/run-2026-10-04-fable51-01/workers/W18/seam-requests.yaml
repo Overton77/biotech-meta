@@ -1,0 +1,73 @@
+# W18 seam requests (run-2026-10-04-fable51-01). Evidence ids refer to 03-source-manifest.md (W18-Snn); fixtures to fixtures/*.cypher.
+- id: W18-SR-01
+  targetOwner: "W00 / Fable (conventions.uidTypeTokens)"
+  request: "Register uid tokens: event (Event), conference (Conference), community (Community), narrative-arc (NarrativeArc), event-impact (EventImpactAssessment)."
+  cq: [CQ-EN-C01, CQ-EN-C04, CQ-EN-C05, CQ-EN-C06]
+  failingCase: "INV-106 requires a registered token per primary label; catalog 0.2.0 lists none for the four live events_and_narrative types (they are liveSeamTypes). Fixtures 01-04 use the requested tokens; V-117 accepts the format but the token check cannot pass."
+  proposedRuling: "Accept all five."
+- id: W18-SR-02
+  targetOwner: "W00 / Fable (catalog events_and_narrative module)"
+  request: "Promote events_and_narrative from future to provisional with: nodes Event (Occurrence), Conference (Entity), Community (Entity, candidate), NarrativeArc (EvidenceAssessment, candidate), EventImpactAssessment (EvidenceAssessment, candidate); relationships HOSTS_EVENT, INVOLVES, EVENT_ABOUT, CAUSED_BY, EXHIBITS_AT, SPEAKS_AT, ATTENDS, DOCUMENTED_BY_RECORD, RECORDING_OF, PRESENTED_AT (asserted); HAS_EVENT, ARC_INCLUDES_EVENT, ARC_ABOUT, ASSESSES_EVENT, IMPACT_ON (structural); REPORTED_IN, FOLLOWED_BY (derived); assertedPredicates EVENT_OCCURRED, EVENT_SCHEDULED, EVENT_CANCELLED, EVENT_EFFECTIVE plus the asserted relationship names; forbiddenImplications [FOLLOWED_BY, CAUSED_BY], [ARC_INCLUDES_EVENT, CAUSED_BY], [APPROVAL_BASED_ON, CAUSED_BY], [EVENT_SCHEDULED, EVENT_OCCURRED], [HOSTS_EVENT, ENDORSES_PRODUCT], [EXHIBITS_AT, ENDORSES_PRODUCT], [SPEAKS_AT, ENDORSES_PRODUCT], [SPONSORS_CONTENT, HOSTS_EVENT]."
+  cq: [CQ-EN-C01, CQ-EN-C02, CQ-EN-C03, CQ-EN-C04, CQ-EN-C05, CQ-EN-C06, CQ-TM-03]
+  failingCase: "Without registered predicates and pairs, V-112 cannot see N2/N4 (CAUSED_BY citing FOLLOWED_BY or APPROVAL_BASED_ON) as forbidden premises, and V-101 cannot list the W18 asserted types; the run used fixtures/w18-validation-params.json to show both fire (06-fixtures-and-queries.md)."
+  proposedRuling: "Accept as provisional/candidate per element; generate $assertedTypes/$derivedTypes/$implicationPairs from the catalog."
+- id: W18-SR-03
+  targetOwner: "Fable (registry)"
+  request: "Admit W18 as sole writer of union EventRecordTarget, relationship-property types EventRoleEdgeProperties, CausalEdgeProperties, RecordingEdgeProperties, node type EventImpactAssessment (candidate), and relationship types EVENT_ABOUT, ARC_ABOUT, ARC_INCLUDES_EVENT, DOCUMENTED_BY_RECORD, RECORDING_OF, PRESENTED_AT, ASSESSES_EVENT, IMPACT_ON."
+  cq: [CQ-EN-C02, CQ-EN-C03, CQ-EN-C04, CQ-EN-C05, CQ-EN-C06]
+  failingCase: "Registry row W18 lists ABOUT (event/arc) and HAS_EVENT only; keeping them collides with W20 ABOUT (derived retrieval aboutness) and with the conference program edge (fixture 90 N14 caught by W18-V02)."
+  proposedRuling: "Accept; the renames keep one relationship type, one meaning."
+- id: W18-SR-04
+  targetOwner: W00
+  request: "Add 'FUTURE' to the controlled values of Assertion.statedTense (currently PAST, PRESENT) and add ActivityKind.CURATION (arc and impact curation activities)."
+  cq: [CQ-EN-C01, CQ-EN-C05]
+  failingCase: "Fixture 01 E3: Madrigal's 'Rezdiffra is expected to be available to patients in the U.S. in April' is an EVENT_SCHEDULED assertion in the future tense; without FUTURE the planned date reads as a past occurrence (N16 shape). Fixture 04 writes activityKind 'CURATION', an unregistered value."
+  proposedRuling: "Accept both as additive kernel vocabulary."
+- id: W18-SR-05
+  targetOwner: W01
+  request: "Insert these fields into the reserved slots. Organization: hostsEvents: [Event!]! @relationship(type: \"HOSTS_EVENT\", direction: OUT, properties: \"AssertedEdgeProperties\"); hostsConferences: [Conference!]! @relationship(type: \"HOSTS_EVENT\", direction: OUT, properties: \"AssertedEdgeProperties\"); exhibitsAt: [Conference!]! @relationship(type: \"EXHIBITS_AT\", direction: OUT, properties: \"EventRoleEdgeProperties\"); involvedInEvents: [Event!]! @relationship(type: \"INVOLVES\", direction: IN, properties: \"EventRoleEdgeProperties\"). Person: speaksAt: [Event!]! @relationship(type: \"SPEAKS_AT\", direction: OUT, properties: \"EventRoleEdgeProperties\"); attends: [Conference!]! @relationship(type: \"ATTENDS\", direction: OUT, properties: \"EventRoleEdgeProperties\"); involvedInEvents: [Event!]! @relationship(type: \"INVOLVES\", direction: IN, properties: \"EventRoleEdgeProperties\"). Descriptions: class asserted; participantRole required; public persons only for Person fields."
+  cq: [CQ-EC-01, CQ-CL-01, CQ-EN-C04]
+  failingCase: "fixture 03: Merck transcript names Robert Davis (PRESENTER) and Christopher Schott (MODERATOR); without the Person-side field the GraphQL API cannot traverse from a person to sessions (Q-GQL-3 reaches them only from the Event side)."
+  proposedRuling: "Accept; also state in W01 that an event role title never creates EMPLOYED_BY."
+- id: W18-SR-06
+  targetOwner: W21
+  request: "(a) Add Episode.recordingOf: [Event!]! @relationship(type: \"RECORDING_OF\", direction: OUT, properties: \"RecordingEdgeProperties\") (W18 owns the type). (b) Use SponsorableTarget (W18) for Organization.sponsorsContent / ConsumerBrand.sponsorsContent. (c) Answer W19-SR-07 with PRESENTED_AT (Document -> Event, W18) instead of a deck -> Episode predicate, and keep the Presentation/Talk work type out unless a talk appears in two recorded works where the occurrence link is insufficient."
+  cq: [CQ-EN-C04, CQ-CL-01, CQ-PV-05]
+  failingCase: "fixture 03: Merck JPM 2026 webcast page says 'The recording of this session is not available any more' while the deck and transcript exist; a deck->Episode link presumes a recorded work; for a never-recorded session it would force an invented Episode. N15 (deck RENDITION_OF the recording) is caught by W18-V06 and W21 V-W21-03."
+  proposedRuling: "Accept (a) and (b); W21 rules (c) with W19."
+- id: W18-SR-07
+  targetOwner: W20
+  request: "Add Document.presentedAt: [Event!]! @relationship(type: \"PRESENTED_AT\", direction: OUT, properties: \"AssertedEdgeProperties\") and confirm that W18 may reuse DerivedSupportProperties for REPORTED_IN (Event -> Source) and the Event.supportedByChunks field on SUPPORTED_BY_CHUNK."
+  cq: [CQ-EN-C04, CQ-EV-01]
+  failingCase: "fixture 01 REPORTED_IN edges carry locatorUid and derivedFromAssertionUids exactly as DerivedSupportProperties; a second W18 type with the same fields would duplicate W20's."
+  proposedRuling: "Accept."
+- id: W18-SR-08
+  targetOwner: W21
+  request: "Decide whether SPONSORS_CONTENT needs a program-level target (an award, symposium or session inside a conference) or whether Conference + roleTitleVerbatim suffices."
+  cq: [CQ-EN-C04, CQ-EC-03]
+  failingCase: "W18-S18: Madrigal supports the AASLD PALD travel award 'for The Liver Meeting 2026'; the fixture targets the Conference edition, which over-states the scope if Madrigal does not sponsor the meeting itself."
+  proposedRuling: "Keep Conference target with roleTitleVerbatim for 0.3; revisit with a second case."
+- id: W18-SR-09
+  targetOwner: W13
+  request: "Confirm that a company's 'approval was based on <study> data' is a W13 regulatory-basis statement (e.g. predicate APPROVAL_BASED_ON, RegulatoryResponse/DrugApproval -> Study|StudyResult) and never an event-to-event CAUSED_BY; confirm RegulatoryResponse / RegulatorySubmission / DrugApproval as EventRecordTarget members and supply an EU record shape (EC decision / Union Register) so the EU authorisation can be DOCUMENTED_BY_RECORD."
+  cq: [CQ-EN-C02, CQ-EN-C03]
+  failingCase: "fixture 90 N4: CAUSED_BY(approval -> readout) citing the 'based on Phase 3 data' assertion is caught by V-112/W18-V01; fixture 01 E4 has no record link because W13 has no EU authorisation record for Rezdiffra."
+  proposedRuling: "Accept; W13 owns the basis predicate and the EU record."
+- id: W18-SR-10
+  targetOwner: W00
+  request: "Exclude assessmentType NARRATIVE_ARC from provenance state 3 (evidence warrants a broader conclusion) and from CONSIDERS_ASSESSMENT targets; adopt W18-V03 as a V-4xx validator."
+  cq: [CQ-PV-01, CQ-EN-C05]
+  failingCase: "fixture 90 N6: an Adjudication CONSIDERS_ASSESSMENT a NarrativeArc and an Assertion SUPPORTED_BY an arc; the eleven baseline validators run in this packet (V-000a, V-000b, V-002, V-101, V-105, V-106, V-110, V-112, V-117, V-421, V-422) return zero rows for both; only W18-V03 reports them."
+  proposedRuling: "Accept."
+- id: W18-SR-11
+  targetOwner: W00
+  request: "Broaden ANNOUNCED_IN (catalog: SourceRevisionEvent -> SourceSnapshot) to allow Event -> SourceSnapshot as an optional structural pointer to the announcing capture, or confirm that Event.announcementAssertionUid (property) is sufficient."
+  cq: [CQ-EN-C02, CQ-TM-03]
+  failingCase: "announcedAt is derived from the snapshot behind the announcement assertion; without either pointer a later re-materialization cannot tell which capture set the value (fixture 01 uses the property)."
+  proposedRuling: "Keep the property for 0.3 (no new edge); revisit if the derivation proves ambiguous."
+- id: W18-SR-12
+  targetOwner: "W17, Fable"
+  request: "Deliver SafetySignal and AdverseEffect node types (members of EventSubjectTarget) or tell W18 to drop them from the union before merge."
+  cq: [CQ-EN-C01]
+  failingCase: "merge build of all fragments needs stubs for SafetySignal and AdverseEffect (W17 has no fragment in the workers directory at 2026-10-04T01:56Z); a union member that does not exist fails the build."
+  proposedRuling: "Keep members if W17 delivers; otherwise remove at merge."

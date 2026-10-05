@@ -1,0 +1,145 @@
+# W20 seam requests (run-2026-10-04-fable51-01). Fixture/query ids refer to 06-fixtures-and-queries.md.
+- id: W20-SR-01
+  targetOwner: W00
+  request: "Mark RESOLVES_TO_CHUNK ruleOnly: true in the catalog (and declare HAS_CHUNK, OCCURS_IN_SEGMENT (chunk), ABOUT, MENTIONS (chunk) as ruleOnly derived types), so V-112 accepts derivationRule without derivedFromAssertionUids."
+  cq: CQ-PV-02
+  failingCase: "fixture 01 RESOLVES_TO_CHUNK edges carry derivationRule 'offset-overlap-v1' and segmentationHash but no input assertion (the derivation is an offset overlap). With RESOLVES_TO_CHUNK in $derivedTypes and absent from $ruleOnlyDerivedTypes, V-112 reports DERIVATION_WITHOUT_SOURCE_ASSERTIONS for every edge (by reading V-112; V-112 was not run because it needs parameter lists)."
+  proposedRuling: "RESOLVES_TO_CHUNK, HAS_CHUNK, OCCURS_IN_SEGMENT, ABOUT and MENTIONS from Chunk/Document are rule-only derived; SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT are NOT rule-only (they need derivedFromAssertionUids)."
+- id: W20-SR-02
+  targetOwner: W00
+  request: "Register uid token 'segmentation' for Segmentation in conventions.uidTypeTokens."
+  cq: CQ-PV-03
+  failingCase: "Segmentation has a live stored id (segmentationId) and V-117 applies, but no registered token exists; fixtures 01 and 03 use hu:segmentation:… pending registration."
+  proposedRuling: "Segmentation: segmentation."
+- id: W20-SR-03
+  targetOwner: Fable (registry)
+  request: "Register union DocumentAuthorTarget = Person | Organization with sole writer W20 (rename of live union DocumentAuthor)."
+  cq: CQ-CL-01
+  failingCase: "Document.authoredBy needs a range union; the registry lists none and B6 requires <Role>Target naming."
+  proposedRuling: "Accept as W20-owned."
+- id: W20-SR-04
+  targetOwner: Fable (registry) with W00
+  request: "Register relationship-property type RetrievalEdgeProperties (DerivedEdgeProperties fields + salience, aboutness, segmentationHash, activityUid) with sole writer W20, for derived retrieval ABOUT/MENTIONS edges. W21 (Episode.mentions), W16 (ProtocolResult.mentions) and W22 (ProductLabelRegion.mentions) may reuse it."
+  cq: CQ-AX-14
+  failingCase: "ABOUT/MENTIONS are derived (round 0006 D9) and need DerivedEdgeProperties fields, but salience and aboutness have no frozen home; without them live ranking features are lost or put on support edges where they would read as confidence."
+  proposedRuling: "Accept; mark maturity CANDIDATE until a retrieval evaluation exists."
+- id: W20-SR-05
+  targetOwner: W00
+  request: "Extend WAS_GENERATED_BY domain to Segmentation (catalog lists Assertion|SourceSnapshot|DocumentTextVersion|SourceLocator|EvidenceAssessment)."
+  cq: CQ-PV-03
+  failingCase: "activityKind SEGMENTATION exists but nothing may be WAS_GENERATED_BY it; fixture 01 Q01-h needs Segmentation -> Activity to answer which run produced the chunks an index serves."
+  proposedRuling: "Add Segmentation to the domain (zero_or_one)."
+- id: W20-SR-06
+  targetOwner: W00
+  request: "State whether a re-anchored locator (REANCHORS) joins the cited assertion's SUPPORTED_BY. W20 assumes NO automatic join: chunk shortcuts into a corrected text version are derived only from locators an assertion is SUPPORTED_BY."
+  cq: CQ-PV-02
+  failingCase: "fixture 01 Q01-e: chunk g3-c0 of the corrected capture reaches A1 only via L2 -REANCHORS-> L1; SUPPORTED_BY_CHUNK from A1 into tv2 would fail W20-V01 (L2 is not A1's locator)."
+  proposedRuling: "No automatic join; a CAPTURE_FIDELITY review may add SUPPORTED_BY to the new locator (assertion content unchanged), after which shortcuts regenerate."
+- id: W20-SR-07
+  targetOwner: W00
+  request: "Add a range index on SourceLocator.quoteHash; keep REANCHORS within one Source (V-409) and answer cross-rendition span agreement by a computed quoteHash join (candidate CQ-PV-C03); no stored cross-rendition alignment edge."
+  cq: CQ-PV-C03
+  failingCase: "fixture 04 Q04-a: PDF and PMC HTML locators share quoteHash sha256:52bb34c1…; the connector text does not (1b2ef40c…). REANCHORS cannot link them (different Sources)."
+  proposedRuling: "Accept the index and the computed join; revisit a stored edge only with a fuzzy-alignment CQ."
+- id: W20-SR-08
+  targetOwner: W00
+  request: "Make W00's Source type read the same stored properties Document writes on shared :Document:Source nodes: Source.name @alias(property: \"title\") (or Source exposes title only), Source.canonicalUri stored as canonicalUri. Document stores url and canonicalUri with equal values."
+  cq: CQ-PV-02
+  failingCase: "A Document created through the API stores title/url; read through W00's Source type its name and canonicalUri are null and the Source.canonicalUri uniqueness constraint never sees it (fixture 02 N13/N14 show drift; W20-V05)."
+  proposedRuling: "Source.name aliased to title; canonicalUri required for new writes; W20-V05 as the drift check."
+- id: W20-SR-09
+  targetOwner: W00
+  request: "Allow content-derived opaque uid segments (hex sha256 of the identity tuple) for regenerable InformationArtifacts: DocumentTextVersion (snapshot uid, methodVersion, textVersionHash), Segmentation (text version uid, segmentationHash), Chunk (text version uid, segmentationHash, index)."
+  cq: CQ-PV-C02
+  failingCase: "catalog liveIdProjection says UUID or ULID; random ids make a re-run of the same segmentation create duplicate chunks unless a lookup precedes every write (fixture 01 re-runs would duplicate)."
+  proposedRuling: "Permit hex digests for derived artifacts (still opaque, never names)."
+- id: W20-SR-10
+  targetOwner: W00 with W19
+  request: "SourceKind has no reinstatement value while DocumentType gains REINSTATEMENT_NOTICE and sourceRevisionKind has REINSTATEMENT."
+  cq: CQ-EV-05
+  failingCase: "A reinstatement notice page has no SourceKind except CORRECTION_NOTICE, which misstates it."
+  proposedRuling: "Add SourceKind REINSTATEMENT_NOTICE, or rule the CORRECTION_NOTICE mapping."
+- id: W20-SR-11
+  targetOwner: W00 with W01, W04
+  request: "HAS_SNAPSHOT names two meanings: live Organization -> OrganizationSnapshot and Product -> ProductSnapshot (VersionedState) versus catalog Source -> SourceSnapshot (InformationArtifact capture)."
+  cq: CQ-PV-02
+  failingCase: "A label-free traversal (x)-[:HAS_SNAPSHOT]->(s) used for capture lineage returns organization state snapshots."
+  proposedRuling: "Keep HAS_SNAPSHOT for Source -> SourceSnapshot; move state snapshots to HAS_STATE or domain attachment types (round 0007)."
+- id: W20-SR-12
+  targetOwner: W18 with Fable
+  request: "ABOUT has one meaning: derived retrieval aboutness with RetrievalEdgeProperties. Event/NarrativeArc ABOUT, if authoritative, should use an asserted predicate (INVOLVES or a W18 type)."
+  cq: CQ-AX-14
+  failingCase: "Two owners (W18 event/arc, W20 document/chunk) of one relationship type with different classes; a ranking-feature edge would be read as an asserted subject link."
+  proposedRuling: "ABOUT = derived retrieval everywhere."
+- id: W20-SR-13
+  targetOwner: W00
+  request: "MENTIONS is kernel structural (SourceLocator -> Mention) and live derived retrieval (Chunk/Episode/ProtocolResult/ProductLabelRegion -> entity). Rule the split."
+  cq: CQ-AX-14
+  failingCase: "A count of MENTIONS edges mixes captured surface forms with model-linked entities."
+  proposedRuling: "Keep the name for live compatibility; class determined by start label (SourceLocator = structural, others = derived with RetrievalEdgeProperties); validators filter by start label. Alternative: rename retrieval edges MENTIONS_ENTITY."
+- id: W20-SR-14
+  targetOwner: W21
+  request: "Claim.supportedByChunks (SUPPORTED_BY_CHUNK, DerivedSupportProperties, read-only; derivedFromAssertionUids = instantiating assertions); ClaimOccurrence.supportedBy targets SourceLocator (kernel) and supportedByChunks carries the shortcut; ExperienceReport likewise. Chunk -[:ASSERTS]-> Claim edges migrate to Claim -[:SUPPORTED_BY_CHUNK]-> Chunk only when an instantiating Assertion and locator exist."
+  cq: CQ-EV-01
+  failingCase: "live Claim.supportedBy and Chunk.assertsClaims store the same fact twice; fixture 02 N1 shows a chunk-only support edge that V-407 catches only for Assertion starts."
+  proposedRuling: "Accept."
+- id: W20-SR-15
+  targetOwner: W21
+  request: "Remove Episode.hasTranscriptVersions (HAS_TRANSCRIPT). A transcript is a DocumentTextVersion TEXT_OF_SNAPSHOT a snapshot of a rendition Source RENDITION_OF the Episode."
+  cq: CQ-CL-08
+  failingCase: "fixture 04 Q04-c: the publisher page and YouTube cues differ in wording and only the video has a timeline; an Episode-level transcript link cannot say which."
+  proposedRuling: "Accept; no derived shortcut."
+- id: W20-SR-16
+  targetOwner: W16
+  request: "ProtocolResult.supportedBy (SUPPORTED_BY -> union ProvenanceSource = Chunk|Document|Organization|Study) mixes evidence endpoints and actors; split into SUPPORTED_BY_CHUNK/SUPPORTED_BY_DOCUMENT shortcuts (DerivedSupportProperties) and asserted links for Organization/Study."
+  cq: CQ-EV-01
+  failingCase: "an Organization as a 'support' target reads as evidence."
+  proposedRuling: "Accept."
+- id: W20-SR-17
+  targetOwner: W01, W02, W03, W04, W05, W06, W07, W09, W11, W17, W18, W22
+  request: "On your types, write supportedByChunks / supportedByDocuments as @relationship(type: \"SUPPORTED_BY_CHUNK\" | \"SUPPORTED_BY_DOCUMENT\", direction: OUT, properties: \"DerivedSupportProperties\") with @settable(onCreate: false, onUpdate: false); rename live supportedBy -> Chunk fields to supportedByChunks."
+  cq: CQ-EV-01
+  failingCase: "fixture 02 N3 (Mechanism -[:SUPPORTED_BY]-> Chunk without locator) passes V-407 (start is not an Assertion) and is caught only by W20-V01."
+  proposedRuling: "Accept; entity-type starts keep a shortcut only when an Assertion about them is SUPPORTED_BY the locator, otherwise the row migrates to Chunk -MENTIONS-> entity."
+- id: W20-SR-18
+  targetOwner: W00 with Fable (validation)
+  request: "Adopt W20-V01 (V-407 generalised to every start label and to SUPPORTED_BY_CHUNK) and W20-V02 to W20-V10 (operations.cypher part C)."
+  cq: CQ-AX-07
+  failingCase: "fixture 02 (run): V-407 reports 1 of the 4 chunk-support defects (N1); W20-V01 reports all 4 (N1, N2, N3, N4)."
+  proposedRuling: "Accept into the merged validation file."
+- id: W20-SR-19
+  targetOwner: W00
+  request: "Clarify the offset unit. property-cards.md says 'Unicode code points after normalizationVersion'. W20 proposes: offsets count code points in DocumentTextVersion.text as stored; DocumentTextVersion.normalizationVersion names what the producer already applied; SourceLocator.normalizationVersion governs the quote hash only."
+  cq: CQ-PV-C01
+  failingCase: "fixture 04 (computed): counting after NFC-WS1 moves the PDF sentence start from 538 to 536 and the connector sentence from 514 to 512 (double newlines collapse), so substring(text, start, len) no longer reproduces exact; W20-V03 depends on stored-text counting. A UTF-16 writer drifts one per astral character (run: size('a😀b') = 3 in Cypher, length 4 in JavaScript)."
+  proposedRuling: "Accept W20's reading; writers convert UTF-16 offsets to code points."
+- id: W20-SR-20
+  targetOwner: W00
+  request: "Register a matching-only normalization for FUZZY re-anchoring and cross-rendition search (e.g. LIG-HY1 = NFC-WS1 + expand U+FB00..U+FB06 ligatures + remove U+00AD soft hyphen), never used for quoteHash; reject NFKC."
+  cq: CQ-PV-02
+  failingCase: "run on Neo4j 5.26.31 and Python: NFC keeps 'ﬁ'; NFKC turns '10⁶' into '106' and 'µ' into 'μ' (quantity corruption); fixture 04 PDF text splits 'signi\\nfi\\ncance'."
+  proposedRuling: "Candidate; NFC-WS1 stays the only hash normalization."
+- id: W20-SR-21
+  targetOwner: W19
+  request: "Rule Source identity for connector-mediated records whose endpoint is not disclosed (PubMed MCP full text)."
+  cq: CQ-PV-02
+  failingCase: "fixture 04 uses canonicalUri 'mcp:pubmed/get_full_text_article/PMC11176364' because the connector does not disclose its upstream URL; its text differs from PMC HTML (dropped P, figure numbers, NCT number)."
+  proposedRuling: "A connector endpoint is its own Source with a 'connector:' or 'mcp:' scheme URI and the content's sourceKind; never merged with the HTML page Source."
+- id: W20-SR-22
+  targetOwner: Fable (query-shapes)
+  request: "QS-8 returns node.name, which is null for Document (stored title) and Chunk (stored chunkKey) hits; use coalesce(node.name, node.title, node.chunkKey)."
+  cq: CQ-AX-14
+  failingCase: "Q-AX-14 (run) returns display names only through the coalesce; the shipped QS-8 would return null names for all three Document hits."
+  proposedRuling: "Patch QS-8."
+- id: W20-SR-23
+  targetOwner: Fable with W00 (examples)
+  request: "Repair docs/schema/examples/claim-retelling-provenance.cypher Document nodes: they set documentType (GraphQL name) instead of stored type, no documentId, no url, entityType 'Source'."
+  cq: CQ-AX-14
+  failingCase: "fixture 02 N13 reproduces that shape; GraphQL read (run) fails with 'Cannot return null for non-nullable field Document.id'; W20-V04 lists five findings."
+  proposedRuling: "Set documentId, type, url; entityType 'Document' for nodes created as Document."
+- id: W20-SR-24
+  targetOwner: Fable (contract B1)
+  request: "Allow the standard @deprecated directive on advisory-deprecated fields (Document.isPrimarySource); until then the field is read-only via @settable."
+  cq: CQ-PV-05
+  failingCase: "clients cannot see the deprecation in introspection."
+  proposedRuling: "Allow @deprecated(reason:) in the merged file."

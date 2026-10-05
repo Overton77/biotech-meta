@@ -1,0 +1,58 @@
+# SCRATCH BUILD STUBS used only to build ../sdl-fragment.graphql with @neo4j/graphql 7.6.3. NOT part of the fragment:
+# every name below is defined by its registry owner (W00, W02, W03, W04, W05, W06, W09, W10, W16, W20). Kernel interfaces,
+# enums and property types are copied from contract B3/B4/B5; domain node stubs carry only the Entity fields.
+# Build: cat build-stubs.graphql ../sdl-fragment.graphql > combined.graphql; VECTOR_PROVIDER=0 node build-schema.mjs combined.graphql
+interface Entity { id: ID!  uid: String!  name: String  description: String  mongoResearchRunId: String }
+interface SearchIndexable { searchText: String  searchFields: [String!]  embeddingModel: String  embeddingDimensions: Int }
+interface EntityArchetype { entityType: String! }
+interface AssertionArchetype { predicate: String!  status: AssertionStatus!  recordedAt: DateTime!  recordedTo: DateTime  contentHash: String  polarity: Polarity  basisKind: BasisKind  predicateClass: PredicateClass  assertionBasis: AssertionBasis  speechAct: SpeechAct  reportedSpeechAct: SpeechAct  valueString: String  valueNumber: Float  valueBoolean: Boolean  unitCode: String  quantityBasis: QuantityBasis  validFrom: DateTime  validTo: DateTime  validFromPrecision: TimePrecision  validToPrecision: TimePrecision  validFromBasis: ValidTimeBasis  validToBasis: ValidTimeBasis  jurisdiction: String  derivationRule: String  extractionMethod: String  extractionConfidence: Float  agentRunUid: String  confidence: Float }
+interface EvidenceAssessmentArchetype { assessmentType: String!  methodVersion: String!  status: AssessmentStatus!  recordedAt: DateTime!  recordedTo: DateTime  summary: String  overallScore: Float  confidence: Float }
+enum PrivacyClass { PUBLIC INTERNAL }
+enum NodeMaturity { CANDIDATE PROVISIONAL ACCEPTED DEPRECATED }
+enum AssertionStatus { EXTRACTED PROPOSED ACCEPTED REJECTED DISPUTED SUPERSEDED UNRESOLVED }
+enum AssessmentStatus { PROPOSED ACCEPTED SUPERSEDED WITHDRAWN }
+enum Polarity { POSITIVE NEGATIVE MIXED UNKNOWN }
+enum BasisKind { DIRECT_MEASUREMENT INFERRED_FROM_MEASUREMENT CITED_FROM_PRIOR_WORK HYPOTHESIS CALCULATED }
+enum PredicateClass { MECHANISM ROLE COMMERCIAL REGULATORY QUANTITY IDENTITY CLAIM OTHER }
+enum AssertionBasis { PERSONAL_EXPERIENCE THIRD_PARTY_ANECDOTE MANUFACTURER_CLAIM STUDY_RESULT MECHANISM_REASONING EXPERT_OPINION UNSTATED }
+enum SpeechAct { STATES REPORTS_PRACTICE RECOMMENDS CAUTIONS SPECULATES QUESTIONS DENIES }
+enum TimePrecision { INSTANT DAY MONTH QUARTER YEAR DECADE }
+enum ValidTimeBasis { STATED_BY_SOURCE PUBLICATION_PROXY OBSERVATION_ONLY INFERRED UNKNOWN }
+enum QuantityBasis { PER_DAY PER_DOSE PER_SERVING PER_KG_BODY_WEIGHT_PER_DAY SINGLE_DOSE }
+enum MassBasis { SALT_FORM ACTIVE_MOIETY MATERIAL_AS_IS UNSPECIFIED }
+enum ReportedStatus { REPORTED NOT_REPORTED NOT_APPLICABLE }
+enum SupersessionKind { SOURCE_CORRECTION VALIDITY_BOUNDED EXTRACTION_FIX RESOLUTION_FIX DUPLICATE_MERGE RE_REVIEW SOURCE_REVISION }
+enum MechanismSetting { IN_VITRO_CELL_FREE IN_VITRO_CELL EX_VIVO IN_VIVO_NONMAMMAL IN_VIVO_MAMMAL HUMAN_INTERVENTIONAL HUMAN_OBSERVATIONAL IN_SILICO }
+enum EvidenceStrength { LOW MODERATE HIGH }
+enum ThresholdComparator { GT GTE LT LTE OUTSIDE_REFERENCE_RANGE }
+type StructuralEdgeProperties @relationshipProperties { orderIndex: Int  notes: String  mongoResearchRunId: String }
+type DerivedEdgeProperties @relationshipProperties { projectionOfAssertionUid: String  derivationRule: String  derivedFromAssertionUids: [String!]  derivedFromAssessmentUids: [String!]  derivedAt: DateTime  mongoResearchRunId: String }
+type SupersessionProperties @relationshipProperties { supersessionKind: SupersessionKind!  recordedAt: DateTime!  sourceRevisionEventUid: String }
+type IdentifierLinkProperties @relationshipProperties { relationshipUid: String!  assertionUid: String!  validFrom: DateTime  validTo: DateTime  validFromPrecision: TimePrecision  validToPrecision: TimePrecision  validFromBasis: ValidTimeBasis!  validToBasis: ValidTimeBasis!  recordedFrom: DateTime!  recordedTo: DateTime  isPrimary: Boolean  mongoResearchRunId: String }
+type MechanismLinkProperties @relationshipProperties { orderIndex: Int  notes: String  mongoResearchRunId: String }
+type AssociationProjectionProperties @relationshipProperties { projectionOfAssertionUid: String  derivationRule: String  derivedFromAssertionUids: [String!]  derivedAt: DateTime  mongoResearchRunId: String }
+type DerivedSupportProperties @relationshipProperties { locatorUid: String  derivationRule: String  derivedAt: DateTime  mongoResearchRunId: String }
+type Assertion implements Entity @node(labels: ["Assertion"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String predicate: String! }
+type SourceLocator implements Entity @node(labels: ["SourceLocator", "InformationArtifact"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String exact: String }
+type Activity implements Entity @node(labels: ["Activity", "Occurrence"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Identifier implements Entity @node(labels: ["Identifier", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String scheme: String! value: String! }
+type Person implements Entity @node(labels: ["Person", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Organization implements Entity @node(labels: ["Organization", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Agent implements Entity @node(labels: ["Agent", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+union AsserterTarget = Person | Organization | Agent
+type ChemicalSubstance implements Entity @node(labels: ["ChemicalSubstance", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type IngredientMaterial implements Entity @node(labels: ["IngredientMaterial", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Organ implements Entity @node(labels: ["Organ", "AnatomicalContext", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Condition implements Entity @node(labels: ["Condition", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Product implements Entity @node(labels: ["Product", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type ProductVariant implements Entity @node(labels: ["ProductVariant", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Lifestyle implements Entity @node(labels: ["Lifestyle", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Exposure implements Entity @node(labels: ["Exposure", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Treatment implements Entity @node(labels: ["Treatment", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Procedure implements Entity @node(labels: ["Procedure", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Study implements Entity @node(labels: ["Study", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type StudyResult implements Entity @node(labels: ["StudyResult", "InformationArtifact"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type UseContextProfile implements Entity @node(labels: ["UseContextProfile", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Document implements Entity @node(labels: ["Document", "Source", "Entity"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+type Chunk implements Entity @node(labels: ["Chunk", "InformationArtifact"]) { id: ID! @id uid: String! name: String description: String mongoResearchRunId: String }
+union AssertionSubjectTarget = ChemicalSubstance | IngredientMaterial | Product | ProductVariant | Treatment | Procedure | Lifestyle | Exposure | Condition | UseContextProfile | AdverseEffect | SafetySignal

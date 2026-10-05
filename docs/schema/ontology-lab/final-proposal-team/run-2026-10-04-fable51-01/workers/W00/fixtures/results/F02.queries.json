@@ -1,0 +1,93 @@
+[
+ {
+  "n": 1,
+  "status": "ok",
+  "rows": 2,
+  "result": [
+   {
+    "q": "Q02-a",
+    "viewpoint": "R=2026-04-10",
+    "formulationsValidAt2021": []
+   },
+   {
+    "q": "Q02-a",
+    "viewpoint": "R=now",
+    "formulationsValidAt2021": [
+     "hu:formulation:w00-late-fv-2019"
+    ]
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 2,
+  "status": "ok",
+  "rows": 1,
+  "result": [
+   {
+    "q": "Q02-b",
+    "validFrom": "2019-01-01T00:00:00Z",
+    "vfPrecision": "YEAR",
+    "vfBasis": "STATED_BY_SOURCE",
+    "validTo": "2025-11-01T00:00:00Z",
+    "vtBasis": "INFERRED",
+    "rule": "successor_state_start",
+    "archiveObservedAt": "2019-05-10T00:00:00Z",
+    "retrievedYear": 2026,
+    "recordedYear": 2026,
+    "episodeRecordedFromEqualsAssertionRecordedAt": true,
+    "notBeforeRetrieval": true
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 3,
+  "status": "ok",
+  "rows": 1,
+  "result": [
+   {
+    "q": "Q02-c",
+    "formulation": "hu:formulation:w00-late-fv-2019",
+    "validFrom": "2019-01-01T00:00:00Z",
+    "validTo": "2025-11-01T00:00:00Z",
+    "added": true,
+    "closed": false
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 4,
+  "status": "ok",
+  "rows": 5,
+  "result": [
+   {
+    "q": "Q02-d",
+    "validAt": "2018-06-01T00:00:00Z",
+    "validityClass": "KNOWN_NOT_VALID"
+   },
+   {
+    "q": "Q02-d",
+    "validAt": "2019-06-01T00:00:00Z",
+    "validityClass": "POSSIBLE_START_UNCERTAIN"
+   },
+   {
+    "q": "Q02-d",
+    "validAt": "2021-06-01T00:00:00Z",
+    "validityClass": "KNOWN_WITHIN"
+   },
+   {
+    "q": "Q02-d",
+    "validAt": "2025-11-15T00:00:00Z",
+    "validityClass": "POSSIBLE_END_UNCERTAIN"
+   },
+   {
+    "q": "Q02-d",
+    "validAt": "2025-12-15T00:00:00Z",
+    "validityClass": "KNOWN_NOT_VALID"
+   }
+  ],
+  "error": null
+ }
+]

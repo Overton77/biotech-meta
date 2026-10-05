@@ -1,0 +1,71 @@
+# W18 migration map (live current_biotech_schema.graphql 86b5e0b5…f112 -> W18 recommendation). Actions: keep|rename|move|split|merge|derive|retire.
+# Relabel statements add the archetype label to every existing node: Event -> :Occurrence, Conference/Community -> :Entity,
+# NarrativeArc -> :EvidenceAssessment (re-archetype; live NarrativeArc nodes carried no archetype label). uid backfill: hu:<token>:<id>.
+# --- unions ---
+- {live: "union EventParticipant (Organization|Person|Product|Compound|Study|TechnologyPlatform|Treatment|Procedure)", final: EventParticipantTarget, action: rename, note: "members narrowed to Organization|Person|Community; INVOLVES edges whose target is Product/Compound/Study/TechnologyPlatform/Treatment/Procedure are rewritten as EVENT_ABOUT with the same assertion"}
+- {live: "union EventSubject", final: EventSubjectTarget, action: rename, note: "Compound -> ChemicalSubstance (D-002, W02 mapping); Conference and Publication added"}
+- {live: "union Sponsorable (Conference|Channel|Episode)", final: SponsorableTarget, action: rename, note: "Series and Document added (catalog SPONSORS_CONTENT range); consumed by W21/W01"}
+# --- enums ---
+- {live: EventCategory, final: EventCategory, action: keep, note: "26 values unchanged"}
+- {live: ImpactLevel, final: ImpactLevel, action: keep, note: "used only by EventImpactAssessment.impactLevel"}
+- {live: EventStatus, final: EventStatus, action: keep, note: "semantics: materialized projection; ANNOUNCED legacy (new writes PLANNED)"}
+- {live: EventPhase, final: null, action: retire, note: "computed at query time from startedAt/endedAt and a valid-at instant; stored phase goes stale"}
+# --- Community ---
+- {live: Community, final: Community, action: keep, note: "labels [Community, Entity]; entityType 'Community'; CANDIDATE"}
+- {live: Community.id, final: Community.id, action: keep, note: "opaque segment of uid"}
+- {live: Community.name, final: Community.name, action: keep, note: "String! -> String (D-013); presentation only"}
+- {live: Community.description, final: Community.description, action: keep, note: ""}
+- {live: Community.mongoResearchRunId, final: Community.mongoResearchRunId, action: keep, note: "maps to Activity.externalRunId"}
+- {live: "Community.createdAt / updatedAt", final: "Community.createdAt / updatedAt", action: keep, note: ""}
+- {live: Community.communityType, final: Community.communityType, action: keep, note: "controlled string list in model card"}
+- {live: "Community.hostsEvents (HOSTS_EVENT, RoleMetadata)", final: "Community.hostsEvents (HOSTS_EVENT, AssertedEdgeProperties)", action: keep, note: "each edge needs an assertion; legacy edges get a MIGRATION assertion (status EXTRACTED, asserter null, extractionMethod 'live-edge-migration-v1') and validFromBasis/validToBasis UNKNOWN"}
+# --- Conference ---
+- {live: Conference, final: Conference, action: keep, note: "labels [Conference, Entity]; entityType 'Conference'; PROVISIONAL"}
+- {live: Conference.name, final: Conference.name, action: keep, note: "String! -> String (D-013)"}
+- {live: "Conference.id / description / mongoResearchRunId / createdAt / updatedAt", final: same, action: keep, note: ""}
+- {live: Conference.conferenceType, final: Conference.conferenceType, action: keep, note: "controlled string"}
+- {live: Conference.location, final: Conference.location, action: keep, note: "presentation; venue Facility deferred (CL-015)"}
+- {live: Conference.startDate, final: Conference.startDate, action: rename, note: "retyped DateTime -> Date: local calendar date in Conference.timeZone (convert with the venue zone, not UTC truncation)"}
+- {live: Conference.endDate, final: Conference.endDate, action: rename, note: "retyped DateTime -> Date (inclusive as printed)"}
+- {live: Conference.websiteUrl, final: Conference.websiteUrl, action: keep, note: "presentation; create a Source with canonicalUri for capture"}
+- {live: "Conference.hasEvents (HAS_EVENT, OrderingMetadata)", final: "Conference.hasEvents (HAS_EVENT, StructuralEdgeProperties)", action: keep, note: "OrderingMetadata order -> orderIndex"}
+- {live: null, final: "Conference.seriesName / editionLabel / timeZone / attendanceMode", action: keep, note: "new optional fields (no live data)"}
+# --- Event ---
+- {live: Event, final: Event, action: keep, note: "labels [Event, Occurrence]; occurrenceType 'Event'; PROVISIONAL"}
+- {live: "Event.id / description / mongoResearchRunId / createdAt / updatedAt / searchText / searchFields / embeddingModel / embeddingDimensions / summaryText / searchEmbedding", final: same, action: keep, note: "@vector re-added by Fable without provider (D-014)"}
+- {live: Event.name, final: Event.name, action: keep, note: "String! -> String (D-013)"}
+- {live: Event.eventCategory, final: Event.eventCategory, action: keep, note: ""}
+- {live: Event.eventStatus, final: Event.eventStatus, action: keep, note: "recomputed from assertions after migration"}
+- {live: Event.happenedAt, final: Event.startedAt, action: rename, note: "plus startedAtPrecision/startedAtBasis from a MIGRATION EVENT_OCCURRED assertion; precision guessed only when the value is a period start (e.g. day-1 midnight -> MONTH flagged for review); unknown -> basis UNKNOWN"}
+- {live: Event.happenedAtEnd, final: Event.endedAt, action: rename, note: "null stays null (unknown, not ongoing)"}
+- {live: Event.announcedAt, final: Event.announcedAt, action: keep, note: "add announcedAtPrecision; announcementAssertionUid null until a first-party snapshot is captured (W18-V04 flags ANNOUNCED_WITHOUT_ASSERTION for review)"}
+- {live: Event.effectiveAt, final: Event.effectiveFrom, action: rename, note: "kept only with a MIGRATION EVENT_EFFECTIVE assertion; values equal to announcedAt are flagged (likely proxies)"}
+- {live: Event.impactLevel, final: EventImpactAssessment.impactLevel, action: move, note: "one EventImpactAssessment per non-null value, methodVersion 'legacy-import-v0', impactDomain OTHER, status PROPOSED, no IMPACT_ON"}
+- {live: Event.eventPhase, final: null, action: retire, note: "computed"}
+- {live: Event.sourceUrl, final: null, action: retire, note: "create Source(canonicalUri) and queue capture; never a locator; no REPORTED_IN until a locator exists"}
+- {live: "Event.involves (INVOLVES, RoleMetadata)", final: "Event.involves (INVOLVES, EventRoleEdgeProperties)", action: split, note: "Organization/Person targets keep INVOLVES (RoleMetadata.roleType -> participantRole, roleTitle -> roleTitleVerbatim); thing targets -> EVENT_ABOUT"}
+- {live: "Event.about (ABOUT, ExtractionMetadata)", final: "Event.about (EVENT_ABOUT, AssertedEdgeProperties)", action: rename, note: "relationship type renamed; ExtractionMetadata.quoteSpan -> SourceLocator.exact on the authorizing assertion"}
+- {live: "Event.reportedIn (REPORTED_IN -> Document, ExtractionMetadata)", final: "Event.reportedIn (REPORTED_IN -> Source, DerivedSupportProperties)", action: derive, note: "regenerated from event assertions' locators; legacy edges without a locator are dropped after a capture attempt (kept read-only meanwhile)"}
+- {live: "Event.supportedBy (SUPPORTED_BY -> Chunk)", final: "Event.supportedByChunks (SUPPORTED_BY_CHUNK)", action: rename, note: "W20 ruling KCR-4.5; derived read-only with locatorUid"}
+- {live: "Event.causedBy (CAUSED_BY, RoleMetadata)", final: "Event.causedBy (CAUSED_BY, CausalEdgeProperties)", action: keep, note: "legacy edges without an assertion are converted to MIGRATION CAUSED_BY assertions with basisKind null and status EXTRACTED; W18-V01 reports them until a basis is captured; they are excluded from answers meanwhile"}
+- {live: "Event.followedBy (FOLLOWED_BY, OrderingMetadata)", final: "Event.followedBy (FOLLOWED_BY, DerivedEdgeProperties)", action: derive, note: "deleted and regenerated by valid-time-order-v1; source-stated orders become FOLLOWED_BY assertions + projections"}
+# --- NarrativeArc ---
+- {live: NarrativeArc, final: NarrativeArc, action: split, note: "re-archetyped to EvidenceAssessment: assessmentType 'NARRATIVE_ARC', methodVersion 'legacy-arc-v0', status ACCEPTED, recordedAt = createdAt, eventsRecordedAsOf = createdAt, CANDIDATE"}
+- {live: "NarrativeArc.id / name / description / mongoResearchRunId / createdAt / updatedAt / search fields / searchEmbedding", final: same, action: keep, note: "name String! -> String"}
+- {live: NarrativeArc.arcType, final: NarrativeArc.arcType, action: keep, note: ""}
+- {live: NarrativeArc.themeSummary, final: NarrativeArc.themeSummary, action: keep, note: ""}
+- {live: NarrativeArc.impactDomain, final: NarrativeArc.impactDomain, action: keep, note: "presentation facet"}
+- {live: NarrativeArc.arcStatus, final: NarrativeArc.status, action: retire, note: "ongoing/closed is not stored; lifecycle via AssessmentStatus + SUPERSEDES"}
+- {live: NarrativeArc.startedAt, final: NarrativeArc.periodStart, action: rename, note: "an arc is not an occurrence; recomputed from member events"}
+- {live: NarrativeArc.endedAt, final: NarrativeArc.periodEnd, action: rename, note: "recomputed"}
+- {live: "NarrativeArc.hasEvents (HAS_EVENT, OrderingMetadata)", final: "NarrativeArc.includesEvents (ARC_INCLUDES_EVENT, StructuralEdgeProperties)", action: rename, note: "relationship type renamed (one type, one meaning)"}
+- {live: "NarrativeArc.about (ABOUT)", final: "NarrativeArc.about (ARC_ABOUT)", action: rename, note: "structural"}
+- {live: "NarrativeArc.reportedIn (REPORTED_IN)", final: null, action: retire, note: "an arc is not reported in sources; if an external article is the arc's inspiration, it is captured as W21 source content"}
+- {live: "NarrativeArc.supportedBy (SUPPORTED_BY -> Chunk)", final: null, action: retire, note: "an arc is never supported nor support"}
+# --- role edges on W01 types (field slots reserved by W01) ---
+- {live: "Organization.sponsors (SPONSORS, union Sponsorable)", final: "Organization.sponsorsContent (SPONSORS_CONTENT -> SponsorableTarget)", action: move, note: "W21 writes the edge; MIGRATION SPONSORS_CONTENT assertions"}
+- {live: "Organization.exhibitsAt (EXHIBITS_AT, RoleMetadata)", final: "Organization.exhibitsAt (EXHIBITS_AT, EventRoleEdgeProperties)", action: keep, note: "participantRole EXHIBITOR; field text in seam W18-SR-05"}
+- {live: "Person.speaksAt (SPEAKS_AT -> Event, RoleMetadata)", final: "Person.speaksAt (SPEAKS_AT, EventRoleEdgeProperties)", action: keep, note: "participantRole from RoleMetadata.roleType (SPEAKER default); public persons only"}
+- {live: "Person.attends (ATTENDS -> Conference, RoleMetadata)", final: "Person.attends (ATTENDS, EventRoleEdgeProperties)", action: keep, note: "edges from persons that are not public figures with a public source are deleted, not migrated"}
+# --- references to W18 types in other live unions (owners decide) ---
+- {live: "EvidenceSubject / ClaimSubject / AssociationParticipant / MediaSubject members Event, NarrativeArc, Community, Conference", final: "AssertionSubjectTarget (W00), MediaSubjectTarget (W22)", action: keep, note: "NarrativeArc as an assertion subject is allowed (an assertion about an arc); never as SUPPORTED_BY target"}

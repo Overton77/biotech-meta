@@ -1,0 +1,67 @@
+# BUILD-CHECK STUB ONLY. NOT A FRAGMENT. Not read by merge-fragments.mjs (which reads sdl-fragment.graphql only).
+# Minimal copies of W00 contract shapes (01-shared-contract.md B3, B4, B5 subsets) and of the other owners' node types
+# that W08's fragment references by name (W01 Organization, W04 Product, W07 AssayVersion/MeasurementMethod/Metric and
+# enum AlgorithmVersionBasis, W11 ManufacturingStep). Every definition here belongs to its registry owner; field sets
+# are minimal and exist only so that W08's sdl-fragment.graphql builds under @neo4j/graphql 7.6.3.
+
+interface Entity { id: ID!  uid: String!  name: String  description: String  mongoResearchRunId: String }
+interface SearchIndexable { searchText: String  searchFields: [String!]  embeddingModel: String  embeddingDimensions: Int }
+interface EntityArchetype { entityType: String! }
+interface VersionedStateArchetype { stateType: String!  payloadHash: String!  effectiveFrom: DateTime  effectiveTo: DateTime }
+
+enum PrivacyClass { PUBLIC INTERNAL }
+enum NodeMaturity { CANDIDATE PROVISIONAL ACCEPTED DEPRECATED }
+enum TimePrecision { INSTANT DAY MONTH QUARTER YEAR DECADE }
+enum ValidTimeBasis { STATED_BY_SOURCE PUBLICATION_PROXY OBSERVATION_ONLY INFERRED UNKNOWN }
+enum AlgorithmVersionBasis { VENDOR_VERSION_STRING PUBLICATION_VERSION SERVICE_ENDPOINT_UNVERSIONED UNKNOWN }
+
+type AssertedEdgeProperties @relationshipProperties {
+  relationshipUid: String!  assertionUid: String!
+  validFrom: DateTime  validTo: DateTime  validFromPrecision: TimePrecision  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!  recordedTo: DateTime  mongoResearchRunId: String
+}
+
+type StructuralEdgeProperties @relationshipProperties { orderIndex: Int  notes: String  mongoResearchRunId: String }
+type MeasurementEdgeProperties @relationshipProperties {
+  relationshipUid: String!  assertionUid: String!
+  validFrom: DateTime  validTo: DateTime  validFromPrecision: TimePrecision  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!  recordedTo: DateTime  mongoResearchRunId: String
+  unit: String  signalType: String  samplingRateHz: Float  accuracy: Float  notes: String
+}
+
+type Organization implements Entity & EntityArchetype @node(labels: ["Organization", "Entity"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String  entityType: String!
+  developsPlatforms: [TechnologyPlatform!]! @relationship(type: "DEVELOPS_PLATFORM", direction: OUT, properties: "AssertedEdgeProperties")
+  usesPlatforms: [TechnologyPlatform!]! @relationship(type: "USES_PLATFORM", direction: OUT, properties: "UsageEdgeProperties")
+  usesEquipment: [ToolOrInstrument!]! @relationship(type: "USES_EQUIPMENT", direction: OUT, properties: "UsageEdgeProperties")
+}
+type Product implements Entity & EntityArchetype @node(labels: ["Product", "Entity"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String  entityType: String!
+  implementsPlatforms: [TechnologyPlatform!]! @relationship(type: "IMPLEMENTS_PLATFORM", direction: OUT, properties: "UsageEdgeProperties")
+  embodiesModels: [EquipmentModelTarget!]! @relationship(type: "EMBODIES_MODEL", direction: OUT, properties: "AssertedEdgeProperties")
+  runsOnDevices: [Device!]! @relationship(type: "RUNS_ON_DEVICE", direction: OUT, properties: "AssertedEdgeProperties")
+}
+type ManufacturingStep implements Entity & EntityArchetype @node(labels: ["ManufacturingStep", "Entity"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String  entityType: String!
+  usesPlatforms: [TechnologyPlatform!]! @relationship(type: "USES_PLATFORM", direction: OUT, properties: "UsageEdgeProperties")
+  usesEquipment: [ToolOrInstrument!]! @relationship(type: "USES_EQUIPMENT", direction: OUT, properties: "UsageEdgeProperties")
+}
+type MeasurementMethod implements Entity & EntityArchetype @node(labels: ["MeasurementMethod", "Entity"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String  entityType: String!
+  runsOnPlatforms: [TechnologyPlatform!]! @relationship(type: "RUNS_ON_PLATFORM", direction: OUT, properties: "StructuralEdgeProperties")
+}
+type Metric implements Entity & EntityArchetype @node(labels: ["Metric", "Entity"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String  entityType: String!
+}
+type Observation @node(labels: ["Observation", "InformationArtifact"]) { id: ID! @id  uid: String! }
+
+type AssayVersion implements Entity & VersionedStateArchetype @node(labels: ["AssayVersion", "VersionedState"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String
+  stateType: String!  payloadHash: String!  effectiveFrom: DateTime  effectiveTo: DateTime
+  softwareVersion: String  softwareVersionStatus: String  assayKitIdentifier: String
+  runsOnInstrument: [EquipmentModelTarget!]! @relationship(type: "RUNS_ON_INSTRUMENT", direction: OUT, properties: "StructuralEdgeProperties")
+  performedByDevices: [Device!]! @relationship(type: "PERFORMED_WITH_ASSAY_VERSION", direction: IN, properties: "AssertedEdgeProperties")
+  runsFirmwareVersion: [FirmwareVersion!]! @relationship(type: "RUNS_FIRMWARE_VERSION", direction: OUT, properties: "StructuralEdgeProperties")
+}

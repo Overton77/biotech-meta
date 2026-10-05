@@ -1,0 +1,35 @@
+interface Entity { id: ID!  uid: String!  name: String  description: String  mongoResearchRunId: String }
+interface EntityArchetype { entityType: String! }
+interface VersionedStateArchetype { stateType: String!  payloadHash: String!  effectiveFrom: DateTime  effectiveTo: DateTime }
+interface OccurrenceArchetype { occurrenceType: String!  startedAt: DateTime  endedAt: DateTime }
+interface InformationArtifactArchetype { artifactType: String!  publishedAt: DateTime  observedAt: DateTime  contentHash: String }
+enum PrivacyClass { PUBLIC INTERNAL }
+enum NodeMaturity { CANDIDATE PROVISIONAL ACCEPTED DEPRECATED }
+enum TimePrecision { INSTANT DAY MONTH QUARTER YEAR DECADE }
+enum ValidTimeBasis { STATED_BY_SOURCE PUBLICATION_PROXY OBSERVATION_ONLY INFERRED UNKNOWN }
+type AssertedEdgeProperties @relationshipProperties {
+  relationshipUid: String!  assertionUid: String!
+  validFrom: DateTime  validTo: DateTime  validFromPrecision: TimePrecision  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!  recordedTo: DateTime  mongoResearchRunId: String }
+type StateEpisodeProperties @relationshipProperties {
+  relationshipUid: String!  assertionUid: String
+  validFrom: DateTime  validTo: DateTime  validFromPrecision: TimePrecision  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!  recordedTo: DateTime  mongoResearchRunId: String }
+type DerivedEdgeProperties @relationshipProperties {
+  projectionOfAssertionUid: String  derivationRule: String
+  derivedFromAssertionUids: [String!]  derivedFromAssessmentUids: [String!]
+  derivedAt: DateTime  mongoResearchRunId: String }
+type StructuralEdgeProperties @relationshipProperties { orderIndex: Int  notes: String  mongoResearchRunId: String }
+type IdentifierLinkProperties @relationshipProperties { relationshipUid: String!  assertionUid: String!  validFrom: DateTime  validTo: DateTime  validFromPrecision: TimePrecision  validToPrecision: TimePrecision  validFromBasis: ValidTimeBasis!  validToBasis: ValidTimeBasis!  recordedFrom: DateTime!  recordedTo: DateTime  isPrimary: Boolean  mongoResearchRunId: String }
+type Identifier @node(labels: ["Identifier","Entity"]) { id: ID! @id uid: String! scheme: String value: String }
+type Organization @node(labels: ["Organization","Entity"]) { id: ID! @id uid: String! name: String }
+type Facility @node(labels: ["Facility","Entity"]) { id: ID! @id uid: String! name: String }
+type Product @node(labels: ["Product","Entity"]) { id: ID! @id uid: String! name: String }
+type ProductVariant @node(labels: ["ProductVariant","Entity"]) { id: ID! @id uid: String! name: String }
+type IngredientMaterial @node(labels: ["IngredientMaterial","Entity"]) { id: ID! @id uid: String! name: String }
+type MaterialMixture @node(labels: ["MaterialMixture","Entity"]) { id: ID! @id uid: String! name: String }
+type AlgorithmVersion @node(labels: ["AlgorithmVersion","VersionedState"]) { id: ID! @id uid: String! name: String }
+type AssayVersion @node(labels: ["AssayVersion","VersionedState"]) { id: ID! @id uid: String! name: String }
+type StudyIntervention @node(labels: ["StudyIntervention","VersionedState"]) { id: ID! @id uid: String! name: String }

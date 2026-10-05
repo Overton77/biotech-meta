@@ -1,0 +1,1020 @@
+# =====================================================================================================================
+# W09 Studies, interventions and results -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01. Worker: W09 (Opus 5.5). Synthesizer: Fable 5.1.
+# Canonical module: studies_and_evidence (catalog/schema.yaml 0.2.0, digest `8fb50ff0…84f0`).
+# Live baseline: current_biotech_schema.graphql `86b5e0b5…f112`, lines 228-239 and 1597-1754.
+# CQs served: CQ-ST-01..10 (CQ-ST-03/10 jointly with W10), CQ-EV-03/04/05, CQ-ID-01/02, CQ-AX-05, CQ-AX-24 (pointer to W10),
+#             candidates CQ-ST-C01 (device arm), CQ-ST-C02 (procedure/protocol arm), CQ-ST-C03 (registry version identity).
+# Invariants: INV-201, INV-206..INV-209 (V-201, V-202, V-210..V-213, V-215..V-218, V-221, V-223).
+# Contract: section B of 01-shared-contract.md. No `extend`. Only W09-owned types, enums, unions and relationship-property
+# types are defined here. Every other name (Entity, *Archetype interfaces, kernel enums, AssertedEdgeProperties,
+# StateEpisodeProperties, DerivedEdgeProperties, StructuralEdgeProperties, IdentifierLinkProperties, SourceLocator,
+# Source, Identifier, Organization, Person, IngredientMaterial, ChemicalSubstance, ChemicalForm, MaterialMixture,
+# ProductVariant, Product, ProductLot, Device, Biomarker, Metric, Outcome, Condition, Species, Procedure, Treatment,
+# Lifestyle, FoodItem, FoodProduct, Protocol, ProtocolEdition) is imported by name from its registry owner.
+# Relationship class and cardinality are in each field description and are enforced by operations/validation, not SDL.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Enums (W09 sole writer). Values frozen at catalog `conventions` where the catalog defines them; the others are
+# property-card vocabularies registered through W09-SR-01 (see seam-requests.yaml).
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""What kind of measure an outcome definition is (catalog conventions.measureKind; FDA/NIH BEST clinical outcome
+assessment categories). Observed from protocol or registry. Never an endpoint role: surrogate status is a W10
+EndpointClassification. CQ-ST-03."""
+enum MeasureKind {
+  BIOMARKER
+  PERFORMANCE_OUTCOME
+  PATIENT_REPORTED_OUTCOME
+  CLINICIAN_REPORTED_OUTCOME
+  OBSERVER_REPORTED_OUTCOME
+  CLINICAL_EVENT
+}
+
+"""Priority a source declares for an outcome (catalog conventions.outcomePriority). Carried per source by Assertions with
+predicate DECLARES_OUTCOME_PRIORITY; OutcomeDefinition.priority is only the derived registered priority. CQ-ST-04."""
+enum OutcomePriority {
+  PRIMARY
+  SECONDARY
+  OTHER_PRESPECIFIED
+  POST_HOC
+  SAFETY
+}
+
+"""Role of an analysis in the study plan (catalog conventions.analysisKind). INV-206, V-215. CQ-ST-05."""
+enum AnalysisKind {
+  PRIMARY_PRESPECIFIED
+  SECONDARY_PRESPECIFIED
+  SUBGROUP_PRESPECIFIED
+  SUBGROUP_POST_HOC
+  EXPLORATORY
+  SAFETY
+}
+
+"""Shape of the comparison behind an estimate (catalog conventions.comparisonKind). Within-arm change is never a
+between-arm effect (forbidden implication WITHIN_ARM_CHANGE_SIGNIFICANT -> BETWEEN_ARM_EFFECT; V-216). CQ-ST-05."""
+enum ComparisonKind {
+  BETWEEN_ARM
+  WITHIN_ARM_CHANGE
+  ARM_DESCRIPTIVE
+}
+
+"""Reported significance outcome of the stated comparison (catalog conventions.statisticalConclusion). NOT_SIGNIFICANT is
+never NO_EFFECT; NOT_TESTED (no test was run) differs from NOT_REPORTED (the source does not say). CQ-ST-05."""
+enum StatisticalConclusion {
+  SIGNIFICANT_FAVORABLE
+  SIGNIFICANT_UNFAVORABLE
+  NOT_SIGNIFICANT
+  NOT_TESTED
+  NOT_REPORTED
+}
+
+"""How adverse events were collected (catalog conventions.aeCollectionMethod). SYSTEMATIC = actively elicited by a
+structured instrument or at scheduled assessment (ClinicalTrials.gov "Systematic Assessment"); SPONTANEOUS = volunteered
+by participant or investigator ("Non-systematic Assessment"); NOT_DESCRIBED = the source records AEs but does not state
+how. INV-207, V-217. CQ-ST-06."""
+enum AeCollectionMethod {
+  SYSTEMATIC
+  SPONTANEOUS
+  NOT_DESCRIBED
+}
+
+"""Role of a publication's analysis of a dataset (catalog conventions.datasetAnalysisRole). Independence is derived from
+shared Study/Dataset (V-218). CQ-ST-07, CQ-AX-05."""
+enum DatasetAnalysisRole {
+  PRIMARY_REPORT
+  SECONDARY_ANALYSIS
+  POOLED_ANALYSIS
+  REANALYSIS
+}
+
+"""Kind of publication record (catalog conventions.publicationKind). The journal's own designation wins; a differing
+database publication type (PubMed "Published Erratum") is kept as an Assertion. CQ-EV-05."""
+enum PublicationKind {
+  ARTICLE
+  AUTHOR_CORRECTION
+  ERRATUM
+  RETRACTION_NOTICE
+  EXPRESSION_OF_CONCERN
+  PREPRINT
+  CONFERENCE_ABSTRACT
+}
+
+"""Whether a registry date is actual or anticipated (catalog conventions.registryDateType). Null = the registry or tool did
+not say; never defaulted. CQ-ST-08."""
+enum RegistryDateType {
+  ACTUAL
+  ANTICIPATED
+}
+
+"""Whether a registry enrollment count is actual or estimated (catalog conventions.enrollmentCountType). Null = not
+reported by the source/tool, never ESTIMATED by default. CQ-ST-08."""
+enum EnrollmentCountType {
+  ACTUAL
+  ESTIMATED
+}
+
+"""Direction of change as REPORTED by the source (live enum OutcomeDirection kept). Display/extraction value only:
+NO_CHANGE is a reported direction, not a statistical conclusion and not evidence of no effect. CQ-ST-05."""
+enum OutcomeDirection {
+  IMPROVED
+  WORSENED
+  NO_CHANGE
+  MIXED
+  INCONCLUSIVE
+  UNKNOWN
+}
+
+"""Arm type as registered or reported (ClinicalTrials.gov glossary arm types; live StudyArm.armType refined to enum).
+V-221 exempts PLACEBO_COMPARATOR (and, per W09-CR-02, SHAM_COMPARATOR and NO_INTERVENTION). CQ-ST-01. W09-SR-01."""
+enum ArmType {
+  EXPERIMENTAL
+  ACTIVE_COMPARATOR
+  PLACEBO_COMPARATOR
+  SHAM_COMPARATOR
+  NO_INTERVENTION
+  OTHER
+}
+
+"""Role of an arm in one result (property card RESULT_FOR_ARM.armRole). Explicit; never inferred from order. CQ-ST-05.
+W09-SR-01."""
+enum ArmRole {
+  INTERVENTION
+  COMPARATOR
+}
+
+"""Seriousness class of an adverse-event row (property card AdverseEventResult.seriousness). ANY = all AEs regardless of
+seriousness. Severity (mild/moderate/severe) is not seriousness. CQ-ST-06. W09-SR-01."""
+enum AeSeriousness {
+  ANY
+  SERIOUS
+  NON_SERIOUS
+}
+
+"""Who judged relatedness of an adverse event to the intervention. NOT_REPORTED explicit. CQ-ST-06. W09-SR-01."""
+enum RelatednessAssessor {
+  INVESTIGATOR
+  SPONSOR
+  PARTICIPANT
+  INDEPENDENT_COMMITTEE
+  NOT_REPORTED
+}
+
+"""Availability of a dataset as stated by its data-availability statement (property card Dataset.accessLevel).
+CQ-ST-07. W09-SR-01."""
+enum DatasetAccessLevel {
+  PUBLIC
+  CONTROLLED
+  ON_REQUEST
+  UNAVAILABLE
+  UNKNOWN
+}
+
+"""Which cohort a StudyPopulation state describes. Eligible (criteria), enrolled (registered/started), randomized and
+analyzed cohorts differ (NCT02678611: 120 enrolled, 118 analyzed ITT). CQ-EV-04, CQ-ST-08. W09-SR-01."""
+enum StudyPopulationKind {
+  ELIGIBLE
+  ENROLLED
+  RANDOMIZED
+  ANALYZED
+}
+
+"""Analysis set of an analyzed cohort or a result (catalog StudyResult.analysisPopulation; live fixture values).
+CQ-ST-05. W09-SR-01."""
+enum AnalysisSetKind {
+  INTENTION_TO_TREAT
+  MODIFIED_INTENTION_TO_TREAT
+  PER_PROTOCOL
+  SAFETY_SET
+  COMPLETERS
+  OTHER
+  NOT_REPORTED
+}
+
+"""Kind of estimate a StudyResult reports (catalog StudyResult.resultKind; replaces the free values PERCENT_CHANGE and
+ADVERSE_EVENT_COUNT used by the 0.2.0 fixture). CQ-ST-05. W09-SR-01."""
+enum StudyResultKind {
+  MEAN
+  MEDIAN
+  MEAN_DIFFERENCE
+  PERCENT_CHANGE
+  RATIO
+  ODDS_RATIO
+  HAZARD_RATIO
+  RISK_DIFFERENCE
+  AREA_UNDER_CURVE
+  PROPORTION
+  ADVERSE_EVENT_COUNT
+  OTHER
+}
+
+"""How an estimate was obtained from the source text. CQ-ST-05. W09-SR-01."""
+enum EstimateQualifier {
+  AS_REPORTED
+  APPROXIMATE
+  READ_FROM_FIGURE
+  CALCULATED_BY_BELLLABS
+}
+
+"""Study design kind (catalog Study.studyKind). Used to group support by evidence type (CQ-EV-03). W09-SR-01."""
+enum StudyKind {
+  INTERVENTIONAL_RANDOMIZED
+  INTERVENTIONAL_NONRANDOMIZED
+  INTERVENTIONAL_SINGLE_GROUP
+  OBSERVATIONAL_COHORT
+  OBSERVATIONAL_CASE_CONTROL
+  CROSS_SECTIONAL
+  CASE_REPORT
+  CASE_SERIES
+  PRECLINICAL
+  SYSTEMATIC_REVIEW
+  META_ANALYSIS
+  OTHER
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Unions (W09 sole writer)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""READ-ONLY LEGACY range of the live union `StudyIntervention` (D-003, CL-006). Reachable only through
+Study.evaluates (@settable false). Members are the final-schema successors of the live members: Compound ->
+ChemicalSubstance (D-002), CompoundForm -> ChemicalForm and IngredientMaterial (W02-SR-20), FoodItem -> IngredientMaterial
+(W05 FoodItem carries the IngredientMaterial label), FoodProduct -> Product (retired by W05), Lifestyle (W05),
+Treatment/Procedure (W06), Device (W08), Protocol (W16). Specializations that carry a member's label (MaterialMixture,
+FoodItem, MicrobialPreparation -> IngredientMaterial) are NOT listed beside their parent: under @neo4j/graphql 7.6.3 a union
+listing both returns the node twice (W05-SR-09; merge check OVERLAP). Never written; INV-201 makes every legacy EVALUATES
+edge to a Product a V-201 backlog row."""
+union LegacyEvaluatedIntervention = Product | ChemicalSubstance | ChemicalForm | IngredientMaterial | Protocol | Treatment | Device | Procedure | Lifestyle
+
+"""CANDIDATE (CQ-ST-C02). Reusable definition a study intervention instantiates when what was administered is a procedure,
+a treatment regimen, a public protocol edition, a named protocol whose edition content is unknown (W05-SR-06: DICA-NUTS
+'Brazilian cardioprotective diet prescription'), or a lifestyle practice, rather than (or in addition to) a material or device.
+Members owned by W06 (Procedure, Treatment), W16 (ProtocolEdition, Protocol), W05 (Lifestyle). Supported by W06-SR-03."""
+union InterventionDefinitionTarget = Procedure | Treatment | ProtocolEdition | Protocol | Lifestyle
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Relationship-property types (W09 sole writer). Each embeds every field of the frozen W00 type it specializes.
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""USES_INTERVENTION_MATERIAL and USES_INTERVENTION_DEVICE (asserted). Specializes AssertedEdgeProperties (all fields
+repeated) + asReportedName: the name under which the source reports what was administered (required by V-202 when the
+target is a ProductVariant; recommended for every target). The target is the material/product/device AS ADMINISTERED AT
+STUDY TIME, never the variant's current formulation (round 0002 R1)."""
+type InterventionMaterialProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  asReportedName: String
+}
+
+"""RESULT_FOR_ARM (structural). Specializes StructuralEdgeProperties (all fields) + armRole (explicit; never inferred from
+edge order). CQ-ST-05."""
+type ResultArmProperties @relationshipProperties {
+  orderIndex: Int
+  notes: String
+  mongoResearchRunId: String
+  armRole: ArmRole!
+}
+
+"""ANALYZES_DATASET (asserted). Specializes AssertedEdgeProperties (all fields) + analysisRole (catalog requiredQualifier).
+CQ-ST-07, V-218."""
+type DatasetAnalysisProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  analysisRole: DatasetAnalysisRole!
+}
+
+"""CORRECTS and RETRACTS (asserted; publication-level view of a SourceRevisionEvent, round 0007). Specializes
+AssertedEdgeProperties (all fields) + sourceRevisionEventUid: the W00 SourceRevisionEvent (ERRATUM,
+CORRECTED_AND_REPUBLISHED for CORRECTS; RETRACTION for RETRACTS) that revises a rendition Source of the target
+Publication. CQ-EV-05. Registration requested in W09-SR-02."""
+type PublicationRevisionProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  sourceRevisionEventUid: String!
+}
+
+"""READ-ONLY LEGACY properties of the live EVALUATES edge (live InterventionArmMetadata, stored names unchanged so legacy
+edges stay readable). Never written. `confidence` is a deprecated bare confidence (contract A4) kept only for reading.
+Successor fields: armLabel -> StudyArm.name; interventionRole -> StudyArm.armType; doseText ->
+InterventionComponent.verbatimDoseText; doseAmount/doseUnit -> InterventionComponent.quantity/unitCode (+quantityBasis,
+massBasis); route/frequency -> StudyIntervention.route/schedule/dosesPerDay. Registration requested in W09-SR-02."""
+type LegacyInterventionArmProperties @relationshipProperties {
+  armLabel: String
+  interventionRole: String
+  doseText: String
+  doseAmount: Float
+  doseUnit: String
+  route: String
+  frequency: String
+  confidence: Float
+  notes: String
+  mongoResearchRunId: String
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Node types (W09 sole writer)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Study: the identity of one research investigation (a trial, an observational study, a case report, a preclinical study).
+It is NOT its registration (TrialRegistration), registry version (RegistrationVersion), protocol document
+(ProtocolVersion), publication, dataset, arm, intervention or result (V-012). Registry status, enrollment, design and
+results-posted live on RegistrationVersion with observedAt (INV-208, R10); publication ids live on Publication; evidence
+level is a W10 EvidenceStrengthAssessment (INV-209). A Study never links directly to Product, ProductVariant or
+FormulationVersion; evidence reaches commercial identities only through W10 EvidenceApplicability (INV-201, V-201).
+`overallStatus` and `enrollmentCount` exist only as a derived read-only cache naming its RegistrationVersion (V-210).
+CQ-ST-01..09, CQ-EV-03, CQ-ID-01/02. Module studies_and_evidence. Archetype Entity. uid token `study`.
+"""
+type Study implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Study", "Entity"])
+  @fulltext(indexes: [{indexName: "StudySearch", fields: ["name", "description", "searchText"], queryName: "searchStudies"}]) {
+  id: ID! @id
+  uid: String!
+  "Presentation title (catalog Study.title maps here; D-013). Registry titles are versioned on RegistrationVersion."
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Embedding vector for the StudySearchEmbedding index Fable may declare with @vector (no provider; D-014). Derived, never evidence (INV-107)."
+  searchEmbedding: [Float!]
+  "Design kind as classified at ingestion from the registry or paper (CQ-EV-03 grouping). Null = not classified."
+  studyKind: StudyKind
+  "DERIVED cache (INV-208): overallStatus of the RegistrationVersion named by projectionOfRegistrationVersionUid. Never written by clients."
+  overallStatus: String @settable(onCreate: false, onUpdate: false)
+  "DERIVED cache (INV-208): enrollmentCount of the named RegistrationVersion; its actual/estimated type is only on the version."
+  enrollmentCount: Int @settable(onCreate: false, onUpdate: false)
+  "uid of the RegistrationVersion the two cache fields project (required whenever either cache field is non-null; V-210)."
+  projectionOfRegistrationVersionUid: String @settable(onCreate: false, onUpdate: false)
+
+  """class: asserted; cardinality: many (one study may have CT.gov + ISRCTN + ANZCTR registrations); catalog: REGISTERED_AS"""
+  registeredAs: [TrialRegistration!]! @relationship(type: "REGISTERED_AS", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_PROTOCOL_VERSION"""
+  protocolVersions: [ProtocolVersion!]! @relationship(type: "HAS_PROTOCOL_VERSION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_ARM (live hasArms)"""
+  arms: [StudyArm!]! @relationship(type: "HAS_ARM", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many (one per source/version that states criteria); catalog: HAS_ELIGIBLE_POPULATION"""
+  eligiblePopulations: [StudyPopulation!]! @relationship(type: "HAS_ELIGIBLE_POPULATION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_ENROLLED_COHORT (live studiesPopulations / STUDIES merged)"""
+  enrolledCohorts: [StudyPopulation!]! @relationship(type: "HAS_ENROLLED_COHORT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: DEFINES_OUTCOME (live hasOutcomeMeasures / HAS_OUTCOME_MEASURE merged)"""
+  outcomeDefinitions: [OutcomeDefinition!]! @relationship(type: "DEFINES_OUTCOME", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PRODUCED_DATASET (live hasDatasets / HAS_DATASET refined)"""
+  producedDatasets: [Dataset!]! @relationship(type: "PRODUCED_DATASET", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse field); cardinality: many; catalog: REPORTS_ON"""
+  reportedIn: [Publication!]! @relationship(type: "REPORTS_ON", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; live INVESTIGATES kept. Written only when a registry/paper condition resolves to a W03
+  Condition; non-disease registry text ("Safety: Healthy Subjects") stays in RegistrationVersion.conditionsVerbatim."""
+  investigatesConditions: [Condition!]! @relationship(type: "INVESTIGATES", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; live STUDIED_IN kept for the species of the studied population (preclinical
+  contexts use W03 MechanismEvidenceContext -IN_SPECIES->)."""
+  studiedInSpecies: [Species!]! @relationship(type: "STUDIED_IN", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived; cardinality: many; live SPONSORED_BY kept as a read-only projection: derivationRule
+  'inverse-of:SPONSORS_STUDY@1' + derivedFromAssertionUids (W01 predicate SPONSORS_STUDY). Sponsorship never implies
+  execution (FI SPONSORS_STUDY -> EXECUTES_STUDY)."""
+  sponsoredBy: [Organization!]! @relationship(type: "SPONSORED_BY", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; live OPERATED_BY kept as a read-only projection: derivationRule
+  'inverse-of:SERVES_AS_CRO_FOR@1'. A registry "collaborator" is NOT a CRO (W09-SR-05)."""
+  operatedBy: [Organization!]! @relationship(type: "OPERATED_BY", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; live INVESTIGATED_BY kept as a read-only projection of a W01 investigator-role
+  assertion (predicate requested in W09-SR-05)."""
+  investigatedBy: [Person!]! @relationship(type: "INVESTIGATED_BY", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: legacy (read-only); cardinality: many; live EVALUATES (InterventionArmMetadata). INV-201 / CL-017 / D-003:
+  never written; successor path is HAS_ARM -> ASSIGNS_INTERVENTION -> HAS_INTERVENTION_COMPONENT ->
+  USES_INTERVENTION_MATERIAL, and commercial applicability only through W10 EvidenceApplicability."""
+  evaluates: [LegacyEvaluatedIntervention!]! @relationship(type: "EVALUATES", direction: OUT, properties: "LegacyInterventionArmProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+TrialRegistration: the identity of one registry entry (registry + registrationId, e.g. ClinicalTrials.gov NCT02678611,
+ANZCTR ACTRN12624000959572). Not the Study (one study may have several registrations) and not a version of the entry.
+The registration id is also an Identifier record (scheme NCT/ACTRN/ISRCTN, issuer the registry); the materialized
+`registrationId` is a lookup key, not the identity. CQ-ST-08, CQ-ST-04. Module studies_and_evidence. Archetype Entity.
+uid token `trial-registration`.
+"""
+type TrialRegistration implements Entity & EntityArchetype
+  @node(labels: ["TrialRegistration", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Registry name, normalized (ClinicalTrials.gov, ANZCTR, ISRCTN, EU CTR ...). Identity key with registrationId."
+  registry: String!
+  "Registry-assigned id as displayed (NCT02678611). Materialized key; the Identifier record is authoritative."
+  registrationId: String!
+
+  """class: asserted (inverse field); cardinality: one_or_more; catalog: REGISTERED_AS"""
+  studies: [Study!]! @relationship(type: "REGISTERED_AS", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural; temporalProfile: bitemporal_attachment; exclusivity: EXCLUSIVE per registration (TM-R5);
+  cardinality: many (one edge per recorded-time episode); catalog: HAS_REGISTRATION_VERSION"""
+  versions: [RegistrationVersion!]! @relationship(type: "HAS_REGISTRATION_VERSION", direction: OUT, properties: "StateEpisodeProperties")
+  """class: asserted; cardinality: many; identity_resolution HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+}
+
+"""
+RegistrationVersion: one observed version of a registry entry, as captured by BellLabs (InformationArtifact). Holds
+registered status, enrollment (with actual/estimated type), dates (with actual/anticipated type and precision), design,
+site countries, verbatim conditions/interventions and whether results are posted. `observedAt` (BellLabs) is never a
+substitute for `versionDate` (registry); unknown registry history stays null (round 0002; history BLOCKED for NCT02678611
+on 2026-10-04). resultsPosted=false means "no registry results section as observed", never "unpublished"
+(FI REGISTRY_RESULTS_NOT_POSTED -> RESULTS_UNPUBLISHED; V-212). Not the Study and not a publication.
+CQ-ST-08, CQ-ST-04, CQ-ST-C03. Module studies_and_evidence. Archetype InformationArtifact. uid token `registration-version`.
+"""
+type RegistrationVersion implements Entity & InformationArtifactArchetype
+  @node(labels: ["RegistrationVersion", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  "Registry publication instant of this version, when the registry states it (first instant of its precision)."
+  publishedAt: DateTime
+  "When BellLabs saw this version as displayed (operational). Required (V-211)."
+  observedAt: DateTime!
+  "sha256 over the captured registry record (D-016); SYNTHETIC_FIXTURE basis in fixtures."
+  contentHash: String
+  "Registry's own date for this version (history tab). Null = history not obtained."
+  versionDate: Date
+  "Registry's own version number (CT.gov history). Null = not obtained."
+  registryVersionNumber: Int
+  "Registry 'last update posted' date shown on the version, the best version key when history is unavailable (CQ-ST-C03)."
+  lastUpdatePostedDate: Date
+  briefTitle: String
+  officialTitle: String
+  acronym: String
+  "Registry overall status as displayed (CT.gov OverallStatus vocabulary or the registry's own); never copied onto Study except as the derived cache."
+  overallStatus: String
+  enrollmentCount: Int
+  enrollmentCountType: EnrollmentCountType
+  resultsPosted: Boolean
+  resultsFirstPostedDate: Date
+  startDate: Date
+  startDatePrecision: TimePrecision
+  startDateType: RegistryDateType
+  primaryCompletionDate: Date
+  primaryCompletionDatePrecision: TimePrecision
+  primaryCompletionDateType: RegistryDateType
+  completionDate: Date
+  completionDatePrecision: TimePrecision
+  completionDateType: RegistryDateType
+  studyType: String
+  allocation: String
+  interventionModel: String
+  masking: String
+  primaryPurpose: String
+  "Registry phase list as displayed (PHASE1, NA ...); a disagreeing narrative statement ('Phase 2' in a summary) is an Assertion."
+  phase: [String!]
+  "ISO 3166-1 alpha-2 codes of registered sites (live Study.countries). A publication's differing site list is an Assertion."
+  siteCountries: [String!]
+  fdaRegulatedDrug: Boolean
+  fdaRegulatedDevice: Boolean
+  "Registry 'conditions' text verbatim; resolved Conditions are INVESTIGATES assertions."
+  conditionsVerbatim: [String!]
+  "Registry intervention labels verbatim ('Basis 250', 'Mitopure 500mg')."
+  interventionNamesVerbatim: [String!]
+  sponsorNameVerbatim: String
+  collaboratorNamesVerbatim: [String!]
+
+  """class: structural (inverse field); cardinality: exactly_one (V-211); catalog: HAS_REGISTRATION_VERSION"""
+  registration: [TrialRegistration!]! @relationship(type: "HAS_REGISTRATION_VERSION", direction: IN, properties: "StateEpisodeProperties")
+  """class: structural; cardinality: one_or_more (coarse SECTION or WHOLE_SNAPSHOT locators allowed); provenance SUPPORTED_BY
+  (domain extension requested in W09-SR-03)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+}
+
+"""
+ProtocolVersion: one version of a study's own protocol or statistical analysis plan document (InformationArtifact), e.g.
+a protocol PDF attached to a registry record or a published protocol paper. It is the research design document of ONE
+study; a public, reusable consumer or practice protocol is a W16 ProtocolEdition (CL-007). Not a RegistrationVersion
+(the registry's summary of the design). CQ-ST-04 (prespecification), CQ-ST-05. Module studies_and_evidence. Archetype
+InformationArtifact. uid token requested `protocol-version` (W09-SR-04).
+"""
+type ProtocolVersion implements Entity & InformationArtifactArchetype
+  @node(labels: ["ProtocolVersion", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  "Version label as stated in the document ('Protocol v3.0', 'SAP v1.1')."
+  versionName: String
+  "Date the document states for this version. Null = not stated."
+  versionDate: Date
+
+  """class: structural (inverse field); cardinality: exactly_one; catalog: HAS_PROTOCOL_VERSION"""
+  study: [Study!]! @relationship(type: "HAS_PROTOCOL_VERSION", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: one_or_more; provenance SUPPORTED_BY (W09-SR-03)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+}
+
+"""
+StudyArm: a state of one arm (or crossover treatment condition) of a study as reported by a source (VersionedState):
+name, arm type, planned size. What the arm received is the asserted ASSIGNS_INTERVENTION edge to a StudyIntervention,
+never a direct edge to a product (live RECEIVES retired; INV-201). A corrected arm description is a new state.
+CQ-ST-01, CQ-ST-05, CQ-ST-06. Module studies_and_evidence. Archetype VersionedState. uid token `arm`.
+"""
+type StudyArm implements Entity & VersionedStateArchetype
+  @node(labels: ["StudyArm", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  "Arm label as reported (live InterventionArmMetadata.armLabel moves here)."
+  name: String
+  "Arm description as reported (live armDescription)."
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  armType: ArmType
+  "Comparator kind verbatim (live comparatorType)."
+  comparatorType: String
+  "Planned arm size (live plannedEnrollment)."
+  plannedSize: Int
+
+  """class: structural (inverse field); cardinality: exactly_one; catalog: HAS_ARM"""
+  study: [Study!]! @relationship(type: "HAS_ARM", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: one_or_more (none for NO_INTERVENTION); catalog: ASSIGNS_INTERVENTION (live RECEIVES split)"""
+  assignedInterventions: [StudyIntervention!]! @relationship(type: "ASSIGNS_INTERVENTION", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+StudyIntervention: what one arm was assigned, as reported by a source (VersionedState): name, route, dosage form,
+schedule, doses per day, planned duration, registry intervention type. Its administered materials and devices are its
+InterventionComponents. GraphQL type name per D-003 (the live union of this name is LegacyEvaluatedIntervention). A study
+intervention is identified at study time; it is never the current marketed product, even when the paper says
+"commercially known as" (that is an ADMINISTERED_AS_COMMERCIAL_PRODUCT Assertion; FI USES_INTERVENTION_MATERIAL ->
+EVALUATES_PRODUCT; FI SHARED_INGREDIENT_NAME -> EVIDENCE_APPLIES). It is the W10 EvidenceApplicability evidence target.
+CQ-ST-01, CQ-ST-02, CQ-EV-04, CQ-ID-01. Module studies_and_evidence. Archetype VersionedState. uid token `intervention`.
+"""
+type StudyIntervention implements Entity & VersionedStateArchetype
+  @node(labels: ["StudyIntervention", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Route as reported (ORAL, TRANSCRANIAL ...). String pending a shared AdministrationRoute enum (W09-SR-06). Null = not reported."
+  route: String
+  "Dosage/delivery form as reported (CAPSULE, WHOLE_FOOD, BEVERAGE, DEVICE_SESSION ...). String pending shared DosageForm enum (W09-SR-06). Null = not reported."
+  dosageForm: String
+  "Schedule verbatim ('once daily at breakfast', 'six sessions over 2 weeks', 'single test meal')."
+  schedule: String
+  "Administrations per day. Null = not reported or not applicable (single test meal)."
+  dosesPerDay: Int
+  "Planned intervention duration, ISO 8601 (P8W). Null = not reported."
+  durationIso: String
+  "Registry intervention type as registered (DIETARY_SUPPLEMENT, DEVICE, PROCEDURE, BEHAVIORAL, OTHER ...)."
+  registryInterventionType: String
+
+  """class: asserted (inverse field); cardinality: one_or_more; catalog: ASSIGNS_INTERVENTION"""
+  assignedToArms: [StudyArm!]! @relationship(type: "ASSIGNS_INTERVENTION", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: one_or_more (zero only for a definition-only intervention, see definitions); catalog: HAS_INTERVENTION_COMPONENT"""
+  components: [InterventionComponent!]! @relationship(type: "HAS_INTERVENTION_COMPONENT", direction: OUT, properties: "StructuralEdgeProperties")
+  """CANDIDATE (CQ-ST-C02). class: asserted; cardinality: zero_or_more; new relationship FOLLOWS_INTERVENTION_DEFINITION:
+  the reusable procedure/treatment/protocol edition/lifestyle practice this intervention instantiates. Successor of the
+  non-material members of the live union. Never implies that the definition is effective or recommended."""
+  definitions: [InterventionDefinitionTarget!]! @relationship(type: "FOLLOWS_INTERVENTION_DEFINITION", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+InterventionComponent: one administered constituent of a study intervention as reported (VersionedState): amount, UCUM
+unit, quantity basis (per day, per dose, single dose ...), mass basis (salt, active moiety, material as is, unspecified),
+verbatim dose text, and whether the amount was reported. Its target is the material, product variant, lot or device AS
+ADMINISTERED AT STUDY TIME (USES_INTERVENTION_MATERIAL / USES_INTERVENTION_DEVICE, asserted, with asReportedName).
+Amount "250 mg NR" with massBasis UNSPECIFIED is never compared as a ratio with a label's "NR chloride 250 mg" (INV-203).
+quantityBasis and massBasis are required when quantityStatus is REPORTED (V-221; device/sham exemption W09-CR-02).
+CQ-ST-01, CQ-EV-04, CQ-ST-C01. Module studies_and_evidence. Archetype VersionedState. uid token `intervention-component`.
+"""
+type InterventionComponent implements Entity & VersionedStateArchetype
+  @node(labels: ["InterventionComponent", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Amount as reported. Null when quantityStatus is NOT_REPORTED or NOT_APPLICABLE."
+  quantity: Float
+  "UCUM unit (mg/d, g, {session})."
+  unitCode: String
+  quantityBasis: QuantityBasis
+  "UNSPECIFIED when the source does not say salt vs moiety vs as-is; null only when not applicable (device)."
+  massBasis: MassBasis
+  "REPORTED, NOT_REPORTED or NOT_APPLICABLE (kernel ReportedStatus). Null reads as REPORTED when quantity is non-null."
+  quantityStatus: ReportedStatus
+  "Exact dose/delivery wording from the source ('250 mg of NR (2 capsules x 125 mg)', '808-904 nm, six sessions')."
+  verbatimDoseText: String
+
+  """class: structural (inverse field); cardinality: exactly_one; catalog: HAS_INTERVENTION_COMPONENT"""
+  intervention: [StudyIntervention!]! @relationship(type: "HAS_INTERVENTION_COMPONENT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: zero_or_one per target kind (exactly one target overall, V-W09-03); catalog:
+  USES_INTERVENTION_MATERIAL -> IngredientMaterial (material as administered; food fractions included per W09-SR-07)"""
+  usesMaterial: [IngredientMaterial!]! @relationship(type: "USES_INTERVENTION_MATERIAL", direction: OUT, properties: "InterventionMaterialProperties")
+  """class: asserted; cardinality: zero_or_one; catalog: USES_INTERVENTION_MATERIAL -> ProductVariant (only when the source
+  states a marketed variant was administered; asReportedName required, V-202; never the variant's current formulation)"""
+  usesProductVariant: [ProductVariant!]! @relationship(type: "USES_INTERVENTION_MATERIAL", direction: OUT, properties: "InterventionMaterialProperties")
+  """class: asserted; cardinality: zero_or_one; catalog: USES_INTERVENTION_MATERIAL -> ProductLot (lot-level identity)"""
+  usesProductLot: [ProductLot!]! @relationship(type: "USES_INTERVENTION_MATERIAL", direction: OUT, properties: "InterventionMaterialProperties")
+  """CANDIDATE (CQ-ST-C01). class: asserted; cardinality: zero_or_one; new relationship USES_INTERVENTION_DEVICE -> W08
+  Device as used at study time (real or sham mode is the arm's armType, not a device property). Range confirmation
+  requested from W08 (W09-SR-08)."""
+  usesDevice: [Device!]! @relationship(type: "USES_INTERVENTION_DEVICE", direction: OUT, properties: "InterventionMaterialProperties")
+}
+
+"""
+StudyPopulation: a state of one cohort of a study as reported by one source (VersionedState): eligible (criteria),
+enrolled, randomized or analyzed (with analysis set). Eligible, enrolled and analyzed cohorts are distinct records
+(NCT02678611: 120 enrolled, 118 analyzed ITT) and are never merged into one size. Replaces live Population (D-007).
+Not a person, not a participant record (no private data; contract A9). CQ-EV-04 (POPULATION dimension input), CQ-ST-08.
+Module studies_and_evidence. Archetype VersionedState. uid token requested `study-population` (W09-SR-04).
+"""
+type StudyPopulation implements Entity & VersionedStateArchetype
+  @node(labels: ["StudyPopulation", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  populationKind: StudyPopulationKind!
+  "Analysis set when populationKind is ANALYZED."
+  analysisSet: AnalysisSetKind
+  "Cohort size as reported by this source. Null = not reported."
+  size: Int
+  "Verbatim size text (live Study.sampleSizeText; '40, 38 and 40 per group')."
+  sizeText: String
+  "Sex eligibility as stated (live Population.sexEligibility)."
+  sexEligibility: String
+  "Minimum age verbatim ('60 Years'; live Population.minAge)."
+  minAge: String
+  "Maximum age verbatim ('80 Years')."
+  maxAge: String
+  healthyVolunteers: Boolean
+
+  """class: structural (inverse fields); cardinality: exactly_one study; catalog: HAS_ELIGIBLE_POPULATION / HAS_ENROLLED_COHORT"""
+  eligibleFor: [Study!]! @relationship(type: "HAS_ELIGIBLE_POPULATION", direction: IN, properties: "StructuralEdgeProperties")
+  enrolledIn: [Study!]! @relationship(type: "HAS_ENROLLED_COHORT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural (inverse field); cardinality: many; catalog: HAS_ANALYZED_COHORT"""
+  analyzedIn: [StudyResult!]! @relationship(type: "HAS_ANALYZED_COHORT", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+OutcomeDefinition: a state of what a study measures as an outcome (VersionedState): name, measure kind, time frame, the
+biomarker or metric it measures, and the source document that defines it. Priority (primary/secondary...) is NOT a stored
+fact: each source's ranking is a DECLARES_OUTCOME_PRIORITY Assertion; `priority` is a derived projection of the declaration
+in the earliest RegistrationVersion (registry vs paper disagreement for NCT02678611 whole-blood NAD+ stays visible; V-223).
+Endpoint role and surrogate status are W10 EndpointClassification (INV-205). Replaces live OutcomeMeasure (D-007).
+CQ-ST-03, CQ-ST-04, CQ-ST-05. Module studies_and_evidence. Archetype VersionedState. uid token `outcome` (registered fixture
+alias; `outcome-definition` requested, W09-SR-04).
+"""
+type OutcomeDefinition implements Entity & VersionedStateArchetype
+  @node(labels: ["OutcomeDefinition", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  measureKind: MeasureKind!
+  "Time frame verbatim (live timepointLabel)."
+  timepoint: String
+  "DERIVED (kind calculated): priority declared by the earliest RegistrationVersion's DECLARES_OUTCOME_PRIORITY assertion; null when no registry declaration. Regenerated when an earlier version arrives."
+  priority: OutcomePriority @settable(onCreate: false, onUpdate: false)
+  "uid of the DECLARES_OUTCOME_PRIORITY assertion that `priority` projects."
+  priorityAssertionUid: String @settable(onCreate: false, onUpdate: false)
+
+  """class: structural (inverse field); cardinality: exactly_one; catalog: DEFINES_OUTCOME"""
+  study: [Study!]! @relationship(type: "DEFINES_OUTCOME", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: one_or_more over the three target kinds; catalog: DEFINED_IN -> RegistrationVersion"""
+  definedInRegistrationVersions: [RegistrationVersion!]! @relationship(type: "DEFINED_IN", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; catalog: DEFINED_IN -> ProtocolVersion"""
+  definedInProtocolVersions: [ProtocolVersion!]! @relationship(type: "DEFINED_IN", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; catalog: DEFINED_IN -> Publication"""
+  definedInPublications: [Publication!]! @relationship(type: "DEFINED_IN", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: MEASURES_BIOMARKER -> W07 Biomarker (analyte in a matrix)"""
+  measuresBiomarker: [Biomarker!]! @relationship(type: "MEASURES_BIOMARKER", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_more; live MEASURED_BY_METRIC kept (W07 Metric); payload of the definition"""
+  measuredByMetrics: [Metric!]! @relationship(type: "MEASURED_BY_METRIC", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_more; live REFERS_TO_OUTCOME kept (W03 Outcome concept)"""
+  refersToOutcomes: [Outcome!]! @relationship(type: "REFERS_TO_OUTCOME", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural (inverse field); catalog: RESULT_FOR"""
+  results: [StudyResult!]! @relationship(type: "RESULT_FOR", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+StudyResult: one reported estimate for one outcome definition, arm(s), analysis set and timepoint, as captured from a
+publication or registry results section (InformationArtifact). Carries analysisKind, comparisonKind,
+statisticalConclusion (observed; NOT_SIGNIFICANT is not no-effect), multiplicityAdjusted (null = not reported) and the
+derived isStatisticallySignificant. Clinical meaningfulness is an author Assertion (RESULT_CLINICALLY_MEANINGFUL) or a W10
+ResultInterpretation, never a property here (INV-209, V-213). Replaces live OutcomeResult (D-007) and the result part of
+live StudyOutcome. Enters syntheses only through W10 INCLUDES_RESULT {inputRole} under INV-206 (V-215, V-216).
+CQ-ST-05, CQ-ST-10, CQ-EV-03. Module studies_and_evidence. Archetype InformationArtifact. uid token `study-result`.
+"""
+type StudyResult implements Entity & InformationArtifactArchetype
+  @node(labels: ["StudyResult", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  resultKind: StudyResultKind
+  "Point estimate (live effectSizeValue)."
+  estimate: Float
+  estimateQualifier: EstimateQualifier
+  "UCUM unit of the estimate (live effectSizeUnit)."
+  unitCode: String
+  "Exact p-value when reported as a number. An inequality ('P < .01') stays only in pValueText."
+  pValue: Float
+  pValueText: String
+  ciLower: Float
+  ciUpper: Float
+  "Confidence level as a fraction (0.95)."
+  ciLevel: Float
+  "Verbatim CI text (live confidenceIntervalText)."
+  confidenceIntervalText: String
+  analysisPopulation: AnalysisSetKind
+  analysisKind: AnalysisKind!
+  comparisonKind: ComparisonKind!
+  statisticalConclusion: StatisticalConclusion!
+  "Null = not reported (never false by default)."
+  multiplicityAdjusted: Boolean
+  "DERIVED (kind calculated): true iff statisticalConclusion is SIGNIFICANT_*; false iff NOT_SIGNIFICANT; null for NOT_TESTED/NOT_REPORTED. Replaces live isStatisticallySignificant."
+  isStatisticallySignificant: Boolean @settable(onCreate: false, onUpdate: false)
+  "Direction as reported (live direction)."
+  direction: OutcomeDirection
+  baselineValue: Float
+  followupValue: Float
+  absoluteChange: Float
+  relativeChangePercent: Float
+  "n contributing to this estimate as reported (live sampleSize)."
+  sampleSize: Int
+  "Timepoint verbatim (live timepointLabel)."
+  timepoint: String
+  "Result sentence verbatim (live resultText)."
+  resultText: String
+
+  """class: structural; cardinality: exactly_one; catalog: RESULT_FOR (live FOR_MEASURE merged)"""
+  resultFor: [OutcomeDefinition!]! @relationship(type: "RESULT_FOR", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: one_or_more (one INTERVENTION, zero or more COMPARATOR); catalog: RESULT_FOR_ARM (live FROM_ARM merged)"""
+  arms: [StudyArm!]! @relationship(type: "RESULT_FOR_ARM", direction: OUT, properties: "ResultArmProperties")
+  """class: structural; cardinality: zero_or_one; catalog: HAS_ANALYZED_COHORT"""
+  analyzedCohort: [StudyPopulation!]! @relationship(type: "HAS_ANALYZED_COHORT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: one_or_more; provenance SUPPORTED_BY (W09-SR-03)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+}
+
+"""
+AdverseEventResult: one reported adverse-event row for one arm, event term and seriousness class (labels
+AdverseEventResult:StudyResult:InformationArtifact). Counts are what was REPORTED under a stated collection method: a
+reported zero carries collectionMethod (INV-207); a source with no AE section yields NO AdverseEventResult (notReported,
+never zero; FI "no AEs reported" -> "no events"). Severity is not seriousness. Cross-study safety comparison needs W10
+applicability; safety signals are W17. CQ-ST-06. Module studies_and_evidence. Archetype InformationArtifact (parent label
+StudyResult). uid token `study-result` (parent; `adverse-event-result` requested, W09-SR-04).
+"""
+type AdverseEventResult implements Entity & InformationArtifactArchetype
+  @node(labels: ["AdverseEventResult", "StudyResult", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  resultKind: StudyResultKind
+  "SAFETY for AE rows."
+  analysisKind: AnalysisKind!
+  "ARM_DESCRIPTIVE for per-arm counts; BETWEEN_ARM only for a reported between-arm test."
+  comparisonKind: ComparisonKind!
+  "NOT_TESTED for descriptive counts; the reported test result otherwise."
+  statisticalConclusion: StatisticalConclusion!
+  eventTerm: String!
+  "MedDRA (or other vocabulary) code when reported. Null = not reported."
+  eventTermCode: String
+  "Coding vocabulary and version when stated ('MedDRA', 'MedDRA 20.0')."
+  eventTermVocabulary: String
+  seriousness: AeSeriousness!
+  participantsAffected: Int
+  "Arm denominator. Null = not extracted/not reported."
+  participantsAtRisk: Int
+  eventCount: Int
+  collectionMethod: AeCollectionMethod!
+  "Verbatim collection wording ('self-reported AEs', 'recorded and coded according to MedDRA')."
+  collectionMethodText: String
+  relatednessAssessor: RelatednessAssessor
+  "AE time frame verbatim."
+  timeFrameText: String
+
+  """class: structural; cardinality: exactly_one INTERVENTION arm; catalog: RESULT_FOR_ARM"""
+  arms: [StudyArm!]! @relationship(type: "RESULT_FOR_ARM", direction: OUT, properties: "ResultArmProperties")
+  """class: structural; cardinality: zero_or_one (a safety OutcomeDefinition when the source defines one); catalog: RESULT_FOR"""
+  resultFor: [OutcomeDefinition!]! @relationship(type: "RESULT_FOR", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one; catalog: HAS_ANALYZED_COHORT (safety set)"""
+  analyzedCohort: [StudyPopulation!]! @relationship(type: "HAS_ANALYZED_COHORT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: one_or_more; provenance SUPPORTED_BY (W09-SR-03)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+}
+
+"""
+Publication: the work-level scholarly identity of one article, correction, retraction notice, expression of concern,
+preprint or conference abstract (InformationArtifact; D-005). Not a Source: its retrievable renditions (doi.org landing,
+PMC HTML, PDF, PubMed record) are W00 Sources RENDITION_OF it, and their captures are SourceSnapshots. DOI and PMID are
+Identifier records; `doi`, `pmid`, `pmcid` are normalized materialized lookup keys only. A correction or retraction is
+its own Publication linked by CORRECTS/RETRACTS, each naming the W00 SourceRevisionEvent; the corrected article's earlier
+assertions are never deleted (round 0007). Reaches Study only via REPORTS_ON and never a product (INV-201).
+CQ-EV-05, CQ-ST-07, CQ-ST-08, CQ-AX-05. Module studies_and_evidence. Archetype InformationArtifact. uid token `publication`.
+"""
+type Publication implements Entity & InformationArtifactArchetype
+  @node(labels: ["Publication", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  "Title (catalog Publication.title)."
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  "Issue/online publication instant (first instant of its precision)."
+  publishedAt: DateTime
+  publishedAtPrecision: TimePrecision
+  observedAt: DateTime
+  contentHash: String
+  publicationKind: PublicationKind!
+  "Normalized DOI (lower case, no resolver prefix). Materialized key; the Identifier is authoritative."
+  doi: String
+  "PMID. Materialized key."
+  pmid: String
+  "PMCID. Materialized key."
+  pmcid: String
+  venueName: String
+  citationText: String
+
+  """class: asserted; cardinality: zero_or_more (an article may report several studies; a correction usually none); catalog: REPORTS_ON"""
+  reportsOn: [Study!]! @relationship(type: "REPORTS_ON", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_more; catalog: ANALYZES_DATASET {analysisRole}"""
+  analyzesDatasets: [Dataset!]! @relationship(type: "ANALYZES_DATASET", direction: OUT, properties: "DatasetAnalysisProperties")
+  """class: asserted; cardinality: zero_or_more; catalog: CORRECTS (publication-level view of a W00 SourceRevisionEvent)"""
+  corrects: [Publication!]! @relationship(type: "CORRECTS", direction: OUT, properties: "PublicationRevisionProperties")
+  """class: asserted (inverse field); catalog: CORRECTS"""
+  correctedBy: [Publication!]! @relationship(type: "CORRECTS", direction: IN, properties: "PublicationRevisionProperties")
+  """class: asserted; cardinality: zero_or_more; catalog: RETRACTS"""
+  retracts: [Publication!]! @relationship(type: "RETRACTS", direction: OUT, properties: "PublicationRevisionProperties")
+  """class: asserted (inverse field); catalog: RETRACTS"""
+  retractedBy: [Publication!]! @relationship(type: "RETRACTS", direction: IN, properties: "PublicationRevisionProperties")
+  """class: structural (inverse field); cardinality: zero_or_more; provenance RENDITION_OF (W00 Source -> Publication)"""
+  renditions: [Source!]! @relationship(type: "RENDITION_OF", direction: IN)
+  """class: asserted; cardinality: one_or_more (DOI and/or PMID); identity_resolution HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+}
+
+"""
+Dataset: the identity of a body of study data (participant-level data, samples-derived data, a public deposit) (Entity).
+A Study PRODUCED_DATASET it; Publications ANALYZES_DATASET it with an analysisRole. Two results whose publications share a
+Study or Dataset are not independent replications (V-218; CQ-AX-05 counts are a lower bound on dependence because reuse is
+often undeclared). Accession numbers are Identifier records. CQ-ST-07, CQ-AX-05. Module studies_and_evidence. Archetype
+Entity. uid token `dataset`.
+"""
+type Dataset implements Entity & EntityArchetype
+  @node(labels: ["Dataset", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Kind verbatim (TRIAL_PARTICIPANT_DATA, BIOSPECIMEN_DERIVED, PUBLIC_DEPOSIT ...)."
+  datasetKind: String
+  accessLevel: DatasetAccessLevel
+  dataFormat: String
+  "Landing URL when stated (presentation; the retrieval endpoint is a W00 Source)."
+  sourceUrl: String
+
+  """class: asserted (inverse field); cardinality: zero_or_more; catalog: PRODUCED_DATASET"""
+  producedBy: [Study!]! @relationship(type: "PRODUCED_DATASET", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse field); catalog: ANALYZES_DATASET"""
+  analyzedIn: [Publication!]! @relationship(type: "ANALYZES_DATASET", direction: IN, properties: "DatasetAnalysisProperties")
+  """class: asserted; identity_resolution HAS_IDENTIFIER (W00); live Dataset.registrationId moves here"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+}

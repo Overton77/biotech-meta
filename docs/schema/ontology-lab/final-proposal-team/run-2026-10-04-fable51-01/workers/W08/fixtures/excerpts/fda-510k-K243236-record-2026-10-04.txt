@@ -1,0 +1,20 @@
+Source: https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm?ID=K243236
+Retrieved: 2026-10-04. Firecrawl live scrape (maxAge 0) returned HTTP 503 "Accessdata Error" (BLOCKED for live capture). Tavily extract returned the record table (response_time 0.01 s, i.e. served from Tavily's store; Tavily's own capture time unknown). Page footer: "Page Last Updated: 09/28/2026".
+Capture: COMPLETE for the record table (via SEARCH-PROVIDER STORE, not a live fetch).
+---
+Device Classification Name | Electrocardiograph Software For Over-The-Counter Use
+510(k) Number | K243236
+Device Name | WHOOP ECG (electrocardiogram) Feature (1.0)
+Applicant | Whoop., Inc. One Kenmore Sq. Boston, MA 02215
+Regulation Number | 870.2345
+Classification Product Code | QDA
+Date Received | 10/10/2024
+Decision Date | 04/04/2025
+Decision | Substantially Equivalent (SESE)
+Regulation Medical Specialty | Cardiovascular
+Summary | https://www.accessdata.fda.gov/cdrh_docs/pdf24/K243236.pdf
+Type | Traditional
+Clinical Trials | NCT06622265
+Reviewed by Third Party | No
+Combination Product | No
+Predetermined Change Control Plan Authorized | No

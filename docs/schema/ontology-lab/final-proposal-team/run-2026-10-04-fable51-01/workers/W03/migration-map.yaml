@@ -1,0 +1,156 @@
+# W03 migration map: live element -> final element. Live digest 86b5e0b5...f112; catalog 8fb50ff0...84f0.
+# action: keep | rename | move | split | merge | derive | retire. "move" = owned by another worker's type; the W03 note
+# states the meaning W03 needs preserved. Relabel statements: every node of a W03 type gains its archetype label
+# (D-001) and a uid 'hu:<token>:<id>' (INV-106); Entity.name becomes nullable (D-013).
+# ---------------------------------------------------------------------------------------------------------------
+# Mechanism (live 1147)
+- {live: Mechanism, final: Mechanism, action: keep, note: "labels Mechanism, Entity; add uid, entityType, privacyClass, maturity, schemaVersion"}
+- {live: Mechanism.name, final: Mechanism.name, action: keep, note: "String! -> String (D-013)"}
+- {live: Mechanism.description, final: Mechanism.description, action: keep, note: ""}
+- {live: Mechanism.mongoResearchRunId, final: Mechanism.mongoResearchRunId, action: keep, note: "maps to Activity.externalRunId (W00)"}
+- {live: Mechanism.createdAt, final: Mechanism.createdAt, action: keep, note: ""}
+- {live: Mechanism.updatedAt, final: Mechanism.updatedAt, action: keep, note: ""}
+- {live: Mechanism.searchText, final: Mechanism.searchText, action: keep, note: "INV-107 derived search text"}
+- {live: Mechanism.searchFields, final: Mechanism.searchFields, action: keep, note: ""}
+- {live: Mechanism.embeddingModel, final: Mechanism.embeddingModel, action: keep, note: ""}
+- {live: Mechanism.embeddingDimensions, final: Mechanism.embeddingDimensions, action: keep, note: ""}
+- {live: Mechanism.searchEmbedding, final: Mechanism.searchEmbedding, action: keep, note: "no @vector in live; Fable decides retrieval justification (D-014)"}
+- {live: Mechanism.mechanismClass, final: Mechanism.mechanismClass, action: keep, note: "catalog property mechanismKind maps to this live name; display classification"}
+- {live: Mechanism.regulatoryMode, final: Mechanism.regulatoryMode, action: keep, note: "display"}
+- {live: Mechanism.biologicalLayer, final: Mechanism.biologicalLayer, action: keep, note: "display"}
+- {live: Mechanism.keyEntitiesSummary, final: Mechanism.keyEntitiesSummary, action: keep, note: "display only"}
+- {live: "Mechanism.involvesPathways / INVOLVES_PATHWAY (MechanismLinkMetadata)", final: "Mechanism.involvesPathways / INVOLVES_PATHWAY (MechanismLinkProperties)", action: keep, note: "structural curated; add referenceSnapshotUid/RecordId/Revision/Release"}
+- {live: "Mechanism.actsInOrgans / ACTS_IN -> Organ (AssociationMetadata)", final: "Mechanism.actsIn / ACTS_IN -> AnatomicalContext (AssociationProjectionProperties)", action: derive, note: "mx-proj/v1; existing edges dropped and regenerated from accepted DIRECT_MEASUREMENT assertions; un-regenerable legacy edges become candidate assertions (EXTRACTED) for review"}
+- {live: "Mechanism.actsInContexts / ACTS_IN_CONTEXT", final: "Mechanism.actsIn / ACTS_IN", action: merge, note: "Organ is an AnatomicalContext; one edge type"}
+- {live: "Mechanism.appliesToSpecies / APPLIES_TO_SPECIES", final: "Mechanism.appliesToSpecies (derived, read-only)", action: derive, note: "mx-proj/v1; POSITIVE measured contexts only (V-234r)"}
+- {live: "Mechanism.influencesOutcomes / INFLUENCES_OUTCOME", final: "Mechanism.influencesOutcomes (derived, read-only)", action: derive, note: "mx-proj/v1"}
+- {live: "Mechanism.supportedBy / SUPPORTED_BY -> Chunk (ExtractionMetadata)", final: null, action: retire, note: "evidence attaches to Assertions via SUPPORTED_BY -> SourceLocator; mentions via W00 Mention; chunk shortcut is W20's derived SUPPORTED_BY_CHUNK"}
+- {live: "Mechanism @fulltext MechanismSearch", final: "Mechanism @fulltext MechanismSearch", action: keep, note: "D-015 index and query name retained"}
+# Pathway (live 1171)
+- {live: Pathway, final: Pathway, action: keep, note: "labels Pathway, Entity; uid token 'pathway' requested (W03-SR-04)"}
+- {live: Pathway.pathwayClass, final: Pathway.pathwayClass, action: keep, note: "display"}
+- {live: Pathway.sourceDatabase, final: Pathway.sourceDatabase, action: keep, note: "materialized from primary Identifier scheme"}
+- {live: Pathway.externalId, final: "Pathway.externalId + Identifier{REACTOME_STID|KEGG|WIKIPATHWAYS}", action: keep, note: "normalize to the unversioned stable id (strip '.N' into pathwayRevision); V-W03-09"}
+- {live: Pathway.pathwayRevision, final: Pathway.pathwayRevision, action: keep, note: "meaning narrowed: derived cache of the latest observed revision; authoritative revision on SourceSnapshot and MechanismLinkProperties.referenceRevision"}
+- {live: "Pathway.actsInOrgans / ACTS_IN", final: null, action: retire, note: "no CQ; authorities do not scope pathways to organs; avoids a second meaning of ACTS_IN"}
+- {live: "Pathway.hasMechanisms / HAS_MECHANISM -> Mechanism", final: "Pathway.mechanisms (INVOLVES_PATHWAY, IN)", action: merge, note: "reverse each edge into Mechanism-INVOLVES_PATHWAY->Pathway, keep properties; drop duplicates"}
+- {live: "Pathway.supportedBy", final: null, action: retire, note: "as Mechanism.supportedBy"}
+# Organ (live 1186)
+- {live: Organ, final: "Organ (labels Organ, AnatomicalContext, Entity)", action: rename, note: "relabel: SET n:AnatomicalContext, n.contextKind = 'ORGAN'; uid token anatomical-context (W03-SR-04); merge with any AnatomicalContext node of the same organ through EquivalenceAssessment + redirect"}
+- {live: Organ.organSystem, final: Organ.organSystem, action: keep, note: "display"}
+- {live: "Organ.measuredByMetrics / MEASURED_BY_METRIC", final: null, action: retire, note: "compartment of a measurand is Biomarker MEASURED_IN_MATRIX; Metric.systemKind (W07)"}
+- {live: "Organ.hasMechanisms / HAS_MECHANISM", final: "Organ.actingMechanisms (ACTS_IN, IN, derived)", action: derive, note: "legacy edges dropped; regenerated from measured contexts"}
+- {live: "Organ.supportedBy", final: null, action: retire, note: ""}
+# Condition (live 1199)
+- {live: Condition, final: Condition, action: keep, note: "labels Condition, Entity; uid token 'condition' requested"}
+- {live: Condition.conditionClass, final: Condition.conditionClass, action: keep, note: "display"}
+- {live: Condition.mondoId, final: "Condition.mondoId + Identifier{MONDO}", action: keep, note: "materialized key ^MONDO:[0-9]{7}$; null = no MONDO concept recorded"}
+- {live: Condition.icd11Code, final: "Identifier{ICD11} via HAS_IDENTIFIER; Condition.icd11Code read-only", action: move, note: "classification code with release validity; field kept read-only for API compatibility and fulltext index"}
+- {live: Condition.orphaCode, final: "Condition.orphaCode + Identifier{ORPHANET}", action: keep, note: "key ^ORPHA:[0-9]+$"}
+- {live: Condition.omimId, final: "Condition.omimId + Identifier{OMIM}", action: keep, note: "key ^[0-9]{6}$"}
+- {live: Condition.isRare, final: Condition.isRare, action: keep, note: "display hint; record the subset it came from"}
+- {live: "catalog Condition.icd10Code", final: "Identifier{ICD10CM} via HAS_IDENTIFIER with fiscal-year validity", action: move, note: "not carried as a node property (V-W03-08); E88.81 leaf FY2022 vs header FY2027"}
+- {live: Condition.searchText, final: Condition.searchText, action: keep, note: ""}
+- {live: Condition.searchFields, final: Condition.searchFields, action: keep, note: ""}
+- {live: Condition.embeddingModel, final: Condition.embeddingModel, action: keep, note: ""}
+- {live: Condition.embeddingDimensions, final: Condition.embeddingDimensions, action: keep, note: ""}
+- {live: Condition.searchEmbedding, final: Condition.searchEmbedding, action: keep, note: ""}
+- {live: "Condition @fulltext ConditionSearch", final: "Condition @fulltext ConditionSearch", action: keep, note: "D-015; a hit on an identifier field is a lookup candidate, never identity"}
+- {live: "Condition.affectsOrgans / AFFECTS_ORGAN (AssociationMetadata)", final: "Condition.affectsOrgans / AFFECTS_ORGAN (MechanismLinkProperties)", action: keep, note: "structural curated anatomical involvement; shared type name with W17 (W03-SR-08)"}
+- {live: "Condition.hasMechanisms / HAS_MECHANISM", final: "Condition.hasMechanisms", action: keep, note: "curated; MechanismLinkProperties"}
+- {live: "Condition.involvesPathways / INVOLVES_PATHWAY", final: "Condition.involvesPathways", action: keep, note: "curated"}
+- {live: "Condition.appliesToSpecies / APPLIES_TO_SPECIES", final: null, action: retire, note: "species is part of a condition concept's identity"}
+- {live: "Condition.indicatedByBiomarkers / INDICATES (IN)", final: "Biomarker.indicatesConditions (W07, derived one-to-one)", action: move, note: "inverse field omitted here (W03-SR-12)"}
+- {live: "Condition.investigatedByStudies / INVESTIGATES (IN)", final: "W09 Study field", action: move, note: "registry-asserted condition studied"}
+- {live: "Condition.treatedBy / TARGETS_CONDITION (IN)", final: "W06 Treatment.targetsConditions", action: move, note: ""}
+- {live: "Condition.workedOnBy / WORKS_ON_CONDITION (IN)", final: "W01 Organization field", action: move, note: ""}
+- {live: "Condition.relatedSafetySignals / RELATES_TO_CONDITION (IN)", final: "W17 SafetySignal field", action: move, note: ""}
+- {live: "Condition.supportedBy", final: null, action: retire, note: ""}
+# Outcome (live 1228)
+- {live: Outcome, final: Outcome, action: keep, note: "labels Outcome, Entity"}
+- {live: Outcome.outcomeClass, final: Outcome.outcomeClass, action: keep, note: "catalog outcomeKind maps here; display"}
+- {live: Outcome.outcomeDomain, final: Outcome.outcomeDomain, action: keep, note: "display"}
+- {live: Outcome.timeframeText, final: Outcome.timeframeText, action: keep, note: "display; timepoints belong to OutcomeDefinition (W09)"}
+- {live: "Outcome.operationalizedBy / OPERATIONALIZED_BY -> Metric (AssociationMetadata)", final: "Outcome.operationalizedBy (StructuralEdgeProperties)", action: keep, note: "structural curated; shared name with W16 (W03-SR-07)"}
+- {live: "Outcome.reflectsMechanisms / REFLECTS_MECHANISM", final: "Outcome.reflectsMechanisms (MechanismLinkProperties)", action: keep, note: "curated readout-of; never a premise (V-W03-03)"}
+- {live: "Outcome.associatedWithConditions / ASSOCIATED_WITH_CONDITION", final: "Outcome.associatedWithConditions (derived, read-only)", action: derive, note: "one-to-one projection of an ASSOCIATED_WITH_CONDITION assertion"}
+# MolecularEntity (live 1322)
+- {live: MolecularEntity, final: MolecularEntity, action: keep, note: "genome-encoded actors only (CL-002); nodes with entityKind METABOLITE/SMALL_MOLECULE migrate to W02 ChemicalSubstance by InChIKey with an EquivalenceAssessment and uid redirect"}
+- {live: MolecularEntity.entityKind, final: MolecularEntity.entityKind, action: keep, note: "controlled values (candidate enum MolecularEntityKind); V-W03-05"}
+- {live: MolecularEntity.geneSymbol, final: MolecularEntity.geneSymbol, action: keep, note: "display"}
+- {live: MolecularEntity.hgncId, final: "MolecularEntity.hgncId + Identifier{HGNC}", action: keep, note: "materialized key"}
+- {live: MolecularEntity.uniprotId, final: "MolecularEntity.uniprotId + Identifier{UNIPROTKB}", action: keep, note: ""}
+- {live: MolecularEntity.ensemblId, final: "MolecularEntity.ensemblId + Identifier{ENSEMBL}", action: keep, note: ""}
+- {live: "MolecularEntity.encodesBiomarkers / ENCODES (AssociationMetadata)", final: "ENCODES (MechanismLinkProperties)", action: keep, note: "curated"}
+- {live: "MolecularEntity.participatesInPathways / PARTICIPATES_IN", final: "PARTICIPATES_IN (MechanismLinkProperties)", action: keep, note: "curated"}
+- {live: "MolecularEntity.contributesToMechanisms / CONTRIBUTES_TO", final: "CONTRIBUTES_TO (MechanismLinkProperties)", action: keep, note: "curated"}
+- {live: "MolecularEntity.supportedBy", final: null, action: retire, note: ""}
+# AnatomicalContext (live 1338)
+- {live: AnatomicalContext, final: AnatomicalContext, action: keep, note: "labels AnatomicalContext, Entity"}
+- {live: AnatomicalContext.contextKind, final: "AnatomicalContext.contextKind: AnatomicalContextKind", action: rename, note: "free text -> enum; unmapped values become null with a MIGRATION adjudication note"}
+- {live: "AnatomicalContext.supportedBy", final: null, action: retire, note: ""}
+# Species (live 1348)
+- {live: Species, final: Species, action: keep, note: ""}
+- {live: Species.ncbiTaxonomyId, final: Species.ncbiTaxonomyId, action: keep, note: "identity key; uniqueness constraint in operations"}
+- {live: Species.scientificName, final: Species.scientificName, action: keep, note: ""}
+- {live: "Species.supportedBy", final: null, action: retire, note: ""}
+# RiskFactor (live 1359)
+- {live: RiskFactor, final: RiskFactor, action: keep, note: "uid token 'risk-factor' requested"}
+- {live: RiskFactor.riskClass, final: RiskFactor.riskClass, action: keep, note: "display"}
+- {live: RiskFactor.modifiable, final: RiskFactor.modifiable, action: keep, note: "display"}
+- {live: RiskFactor.exposureCategory, final: RiskFactor.exposureCategory, action: keep, note: "display"}
+- {live: "RiskFactor.increasesRiskFor / INCREASES_RISK_FOR", final: "RiskFactor.increasesRiskFor (derived)", action: derive, note: "one-to-one projection; predicate INCREASES_RISK_FOR registered as mechanisms assertedPredicate (W03-SR-12)"}
+- {live: "RiskFactor.mediatesRiskThrough / MEDIATES_RISK_THROUGH", final: "RiskFactor.mediatesRiskThrough (derived)", action: derive, note: "one-to-one"}
+- {live: "RiskFactor.appliesToSpecies / APPLIES_TO_SPECIES", final: "RiskFactor.appliesToSpecies (derived)", action: derive, note: "mx-proj/v1 species rule"}
+- {live: "RiskFactor.supportedBy", final: null, action: retire, note: ""}
+# Association (live 2748) and related
+- {live: Association, final: "Assertion | RelationshipAssertion (W00/W21) or EvidenceSynthesis/EvidenceAssessment (W10)", action: split, note: "by origin: a source-extracted association becomes an Assertion (LEFT -> HAS_SUBJECT, RIGHT -> HAS_OBJECT, associationType -> registered predicate; unregistered types stay PROPOSED with predicate candidate); a BellLabs aggregate becomes an assessment with methodVersion. Node deleted after migration; uid redirect kept"}
+- {live: Association.associationSummary, final: "Assertion.valueString or assessment.summary", action: move, note: ""}
+- {live: Association.associationType, final: Assertion.predicate, action: move, note: "mapped to a registered predicate or kept as candidate"}
+- {live: Association.associationCategory, final: Assertion.predicateClass, action: move, note: "MECHANISM when a mechanism predicate; then basisKind required (migrate with UNKNOWN basis -> status PROPOSED until reviewed)"}
+- {live: "Association.left / LEFT (RoleMetadata)", final: HAS_SUBJECT, action: move, note: ""}
+- {live: "Association.right / RIGHT (RoleMetadata)", final: HAS_OBJECT, action: move, note: "several RIGHT targets -> several assertions (one object each, INV-003)"}
+- {live: "union AssociationParticipant", final: "W00 AssertionSubjectTarget", action: retire, note: ""}
+- {live: "enum AssociationPolarity", final: "W00 Polarity", action: retire, note: "POSITIVE/NEGATIVE/MIXED/UNKNOWN map 1:1; NEUTRAL -> NEGATIVE when it records a measured null, else UNKNOWN, with a MIGRATION adjudication; Claim.claimPolarity is W21's"}
+# Relationship-property types
+- {live: AssociationMetadata, final: AssociationProjectionProperties, action: split, note: "on derived edges only; truth-bearing fields move as below"}
+- {live: AssociationMetadata.direction, final: "Assertion.predicate (direction-specific predicate)", action: move, note: ""}
+- {live: AssociationMetadata.polarity, final: "Assertion.polarity; AssociationProjectionProperties.projectedPolarity (derived)", action: move, note: ""}
+- {live: AssociationMetadata.evidenceStrength, final: "EvidenceStrengthAssessment (W10)", action: move, note: "edge copy only as derivedFromAssessmentUids"}
+- {live: AssociationMetadata.citation, final: "Assertion -SUPPORTED_BY-> SourceLocator", action: move, note: ""}
+- {live: AssociationMetadata.causalStatus, final: Assertion.basisKind, action: move, note: ""}
+- {live: AssociationMetadata.comparator, final: "MechanismEvidenceContext / StudyArm", action: move, note: ""}
+- {live: AssociationMetadata.populationSubset, final: "MechanismEvidenceContext.modelDescriptor / StudyPopulation", action: move, note: ""}
+- {live: AssociationMetadata.latency, final: "MechanismEvidenceContext.exposureDurationIso", action: move, note: ""}
+- {live: AssociationMetadata.timeHorizon, final: "MechanismEvidenceContext.exposureDurationIso / Assertion valid time", action: move, note: ""}
+- {live: AssociationMetadata.associationShape, final: AssociationProjectionProperties.associationShape, action: keep, note: "display"}
+- {live: AssociationMetadata.specificity, final: AssociationProjectionProperties.specificity, action: keep, note: "display"}
+- {live: AssociationMetadata.effectSummary, final: AssociationProjectionProperties.effectSummary, action: keep, note: "display"}
+- {live: AssociationMetadata.notes, final: "Assertion note / dropped on derived edges", action: retire, note: ""}
+- {live: AssociationMetadata.mongoResearchRunId, final: AssociationProjectionProperties.mongoResearchRunId, action: keep, note: ""}
+- {live: MechanismLinkMetadata, final: MechanismLinkProperties, action: rename, note: "adds reference revision fields"}
+- {live: MechanismLinkMetadata.regulatorySign, final: "MechanismLinkProperties.regulatorySign: RegulatorySign", action: rename, note: "free text -> enum; unmapped -> UNKNOWN"}
+- {live: MechanismLinkMetadata.enzymeRole, final: MechanismLinkProperties.enzymeRole, action: keep, note: ""}
+- {live: MechanismLinkMetadata.stoichiometryNote, final: MechanismLinkProperties.stoichiometryNote, action: keep, note: ""}
+- {live: MechanismLinkMetadata.upstreamDownstream, final: MechanismLinkProperties.upstreamDownstream, action: keep, note: ""}
+- {live: MechanismLinkMetadata.notes, final: MechanismLinkProperties.notes, action: keep, note: ""}
+- {live: MechanismLinkMetadata.mongoResearchRunId, final: MechanismLinkProperties.mongoResearchRunId, action: keep, note: ""}
+# Mechanism-domain edges on other owners' live types (meaning owned or ruled by W03; field owner in note)
+- {live: "Compound.modulates / MODULATES", final: "ChemicalSubstance.modulates (derived, W02 field)", action: derive, note: "mx-proj/v1 (W03-SR-05)"}
+- {live: "CompoundForm.affectsMechanisms / AFFECTS_MECHANISM", final: "ChemicalForm|IngredientMaterial.affectsMechanisms (derived, W02 fields)", action: derive, note: "mx-proj/v1"}
+- {live: "Lifestyle.affectsMechanisms / AFFECTS_MECHANISM", final: "Lifestyle.affectsMechanisms (derived, W05 field)", action: derive, note: "Lifestyle subject accepted (W05-SR-05)"}
+- {live: "Lifestyle.associatedWithConditions, AdverseEffect.associatedWithConditions / ASSOCIATED_WITH_CONDITION", final: "derived one-to-one (W05, W17 fields)", action: derive, note: ""}
+- {live: "Lifestyle.associatedWithOutcomes / ASSOCIATED_WITH_OUTCOME", final: "derived one-to-one (W05 field)", action: derive, note: ""}
+- {live: "Biomarker.reflectsMechanisms, Metric.reflectsMechanisms / REFLECTS_MECHANISM", final: "REFLECTS_MECHANISM (MechanismLinkProperties; W07 fields)", action: keep, note: "curated readout-of; Metric's used AssociationMetadata -> MechanismLinkProperties"}
+- {live: "Biomarker.inPathways / IN_PATHWAY", final: "analyte PARTICIPATES_IN Pathway via candidate HAS_ANALYTE", action: retire, note: "ruling for W07-SR-07; read-only until migrated"}
+- {live: "Biomarker.expressedInOrgans / EXPRESSED_IN", final: "EXPRESSED_IN_CONTEXT", action: merge, note: "Organ is AnatomicalContext (W07-SR-07)"}
+- {live: "Biomarker.expressedInContexts / EXPRESSED_IN_CONTEXT", final: "EXPRESSED_IN_CONTEXT (curated, read-only)", action: keep, note: "W07 field"}
+- {live: "Biomarker.specimenMatrix", final: "Biomarker -MEASURED_IN_MATRIX-> AnatomicalContext", action: move, note: "W07 field; meaning W03"}
+- {live: "Metric.measuredInOrgans / MEASURED_IN -> Organ", final: null, action: retire, note: "collides with MechanismEvidenceContext MEASURED_IN; compartment is Biomarker MEASURED_IN_MATRIX / Metric.systemKind (W03-SR-06)"}
+- {live: "Study.studiedInSpecies / STUDIED_IN", final: "W09 field (human studies); preclinical species via MechanismEvidenceContext IN_SPECIES", action: move, note: ""}
+- {live: "Study.evaluatesRiskFactors / EVALUATES_RISK_FACTOR", final: "W09 field", action: move, note: ""}
+- {live: "StudyOutcome.refersToOutcomes, OutcomeMeasure.refersToOutcomes / REFERS_TO_OUTCOME", final: "W09 OutcomeDefinition -> Outcome (structural)", action: move, note: "Outcome concept is the W03 referent"}
+# Catalog elements (no live counterpart)
+- {live: "catalog MechanismEvidenceContext", final: MechanismEvidenceContext, action: keep, note: "proposed-delta used EXPOSED_TO -> CompoundForm; now IngredientMaterial|ChemicalForm|ChemicalSubstance"}
+- {live: "catalog OBSERVED_IN_CONTEXT, IN_SPECIES, MEASURED_IN, EXPOSED_TO, IN_STUDY_ARM, MEASURED_IN_MATRIX", final: same, action: keep, note: "structural"}
+- {live: "proposed-delta enums MechanismSetting, ExposureBasis", final: same, action: keep, note: ""}

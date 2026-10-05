@@ -1,0 +1,8 @@
+[
+ {"name": "create product via API (uid supplied by client)", "query": "mutation { createProducts(input: [{ uid: \"hu:product:rt-0001\", name: \"Roundtrip Product\", entityType: \"Product\", privacyClass: PUBLIC }]) { products { id uid name createdAt privacyClass } } }"},
+ {"name": "read product back with DateTime (needs APOC)", "query": "{ products(where: { uid: { eq: \"hu:product:rt-0001\" } }) { id uid name createdAt updatedAt } }"},
+ {"name": "update attempt on uid (should be rejected if settable rules apply, else succeed)", "query": "mutation { updateProducts(where: { uid: { eq: \"hu:product:rt-0001\" } }, update: { name: { set: \"Renamed\" } }) { products { uid name } } }"},
+ {"name": "read Cypher-ingested assertion (created below by driver) through generic Assertion type", "query": "{ assertions(where: { uid: { eq: \"hu:assertion:rt-0001\" } }) { uid predicate status recordedAt polarity } }"},
+ {"name": "enum rejection: invalid status value", "query": "mutation { createProducts(input: [{ uid: \"hu:product:rt-0002\", name: \"X\", entityType: \"Product\", privacyClass: SECRET }]) { products { uid } } }"},
+ {"name": "read Document created by Cypher with stored names (alias check)", "query": "{ documents(where: { uid: { eq: \"hu:document:rt-0001\" } }) { id uid name sourceUrl documentType } }"}
+]

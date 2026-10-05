@@ -1,0 +1,187 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/operations.cypher",
+ "uri": "bolt://127.0.0.1:39915/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 8,
+ "ok": 8,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 1,
+    "constraintsRemoved": 0
+   },
+   "ms": 86,
+   "sample": [],
+   "header": "// W23 operations companion (Neo4j 5.26 Community-runnable statements only). Proposal; Fable merges into\n// docs/schema/neo4j/final_biotech_schema_operations.cypher. Idempotent (IF NOT EXISTS). Stored property names only.\n// uid uniqueness for AnswerRecord (Occurrence), PolicyVersion (VersionedState"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 1,
+    "constraintsRemoved": 0
+   },
+   "ms": 27,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 1,
+    "constraintsRemoved": 0
+   },
+   "ms": 21,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 1,
+    "constraintsRemoved": 0
+   },
+   "ms": 20,
+   "sample": [],
+   "header": "// O-W23-02: one version label per policy family; one criterion per key and method version (identity includes method)"
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 1,
+    "constraintsRemoved": 0
+   },
+   "ms": 29,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 1,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 11,
+   "sample": [],
+   "header": "// O-W23-03: retrieval indexes. AnswerRecord by viewpoint (CQ-AX-03 replay queues, audit by period) and by query shape\n// (re-run every answer of a shape after a shape change); PolicyVersion by family (effective-version lookup)."
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 1,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 10,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 1,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 11,
+   "sample": [],
+   "header": ""
+  }
+ ]
+}

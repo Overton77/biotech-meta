@@ -1,0 +1,121 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/12-answer-record-negative.cypher",
+ "uri": "bolt://127.0.0.1:38819/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 5,
+ "ok": 5,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "V-121",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 1,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 14,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 153,
+   "sample": [],
+   "header": "// W23 fixture 12: AnswerRecord negatives (load 00-shared-base.cypher first). Each record carries a deliberate defect.\n// Expected detector rows: 06-fixtures-and-queries.md (V-121, V-W23-01a, V-W23-01b, V-W23-02, V-W23-03).\n// N1: an answer log that names the asker and stores the question (the C-4 f"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 1,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 12,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 367,
+   "sample": [],
+   "header": "// N2: an owner-private answer written into the shared graph, computed with private context, marked PUBLIC."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 1,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 13,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 355,
+   "sample": [],
+   "header": "// N3: a citation recorded after the answer's viewpoint (A2 recorded 2026-06-15; viewpoint 2026-04-10): not replayable."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 1,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 13,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 373,
+   "sample": [],
+   "header": "// N4: a citation already superseded at the viewpoint (A1 superseded 2026-06-15; viewpoint 2026-07-01)."
+  },
+  {
+   "n": 5,
+   "id": "V-121",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 11,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 72,
+   "sample": [],
+   "header": "// N5: a traced answer without citations, without a schema digest, with a session key V-121 does not name (minimal pair to N1)."
+  }
+ ]
+}

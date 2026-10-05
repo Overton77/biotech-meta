@@ -1,0 +1,89 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W00/fixtures/13-queries.cypher",
+ "uri": "bolt://127.0.0.1:40729/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 2,
+ "ok": 2,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 152,
+   "sample": [
+    {
+     "viewpoint": "2026-04-10T09:00:00Z",
+     "heldUid": "hu:org:w00-acme-b",
+     "resolvedUid": "hu:org:w00-acme-b",
+     "redirectRecord": null
+    },
+    {
+     "viewpoint": "2026-10-04T00:00:00Z",
+     "heldUid": "hu:org:w00-acme-b",
+     "resolvedUid": "hu:org:w00-acme-a",
+     "redirectRecord": "hu:assessment:w00-merge-acme"
+    }
+   ],
+   "header": "// W00 fixture 13 queries (read-only; load 00-common-base.cypher and 13-reconciliation-rulings.cypher first).\n// Q13-a (W00-R-11, CQ-ID-04): resolve a held uid as of two recorded viewpoints. Expected: 2026-04-10 -> the held uid itself\n// (redirect recorded later); 2026-10-04 -> hu:org:w00-acme-a via"
+  },
+  {
+   "n": 2,
+   "id": "V-503r",
+   "status": "ok",
+   "rows": 4,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 71,
+   "sample": [
+    {
+     "v": "2024-08-20T12:00:00Z",
+     "assertionUid": "hu:assertion:w00-holding-as-of",
+     "answerClass": "KNOWN_AT_WITNESS"
+    },
+    {
+     "v": "2024-08-20T12:00:00Z",
+     "assertionUid": "hu:assertion:w00-holding-as-of-no-precision",
+     "answerClass": "NOT_EVALUABLE"
+    },
+    {
+     "v": "2024-09-01T00:00:00Z",
+     "assertionUid": "hu:assertion:w00-holding-as-of",
+     "answerClass": "POSSIBLE_START_UNKNOWN"
+    },
+    {
+     "v": "2024-09-01T00:00:00Z",
+     "assertionUid": "hu:assertion:w00-holding-as-of-no-precision",
+     "answerClass": "NOT_EVALUABLE"
+    }
+   ],
+   "header": "// Q13-b (W00-R-13, CQ-TM-04): did the holder hold Acme stock on V? statedAsOf is a witness instant, never a bound.\n// Expected: V = 2024-08-20 -> KNOWN_AT_WITNESS (inside the DAY precision period); V = 2024-09-01 -> POSSIBLE_START_UNKNOWN\n// (bounds unknown; the witness does not extend to V); the r"
+  }
+ ]
+}

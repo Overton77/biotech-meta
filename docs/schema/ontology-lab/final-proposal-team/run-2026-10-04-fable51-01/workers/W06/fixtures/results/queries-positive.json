@@ -1,0 +1,373 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/w06-queries.cypher",
+ "uri": "bolt://127.0.0.1:40297/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 9,
+ "ok": 9,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 3,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 153,
+   "sample": [
+    {
+     "identityKind": "Product",
+     "uid": "hu:product:casgevy",
+     "name": "CASGEVY"
+    },
+    {
+     "identityKind": "StudyIntervention",
+     "uid": "hu:intervention:nct03745287-exa-cel",
+     "name": "Exa-cel"
+    },
+    {
+     "identityKind": "Treatment",
+     "uid": "hu:treatment:exagamglogene-autotemcel",
+     "name": "exagamglogene autotemcel (exa-cel)"
+    }
+   ],
+   "header": "// =====================================================================================================================\n// W06 competency-question queries (one per covered Essential CQ and per candidate CQ). Read-only. Expected rows are in\n// 06-fixtures-and-queries.md. Each statement is independen"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 198,
+   "sample": [
+    {
+     "study": "hu:study:nct03745287",
+     "arm": "Exa-cel (single arm)",
+     "administered": "Exa-cel",
+     "registryType": "BIOLOGICAL",
+     "schedule": "single dose (registry title: \"a Single Dose\")",
+     "dose": "NOT_REPORTED"
+    }
+   ],
+   "header": "// Q-02 (CQ-ST-01 via CQ-IV-C01): which study interventions instantiate treatment T, and what exactly was administered."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 386,
+   "sample": [
+    {
+     "validAt": {
+      "year": 2025,
+      "month": 6,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "product": "CASGEVY",
+     "approvalsInForce": [
+      "US: treatment of patients aged 12 years and older with transfusion-dependent beta-thalassemia (TDT)"
+     ],
+     "designationsNotApproval": [
+      "US designation: Treatment of beta-thalassemia"
+     ]
+    },
+    {
+     "validAt": {
+      "year": 2026,
+      "month": 8,
+      "day": 1,
+      "hour": 0,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "product": "CASGEVY",
+     "approvalsInForce": [
+      "US: treatment of patients aged 2 years and older with transfusion-dependent beta-thalassemia (TDT)",
+      "US: treatment of patients aged 12 years and older with transfusion-dependent beta-thalassemia (TDT)"
+     ],
+     "designationsNotApproval": [
+      "US designation: Treatment of beta-thalassemia"
+     ]
+    }
+   ],
+   "header": "// Q-03 (CQ-MF-02 / CQ-AX-23): is the treatment approved, as of valid time V, for which product and indication? Designations\n// are listed separately and never counted as approval. Only ACCEPTED status assertions answer."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 449,
+   "sample": [
+    {
+     "procedureDefinition": "therapeutic plasma exchange (TPE; plasmapheresis with plasma replacement)",
+     "offeredBy": [
+      "Next Health"
+     ],
+     "candidateOfferers": [
+      "Circulate Health (unverified capture)"
+     ],
+     "listings": [
+      "https://www.next-health.com/product/therapeutic-plasma-exchange"
+     ],
+     "priceObservations": [
+      [
+       "10000.0 USD @ 2026-10-04T01:02:00Z"
+      ]
+     ],
+     "employedByProtocolSteps": [
+      "hu:protocol-step:synthetic-tpe-practice-e1-step3"
+     ],
+     "instantiatedByStudyInterventions": [
+      "hu:intervention:nct06597656-plasmapheresis [PROCEDURE]"
+     ],
+     "componentOfTreatments": []
+    }
+   ],
+   "header": "// Q-04 (CQ-IV-C02): procedure definition versus who offers it, where it is listed and priced, which protocol steps employ\n// it, which study interventions instantiate it, which treatment concepts use it -- each kept in its own column."
+  },
+  {
+   "n": 5,
+   "id": "QS-7",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 676,
+   "sample": [
+    {
+     "developerState": "NOT_RECORDED",
+     "otherRolesManufacturer": [
+      "Vertex Pharmaceuticals Incorporated manufactures CASGEVY"
+     ],
+     "otherRolesSponsor": [
+      "Vertex Pharmaceuticals Incorporated sponsors hu:study:nct03745287"
+     ]
+    }
+   ],
+   "header": "// Q-05 (CQ-IV-C04, QS-7 shape): who develops treatment T? Unknown stays unknown; other roles are reported as other roles."
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 138,
+   "sample": [
+    {
+     "treatmentUid": "hu:treatment:delandistrogene-moxeparvovec",
+     "modalities": [
+      "GENE_THERAPY"
+     ],
+     "legacyModality": "GENE_THERAPY",
+     "registryInterventionTypes": [
+      "GENETIC"
+     ]
+    },
+    {
+     "treatmentUid": "hu:treatment:exagamglogene-autotemcel",
+     "modalities": [
+      "CELL_THERAPY",
+      "GENE_THERAPY"
+     ],
+     "legacyModality": null,
+     "registryInterventionTypes": [
+      "BIOLOGICAL"
+     ]
+    }
+   ],
+   "header": "// Q-06 (CQ-IV-C03): which treatment concepts are gene therapies, and how did registries type their administered\n// interventions? (Registry type is reported, never mapped onto modality.)"
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 64,
+   "sample": [
+    {
+     "code": "6A550Z3",
+     "definitions": [
+      "therapeutic plasma exchange (TPE; plasmapheresis with plasma replacement)",
+      "plasma donation by plasmapheresis (plasma collected, not exchanged)"
+     ],
+     "note": "shared code is a performance classification, not identity"
+    },
+    {
+     "code": "6A551Z3",
+     "definitions": [
+      "therapeutic plasma exchange (TPE; plasmapheresis with plasma replacement)",
+      "plasma donation by plasmapheresis (plasma collected, not exchanged)"
+     ],
+     "note": "shared code is a performance classification, not identity"
+    }
+   ],
+   "header": "// Q-07 (CQ-IV-C05): which procedure definitions share a classification code, and what distinguishes them?"
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 100,
+   "sample": [
+    {
+     "evidenceTarget": "hu:intervention:nct03745287-exa-cel",
+     "viaConcept": "hu:treatment:exagamglogene-autotemcel",
+     "navigatedProduct": "CASGEVY",
+     "applicability": "NOT_ASSESSED"
+    }
+   ],
+   "header": "// Q-08 (CQ-EV-04 guard): from an administered intervention, the concept leads to a product for navigation only; evidence\n// applicability to that product is read solely from EvidenceApplicability (none exists here -> NOT_ASSESSED)."
+  },
+  {
+   "n": 9,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 334,
+   "sample": [
+    {
+     "legacyDesignationText": "Orphan designation: Treatment of amyotrophic lateral sclerosis (designated 03/12/2015)",
+     "legacyStageText": "Approved",
+     "product": "RADICAVA",
+     "states": [
+      "APPROVAL [EXTRACTED]"
+     ]
+    },
+    {
+     "legacyDesignationText": "Orphan designation: Treatment of amyotrophic lateral sclerosis (designated 03/12/2015)",
+     "legacyStageText": "Approved",
+     "product": "Treeway edaravone (investigational product; product name not captured)",
+     "states": [
+      "UNSPECIFIED_END(Designation Withdrawn or Revoked (source does not distinguish; date not captured)) [ACCEPTED]",
+      "DESIGNATION [ACCEPTED]"
+     ]
+    }
+   ],
+   "header": "// Q-09 (CQ-AX-23 negative, designation text): is \"edaravone for ALS\" approved? Answer per product with capture status."
+  }
+ ]
+}

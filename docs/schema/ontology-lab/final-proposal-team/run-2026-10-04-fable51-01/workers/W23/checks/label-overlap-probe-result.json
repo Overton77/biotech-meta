@@ -1,0 +1,46 @@
+{
+ "storedEdges": 2,
+ "result": {
+  "probeHolders": [
+   {
+    "pid": "probe-holder",
+    "viaUnion": [
+     {
+      "__typename": "Assertion",
+      "uid": "probe-co1"
+     },
+     {
+      "__typename": "Assertion",
+      "uid": "probe-a1"
+     },
+     {
+      "__typename": "ClaimOccurrence",
+      "uid": "probe-co1"
+     }
+    ],
+    "viaInterface": [
+     {
+      "__typename": "Assertion",
+      "uid": "probe-co1"
+     },
+     {
+      "__typename": "Assertion",
+      "uid": "probe-a1"
+     },
+     {
+      "__typename": "ClaimOccurrence",
+      "uid": "probe-co1"
+     }
+    ],
+    "viaConcrete": [
+     {
+      "uid": "probe-co1"
+     },
+     {
+      "uid": "probe-a1"
+     }
+    ]
+   }
+  ]
+ }
+}

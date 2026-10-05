@@ -1,0 +1,18 @@
+[
+ {
+  "name": "T2 provenance chain over fixture 09",
+  "query": "{ sources(sort: [{canonicalUri: ASC}]) { uid canonicalUri sourceKind renditionOfPublication { uid } revisionEvents { revisionKind } snapshots { uid contentHashBasis locators { selectorKind section exact supports { __typename ... on Assertion { uid status } ... on Adjudication { uid adjudicationKind verdict } } } } } }"
+ },
+ {
+  "name": "T2b answer activity authorized by policy (state 5)",
+  "query": "{ activities(where: {activityKind: {eq: ANSWER_COMPOSITION}}) { uid usedAssertions { uid } usedLocators { uid } authorizedByConnection { edges { properties { useKind } node { uid } } } associatedWithAgents { uid agentKind } } }"
+ },
+ {
+  "name": "T2c adjudication supersession (SOURCE_REVISION)",
+  "query": "{ adjudications(where: {adjudicationKind: {eq: SUPPORT}}, sort: [{recordedAt: ASC}]) { uid verdict recordedAt supersedesConnection { edges { properties { supersessionKind sourceRevisionEventUid } node { uid verdict } } } evaluates { uid status } } }"
+ },
+ {
+  "name": "T2d retraction assertion asserter via union",
+  "query": "{ assertions(where: {predicate: {eq: \"RETRACTS_SOURCE\"}}) { uid assertedBy { __typename ... on Organization { uid } } subject { __typename ... on Source { uid } } object { __typename ... on Source { uid } } } }"
+ }
+]

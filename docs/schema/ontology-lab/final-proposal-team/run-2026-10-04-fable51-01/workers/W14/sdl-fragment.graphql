@@ -1,0 +1,437 @@
+# =====================================================================================================================
+# W14 Intellectual property and licensing -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W14 (Opus 5.5)   Coordinator/synthesizer: Fable 5.1
+# Canonical catalog modules: regulatory_and_ip (PatentFamily, PatentApplication, GrantedPatent, PatentClaim, PatentLicense,
+#   FAMILY_HAS_APPLICATION, APPLICATION_GRANTED_AS, HAS_PATENT_CLAIM, LICENSE_COVERS); products_and_formulations
+#   (Trademark, MARKETED_UNDER_MARK; T-001: no module transfer proposed); organizations (projections of the asserted
+#   predicates OWNS_TRADEMARK, ASSIGNED_PATENT, LICENSES_PATENT; predicate registration stays with W01, W14-SR-03).
+# Catalog 0.2.0 digest 8fb50ff0...84f0; live schema digest 86b5e0b5...f112 (the live schema has no patent or trademark type).
+# Competency questions: CQ-EC-01, CQ-EC-02, CQ-MF-01 (trademark owner vs marketer vs supplier), CQ-CL-05 (IP interest is
+#   W01's HAS_IP_INTEREST_IN, kept distinct here); candidates CQ-IP-C01..C05 (02-cq-coverage.md).
+# Invariants: INV-009, INV-010, INV-101, INV-102, INV-106; forbidden implications [LICENSES_PATENT, OWNS_STUDY],
+#   [PATENT_CLAIMS, PROVES_EFFICACY], [SHARED_IDENTIFIER_SCHEME_VALUE_ACROSS_ISSUERS, SAME_IDENTITY]; proposed
+#   V-W14-01..V-W14-12 (fixtures/w14-validation.cypher).
+#
+# Owned here (sole writer, registry row W14): PatentFamily, PatentApplication, GrantedPatent, PatentClaim, PatentLicense,
+#   Trademark, union PatentLicenseTarget; relationship types FAMILY_HAS_APPLICATION, APPLICATION_GRANTED_AS,
+#   HAS_PATENT_CLAIM, LICENSE_COVERS, MARKETED_UNDER_MARK and the IP-side fields of OWNS_TRADEMARK, ASSIGNED_PATENT,
+#   LICENSES_PATENT.
+# CANDIDATE elements included because a candidate CQ and a failing fixture need them (registry update requested,
+#   W14-SR-01/02): IpRightStatus (VersionedState), union IpRightStatusSubjectTarget, relationship IP_STATUS_OF,
+#   relationship GRANTS_PATENT_LICENSE (licensor side; predicate registration W14-SR-03 to W01).
+# Proposed uid tokens (not yet registered; W14-SR-01 to W00): patent-family, patent-application, granted-patent,
+#   patent-claim, patent-license, trademark, ip-status.
+# Controlled strings marked "(candidate enum X)" are closed vocabularies whose enum registration is requested
+#   (W14-SR-02); they stay String here so no unregistered enum enters the merged file.
+# No new relationship-property type: every edge reuses a frozen W00 type (AssertedEdgeProperties,
+#   StructuralEdgeProperties, IdentifierLinkProperties).
+# Other owners' types are referenced by name only:
+#   W00: Entity, EntityArchetype, VersionedStateArchetype, InformationArtifactArchetype, PrivacyClass, NodeMaturity,
+#        ReportedStatus, Identifier, AssertedEdgeProperties, StructuralEdgeProperties, IdentifierLinkProperties
+#   W01: Organization          W02: BrandedIngredientMaterial
+# Relationship class and cardinality are stated in each field description and are enforced by the operations/validation
+# layer (07-operations.md), never by SDL.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Unions
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Range of LICENSE_COVERS (catalog: PatentFamily|PatentApplication|GrantedPatent|PatentClaim). A license covers exactly
+the members its source names (or the family when the source states family-level coverage); coverage is never inferred
+from family membership (V-W14-05) and never implies that a product is licensed, made under the patent or effective.
+"""
+union PatentLicenseTarget = PatentFamily | PatentApplication | GrantedPatent | PatentClaim
+
+"""
+CANDIDATE (W14-SR-02). Range of IP_STATUS_OF: the jurisdictional right or claim whose legal status an IpRightStatus
+describes. A patent-level status never implies a claim-level status and vice versa (V-W14-07).
+"""
+union IpRightStatusSubjectTarget = PatentApplication | GrantedPatent | PatentClaim | Trademark
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Entities
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A patent family as delimited by ONE stated family definition (familyDefinition: DOCDB simple family, INPADOC extended
+family, the family list a source displays, or a curated grouping). Family membership is definition- and source-dependent:
+the same application can belong to two PatentFamily nodes under different definitions, and they are compared through an
+EquivalenceAssessment (OVERLAPPING_SCOPE), never merged. It is NOT a right (rights are applications, grants and claims in
+one jurisdiction), NOT a legal status holder (status lives on IpRightStatus of members), and membership NEVER implies
+license coverage or assignment of every member. CQ-IP-C05, CQ-IP-C02, CQ-EC-01. Module regulatory_and_ip. Archetype Entity.
+"""
+type PatentFamily implements Entity & EntityArchetype
+  @node(labels: ["PatentFamily", "Entity"]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'PatentFamily'."
+  entityType: String!
+  "Materialized key of the family Identifier under familyDefinition (e.g. a DOCDB family id); null when the definition has no public id (SOURCE_DISPLAYED, CURATED). The Identifier record is authoritative."
+  familyIdentifier: String
+  "Controlled string DOCDB_SIMPLE | INPADOC_EXTENDED | SOURCE_DISPLAYED | CURATED (candidate enum PatentFamilyDefinition). Required: a family without a definition has no stable membership."
+  familyDefinition: String!
+  "Representative title as displayed by the defining source (presentation only)."
+  title: String
+  """class: structural; cardinality: one_or_more; catalog: FAMILY_HAS_APPLICATION (membership under this node's familyDefinition, as captured)"""
+  applications: [PatentApplication!]! @relationship(type: "FAMILY_HAS_APPLICATION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted (inverse view; Organization -> PatentFamily); cardinality: many; catalog: ASSIGNED_PATENT (only when the source states family-level holding, e.g. 'patents held by Dartmouth')"""
+  assignees: [Organization!]! @relationship(type: "ASSIGNED_PATENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view); cardinality: many; catalog: LICENSE_COVERS (only when the license source states family-level coverage)"""
+  coveringLicenses: [PatentLicense!]! @relationship(type: "LICENSE_COVERS", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A trademark RIGHT in one jurisdiction: one application/registration at one office (USPTO serial and registration, an EUIPO
+filing, a Madrid international registration or a designation). markText is the sign as filed; the same markText in two
+jurisdictions is two Trademark nodes (a name never establishes identity), and a related property listed on an office
+record (e.g. an international registration 'based on this property') is a different Trademark, never an Identifier of
+this one. It is NOT a ConsumerBrand (W01; a brand is an organizational identity, a mark registration is a right),
+NOT a BrandedIngredientMaterial (W02; the material is marketed under the mark through MARKETED_UNDER_MARK), and NOT a
+status holder by property: registration, renewal, scope amendments, cancellation and expiry are IpRightStatus episodes.
+Ownership is the asserted OWNS_TRADEMARK edge; owning a mark never implies marketing, supplying or manufacturing the
+material sold under it. CQ-IP-C04, CQ-EC-02, CQ-MF-01. Module products_and_formulations (T-001: stays; SDL written by W14).
+Archetype Entity.
+"""
+type Trademark implements Entity & EntityArchetype
+  @node(labels: ["Trademark", "Entity"]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Trademark'."
+  entityType: String!
+  "Literal elements of the mark as filed (e.g. 'NIAGEN'). Presentation and search only; never identity."
+  markText: String!
+  "Office jurisdiction code of the right (ISO 3166-1 alpha-2 such as US; EM for EUIPO; WO for a Madrid international registration)."
+  jurisdiction: String!
+  "Office application / serial number as printed (USPTO serial '85932490'). Identifier record (scheme USPTO_TM_SERIAL) is authoritative."
+  applicationSerialNumber: String
+  "Office registration number as printed ('4606519'); null before registration. Identifier record (scheme USPTO_TM_REGISTRATION) is authoritative."
+  registrationNumber: String
+  "Materialized identity key '<jurisdiction>:<normalized application serial>' (digits only, no separators), stable from filing through registration; unique by constraint (07-operations.md)."
+  officeKey: String!
+  "Controlled string STANDARD_CHARACTER | SPECIAL_FORM | OTHER (candidate enum MarkDrawingKind); as filed."
+  markDrawingKind: String
+  """class: asserted (inverse view; Organization -> Trademark); cardinality: many (one per recorded-time episode); catalog: OWNS_TRADEMARK (organizations assertedPredicates)"""
+  owners: [Organization!]! @relationship(type: "OWNS_TRADEMARK", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view; BrandedIngredientMaterial -> Trademark); cardinality: many; catalog: MARKETED_UNDER_MARK (the outgoing field on BrandedIngredientMaterial is requested from W02, W14-SR-05)"""
+  markedMaterials: [BrandedIngredientMaterial!]! @relationship(type: "MARKETED_UNDER_MARK", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: one_or_more; catalog: HAS_IDENTIFIER (W00)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted (inverse view); cardinality: many (episodes); CANDIDATE: IP_STATUS_OF"""
+  statuses: [IpRightStatus!]! @relationship(type: "IP_STATUS_OF", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Information artifacts (immutable once captured; status is never a property here)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A patent application filed at one office (national, regional, PCT international or provisional), identified by office
+and application number. The artifact is immutable: its bibliographic data as filed/published (title, applicant and
+inventor names as printed) never change; its prosecution and legal status (pending, published, granted, abandoned,
+withdrawn, lapsed) are IpRightStatus episodes. Claims as filed or published are PatentClaim nodes distinct from the granted
+claims. The published document (A1 publication, PDF) is a Source/Document rendition (W19/W20 DocumentType
+PATENT_APPLICATION), not this node. Printed inventor names are NOT inventor roles and NOT ownership (inventorship,
+assignment and IP interest stay three separate facts). CQ-IP-C05, CQ-IP-C01, CQ-EC-01. Module regulatory_and_ip.
+Archetype InformationArtifact.
+"""
+type PatentApplication implements Entity & InformationArtifactArchetype
+  @node(labels: ["PatentApplication", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'PatentApplication'."
+  artifactType: String!
+  "First publication of the application (e.g. A1), when published; null = not published or unknown."
+  publishedAt: DateTime
+  "Instant the record was known to display these data (capture of the office or aggregator page)."
+  observedAt: DateTime
+  "sha256:<hex> over the captured bibliographic record (basis on the SourceSnapshot)."
+  contentHash: String
+  "Application number as printed by the office ('11/912,400', 'EP05722944', 'PCT/US2005/004337')."
+  applicationNumber: String!
+  "Office jurisdiction code (US, EP, JP, CA, AU; WO for a PCT international application)."
+  jurisdiction: String!
+  "Materialized identity key '<jurisdiction>:<normalized application number>' (e.g. 'US:11912400', 'EP:05722944'); unique by constraint."
+  officeKey: String!
+  "Filing date as stated by the office (date only)."
+  filingDate: Date
+  "Controlled string NATIONAL | REGIONAL | PCT_INTERNATIONAL | PROVISIONAL (candidate enum PatentApplicationKind)."
+  applicationKind: String
+  "Title as filed/published."
+  title: String
+  "Applicant names exactly as printed on the published application (immutable; never the current owner)."
+  applicantNamesVerbatim: [String!]
+  "Inventor names exactly as printed (immutable public bibliographic data; not Person identities and not ownership)."
+  inventorNamesVerbatim: [String!]
+  """class: structural (inverse view); cardinality: many (one per family definition); catalog: FAMILY_HAS_APPLICATION"""
+  families: [PatentFamily!]! @relationship(type: "FAMILY_HAS_APPLICATION", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: zero_or_one per grant episode (a reissue is a second GrantedPatent); catalog: APPLICATION_GRANTED_AS"""
+  grantedAs: [GrantedPatent!]! @relationship(type: "APPLICATION_GRANTED_AS", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: many; catalog: HAS_PATENT_CLAIM (claims as filed or as published; never the granted claims)"""
+  claims: [PatentClaim!]! @relationship(type: "HAS_PATENT_CLAIM", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: one_or_more; catalog: HAS_IDENTIFIER (application number, publication numbers)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted (inverse view; Organization -> PatentApplication); cardinality: many; catalog: ASSIGNED_PATENT"""
+  assignees: [Organization!]! @relationship(type: "ASSIGNED_PATENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view); cardinality: many; catalog: LICENSE_COVERS"""
+  coveringLicenses: [PatentLicense!]! @relationship(type: "LICENSE_COVERS", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view); cardinality: many (episodes); CANDIDATE: IP_STATUS_OF"""
+  statuses: [IpRightStatus!]! @relationship(type: "IP_STATUS_OF", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A granted patent (one grant publication at one office, identified by office, patent number and kind code; a reissue or a
+reexamination certificate is a further artifact). Immutable: bibliographic data as printed at grant. Whether it is in force,
+expired (term end, adjusted term), lapsed for non-payment, or surrendered is an IpRightStatus episode on this node; whether
+a CLAIM is valid, held invalid or cancelled is an IpRightStatus episode on that PatentClaim. An aggregator's "Active" is a
+status assertion by that aggregator, never a claim-validity fact (V-W14-07). Holding the grant (ASSIGNED_PATENT), licensing
+it (PatentLicense) and the claims' subject matter (PATENT_CLAIMS assertions) never imply efficacy, study ownership or that a
+product practices the claims. CQ-IP-C01, CQ-IP-C02, CQ-EC-01. Module regulatory_and_ip. Archetype InformationArtifact.
+"""
+type GrantedPatent implements Entity & InformationArtifactArchetype
+  @node(labels: ["GrantedPatent", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'GrantedPatent'."
+  artifactType: String!
+  "Grant publication instant (first instant of grantDate in UTC)."
+  publishedAt: DateTime
+  "Instant the record was known to display these data."
+  observedAt: DateTime
+  "sha256:<hex> over the captured grant record (basis on the SourceSnapshot)."
+  contentHash: String
+  "Patent number as printed ('8,197,807')."
+  patentNumber: String!
+  "Kind code of the grant publication ('B2', 'B1', 'E' for reissue)."
+  kindCode: String
+  "Office jurisdiction code (US, EP, AU ...)."
+  jurisdiction: String!
+  "Materialized identity key '<jurisdiction>:<digits of patent number>' (kind code excluded; e.g. 'US:8197807'); unique by constraint."
+  officeKey: String!
+  "Grant date as stated (date only)."
+  grantDate: Date
+  "Title as granted."
+  title: String
+  "Assignee names exactly as printed on the grant (immutable; the holder over time is ASSIGNED_PATENT)."
+  assigneeNamesVerbatim: [String!]
+  "Inventor names exactly as printed (immutable; not Person identities, not ownership, not IP interest)."
+  inventorNamesVerbatim: [String!]
+  """class: asserted (inverse view); cardinality: exactly_one per grant; catalog: APPLICATION_GRANTED_AS"""
+  application: [PatentApplication!]! @relationship(type: "APPLICATION_GRANTED_AS", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: one_or_more; catalog: HAS_PATENT_CLAIM (claims as granted)"""
+  claims: [PatentClaim!]! @relationship(type: "HAS_PATENT_CLAIM", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted; cardinality: one_or_more; catalog: HAS_IDENTIFIER (patent number with issuer and jurisdiction)"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted (inverse view; Organization -> GrantedPatent); cardinality: many (episodes); catalog: ASSIGNED_PATENT"""
+  assignees: [Organization!]! @relationship(type: "ASSIGNED_PATENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view); cardinality: many; catalog: LICENSE_COVERS"""
+  coveringLicenses: [PatentLicense!]! @relationship(type: "LICENSE_COVERS", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view); cardinality: many (episodes); CANDIDATE: IP_STATUS_OF"""
+  statuses: [IpRightStatus!]! @relationship(type: "IP_STATUS_OF", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+One numbered claim of one application publication or one grant, with its verbatim text and hash. A claim as filed and the
+claim of the same number as granted are two nodes (amendment changes text). Validity is never a property: a court or office
+holding a claim invalid, unpatentable, cancelled or confirmed is an IpRightStatus episode on this node. What the claim
+reads on (a material, substance, form or use) is a PATENT_CLAIMS Assertion with an asserter (owner statement, court finding
+or curator reading); [PATENT_CLAIMS, PROVES_EFFICACY] is forbidden, so a functional limitation in the claim text ("increases
+NAD+ biosynthesis upon oral administration") is never an efficacy finding. CQ-IP-C01, CQ-IP-C03. Module regulatory_and_ip.
+Archetype InformationArtifact.
+"""
+type PatentClaim implements Entity & InformationArtifactArchetype
+  @node(labels: ["PatentClaim", "InformationArtifact"])
+  @fulltext(indexes: [{indexName: "PatentClaimText", fields: ["claimText"], queryName: "searchPatentClaims"}]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'PatentClaim'."
+  artifactType: String!
+  "Publication instant of the containing application publication or grant."
+  publishedAt: DateTime
+  "Instant the claim text was captured."
+  observedAt: DateTime
+  "sha256:<hex> of the captured claim record; equals claimTextHash when the record is the text alone."
+  contentHash: String
+  "Claim number within its parent publication."
+  claimNumber: Int!
+  "Controlled string INDEPENDENT | DEPENDENT (candidate enum PatentClaimKind)."
+  claimKind: String!
+  "Claim numbers this claim refers to (empty for an independent claim)."
+  dependsOnClaimNumbers: [Int!]
+  "Verbatim claim text as captured (public)."
+  claimText: String
+  "sha256:<hex> of claimText normalized with NFC-WS1 (catalog normalizationVersions)."
+  claimTextHash: String!
+  "Normalization applied before hashing ('NFC-WS1')."
+  claimTextNormalization: String
+  """class: structural (inverse view); cardinality: exactly_one across applicationParent and grantParent; catalog: HAS_PATENT_CLAIM"""
+  applicationParent: [PatentApplication!]! @relationship(type: "HAS_PATENT_CLAIM", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural (inverse view); cardinality: exactly_one across applicationParent and grantParent; catalog: HAS_PATENT_CLAIM"""
+  grantParent: [GrantedPatent!]! @relationship(type: "HAS_PATENT_CLAIM", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted (inverse view); cardinality: many; catalog: LICENSE_COVERS (only when the license names claims)"""
+  coveringLicenses: [PatentLicense!]! @relationship(type: "LICENSE_COVERS", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view); cardinality: many (episodes); CANDIDATE: IP_STATUS_OF (claim-level validity)"""
+  statuses: [IpRightStatus!]! @relationship(type: "IP_STATUS_OF", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Versioned states
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+The terms of one patent license as stated by one agreement version (or an amendment): exclusivity, field of use,
+territory, sublicensing right, source-stated effective bounds, the verbatim rights definition and term clause. A license
+amendment or replacement is a new PatentLicense state; the old terms' LICENSES_PATENT / LICENSE_COVERS assertions are
+bounded by SUPERSEDES {VALIDITY_BOUNDED} between ASSERTIONS (states are never linked by SUPERSEDES; catalog V-507). Parties are asserted edges: the licensee through
+LICENSES_PATENT (Organization -> PatentLicense) and the licensor through the CANDIDATE GRANTS_PATENT_LICENSE; the licensor
+is never inferred from the assignee (a sublicense is granted by a licensee). What is licensed is the asserted LICENSE_COVERS
+set exactly as the source names it; the rights-definition text ("and any Foreign Patents issuing therefrom") is kept
+verbatim in coverageRuleText and never expanded into family-wide coverage. A term that a public filing redacts or omits is
+null with its *ReportedStatus = NOT_REPORTED, never "unrestricted"; null with a null status is unknown (e.g. not captured).
+A license NEVER implies ownership, sponsorship or funding of any study ([LICENSES_PATENT, OWNS_STUDY]), efficacy, that a
+product practices the patent, or validity of the licensed claims. CQ-IP-C02, CQ-IP-C03, CQ-EC-01. Module regulatory_and_ip.
+Archetype VersionedState.
+"""
+type PatentLicense implements Entity & VersionedStateArchetype
+  @node(labels: ["PatentLicense", "VersionedState"]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'PatentLicense'."
+  stateType: String!
+  "sha256:<hex> over the canonical JSON of the payload fields below (replay identity, D-016)."
+  payloadHash: String!
+  "Source-stated effective date of these terms (payload); query validity comes from the LICENSES_PATENT / LICENSE_COVERS episodes."
+  effectiveFrom: DateTime
+  "Source-stated end; null = unknown or not stated (a 'life of the last-to-expire patent' term is null with termText kept verbatim)."
+  effectiveTo: DateTime
+  "Agreement title as stated ('Exclusive Patent License Agreement')."
+  agreementTitle: String
+  "true exclusive, false non-exclusive; null = unknown or not reported (see exclusivityReportedStatus). Never defaulted."
+  exclusive: Boolean
+  "REPORTED, NOT_REPORTED (redacted or withheld in the public source) or NOT_APPLICABLE; null = not assessed."
+  exclusivityReportedStatus: ReportedStatus
+  "Field of use verbatim ('human and animal therapeutics'); null = unknown or not reported."
+  fieldOfUse: String
+  "Whether the source reports the field of use; NOT_REPORTED is never 'all fields'."
+  fieldOfUseReportedStatus: ReportedStatus
+  "Territory verbatim ('worldwide')."
+  territory: String
+  "Normalized territory: ISO 3166-1 alpha-2 codes, or the single value 'WORLDWIDE'."
+  territoryJurisdictions: [String!]
+  "Whether the source reports the territory."
+  territoryReportedStatus: ReportedStatus
+  "true when the licensee may grant sublicenses per the source; null = unknown."
+  sublicensable: Boolean
+  "Verbatim definition of the licensed rights (named numbers plus any rule such as 'Foreign Patents issuing therefrom ... reissues, reexaminations or extensions')."
+  coverageRuleText: String
+  "Verbatim term clause ('shall remain in full force during the life of the last to expire patents ...')."
+  termText: String
+  """class: asserted; cardinality: one_or_more; catalog: LICENSE_COVERS (exactly the members the source names)"""
+  covers: [PatentLicenseTarget!]! @relationship(type: "LICENSE_COVERS", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view; Organization -> PatentLicense); cardinality: one_or_more; catalog: LICENSES_PATENT (licensee side)"""
+  licensees: [Organization!]! @relationship(type: "LICENSES_PATENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (inverse view; Organization -> PatentLicense); cardinality: zero_or_one per episode; CANDIDATE: GRANTS_PATENT_LICENSE (licensor side; W14-SR-03)"""
+  licensors: [Organization!]! @relationship(type: "GRANTS_PATENT_LICENSE", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+CANDIDATE (W14-SR-02; CQ-IP-C01, CQ-IP-C04; failing case fixtures/w14-ip-core.cypher F-STATUS-01). The legal status of one
+jurisdictional IP right or claim for a bounded period: pending, published, granted/in force, registered, renewed, abandoned,
+withdrawn, lapsed, expired, cancelled, or (claim level) held invalid, held unpatentable, cancelled, confirmed. Mirrors
+RegulatoryStatus but is a separate type because patent status and regulatory status must stay distinct (INV-010). scopeText
+carries the scope of the right during the episode (trademark goods/services as amended; claims affected by a decision).
+Who says so is the asserter of the IP_STATUS_OF Assertion (office record, court, PTAB, owner filing, aggregator display);
+an aggregator's display is never the office's status. An end of status is a new IP_STATUS_OF Assertion with the same object
+and start and a closed end that SUPERSEDES {VALIDITY_BOUNDED} the open one; a vacated decision or mis-extracted date is
+SUPERSEDES {SOURCE_CORRECTION | EXTRACTION_FIX} -- always between the Assertions, never between states (TM-R2, TM-R3,
+V-507, V-507b). Archetype VersionedState.
+Module regulatory_and_ip.
+"""
+type IpRightStatus implements Entity & VersionedStateArchetype
+  @node(labels: ["IpRightStatus", "VersionedState"]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'IpRightStatus'."
+  stateType: String!
+  "sha256:<hex> over statusKind, jurisdiction, scopeText, niceClasses, legalBasisCitation, proceedingReference, effective bounds."
+  payloadHash: String!
+  "Source-stated start of the status (grant date, registration date, decision date)."
+  effectiveFrom: DateTime
+  "Source-stated end (term expiry, adjusted expiration, renewal deadline); null = unknown, never 'perpetual'."
+  effectiveTo: DateTime
+  "Controlled string (candidate enum IpRightStatusKind): PENDING | PUBLISHED | ALLOWED | GRANTED_IN_FORCE | REGISTERED | RENEWED | ABANDONED | WITHDRAWN | LAPSED | EXPIRED | CANCELLED | SURRENDERED | CLAIM_HELD_INVALID | CLAIM_HELD_UNPATENTABLE | CLAIM_CANCELLED | CLAIM_CONFIRMED | DECISION_VACATED."
+  statusKind: String!
+  "Office or court jurisdiction code of the status."
+  jurisdiction: String!
+  "Verbatim status wording of the source ('LIVE/REGISTRATION/Issued and Active', 'Active', 'Withdrawn')."
+  statusTextVerbatim: String
+  "Scope of the right during this episode (trademark goods/services as amended; claim numbers affected by a decision)."
+  scopeText: String
+  "Nice classes in scope during the episode (trademarks only)."
+  niceClasses: [Int!]
+  "Statutory basis of a decision ('35 U.S.C. § 101'); null for office maintenance states."
+  legalBasisCitation: String
+  "Docket / appeal / proceeding number ('Fed. Cir. 2022-1116', 'IPR2021-xxxxx')."
+  proceedingReference: String
+  """class: asserted; cardinality: exactly_one; CANDIDATE: IP_STATUS_OF (status -> right or claim)"""
+  statusOf: [IpRightStatusSubjectTarget!]! @relationship(type: "IP_STATUS_OF", direction: OUT, properties: "AssertedEdgeProperties")
+}

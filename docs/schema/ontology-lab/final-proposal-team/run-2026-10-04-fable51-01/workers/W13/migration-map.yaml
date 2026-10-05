@@ -1,0 +1,71 @@
+# W13 migration map: every live element in scope (live schema 86b5e0b5...f112) -> final element.
+# Relabel and property moves are written for Fable's migration table; no statement here is executed against live data.
+- {live: RegulatoryPathway, final: RegulatoryPathway, action: keep, note: "add labels Entity (D-001); add uid = 'hu:reg-pathway:' + id; entityType 'REGULATORY_PATHWAY'"}
+- {live: RegulatoryPathway.id, final: RegulatoryPathway.id, action: keep, note: "id = opaque segment of uid"}
+- {live: RegulatoryPathway.name, final: RegulatoryPathway.name, action: keep, note: "String! -> String (D-013)"}
+- {live: RegulatoryPathway.description, final: RegulatoryPathway.description, action: keep, note: ""}
+- {live: RegulatoryPathway.mongoResearchRunId, final: RegulatoryPathway.mongoResearchRunId, action: keep, note: "internal tier"}
+- {live: RegulatoryPathway.createdAt, final: RegulatoryPathway.createdAt, action: keep, note: ""}
+- {live: RegulatoryPathway.updatedAt, final: RegulatoryPathway.updatedAt, action: keep, note: ""}
+- {live: RegulatoryPathway.pathwayKind, final: RegulatoryPathway.pathwayKind, action: rename, note: "String -> PathwayKind! (closed). Unmappable free text is kept in description and the node gets maturity CANDIDATE until reviewed; never guessed"}
+- {live: RegulatoryPathway.submissionCategory, final: RegulatoryPathway.submissionCategory, action: keep, note: "verbatim text"}
+- {live: RegulatoryPathway.jurisdictionCode, final: RegulatoryPathway.jurisdiction, action: rename, note: "normalize per W13-SR-01 (ISO 3166-1/2, EU); 'UK' is split into GB-GBN / GB-NIR only when the source says which"}
+- {live: RegulatoryPathway.hasSteps, final: RegulatoryPathway.hasSteps, action: keep, note: "HAS_REGULATORY_STEP; OrderingMetadata -> StructuralEdgeProperties (orderIndex kept; sequenceIndex -> orderIndex when orderIndex null; seasonNumber/episodeNumber/startTime/endTime/publishedAt/rhetoricalRole dropped: no meaning on this edge)"}
+- {live: null, final: RegulatoryPathwayVersion, action: split, note: "new; one version per legal-basis regime; created from Federal Register / eCFR citations; existing pathway nodes get zero versions until sourced (derived pathway fields then stay null = unknown)"}
+- {live: null, final: HAS_PATHWAY_VERSION, action: split, note: "new structural bitemporal attachment"}
+- {live: null, final: UNDER_LEGAL_BASIS_VERSION, action: split, note: "new; written only when a source ties a status to a regime (dependency) or records the filing regime"}
+- {live: RegulatoryStep, final: RegulatoryStep, action: keep, note: "add Entity label, uid 'hu:reg-step:' + id (token W13-SR-04), entityType"}
+- {live: RegulatoryStep.name, final: RegulatoryStep.name, action: keep, note: "nullable"}
+- {live: RegulatoryStep.description, final: RegulatoryStep.description, action: keep, note: ""}
+- {live: RegulatoryStep.mongoResearchRunId, final: RegulatoryStep.mongoResearchRunId, action: keep, note: ""}
+- {live: RegulatoryStep.createdAt, final: RegulatoryStep.createdAt, action: keep, note: ""}
+- {live: RegulatoryStep.updatedAt, final: RegulatoryStep.updatedAt, action: keep, note: ""}
+- {live: RegulatoryStep.stepKind, final: RegulatoryStep.stepKind, action: keep, note: "free text"}
+- {live: RegulatoryStep.milestoneCode, final: RegulatoryStep.milestoneCode, action: keep, note: ""}
+- {live: RegulatoryStatus, final: RegulatoryStatus, action: split, note: "status kept under the live name with labels [RegulatoryStatus, VersionedState]; submission and response fields move out (below); one live node yields 1 RegulatorySubmission (if applicationNumber present), 1 RegulatoryResponse (if decisionDate present) and 1 RegulatoryStatus; statusKind must be set by review, never defaulted (a live node whose statusCode cannot be mapped stays maturity CANDIDATE and is excluded from approval answers)"}
+- {live: RegulatoryStatus.id, final: RegulatoryStatus.id, action: keep, note: "uid 'hu:regulatory-status:' + id"}
+- {live: RegulatoryStatus.name, final: RegulatoryStatus.name, action: keep, note: "nullable"}
+- {live: RegulatoryStatus.description, final: RegulatoryStatus.description, action: keep, note: ""}
+- {live: RegulatoryStatus.mongoResearchRunId, final: RegulatoryStatus.mongoResearchRunId, action: keep, note: ""}
+- {live: RegulatoryStatus.createdAt, final: RegulatoryStatus.createdAt, action: keep, note: ""}
+- {live: RegulatoryStatus.updatedAt, final: RegulatoryStatus.updatedAt, action: keep, note: ""}
+- {live: RegulatoryStatus.statusCode, final: RegulatoryStatus.statusCodeVerbatim, action: rename, note: "verbatim; statusKind (closed) assigned by mapping table plus review; 'APPROVED' maps to APPROVAL only with an approving response (V-336), otherwise review"}
+- {live: RegulatoryStatus.effectiveDate, final: RegulatoryStatus.effectiveFrom, action: rename, note: "payload; also seeds STATUS_OF validFrom with validFromBasis STATED_BY_SOURCE when the source is known, else UNKNOWN"}
+- {live: RegulatoryStatus.expirationOrRenewalDate, final: RegulatoryStatus.effectiveTo, action: rename, note: "payload; a renewal date is not an end of validity unless stated; null stays unknown"}
+- {live: RegulatoryStatus.applicationNumber, final: RegulatorySubmission.identifier, action: move, note: "plus Identifier record (scheme by prefix: K -> FDA_510K, DEN -> FDA_DEN, P -> FDA_PMA, NDA/BLA, GRN, NDI); DrugApproval.applicationNumber keeps a verbatim copy"}
+- {live: RegulatoryStatus.decisionDate, final: RegulatoryResponse.issuedAt, action: move, note: "response created with responseKind from review; never inferred from statusCode alone"}
+- {live: RegulatoryStatus.jurisdictionCode, final: RegulatoryStatus.jurisdiction, action: rename, note: "required (V-333)"}
+- {live: RegulatoryStatus.issuedBy, final: RegulatoryStatus.issuedBy, action: keep, note: "ISSUED_BY; RoleMetadata dropped (no role meaning); also copied to the new RegulatoryResponse"}
+- {live: RegulatoryAgency, final: RegulatoryAgency, action: keep, note: "add labels Organization, Entity; uid 'hu:org:' + id (W13-SR-02); if an Organization node already represents the agency, merge through EquivalenceAssessment (never two identities)"}
+- {live: RegulatoryAgency.id, final: RegulatoryAgency.id, action: keep, note: ""}
+- {live: RegulatoryAgency.name, final: RegulatoryAgency.name, action: keep, note: "nullable"}
+- {live: RegulatoryAgency.description, final: RegulatoryAgency.description, action: keep, note: ""}
+- {live: RegulatoryAgency.mongoResearchRunId, final: RegulatoryAgency.mongoResearchRunId, action: keep, note: ""}
+- {live: RegulatoryAgency.createdAt, final: RegulatoryAgency.createdAt, action: keep, note: ""}
+- {live: RegulatoryAgency.updatedAt, final: RegulatoryAgency.updatedAt, action: keep, note: ""}
+- {live: RegulatoryAgency.agencyCode, final: RegulatoryAgency.agencyCode, action: keep, note: ""}
+- {live: RegulatoryAgency.overseesPathways, final: RegulatoryAgency.overseesPathways, action: keep, note: "OVERSEES; RoleMetadata -> StructuralEdgeProperties (role/title/corporateRole/... dropped; validFrom/validTo dropped: oversight change is a pathway version fact)"}
+- {live: Product.hasRegulatoryStatuses, final: RegulatoryStatus.legacyHeldBy, action: derive, note: "HAS_REGULATORY_STATUS read-only, DerivedEdgeProperties, rule W13-DR-01; each live edge first becomes a STATUS_OF Assertion (status -> product) with locator from the live ExtractionMetadata or 'MIGRATION' reviewerType; field stays on Product (W04, W13-SR-08)"}
+- {live: Product.followsRegulatoryPathways, final: RegulatoryPathway.legacyFollowedBy, action: derive, note: "FOLLOWS_PATHWAY read-only, rule W13-DR-02; live edges without a submission become a RegulatorySubmission stub only when a source names the filing, otherwise retired (a pathway link without a filing is not evidence)"}
+- {live: Product.status, final: null, action: derive, note: "W04 field; value APPROVED guarded by V-322r (current APPROVAL status with approving response); development-stage values unaffected"}
+- {live: Product.approvedYear, final: null, action: derive, note: "W04 field; YEAR of the APPROVAL STATUS_OF validFrom, precision YEAR"}
+- {live: Product.regulatoryAuthorizationId, final: null, action: derive, note: "W04 field; projection of the primary Identifier on the RegulatorySubmission behind the product's current status"}
+- {live: Product.primaryRegulatoryIdentifier, final: null, action: derive, note: "W04 field; same as regulatoryAuthorizationId; fulltext index keeps it as a lookup hint only"}
+- {live: ProductSnapshot.status, final: null, action: derive, note: "W04; same guard"}
+- {live: ProductSnapshot.approvedYear, final: null, action: derive, note: "W04; YEAR precision projection"}
+- {live: ProductSnapshot.regulatoryAuthorizationId, final: null, action: derive, note: "W04"}
+- {live: Treatment.orphanDrugDesignation, final: OrphanDesignation, action: derive, note: "W06 field becomes a text projection of an OrphanDesignation (indication + jurisdiction); never approval (W13-SR-09)"}
+- {live: PhysicalLocation.establishmentIdentifier, final: Identifier, action: move, note: "W01; plus RegulatoryStatus{ESTABLISHMENT_REGISTRATION} STATUS_OF the Facility when a registration source exists (W13-SR-10)"}
+- {live: Material.regulatoryCategoryHint, final: null, action: keep, note: "W02/W11 hint; becomes RegulatoryStatus only from an agency source (W13-SR-11)"}
+- {live: OrganizationType.REGULATORY_AGENCY, final: RegulatoryAgency, action: keep, note: "W01 enum value; nodes with it get the RegulatoryAgency label after review"}
+- {live: ISSUED_BY, final: ISSUED_BY, action: keep, note: "RoleMetadata properties dropped"}
+- {live: HAS_REGULATORY_STEP, final: HAS_REGULATORY_STEP, action: keep, note: "see hasSteps"}
+- {live: OVERSEES, final: OVERSEES, action: keep, note: "see overseesPathways"}
+- {live: HAS_REGULATORY_STATUS, final: HAS_REGULATORY_STATUS, action: derive, note: "see Product.hasRegulatoryStatuses"}
+- {live: FOLLOWS_PATHWAY, final: FOLLOWS_PATHWAY, action: derive, note: "see Product.followsRegulatoryPathways"}
+- {live: "catalog DESIGNATION_FOR", final: STATUS_OF, action: merge, note: "GraphQL field OrphanDesignation.designationFor over STATUS_OF; no stored DESIGNATION_FOR type"}
+- {live: "catalog APPROVAL_FOR", final: STATUS_OF, action: merge, note: "GraphQL field DrugApproval.approvalFor over STATUS_OF"}
+- {live: "proposed-delta RegulatorySubmission.submissionKind (String!)", final: RegulatorySubmission.submissionKind, action: rename, note: "String -> PathwayKind!"}
+- {live: "proposed-delta SUBMITTED_BY / SUPERSEDES_SUBMISSION properties AssertedTemporalMetadata", final: AssertedEdgeProperties, action: rename, note: "frozen W00 type"}
+- {live: "inherited fixture examples/filing-vs-capability.cypher reg-pathway us-fda-gras-notice legalBasisCitation '21 CFR Part 170 Subpart E'", final: RegulatoryPathwayVersion, action: split, note: "anachronistic for GRN 000635 (letter 2016-08-03 cites proposed 21 CFR 170.36; subpart E effective 2016-10-17); W13-D13"}
+- {live: "inherited fixture uid hu:reg-response:us-fda-grn-000635 issuedAt null", final: RegulatoryResponse.issuedAt, action: keep, note: "value now captured: 2016-08-03 (S1, S2)"}

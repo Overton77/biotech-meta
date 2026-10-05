@@ -1,0 +1,116 @@
+[
+ {
+  "n": 1,
+  "status": "ok",
+  "rows": 12,
+  "result": [
+   {
+    "q": "Q03-a",
+    "predicate": "ADVISES_ORGANIZATION",
+    "validAt": "2010-06-01T00:00:00Z",
+    "precisionAwareClass": "KNOWN_NOT_VALID",
+    "precisionBlindQs2aClass": "EXCLUDED"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "ADVISES_ORGANIZATION",
+    "validAt": "2011-06-15T00:00:00Z",
+    "precisionAwareClass": "POSSIBLE_START_UNCERTAIN",
+    "precisionBlindQs2aClass": "OPEN_END"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "ADVISES_ORGANIZATION",
+    "validAt": "2014-06-01T00:00:00Z",
+    "precisionAwareClass": "OPEN_END_SUPPORTED",
+    "precisionBlindQs2aClass": "OPEN_END"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "ADVISES_ORGANIZATION",
+    "validAt": "2017-06-01T00:00:00Z",
+    "precisionAwareClass": "OPEN_END_SUPPORTED",
+    "precisionBlindQs2aClass": "OPEN_END"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "ADVISES_ORGANIZATION",
+    "validAt": "2018-02-01T00:00:00Z",
+    "precisionAwareClass": "OPEN_END_SUPPORTED",
+    "precisionBlindQs2aClass": "OPEN_END"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "ADVISES_ORGANIZATION",
+    "validAt": "2021-12-27T00:00:00Z",
+    "precisionAwareClass": "OPEN_END_SUPPORTED",
+    "precisionBlindQs2aClass": "OPEN_END"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "BOARD_MEMBER_OF",
+    "validAt": "2010-06-01T00:00:00Z",
+    "precisionAwareClass": "KNOWN_NOT_VALID",
+    "precisionBlindQs2aClass": "EXCLUDED"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "BOARD_MEMBER_OF",
+    "validAt": "2011-06-15T00:00:00Z",
+    "precisionAwareClass": "POSSIBLE_START_UNCERTAIN",
+    "precisionBlindQs2aClass": "KNOWN_WITHIN"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "BOARD_MEMBER_OF",
+    "validAt": "2014-06-01T00:00:00Z",
+    "precisionAwareClass": "KNOWN_WITHIN",
+    "precisionBlindQs2aClass": "KNOWN_WITHIN"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "BOARD_MEMBER_OF",
+    "validAt": "2017-06-01T00:00:00Z",
+    "precisionAwareClass": "POSSIBLE_END_UNCERTAIN",
+    "precisionBlindQs2aClass": "EXCLUDED"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "BOARD_MEMBER_OF",
+    "validAt": "2018-02-01T00:00:00Z",
+    "precisionAwareClass": "KNOWN_NOT_VALID",
+    "precisionBlindQs2aClass": "EXCLUDED"
+   },
+   {
+    "q": "Q03-a",
+    "predicate": "BOARD_MEMBER_OF",
+    "validAt": "2021-12-27T00:00:00Z",
+    "precisionAwareClass": "KNOWN_NOT_VALID",
+    "precisionBlindQs2aClass": "EXCLUDED"
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 2,
+  "status": "ok",
+  "rows": 1,
+  "result": [
+   {
+    "q": "Q03-b",
+    "predicate": "BOARD_MEMBER_OF",
+    "roleCode": "B",
+    "assertedBy": "hu:person:w00-david-a-sinclair",
+    "selectorKind": "TEXT_QUOTE",
+    "exact": "InsideTracker (Segterra), Cambridge, MA B (2011-2017) I,A,IP (2011-present)",
+    "quoteHash": "sha256:1994dc81bbae7b429ed8275104570117247c25516901dff418f3deb679102ecd",
+    "hashBasis": "SYNTHETIC_FIXTURE",
+    "completeness": "PARTIAL_EXCERPT",
+    "canonicalUri": "https://sinclair.hms.harvard.edu/david-sinclairs-affiliations",
+    "sourceKind": "SELF_DISCLOSURE_PAGE",
+    "captureStatus": "ACCEPTED"
+   }
+  ],
+  "error": null
+ }
+]

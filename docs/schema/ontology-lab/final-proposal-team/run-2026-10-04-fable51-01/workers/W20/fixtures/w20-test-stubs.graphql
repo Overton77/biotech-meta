@@ -1,0 +1,20 @@
+# TEST STUBS ONLY (not owned by W20, not a proposal): minimal stand-ins for W00/W01/W09/W21 types so the W20 fragment can be built and round-tripped with @neo4j/graphql 7.6.3.
+interface Entity { id: ID!  uid: String!  name: String  description: String  mongoResearchRunId: String }
+interface SearchIndexable { searchText: String  searchFields: [String!]  embeddingModel: String  embeddingDimensions: Int }
+interface EntityArchetype { entityType: String! }
+interface InformationArtifactArchetype { artifactType: String!  publishedAt: DateTime  observedAt: DateTime  contentHash: String }
+enum PrivacyClass { PUBLIC INTERNAL }
+enum NodeMaturity { CANDIDATE PROVISIONAL ACCEPTED DEPRECATED }
+enum SourceKind { PEER_REVIEWED_PUBLICATION PODCAST_TRANSCRIPT_PAGE VIDEO_RENDITION WEBPAGE_STUB }
+type DerivedEdgeProperties @relationshipProperties { projectionOfAssertionUid: String  derivationRule: String  derivedFromAssertionUids: [String!]  derivedFromAssessmentUids: [String!]  derivedAt: DateTime  mongoResearchRunId: String }
+type AssertedEdgeProperties @relationshipProperties { relationshipUid: String!  assertionUid: String!  validFrom: DateTime  validTo: DateTime  recordedFrom: DateTime!  recordedTo: DateTime  mongoResearchRunId: String }
+type SourceSnapshot @node(labels: ["SourceSnapshot", "InformationArtifact"]) { id: ID! @id  uid: String!  contentHash: String }
+type SourceLocator @node(labels: ["SourceLocator", "InformationArtifact"]) { id: ID! @id  uid: String!  exact: String }
+type Activity @node(labels: ["Activity", "Occurrence"]) { id: ID! @id  uid: String!  activityKind: String }
+type Episode @node(labels: ["Episode", "Entity"]) { id: ID! @id  uid: String! }
+type EpisodeSegment @node(labels: ["EpisodeSegment", "InformationArtifact"]) { id: ID! @id  uid: String! }
+type Claim @node(labels: ["Claim", "Entity"]) { id: ID! @id  uid: String!  claimText: String }
+type Publication @node(labels: ["Publication", "InformationArtifact"]) { id: ID! @id  uid: String! }
+type Person @node(labels: ["Person", "Entity"]) { id: ID! @id  uid: String!  name: String }
+type Organization @node(labels: ["Organization", "Entity"]) { id: ID! @id  uid: String!  name: String }
+union AssertionSubjectTarget = Person | Organization | Claim | Episode

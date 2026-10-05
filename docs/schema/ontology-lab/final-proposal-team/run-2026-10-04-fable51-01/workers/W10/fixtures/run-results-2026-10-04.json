@@ -1,0 +1,1384 @@
+{
+ "run": "2026-10-04 W10 on embedded Neo4j 5.26.31 Community + APOC Core 5.26.31; @neo4j/graphql 7.6.3",
+ "files": {
+  "00-constraints.json": {
+   "file": "neo4j/constraints.cypher",
+   "total": 57,
+   "ok": 45,
+   "failed": 12
+  },
+  "01-inherited.json": {
+   "file": "examples/study-vs-product-mismatch.cypher",
+   "total": 44,
+   "ok": 44,
+   "failed": 0
+  },
+  "02-operations-empty.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/operations.cypher",
+   "total": 31,
+   "ok": 31,
+   "failed": 0
+  },
+  "10-01-applicability-basis-13dim.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-01-applicability-basis-13dim.cypher",
+   "total": 14,
+   "ok": 14,
+   "failed": 0
+  },
+  "10-02-dose-ratio-minimal-pair.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-02-dose-ratio-minimal-pair.cypher",
+   "total": 13,
+   "ok": 13,
+   "failed": 0
+  },
+  "10-03-surrogate-context.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-03-surrogate-context.cypher",
+   "total": 13,
+   "ok": 13,
+   "failed": 0
+  },
+  "10-04-null-primary-synthesis.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-04-null-primary-synthesis.cypher",
+   "total": 10,
+   "ok": 10,
+   "failed": 0
+  },
+  "10-05-synthesis-versioning.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-05-synthesis-versioning.cypher",
+   "total": 18,
+   "ok": 18,
+   "failed": 0
+  },
+  "20-validation-positives.json": {
+   "file": "neo4j/validation.cypher",
+   "total": 174,
+   "ok": 174,
+   "failed": 0
+  },
+  "21-w10-validators-positives.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/operations.cypher",
+   "total": 31,
+   "ok": 31,
+   "failed": 0
+  },
+  "30-queries.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-80-queries.cypher",
+   "total": 15,
+   "ok": 15,
+   "failed": 0
+  },
+  "50-negatives.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/fixtures/w10-90-negatives.cypher",
+   "total": 44,
+   "ok": 44,
+   "failed": 0
+  },
+  "60-validation-negatives.json": {
+   "file": "neo4j/validation.cypher",
+   "total": 174,
+   "ok": 174,
+   "failed": 0
+  },
+  "61-w10-validators-negatives.json": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W10/operations.cypher",
+   "total": 31,
+   "ok": 31,
+   "failed": 0
+  }
+ },
+ "validatorRows": {
+  "20-validation-positives.json": {
+   "V-118": {
+    "rows": 6,
+    "sample": [
+     {
+      "label": "InformationArtifact",
+      "nodes": 48,
+      "withUid": 48,
+      "missingUid": 0
+     },
+     {
+      "label": "Entity",
+      "nodes": 13,
+      "withUid": 13,
+      "missingUid": 0
+     },
+     {
+      "label": "Occurrence",
+      "nodes": 1,
+      "withUid": 1,
+      "missingUid": 0
+     }
+    ]
+   },
+   "V-212": {
+    "rows": 2,
+    "sample": [
+     {
+      "study": "hu:study:nct02678611-basis-nrpt",
+      "observedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 3,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "resultsArticle": "29184669"
+     },
+     {
+      "study": "hu:study:nct02712593-niagen",
+      "observedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 3,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "resultsArticle": "31278280"
+     }
+    ]
+   },
+   "V-223": {
+    "rows": 1,
+    "sample": [
+     {
+      "outcome": "hu:outcome:nct02678611-nad-whole-blood",
+      "priorities": [
+       "SECONDARY",
+       "PRIMARY"
+      ]
+     }
+    ]
+   },
+   "V-401b": {
+    "rows": 1,
+    "sample": [
+     {
+      "acceptedAssertionsWithOnlyCoarseLocators": 39
+     }
+    ]
+   },
+   "V-514b": {
+    "rows": 1,
+    "sample": [
+     {
+      "assertionsWithoutContentHash": 39
+     }
+    ]
+   },
+   "V-522": {
+    "rows": 100,
+    "sample": [
+     {
+      "labels": [
+       "Entity",
+       "Organization",
+       "LegalEntity"
+      ],
+      "nodeWithoutPrivacyClass": "hu:org:elysium-health-inc"
+     },
+     {
+      "labels": [
+       "Entity",
+       "Organization",
+       "LegalEntity"
+      ],
+      "nodeWithoutPrivacyClass": "hu:org:chromadex-inc"
+     },
+     {
+      "labels": [
+       "Entity",
+       "Organization",
+       "LegalEntity"
+      ],
+      "nodeWithoutPrivacyClass": "hu:org:kgk-science-inc"
+     }
+    ]
+   }
+  },
+  "21-w10-validators-positives.json": {
+   "W10-V13": {
+    "rows": 1,
+    "sample": [
+     {
+      "newer": "hu:synthesis:nr-muscle-mito-function-older-humans-v2",
+      "older": "hu:synthesis:nr-muscle-mito-function-older-humans-v1",
+      "ncs": [],
+      "ocs": []
+     }
+    ]
+   },
+   "W10-V16": {
+    "rows": 2,
+    "sample": [
+     {
+      "dimensionWithoutCopiedAssessment": "hu:applicability:nct02678611-1x-to-basis-current-outcome_relevance",
+      "kind": "OUTCOME_RELEVANCE",
+      "verdict": "PARTIAL"
+     },
+     {
+      "dimensionWithoutCopiedAssessment": "hu:applicability:nct02712593-300-to-tru-niagen-300-outcome_relevance",
+      "kind": "OUTCOME_RELEVANCE",
+      "verdict": "PARTIAL"
+     }
+    ]
+   },
+   "W10-V16b": {
+    "rows": 1,
+    "sample": [
+     {
+      "backdatedAssessment": "hu:synthesis:nr-muscle-mito-function-older-humans-v2",
+      "labels": [
+       "EvidenceAssessment",
+       "EvidenceSynthesis"
+      ],
+      "recordedAt": {
+       "year": 2019,
+       "month": 9,
+       "day": 15,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "snapshot": "hu:snapshot:pmc6702140-2026-10-03",
+      "retrievedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 3,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      }
+     }
+    ]
+   }
+  },
+  "60-validation-negatives.json": {
+   "V-002": {
+    "rows": 1,
+    "sample": [
+     {
+      "assertionUid": "hu:assertion:w10-n16-mech",
+      "subjects": 0
+     }
+    ]
+   },
+   "V-003": {
+    "rows": 1,
+    "sample": [
+     {
+      "assertionUid": "hu:assertion:w10-n16-mech",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-113": {
+    "rows": 2,
+    "sample": [
+     {
+      "sharedLabels": [
+       "EvidenceAssessment",
+       "EvidenceApplicability"
+      ],
+      "sharedUid": "hu:applicability:w10-n01-ea",
+      "relType": "ASSESSES_APPLICABILITY_TO",
+      "privateUid": "hu:private-user-context:w10-n01"
+     },
+     {
+      "sharedLabels": [
+       "EvidenceAssessment",
+       "EvidenceApplicability"
+      ],
+      "sharedUid": "hu:applicability:w10-n02-ea",
+      "relType": "ASSESSES_APPLICABILITY_TO",
+      "privateUid": "hu:private-user-context:w10-n02"
+     }
+    ]
+   },
+   "V-118": {
+    "rows": 6,
+    "sample": [
+     {
+      "label": "InformationArtifact",
+      "nodes": 56,
+      "withUid": 56,
+      "missingUid": 0
+     },
+     {
+      "label": "Entity",
+      "nodes": 19,
+      "withUid": 19,
+      "missingUid": 0
+     },
+     {
+      "label": "Occurrence",
+      "nodes": 1,
+      "withUid": 1,
+      "missingUid": 0
+     }
+    ]
+   },
+   "V-201": {
+    "rows": 1,
+    "sample": [
+     {
+      "studySide": "hu:study:w10-n00-st",
+      "rel": "EVALUATES",
+      "commercialTarget": "hu:product:w10-n13-p"
+     }
+    ]
+   },
+   "V-203": {
+    "rows": 1,
+    "sample": [
+     {
+      "assessment": "hu:applicability:w10-n14-ea",
+      "evidenceTargets": 1,
+      "useTargets": 2
+     }
+    ]
+   },
+   "V-204": {
+    "rows": 1,
+    "sample": [
+     {
+      "assessment": "hu:applicability:w10-n04-ea",
+      "missing": [
+       "POPULATION"
+      ]
+     }
+    ]
+   },
+   "V-206": {
+    "rows": 2,
+    "sample": [
+     {
+      "dimension": "hu:applicability-dimension:w10-n05-ea-dose",
+      "kind": "DOSE",
+      "ratio": 1,
+      "verdict": "PARTIAL"
+     },
+     {
+      "dimension": "hu:applicability-dimension:w10-n06-ea-dose",
+      "kind": "DOSE",
+      "ratio": null,
+      "verdict": "MATCH"
+     }
+    ]
+   },
+   "V-207": {
+    "rows": 1,
+    "sample": [
+     {
+      "badExplanationOnlyDimension": "hu:applicability-dimension:w10-n07-ea-background-context",
+      "verdict": "PARTIAL"
+     }
+    ]
+   },
+   "V-207b": {
+    "rows": 2,
+    "sample": [
+     {
+      "compositeWithoutBasis": "hu:applicability:w10-n03-ea"
+     },
+     {
+      "compositeWithoutBasis": "hu:applicability:w10-n04-ea"
+     }
+    ]
+   },
+   "V-209": {
+    "rows": 7,
+    "sample": [
+     {
+      "dimensionWithoutProvenanceOrMissingFacts": "hu:applicability-dimension:w10-n05-ea-dose",
+      "verdict": "PARTIAL"
+     },
+     {
+      "dimensionWithoutProvenanceOrMissingFacts": "hu:applicability-dimension:w10-n06-ea-dose",
+      "verdict": "MATCH"
+     },
+     {
+      "dimensionWithoutProvenanceOrMissingFacts": "hu:applicability-dimension:w10-n07-ea-background-context",
+      "verdict": "PARTIAL"
+     }
+    ]
+   },
+   "V-212": {
+    "rows": 2,
+    "sample": [
+     {
+      "study": "hu:study:nct02678611-basis-nrpt",
+      "observedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 3,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "resultsArticle": "29184669"
+     },
+     {
+      "study": "hu:study:nct02712593-niagen",
+      "observedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 3,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "resultsArticle": "31278280"
+     }
+    ]
+   },
+   "V-214": {
+    "rows": 2,
+    "sample": [
+     {
+      "incompleteSurrogateContext": "hu:endpoint-classification:w10-n08-ctx"
+     },
+     {
+      "incompleteSurrogateContext": "hu:endpoint-classification:w10-n08-transferred"
+     }
+    ]
+   },
+   "V-214b": {
+    "rows": 1,
+    "sample": [
+     {
+      "biomarkerWithIntrinsicSurrogateStatus": "hu:biomarker:w10-n09-ldl"
+     }
+    ]
+   },
+   "V-215": {
+    "rows": 1,
+    "sample": [
+     {
+      "synthesis": "hu:synthesis:w10-n10-syn",
+      "nonPrimaryConfirmatory": "hu:study-result:w10-n10-subgroup",
+      "nullPrimary": "hu:study-result:w10-n10-primary"
+     }
+    ]
+   },
+   "V-219b": {
+    "rows": 1,
+    "sample": [
+     {
+      "synthesis": "hu:synthesis:w10-n12-syn",
+      "trigger": "hu:publication:w10-n12-pub"
+     }
+    ]
+   },
+   "V-219c": {
+    "rows": 1,
+    "sample": [
+     {
+      "triggeredWithoutPredecessor": "hu:synthesis:w10-n12-syn"
+     }
+    ]
+   },
+   "V-223": {
+    "rows": 1,
+    "sample": [
+     {
+      "outcome": "hu:outcome:nct02678611-nad-whole-blood",
+      "priorities": [
+       "SECONDARY",
+       "PRIMARY"
+      ]
+     }
+    ]
+   },
+   "V-231": {
+    "rows": 1,
+    "sample": [
+     {
+      "assertion": "hu:assertion:w10-n16-mech",
+      "basisKind": "DIRECT_MEASUREMENT",
+      "contexts": 0
+     }
+    ]
+   },
+   "V-237": {
+    "rows": 1,
+    "sample": [
+     {
+      "assessment": "hu:applicability:w10-n16-ea",
+      "exposureVerdict": "PARTIAL"
+     }
+    ]
+   },
+   "V-401b": {
+    "rows": 1,
+    "sample": [
+     {
+      "acceptedAssertionsWithOnlyCoarseLocators": 39
+     }
+    ]
+   },
+   "V-514b": {
+    "rows": 1,
+    "sample": [
+     {
+      "assertionsWithoutContentHash": 40
+     }
+    ]
+   },
+   "V-520": {
+    "rows": 1,
+    "sample": [
+     {
+      "labels": [
+       "UserContext"
+      ],
+      "privateNodeInSharedGraph": "hu:private-user-context:w10-n02"
+     }
+    ]
+   },
+   "V-521": {
+    "rows": 2,
+    "sample": [
+     {
+      "kind": "NODE",
+      "item": "hu:private-user-context:w10-n02"
+     },
+     {
+      "kind": "NODE",
+      "item": "hu:use-profile:w10-n21-up"
+     }
+    ]
+   },
+   "V-522": {
+    "rows": 100,
+    "sample": [
+     {
+      "labels": [
+       "Entity",
+       "Organization",
+       "LegalEntity"
+      ],
+      "nodeWithoutPrivacyClass": "hu:org:elysium-health-inc"
+     },
+     {
+      "labels": [
+       "Entity",
+       "Organization",
+       "LegalEntity"
+      ],
+      "nodeWithoutPrivacyClass": "hu:org:chromadex-inc"
+     },
+     {
+      "labels": [
+       "Entity",
+       "Organization",
+       "LegalEntity"
+      ],
+      "nodeWithoutPrivacyClass": "hu:org:kgk-science-inc"
+     }
+    ]
+   },
+   "V-524": {
+    "rows": 2,
+    "sample": [
+     {
+      "violation": "APPLICABILITY_TO_USER_CONTEXT",
+      "item": "hu:applicability:w10-n01-ea"
+     },
+     {
+      "violation": "APPLICABILITY_TO_USER_CONTEXT",
+      "item": "hu:applicability:w10-n02-ea"
+     }
+    ]
+   }
+  },
+  "61-w10-validators-negatives.json": {
+   "W10-V02": {
+    "rows": 1,
+    "sample": [
+     {
+      "dimension": "hu:applicability-dimension:w10-n18-ea-dose",
+      "kind": "DOSE",
+      "recorded": "CATEGORICAL",
+      "expected": "CONTINUOUS"
+     }
+    ]
+   },
+   "W10-V03": {
+    "rows": 1,
+    "sample": [
+     {
+      "dimension": "hu:applicability-dimension:w10-n19-ea-dose",
+      "ratio": 2,
+      "evidenceValue": 500,
+      "targetValue": 250,
+      "unitCode": "mg/d"
+     }
+    ]
+   },
+   "W10-V04": {
+    "rows": 2,
+    "sample": [
+     {
+      "dimension": "hu:applicability-dimension:w10-n06-ea-dose",
+      "kind": "DOSE",
+      "ratio": null,
+      "method": "applicability-v0.2-candidate"
+     },
+     {
+      "dimension": "hu:applicability-dimension:w10-n20-ea-dose",
+      "kind": "DOSE",
+      "ratio": 0.8,
+      "method": "applicability-v0.2-candidate"
+     }
+    ]
+   },
+   "W10-V05": {
+    "rows": 2,
+    "sample": [
+     {
+      "compositeWithoutBasis": "hu:applicability:w10-n03-ea",
+      "method": null,
+      "missing": [],
+      "unassessed": [
+       "STUDY_DESIGN_AND_QUALITY",
+       "OUTCOME_RELEVANCE",
+       "SCHEDULE",
+       "DOSAGE_FORM",
+       "DOSE",
+       "ACTIVE_COMPOSITION",
+       "MATERIAL_IDENTITY",
+       "COMPARATOR",
+       "POPULATION",
+       "ROUTE",
+       "DURATION"
+      ]
+     },
+     {
+      "compositeWithoutBasis": "hu:applicability:w10-n04-ea",
+      "method": "applicability-v0.2-candidate",
+      "missing": [
+       "POPULATION"
+      ],
+      "unassessed": [
+       "DOSAGE_FORM",
+       "OUTCOME_RELEVANCE",
+       "ACTIVE_COMPOSITION",
+       "SCHEDULE",
+       "COMPARATOR",
+       "MATERIAL_IDENTITY",
+       "ROUTE",
+       "STUDY_DESIGN_AND_QUALITY",
+       "DOSE",
+       "DURATION"
+      ]
+     }
+    ]
+   },
+   "W10-V08": {
+    "rows": 1,
+    "sample": [
+     {
+      "transferredSurrogateStatus": "hu:endpoint-classification:w10-n08-transferred",
+      "outcome": "hu:outcome:w10-n08-ldl",
+      "contextMatch": "PARTIAL"
+     }
+    ]
+   },
+   "W10-V09": {
+    "rows": 1,
+    "sample": [
+     {
+      "interpretationWithoutThreshold": "hu:assessment:w10-n17-ri",
+      "interpretation": "EVIDENCE_OF_NO_MEANINGFUL_EFFECT",
+      "meaningfulness": "NOT_MEANINGFUL"
+     }
+    ]
+   },
+   "W10-V10": {
+    "rows": 1,
+    "sample": [
+     {
+      "interpretation": "hu:assessment:w10-n17-rib",
+      "results": 1,
+      "conclusions": [
+       "NOT_SIGNIFICANT"
+      ]
+     }
+    ]
+   },
+   "W10-V11": {
+    "rows": 1,
+    "sample": [
+     {
+      "synthesis": "hu:synthesis:w10-n10-syn",
+      "result": "hu:study-result:w10-n10-subgroup",
+      "analysisKind": "SUBGROUP_POST_HOC",
+      "role": "CONFIRMATORY"
+     }
+    ]
+   },
+   "W10-V11b": {
+    "rows": 2,
+    "sample": [
+     {
+      "synthesis": "hu:synthesis:w10-n10-syn",
+      "posthocResult": "hu:study-result:w10-n10-subgroup",
+      "role": "CONFIRMATORY"
+     },
+     {
+      "synthesis": "hu:synthesis:w10-n11-syn",
+      "posthocResult": "hu:study-result:w10-n11-subgroup",
+      "role": "SUPPORTIVE"
+     }
+    ]
+   },
+   "W10-V13": {
+    "rows": 1,
+    "sample": [
+     {
+      "newer": "hu:synthesis:nr-muscle-mito-function-older-humans-v2",
+      "older": "hu:synthesis:nr-muscle-mito-function-older-humans-v1",
+      "ncs": [],
+      "ocs": []
+     }
+    ]
+   },
+   "W10-V14": {
+    "rows": 1,
+    "sample": [
+     {
+      "profile": "hu:use-profile:w10-n21-up",
+      "extraKeys": [
+       "birthDate",
+       "userContextUid"
+      ]
+     }
+    ]
+   },
+   "W10-V16": {
+    "rows": 2,
+    "sample": [
+     {
+      "dimensionWithoutCopiedAssessment": "hu:applicability:nct02678611-1x-to-basis-current-outcome_relevance",
+      "kind": "OUTCOME_RELEVANCE",
+      "verdict": "PARTIAL"
+     },
+     {
+      "dimensionWithoutCopiedAssessment": "hu:applicability:nct02712593-300-to-tru-niagen-300-outcome_relevance",
+      "kind": "OUTCOME_RELEVANCE",
+      "verdict": "PARTIAL"
+     }
+    ]
+   },
+   "W10-V16b": {
+    "rows": 2,
+    "sample": [
+     {
+      "backdatedAssessment": "hu:synthesis:nr-muscle-mito-function-older-humans-v2",
+      "labels": [
+       "EvidenceAssessment",
+       "EvidenceSynthesis"
+      ],
+      "recordedAt": {
+       "year": 2019,
+       "month": 9,
+       "day": 15,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "snapshot": "hu:snapshot:pmc6702140-2026-10-03",
+      "retrievedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 3,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      }
+     },
+     {
+      "backdatedAssessment": "hu:applicability:w10-n22-ea",
+      "labels": [
+       "EvidenceAssessment",
+       "EvidenceApplicability"
+      ],
+      "recordedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 4,
+       "hour": 2,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "snapshot": "hu:snapshot:w10-n22-snap",
+      "retrievedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 5,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      }
+     }
+    ]
+   }
+  }
+ },
+ "queries": [
+  {
+   "n": 1,
+   "rows": 3,
+   "sample": [
+    {
+     "applicabilityUid": "hu:applicability:nct02678611-1x-to-basis-current",
+     "methodVersion": "applicability-v0.1",
+     "assessmentStatus": "PROPOSED",
+     "evidenceTargetUid": "hu:study-intervention:nct02678611-nrpt-1x",
+     "targetUids": [
+      "hu:formulation:basis-us-current-2026-07-10"
+     ],
+     "evidenceUids": [
+      "hu:study-result:nct02678611-nad-1x-d30"
+     ],
+     "weakestDimensions": [
+      "MATERIAL_IDENTITY:UNKNOWN",
+      "SCHEDULE:UNKNOWN",
+      "STUDY_DESIGN_AND_QUALITY:NOT_ASSESSED"
+     ],
+     "unresolvedDimensions": [
+      "MATERIAL_IDENTITY",
+      "SCHEDULE",
+      "STUDY_DESIGN_AND_QUALITY"
+     ],
+     "dimensionNodes": 13,
+     "derivedScoreIfAny": null
+    },
+    {
+     "applicabilityUid": "hu:applicability:w10-nct02678611-1x-to-basis-current-v2",
+     "methodVersion": "applicability-v0.2-candidate",
+     "assessmentStatus": "PROPOSED",
+     "evidenceTargetUid": "hu:study-intervention:nct02678611-nrpt-1x",
+     "targetUids": [
+      "hu:formulation:basis-us-current-2026-07-10"
+     ],
+     "evidenceUids": [
+      "hu:publication:pmid-29184669",
+      "hu:study-result:nct02678611-nad-1x-d30"
+     ],
+     "weakestDimensions": [
+      "MATERIAL_IDENTITY:UNKNOWN",
+      "STUDY_DESIGN_AND_QUALITY:NOT_ASSESSED"
+     ],
+     "unresolvedDimensions": [
+      "MATERIAL_IDENTITY",
+      "STUDY_DESIGN_AND_QUALITY"
+     ],
+     "dimensionNodes": 13,
+     "derivedScoreIfAny": null
+    },
+    {
+     "applicabilityUid": "hu:applicability:w10-nct02712593-300-to-tru-niagen-300-v2",
+     "methodVersion": "applicability-v0.2-candidate",
+     "assessmentStatus": "PROPOSED",
+     "evidenceTargetUid": "hu:study-intervention:nct02712593-niagen-300",
+     "targetUids": [
+      "hu:formulation:tru-niagen-300mg-observed-2026-10-03"
+     ],
+     "evidenceUids": [
+      "hu:study-result:nct02712593-nad-300",
+      "hu:publication:pmid-31278280"
+     ],
+     "weakestDimensions": [
+      "STUDY_DESIGN_AND_QUALITY:NOT_ASSESSED"
+     ],
+     "unresolvedDimensions": [
+      "STUDY_DESIGN_AND_QUALITY"
+     ],
+     "dimensionNodes": 11,
+     "derivedScoreIfAny": null
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "rows": 2,
+   "sample": [
+    {
+     "dimension": "DOSE",
+     "verdict": "PARTIAL",
+     "missingFacts": [
+      "mass basis of \"125 mg of NR\" per capsule in PMID 29184669 Methods (NR chloride salt or NR cation not stated)"
+     ]
+    },
+    {
+     "dimension": "MATERIAL_IDENTITY",
+     "verdict": "UNKNOWN",
+     "missingFacts": [
+      "supplier and specification of the NR administered in NCT02678611 (Jan-Jul 2016)",
+      "pterostilbene material administered in NCT02678611",
+      "whether Elysium NR-E existed in 2016 and matches the trial NR"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "rows": 7,
+   "sample": [
+    {
+     "dimension": "DOSAGE_FORM",
+     "verdict": "PARTIAL",
+     "missingFacts": [],
+     "competingHypotheses": [],
+     "consideredPredicates": []
+    },
+    {
+     "dimension": "DOSE",
+     "verdict": "PARTIAL",
+     "missingFacts": [
+      "mass basis of \"125 mg of NR\" per capsule in PMID 29184669 Methods (NR chloride salt or NR cation not stated)"
+     ],
+     "competingHypotheses": [],
+     "consideredPredicates": []
+    },
+    {
+     "dimension": "DURATION",
+     "verdict": "PARTIAL",
+     "missingFacts": [],
+     "competingHypotheses": [],
+     "consideredPredicates": []
+    },
+    {
+     "dimension": "MATERIAL_IDENTITY",
+     "verdict": "UNKNOWN",
+     "missingFacts": [
+      "supplier and specification of the NR administered in NCT02678611 (Jan-Jul 2016)",
+      "pterostilbene material administered in NCT02678611",
+      "whether Elysium NR-E existed in 2016 and matches the trial NR"
+     ],
+     "competingHypotheses": [
+      "hu:resolution:nct02678611-nr-is-chromadex-niagen (UNRESOLVED)",
+      "hu:resolution:nct02678611-nr-is-elysium-nr-e (UNRESOLVED)"
+     ],
+     "consideredPredicates": [
+      "SUPPLIES_INGREDIENT_MATERIAL",
+      "PROVIDES_INVESTIGATIONAL_PRODUCT"
+     ]
+    },
+    {
+     "dimension": "OUTCOME_RELEVANCE",
+     "verdict": "PARTIAL",
+     "missingFacts": [],
+     "competingHypotheses": [],
+     "consideredPredicates": []
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "rows": 2,
+   "sample": [
+    {
+     "assessment": "hu:applicability:w10-nct02678611-1x-to-basis-current-v2",
+     "evidenceValue": 250,
+     "evQB": "PER_DAY",
+     "evMB": "UNSPECIFIED",
+     "targetValue": 250,
+     "tgQB": "PER_DAY",
+     "tgMB": "SALT_FORM",
+     "unit": "mg/d",
+     "ratio": null,
+     "verdict": "PARTIAL",
+     "profileServingsPerDay": 1
+    },
+    {
+     "assessment": "hu:applicability:w10-nct02712593-300-to-tru-niagen-300-v2",
+     "evidenceValue": 300,
+     "evQB": "PER_DAY",
+     "evMB": "SALT_FORM",
+     "targetValue": 300,
+     "tgQB": "PER_DAY",
+     "tgMB": "SALT_FORM",
+     "unit": "mg/d",
+     "ratio": 1,
+     "verdict": "MATCH",
+     "profileServingsPerDay": 1
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "rows": 1,
+   "sample": [
+    {
+     "outcome": "hu:outcome:nct02678611-ldl-c",
+     "studyEndpointClass": "BIOMARKER_NOT_SURROGATE",
+     "studyBiomarkerCategory": "SAFETY",
+     "studySurrogateLevel": "NOT_ESTABLISHED",
+     "contextMatch": "PARTIAL",
+     "comparedWith": "hu:endpoint-classification:ldl-c-fda-hypercholesterolemia-lipid-lowering",
+     "generalContexts": [
+      {
+       "uid": "hu:endpoint-classification:w10-ldl-c-fda-lal-deficiency-enzyme",
+       "disease": "Lysosomal Acid Lipase (LAL) deficiency",
+       "level": "VALIDATED",
+       "approval": "TRADITIONAL",
+       "cls": "SURROGATE_ENDPOINT",
+       "mechanism": "Hydrolytic lysosomal cholesteryl ester and triacylglycerol-specific enzyme"
+      },
+      {
+       "uid": "hu:endpoint-classification:w10-ldl-c-fda-hypercholesterolemia-lipid-lowering-v2",
+       "disease": "Hypercholesterolemia",
+       "level": "VALIDATED",
+       "approval": "TRADITIONAL",
+       "cls": "SURROGATE_ENDPOINT",
+       "mechanism": "Lipid-lowering"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "rows": 2,
+   "sample": [
+    {
+     "outcome": "Between-group difference in Parkinson disease related pattern (PDRP), FDG-PET, baseline to 3-4 weeks",
+     "measureKind": "BIOMARKER",
+     "registeredPriority": "PRIMARY",
+     "endpointClass": "BIOMARKER_NOT_SURROGATE",
+     "biomarkerCategory": "PHARMACODYNAMIC_RESPONSE",
+     "surrogateLevel": "NOT_ESTABLISHED",
+     "patientImportantDerived": false
+    },
+    {
+     "outcome": "Motor symptom change measured by MDS-UPDRS",
+     "measureKind": "CLINICIAN_REPORTED_OUTCOME",
+     "registeredPriority": "SECONDARY",
+     "endpointClass": "CLINICAL_OUTCOME",
+     "biomarkerCategory": null,
+     "surrogateLevel": null,
+     "patientImportantDerived": true
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "rows": 3,
+   "sample": [
+    {
+     "result": "hu:study-result:atlas-power-ua-vs-placebo-d120",
+     "analysisKind": "PRIMARY_PRESPECIFIED",
+     "comparisonKind": "BETWEEN_ARM",
+     "conclusion": "NOT_SIGNIFICANT",
+     "inputRole": "CONFIRMATORY",
+     "bellLabsInterpretation": "INCONCLUSIVE",
+     "nonPrimaryUsedAsConfirmatory": false
+    },
+    {
+     "result": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+     "analysisKind": "SECONDARY_PRESPECIFIED",
+     "comparisonKind": "BETWEEN_ARM",
+     "conclusion": "SIGNIFICANT_FAVORABLE",
+     "inputRole": "SUPPORTIVE",
+     "bellLabsInterpretation": null,
+     "nonPrimaryUsedAsConfirmatory": false
+    },
+    {
+     "result": "hu:study-result:atlas-synthetic-subgroup-low-vo2max",
+     "analysisKind": "SUBGROUP_POST_HOC",
+     "comparisonKind": "BETWEEN_ARM",
+     "conclusion": "SIGNIFICANT_FAVORABLE",
+     "inputRole": "HYPOTHESIS_GENERATING",
+     "bellLabsInterpretation": null,
+     "nonPrimaryUsedAsConfirmatory": false
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "rows": 1,
+   "sample": [
+    {
+     "result": "hu:study-result:atlas-6mwt-ua-vs-placebo",
+     "authorsSayMeaningful": true,
+     "captureStatus": "ACCEPTED",
+     "bellLabsVerdict": "UNDETERMINED",
+     "threshold": null,
+     "thresholdSource": null
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "rows": 2,
+   "sample": [
+    {
+     "claim": "Vitamin D supplementation reduces the risk of acute respiratory infection",
+     "fromVerdict": "SUPPORTED",
+     "toVerdict": "SUPPORTED",
+     "criterion": "SYSTEMATIC_REVIEW_UPDATE",
+     "effect": "WEAKENED",
+     "trigger": "hu:publication:pmid-33798465",
+     "publishedAt": {
+      "year": 2021,
+      "month": 3,
+      "day": 30
+     },
+     "recordedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 2,
+      "minute": 11,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "provenance": [
+      "hu:locator:pmid33798465-abstract-pooled-or"
+     ]
+    },
+    {
+     "claim": "Vitamin D supplementation reduces the risk of acute respiratory infection",
+     "fromVerdict": "SUPPORTED",
+     "toVerdict": "INSUFFICIENT",
+     "criterion": "POOLED_ESTIMATE_CI_INCLUDES_NULL",
+     "effect": "WEAKENED",
+     "trigger": "hu:publication:pmid-39993397",
+     "publishedAt": {
+      "year": 2025,
+      "month": 2,
+      "day": 21
+     },
+     "recordedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 2,
+      "minute": 12,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "provenance": [
+      "hu:locator:pmc12056739-interpretation",
+      "hu:locator:pmc12056739-findings-pooled-or"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 10,
+   "rows": 2,
+   "sample": [
+    {
+     "version": "hu:synthesis:w10-vitamin-d-ari-prevention-v2",
+     "recordedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 2,
+      "minute": 11,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "evidencePublishedAt": {
+      "year": 2021,
+      "month": 3,
+      "day": 30
+     },
+     "criterion": "SYSTEMATIC_REVIEW_UPDATE",
+     "effect": "WEAKENED"
+    },
+    {
+     "version": "hu:synthesis:w10-vitamin-d-ari-prevention-v3",
+     "recordedAt": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 2,
+      "minute": 12,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "evidencePublishedAt": {
+      "year": 2025,
+      "month": 2,
+      "day": 21
+     },
+     "criterion": "POOLED_ESTIMATE_CI_INCLUDES_NULL",
+     "effect": "WEAKENED"
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "rows": 1,
+   "sample": [
+    {
+     "claim": "Vitamin D supplementation reduces the risk of acute respiratory infection",
+     "currentVersion": "hu:synthesis:w10-vitamin-d-ari-prevention-v3",
+     "verdict": "INSUFFICIENT",
+     "method": "synthesis-v0.1",
+     "scheme": "GRADE",
+     "level": "moderate",
+     "criteria": [
+      "publication bias suspected: funnel plot left-sided asymmetry (Egger p=0.0020)"
+     ],
+     "strengthMethod": "grade-as-reported-by-review-v0"
+    }
+   ]
+  },
+  {
+   "n": 12,
+   "rows": 2,
+   "sample": [
+    {
+     "asOf": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 2,
+      "minute": 11,
+      "second": 30,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "version": "hu:synthesis:w10-vitamin-d-ari-prevention-v2",
+     "verdict": "SUPPORTED",
+     "cutoff": {
+      "year": 2021,
+      "month": 3,
+      "day": 30
+     }
+    },
+    {
+     "asOf": {
+      "year": 2026,
+      "month": 10,
+      "day": 4,
+      "hour": 3,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "version": "hu:synthesis:w10-vitamin-d-ari-prevention-v3",
+     "verdict": "INSUFFICIENT",
+     "cutoff": {
+      "year": 2025,
+      "month": 2,
+      "day": 21
+     }
+    }
+   ]
+  },
+  {
+   "n": 13,
+   "rows": 2,
+   "sample": [
+    {
+     "input": "hu:assertion:w10-pmid39993397-pooled-or-any-ari",
+     "inputRecordKind": "Assertion",
+     "predicate": "REPORTS_POOLED_ESTIMATE",
+     "pooledOR": 0.94,
+     "role": "CONFIRMATORY",
+     "sourceSpan": "For the primary comparison of any vitamin D versus placebo, the intervention did not statistically significantly affect overall ARI risk (OR 0\u00b794 [95% CI 0\u00b788\u20131\u00b700], p=0\u00b7057; 40 studies; 61 589 participants;=26\u00b74%).",
+     "verdictRecordKind": "EvidenceAssessment"
+    },
+    {
+     "input": "hu:assertion:w10-pmid39993397-subgroup-age-1-15-or",
+     "inputRecordKind": "Assertion",
+     "predicate": "REPORTS_POOLED_ESTIMATE",
+     "pooledOR": 0.74,
+     "role": "HYPOTHESIS_GENERATING",
+     "sourceSpan": "A statistically significant protective effect of vitamin D was seen for participants aged 1\u201315 years (OR 0\u00b774 [95% CI 0\u00b760\u20130\u00b792]; 11 944 participants in 16 studies)",
+     "verdictRecordKind": "EvidenceAssessment"
+    }
+   ]
+  },
+  {
+   "n": 14,
+   "rows": 1,
+   "sample": [
+    {
+     "assessment": "hu:applicability:elhassan-muscle-naad-to-basis-current",
+     "mechanismPredicate": "INCREASES_LEVEL_OF",
+     "basisKind": "DIRECT_MEASUREMENT",
+     "exposure": "UNKNOWN",
+     "evidenceValue": 1000,
+     "targetValue": 250,
+     "ratio": null,
+     "missingFacts": [
+      "human muscle exposure data for Elysium NR-E at the Basis dose",
+      "servings per day",
+      "mass basis of the 1 g dose"
+     ],
+     "humanExposureResultsLinked": 0
+    }
+   ]
+  },
+  {
+   "n": 15,
+   "rows": 4,
+   "sample": [
+    {
+     "applicability": "hu:applicability:elhassan-muscle-naad-to-basis-current",
+     "evidenceTargetKind": "Assertion",
+     "evidenceTarget": "hu:assertion:elhassan-nr-increases-naad-muscle",
+     "superseded": false,
+     "directStudyEdges": 0
+    },
+    {
+     "applicability": "hu:applicability:nct02678611-1x-to-basis-current",
+     "evidenceTargetKind": "StudyIntervention",
+     "evidenceTarget": "hu:study-intervention:nct02678611-nrpt-1x",
+     "superseded": true,
+     "directStudyEdges": 0
+    },
+    {
+     "applicability": "hu:applicability:nct02712593-300-to-basis-current",
+     "evidenceTargetKind": "StudyIntervention",
+     "evidenceTarget": "hu:study-intervention:nct02712593-niagen-300",
+     "superseded": false,
+     "directStudyEdges": 0
+    },
+    {
+     "applicability": "hu:applicability:w10-nct02678611-1x-to-basis-current-v2",
+     "evidenceTargetKind": "StudyIntervention",
+     "evidenceTarget": "hu:study-intervention:nct02678611-nrpt-1x",
+     "superseded": false,
+     "directStudyEdges": 0
+    }
+   ]
+  }
+ ]
+}

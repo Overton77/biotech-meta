@@ -1,0 +1,12 @@
+Source: https://www.accessdata.fda.gov/scripts/opdlisting/oopd/detailedIndex.cfm?cfgridkey=714319
+Captured: 2026-10-04 via Firecrawl scrape (markdown). COMPLETE for the record table.
+| Generic Name: | exagamglogene autotemcel |
+| Trade Name: | Casgevy |
+| Date Designated: | 04/28/2020 |
+| Orphan Designation: | Treatment of beta-thalassemia |
+| Orphan Designation Status: | Designated/Approved |
+| Sponsor: | Vertex Pharmaceuticals Inc. 50 Northern Avenue Boston, Massachusetts 02210 United States  (The sponsor address listed is the last reported by the sponsor to OOPD.) |
+Marketing approved:
+| 1 | Generic Name: exagamglogene autotemcel | Trade Name: Casgevy | Marketing Approval Date: 01/16/2024 | Approved Labeled Indication: treatment of patients aged 12 years and older with transfusion-dependent beta-thalassemia (TDT) | Exclusivity End Date: 01/16/2031 | Exclusivity Protected Indication*: treatment of patients aged 12 years and older with transfusion-dependent beta-thalassemia (TDT) |
+| 2 | Generic Name: exagamglogene autotemcel | Trade Name: Casgevy | Marketing Approval Date: 07/01/2026 | Approved Labeled Indication: treatment of patients aged 2 years and older with transfusion-dependent beta-thalassemia (TDT) | Exclusivity End Date: TBD |
+*Exclusivity Protected Indications are shown for approvals from 01/01/2013 to the present.

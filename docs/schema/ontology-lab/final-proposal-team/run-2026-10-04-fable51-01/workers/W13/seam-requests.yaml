@@ -1,0 +1,109 @@
+# W13 seam requests (Fable copies into 03-conflict-ledger.md and assigns a resolver). Evidence ids refer to 03-source-manifest.md.
+- id: W13-SR-01
+  targetOwner: W00
+  request: "Fix the value convention for every `jurisdiction` String (Assertion, RegulatoryStatus, Identifier, LabelSnapshot, FormulationVersion partitions): ISO 3166-1 alpha-2 for countries; ISO 3166-2 subdivision codes where coverage is sub-national; the reserved code EU for the European Union; one registered composite code for Great Britain (proposed GB-GBN, ISO 3166-2:GB entry to be verified); 'UK' and bare 'GB' forbidden where the source names constituent coverage."
+  cq: [CQ-MF-C03, CQ-MF-02, CQ-AX-23]
+  failingCase: "FSA register NOVEL-96 (S16) 'Applies in: England, Scotland, Wales'; EU 2020/16 (S15) applies in the EU. Coding the GB entry as 'GB' (ISO 3166-1 = whole UK) wrongly asserts Northern Ireland coverage; fixture w13-jurisdiction-and-pending-values.cypher, query Q-MF-C03 returns GB-NIR NOT_RECORDED only because the code is subdivision-aware."
+  proposedRuling: "Adopt the convention as a conventions.jurisdictionCode entry; keep the field a String; validator checks values against a registered list."
+- id: W13-SR-02
+  targetOwner: W00
+  request: "Register uid tokens: RegulatoryAgency -> org (as LegalEntity); OrphanDesignation and DrugApproval -> regulatory-status; register the existing fixture aliases as primary-label tokens: RegulatoryPathway -> reg-pathway, RegulatorySubmission -> reg-submission, RegulatoryResponse -> reg-response. Production RegulatoryStatus keeps regulatory-status (reg-status stays a fixture alias)."
+  cq: [CQ-MF-02]
+  failingCase: "catalog conventions.uidTypeTokens has RegulatoryStatus: regulatory-status but no primary-label token for the other W13 types; INV-106 cannot be checked for hu:org:us-fda carrying the RegulatoryAgency label, nor for OrphanDesignation uids."
+  proposedRuling: "Accept as listed."
+- id: W13-SR-03
+  targetOwner: W00
+  request: "Enum coordination for non-US premarket authorisations: add PathwayKind NOVEL_FOOD_AUTHORISATION and RegulatoryResponseKind NOVEL_FOOD_AUTHORISED (per-pathway list NOVEL_FOOD_AUTHORISATION -> [NOVEL_FOOD_AUTHORISED]); add NOVEL_FOOD_AUTHORISED to the V-336 approving set; decide whether the resulting status kind is APPROVAL (W13 recommendation, jurisdiction-qualified, scopeText mandatory in answers) or a new kind AUTHORIZATION."
+  cq: [CQ-MF-C03, CQ-MF-02, CQ-AX-23]
+  failingCase: "Commission Implementing Regulation (EU) 2020/16 (S15) places NR chloride on the Union list ('Authorised on 20 February 2020', food supplements 300 mg/day adults). With catalog values the EU status either misuses the NDA response kind APPROVED or fails V-336; executed: V-336 rows for hu:regulatory-status:eu-nrc-novel-food and gb-nrc-novel-food; V-W13-02 and V-W13-03 rows for the proposed values."
+  proposedRuling: "Add the two values; keep APPROVAL as the status kind with jurisdiction EU / GB-GBN; extend V-336 and V-W13-03. Unresolved alternative: AUTHORIZATION status kind (would also need V-320 updates)."
+- id: W13-SR-04
+  targetOwner: W00
+  request: "Register new uid tokens: reg-pathway-version (RegulatoryPathwayVersion), reg-step (RegulatoryStep), regulatory-inspection (RegulatoryInspection, candidate). W02 is asked separately for the MaterialMixture token (fixtures use 'mixture')."
+  cq: [CQ-MF-C02, CQ-MF-C01]
+  failingCase: "fixtures w13-regulatory-kinds.cypher and w13-inspection.cypher need these tokens; without them INV-106 fails."
+  proposedRuling: "Accept."
+- id: W13-SR-05
+  targetOwner: W00
+  request: "Add predicateExclusivity HAS_PATHWAY_VERSION: {mode: EXCLUSIVE, scope: subject} (TM-R5 declaration list) and the bitemporal_attachment profile for HAS_PATHWAY_VERSION (StateEpisodeProperties; assertionUid expected)."
+  cq: [CQ-MF-C02]
+  failingCase: "Two current HAS_PATHWAY_VERSION episodes of the GRAS program overlapping in valid time (fixture N-14) make 'which basis governed on date D' ambiguous; executed V-W13-06 returns 2 rows."
+  proposedRuling: "Accept; V-W13-06 becomes the INV-505 check for this type."
+- id: W13-SR-06
+  targetOwner: W00
+  request: "Add RegulatoryResponseKind NDI_FILING_ACKNOWLEDGED to the NDI_NOTIFICATION list (procedural acknowledgment that sets or resets the filing date); add it to the V-320a non-approval list; a status may never RESULTS_FROM_RESPONSE it (new check V-W13-13 when ruled)."
+  cq: [CQ-MF-03, CQ-MF-02]
+  failingCase: "FDA letter dated 2018-03-07 for NDI 1062 (S3): 'acceptance of this notification for filing is a procedural matter, and thus, does not constitute a finding by FDA that the new dietary ingredient ... is safe'. The company lists 'FDA NDIN no objection ... March 07, 2018 ... NDI 1062' (S7). Without a procedural kind the filing letter is either forced into NDI_ACKNOWLEDGED_WITHOUT_OBJECTION (makes the company claim look supported) or dropped (the characterization has no agency record to be adjudicated against). S5 separates 'acknowledgement of receipt' from the 'response letter'."
+  proposedRuling: "Accept the value."
+- id: W13-SR-07
+  targetOwner: W00
+  request: "Register candidate assertedPredicates INSPECTION_PERIOD, INSPECTION_FOUND_VIOLATION, INSPECTION_CLASSIFIED_AS (valueString = NAI|VAI|OAI plus project area), and candidate forbidden implications [INSPECTION_CLASSIFIED_NAI, CGMP_COMPLIANT] and [NO_INSPECTION_RECORD, NOT_INSPECTED]; register HAS_PATHWAY_VERSION, UNDER_LEGAL_BASIS_VERSION, INSPECTED_FACILITY, CONDUCTED_BY in the catalog relationship list."
+  cq: [CQ-MF-C01, CQ-MF-06, CQ-MF-C02]
+  failingCase: "FDA Data Dashboard (S19): classification is per project area; 'FDA does not issue CGMP certificates at the conclusion of an inspection'; 'Not all inspections are included'. Warning letter CMS #698661 (S18) states two inspection end dates; executed Q-MF-06 returns CONFLICTING only because each statement is its own assertion."
+  proposedRuling: "Register as candidate predicates; the forbidden pairs enter V-W13-12."
+- id: W13-SR-08
+  targetOwner: W04
+  request: "Declare on Product: hasRegulatoryStatuses: [RegulatoryStatus!]! @relationship(type: \"HAS_REGULATORY_STATUS\", direction: OUT, properties: \"DerivedEdgeProperties\") @settable(onCreate: false, onUpdate: false) and followsRegulatoryPathways likewise with FOLLOWS_PATHWAY; guard status = APPROVED with V-322r; derive approvedYear (YEAR precision of the APPROVAL STATUS_OF validFrom), regulatoryAuthorizationId and primaryRegulatoryIdentifier from the submission Identifier; same for ProductSnapshot."
+  cq: [CQ-MF-02, CQ-AX-23]
+  failingCase: "Fixture N-07: Product.status = 'APPROVED' on Tru Niagen with an unbacked APPROVAL status passes catalog V-322 (executed: 0 rows) and fails V-322r (1 row)."
+  proposedRuling: "W04 writes the fields with these directives; W13 owns the relationship semantics and rules W13-DR-01/02."
+- id: W13-SR-09
+  targetOwner: W06
+  request: "Treatment.orphanDrugDesignation becomes a read-only text projection of an OrphanDesignation (indication, jurisdiction) and must not be read as approval; fulltext index keeps it as a lookup hint."
+  cq: [CQ-MF-02, CQ-AX-23]
+  failingCase: "OOPD record S10: 'Orphan Designation Status: Designated; FDA Orphan Approval Status: Not FDA Approved for Orphan Indication'."
+  proposedRuling: "Accept."
+- id: W13-SR-10
+  targetOwner: W01
+  request: "PhysicalLocation.establishmentIdentifier moves to an Identifier on the Facility plus a RegulatoryStatus{ESTABLISHMENT_REGISTRATION} STATUS_OF the Facility when a registration source exists; W01's Organization type will read RegulatoryAgency nodes (shared Organization label) and keeps organizationKind REGULATORY_AGENCY."
+  cq: [CQ-MF-06, CQ-PF-03]
+  failingCase: "Fixture N-02: registration attached to a Product fires V-323 and V-333r (executed)."
+  proposedRuling: "Accept."
+- id: W13-SR-11
+  targetOwner: W02
+  request: "Confirm MaterialMixture as the identity of a designated drug combination (e.g. 'nicotinamide riboside and pterostilbene', OOPD 628218) and register its uid token; Material.regulatoryCategoryHint becomes a RegulatoryStatus only from an agency source."
+  cq: [CQ-MF-02, CQ-PF-03]
+  failingCase: "S10 designates a two-substance combination; catalog DESIGNATION_FOR range (IngredientMaterial|StudyIntervention|Product) has no member for it; attaching to the Basis Product would assert a designation the record does not make."
+  proposedRuling: "Accept MaterialMixture in RegulatorySubjectTarget."
+- id: W13-SR-12
+  targetOwner: W07
+  request: "Confirm AssayVersion is the right grain for a laboratory-developed test as a regulatory subject (LDT enforcement discretion, LDT rule episodes)."
+  cq: [CQ-MF-C02, CQ-MF-02]
+  failingCase: "The catalog STATUS_OF range has AlgorithmVersion but no assay identity; an LDT status (synthetic fixture, three episodes across 89 FR 37286 and its vacatur) has no subject otherwise."
+  proposedRuling: "Accept AssayVersion in RegulatorySubjectTarget."
+- id: W13-SR-13
+  targetOwner: W12
+  request: "Consume RegulatoryInspection (candidate) and the inspection assertions; never derive CertificationListing or a quality pass from registration, inspection classification or a CLAIMS_CGMP_COMPLIANCE assertion."
+  cq: [CQ-MF-06]
+  failingCase: "Fixture N-13: CGMP_COMPLIANT inferred from registration and from the company claim fires V-W13-12 (executed, 2 rows)."
+  proposedRuling: "Accept."
+- id: W13-SR-14
+  targetOwner: W10
+  request: "Own CQ-PF-04 coverage matching: whether RegulatoryResponse.conditionsOfUseText (verbatim) covers a formulation's material form and dose is an EvidenceApplicability/UseContextProfile assessment, not a W13 field."
+  cq: [CQ-PF-04]
+  failingCase: "GRN 000635 conditions are food categories at 0.0057% by weight; a 300 mg/day capsule is outside; the EU entry is food supplements 300 mg/day. A boolean 'covers' on the response would be a calculation without a method."
+  proposedRuling: "Accept."
+- id: W13-SR-15
+  targetOwner: W00
+  request: "Revise catalog validators: V-322 -> V-322r (approving response and current episode), V-333 -> V-333r (count DISTINCT subjects; at most one current STATUS_OF episode), V-334 -> V-334r (compare current STATUS_OF episode with current HAS_PATHWAY_VERSION episode of the UNDER_LEGAL_BASIS_VERSION target); add V-W13-01..12."
+  cq: [CQ-MF-02, CQ-AX-23, CQ-MF-C02]
+  failingCase: "Executed on 5.26.31: V-333 fires on a valid status with two recorded-time STATUS_OF episodes (LDT ED v2); V-322 returns 0 rows for an APPROVED product whose only APPROVAL status lacks an approving response (N-07); V-334 cannot see a vacatur expressed as an episode bound."
+  proposedRuling: "Accept the r-revisions; keep the originals for one release as migration checks."
+- id: W13-SR-16
+  targetOwner: W00
+  request: "Record the runtime fact that @neo4j/graphql 7.6.3 reads DateTime fields through apoc.date.convertFormat; the embedded 5.26.31 Community harness has no APOC, so every GraphQL read selecting a DateTime fails ('Unknown function apoc.date.convertFormat'). Operations must install APOC core (Community-compatible) or the validation harness must add it."
+  cq: [CQ-TM-03]
+  failingCase: "fixtures/run-results/gql-roundtrip.mjs: queries selecting validFrom/validTo/startedAt fail; the same queries without DateTime fields succeed."
+  proposedRuling: "Fable adds APOC core to the deployment prerequisites and the harness."
+- id: W13-SR-17
+  targetOwner: W14
+  request: "The forbidden implication [PATENT_CLAIMS, PROVES_EFFICACY] in module regulatory_and_ip is guarded by W14, not W13."
+  cq: [CQ-EC-01]
+  failingCase: "W13 owns no patent type; without an explicit hand-off the pair has no validator owner."
+  proposedRuling: "W14 carries it."
+- id: W13-SR-18
+  targetOwner: W09
+  request: "StudyIntervention is a permitted OrphanDesignation/DrugApproval subject (catalog DESIGNATION_FOR/APPROVAL_FOR range); Study.fdaRegulatedDrug/fdaRegulatedDevice (RegistrationVersion) are registry flags, never a RegulatoryStatus."
+  cq: [CQ-MF-02]
+  failingCase: "A registry flag 'FDA regulated drug: yes' read as an FDA status would create approval-like answers for unapproved investigational products."
+  proposedRuling: "Accept."

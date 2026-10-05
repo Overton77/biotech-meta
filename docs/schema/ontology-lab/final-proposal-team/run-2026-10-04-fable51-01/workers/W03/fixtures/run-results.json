@@ -1,0 +1,629 @@
+{
+ "harness": "validation/harness run-cypher.mjs (statement per transaction); Neo4j 5.26.31 Community embedded (org.neo4j.test:neo4j-harness), fresh instance; params validation/validation-params.json",
+ "date": "2026-10-04",
+ "order": [
+  "pos: w03-positive, w03-projection-job (first), w03-projection-job (second, idempotence), w03-validation, neo4j/validation.cypher, w03-cq-queries",
+  "neg: w03-negative, w03-validation, neo4j/validation.cypher (on top of pos)"
+ ],
+ "runs": {
+  "neg-validation": {
+   "file": "neo4j/validation.cypher",
+   "total": 174,
+   "ok": 174,
+   "failed": 0,
+   "nonZero": [
+    {
+     "n": 4,
+     "id": "V-002",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 5,
+     "id": "V-003",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 28,
+     "id": "V-112",
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 34,
+     "id": "V-118",
+     "status": "ok",
+     "rows": 10,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 42,
+     "id": "V-203",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 43,
+     "id": "V-204",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 45,
+     "id": "V-206",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 50,
+     "id": "V-209",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 72,
+     "id": "V-232",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 73,
+     "id": "V-233",
+     "status": "ok",
+     "rows": 8,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 74,
+     "id": "V-234",
+     "status": "ok",
+     "rows": 3,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 76,
+     "id": "V-236",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 77,
+     "id": "V-237",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 79,
+     "id": "V-239",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 117,
+     "id": "V-401b",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 166,
+     "id": "V-514b",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 169,
+     "id": "V-522",
+     "status": "ok",
+     "rows": 10,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    }
+   ]
+  },
+  "neg-w03-negative": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-negative.cypher",
+   "total": 20,
+   "ok": 20,
+   "failed": 0,
+   "nonZero": "omitted (write statements)"
+  },
+  "neg-w03-validation": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-validation.cypher",
+   "total": 25,
+   "ok": 25,
+   "failed": 0,
+   "nonZero": [
+    {
+     "n": 1,
+     "id": "V-112",
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 4,
+     "id": "V-232",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 5,
+     "id": "V-233",
+     "status": "ok",
+     "rows": 8,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 6,
+     "id": "V-234",
+     "status": "ok",
+     "rows": 3,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 8,
+     "id": "V-236",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 9,
+     "id": "V-237",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 11,
+     "id": "V-239",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 12,
+     "id": "V-233r",
+     "status": "ok",
+     "rows": 3,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 13,
+     "id": "V-234r",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 14,
+     "id": "V-W03-01",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 16,
+     "id": "V-W03-03",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 17,
+     "id": "V-W03-04",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 18,
+     "id": "V-W03-05",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 19,
+     "id": "V-W03-06",
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 21,
+     "id": "V-W03-08",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 22,
+     "id": "V-W03-09",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 23,
+     "id": "V-W03-10",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    }
+   ]
+  },
+  "pos-validation": {
+   "file": "neo4j/validation.cypher",
+   "total": 174,
+   "ok": 174,
+   "failed": 0,
+   "nonZero": [
+    {
+     "n": 34,
+     "id": "V-118",
+     "status": "ok",
+     "rows": 9,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 73,
+     "id": "V-233",
+     "status": "ok",
+     "rows": 4,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 74,
+     "id": "V-234",
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 117,
+     "id": "V-401b",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 166,
+     "id": "V-514b",
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    }
+   ]
+  },
+  "pos-w03-cq-queries": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-cq-queries.cypher",
+   "total": 11,
+   "ok": 11,
+   "failed": 0,
+   "nonZero": [
+    {
+     "n": 1,
+     "id": null,
+     "status": "ok",
+     "rows": 4,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 2,
+     "id": null,
+     "status": "ok",
+     "rows": 10,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 3,
+     "id": null,
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 4,
+     "id": null,
+     "status": "ok",
+     "rows": 5,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 5,
+     "id": "V-203",
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 6,
+     "id": null,
+     "status": "ok",
+     "rows": 6,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 7,
+     "id": null,
+     "status": "ok",
+     "rows": 6,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 8,
+     "id": null,
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 9,
+     "id": null,
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 10,
+     "id": null,
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 11,
+     "id": null,
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    }
+   ]
+  },
+  "pos-w03-positive": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-positive.cypher",
+   "total": 295,
+   "ok": 295,
+   "failed": 0,
+   "nonZero": "omitted (write statements)"
+  },
+  "pos-w03-projection-job-first": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-projection-job.cypher",
+   "total": 7,
+   "ok": 7,
+   "failed": 0,
+   "nonZero": [
+    {
+     "n": 2,
+     "id": null,
+     "status": "ok",
+     "rows": 0,
+     "relsCreated": 2,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 4,
+     "id": "V-234r",
+     "status": "ok",
+     "rows": 0,
+     "relsCreated": 2,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 5,
+     "id": null,
+     "status": "ok",
+     "rows": 0,
+     "relsCreated": 2,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 7,
+     "id": null,
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    }
+   ]
+  },
+  "pos-w03-projection-job": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-projection-job.cypher",
+   "total": 7,
+   "ok": 7,
+   "failed": 0,
+   "nonZero": [
+    {
+     "n": 1,
+     "id": null,
+     "status": "ok",
+     "rows": 0,
+     "relsCreated": 0,
+     "relsDeleted": 6,
+     "error": null
+    },
+    {
+     "n": 2,
+     "id": null,
+     "status": "ok",
+     "rows": 0,
+     "relsCreated": 2,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 4,
+     "id": "V-234r",
+     "status": "ok",
+     "rows": 0,
+     "relsCreated": 2,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 5,
+     "id": null,
+     "status": "ok",
+     "rows": 0,
+     "relsCreated": 2,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 7,
+     "id": null,
+     "status": "ok",
+     "rows": 1,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    }
+   ]
+  },
+  "pos-w03-validation": {
+   "file": "ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W03/fixtures/w03-validation.cypher",
+   "total": 25,
+   "ok": 25,
+   "failed": 0,
+   "nonZero": [
+    {
+     "n": 5,
+     "id": "V-233",
+     "status": "ok",
+     "rows": 4,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    },
+    {
+     "n": 6,
+     "id": "V-234",
+     "status": "ok",
+     "rows": 2,
+     "relsCreated": 0,
+     "relsDeleted": 0,
+     "error": null
+    }
+   ]
+  }
+ }
+}

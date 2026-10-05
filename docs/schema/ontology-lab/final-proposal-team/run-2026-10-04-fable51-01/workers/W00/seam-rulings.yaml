@@ -1,0 +1,1398 @@
+reconciliation: W00 seam rulings, Wave 4 reconciliation pass, run-2026-10-04-fable51-01
+window: 2026-10-04T01:50:08Z - (see 08-completion-report.md, Reconciliation pass)
+inputs: validation/inventories/seam-requests-consolidated.json (132 W00-targeted of 337), every workers/W*/seam-requests.yaml and 05-decision-seam-ledger.md
+  present at 01:50Z and at the final re-scan, plus W00-SR items Fable named
+rule: A request without a failing case or a primary source is DEFERRED; when two requests conflict the ruling names the loser and its fallback. The frozen
+  contract text is unchanged; Fable carries accepted contract changes into the decision report.
+counts:
+  ACCEPTED: 149
+  REJECTED: 2
+  ACCEPTED_AS_CANDIDATE: 13
+total: 164
+themes:
+- rulingId: W00-R-01
+  theme: uid tokens
+  ruling: 'One token per primary label, collected in uid-token-registry.yaml (190 labels: 47 catalog 0.2.0 label keys kept unchanged, 143 added or confirmed).
+    Refinement specializations (a node may gain the label later) use the parent token (T2: LegalEntity, RegulatoryAgency, TestingLaboratory -> org; IngredientMaterial
+    subtypes and FoodItem -> material; Organ -> anatomical-context; LabelSnapshot -> snapshot; DrugApproval, OrphanDesignation -> regulatory-status). Creation-time
+    kinds may carry their own token (T3: Document, ClaimOccurrence, AdverseEventResult, CohortParticipant, SourceDiscoveryRecord, TradeItemIdentifier).
+    Collisions: platform = W21 Platform, TechnologyPlatform = technology-platform (W08 yields, as W08 proposed); outcome = W03 Outcome, OutcomeDefinition
+    = outcome-definition; SpecificationCriterion = spec-criterion (owner W12 over W11 suggestion; W11 fallback: migrate). experience-report rejected (type
+    retired). 3 merged-fragment labels still have no token (W21 ClaimEvidenceAssessment, ConflictRelevanceAssessment, RetellingFidelityAssessment; their
+    nodes pass through the EvidenceAssessment token assessment); V-W00-16 reports unregistered tokens.'
+  artifacts: uid-token-registry.yaml; V-W00-16; fixtures/validation-params-w00.json uidTypeTokens
+- rulingId: W00-R-02
+  theme: 'QUANTITY assertions: object plus quantity'
+  ruling: 'For predicateClass QUANTITY only, an Assertion may carry one HAS_OBJECT plus one numeric literal (valueNumber + unitCode, with quantityBasis,
+    massBasis, amountReferent); objects + literals >= 1 and valueString/valueBoolean never ride with an object. Every other class keeps INV-003 literal-xor-object.
+    Failing cases: W02 fx-91 (two literal-only CALCULATED amounts, refersTo null), W04 w04-03 (component -> NR cation 263.42 mg fails V-003), W07-SR-13
+    (CHANGED_BETWEEN delta). W01-SR-22 (stake) is COMMERCIAL and keeps its workaround; the QUANTITY route is its future path. W04 literal-only fallback
+    stays valid.'
+  artifacts: V-003r; fixture 13 P2/N2; predicate-registry.yaml
+- rulingId: W00-R-03
+  theme: Qualifiers of asserted edges
+  ruling: 'An asserted edge qualifier (W09 analysisRole, asReportedName, armRole; IdentifierLinkProperties.isPrimary) is stored on the authorizing Assertion
+    under the edge property name, typed by the owner, copied to the edge and covered by contentHash. Generic key/value string lists on Assertion (W09 option
+    a) are rejected: untyped and outside the owners'' enums. Failing case W09 fixtures/03 (analysisRole in valueString -> V-003 rows).'
+  artifacts: V-505r QUALIFIER_DIFFERS:<key>; V-505i (informational); fixture 13 P5/N5
+- rulingId: W00-R-04
+  theme: uid for API creates
+  ruling: 'Contract B2 keeps id: ID! @id. Every create of a uid-identified record goes through the ingestion service, which mints the opaque id, writes
+    uid = hu:<token>: + id and MERGEs on uid inside the write-guarded transaction (07-operations.md G0-G6). GraphQL create mutations for these types are
+    not exposed by the deployed API (application-enforced); updates stay limited by @settable. Alternative (b), a client-supplied id without @id, is recorded
+    and not adopted because it changes the frozen B2 skeleton for every type. Failing cases: W00 T5a, W12 round trip (random id, V-117 row).'
+  artifacts: 10-kernel-operations-delta.md section 5
+- rulingId: W00-R-05
+  theme: uid/id on the archetype interfaces
+  ruling: 'uid: String! and id: ID! added to AssertionArchetype and EvidenceAssessmentArchetype. Failing case W23 checks/roundtrip-variant-a-contract-B3.json
+    ("uid is not defined by type EvidenceAssessmentArchetypeWhere"). Every implementer already has both through Entity, so the merged schema builds. The
+    other four archetype interfaces are unchanged (no failing case).'
+  artifacts: sdl-fragment.graphql
+- rulingId: W00-R-06
+  theme: privacyClass stored casing
+  ruling: Stored values are the GraphQL enum names PUBLIC and INTERNAL; any other stored value (public, internal, private-personal, PRIVATE_PERSONAL, synthetic)
+    is a violation; private data never enters the shared graph (D-012). Lower-case values are migrated (public -> PUBLIC, internal -> INTERNAL; synthetic
+    -> INTERNAL (fixture data is never public); private-personal -> removed from the shared graph). Requests W16-SR-04, W23-SR-08, W07-SR-15.
+  artifacts: V-313r, V-521r (absorbs V-W23-09, V-W23-10); 10-kernel-operations-delta.md section 2
+- rulingId: W00-R-07
+  theme: Predicate registrations, exclusivity, forbidden implications
+  ruling: 'Collected in predicate-registry.yaml with predicateClass and owner module: REGISTERED when a failing case exists, CANDIDATE otherwise usable,
+    DEFERRED without failing case or owner. predicateExclusivity gains STRAIN_OF, HAS_PATHWAY_VERSION (EXCLUSIVE per subject) and HAS_CAPABILITY_STATE,
+    GOVERNED_BY_SPECIFICATION (EXCLUSIVE with partitionByPath, enforced by the ingestion service and audited by W11 validators); IP_STATUS_OF stays NONEXCLUSIVE.
+    32 implication pairs added (W09, W10, W12, W13, W14, W15, W17, W22); pairs whose conclusion is a structural type ([DEPICTS, SUPPORTED_BY]) stay out
+    of the V-112 parameter.'
+  artifacts: predicate-registry.yaml; validation-params-w00.json
+- rulingId: W00-R-08
+  theme: SourceKind values
+  ruling: 'Kernel enum. Added: TRIAL_REGISTRY_RECORD, BIBLIOGRAPHIC_RECORD, NEWS_ARTICLE, LEGISLATION_OR_REGULATION, PRESENTATION_SLIDES, PERSONAL_WEBPAGE,
+    TECHNICAL_DOCUMENTATION, LABORATORY_REPORT, REINSTATEMENT_NOTICE, PODCAST_FEED, EVENT_TRANSCRIPT, MEDIA_FILE, MEDIA_REPOSITORY_RECORD, DATA_REPOSITORY_RECORD,
+    OTHER (with Source.sourceKindNote, V-W00-17), and CANDIDATE BLOG_OR_REVIEW_PAGE, STOREFRONT_STRUCTURED_DATA. Conflict W09 BIBLIOGRAPHIC_DATABASE_RECORD
+    vs W19 BIBLIOGRAPHIC_RECORD: W19 wins (registry owner; one value for every bibliographic database); W09 fallback: use BIBLIOGRAPHIC_RECORD. Revision
+    states are never kinds; notices are documents, so REINSTATEMENT_NOTICE joins the existing notice kinds.'
+  artifacts: sdl-fragment.graphql (Fable carries into B5)
+- rulingId: W00-R-09
+  theme: ActivityKind values
+  ruling: Kernel enum. Added CALCULATION (W02-SR-04), DISCOVERY (W19-SR-03), MEDIA_GENERATION, MEDIA_TRANSFORMATION, MEDIA_ASSESSMENT (W22-SR-04). Each
+    has a failing case.
+  artifacts: sdl-fragment.graphql
+- rulingId: W00-R-10
+  theme: UseKind and RelevanceBasis values
+  ruling: 'UseKind DISPLAY_MEDIA (W22-SR-02 and W23-SR-15 ask for the same use; W22 name wins because it covers pages and exports, not only answers; W23
+    fallback: none, PolicyVersion.permittedUseKinds follows UseKind). QUOTE_IN_ANSWER never covers images. DERIVE_MEDIA DEFERRED to W23 (no failing case).
+    RelevanceBasis SAME_SERVICE_CATEGORY (W21-SR-14, fx03).'
+  artifacts: sdl-fragment.graphql
+- rulingId: W00-R-11
+  theme: Identity-merge redirect
+  ruling: 'Contract A2 redirect = an EquivalenceAssessment with equivalenceKind SAME_IDENTITY_MERGED plus survivingUid and retiredUid (both its two COMPARES_IDENTITIES
+    targets). The retired node stays (maturity DEPRECATED); a held uid resolves through the latest ACCEPTED redirect recorded at or before the viewpoint;
+    private records are never rewritten; re-stated assertions use SUPERSEDES {DUPLICATE_MERGE}. Conflict: W00-SR-05 proposed redirectToUid on the retired
+    node; W23-SR-06 proposed fields on the record. W23 shape wins (immutable, carries recordedAt); W00 names the kind (W23 fallback: equivalenceKind replaces
+    its redirectKind field).'
+  artifacts: sdl-fragment.graphql; V-432r; V-W00-13; fixture 13 Q13-a
+- rulingId: W00-R-12
+  theme: massBasis and amountReferent on AssertionArchetype
+  ruling: 'Added to the interface (contract A11 makes them mandatory qualifiers). Merged-build check: ClaimOccurrence and RelationshipAssertion (W21) already
+    carry them; ContraindicationAssertion and InteractionAssertion (W17) must add two nullable fields; with that addition the merged schema builds (Neo4jGraphQL
+    7.6.3 BUILD OK).'
+  artifacts: sdl-fragment.graphql; 10-kernel-operations-delta.md section 6
+- rulingId: W00-R-13
+  theme: Point-in-time statements and the as-of ladder
+  ruling: Assertion.statedAsOf + statedAsOfPrecision record a source-stated witness instant ("as of April 25, 2025"); bounds stay null with UNKNOWN basis.
+    QS-W00-P gains KNOWN_AT_WITNESS (V inside the witness precision period). Open-end witness = coalesce(publishedAt, observedAt) for PRESENT or null statedTense
+    (W01-SR-08). The precision-aware ladder replaces raw-bound QS-2a/2b (W01-SR-04). Not copied onto edges (B4 frozen; readers join by assertionUid).
+  artifacts: sdl-fragment.graphql; V-503r; fixture 13 Q13-b
+- rulingId: W00-R-14
+  theme: Source and Document stored names
+  ruling: 'Source.name reads the stored title (@alias(property: "title")) and the separate Source.title field is removed, so a :Document:Source node shows
+    one title through both types (W20-SR-08 failing case N13/N14). Document writes canonicalUri equal to url (W20-V05) and dual-writes id = documentId (W00-SR-03).
+    Contract B2 alias list gains Source.name -> title (Fable).'
+  artifacts: sdl-fragment.graphql
+- rulingId: W00-R-15
+  theme: renditionCoverage and canonicalUri
+  ruling: 'Already adopted in the first pass and confirmed: Source.renditionCoverage (CANDIDATE), canonicalUri = post-redirect retrieval endpoint, never
+    a resolver; V-235 joins by RENDITION_OF; QS-7 requires a COMPLETE capture of a FULL rendition.'
+  artifacts: V-235r; V-W00-19
+- rulingId: W00-R-16
+  theme: HAS_SNAPSHOT vs HAS_STATE
+  ruling: HAS_SNAPSHOT means Source -> SourceSnapshot only. Entity state caches (Organization -> OrganizationSnapshot, Product -> ProductSnapshot, MerchantListing
+    -> ListingSnapshot) use HAS_STATE with StateEpisodeProperties; the stored relabel runs at migration; GraphQL field names stay. W04 preferred keeping
+    a read-only legacy name; overruled because a label-free capture traversal cannot be guarded.
+  artifacts: V-W00-15; 10-kernel-operations-delta.md
+- rulingId: W00-R-17
+  theme: EVALUATES vs LEGACY_EVALUATES
+  ruling: EVALUATES means Adjudication -> Assertion only. The legacy Study -> intervention edge is stored as LEGACY_EVALUATES (W09-SR-13), read through
+    Study.evaluates.
+  artifacts: V-W00-15; 10-kernel-operations-delta.md
+- rulingId: W00-R-18
+  theme: PROV relationship ranges
+  ruling: WAS_GENERATED_BY domain adds Segmentation, AnswerRecord, MediaAsset, MediaVariant, MediaAnnotation, PriceObservation, Offer, AffiliateLink (MediaSuitabilityAssessment
+    is already an EvidenceAssessment); USED range adds MediaAsset, MediaVariant, MediaAnnotation. USED -> MediaRightsRecord DEFERRED (conditional request,
+    no failing case).
+  artifacts: sdl-fragment.graphql Activity fields
+- rulingId: W00-R-19
+  theme: MENTIONS split
+  ruling: 'Kernel MENTIONS stays SourceLocator -> Mention (structural). Entity-level retrieval links from Chunk, Episode, ProtocolResult and ProductLabelRegion
+    are MENTIONS_ENTITY (derived, ruleOnly, RetrievalEdgeProperties, W20 sole writer). W20 preferred one name split by start label; the rename wins because
+    label-free counts and traversals cannot be guarded (W21-SR-10). W20/W21/W16 fallback: keep their GraphQL field names (mentions) with the new type.'
+  artifacts: V-W00-15; predicate-registry.yaml
+- rulingId: W00-R-20
+  theme: IDENTIFIED_BY vs HAS_IDENTIFIER
+  ruling: 'One meaning, one type: IDENTIFIED_BY is relabelled HAS_IDENTIFIER (IdentifierLinkProperties, asserted) at migration; W04 and W15 keep tradeItemIdentifiers
+    fields (target TradeItemIdentifier) with type HAS_IDENTIFIER; IDENTIFIED_BY leaves $assertedTypes.'
+  artifacts: V-W00-15; validation-params-w00.json
+- rulingId: W00-R-21
+  theme: AssertionSubjectTarget membership
+  ruling: 'MR-01 and MR-02 applied: dropped Association, FoodProduct, ExperienceReport, MediaSource (retired), Organ, LabelSnapshot, FoodItem (specializations),
+    SafetySignal and NarrativeArc (now EvidenceAssessment archetype, moved to SupportedRecordTarget). Added FirmwareVersion (W08), IpRightStatus (W14),
+    MediaRightsRecord (W22), RegulatoryPathwayVersion and RegulatoryInspection (W13), UseConstraint (completeness). prune-unions over the merged fragments
+    now reports no W00 change.'
+  artifacts: sdl-fragment.graphql
+- rulingId: W00-R-22
+  theme: SupportedRecordTarget and SUPPORTED_BY domain
+  ruling: 'Adds captured-record types that report what a source said: StudyResult, RegistrationVersion, ProtocolVersion (W09-SR-03), MeasuredResult, LotTestSummary,
+    CertificateOfAnalysis (W12-SR-02), PriceObservation, AffiliateLink (W15-SR-09), and every EvidenceAssessment-archetype type of the merge (SafetySignal,
+    NarrativeArc, EventImpactAssessment, MediaSuitabilityAssessment, SourceAuthorityAssessment). Assertion covers ClaimOccurrence, RelationshipAssertion,
+    ContraindicationAssertion, InteractionAssertion (MR-01).'
+  artifacts: sdl-fragment.graphql
+- rulingId: W00-R-23
+  theme: ruleOnly derived types and V-112
+  ruling: 'ruleOnly: RESOLVES_TO_CHUNK, HAS_CHUNK, CHUNK_IN_SEGMENT, ABOUT, MENTIONS_ENTITY (W20-SR-01; the chunk use of OCCURS_IN_SEGMENT is renamed CHUNK_IN_SEGMENT
+    because W21 OCCURS_IN_SEGMENT is structural, executed failing case: 7 V-112r NO_CITATION rows on W21 fixtures), HAS_CURRENT_PROTOCOL_STEP (W16-SR-06),
+    COMPARED_TO for the same-version clause only (W07-SR-10). SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT need inputs. V-112r reads the hypothesis citation
+    from derivedFromAssessmentUids and flags RULE_ONLY_ACROSS_VERSIONS.'
+  artifacts: V-112r; validation-params-w00.json
+- rulingId: W00-R-24
+  theme: Normalization versions and offsets
+  ruling: IMG-PX1 (W22-SR-05) registered for IMAGE_REGION; W00-SR-10 IMG-REL-XYWH-1 withdrawn (W22 owns the geometry; locators are bound to one raster).
+    LIG-HY1 registered as matching-only (CANDIDATE; never for quoteHash; NFKC rejected). Offsets count code points of DocumentTextVersion.text as stored
+    (W20-SR-19).
+  artifacts: fixture 10
+- rulingId: W00-R-25
+  theme: Derived RECOMMENDS
+  ruling: 'RECOMMENDS is derived in rule mode: derivationRule + exactly one derivedFromAssertionUids whose assertion has speechAct RECOMMENDS, is asserted
+    by the start node and names the end node; never assertionUid or projectionOfAssertionUid (answers the W05 ledger question). A legacy assertionUid is
+    accepted by V-423r only as a migration fallback and reported by V-W00-02r.'
+  artifacts: V-423r; V-W00-02r
+- rulingId: W00-R-26
+  theme: Mechanism projections in rule mode
+  ruling: Mechanism projections cite inputs through derivationRule mx-proj/v1 + derivedFromAssertionUids (or a 1:1 projectionOfAssertionUid); V-233r/V-234r
+    replace V-233/V-234 (W03-SR-01).
+  artifacts: V-233r, V-234r
+- rulingId: W00-R-27
+  theme: Field-level privacy on kernel types
+  ruling: Adopted as W23-SR-10 lists; recorded in the fragment banner; W23 owns the closure table.
+  artifacts: sdl-fragment.graphql banner
+- rulingId: W00-R-28
+  theme: Runtime prerequisite APOC
+  ruling: APOC Core 5.26.31 (with apoc-common) is a runtime prerequisite of @neo4j/graphql 7.6.3 for DateTime reads (W00-SR-14, W12-SR-11, W13-SR-16, W15-SR-16).
+  artifacts: 10-kernel-operations-delta.md section 4
+- rulingId: W00-R-29
+  theme: Provenance reading rules without schema change
+  ruling: No automatic SUPPORTED_BY join through REANCHORS (W20-SR-06); quoteHash range index and computed cross-rendition join (W20-SR-07); DELIMITED_BY
+    is a W21 structural relationship (W21-SR-03); RENDITION_TEXT_DISAGREES trace gap (W21-SR-21).
+  artifacts: 10-kernel-operations-delta.md
+- rulingId: W00-R-30
+  theme: observedInContext
+  ruling: Assertion.observedInContext confirmed; DERIVED_FROM_ASSERTION also carries premises of INFERRED_FROM_MEASUREMENT assertions (W03-SR-02).
+  artifacts: sdl-fragment.graphql
+- rulingId: W00-R-31
+  theme: Content clock for REANCHORS and revisions
+  ruling: V-409r and V-512r order by coalesce(observedAt, retrievedAt); a cache hit records observedAt = cache time (W19-SR-15).
+  artifacts: V-409r, V-512r
+- rulingId: W00-R-32
+  theme: V-432 relationship name
+  ruling: V-432r matches COMPARES_IDENTITIES and checks the redirect fields.
+  artifacts: V-432r
+- rulingId: W00-R-33
+  theme: V-006 ranges
+  ruling: V-006r = V-W02-10.
+  artifacts: V-006r
+- rulingId: W00-R-34
+  theme: W09 validator corrections
+  ruling: V-211r, V-215r, V-217r + V-217i, V-221r adopted.
+  artifacts: validation-corrections.cypher
+- rulingId: W00-R-35
+  theme: W07 validator corrections
+  ruling: V-302r, V-303r, V-304r, V-305c adopted; V-314..V-318 by reference.
+  artifacts: validation-corrections.cypher
+- rulingId: W00-R-36
+  theme: W13 and W11 validator corrections
+  ruling: V-322r, V-333r, V-334r (W13-SR-15) and V-324r (W11-SR-11) adopted.
+  artifacts: validation-corrections.cypher
+- rulingId: W00-R-37
+  theme: Episode coverage of V-503/V-505
+  ruling: V-503r and V-505r cover assertions and every edge naming an authorizing assertion or listed in $episodeTypes (W12-SR-09); V-505r generalizes V-W00-11.
+  artifacts: validation-corrections.cypher
+- rulingId: W00-R-38
+  theme: Protocol step validators
+  ruling: V-525r/V-526r restated on HAS_PROTOCOL_STEP (W16-SR-14).
+  artifacts: validation-corrections.cypher
+- rulingId: W00-R-39
+  theme: Exclusive-attachment validators
+  ruling: V-108r informational (review queue), V-508r/V-509r over $exclusiveTypes with partition coalesce(r.jurisdiction, t.jurisdiction) (W04-SR-03).
+  artifacts: validation-corrections.cypher
+- rulingId: W00-R-40
+  theme: Validator adoptions from W20, W21, W22
+  ruling: W20-V01 replaces V-407; V-W21-12 replaces V-416 (Assertion.qualifiedBy added); W20-V02..V10, V-W21-*, V-601..V-615 adopted by reference.
+  artifacts: validation-corrections.cypher; sdl-fragment.graphql
+- rulingId: W00-R-41
+  theme: Validation parameters
+  ruling: V-101 and V-W00-02 read $assertedTypes/$derivedTypes; validation-params-w00.json adds the W01, W08, W13, W15, W21 types and drops IDENTIFIED_BY.
+  artifacts: fixtures/validation-params-w00.json
+- rulingId: W00-R-42
+  theme: Jurisdiction code convention
+  ruling: ISO 3166-1 alpha-2; ISO 3166-2 subdivisions; reserved EU; GB-GBN as a registered code pending verification against ISO 3166-2:GB (not fetched
+    in this pass); "UK" forbidden. CANDIDATE until verified.
+  artifacts: 10-kernel-operations-delta.md section 5
+- rulingId: W00-R-43
+  theme: Content-derived opaque segments
+  ruling: DocumentTextVersion, Segmentation and Chunk may use a hex sha256 of their identity tuple as the opaque uid segment (W20-SR-09).
+  artifacts: 10-kernel-operations-delta.md section 5
+- rulingId: W00-R-44
+  theme: 'Domain enums: kernel conflict check only'
+  ruling: 'ResultQualifier, ReferenceIntervalDerivation (W07), PathwayKind, RegulatoryResponseKind (W13), OfferKind, ObservedAvailability, CommerceMatch
+    enums (W15), SexScope, ExposureRoute, ExposureStatus, MolecularEntityKind (W03), AuthorityScope (W19), DocumentType TRANSCRIPT (W20/W21), IpRightStatus
+    (W14): none collides with a kernel enum name or value meaning.'
+  artifacts: none
+- rulingId: W00-R-45
+  theme: Routed or declined
+  ruling: Examples repairs (W02-SR-17, W04-SR-12, W20-SR-23, W21-SR-17) belong to Fable; @declareRelationship on interface fields is a contract B1 change
+    for Fable (W07-SR-01); route vocabulary is W09 domain business (W16-SR-09 REJECTED as a kernel request).
+  artifacts: none
+- rulingId: W00-R-46
+  theme: W19 authority scope
+  ruling: AuthorityScope and predicateAuthorityScopes admitted as CANDIDATE; V-324r is the hard rule until rows exist.
+  artifacts: none
+- rulingId: W00-R-47
+  theme: W15 catalog ranges
+  ruling: Kernel check only; no kernel relationship touched.
+  artifacts: none
+- rulingId: W00-R-48
+  theme: W09 relationship-property types
+  ruling: PublicationRevisionProperties must contain every AssertedEdgeProperties field; LegacyInterventionArmProperties is legacy read-only.
+  artifacts: none
+- rulingId: W00-R-49
+  theme: V-231 scope and W17/W18 archetype checks
+  ruling: 'V-231r restricts the INV-210 context check to mechanism-class assertions (null class read as mechanism), as INV-210 is worded (W17-SR-09). SafetySignal,
+    NarrativeArc and EventImpactAssessment are EvidenceAssessment types; Event an Occurrence; Conference and Community Entities: no kernel conflict.'
+  artifacts: V-231r
+- rulingId: W00-R-50
+  theme: CONSIDERS_ASSESSMENT domain
+  ruling: 'CONSIDERS_ASSESSMENT may start at any EvidenceAssessment (W10 fixture w10-01: ApplicabilityDimension -> ResolutionHypothesis/EndpointClassification);
+    a NarrativeArc is never its target and never a provenance-state-3 warrant (W18-SR-10, W18-V03). V-504 is generalized to assessments by V-504a (W00-R-51).'
+  artifacts: sdl-fragment.graphql doc
+- rulingId: W00-R-51
+  theme: No backdating for assessments
+  ruling: 'V-504a: an EvidenceAssessment is never recorded before the retrieval of a snapshot whose locator supports it (W10-SR-05, INV-502).'
+  artifacts: V-504a
+requests:
+- id: W00-SR-01
+  requester: W00
+  ruling: ACCEPTED
+  rulingId: W00-R-12
+  rationale: 'Primary source S-03 (Lifespan #4 description); failing case: examples write quantityBasis UNSPECIFIED (T4a).'
+  change: 'massBasis and amountReferent added to AssertionArchetype. Merged-build check: ContraindicationAssertion and InteractionAssertion (W17) must add
+    the two nullable fields; with them the merged schema builds (10-kernel-operations-delta.md section 6).'
+- id: W00-SR-02
+  requester: W00
+  ruling: ACCEPTED
+  rulingId: W00-R-04
+  rationale: Primary source S-01 (@id autogenerates and is absent from create input); test T5a.
+  change: 'As W12-SR-11: creates through the ingestion service; option (b) (client-supplied id) is the recorded alternative, not adopted.'
+- id: W00-SR-05
+  requester: W00
+  ruling: ACCEPTED
+  rulingId: W00-R-11
+  rationale: 'Primary: catalog identity_resolution.rules (redirect record open). Merged with W23-SR-06.'
+  change: As W23-SR-06; redirectToUid on the retired node withdrawn.
+- id: W00-SR-07
+  requester: W00
+  ruling: ACCEPTED
+  rulingId: W00-R-20
+  rationale: 'Primary: catalog IDENTIFIED_BY and HAS_IDENTIFIER; failing case: QS-1a/CQ-ID-04 must union two types with different property contracts; IDENTIFIED_BY
+    edges carry no assertionUid.'
+  change: IDENTIFIED_BY relabelled HAS_IDENTIFIER (IdentifierLinkProperties) at migration; W04/W15 keep tradeItemIdentifiers fields with type HAS_IDENTIFIER;
+    removed from $assertedTypes; V-W00-15 USE_HAS_IDENTIFIER.
+- id: W00-SR-10
+  requester: W00
+  ruling: REJECTED
+  rulingId: W00-R-24
+  rationale: Superseded by W22-SR-05 (IMG-PX1, failing case mp5); the owner of the geometry wins.
+  change: IMG-REL-XYWH-1 withdrawn; fixture 10 uses IMG-PX1.
+- id: W00-SR-11
+  requester: W00
+  ruling: ACCEPTED
+  rulingId: W00-R-21
+  rationale: Executed probe P-1; equals MR-01.
+  change: 'Applied (prune-unions report: no W00 union member left to prune).'
+- id: W00-SR-12
+  requester: W00
+  ruling: ACCEPTED
+  rulingId: W00-R-32
+  rationale: Fixture 08 failing case.
+  change: V-432r.
+- id: W00-SR-14
+  requester: W00
+  ruling: ACCEPTED
+  rulingId: W00-R-28
+  rationale: Primary source S-09; test T1.
+  change: APOC core recorded as runtime prerequisite.
+- id: W01-SR-01
+  requester: W01
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case w01-03/w01-06 write hu:org-snapshot:/hu:cohort-participant: uids that INV-106 cannot check. CohortParticipant is a creation-time
+    kind (rule T3), so it may carry its own token.'
+  change: 'uid-token-registry.yaml: OrganizationSnapshot org-snapshot, CohortParticipant cohort-participant; LegalEntity keeps org, Facility keeps facility.'
+- id: W01-SR-02
+  requester: W01
+  ruling: ACCEPTED
+  rulingId: W00-R-12
+  rationale: 'Failing case: 7.6.3 build fails with name: String! on the interface (D-013). Already applied in the W00 fragment before this pass.'
+  change: None in this pass (ActorIdentity.name is nullable).
+- id: W01-SR-03
+  requester: W01
+  ruling: ACCEPTED
+  rulingId: W00-R-16
+  rationale: 'Failing case: live schema lines 554/624, 773/818, 904/927 put state caches on HAS_SNAPSHOT; a label-free (x)-[:HAS_SNAPSHOT]->(s) mixes captures
+    with state caches (CL-014 one type, one meaning).'
+  change: Entity state caches use HAS_STATE (StateEpisodeProperties); HAS_SNAPSHOT is Source -> SourceSnapshot only (fragment doc on Source.snapshots);
+    V-W00-15 reports USE_HAS_STATE; migration relabel in 10-kernel-operations-delta.md.
+- id: W01-SR-04
+  requester: W01
+  ruling: ACCEPTED
+  rulingId: W00-R-13
+  rationale: 'Failing case: Rubin BOARD_MEMBER_OF validFrom 2017 YEAR answered "yes" for 2017-05-15 by raw-bound QS-2b. Same ladder as W00 QS-W00-P.'
+  change: QS-2a/2b use the precision-aware class ladder (KNOWN_NOT_VALID, POSSIBLE_END_PRECISION, POSSIBLE_START_UNKNOWN, POSSIBLE_START_PRECISION, KNOWN,
+    KNOWN_OPEN_END_WITNESSED, POSSIBLE_OPEN_END_STALE) plus KNOWN_AT_WITNESS from W00-R-13.
+- id: W01-SR-06
+  requester: W01
+  ruling: ACCEPTED
+  rulingId: W00-R-41
+  rationale: 'Failing case: validation-params lists none of the W01 edge types, so N4/N8 pass every 0.2.0 check. Kernel check: the W01 relationship block
+    conflicts with no kernel type.'
+  change: validation-params-w00.json $assertedTypes adds BOARD_MEMBER_OF, EMPLOYED_BY, ADVISES_ORGANIZATION, INVESTED_IN, HOLDS_EQUITY_IN, PARENT_OF, OWNS_BRAND,
+    OPERATES_FACILITY, MARKETS_PRODUCT, MANUFACTURES_PRODUCT, DISTRIBUTES_PRODUCT, ENDORSES_PRODUCT; V-W01-* stay W01-owned; Fable carries the catalog block.
+- id: W01-SR-07
+  requester: W01
+  ruling: ACCEPTED
+  rulingId: W00-R-13
+  rationale: 'Primary source S1 (13D/A "as of" holding); failing case w01-04: HOLDS_EQUITY_IN can only answer POSSIBLE_START_UNKNOWN for 2024-09-01. A witness
+    instant is not a bound, so bounds stay null/UNKNOWN.'
+  change: 'Assertion.statedAsOf: DateTime + statedAsOfPrecision: TimePrecision (generic Assertion only; immutable); V-503r requires the precision; the as-of
+    ladder adds KNOWN_AT_WITNESS (fixture 13 Q13-b). Not copied to edges (B4 frozen): readers join through assertionUid. W01 fallback for the edge copy:
+    none needed.'
+- id: W01-SR-08
+  requester: W01
+  ruling: ACCEPTED
+  rulingId: W00-R-13
+  rationale: 'Failing case: 2025 proxy (publishedAt 2025-04-29) captured 2026-10-04 makes "director on 2026-06-01?" OPEN_END_SUPPORTED. The issuer clock
+    is the last instant the source speaks for.'
+  change: Open-end witness = coalesce(snapshot.publishedAt, snapshot.observedAt) for statedTense PRESENT or null; live pages without publishedAt keep observedAt
+    (QS-W00-P text).
+- id: W01-SR-22
+  requester: W01
+  ruling: ACCEPTED
+  rulingId: W00-R-02
+  rationale: No change requested; failing case (V-003 row with share count beside an object) is real. HOLDS_EQUITY_IN is COMMERCIAL, so the QUANTITY relaxation
+    does not apply to it.
+  change: Keep the verbatim workaround for 0.3; when a CQ needs arithmetic, use a separate QUANTITY-class assertion (object = issuer, valueNumber = shares)
+    that W00-R-02 now permits.
+- id: W02-SR-01
+  requester: W02
+  ruling: ACCEPTED
+  rulingId: W00-R-02
+  rationale: 'Primary source M-06 (EFSA 2019 Table 2); failing case fx-91: two literal-only CALCULATED amounts with one subject and predicate, Q-10 refersTo
+    null. Only QUANTITY needs the object as the referent of the number.'
+  change: 'INV-003 amended for predicateClass QUANTITY only: one HAS_OBJECT plus at most one numeric literal (valueNumber + unitCode, with quantityBasis/massBasis/amountReferent);
+    every other class keeps literal-xor-object. V-003 replaced by V-003r (validation-corrections.cypher). Asserted QUANTITATIVELY_CONTAINS edges copy the
+    assertion quantity qualifiers (V-505r QUALIFIER_DIFFERS).'
+- id: W02-SR-02
+  requester: W02
+  ruling: ACCEPTED
+  rulingId: W00-R-33
+  rationale: 'Primary sources M-11/M-12 (Ph. Eur. ranges); failing case fx-91: frozen V-006 2 rows for complete BETWEEN statements.'
+  change: V-006 replaced by V-006r (= V-W02-10).
+- id: W02-SR-03
+  requester: W02
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case fx-02: a material reclassified from IngredientMaterial to BotanicalPreparation would need a uid change under per-specialization
+    tokens.'
+  change: 'Rule T2 (refinement specializations use the parent token): BrandedIngredientMaterial, BotanicalPreparation, MicrobialPreparation, MaterialMixture
+    -> material; botanical-taxon, microbial-taxon, microbial-strain, constituent, nutrient registered.'
+- id: W02-SR-04
+  requester: W02
+  ruling: ACCEPTED
+  rulingId: W00-R-07 / W00-R-09
+  rationale: 'Primary sources M-03/M-04 (PubChem); failing case fx-01: MW inputs have no home and a calculation can only name an Agent.'
+  change: 'predicate-registry.yaml: HAS_MOLECULAR_WEIGHT (QUANTITY literal) REGISTERED, QUANTITATIVELY_CONTAINS CALCULATED with IngredientComponent subject
+    confirmed; ActivityKind CALCULATION added to the fragment.'
+- id: W02-SR-05
+  requester: W02
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: Primary sources M-13/M-14/M-16; failing case fx-05 (strain GG under two species), fx-90 N13 -> V-W02-09.
+  change: predicateExclusivity STRAIN_OF {EXCLUSIVE, subject}; STRAIN_OF added to $exclusiveTypes (V-108r/V-508r/V-509r).
+- id: W02-SR-17
+  requester: W02
+  ruling: ACCEPTED
+  rulingId: W00-R-45
+  rationale: Real clock defect (V-110 3 rows after 2026-10-04T00:00Z) in docs/schema/examples/elysium-basis.cypher; the examples belong to Fable, not to
+    W00.
+  change: 'Routed to Fable: replace recordedAt = datetime() with literal values. No W00 change.'
+- id: W02-SR-24
+  requester: W02
+  ruling: ACCEPTED
+  rulingId: W00-R-21
+  rationale: 'Failing case: every W02 assertion in fx-01..fx-07 has a W02 subject absent from the live unions.'
+  change: AssertionSubjectTarget lists ChemicalSubstance, ChemicalForm, IngredientMaterial, BotanicalTaxon, MicrobialTaxon, MicrobialStrain, Constituent,
+    Nutrient (specializations read through IngredientMaterial, MR-01).
+- id: W03-SR-01
+  requester: W03
+  ruling: ACCEPTED
+  rulingId: W00-R-26
+  rationale: 'Failing case: six valid rule-mode edges pass V-112 but verbatim V-233 4 rows, V-234 2 rows (run 2026-10-04); catalog relationshipClasses.derived
+    already allows rule mode.'
+  change: V-233/V-234 replaced by V-233r/V-234r; derivation rule mx-proj/v1 registered; V-112r unchanged in substance.
+- id: W03-SR-02
+  requester: W03
+  ruling: ACCEPTED
+  rulingId: W00-R-30
+  rationale: 'Failing case: the W00 fragment exposes no traversal from an assertion to its MechanismEvidenceContext (INV-210). The field already exists
+    in the W00 fragment (added in the first pass).'
+  change: Assertion.observedInContext confirmed; DERIVED_FROM_ASSERTION doc widened to "inputs of a CALCULATED assertion or premises of an INFERRED_FROM_MEASUREMENT
+    assertion".
+- id: W03-SR-04
+  requester: W03
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case: hu:pathway:, hu:condition: fixture uids unregistered; Organ is a refinement of AnatomicalContext.'
+  change: Tokens pathway, condition, risk-factor; Organ -> anatomical-context (rule T2).
+- id: W03-SR-12
+  requester: W03
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: 'Live Outcome.reflectsMechanisms and Mechanism.actsInOrgans have no registry row; one-to-one projection predicates unregistered. Kernel check:
+    no conflict; MECHANISM class requires basisKind (INV-210).'
+  change: 'predicate-registry.yaml: INCREASES_RISK_FOR, MEDIATES_RISK_THROUGH, ASSOCIATED_WITH_CONDITION, ASSOCIATED_WITH_OUTCOME REGISTERED; ACTS_IN added
+    to $derivedTypes and V-233r. Domain enums (c) confirmed no kernel conflict (W00-R-44); (d) left to Fable at merge.'
+- id: W04-SR-01
+  requester: W04
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: Failing case w04-02/w04-04 create unregistered PackageConfiguration/ServingDefinition/QuantityDeclaration uids; LabelSnapshot is a SourceSnapshot
+    refinement on the same node.
+  change: Tokens package-configuration, serving-definition, quantity-declaration, product-snapshot; LabelSnapshot -> snapshot (rule T2).
+- id: W04-SR-02
+  requester: W04
+  ruling: ACCEPTED
+  rulingId: W00-R-31
+  rationale: 'Failing case w04-04: Wayback capture retrieved before an older live capture; V-409 3 rows on a correct REANCHORS.'
+  change: V-409 replaced by V-409r (content clock coalesce(observedAt, retrievedAt)); same for V-512r.
+- id: W04-SR-03
+  requester: W04
+  ruling: ACCEPTED
+  rulingId: W00-R-39
+  rationale: 'Failing case w04-04: two OBSERVATION_ONLY versions with an unknown transition; V-108 reports a violation for an honest unknown.'
+  change: V-108r is informational (review queue); V-508r/V-509r partition by coalesce(r.jurisdiction, t.jurisdiction) over $exclusiveTypes.
+- id: W04-SR-04
+  requester: W04
+  ruling: ACCEPTED
+  rulingId: W00-R-02 / W00-R-07
+  rationale: 'Failing case w04-03: 300 mg NIAGEN -> 263.42 mg NR cation fails V-003 as object + number. W04 asked to register the predicate or rule the
+    QUANTITY question; W00 rules the QUANTITY question in favour of the object form.'
+  change: ACTIVE_MOIETY_AMOUNT and NUTRIENT_EQUIVALENT_AMOUNT REGISTERED as QUANTITY (object = moiety + valueNumber/unitCode, CALCULATED with inputs). W04
+    literal-only form remains valid under V-003r (objects 0, literal 1) as its fallback.
+- id: W04-SR-06
+  requester: W04
+  ruling: ACCEPTED
+  rulingId: W00-R-16
+  rationale: Same failing case as W01-SR-03 (Document vs Product through one type). W04 preferred keeping the legacy name read-only; the relabel wins because
+    HAS_SNAPSHOT must mean capture for V-512 and QS-2a lastObservedAt.
+  change: 'Product -> ProductSnapshot moves to HAS_STATE at migration; W04 fragment fields keep their names (Product.snapshots / ProductSnapshot.product)
+    with type HAS_STATE. Loser fallback: none required (mechanical relabel); V-W00-15 audits leftovers.'
+- id: W04-SR-12
+  requester: W04
+  ruling: ACCEPTED
+  rulingId: W00-R-45
+  rationale: Same defect as W02-SR-17 in docs/schema/examples/elysium-basis.cypher (Fable-owned).
+  change: Routed to Fable; no W00 change.
+- id: W05-SR-01
+  requester: W05
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: Failing case fixtures 04/05 use hu:exposure:/hu:lifestyle:; FoodItem is a refinement of IngredientMaterial.
+  change: Tokens exposure, lifestyle; FoodItem -> material; specialization-token rule stated as T2/T3 in uid-token-registry.yaml.
+- id: W05-SR-09
+  requester: W05
+  ruling: ACCEPTED
+  rulingId: W00-R-21
+  rationale: 'Executed failing case: ExposureAgentTarget returned hu:material:food-brazil-nut twice. Same as W00-SR-11 and Fable MR-01.'
+  change: 'MR-01 applied to W00 unions: Organ, LabelSnapshot, FoodItem dropped from AssertionSubjectTarget (prune-unions report).'
+- id: W05-SR-13
+  requester: W05
+  ruling: ACCEPTED
+  rulingId: W00-R-21
+  rationale: 'Failing case: fixtures 04/05 assertions with Exposure or Lifestyle subjects. The predicate part has no failing case of its own.'
+  change: Exposure and Lifestyle are AssertionSubjectTarget members (already present); CHARACTERIZES_EXPOSURE_IN_POPULATION DEFERRED to W10 in predicate-registry.yaml.
+- id: W06-SR-02
+  requester: W06
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case: hu:treatment:/hu:procedure: unregistered.'
+  change: Tokens treatment, procedure (W09-SR-04 asks the same procedure token).
+- id: W06-SR-12
+  requester: W06
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: Fixtures 01/03/04 use unregistered predicates; GeekWire filed as PRESS_RELEASE.
+  change: 'TARGETS_CONDITION, USES_COMPONENT REGISTERED; DECLARES_DEVELOPMENT_STAGE, HAS_TREATMENT_MODALITY, REPORTS_PROCEDURE_VOLUME CANDIDATE; FI-W06-01..15
+    kernel check: no conflict; SourceKind NEWS_ARTICLE added (W00-R-08).'
+- id: W07-SR-01
+  requester: W07
+  ruling: ACCEPTED
+  rulingId: W00-R-45
+  rationale: 'Failing case: DiagnosticResult interface exposes no traversal without @declareRelationship; the merged build (Fable MR-03) already depends
+    on it.'
+  change: 'Contract B1 change for Fable: @declareRelationship allowed on interface fields (no arguments). No W00 fragment change.'
+- id: W07-SR-03
+  requester: W07
+  ruling: ACCEPTED
+  rulingId: W00-R-44
+  rationale: 'Domain enum (W07-owned). Kernel check: ResultQualifier does not collide with ReportedStatus (kernel), which stays for kernel fields.'
+  change: Confirmed no kernel conflict; NOT_REPORTED value is W07 ledger business.
+- id: W07-SR-06
+  requester: W07
+  ruling: ACCEPTED
+  rulingId: W00-R-44
+  rationale: 'Domain enum ReferenceIntervalDerivation (W07). Source: Quest 496 "based on ADA guidelines".'
+  change: Confirmed no kernel conflict.
+- id: W07-SR-09
+  requester: W07
+  ruling: ACCEPTED
+  rulingId: W00-R-35
+  rationale: 'Primary source S7 (Everlywell); failing case: positive fixture 1 V-303 row, 0 V-303r rows; N5 fails both.'
+  change: V-303 replaced by V-303r.
+- id: W07-SR-10
+  requester: W07
+  ruling: ACCEPTED
+  rulingId: W00-R-23
+  rationale: 'Failing case: catalog V-112 2 DERIVATION_WITHOUT_SOURCE_ASSERTIONS rows on same-version COMPARED_TO.'
+  change: COMPARED_TO in $ruleOnlyDerivedTypes; V-112r adds RULE_ONLY_ACROSS_VERSIONS so rule-only applies to the INV-301 same-version clause only.
+- id: W07-SR-11
+  requester: W07
+  ruling: ACCEPTED
+  rulingId: W00-R-35
+  rationale: Failing cases N4, N10/N1, N6-N8, N13, N14 pass every catalog V-3xx.
+  change: V-302r, V-304r, V-305c in validation-corrections.cypher; V-314..V-318 adopted by reference (W07 keeps the text).
+- id: W07-SR-12
+  requester: W07
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: PanelDefinition and ReferenceRange have no token; label-keyed entries for existing fixture tokens.
+  change: Tokens panel-definition, reference-range plus Biomarker biomarker, Metric metric, LabTest lab-test, MeasurementMethod method, Specimen specimen-type,
+    ReferenceSystem reference-system, Algorithm algorithm, ReferenceIntervalVersion ri-version, ComparabilityAssessment comparability.
+- id: W07-SR-13
+  requester: W07
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-02 / W00-R-07
+  rationale: 'Failing case: GrimAge2 "decreased by 4 years" failed V-003 with object + literal. Under W00-R-02 the delta may ride on the QUANTITY assertion.'
+  change: CHANGED_BETWEEN CANDIDATE (QUANTITY; object = earlier result; optional valueNumber + unitCode delta).
+- id: W07-SR-15
+  requester: W07
+  ruling: ACCEPTED
+  rulingId: W00-R-06
+  rationale: 'Failing case: catalog V-313 reports all 15 positive results (expects lower-case values).'
+  change: V-313 replaced by V-313r.
+- id: W08-SR-06
+  requester: W08
+  ruling: ACCEPTED
+  rulingId: W00-R-01 / W00-R-07 / W00-R-21
+  rationale: 'All W08 fixtures use unregistered tokens; release-note assertions have a FirmwareVersion subject outside AssertionSubjectTarget. Collision:
+    W21 asks platform for Platform.'
+  change: Tokens device, technology-platform (platform stays W21 Platform), sensor, modality, firmware-version; FirmwareVersion added to AssertionSubjectTarget;
+    the 14 predicates CANDIDATE and the 8 relationship types added to $assertedTypes.
+- id: W09-CR-01
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-34
+  rationale: Sources S-07 Basis, S-19 ENERGIZE; frozen V-217 5 rows on faithful captures.
+  change: V-217 replaced by V-217r + V-217i (informational).
+- id: W09-CR-02
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-34
+  rationale: 'Failing case fixtures/04: 4 false positives and 4 silently skipped null-armType arms.'
+  change: V-221 replaced by V-221r.
+- id: W09-CR-03
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-34
+  rationale: 'Failing case fixtures/01 statement 6: re-bounded episode gives owners = 2.'
+  change: V-211 replaced by V-211r.
+- id: W09-CR-04
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-34
+  rationale: 'Failing case fixtures/90 N08: INDEPENDENT_REPLICATION after a null primary passes frozen V-215.'
+  change: V-215 replaced by V-215r.
+- id: W09-SR-02
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-48
+  rationale: 'Failing case fixtures/06: CORRECTS must name the ERRATUM event; Study.evaluates needs a B4-conformant properties type. Kernel check: PublicationRevisionProperties
+    must contain every AssertedEdgeProperties field (B4 specialization rule).'
+  change: Accepted as W09 relationship-property types (Fable registry); kernel condition stated.
+- id: W09-SR-03
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-22
+  rationale: 'Failing case fixtures/02, 05: each StudyResult/AdverseEventResult cites its TEXT_QUOTE locator; wrapping every result in an assertion is heavier
+    (W09 alternative rejected).'
+  change: SUPPORTED_BY domain and SupportedRecordTarget add StudyResult (covers AdverseEventResult), RegistrationVersion, ProtocolVersion.
+- id: W09-SR-04
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case: hu:study-population:, hu:device:, hu:procedure: unregistered; outcome ambiguous between Outcome and OutcomeDefinition. AdverseEventResult
+    is a creation-time kind (T3).'
+  change: Tokens protocol-version, study-population, outcome-definition, adverse-event-result, device, procedure; fixture uids hu:outcome:<id> of OutcomeDefinitions
+    migrate with SAME_IDENTITY_MERGED redirects.
+- id: W09-SR-12
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-03
+  rationale: 'Failing case fixtures/03: analysisRole in valueString beside HAS_OBJECT -> V-003 rows. W09 option (a) key/value string lists is rejected (untyped,
+    bypasses domain enums); option (b) is adopted with storage on both sides.'
+  change: 'Rule: an asserted edge qualifier is stored on the authorizing Assertion under the edge property name (typed by the owner), copied to the edge,
+    and covered by contentHash; V-505r reports QUALIFIER_DIFFERS:<key>, V-505i lists edge-only qualifiers. W09 fallback for (a): none.'
+- id: W09-SR-13
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-17
+  rationale: 'Failing case: MATCH ()-[:EVALUATES]->() mixes adjudications and legacy study edges (CL-014 precedent HAS_VARIANT).'
+  change: Stored legacy type renamed LEGACY_EVALUATES at migration; Study.evaluates keeps its GraphQL name with type LEGACY_EVALUATES; EVALUATES is Adjudication
+    -> Assertion only (fragment doc); V-W00-15 reports USE_LEGACY_EVALUATES.
+- id: W09-SR-14
+  requester: W09
+  ruling: ACCEPTED
+  rulingId: W00-R-08
+  rationale: 'Failing case: ClinicalTrials.gov records filed as REGULATORY_RECORD, PubMed record null. Conflict with W19-SR-01 on the name of the bibliographic
+    value.'
+  change: 'TRIAL_REGISTRY_RECORD and BIBLIOGRAPHIC_RECORD added (W19 spelling wins: one value covers PubMed, Crossref, OpenAlex records). W09 fallback:
+    use BIBLIOGRAPHIC_RECORD wherever BIBLIOGRAPHIC_DATABASE_RECORD was planned.'
+- id: W09-SR-16
+  requester: W09
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-07
+  rationale: Fixtures/06 statement 6 and fixtures/90 N16.
+  change: CITES_AS_REFERENCE, EVALUATES_RISK_FACTOR CANDIDATE; [REGISTRY_RESULTS_NOT_POSTED, RESULTS_UNPUBLISHED] added to implicationPairs.
+- id: W10-SR-01
+  requester: W10
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case: fixtures 04/05 mint hu:assessment:w10-ri-* and hu:assessment:w10-strength-* because no dedicated token exists, so the label
+    cannot be recovered from the uid; fixtures also write 36 hu:use-profile:, 28 hu:endpoint-classification:, 47 hu:synthesis: uids.'
+  change: 'UseContextProfile use-profile, EndpointClassification endpoint-classification, EvidenceSynthesis synthesis, ResultInterpretation result-interpretation,
+    EvidenceStrengthAssessment strength-assessment; existing hu:assessment: uids stay valid through the EvidenceAssessment label token (V-W00-16 accepts
+    them).'
+- id: W10-SR-04
+  requester: W10
+  ruling: ACCEPTED
+  rulingId: W00-R-50
+  rationale: 'Source: round 0002 section B R4 table; failing case fixture 01: MATERIAL_IDENTITY cites two ResolutionHypothesis records and OUTCOME_RELEVANCE
+    an EndpointClassification (w10-01 lines 160-167); without the edge the copy is unverifiable (W10-V16 rows).'
+  change: CONSIDERS_ASSESSMENT domain = any EvidenceAssessment, class structural (fragment doc on Adjudication.considersAssessments; W10 declares the field
+    on its types); NarrativeArc never a target (W18-SR-10).
+- id: W10-SR-05
+  requester: W10
+  ruling: ACCEPTED
+  rulingId: W00-R-51
+  rationale: 'Source INV-502; failing case: inherited hu:synthesis:nr-muscle-mito-function-older-humans-v2 recorded 2019-09-15 is SUPPORTED_BY a locator
+    on hu:snapshot:pmc6702140-2026-10-03; V-504 is silent.'
+  change: W10-V16b adopted as V-504a (validation-corrections.cypher).
+- id: W10-SR-06
+  requester: W10
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-07
+  rationale: 'Failing case fixture 05: the 2025 vitamin D review reports OR 0.94 (CI 0.88-1.00) and a significant subgroup that are not StudyResults of
+    a Study.'
+  change: REPORTS_POOLED_ESTIMATE CANDIDATE (QUANTITY literal); the INV-206 extension to pooled analyses stays a W10 method rule (synthesis-v0.1) until
+    a validator exists.
+- id: W10-SR-07
+  requester: W10
+  ruling: ACCEPTED
+  rulingId: W00-R-05
+  rationale: 'Failing case: GraphQL R1 "Cannot query field uid on type EvidenceAssessmentArchetype". W10 proposed documenting the inline-fragment pattern
+    because B3 is frozen; W23-SR-03 asked for the interface change with the same failing case. The interface change wins (Fable carries B3); the inline
+    fragment `... on Entity { uid }` remains a valid fallback.'
+  change: uid/id on EvidenceAssessmentArchetype (done; GraphQL check T6d).
+- id: W10-SR-11
+  requester: W10
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: Failing cases W14 N-2 (CALCULATED PROVES_EFFICACY from a patent claim) and W06 N3 (StudyIntervention -[:EVIDENCE_APPLIES_TO]-> CASGEVY).
+  change: '[PATENT_CLAIMS, SYNTHESIS_INPUT] registered and added to implicationPairs; the composite [INSTANTIATES_TREATMENT + USES_COMPONENT(ADMINISTERED_PRODUCT),
+    EVIDENCE_APPLIES_TO_PRODUCT] registered as enforced by V-201 (not a pairwise V-112 parameter).'
+- id: W11-SR-04
+  requester: W11
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: Failing cases N10 and N4 are invisible to V-108 because the subject has several legitimate parallel lines.
+  change: predicateExclusivity HAS_CAPABILITY_STATE and GOVERNED_BY_SPECIFICATION with partitionByPath; enforced in the ingestion write transaction, audited
+    by V-W11-02/07; excluded from the generic $exclusiveTypes checks.
+- id: W11-SR-08
+  requester: W11
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'INV-106/V-117 cannot check W11 uids. Conflict: W11 suggests specification-criterion for W12 SpecificationCriterion; W12 (owner) asks spec-criterion.'
+  change: 'Tokens specification, specification-version, process, process-step, capability; SpecificationCriterion -> spec-criterion (owner wins; W11 fallback:
+    migrate any hu:specification-criterion: uid).'
+- id: W11-SR-09
+  requester: W11
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-07
+  rationale: 'Sources: NAI FY2025 10-K; Niagen press release (fixture 03-04 PROPOSED).'
+  change: CLAIMS_THIRD_PARTY_CERTIFICATION and SPECIFICATION_EFFECTIVE_FROM CANDIDATE (literal; never project to COVERS/CERTIFIED_UNDER or to a bound).
+- id: W11-SR-11
+  requester: W11
+  ruling: ACCEPTED
+  rulingId: W00-R-36
+  rationale: 'Failing case: the V-324 denylist lets ORGANIZATION_WEBPAGE, SELF_DISCLOSURE_PAGE, MANUFACTURER_LABEL_PAGE, MARKETPLACE_LISTING authorize OPERATING.'
+  change: 'V-324 replaced by V-324r (allowlist); SourceKind guidance: an 8-K press-release exhibit is PRESS_RELEASE.'
+- id: W12-SR-01
+  requester: W12
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case: no quality token; fixtures w12-00..40 violate INV-106 registration.'
+  change: Tokens lot, test-sample, test-execution, test-method, measured-result, spec-criterion, pass-fail, lot-test-summary, coa, cert-program, cert-listing,
+    cert-scope; TestingLaboratory -> org (T2).
+- id: W12-SR-02
+  requester: W12
+  ruling: ACCEPTED
+  rulingId: W00-R-22
+  rationale: Source S1 (COA T25189001, 555 mg/capsule) cannot cite its locator.
+  change: SupportedRecordTarget adds MeasuredResult, LotTestSummary, CertificateOfAnalysis (structural SUPPORTED_BY).
+- id: W12-SR-03
+  requester: W12
+  ruling: ACCEPTED
+  rulingId: W00-R-08
+  rationale: S1 and S9 are neither marketing pages nor audit reports.
+  change: SourceKind LABORATORY_REPORT added.
+- id: W12-SR-04
+  requester: W12
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: Sources S1/S3 pass rows use an unregistered predicate.
+  change: CONFORMS_TO_SPECIFICATION REGISTERED (CLAIM, assertion-only).
+- id: W12-SR-07
+  requester: W12
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: Negatives N02-N06, N11, N18 exercise each pair; the quality module has none.
+  change: Six quality forbidden-implication pairs registered and added to implicationPairs.
+- id: W12-SR-09
+  requester: W12
+  ruling: ACCEPTED
+  rulingId: W00-R-37
+  rationale: 'Failing case N11: OBSERVATION_ONLY end on HAS_CERTIFICATION_SCOPE missed by V-503 (assertions only).'
+  change: V-503r and V-505r cover every episode edge ($episodeTypes or any edge with assertionUid).
+- id: W12-SR-11
+  requester: W12
+  ruling: ACCEPTED
+  rulingId: W00-R-04 / W00-R-28
+  rationale: 'Round trip 2026-10-04: an API create stored a random id, so V-117 fails; DateTime reads need apoc.date.convertFormat. Same as W00-SR-02/-14.'
+  change: 'Kernel and domain creates go through the ingestion service, which mints uid = hu:<token>: + id; GraphQL create mutations for uid-identified types
+    are not exposed at deployment (application-enforced; the fragment keeps @mutation for read-write parity, the deployment disables create); APOC core
+    is a runtime prerequisite.'
+- id: W13-SR-01
+  requester: W13
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-42
+  rationale: Primary sources S15 (EU 2020/16), S16 (FSA register "England, Scotland, Wales"); failing case Q-M with GB coding Northern Ireland coverage.
+    The GB-GBN code was not verified against ISO 3166-2:GB in this pass.
+  change: 'conventions.jurisdictionCode: ISO 3166-1 alpha-2; ISO 3166-2 subdivisions; reserved EU; GB-GBN registered as a BellLabs code pending verification
+    (if absent from ISO 3166-2:GB it stays a documented local composite); "UK" forbidden. Field stays String.'
+- id: W13-SR-02
+  requester: W13
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case: hu:org:us-fda with RegulatoryAgency label and OrphanDesignation uids unchecked.'
+  change: RegulatoryAgency -> org; OrphanDesignation, DrugApproval -> regulatory-status (T2); RegulatoryPathway reg-pathway, RegulatorySubmission reg-submission,
+    RegulatoryResponse reg-response; reg-status stays a fixture alias.
+- id: W13-SR-03
+  requester: W13
+  ruling: ACCEPTED
+  rulingId: W00-R-44
+  rationale: 'Domain enums (PathwayKind, RegulatoryResponseKind are W13). Source S15. Kernel check: no conflict.'
+  change: Confirmed no kernel conflict; V-336 change is W13 validator business.
+- id: W13-SR-04
+  requester: W13
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: Fixtures need the tokens; RegulatoryInspection is a CANDIDATE type.
+  change: reg-pathway-version, reg-step registered; regulatory-inspection ACCEPTED_AS_CANDIDATE; MaterialMixture uses material (not mixture).
+- id: W13-SR-05
+  requester: W13
+  ruling: ACCEPTED
+  rulingId: W00-R-07 / W00-R-21
+  rationale: 'Failing case N-14: two current overlapping GRAS pathway versions; V-W13-06 2 rows.'
+  change: HAS_PATHWAY_VERSION {EXCLUSIVE, subject}, bitemporal_attachment profile; added to $exclusiveTypes, $assertedTypes and $episodeTypes; RegulatoryPathwayVersion
+    added to AssertionSubjectTarget.
+- id: W13-SR-06
+  requester: W13
+  ruling: ACCEPTED
+  rulingId: W00-R-44
+  rationale: 'Source S3 (FDA letter 2018-03-07). Domain enum; kernel check: no conflict.'
+  change: Confirmed no kernel conflict.
+- id: W13-SR-07
+  requester: W13
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-07 / W00-R-21
+  rationale: Source S19 (FDA Data Dashboard), S18 (warning letter).
+  change: INSPECTION_PERIOD, INSPECTION_FOUND_VIOLATION, INSPECTION_CLASSIFIED_AS CANDIDATE; two candidate FI pairs added; RegulatoryInspection added to
+    AssertionSubjectTarget; relationship rows are W13 registry business.
+- id: W13-SR-15
+  requester: W13
+  ruling: ACCEPTED
+  rulingId: W00-R-36
+  rationale: 'Executed on 5.26.31: V-333 fires on a valid status, V-322 0 rows on N-07, V-334 blind to an episode-expressed vacatur.'
+  change: V-322r, V-333r, V-334r replace the originals; originals stay one release as migration checks (W13 proposal).
+- id: W13-SR-16
+  requester: W13
+  ruling: ACCEPTED
+  rulingId: W00-R-28
+  rationale: 'Executed: every DateTime GraphQL read fails without APOC. Same as W00-SR-14.'
+  change: APOC core 5.26.31 recorded as a runtime prerequisite (10-kernel-operations-delta.md section 4).
+- id: W14-SR-01
+  requester: W14
+  ruling: ACCEPTED
+  rulingId: W00-R-01 / W00-R-21
+  rationale: No token for the six IP types; IpRightStatus enters the union because W14-SR-02 (status per right and per claim, S1 vs S5) is accepted by the
+    kernel check.
+  change: Tokens patent-family, patent-application, granted-patent, patent-claim, patent-license, trademark; ip-status ACCEPTED_AS_CANDIDATE; IpRightStatus
+    added to AssertionSubjectTarget.
+- id: W14-SR-02
+  requester: W14
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-44
+  rationale: 'Failing case F-STATUS-01 (S1 Active vs S5 claims 1-3 ineligible). Kernel check: IpRightStatus is a VersionedState and does not collide with
+    RegulatoryStatus (INV-010 neighbour kept distinct).'
+  change: Kernel check passed; admission is Fable registry business; union membership added (W00-R-21).
+- id: W14-SR-04
+  requester: W14
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: 'Failing case N-2: a CALCULATED PROVES_EFFICACY from a PATENT_CLAIMS reading is caught only by V-W14-02.'
+  change: PATENT_CLAIMS REGISTERED (assertion-only); six pairs added to implicationPairs so V-112r covers them.
+- id: W14-SR-08
+  requester: W14
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: Classification consistency only; no failing case needed because nothing changes.
+  change: PredicateClass assignments confirmed; no new PredicateClass value.
+- id: W15-SR-07
+  requester: W15
+  ruling: ACCEPTED
+  rulingId: W00-R-47
+  rationale: 'Sources S2, S6, S11: bundles and recall scopes. Kernel check: no kernel relationship touched.'
+  change: Confirmed no kernel conflict; catalog range extensions are W15/Fable business.
+- id: W15-SR-08
+  requester: W15
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: INV-106 / V-000a cannot check seven W15 types.
+  change: Tokens listing, offer, price-obs, subscription-plan, bundle, bundle-component, inventory-item, individual-unit, affiliate-link, commerce-match.
+- id: W15-SR-09
+  requester: W15
+  ruling: ACCEPTED
+  rulingId: W00-R-18 / W00-R-22
+  rationale: 'Source S8 (Walmart $19.90 vs $45.00): an observation must name the span that showed it. Part (b) asks for a string sourceLocatorUid or an
+    edge; the edge wins because W20-V01-style checks and QS-1a traces traverse SUPPORTED_BY (the second consumer W15 asked for).'
+  change: (a) WAS_GENERATED_BY domain adds PriceObservation, Offer, AffiliateLink (Activity inverse fields in the fragment); (b) SupportedRecordTarget adds
+    PriceObservation and AffiliateLink; sourceLocatorUid may stay as a denormalized cache checked by V-W15-08 (W15 fallback).
+- id: W15-SR-10
+  requester: W15
+  ruling: ACCEPTED
+  rulingId: W00-R-44
+  rationale: 'Domain enums (W15). Kernel check: no conflict with kernel enums.'
+  change: Confirmed; CommerceMatch enums decided by Fable at merge.
+- id: W15-SR-11
+  requester: W15
+  ruling: ACCEPTED
+  rulingId: W00-R-07 / W00-R-41
+  rationale: 'Run 2026-10-04: N10 zero V-112 rows; N9 caught by catalog V-101 but not by the W00 inlined list.'
+  change: (a) LISTING_TITLE_AMOUNT REGISTERED; (b) V-101r/V-W00-02r read $assertedTypes (W15 types added); (c) two AFFILIATE_FOR_OFFER pairs added to implicationPairs.
+- id: W15-SR-15
+  requester: W15
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-08
+  rationale: 'Sources S6/S7: one publisher in two renditions that disagree on price; existing kinds misstate both.'
+  change: SourceKind BLOG_OR_REVIEW_PAGE and STOREFRONT_STRUCTURED_DATA added as CANDIDATE values; W19 may rename before 0.3.
+- id: W15-SR-16
+  requester: W15
+  ruling: ACCEPTED
+  rulingId: W00-R-28
+  rationale: Executed W15 GraphQL round trip without APOC.
+  change: As W13-SR-16.
+- id: W16-SR-01
+  requester: W16
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: Fixtures 03/07/10 write unregistered MeasurementPlan/Target/Observation uids.
+  change: Tokens measurement-plan, target, observation, protocol-result; ProtocolAdjustmentRule -> protocol-rule; condition (W03) and device (W08) registered
+    by their owners.
+- id: W16-SR-02
+  requester: W16
+  ruling: ACCEPTED
+  rulingId: W00-R-07 / W00-R-21
+  rationale: Fixtures 02 and 09 use unregistered predicates. W16 offered STEP_OCCURRENCES_PER_WEEK or a generic STEP_SCHEDULE_REPORTED with unitCode; the
+    generic one is chosen.
+  change: Seven predicates REGISTERED plus STEP_SCHEDULE_REPORTED (QUANTITY); Protocol, ProtocolEdition, ProtocolStep, Observation already in AssertionSubjectTarget.
+- id: W16-SR-04
+  requester: W16
+  ruling: ACCEPTED
+  rulingId: W00-R-06
+  rationale: V-533p compares with INTERNAL while 0.2.0 fixtures store internal.
+  change: Stored privacyClass values are PUBLIC/INTERNAL; lower-case values migrate (10-kernel-operations-delta.md); V-313r, V-521r.
+- id: W16-SR-06
+  requester: W16
+  ruling: ACCEPTED
+  rulingId: W00-R-23
+  rationale: D-004 needs a derived read-only projection and B1 forbids @cypher; derivationRule alone is legal only for ruleOnly types.
+  change: HAS_CURRENT_PROTOCOL_STEP ruleOnly (rule protocol-current-steps-v1) in $ruleOnlyDerivedTypes and $derivedTypes; V-542p stays W16-owned.
+- id: W16-SR-09
+  requester: W16
+  ruling: REJECTED
+  rulingId: W00-R-45
+  rationale: Route vocabulary is a domain vocabulary (StudyIntervention route, StepDoseProperties.route), not a kernel enum; W00 declines ownership.
+  change: 'No kernel change. W16 fallback: W09 owns one shared route enum (or EDQM Standard Terms code string) and W16 switches to it; Fable rules ownership.'
+- id: W16-SR-18
+  requester: W16
+  ruling: ACCEPTED
+  rulingId: W00-R-19
+  rationale: 'One relationship type, one meaning: kernel MENTIONS is SourceLocator -> Mention (identity_resolution).'
+  change: 'ProtocolResult.mentions uses MENTIONS_ENTITY with RetrievalEdgeProperties (derived). W16 fallback for a curated link: an asserted Assertion,
+    never a structural MENTIONS.'
+- id: W17-SR-02
+  requester: W17
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case: INV-106 / V-106 cannot check hu:safety-signal:, hu:use-constraint:, hu:adverse-effect: uids written by fixtures 00-05 (89, 124,
+    74 uids observed).'
+  change: AdverseEffect adverse-effect, SafetySignal safety-signal, UseConstraint use-constraint; ContraindicationAssertion and InteractionAssertion use
+    assertion (RelationshipAssertion precedent).
+- id: W17-SR-03
+  requester: W17
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-07
+  rationale: 'Failing case: fixtures 03-05 write 23 assertions with these predicates (V-W17-04/05 check them by name); QS-4a needs the pairs [NO_INTERACTION_RECORD,
+    NO_INTERACTION] and [POTENTIAL_SIGNAL_LISTED, CAUSAL_ASSOCIATION]. The PredicateClass value SAFETY has no failing case (fixtures work with OTHER).'
+  change: Four predicates CANDIDATE while the module is candidate (W17 proposal); FI-W17-01..09 registered and their 12 pairs added to implicationPairs;
+    PredicateClass SAFETY DEFERRED.
+- id: W17-SR-05
+  requester: W17
+  ruling: ACCEPTED
+  rulingId: W00-R-21 / W00-R-22
+  rationale: 'Failing case: fixture 02 writes SafetySignal -SUPPORTED_BY-> SourceLocator for the AEMS rows; with the old union SourceLocator.supports cannot
+    return them. SafetySignal carries the EvidenceAssessment archetype, outside the HAS_SUBJECT range.'
+  change: SafetySignal removed from AssertionSubjectTarget and added to SupportedRecordTarget; AdverseEffect kept.
+- id: W17-SR-06
+  requester: W17
+  ruling: ACCEPTED
+  rulingId: W00-R-49
+  rationale: 'Failing case: the AEMS lenvatinib row "no action was necessary at the time" has no claim-verdict equivalent; fixture 02 needs CLOSED_NO_ACTION.
+    Kernel check of (a)-(c): no archetype or kernel enum conflict.'
+  change: (a) SafetySignal is its own EvidenceAssessment type beside EvidenceSynthesis; (b) a UseContextProfile may be a POPULATION scope member of a UseConstraint;
+    (c) EvidenceStrength stays the legacy hint enum; (d) wording is W10's.
+- id: W17-SR-09
+  requester: W17
+  ruling: ACCEPTED
+  rulingId: W00-R-49
+  rationale: 'Source INV-210 ("Every mechanism-class Assertion ..."); failing case: a primary PK study INTERACTS_WITH assertion with basisKind DIRECT_MEASUREMENT
+    is flagged by V-231 (first version of W17 fixture 04, 2 rows); reproduced in this pass on W07 fx-90 (frozen V-231 1 row on a non-mechanism DIRECT_MEASUREMENT,
+    V-231r 0).'
+  change: V-231 replaced by V-231r (mechanism class only; null class read as mechanism); V-W17-01..13 adopted by reference.
+- id: W18-SR-01
+  requester: W18
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'Failing case: catalog 0.2.0 lists no token for the events_and_narrative types; fixtures 01-04 write 202 hu:event:, 23 hu:conference:, 4 hu:community:,
+    34 hu:narrative-arc:, 15 hu:event-impact: uids.'
+  change: Event event, Conference conference, Community community, NarrativeArc narrative-arc, EventImpactAssessment event-impact.
+- id: W18-SR-02
+  requester: W18
+  ruling: ACCEPTED
+  rulingId: W00-R-49
+  rationale: 'Failing case: without registered predicates and pairs V-112 cannot see N2/N4 and V-101 cannot list the W18 asserted types (W18 06 shows both
+    fire with fixtures/w18-validation-params.json). Kernel check: each W18 type carries exactly one archetype label; no kernel conflict.'
+  change: Promotion is Fable registry business; once the catalog carries the module, the validation parameters regenerate from it (W18 params file is the
+    input). Union membership follows the archetypes (W00-R-21/22).
+- id: W18-SR-04
+  requester: W18
+  ruling: ACCEPTED
+  rulingId: W00-R-09 / W00-R-13
+  rationale: 'Failing cases: fixture 01 E3 (Madrigal "expected to be available ... in April") is an EVENT_SCHEDULED statement in the future tense, which
+    without FUTURE reads as a past occurrence (N16 shape); fixture 04 writes activityKind CURATION, unreadable through the frozen enum.'
+  change: ActivityKind CURATION added; statedTense documents FUTURE (controlled string).
+- id: W18-SR-10
+  requester: W18
+  ruling: ACCEPTED
+  rulingId: W00-R-50
+  rationale: 'Failing case fixture 90 N6: an Adjudication CONSIDERS_ASSESSMENT a NarrativeArc and an Assertion SUPPORTED_BY an arc; eleven baseline validators
+    return zero rows, only W18-V03 reports them.'
+  change: NarrativeArc excluded from provenance state 3 and from CONSIDERS_ASSESSMENT targets; W18-V03 adopted by reference (final V-4xx id by Fable).
+- id: W18-SR-11
+  requester: W18
+  ruling: ACCEPTED
+  rulingId: W00-R-29
+  rationale: W18 offers two options and recommends the property; the failing case (re-materialization cannot tell which capture set announcedAt) is met
+    by Event.announcementAssertionUid, whose assertion is SUPPORTED_BY the announcing locator.
+  change: No new edge; ANNOUNCED_IN keeps its catalog domain (SourceRevisionEvent -> SourceSnapshot); revisit only if the derivation proves ambiguous.
+- id: W19-SR-01
+  requester: W19
+  ruling: ACCEPTED
+  rulingId: W00-R-08
+  rationale: 'Registry failing case: 46 of 127 entries have no sourceKind; ClinicalTrials.gov N-06 filed as REGULATORY_RECORD.'
+  change: Eight values added (TRIAL_REGISTRY_RECORD, BIBLIOGRAPHIC_RECORD, NEWS_ARTICLE, LEGISLATION_OR_REGULATION, PRESENTATION_SLIDES, PERSONAL_WEBPAGE,
+    TECHNICAL_DOCUMENTATION, OTHER) plus Source.sourceKindNote; V-W00-17.
+- id: W19-SR-02
+  requester: W19
+  ruling: ACCEPTED
+  rulingId: W00-R-15
+  rationale: 'Fixture 03 / Q-08a: a COMPLETE capture of the PubMed abstract record would read NOT_FOUND_IN_COMPLETE_CAPTURE.'
+  change: Source.renditionCoverage (CANDIDATE enum RenditionCoverage) kept; FI [NOT_FOUND_IN_PARTIAL_CAPTURE, NOT_DISCLOSED] extended to complete captures
+    of PARTIAL renditions.
+- id: W19-SR-03
+  requester: W19
+  ruling: ACCEPTED
+  rulingId: W00-R-09
+  rationale: 'Fixture 05: N-07/N-08 discovery failures leave no record, so missing history reads "never changed".'
+  change: ActivityKind DISCOVERY added; SourceDiscoveryRecord shares the Activity label (read through Activity, MR-01); discovery-only fields stay on the
+    specialization.
+- id: W19-SR-04
+  requester: W19
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-46
+  rationale: 'Fixture 05 / Q-15: an OPERATING state supported only by a securities filing passes V-324 though the filing is SELF_DECLARATION.'
+  change: AuthorityScope (W19 enum) and conventions.predicateAuthorityScopes admitted as CANDIDATE; a predicate without a row reads NOT_ASSESSED; V-324r
+    stays the hard check until rows exist.
+- id: W19-SR-05
+  requester: W19
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-01
+  rationale: 'INV-106: borrowed tokens assessment/policy/activity collide in meaning.'
+  change: source-authority, coverage-requirement, source-discovery ACCEPTED_AS_CANDIDATE with the candidate types.
+- id: W19-SR-09
+  requester: W19
+  ruling: ACCEPTED
+  rulingId: W00-R-31
+  rationale: 'Fixture 04: archive capture observed 2018 retrieved after a live capture; V-409/V-512 1 row each.'
+  change: V-409r, V-512r (content clock).
+- id: W19-SR-10
+  requester: W19
+  ruling: ACCEPTED
+  rulingId: W00-R-15
+  rationale: 15 registry entries use doi.org resolver URLs; V-235 joins on "https://doi.org/" + doi and misses PMC/PubMed renditions.
+  change: canonicalUri rule adopted (post-redirect endpoint, never a resolver); V-235r joins by RENDITION_OF; V-W00-19 promotes Q-02.
+- id: W19-SR-13
+  requester: W19
+  ruling: ACCEPTED
+  rulingId: W00-R-15
+  rationale: 'Fixture 03: complete captures of partial renditions counted as covering (Q-08a, Q-08c).'
+  change: QS-7 NOT_DECLARED_IN_COVERING_SOURCE requires a COMPLETE capture of a FULL rendition, else NOT_FOUND_IN_PARTIAL_CAPTURE.
+- id: W19-SR-15
+  requester: W19
+  ruling: ACCEPTED
+  rulingId: W00-R-31
+  rationale: 'N-14: cache hit served 19 hours old content.'
+  change: 'Ingestion rule: observedAt = the service cache time, retrievedAt = request time; the CAPTURE Activity methodVersion records cache state. No schema
+    change.'
+- id: W20-SR-01
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-23
+  rationale: 'Failing case fixture 01: offset-overlap-v1 RESOLVES_TO_CHUNK edges reported by V-112 as DERIVATION_WITHOUT_SOURCE_ASSERTIONS.'
+  change: 'RESOLVES_TO_CHUNK, HAS_CHUNK, ABOUT, MENTIONS_ENTITY are ruleOnly; the chunk-overlap use of OCCURS_IN_SEGMENT is renamed CHUNK_IN_SEGMENT (ruleOnly)
+    because W21 already uses OCCURS_IN_SEGMENT as a structural ClaimOccurrence -> EpisodeSegment edge: with OCCURS_IN_SEGMENT listed as derived, V-112r
+    reported 7 correct W21 edges as NO_CITATION (run of this pass). W20 fallback: Chunk.inEpisodeSegments keeps its field name with type CHUNK_IN_SEGMENT.
+    SUPPORTED_BY_CHUNK and SUPPORTED_BY_DOCUMENT are not ruleOnly.'
+- id: W20-SR-02
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: Segmentation has a live stored id and V-117 applies but no token.
+  change: Token segmentation.
+- id: W20-SR-04
+  requester: W20
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-19
+  rationale: 'ABOUT/MENTIONS_ENTITY are derived and need DerivedEdgeProperties fields plus ranking features with no frozen home. Kernel condition: the type
+    contains every DerivedEdgeProperties field (B4 specialization rule).'
+  change: RetrievalEdgeProperties admitted as CANDIDATE (W20 sole writer; W21, W16, W22 reuse); maturity CANDIDATE until a retrieval evaluation exists.
+- id: W20-SR-05
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-18
+  rationale: Fixture 01 Q01-h needs Segmentation -> Activity; activityKind SEGMENTATION exists with nothing to generate.
+  change: WAS_GENERATED_BY domain adds Segmentation; Activity.generatedSegmentations inverse field.
+- id: W20-SR-06
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-29
+  rationale: 'Fixture 01 Q01-e: chunk g3-c0 reaches A1 only through REANCHORS; an automatic join would put a span A1 never cited behind it.'
+  change: 'No automatic join: a CAPTURE_FIDELITY review may add SUPPORTED_BY to the re-anchored locator (content unchanged); shortcuts regenerate from it.'
+- id: W20-SR-07
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-29
+  rationale: 'Fixture 04 Q04-a: PDF and PMC locators share a quoteHash across Sources; REANCHORS cannot link them.'
+  change: Range index on SourceLocator.quoteHash (10-kernel-operations-delta.md); cross-rendition agreement is a computed quoteHash join (candidate CQ-PV-C03);
+    no stored edge.
+- id: W20-SR-08
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-14
+  rationale: 'Failing case fixture 02 N13/N14: a Document read through Source shows null name and the canonicalUri constraint misses it (W20-V05).'
+  change: 'Source.name is @alias(property: "title") and the separate Source.title field is removed (one stored property, one field, as Document.name); canonicalUri
+    required for new writes (Document writes url and canonicalUri equal; W20-V05). Contract B2 alias list gains Source.name -> title (Fable).'
+- id: W20-SR-09
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-43
+  rationale: Fixture 01 re-runs would duplicate chunks with random ids unless a lookup precedes every write.
+  change: Opaque segment may be a hex sha256 of the identity tuple for DocumentTextVersion, Segmentation, Chunk only (still opaque, never a name); liveIdProjection
+    note amended.
+- id: W20-SR-10
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-08
+  rationale: A reinstatement notice page can only be filed as CORRECTION_NOTICE, which misstates it; notices are documents (kinds), not revision states.
+  change: SourceKind REINSTATEMENT_NOTICE added (pairs with SourceRevisionKind REINSTATEMENT).
+- id: W20-SR-11
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-16
+  rationale: Same failing case as W01-SR-03.
+  change: As W01-SR-03.
+- id: W20-SR-13
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-19
+  rationale: 'A count of MENTIONS mixes captured surface forms with model-linked entities. W20 preferred keeping the name and splitting by start label;
+    W21 asked for a rename. The rename wins: a label-free traversal cannot be guarded by start label.'
+  change: 'Kernel MENTIONS = SourceLocator -> Mention; entity-level retrieval edges are MENTIONS_ENTITY (derived, ruleOnly, RetrievalEdgeProperties). W20
+    fallback: Chunk.mentions keeps its GraphQL name with type MENTIONS_ENTITY; V-W00-15 audits leftovers.'
+- id: W20-SR-18
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-40
+  rationale: 'Fixture 02 (run): V-407 reports 1 of 4 chunk-support defects; W20-V01 all 4.'
+  change: V-407 replaced by W20-V01 (V-407r); W20-V02..V10 adopted by reference as W20 validators.
+- id: W20-SR-19
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-24
+  rationale: 'Fixture 04 (computed): counting after NFC-WS1 moves the PDF start 538 -> 536 so substring() no longer reproduces exact.'
+  change: Offsets count code points of DocumentTextVersion.text as stored; SourceLocator.normalizationVersion governs the quote hash only; writers convert
+    UTF-16 offsets.
+- id: W20-SR-20
+  requester: W20
+  ruling: ACCEPTED_AS_CANDIDATE
+  rulingId: W00-R-24
+  rationale: 'Run on 5.26.31: NFKC turns 10^6 into 106 and micro into mu; fixture 04 splits "signi\nfi\ncance".'
+  change: LIG-HY1 registered as a matching-only normalization (never for quoteHash); NFKC rejected; NFC-WS1 stays the only hash normalization.
+- id: W20-SR-23
+  requester: W20
+  ruling: ACCEPTED
+  rulingId: W00-R-45
+  rationale: Fixture 02 N13 reproduces the example shape and fails the GraphQL read (Document.id null).
+  change: Routed to Fable (examples owner); W00 agrees with documentId, type, url and entityType Document.
+- id: W21-SR-01
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'fx01 creates hu:platform: uids; collision with W08 resolved (TechnologyPlatform -> technology-platform).'
+  change: 'Platform: platform.'
+- id: W21-SR-03
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-29
+  rationale: 'fx01: the YouTube and feed sponsor chapters need snapshot-bound boundaries. Kernel check: structural, EpisodeSegment -> SourceLocator, no
+    kernel conflict.'
+  change: DELIMITED_BY accepted as a W21-owned structural relationship (V-W21-05).
+- id: W21-SR-07
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-25
+  rationale: 'fx07: a correct derived RECOMMENDS edge returns 1 row from verbatim V-423 (reads assertionUid, which D-011 forbids on derived edges).'
+  change: 'V-423 replaced by V-W21-06 (V-423r); RECOMMENDS added to $derivedTypes; W05 ledger question answered: rule mode, never assertionUid or projectionOfAssertionUid.'
+- id: W21-SR-10
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-19
+  rationale: One type, two meanings (CL-014 precedent).
+  change: 'As W20-SR-13: MENTIONS_ENTITY for retrieval; Episode.mentions keeps its field name with type MENTIONS_ENTITY.'
+- id: W21-SR-13
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-08
+  rationale: fx01 feed, fx06 transcript and deck, fx04 article carry null or the misfit NEWSLETTER.
+  change: SourceKind PODCAST_FEED, EVENT_TRANSCRIPT, PRESENTATION_SLIDES, NEWS_ARTICLE added; DocumentType TRANSCRIPT is W20 business (no kernel conflict).
+- id: W21-SR-14
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-10
+  rationale: 'fx03: the guest statement vs the InsideTracker sponsorship is neither SAME_ORGANIZATION nor SPONSOR_OF_CONTAINER in substance.'
+  change: RelevanceBasis SAME_SERVICE_CATEGORY added.
+- id: W21-SR-15
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-07
+  rationale: fx03 practice reports and fx06 talk statements stay PROPOSED on unregistered predicates. The two placeholders have no owner and no failing
+    case of their own.
+  change: SELF_REPORTED_PRACTICE, OPERATES_CHANNEL, ACCOMPANIES_TALK REGISTERED; FORECASTS_COMMERCIAL_OPPORTUNITY and REPORTS_LIFESPAN_EFFECT DEFERRED.
+- id: W21-SR-16
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-40 / W00-R-41
+  rationale: Each V-W21 validator has a negative only it catches; params omit SPONSORS_CONTENT.
+  change: V-W21-06 -> V-423r, V-W21-12 -> V-416r; others adopted by reference; SPONSORS_CONTENT, OPERATES_CHANNEL, SERVES_ON_CHANNEL, ACCOMPANIES_TALK in
+    $assertedTypes; RECOMMENDS in $derivedTypes.
+- id: W21-SR-17
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-45
+  rationale: 'Executed: V-W21-02 1 row, V-W21-09 2 rows on the inherited example.'
+  change: Routed to Fable (examples); W00 agrees with the target shape.
+- id: W21-SR-21
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-29
+  rationale: 'fx03 Q03-4: publisher and YouTube captions disagree on a hedge.'
+  change: QS-1a trace gap code RENDITION_TEXT_DISAGREES; cross-rendition discrepancies route to CAPTURE_FIDELITY adjudication (PARTIALLY_SUPPORTED). No
+    schema change.
+- id: W21-SR-23
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-40
+  rationale: W08-SR-10 device qualifiers have no container; verbatim V-416 flags every one.
+  change: Assertion.qualifiedBy / qualifies fields (QUALIFIED_BY, QualificationProperties owned by W21) added to the W00 fragment; V-416 replaced by V-W21-12
+    (V-416r).
+- id: W21-SR-25
+  requester: W21
+  ruling: ACCEPTED
+  rulingId: W00-R-21
+  rationale: 'merge-fragments 01:49Z: UNDEF ExperienceReport <- W00 (MR-02).'
+  change: ExperienceReport dropped from AssertionSubjectTarget; no token.
+- id: W22-SR-01
+  requester: W22
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: No media token; INV-106 cannot check mp1..mp6 uids.
+  change: media-asset, media-variant, media-annotation, graph-view, figure-panel, label-region, media-assessment, media-rights; Pathway pathway (W03 agrees).
+- id: W22-SR-02
+  requester: W22
+  ruling: ACCEPTED
+  rulingId: W00-R-10
+  rationale: 'mp4 Q-MP4-3 / V-608: displaying an image needs a useKind; QUOTE_IN_ANSWER misstates it. Conflicts with W23-SR-15 on the name only.'
+  change: 'UseKind DISPLAY_MEDIA added (covers answers, pages and exports); DERIVE_MEDIA DEFERRED to W23 (no failing case yet). W23 fallback: DISPLAY_MEDIA_IN_ANSWER
+    is not added; PolicyVersion.permittedUseKinds uses DISPLAY_MEDIA.'
+- id: W22-SR-03
+  requester: W22
+  ruling: ACCEPTED
+  rulingId: W00-R-18
+  rationale: mp5 Q-MP5-1 and mp6 Q-MP6-1 traverse Activity-USED->MediaVariant/MediaAnnotation; V-607/V-614 depend on it.
+  change: WAS_GENERATED_BY domain adds MediaAsset, MediaVariant, MediaAnnotation (MediaSuitabilityAssessment already an EvidenceAssessment); USED range
+    adds MediaAsset, MediaVariant, MediaAnnotation; Activity forward and inverse fields added.
+- id: W22-SR-04
+  requester: W22
+  ruling: ACCEPTED
+  rulingId: W00-R-09
+  rationale: 'mp3/mp6: a generated illustration and an overlay must be distinguishable from a CAPTURE (V-607).'
+  change: ActivityKind MEDIA_GENERATION, MEDIA_TRANSFORMATION, MEDIA_ASSESSMENT added.
+- id: W22-SR-05
+  requester: W22
+  ruling: ACCEPTED
+  rulingId: W00-R-24
+  rationale: 'mp5: the same region is (310,240,1320,1180) on the 1946 px rendition; an IMAGE_REGION locator is bound to one snapshot (one byte sequence),
+    so pixel coordinates on that raster are exact. Conflict with W00-SR-10 (relative fractions): W22 wins.'
+  change: 'IMG-PX1 registered in conventions.normalizationVersions; IMAGE_REGION locators must use a registered image normalization; W00 fixture 10 switched
+    to IMG-PX1. W00 fallback: relative coordinates are computed at read time for cross-rendition comparison.'
+- id: W22-SR-06
+  requester: W22
+  ruling: ACCEPTED
+  rulingId: W00-R-08
+  rationale: mp1..mp6 Sources (upload.wikimedia.org, Commons API, BioStudies API) have no fitting kind.
+  change: SourceKind MEDIA_FILE, MEDIA_REPOSITORY_RECORD, DATA_REPOSITORY_RECORD added.
+- id: W22-SR-08
+  requester: W22
+  ruling: ACCEPTED
+  rulingId: W00-R-07 / W00-R-40
+  rationale: Negatives mp3 n1/n2, mp4 BAD-1/2, mp5 n1/n2, mp6 n1 are caught only by V-601..V-608b.
+  change: V-601..V-615 adopted by reference (statically checked; V-608b, V-610 informational); six media FI pairs added to implicationPairs.
+- id: W22-SR-13
+  requester: W22
+  ruling: ACCEPTED
+  rulingId: W00-R-21
+  rationale: 'merge-fragments: UNDEF MediaSource <- W00; mp1/mp2/mp4 HAS_RIGHTS_RECORD objects untyped.'
+  change: MediaSource dropped; MediaRightsRecord added to AssertionSubjectTarget; LOCATES_REGION / MediaAnnotation.locatedBy pairing confirmed.
+- id: W23-SR-01
+  requester: W23
+  ruling: ACCEPTED
+  rulingId: W00-R-01
+  rationale: 'fixtures/00 writes hu:decision-criterion: with no registered token.'
+  change: PolicyVersion policy-version, DecisionCriterion decision-criterion, AnswerRecord answer-record (catalog) keyed by label; experience-report rejected
+    (type retired).
+- id: W23-SR-02
+  requester: W23
+  ruling: ACCEPTED
+  rulingId: W00-R-18
+  rationale: Fixture 12 records have no lineage, so V-W23-03b can only be informational.
+  change: WAS_GENERATED_BY domain adds AnswerRecord; Activity.generatedAnswerRecords; V-W23-03b may become a failing validator (W23).
+- id: W23-SR-03
+  requester: W23
+  ruling: ACCEPTED
+  rulingId: W00-R-05
+  rationale: 'checks/roundtrip-variant-a-contract-B3.json: "Field uid is not defined by type EvidenceAssessmentArchetypeWhere".'
+  change: 'uid: String! and id: ID! added to AssertionArchetype and EvidenceAssessmentArchetype (every implementer already has them through Entity; merged
+    build checked).'
+- id: W23-SR-06
+  requester: W23
+  ruling: ACCEPTED
+  rulingId: W00-R-11
+  rationale: fixtures/04-uid-redirect.cypher Q-RD-1/Q-RD-2 resolve only with directed fields. W00-SR-05 proposed redirectToUid on the retired node; W23
+    proposed survivingUid/retiredUid on the record. W23 shape wins (immutable, recorded-time resolvable); W00 names the kind.
+  change: 'EquivalenceKind SAME_IDENTITY_MERGED; EquivalenceAssessment.survivingUid/retiredUid; retired node kept with maturity DEPRECATED; V-432r and V-W00-13;
+    fixture 13 Q13-a. W23 fallback: replace redirectKind DUPLICATE_MERGE with equivalenceKind SAME_IDENTITY_MERGED; SupersessionKind DUPLICATE_MERGE stays
+    for re-stated assertions.'
+- id: W23-SR-07
+  requester: W23
+  ruling: ACCEPTED
+  rulingId: W00-R-32
+  rationale: 'fixtures/04: V-432 returns comparedCount 0 for a catalog-conformant assessment (also W00 fixture 08).'
+  change: V-432 replaced by V-432r (COMPARES_IDENTITIES + redirect fields).
+- id: W23-SR-08
+  requester: W23
+  ruling: ACCEPTED
+  rulingId: W00-R-06
+  rationale: 'fixtures/10 2e: PRIVATE_PERSONAL not reported by V-521; the API stores INTERNAL (checks/roundtrip storedNode).'
+  change: Stored values PUBLIC/INTERNAL; any other value is a violation (V-521r absorbs V-W23-09 and V-W23-10); V-313r; QS-5b/QS-6 private tests read hu:private-
+    and any non-final class; lower-case migration.
+- id: W23-SR-10
+  requester: W23
+  ruling: ACCEPTED
+  rulingId: W00-R-27
+  rationale: Q-PP-2 shows A1 <-USED- Activity -AUTHORIZED_BY-> PolicyVersion reachable in two hops from a PUBLIC projection.
+  change: 'Field privacy classes adopted (fragment banner): Activity INTERNAL; Agent model/promptVersion/toolVersion INTERNAL; Adjudication humanReviewPending
+    and reviewer edges INTERNAL; ResolutionHypothesis INTERNAL; mongoResearchRunId, agentRunUid, extractionConfidence, extractionMethod INTERNAL. W23 owns
+    the closure table.'
+- id: W23-SR-15
+  requester: W23
+  ruling: ACCEPTED
+  rulingId: W00-R-10 / W00-R-18
+  rationale: Same failing case as W22-SR-02 (an image answer can only cite QUOTE_IN_ANSWER). The USED -> MediaRightsRecord extension has no failing case
+    (conditional request).
+  change: UseKind DISPLAY_MEDIA (W22 name); QUOTE_IN_ANSWER never covers images; USED range adds MediaAsset (W22-SR-03); USED -> MediaRightsRecord DEFERRED
+    until a composing Activity must cite a rights record.

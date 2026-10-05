@@ -1,0 +1,74 @@
+# W19 migration map: live and catalog elements in the Source Intelligence scope.
+# Live schema: docs/schema/current_biotech_schema.graphql (86b5e0b5...f112), lines 2589-2695 (DocumentType, DocumentDomain, Document).
+# Final owners: Document SDL W20; Source / RENDITION_OF / SourceKind W00; Publication W09; Episode W21. W19 records the recommended
+# mapping; the owners write the final definitions.
+- {live: Document, final: "Document (labels Document, Source, Entity)", action: keep, note: "always a Source; one canonicalUri; W20 writes the SDL"}
+- {live: Document.id (stored documentId), final: Document.id, action: keep, note: "uid hu:document:<opaque> ends with ':' + documentId (V-117)"}
+- {live: Document.name (stored title), final: Source.title / Document.name, action: keep, note: "presentation only, never identity"}
+- {live: Document.documentKey, final: Document.documentKey, action: keep, note: "W20; not identity across renditions"}
+- {live: Document.sourceUrl (stored url), final: Source.canonicalUri, action: rename, note: "apply canonicalUri rule (W19-SR-10); a doi.org or identifiers.org value becomes an Identifier of the Publication, not a canonicalUri"}
+- {live: Document.documentType (stored type), final: Document.documentType (genre) + Source.sourceKind (endpoint kind), action: split, note: "genre stays on DocumentType (W20); sourceKind derived by the table below at migration, then curated"}
+- {live: Document.documentDomain, final: Document.documentDomain, action: keep, note: "W20"}
+- {live: Document.publisher, final: Source.publisherUid (+ verbatim publisher string), action: refine, note: "resolve to Organization/Person; keep the string as stated"}
+- {live: Document.publicationVenue, final: Publication (W09) venue, action: move, note: "venue is a property of the scholarly work"}
+- {live: Document.publishedAt, final: "Publication.publishedAt | Episode.publishedAt | SourceSnapshot.publishedAt", action: split, note: "work issue time vs version issue time of this endpoint"}
+- {live: Document.fileFormat, final: SourceSnapshot.mimeType, action: move, note: "per capture"}
+- {live: Document.languageCode, final: SourceSnapshot.language, action: move, note: "per capture; may also stay on Document as declared language (W20)"}
+- {live: Document.isPeerReviewed, final: Document.isPeerReviewed, action: keep, note: "venue fact; unaffected by retraction"}
+- {live: Document.isPrimarySource, final: null, action: retire, note: "derive per assertion: no outgoing RETELLS (Q-05); advisory deprecation first, read-only"}
+- {live: Document.isRegulatorySource, final: "Source.sourceKind in [REGULATORY_RECORD, REGULATORY_GUIDANCE, LEGISLATION_OR_REGULATION]", action: derive, note: "plus SourceAuthorityAssessment scopes REGULATORY_ACTION / REGULATORY_FRAMEWORK"}
+- {live: Document.isFinancialDisclosure, final: Document.isFinancialDisclosure, action: keep, note: "genre fact (CQ-CL-05)"}
+- {live: "Document.sourceForEpisodes (SOURCE_OF -> Episode, RoleMetadata)", final: RENDITION_OF (Source -> Episode), action: rename, note: "direction Source -> work; RoleMetadata dropped; apply test R3 (a deck is never a rendition of a talk)"}
+- {live: Document.hasTextVersions (HAS_TEXT_VERSION), final: HAS_TEXT_VERSION, action: keep, note: "W00/W20"}
+- {live: Document.hasChunks, final: HAS_CHUNK (derived), action: keep, note: "W20"}
+- {live: Document.about, final: ABOUT (derived retrieval), action: keep, note: "W20; never evidence"}
+- {live: Document.authoredBy, final: "AUTHORED_BY (W20) and ASSERTED_BY on the document's assertions", action: keep, note: "authorship is not attribution of every sentence"}
+- {live: "@fulltext DocumentSearch [name, sourceUrl, searchText]", final: "DocumentSearch on stored [title, url, searchText]", action: keep, note: "D-015; url stays the stored name of canonicalUri for Document until W20/W00 decide an alias"}
+# DocumentType -> SourceKind derivation table (default; curation may override per Source)
+- {live: DocumentType.SCIENTIFIC_ARTICLE, final: SourceKind.PEER_REVIEWED_PUBLICATION, action: derive, note: "if the endpoint is PubMed: BIBLIOGRAPHIC_RECORD"}
+- {live: DocumentType.REVIEW_ARTICLE, final: SourceKind.PEER_REVIEWED_PUBLICATION, action: derive, note: ""}
+- {live: DocumentType.META_ANALYSIS, final: SourceKind.PEER_REVIEWED_PUBLICATION, action: derive, note: ""}
+- {live: DocumentType.SYSTEMATIC_REVIEW, final: SourceKind.PEER_REVIEWED_PUBLICATION, action: derive, note: ""}
+- {live: DocumentType.CASE_REPORT, final: SourceKind.PEER_REVIEWED_PUBLICATION, action: derive, note: ""}
+- {live: DocumentType.PREPRINT, final: SourceKind.PREPRINT, action: derive, note: ""}
+- {live: DocumentType.CLINICAL_TRIAL_RECORD, final: SourceKind.TRIAL_REGISTRY_RECORD, action: derive, note: "proposed value (W19-SR-01)"}
+- {live: DocumentType.CLINICAL_TRIAL_PROTOCOL, final: SourceKind.OTHER, action: derive, note: "protocol document; W09 ProtocolVersion is the work"}
+- {live: DocumentType.TRIAL_RESULT, final: SourceKind.TRIAL_REGISTRY_RECORD, action: derive, note: "results section of a registry record; a journal results paper is PEER_REVIEWED_PUBLICATION"}
+- {live: DocumentType.WHITE_PAPER, final: SourceKind.ORGANIZATION_WEBPAGE, action: derive, note: "or MARKETING_PAGE when promotional"}
+- {live: DocumentType.TECHNICAL_REPORT, final: SourceKind.TECHNICAL_DOCUMENTATION, action: derive, note: "proposed value"}
+- {live: DocumentType.REGULATORY_FILING, final: SourceKind.REGULATORY_RECORD, action: derive, note: ""}
+- {live: DocumentType.SEC_FILING, final: SourceKind.SECURITIES_FILING, action: derive, note: "AuthorityScope SELF_DECLARATION"}
+- {live: DocumentType.ANNUAL_REPORT, final: SourceKind.SECURITIES_FILING, action: derive, note: "or ORGANIZATION_WEBPAGE when not filed"}
+- {live: DocumentType.QUARTERLY_REPORT, final: SourceKind.SECURITIES_FILING, action: derive, note: ""}
+- {live: DocumentType.INVESTOR_PRESENTATION, final: SourceKind.PRESENTATION_SLIDES, action: derive, note: "proposed value; never RENDITION_OF a talk"}
+- {live: DocumentType.EARNINGS_TRANSCRIPT, final: SourceKind.PODCAST_TRANSCRIPT_PAGE, action: derive, note: "transcript of a call; the call is the work (W21)"}
+- {live: DocumentType.PRESS_RELEASE, final: SourceKind.PRESS_RELEASE, action: derive, note: ""}
+- {live: DocumentType.PATENT, final: SourceKind.LEGAL_RECORD, action: derive, note: "W14 owns patent identity"}
+- {live: DocumentType.PATENT_APPLICATION, final: SourceKind.LEGAL_RECORD, action: derive, note: ""}
+- {live: DocumentType.PRODUCT_LABEL, final: SourceKind.MANUFACTURER_LABEL_PAGE, action: derive, note: "AuthorityScope LABEL_DECLARATION"}
+- {live: DocumentType.PACKAGE_INSERT, final: SourceKind.MANUFACTURER_LABEL_PAGE, action: derive, note: ""}
+- {live: DocumentType.SAFETY_COMMUNICATION, final: SourceKind.REGULATORY_RECORD, action: derive, note: "when issued by an agency; else ORGANIZATION_WEBPAGE"}
+- {live: DocumentType.SAFETY_DATA_SHEET, final: SourceKind.TECHNICAL_DOCUMENTATION, action: derive, note: ""}
+- {live: DocumentType.SOP, final: SourceKind.TECHNICAL_DOCUMENTATION, action: derive, note: ""}
+- {live: DocumentType.POLICY, final: SourceKind.ORGANIZATION_WEBPAGE, action: derive, note: ""}
+- {live: DocumentType.GUIDELINE, final: SourceKind.STANDARDS_DOCUMENT, action: derive, note: "agency guidance -> REGULATORY_GUIDANCE"}
+- {live: DocumentType.WEBPAGE, final: SourceKind.ORGANIZATION_WEBPAGE, action: derive, note: "curate: SELF_DISCLOSURE_PAGE, PERSONAL_WEBPAGE, PODCAST_TRANSCRIPT_PAGE as applicable"}
+- {live: DocumentType.BLOG_POST, final: SourceKind.NEWSLETTER, action: derive, note: "or PERSONAL_WEBPAGE / NEWS_ARTICLE"}
+- {live: DocumentType.NEWS_ARTICLE, final: SourceKind.NEWS_ARTICLE, action: derive, note: "proposed value"}
+- {live: DocumentType.CONFERENCE_ABSTRACT, final: SourceKind.PEER_REVIEWED_PUBLICATION, action: derive, note: "work is a Publication with publicationKind CONFERENCE_ABSTRACT"}
+- {live: DocumentType.CONFERENCE_POSTER, final: SourceKind.PRESENTATION_SLIDES, action: derive, note: "proposed value"}
+- {live: DocumentType.CONFERENCE_PRESENTATION, final: SourceKind.PRESENTATION_SLIDES, action: derive, note: "the recorded talk is an Episode rendition, not this Document"}
+- {live: DocumentType.DATASET, final: SourceKind.OTHER, action: derive, note: "W09 Dataset is the identity"}
+- {live: DocumentType.DATABASE_RECORD, final: SourceKind.BIBLIOGRAPHIC_RECORD, action: derive, note: "curate: TERMINOLOGY_RECORD, REGULATORY_RECORD, TRIAL_REGISTRY_RECORD"}
+- {live: DocumentType.MANUAL, final: SourceKind.TECHNICAL_DOCUMENTATION, action: derive, note: ""}
+- {live: DocumentType.UNKNOWN, final: SourceKind.OTHER, action: derive, note: "with sourceKindNote"}
+# catalog and repository elements
+- {live: catalog Source.sourceKind (27 values), final: SourceKind (35 values), action: keep, note: "add 8 values (W19-SR-01); none removed"}
+- {live: catalog RENDITION_OF (Source -> Episode|Publication), final: RENDITION_OF, action: keep, note: "test R3; at most one work per Source; target never a Source"}
+- {live: "validation V-235 join canonicalUri = 'https://doi.org/' + pub.doi", final: "V-235 via (src)-[:RENDITION_OF]->(pub)", action: refine, note: "W19-SR-10; current join misses PMC/PubMed renditions"}
+- {live: "validation V-409 / V-512 ordering by retrievedAt", final: "order by coalesce(observedAt, retrievedAt)", action: refine, note: "W19-SR-09; late archive captures"}
+- {live: "source-registry.yaml kind", final: Source.sourceKind, action: rename, note: "registry-authority-mapping.yaml proposedSourceKind"}
+- {live: "source-registry.yaml authorityFor", final: "SourceAuthorityAssessment.authorityScopes + authorityForTags", action: split, note: "controlled scope + verbatim tags"}
+- {live: "source-registry.yaml notAuthorityFor", final: SourceAuthorityAssessment.notAuthorityForTags, action: move, note: "verbatim"}
+- {live: "source-registry.yaml url (doi.org, 15 entries)", final: "Identifier (scheme DOI) on Publication", action: split, note: "the Source is the resolved landing page captured, not the DOI"}
+- {live: "source-registry.yaml url (pubmed.ncbi.nlm.nih.gov for a work, 4 entries)", final: "Source sourceKind BIBLIOGRAPHIC_RECORD, RENDITION_OF Publication, renditionCoverage PARTIAL", action: refine, note: ""}

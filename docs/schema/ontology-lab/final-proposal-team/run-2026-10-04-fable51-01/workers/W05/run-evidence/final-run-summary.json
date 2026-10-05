@@ -1,0 +1,885 @@
+{
+ "r6-ops.json": {
+  "total": 11,
+  "ok": 11,
+  "failed": 0,
+  "nonzero": []
+ },
+ "r6-val-clean.json": {
+  "total": 12,
+  "ok": 12,
+  "failed": 0,
+  "nonzero": []
+ },
+ "r6-cq.json": {
+  "total": 9,
+  "ok": 9,
+  "failed": 0,
+  "nonzero": [
+   {
+    "n": 1,
+    "rows": 2,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Q-ST-01-food: what did each arm take (followed definitions and material components)?"
+    ],
+    "sample": [
+     {
+      "arm": "DicaBr group (DCB)",
+      "duration": "P16W",
+      "registryType": "DIETARY_SUPPLEMENT",
+      "followsDefinition": "Brazilian Cardioprotective Diet (DicaBr)",
+      "materialComponents": []
+     },
+     {
+      "arm": "DicaBr group and nuts (DCBN)",
+      "duration": "P16W",
+      "registryType": "DIETARY_SUPPLEMENT",
+      "followsDefinition": "Brazilian Cardioprotective Diet (DicaBr)",
+      "materialComponents": [
+       "Peanut (preparation not specified) 10.0 g PER_DAY",
+       "Brazil nut (preparation not specified) 10.0 g PER_DAY",
+       "Cashew nut (preparation not specified) 10.0 g PER_DAY"
+      ]
+     }
+    ]
+   },
+   {
+    "n": 2,
+    "rows": 2,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Q-FL-C01: composition of the food a study used, by preparation variant, with source, derivation and spread."
+    ],
+    "sample": [
+     {
+      "studiedFood": "Brazil nut (preparation not specified)",
+      "variant": "Nuts, brazilnuts, dried, unblanched",
+      "variantKind": "PREPARATION",
+      "amount": 1917,
+      "unit": "ug/hg",
+      "basis": "AMOUNT_PER_MASS_OF_MATERIAL",
+      "statementKind": "TYPICAL_COMPOSITION_REPORTED",
+      "portion": "EDIBLE_PORTION",
+      "derivation": "ANALYTICAL",
+      "min": 136,
+      "max": 2740,
+      "n": 15,
+      "source": "https://api.nal.usda.gov/fdc/v1/food/170569",
+      "publishedAt": {
+       "year": 2019,
+       "month": 4,
+       "day": 1,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "recordedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 4,
+       "hour": 2,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      }
+     },
+     {
+      "studiedFood": "Brazil nut (preparation not specified)",
+      "variant": "Nuts, brazilnuts, dried, unblanched",
+      "variantKind": "PREPARATION",
+      "amount": 1520,
+      "unit": "ug/hg",
+      "basis": "AMOUNT_PER_MASS_OF_MATERIAL",
+      "statementKind": "TYPICAL_COMPOSITION_REPORTED",
+      "portion": "EDIBLE_PORTION",
+      "derivation": "ANALYTICAL",
+      "min": null,
+      "max": null,
+      "n": 6,
+      "source": "https://foodcomposition.example.invalid/records/brazil-nut-dried-2025",
+      "publishedAt": {
+       "year": 2025,
+       "month": 4,
+       "day": 1,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "recordedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 5,
+       "hour": 9,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      }
+     }
+    ]
+   },
+   {
+    "n": 3,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Q-FL-C01b: as-of recorded time 2026-10-04T12:00Z (before the late-arriving record)."
+    ],
+    "sample": [
+     {
+      "amount": 1917,
+      "rel": "hu:rel:qc-fdc-170569-selenium"
+     }
+    ]
+   },
+   {
+    "n": 4,
+    "rows": 4,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Q-AX-04-food: unknown versus assumed zero versus underived zero for a food."
+    ],
+    "sample": [
+     {
+      "component": "DHA",
+      "status": "UNRESOLVED",
+      "basisKind": null,
+      "amount": null,
+      "derivation": null,
+      "reading": "NOT_PROJECTED (unresolved source row)"
+     },
+     {
+      "component": "folic acid",
+      "status": "ACCEPTED",
+      "basisKind": "CALCULATED",
+      "amount": 0,
+      "derivation": "ASSUMED_ZERO",
+      "reading": "ASSUMED_ZERO (not a measurement)"
+     },
+     {
+      "component": "selenium",
+      "status": "ACCEPTED",
+      "basisKind": "DIRECT_MEASUREMENT",
+      "amount": 1520,
+      "derivation": "ANALYTICAL",
+      "reading": "VALUE"
+     }
+    ]
+   },
+   {
+    "n": 5,
+    "rows": 3,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Q-FL-C02: same agent, characterized exposure versus protocol step (minimal pair)."
+    ],
+    "sample": [
+     {
+      "kind": "EXPOSURE",
+      "uid": "hu:exposure:selenium-dietary-high-se-area-adult-male-1438ugd",
+      "route": "ORAL",
+      "duration": "LIFETIME",
+      "intensity": 1438,
+      "unit": "ug/d",
+      "referenceDose": null,
+      "rfdUnit": null
+     },
+     {
+      "kind": "EXPOSURE",
+      "uid": "hu:exposure:selenium-oral-chronic-dietary",
+      "route": "ORAL",
+      "duration": "CHRONIC",
+      "intensity": null,
+      "unit": null,
+      "referenceDose": 0.005,
+      "rfdUnit": "mg/kg/d"
+     },
+     {
+      "kind": "PROTOCOL_STEP",
+      "uid": "hu:protocol-step:synthetic-brazil-nut-daily-eat-two",
+      "route": null,
+      "duration": null,
+      "intensity": 2,
+      "unit": "{nut}",
+      "referenceDose": null,
+      "rfdUnit": null
+     }
+    ]
+   },
+   {
+    "n": 6,
+    "rows": 2,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Q-TM-food: as-of RfD before and after the extraction fix."
+    ],
+    "sample": [
+     {
+      "asOf": {
+       "year": 2026,
+       "month": 10,
+       "day": 4,
+       "hour": 1,
+       "minute": 45,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "rfd": 0.05,
+      "unit": "mg/kg/d"
+     },
+     {
+      "asOf": {
+       "year": 2026,
+       "month": 10,
+       "day": 4,
+       "hour": 3,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "rfd": 0.005,
+      "unit": "mg/kg/d"
+     }
+    ]
+   },
+   {
+    "n": 7,
+    "rows": 2,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Q-RC-05-practice: who reports doing versus who recommends a practice."
+    ],
+    "sample": [
+     {
+      "speaker": "Synthetic Host (W05 fixture)",
+      "speechAct": "RECOMMENDS",
+      "basis": "EXPERT_OPINION",
+      "predicate": "RECOMMENDS",
+      "projectedRecommendation": true
+     },
+     {
+      "speaker": "Synthetic Guest (W05 fixture)",
+      "speechAct": "REPORTS_PRACTICE",
+      "basis": "PERSONAL_EXPERIENCE",
+      "predicate": "SELF_REPORTED_PRACTICE",
+      "projectedRecommendation": false
+     }
+    ]
+   },
+   {
+    "n": 8,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Q-FL-C03: products whose current formulation uses a food (food -> product path, one product identity)."
+    ],
+    "sample": [
+     {
+      "productUid": "hu:product:7b2f4c1e-0d9a-4e55-9b61-2f0a8c3d5e71",
+      "kind": "CONVENTIONAL_FOOD",
+      "labels": [
+       "Entity",
+       "Product"
+      ],
+      "variant": "Synthetic Grove Brazil Nuts, raw, shelled, 16 oz (US)",
+      "formulation": "hu:formulation:synthetic-grove-brazil-nuts-v1"
+     }
+    ]
+   },
+   {
+    "n": 9,
+    "rows": 2,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Q-FL-C04: definitions behind diet arms, which component distinguishes the arms, and what the registry leaves unstated."
+    ],
+    "sample": [
+     {
+      "definition": "Brazilian Cardioprotective Diet (DicaBr)",
+      "intervention": "Brazilian cardioprotective diet",
+      "materialComponents": 0,
+      "knownEditions": 0,
+      "notReported": [
+       "editionContent"
+      ]
+     },
+     {
+      "definition": "Brazilian Cardioprotective Diet (DicaBr)",
+      "intervention": "Brazilian cardioprotective diet plus 30g/day of mixed nuts",
+      "materialComponents": 3,
+      "knownEditions": 0,
+      "notReported": [
+       "editionContent"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "r6-suite-clean.json": {
+  "total": 174,
+  "ok": 174,
+  "failed": 0,
+  "nonzero": [
+   {
+    "n": 34,
+    "rows": 4,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked"
+    ],
+    "sample": [
+     {
+      "label": "IngredientMaterial",
+      "nodes": 5,
+      "withUid": 5,
+      "missingUid": 0
+     },
+     {
+      "label": "Entity",
+      "nodes": 1,
+      "withUid": 1,
+      "missingUid": 0
+     },
+     {
+      "label": "Exposure",
+      "nodes": 3,
+      "withUid": 3,
+      "missingUid": 0
+     }
+    ]
+   },
+   {
+    "n": 66,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked"
+    ],
+    "sample": [
+     {
+      "intervention": "hu:intervention:dica-nuts-diet-only",
+      "incompleteComponent": null
+     }
+    ]
+   },
+   {
+    "n": 71,
+    "rows": 2,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked"
+    ],
+    "sample": [
+     {
+      "assertion": "hu:assertion:fdc-170569-selenium-per-100g",
+      "basisKind": "DIRECT_MEASUREMENT",
+      "contexts": 0
+     },
+     {
+      "assertion": "hu:assertion:synthetic-2025-brazil-nut-selenium",
+      "basisKind": "DIRECT_MEASUREMENT",
+      "contexts": 0
+     }
+    ]
+   },
+   {
+    "n": 117,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked, executed"
+    ],
+    "sample": [
+     {
+      "acceptedAssertionsWithOnlyCoarseLocators": 18
+     }
+    ]
+   },
+   {
+    "n": 166,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked, executed"
+    ],
+    "sample": [
+     {
+      "assertionsWithoutContentHash": 0
+     }
+    ]
+   }
+  ]
+ },
+ "r6-neg.json": {
+  "total": 10,
+  "ok": 10,
+  "failed": 0,
+  "nonzero": []
+ },
+ "r6-val-neg.json": {
+  "total": 12,
+  "ok": 12,
+  "failed": 0,
+  "nonzero": [
+   {
+    "n": 1,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-01: a marketed food carries the retired FoodProduct label (two identities for one product)."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-01",
+      "uid": "hu:product:neg-w05-duplicate-food-product",
+      "labels": [
+       "Entity",
+       "FoodProduct",
+       "Product"
+      ]
+     }
+    ]
+   },
+   {
+    "n": 2,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-02: a FoodItem that is not also an IngredientMaterial, or whose uid token is not the IngredientMaterial token."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-02",
+      "uid": "hu:food:neg-w05-roasted-peanut",
+      "labels": [
+       "FoodItem",
+       "Entity"
+      ]
+     }
+    ]
+   },
+   {
+    "n": 3,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-03: an Exposure intensity without UCUM unit or basis."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-03",
+      "uid": "hu:exposure:neg-w05-intensity-no-unit",
+      "value": 2
+     }
+    ]
+   },
+   {
+    "n": 4,
+    "rows": 2,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-04: an Exposure without any agent."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-04",
+      "uid": "hu:exposure:neg-w05-guest-sauna-history"
+     },
+     {
+      "id": "V-W05-04",
+      "uid": "hu:exposure:neg-w05-intensity-no-unit"
+     }
+    ]
+   },
+   {
+    "n": 5,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-05: a source-scoped food category without the name of its category system."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-05",
+      "uid": "hu:food:neg-w05-roasted-peanut",
+      "foodGroup": "Legumes and Legume Products"
+     }
+    ]
+   },
+   {
+    "n": 6,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-06: an Exposure used as an occurrence (occurrence clocks, or any edge to a person or cohort member)."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-06",
+      "uid": "hu:exposure:neg-w05-guest-sauna-history"
+     }
+    ]
+   },
+   {
+    "n": 7,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// + the W05-SR-04 qualifiers; the reference mass itself is the UCUM denominator, e.g. ug/hg = per 100 g)."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-07",
+      "foodUid": "hu:material:food-brazil-nut-dried-unblanched",
+      "targetUid": "hu:substance:docosahexaenoic-acid",
+      "quantity": 0,
+      "rel": "hu:rel:neg-w05-dha"
+     }
+    ]
+   },
+   {
+    "n": 8,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-08: VARIANT_OF without its authorizing assertion, or a self loop / two-cycle."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-08",
+      "variantUid": "hu:food:neg-w05-roasted-peanut",
+      "baseUid": "hu:material:food-peanut"
+     }
+    ]
+   },
+   {
+    "n": 9,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-09: a RECOMMENDS edge to a practice, food or exposure whose cited assertion is not a RECOMMENDS speech act by that person (food-scoped V-423)."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-09",
+      "recommenderUid": "hu:person:synthetic-guest-w05",
+      "targetUid": "hu:lifestyle:sauna-bathing",
+      "cited": "hu:claim-occurrence:synthetic-w05-guest-reports-sauna"
+     }
+    ]
+   },
+   {
+    "n": 10,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-10: any direct edge between a protocol step and an Exposure (forbidden implication PROTOCOL_STEP_USES_AGENT -> EXPOSURE_CHARACTERIZED)."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-10",
+      "stepUid": "hu:protocol-step:synthetic-brazil-nut-daily-eat-two",
+      "relType": "CHARACTERIZED_AS_EXPOSURE",
+      "exposureUid": "hu:exposure:selenium-oral-chronic-dietary"
+     }
+    ]
+   },
+   {
+    "n": 11,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-11: retired live edges still present in W05 scope."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-11",
+      "fromLabels": [
+       "Exposure",
+       "Entity"
+      ],
+      "relType": "INVOLVES",
+      "toUid": "hu:material:food-brazil-nut"
+     }
+    ]
+   },
+   {
+    "n": 12,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// V-W05-12: product identity collapsed into a reference food (trade identifiers or product backbone on a FoodItem)."
+    ],
+    "sample": [
+     {
+      "id": "V-W05-12",
+      "uid": "hu:material:food-brazil-nut"
+     }
+    ]
+   }
+  ]
+ },
+ "r6-suite-neg.json": {
+  "total": 174,
+  "ok": 174,
+  "failed": 0,
+  "nonzero": [
+   {
+    "n": 16,
+    "rows": 2,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// Every query below is statically checked (syntax and per-statement vari"
+    ],
+    "sample": [
+     {
+      "relType": "QUANTITATIVELY_CONTAINS",
+      "edgeId": "5:f32301da-7460-4285-8de0-fedc5c8b0faf:186",
+      "recordedFrom": null,
+      "assertionUid": "hu:assertion:fdc-170569-dha-zero-underived"
+     },
+     {
+      "relType": "IDENTIFIED_BY",
+      "edgeId": "5:f32301da-7460-4285-8de0-fedc5c8b0faf:189",
+      "recordedFrom": null,
+      "assertionUid": null
+     }
+    ]
+   },
+   {
+    "n": 28,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// params: $derivedTypes, $implicationPairs, $ruleOnlyDerivedTypes (catalog relationships with ruleOnly: true)"
+    ],
+    "sample": [
+     {
+      "edgeType": "RECOMMENDS",
+      "startUid": "hu:person:synthetic-guest-w05",
+      "endUid": "hu:lifestyle:sauna-bathing",
+      "violations": [
+       "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     }
+    ]
+   },
+   {
+    "n": 34,
+    "rows": 5,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked"
+    ],
+    "sample": [
+     {
+      "label": "IngredientMaterial",
+      "nodes": 5,
+      "withUid": 5,
+      "missingUid": 0
+     },
+     {
+      "label": "Entity",
+      "nodes": 1,
+      "withUid": 1,
+      "missingUid": 0
+     },
+     {
+      "label": "Exposure",
+      "nodes": 5,
+      "withUid": 5,
+      "missingUid": 0
+     }
+    ]
+   },
+   {
+    "n": 66,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked"
+    ],
+    "sample": [
+     {
+      "intervention": "hu:intervention:dica-nuts-diet-only",
+      "incompleteComponent": null
+     }
+    ]
+   },
+   {
+    "n": 71,
+    "rows": 2,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked"
+    ],
+    "sample": [
+     {
+      "assertion": "hu:assertion:fdc-170569-selenium-per-100g",
+      "basisKind": "DIRECT_MEASUREMENT",
+      "contexts": 0
+     },
+     {
+      "assertion": "hu:assertion:synthetic-2025-brazil-nut-selenium",
+      "basisKind": "DIRECT_MEASUREMENT",
+      "contexts": 0
+     }
+    ]
+   },
+   {
+    "n": 117,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked, executed"
+    ],
+    "sample": [
+     {
+      "acceptedAssertionsWithOnlyCoarseLocators": 18
+     }
+    ]
+   },
+   {
+    "n": 139,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked"
+    ],
+    "sample": [
+     {
+      "recommenderUid": "hu:person:synthetic-guest-w05",
+      "recommendedUid": "hu:lifestyle:sauna-bathing"
+     }
+    ]
+   },
+   {
+    "n": 166,
+    "rows": 1,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked, executed"
+    ],
+    "sample": [
+     {
+      "assertionsWithoutContentHash": 0
+     }
+    ]
+   },
+   {
+    "n": 169,
+    "rows": 5,
+    "status": "ok",
+    "error": null,
+    "label": [
+     "// status: statically-checked"
+    ],
+    "sample": [
+     {
+      "labels": [
+       "Entity",
+       "FoodProduct",
+       "Product"
+      ],
+      "nodeWithoutPrivacyClass": "hu:product:neg-w05-duplicate-food-product"
+     },
+     {
+      "labels": [
+       "Exposure",
+       "Entity"
+      ],
+      "nodeWithoutPrivacyClass": "hu:exposure:neg-w05-guest-sauna-history"
+     },
+     {
+      "labels": [
+       "Exposure",
+       "Entity"
+      ],
+      "nodeWithoutPrivacyClass": "hu:exposure:neg-w05-intensity-no-unit"
+     }
+    ]
+   }
+  ]
+ },
+ "r6-probe.json": {
+  "total": 4,
+  "ok": 1,
+  "failed": 3,
+  "nonzero": [
+   {
+    "n": 1,
+    "rows": null,
+    "status": "error",
+    "error": "Node(70) already exists with label `Exposure` and property `characterizationHash` = 'sha256:synthetic-exposure-tuple-e1'",
+    "label": [
+     "// P1 duplicate characterization (same tuple hash as E1, different uid) -> exposure_characterization_hash."
+    ],
+    "sample": []
+   },
+   {
+    "n": 2,
+    "rows": null,
+    "status": "error",
+    "error": "Node(81) already exists with label `Lifestyle` and property `uid` = 'hu:lifestyle:sauna-bathing'",
+    "label": [
+     "// P2 duplicate uid on a second node -> lifestyle_uid."
+    ],
+    "sample": []
+   },
+   {
+    "n": 3,
+    "rows": null,
+    "status": "error",
+    "error": "Node(12) already exists with label `IngredientMaterial` and property `uid` = 'hu:material:food-brazil-nut'",
+    "label": [
+     "// P3 a FoodItem reusing a material uid with a second node -> material_uid."
+    ],
+    "sample": []
+   }
+  ]
+ }
+}

@@ -1,0 +1,253 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W08/fixtures/w08-validation.cypher",
+ "uri": "bolt://127.0.0.1:38413/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 11,
+ "ok": 11,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 97,
+   "sample": [],
+   "header": "// W08 validation queries V-W08-01 .. V-W08-11 (proposed; zero rows = valid unless marked informational).\n// Run run-2026-10-04-fable51-01, worker W08. Each statement is self-contained (binds its own variables; nothing crosses ';').\n// Executed on embedded Neo4j 5.26.31 Community (see 06-fixtures-an"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 26,
+   "sample": [],
+   "header": "// V-W08-02: equipment, platform, sensor, modality and firmware nodes carry no regulatory-status or performance property.\n// Clearance/approval live on W13 RegulatoryStatus of a Product; performance is an Assertion (CQ-MF-02, CQ-MF-03)."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 16,
+   "sample": [],
+   "header": "// V-W08-03: no regulatory status, submission subject, designation or approval attaches to an equipment-model,\n// platform, sensor, modality or firmware node (W13 RegulatorySubjectTarget excludes them; 510(k) attaches to a Product)."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 16,
+   "sample": [],
+   "header": "// V-W08-04: every asserted W08 edge is a projection of exactly one matching Assertion (asserted_edge profile; contract A5)."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 28,
+   "sample": [],
+   "header": "// V-W08-05 (candidate FirmwareVersion): an assay version that declares a firmware version keeps the same label in\n// softwareVersion and runs on the device that firmware belongs to (CQ-DX-09, CQ-DX-C01)."
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 10,
+   "sample": [],
+   "header": "// V-W08-06 (candidate FirmwareVersion): exactly one FIRMWARE_VERSION_OF per firmware version, at most one\n// RUNS_FIRMWARE_VERSION per assay version."
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 24,
+   "sample": [],
+   "header": "// V-W08-07 (informational backfill): an assay version running on a Device with a REPORTED softwareVersion that matches a\n// recorded FirmwareVersion of that device but does not declare it."
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 28,
+   "sample": [],
+   "header": "// V-W08-08 (migration): retired live edges in W08 scope must not be written any more."
+  },
+  {
+   "n": 9,
+   "id": "V-113",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 6,
+   "sample": [],
+   "header": "// V-W08-09: equipment models are model-level and public: no unit-level identifiers or owner references, and no link to a\n// private record in either direction (contract A9; complements V-113 .. V-116)."
+  },
+  {
+   "n": 10,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 9,
+   "sample": [],
+   "header": "// V-W08-10 (informational): several equipment-model uids share one display name. Names are never identity; a merge needs an\n// accepted EquivalenceAssessment (contract A2)."
+  },
+  {
+   "n": 11,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 9,
+   "sample": [],
+   "header": "// V-W08-11: a performance claim is an attributed Assertion about a product or a measurement procedure, never about a\n// device model or platform, and it names its asserter and basis (forbidden implication\n// [MANUFACTURER_PERFORMANCE_CLAIM, VALIDATED_PERFORMANCE])."
+  }
+ ]
+}

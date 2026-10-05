@@ -1,0 +1,305 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/01-answer-record-replay.cypher",
+ "uri": "bolt://127.0.0.1:38819/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 6,
+ "ok": 6,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "QS-2a",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 329,
+   "sample": [
+    {
+     "sentence": 0,
+     "citedUid": "hu:assertion:w23-a1-variant-fv-a1",
+     "replayedAssertionUid": "hu:assertion:w23-a1-variant-fv-a1",
+     "objectUid": "hu:formulation:w23-sleepwell-fv-a1",
+     "verdict": "SUPPORTED",
+     "adjudicationUid": "hu:adjudication:w23-cf-a1",
+     "reproduced": true
+    }
+   ],
+   "header": "// W23 fixture 01: AnswerRecord replay, trace and correction reach (QUERIES ONLY; load 00-shared-base.cypher first).\n// CQ-AX-01, CQ-AX-03, CQ-AX-11. Expected rows are in 06-fixtures-and-queries.md. Read-only statements.\n// Q-AR-1 (CQ-AX-03): replay answer AR-1 at its stored viewpoint. For each cite"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 129,
+   "sample": [
+    {
+     "sentence": 0,
+     "citedUid": "hu:assertion:w23-a1-variant-fv-a1",
+     "replayedAssertionUid": "hu:assertion:w23-a2-variant-fv-a1c",
+     "objectUid": "hu:formulation:w23-sleepwell-fv-a1c",
+     "verdict": "SUPPORTED",
+     "adjudicationUid": "hu:adjudication:w23-cf-a2",
+     "reproduced": false
+    }
+   ],
+   "header": "// Q-AR-2 (CQ-AX-03 comparison run, CQ-AX-11): the same replay at R = 2026-10-04 (now). Expected: one row, replayed A2\n// (object fv-a1c, 120 mg), verdict SUPPORTED (cf-a2), reproduced false: the published answer would read differently now."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 47,
+   "sample": [
+    {
+     "answerRecordUid": "hu:answer-record:w23-ar1",
+     "recordedAsOf": {
+      "year": 2026,
+      "month": 4,
+      "day": 10,
+      "hour": 9,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "publishedAt": {
+      "year": 2026,
+      "month": 4,
+      "day": 12,
+      "hour": 9,
+      "minute": 5,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "supersededBy": "hu:assertion:w23-a2-variant-fv-a1c",
+     "supersessionKind": "SOURCE_CORRECTION",
+     "learnedAt": {
+      "year": 2026,
+      "month": 6,
+      "day": 15,
+      "hour": 8,
+      "minute": 10,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "correctedAfterViewpoint": true
+    }
+   ],
+   "header": "// Q-AR-3 (CQ-AX-11): which published answers depend on assertion A1, and was A1 corrected after their viewpoint?\n// Expected: one row, AR-1, superseded by A2 (SOURCE_CORRECTION, learned 2026-06-15T08:10Z), correctedAfterViewpoint true.\n// AR-2 (cites A2) is not returned."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 30,
+   "sample": [
+    {
+     "answerRecordUid": "hu:answer-record:w23-ar1",
+     "citedAssertionUid": "hu:assertion:w23-a1-variant-fv-a1",
+     "supersededBy": "hu:assertion:w23-a2-variant-fv-a1c",
+     "supersessionKind": "SOURCE_CORRECTION"
+    }
+   ],
+   "header": "// Q-AR-3b (CQ-AX-11, whole graph): every published answer that cites an assertion superseded after the answer's own\n// viewpoint (the correction-reach queue). Expected: one row (AR-1, A1, A2, SOURCE_CORRECTION)."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 166,
+   "sample": [
+    {
+     "sentence": 0,
+     "assertionUid": "hu:assertion:w23-a1-variant-fv-a1",
+     "predicate": "HAS_FORMULATION_VERSION",
+     "locators": [
+      {
+       "retrievedAt": {
+        "year": 2026,
+        "month": 3,
+        "day": 2,
+        "hour": 10,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       },
+       "exact": "Magnesium (as magnesium glycinate) 200 mg",
+       "locator": "hu:locator:w23-sleepwell-facts-2026-03-02",
+       "selectorKind": "TEXT_QUOTE",
+       "snapshot": "hu:snapshot:w23-sleepwell-label-2026-03-02",
+       "contentHash": "sha256:fe449dd3422d911999ca028180cdcd386961645e7b5e65266534a817ea20c48a"
+      }
+     ],
+     "adjudications": [
+      {
+       "adjudication": "hu:adjudication:w23-cf-a1",
+       "kind": "CAPTURE_FIDELITY",
+       "verdict": "SUPPORTED",
+       "reviewedAt": {
+        "year": 2026,
+        "month": 3,
+        "day": 2,
+        "hour": 10,
+        "minute": 20,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      }
+     ],
+     "gaps": []
+    }
+   ],
+   "header": "// Q-AR-4 (CQ-AX-01, traceDepth ADJUDICATION): per cited sentence, the locator and snapshot retrieved by R and the\n// adjudications reviewed by R, with named gaps. Expected: one row, sentence 0, A1, one TEXT_QUOTE locator\n// ('Magnesium (as magnesium glycinate) 200 mg') in snapshot 2026-03-02 with i"
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 51,
+   "sample": [
+    {
+     "publicReproducibilityView": {
+      "recordedAsOf": {
+       "year": 2026,
+       "month": 4,
+       "day": 10,
+       "hour": 9,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "publishedAt": {
+       "year": 2026,
+       "month": 4,
+       "day": 12,
+       "hour": 9,
+       "minute": 5,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "citedAssertions": [
+       {
+        "assertionUid": "hu:assertion:w23-a1-variant-fv-a1",
+        "ordinal": 0
+       }
+      ],
+      "validAt": {
+       "year": 2026,
+       "month": 4,
+       "day": 10,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "accessTier": "PUBLIC_ANSWER",
+      "queryShapeId": "QS-2a",
+      "queryShapeVersion": "0.2.0",
+      "uid": "hu:answer-record:w23-ar1",
+      "intervalEnd": null,
+      "schemaDigest": "sha256:8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0",
+      "intervalStart": null,
+      "traceDepth": "ADJUDICATION",
+      "citedAssessments": [
+       {
+        "assessmentUid": "hu:adjudication:w23-cf-a1",
+        "ordinal": 0
+       }
+      ]
+     }
+    }
+   ],
+   "header": "// Q-AR-5 (PUBLIC_ANSWER closure for an INTERNAL AnswerRecord): the reproducibility allow-list view. Expected: one row with\n// exactly the allow-listed keys; no mongoResearchRunId, privacyClass, createdAt or Activity lineage leaves the graph."
+  }
+ ]
+}

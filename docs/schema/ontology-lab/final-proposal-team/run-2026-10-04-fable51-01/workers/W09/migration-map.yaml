@@ -1,0 +1,133 @@
+# W09 migration map: live current_biotech_schema.graphql (86b5e0b5...f112) lines 228-239, 1597-1754, plus the 0.2.0
+# proposed-delta Lane 2 study types, to the W09 final proposal. One entry per live element in scope.
+# action: keep | rename | move | split | merge | derive | retire.
+# Relabel statements are the integrator's (Fable); W09 states the mapping only. Node relabels keep uids (INV-106).
+worker: W09
+run: run-2026-10-04-fable51-01
+entries:
+  # ---- union and relationship-property type ----------------------------------------------------------------------
+  - {live: "union StudyIntervention", final: "union LegacyEvaluatedIntervention", action: rename, note: "D-003/CL-006. Members map to successors: Compound->ChemicalSubstance (D-002; a Compound node that W02 relabels MaterialMixture is still read through the IngredientMaterial member), CompoundForm->ChemicalForm|IngredientMaterial (W02-SR-20), FoodItem->IngredientMaterial member (W05 label), FoodProduct->Product (W05 retirement), others unchanged. Read-only through Study.evaluates."}
+  - {live: "InterventionArmMetadata", final: "LegacyInterventionArmProperties", action: rename, note: "Stored names unchanged so legacy EVALUATES edges stay readable; never written. Its fields split onto arm/intervention/component for new data (below)."}
+  - {live: "InterventionArmMetadata.armLabel", final: "StudyArm.name", action: move, note: "new data"}
+  - {live: "InterventionArmMetadata.interventionRole", final: "StudyArm.armType", action: move, note: "free text mapped to ArmType; unmapped -> OTHER plus description"}
+  - {live: "InterventionArmMetadata.doseText", final: "InterventionComponent.verbatimDoseText", action: move, note: ""}
+  - {live: "InterventionArmMetadata.doseAmount", final: "InterventionComponent.quantity", action: move, note: "quantityBasis/massBasis required when REPORTED; migrated rows get massBasis UNSPECIFIED and quantityBasis from 'frequency' only when unambiguous, else a review row (V-221r)"}
+  - {live: "InterventionArmMetadata.doseUnit", final: "InterventionComponent.unitCode", action: move, note: "normalize to UCUM"}
+  - {live: "InterventionArmMetadata.route", final: "StudyIntervention.route", action: move, note: ""}
+  - {live: "InterventionArmMetadata.frequency", final: "StudyIntervention.schedule / dosesPerDay", action: split, note: "verbatim to schedule; integer to dosesPerDay only when stated"}
+  - {live: "InterventionArmMetadata.confidence", final: null, action: retire, note: "bare confidence deprecated (contract A4); kept readable only on legacy edges"}
+  - {live: "InterventionArmMetadata.notes", final: "StudyIntervention.description", action: move, note: ""}
+  - {live: "InterventionArmMetadata.mongoResearchRunId", final: "Activity.externalRunId (W00)", action: move, note: "KCR-4.4"}
+  # ---- Study ---------------------------------------------------------------------------------------------------------
+  - {live: "Study", final: "Study", action: keep, note: "identity only; labels [Study, Entity]; uid hu:study:<id>"}
+  - {live: "Study.id", final: "Study.id", action: keep, note: "opaque segment of uid"}
+  - {live: "Study.name", final: "Study.name", action: keep, note: "nullable (D-013); catalog title"}
+  - {live: "Study.description", final: "Study.description", action: keep, note: ""}
+  - {live: "Study.mongoResearchRunId", final: "Study.mongoResearchRunId", action: keep, note: "internal tier"}
+  - {live: "Study.createdAt / updatedAt", final: "Study.createdAt / updatedAt", action: keep, note: ""}
+  - {live: "Study.searchText / searchFields / embeddingModel / embeddingDimensions / searchEmbedding", final: "same", action: keep, note: "derived; @vector re-added by Fable without provider (D-014)"}
+  - {live: "Study @fulltext StudySearch", final: "Study @fulltext StudySearch", action: keep, note: "D-015"}
+  - {live: "Study.registryNamespace", final: "TrialRegistration.registry", action: move, note: "create TrialRegistration + REGISTERED_AS assertion; Identifier scheme NCT etc."}
+  - {live: "Study.registryId", final: "TrialRegistration.registrationId", action: move, note: "plus Identifier"}
+  - {live: "Study.canonicalUrl", final: "Source.canonicalUri (W00) RENDITION_OF Publication", action: move, note: "only if it is a publication URL; registry URL -> Source of the TrialRegistration"}
+  - {live: "Study.pmid", final: "Publication.pmid + Identifier(PMID)", action: move, note: "create Publication + REPORTS_ON assertion"}
+  - {live: "Study.doi", final: "Publication.doi + Identifier(DOI)", action: move, note: ""}
+  - {live: "Study.overallStatus", final: "RegistrationVersion.overallStatus", action: move, note: "Study keeps a derived read-only cache only with projectionOfRegistrationVersionUid (INV-208)"}
+  - {live: "Study.registrySyncedAt", final: "RegistrationVersion.observedAt", action: move, note: "observedAt never substitutes for versionDate"}
+  - {live: "Study.startDate", final: "RegistrationVersion.startDate + startDatePrecision + startDateType", action: move, note: "DateTime -> Date; type null unless the registry says ACTUAL/ANTICIPATED"}
+  - {live: "Study.primaryCompletionDate", final: "RegistrationVersion.primaryCompletionDate (+Precision, +Type)", action: move, note: ""}
+  - {live: "Study.completionDate", final: "RegistrationVersion.completionDate (+Precision, +Type)", action: move, note: ""}
+  - {live: "Study.enrollmentCount", final: "RegistrationVersion.enrollmentCount + enrollmentCountType", action: move, note: "derived cache on Study allowed; type null when unknown"}
+  - {live: "Study.studyType", final: "RegistrationVersion.studyType", action: move, note: ""}
+  - {live: "Study.allocation", final: "RegistrationVersion.allocation", action: move, note: ""}
+  - {live: "Study.interventionModel", final: "RegistrationVersion.interventionModel", action: move, note: ""}
+  - {live: "Study.masking", final: "RegistrationVersion.masking", action: move, note: ""}
+  - {live: "Study.primaryPurpose", final: "RegistrationVersion.primaryPurpose", action: move, note: ""}
+  - {live: "Study.countries", final: "RegistrationVersion.siteCountries", action: move, note: "ISO alpha-2"}
+  - {live: "Study.fdaRegulatedDrug", final: "RegistrationVersion.fdaRegulatedDrug", action: move, note: ""}
+  - {live: "Study.fdaRegulatedDevice", final: "RegistrationVersion.fdaRegulatedDevice", action: move, note: ""}
+  - {live: "Study.hasResults", final: "RegistrationVersion.resultsPosted", action: rename, note: "moved and renamed; false = no registry results section as observed, never unpublished"}
+  - {live: "Study.studyPhase", final: "RegistrationVersion.phase", action: move, note: "String -> [String!]"}
+  - {live: "Study.sampleSizeText", final: "StudyPopulation.sizeText", action: move, note: "ENROLLED cohort unless the text says analyzed"}
+  - {live: "Study.evidenceLevel", final: "EvidenceStrengthAssessment (W10)", action: move, note: "kept as extraction hint only on the W10 side (INV-209)"}
+  - {live: "Study.hasPrimarySources / HAS_PRIMARY_SOURCE (RoleMetadata)", final: null, action: retire, note: "publication documents -> Publication + REPORTS_ON and Source RENDITION_OF Publication (D-005); other documents back Assertions via SourceLocator"}
+  - {live: "Study.evaluates / EVALUATES (InterventionArmMetadata)", final: "Study.evaluates / EVALUATES (LegacyInterventionArmProperties), @settable false", action: keep, note: "read-only legacy (INV-201, CL-017). Existing edges to Product are V-201 backlog rows; successor path HAS_ARM->ASSIGNS_INTERVENTION->HAS_INTERVENTION_COMPONENT->USES_INTERVENTION_MATERIAL. Type-name collision with W00 EVALUATES: proposed rename LEGACY_EVALUATES (W09-SR-13)"}
+  - {live: "Study.sponsoredBy / SPONSORED_BY (RoleMetadata)", final: "Study.sponsoredBy / SPONSORED_BY (DerivedEdgeProperties), read-only", action: derive, note: "regenerate from W01 SPONSORS_STUDY assertions (derivationRule inverse-of:SPONSORS_STUDY@1); legacy edges without an assertion become migration assertions with a MIGRATION adjudication"}
+  - {live: "Study.operatedBy / OPERATED_BY (RoleMetadata)", final: "Study.operatedBy / OPERATED_BY (DerivedEdgeProperties), read-only", action: derive, note: "from SERVES_AS_CRO_FOR only; a registry collaborator is not a CRO (W09-SR-05)"}
+  - {live: "Study.investigatedBy / INVESTIGATED_BY (RoleMetadata)", final: "Study.investigatedBy / INVESTIGATED_BY (DerivedEdgeProperties), read-only", action: derive, note: "from W01 investigator-role assertion (W09-SR-05)"}
+  - {live: "Study.studiesPopulations / STUDIES (RoleMetadata)", final: "HAS_ELIGIBLE_POPULATION | HAS_ENROLLED_COHORT -> StudyPopulation", action: merge, note: "populationKind from live Population.populationType when stated, else ELIGIBLE"}
+  - {live: "Study.hasDatasets / HAS_DATASET (RoleMetadata)", final: "PRODUCED_DATASET (AssertedEdgeProperties)", action: rename, note: "asserted; migration assertion per edge"}
+  - {live: "Study.investigatesConditions / INVESTIGATES (RoleMetadata)", final: "Study.investigatesConditions / INVESTIGATES (AssertedEdgeProperties)", action: keep, note: "properties type changes; migration assertion per edge"}
+  - {live: "Study.studiedInSpecies / STUDIED_IN (RoleMetadata)", final: "Study.studiedInSpecies / STUDIED_IN (AssertedEdgeProperties)", action: keep, note: ""}
+  - {live: "Study.evaluatesRiskFactors / EVALUATES_RISK_FACTOR (RoleMetadata)", final: "Assertion {predicate: EVALUATES_RISK_FACTOR}", action: retire, note: "edge retired; each edge becomes an Assertion (candidate predicate, W09-SR-16)"}
+  - {live: "Study.hasArms / HAS_ARM (RoleMetadata)", final: "Study.arms / HAS_ARM (StructuralEdgeProperties)", action: keep, note: "field renamed arms"}
+  - {live: "Study.hasOutcomeMeasures / HAS_OUTCOME_MEASURE (RoleMetadata)", final: "Study.outcomeDefinitions / DEFINES_OUTCOME", action: merge, note: "relationship type renamed by migration"}
+  - {live: "Study.hasOutcomeResults / HAS_OUTCOME_RESULT (RoleMetadata)", final: null, action: retire, note: "derived path Study->DEFINES_OUTCOME->OutcomeDefinition<-RESULT_FOR<-StudyResult; results with no measure get an OutcomeDefinition from resultText"}
+  - {live: "Study.hasOutcomes / HAS_OUTCOME (AssociationMetadata)", final: null, action: retire, note: "StudyOutcome retired (D-007)"}
+  - {live: "Study.reportsSafetySignals / REPORTS_SAFETY_SIGNAL (AssociationMetadata)", final: "AdverseEventResult (W09) + SafetySignal side (W17)", action: retire, note: "field removed from Study; W17 owns the relationship type and its direction (W09-SR-10)"}
+  # ---- StudyOutcome --------------------------------------------------------------------------------------------------
+  - {live: "StudyOutcome", final: "StudyResult | Assertion", action: retire, note: "D-007; outcomeSummary without analysis role becomes an Assertion with locator, never a StudyResult with invented analysisKind"}
+  - {live: "StudyOutcome.outcomeSummary", final: "Assertion.valueString (finding)", action: move, note: ""}
+  - {live: "StudyOutcome.sourceUrl", final: "SourceLocator.uri (W00)", action: move, note: ""}
+  - {live: "StudyOutcome.refersToOutcomes / REFERS_TO_OUTCOME", final: "OutcomeDefinition.refersToOutcomes", action: move, note: "when a definition is created"}
+  - {live: "StudyOutcome.supportedByDocuments / supportedByChunks", final: "SUPPORTED_BY -> SourceLocator", action: move, note: "chunk links are W20-derived"}
+  # ---- StudyArm ------------------------------------------------------------------------------------------------------
+  - {live: "StudyArm", final: "StudyArm", action: keep, note: "archetype VersionedState; label [StudyArm, VersionedState]; needs stateType, payloadHash"}
+  - {live: "StudyArm.armType", final: "StudyArm.armType: ArmType", action: keep, note: "String -> enum"}
+  - {live: "StudyArm.comparatorType", final: "StudyArm.comparatorType", action: keep, note: ""}
+  - {live: "StudyArm.armDescription", final: "StudyArm.description", action: rename, note: ""}
+  - {live: "StudyArm.plannedEnrollment", final: "StudyArm.plannedSize", action: rename, note: ""}
+  - {live: "StudyArm.receivesInterventions / RECEIVES (InterventionArmMetadata)", final: "ASSIGNS_INTERVENTION -> StudyIntervention -> HAS_INTERVENTION_COMPONENT -> InterventionComponent -> USES_INTERVENTION_MATERIAL|USES_INTERVENTION_DEVICE / FOLLOWS_INTERVENTION_DEFINITION", action: split, note: "RECEIVES to Product violates INV-201: target Product becomes an UNRESOLVED IngredientMaterial plus an ADMINISTERED_AS_COMMERCIAL_PRODUCT assertion (asReportedName = product name); never a ProductVariant unless a source states the variant"}
+  - {live: "StudyArm.supportedByDocuments / supportedByChunks", final: "SUPPORTED_BY on the ASSIGNS_INTERVENTION assertion", action: move, note: ""}
+  # ---- OutcomeMeasure ------------------------------------------------------------------------------------------------
+  - {live: "OutcomeMeasure", final: "OutcomeDefinition", action: rename, note: "D-007 relabel; archetype VersionedState"}
+  - {live: "OutcomeMeasure.outcomeKind", final: "OutcomeDefinition.measureKind", action: merge, note: "with measureType; SAFETY flavour -> DECLARES_OUTCOME_PRIORITY SAFETY"}
+  - {live: "OutcomeMeasure.measureType", final: "OutcomeDefinition.measureKind", action: merge, note: "unmappable -> review"}
+  - {live: "OutcomeMeasure.isPrimary", final: "Assertion DECLARES_OUTCOME_PRIORITY + derived OutcomeDefinition.priority", action: split, note: "legacy value becomes an assertion with MIGRATION adjudication and source unknown; priority stays null until a registry declaration exists"}
+  - {live: "OutcomeMeasure.timepointLabel", final: "OutcomeDefinition.timepoint", action: rename, note: ""}
+  - {live: "OutcomeMeasure.measuredByMetrics / MEASURED_BY_METRIC (MeasurementMetadata)", final: "OutcomeDefinition.measuredByMetrics (StructuralEdgeProperties)", action: keep, note: "MeasurementMetadata fields are W07's concern"}
+  - {live: "OutcomeMeasure.refersToOutcomes / REFERS_TO_OUTCOME (AssociationMetadata)", final: "OutcomeDefinition.refersToOutcomes (StructuralEdgeProperties)", action: keep, note: ""}
+  - {live: "OutcomeMeasure.supportedByDocuments / supportedByChunks", final: "DEFINED_IN + SUPPORTED_BY on priority assertions", action: move, note: ""}
+  # ---- OutcomeResult -------------------------------------------------------------------------------------------------
+  - {live: "OutcomeResult", final: "StudyResult", action: rename, note: "D-007 relabel; archetype InformationArtifact; analysisKind/comparisonKind/statisticalConclusion required -> migrated rows without them go to review (not defaulted)"}
+  - {live: "OutcomeResult.resultText", final: "StudyResult.resultText", action: keep, note: ""}
+  - {live: "OutcomeResult.direction", final: "StudyResult.direction", action: keep, note: "reported direction only"}
+  - {live: "OutcomeResult.effectSizeValue", final: "StudyResult.estimate", action: rename, note: ""}
+  - {live: "OutcomeResult.effectSizeUnit", final: "StudyResult.unitCode", action: rename, note: "UCUM"}
+  - {live: "OutcomeResult.pValue", final: "StudyResult.pValue", action: keep, note: "inequalities move to pValueText"}
+  - {live: "OutcomeResult.confidenceIntervalText", final: "StudyResult.confidenceIntervalText (+ciLower/ciUpper/ciLevel)", action: keep, note: ""}
+  - {live: "OutcomeResult.baselineValue / followupValue / absoluteChange / relativeChangePercent", final: "same names on StudyResult", action: keep, note: ""}
+  - {live: "OutcomeResult.sampleSize", final: "StudyResult.sampleSize", action: keep, note: ""}
+  - {live: "OutcomeResult.isStatisticallySignificant", final: "StudyResult.statisticalConclusion (+ derived isStatisticallySignificant)", action: derive, note: "true -> SIGNIFICANT_FAVORABLE only if direction is IMPROVED, else review; false -> NOT_SIGNIFICANT; null -> NOT_REPORTED"}
+  - {live: "OutcomeResult.isClinicallyMeaningful", final: "Assertion RESULT_CLINICALLY_MEANINGFUL / W10 ResultInterpretation", action: move, note: "INV-209"}
+  - {live: "OutcomeResult.timepointLabel", final: "StudyResult.timepoint", action: rename, note: ""}
+  - {live: "OutcomeResult.forMeasures / FOR_MEASURE (RoleMetadata)", final: "StudyResult.resultFor / RESULT_FOR", action: merge, note: ""}
+  - {live: "OutcomeResult.fromArms / FROM_ARM (RoleMetadata)", final: "StudyResult.arms / RESULT_FOR_ARM {armRole}", action: merge, note: "armRole explicit; unknown -> review, never inferred from order"}
+  - {live: "OutcomeResult.supportedByDocuments / supportedByChunks", final: "StudyResult.supportedBy -> SourceLocator", action: move, note: "W09-SR-03"}
+  # ---- Dataset -------------------------------------------------------------------------------------------------------
+  - {live: "Dataset", final: "Dataset", action: keep, note: "labels [Dataset, Entity]"}
+  - {live: "Dataset.datasetKind", final: "Dataset.datasetKind", action: keep, note: ""}
+  - {live: "Dataset.sourceUrl", final: "Dataset.sourceUrl", action: keep, note: "presentation; endpoint is a W00 Source"}
+  - {live: "Dataset.registrationId", final: "Identifier via HAS_IDENTIFIER", action: move, note: ""}
+  - {live: "Dataset.accessLevel", final: "Dataset.accessLevel: DatasetAccessLevel", action: keep, note: "String -> enum; unmapped -> UNKNOWN"}
+  - {live: "Dataset.dataFormat", final: "Dataset.dataFormat", action: keep, note: ""}
+  - {live: "Dataset.isPrimaryResults", final: "ANALYZES_DATASET.analysisRole", action: move, note: "true -> PRIMARY_REPORT on the reporting publication's edge"}
+  # ---- Population ----------------------------------------------------------------------------------------------------
+  - {live: "Population", final: "StudyPopulation", action: rename, note: "D-007 relabel; archetype VersionedState"}
+  - {live: "Population.populationType", final: "StudyPopulation.populationKind", action: rename, note: "unmapped -> ELIGIBLE with description"}
+  - {live: "Population.sampleSize", final: "StudyPopulation.size", action: rename, note: ""}
+  - {live: "Population.sexEligibility / minAge / maxAge / healthyVolunteers", final: "same names on StudyPopulation", action: keep, note: ""}
+  # ---- inbound live fields owned by other workers --------------------------------------------------------------------
+  - {live: "Treatment.evaluatedInStudies (EVALUATES IN, InterventionArmMetadata)", final: "W06 decision", action: keep, note: "must become read-only and reference LegacyInterventionArmProperties (W09-SR-09)"}
+  - {live: "SafetySignal.reportedInStudies (REPORTS_SAFETY_SIGNAL IN)", final: "W17 decision", action: keep, note: "W09-SR-10"}
+  - {live: "Condition.investigatedByStudies (INVESTIGATES IN, RoleMetadata)", final: "W03 field; properties AssertedEdgeProperties", action: keep, note: "W03 must reference AssertedEdgeProperties"}
+  # ---- 0.2.0 proposed-delta Lane 2 study types --------------------------------------------------------------------
+  - {live: "delta: ArmIntervention", final: "StudyIntervention", action: rename, note: "D-003; alias only"}
+  - {live: "delta: InterventionComponent.usesCompoundForm", final: "InterventionComponent.usesMaterial / usesProductVariant / usesProductLot", action: split, note: "CompoundForm placeholder replaced by catalog range"}
+  - {live: "delta: InterventionMaterialMetadata {asReportedName, projectionOfAssertionUid}", final: "InterventionMaterialProperties {asserted_edge fields, asReportedName}", action: rename, note: "D-011: asserted edge carries assertionUid, not projectionOfAssertionUid"}
+  - {live: "delta: extend StudyArm.assignsInterventions", final: "StudyArm.assignedInterventions", action: rename, note: "no extend in final file"}
+  - {live: "delta: extend Study.registrations", final: "Study.registeredAs", action: rename, note: ""}
+  - {live: "delta: extend OutcomeMeasure {measureKind, classifications}", final: "OutcomeDefinition.measureKind; classifications are W10's inverse field", action: move, note: ""}
+  - {live: "delta: extend OutcomeResult {analysisKind, comparisonKind, statisticalConclusion, multiplicityAdjusted}", final: "StudyResult fields", action: move, note: ""}
+  - {live: "delta: AdverseEventResult.arms (RESULT_FOR_ARM, no properties)", final: "AdverseEventResult.arms (ResultArmProperties)", action: keep, note: "armRole added"}
+  - {live: "delta: TrialRegistration, RegistrationVersion (String enums)", final: "same types with EnrollmentCountType/RegistryDateType enums and precision fields", action: keep, note: ""}

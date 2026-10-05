@@ -1,0 +1,19 @@
+SOURCE: https://api.nal.usda.gov/fdc/v1/food/170569 (format=abridged and format=full), relayed by Firecrawl scrape 2026-10-04T01:00Z/01:01Z; direct curl BLOCKED (proxy 403).
+VERBATIM FIELDS (full format unless noted):
+"fdcId":170569
+"description":"Nuts, brazilnuts, dried, unblanched"
+"dataType":"SR Legacy"
+"publicationDate":"4/1/2019"   (abridged format: "2019-04-01")
+"ndbNumber":12078
+"isHistoricalReference":true
+"foodClass":"FinalFood"
+"scientificName":"Bertholletia excelsa"
+"foodCategory":{"id":12,"code":"1200","description":"Nut and Seed Products"}
+foodAttributes: "http://purl.obolibrary.org/obo/NCBITaxon_3645" (NCBI Taxon); "http://purl.obolibrary.org/obo/FOODON_00005217" (FoodOn Ontology ID #1 For FDC Item), "brazilnut (shell off, dried)" (FoodOn Ontology Name #1 For FDC Item)
+foodPortions: {"dataPoints":59,"gramWeight":5.00000000,"amount":1.00000000,"modifier":"kernel"}; {"gramWeight":28.35000000,"amount":1.00000000,"modifier":"oz (6 kernels)"}; {"dataPoints":15,"gramWeight":133.00000000,"amount":1.00000000,"modifier":"cup, whole"}
+foodNutrients[Selenium]: {"nutrient":{"id":1103,"number":"317","name":"Selenium, Se","rank":6200,"unitName":"µg"},"foodNutrientDerivation":{"id":1,"code":"A","description":"Analytical","foodNutrientSource":{"id":1,"code":"1","description":"Analytical or derived from analytical"}},"id":1534106,"amount":1917.00000000,"dataPoints":15,"max":2740.00000000,"min":136.00000000}
+foodNutrients[Folic acid]: {"nutrient":{"id":1186,"number":"431","name":"Folic acid","unitName":"µg"},"foodNutrientDerivation":{"id":68,"code":"Z","description":"Assumed zero (Insignificant amount or not naturally occurring in a food, such as fiber in meat)","foodNutrientSource":{"id":5,"code":"7","description":"Assumed zero"}},"id":1534052,"amount":0E-8,"dataPoints":0}
+foodNutrients[DHA]: {"nutrient":{"id":1272,"number":"621","name":"PUFA 22:6 n-3 (DHA)","unitName":"g"},"id":1534053,"amount":0E-8,"dataPoints":0}   (no foodNutrientDerivation element)
+foodNutrients[Vitamin A, RAE] (abridged): {"number":"320","name":"Vitamin A, RAE","amount":0E-8,"unitName":"UG","derivationCode":"A","derivationDescription":"Analytical"}
+abridged Selenium: {"number":"317","name":"Selenium, Se","amount":1.92E+3,"unitName":"UG","derivationCode":"A","derivationDescription":"Analytical"}
+NOTE: neither format states the mass basis in the record itself; basis comes from FDC documentation (see fdc-docs-excerpt.txt).

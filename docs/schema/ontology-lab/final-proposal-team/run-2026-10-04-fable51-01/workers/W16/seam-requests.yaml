@@ -1,0 +1,121 @@
+# W16 seam requests (Fable copies into 03-conflict-ledger.md and assigns resolvers). No kernel archetype change is requested.
+- id: W16-SR-01
+  targetOwner: W00
+  request: "Register uid type tokens measurement-plan (MeasurementPlan), target (Target), observation (Observation), protocol-result (ProtocolResult); bind the existing fixture token protocol-rule to ProtocolAdjustmentRule; register condition (W03) and device (W08) if those owners agree."
+  cq: [CQ-PR-03, CQ-PR-04, CQ-PC-08]
+  failingCase: "fixtures 03, 07, 10 must write MeasurementPlan/Target/Observation uids; INV-106/V-117 accept the format but conventions.uidTypeTokens has no entry for these labels"
+  proposedRuling: "add the four tokens; protocol-rule is the token of ProtocolAdjustmentRule"
+- id: W16-SR-02
+  targetOwner: W00
+  request: "Register assertedPredicates AUTHORED_PROTOCOL, AUTHORED_PROTOCOL_EDITION, REQUIRES_PERFORMER_ROLE, CITES_EVIDENCE_FOR_STEP, PROTOCOL_INCLUDES_SUBSTANCE, REPORTS_PRACTICE_OF_STEP, PROTOCOL_EFFECTIVE_FOR, STEP_OCCURRENCES_PER_WEEK (or a generic STEP_SCHEDULE_REPORTED with unitCode); include Protocol, ProtocolEdition, ProtocolStep in AssertionSubjectTarget and ProtocolEdition, ProtocolStep, Observation in the object range."
+  cq: [CQ-PR-01, CQ-PR-06]
+  failingCase: "fixture 02 (NAD.com third-party reports), fixture 09 (role and step-evidence attribution) use these predicates; without registration they are candidates"
+  proposedRuling: "register as asserted predicates with predicateClass ROLE (authorship, performer), CLAIM (evidence citation, efficacy), OTHER (schedule reports)"
+- id: W16-SR-03
+  targetOwner: W07
+  request: "Publish the exact GraphQL field types of interface DiagnosticResult. W16 Observation assumes resultKind: DiagnosticResultKind, valueNumber: Float, valueString: String, unitCode: String, valueStatus: ReportedStatus, observedAt: DateTime, reportedAt: DateTime, privacyClass: PrivacyClass. Confirm Observation may use MEASURES_METRIC (Observation -> Metric) and the three result-version edges as structural."
+  cq: [CQ-PC-08, CQ-AX-22]
+  failingCase: "a type mismatch on any interface field makes the merged schema fail to build; fixture 08 Q-W16-08c needs PRODUCED_BY_ASSAY_VERSION on Observation"
+  proposedRuling: "W07 states the types; W16 conforms (no field added by W16 to W07 types)"
+- id: W16-SR-04
+  targetOwner: W00
+  request: "Rule the stored casing of privacyClass: GraphQL enum PrivacyClass {PUBLIC INTERNAL} vs catalog/validator literals 'public'/'internal'/'private-personal'. W16 fixtures store 'PUBLIC'/'INTERNAL'; V-521/QS-6 test the literal 'private-personal'."
+  cq: [CQ-PC-08]
+  failingCase: "V-533p compares privacyClass to 'INTERNAL'; existing 0.2.0 fixtures store 'internal'"
+  proposedRuling: "stored values equal GraphQL enum names (PUBLIC, INTERNAL); leak validators keep testing the private literal and the hu:private- prefix"
+- id: W16-SR-05
+  targetOwner: W01
+  request: "Person.recordsObservations: [Observation!]! @relationship(type: RECORDS, direction: OUT, properties: AssertedEdgeProperties) and Person.postsResults: [ProtocolResult!]! @relationship(type: POSTS_RESULT, direction: OUT, properties: AssertedEdgeProperties); description: public persons and published self-reports only (CL-018)."
+  cq: [CQ-PC-08]
+  failingCase: "V-532p requires asserted attribution; fixture 07 RECORDS edge from a public person"
+  proposedRuling: "W01 writes the two fields with the restriction text; W23 states the public-person-only rule"
+- id: W16-SR-06
+  targetOwner: W00
+  request: "Register derived relationship HAS_CURRENT_PROTOCOL_STEP (Protocol -> ProtocolStep) with ruleOnly: true and rule protocol-current-steps-v1 (D-004 implementation of Protocol.currentSteps without @cypher)."
+  cq: [CQ-PR-01]
+  failingCase: "D-004 requires a read-only derived Protocol.currentSteps; B1 forbids @cypher, so the projection must be a materialized derived edge; the catalog allows derivationRule alone only for ruleOnly types"
+  proposedRuling: "register ruleOnly; V-542p detects stale projections"
+- id: W16-SR-07
+  targetOwner: Fable (ledger; enum owner W16)
+  request: "Add CadenceUnit values YEAR and MINUTE."
+  cq: [CQ-PR-02, CQ-PR-C01]
+  failingCase: "Blueprint 'Full body MRI annually', 'Mole check, annually', 'Eye doctor, annually' are stored as 12 MONTH; 'Every 30 minutes I'll do ~2 to 3 minutes of light activity' has no unit (HOUR with Int interval cannot hold 0.5)"
+  proposedRuling: "add both values (additive)"
+- id: W16-SR-08
+  targetOwner: Fable (ledger; enum owner W16)
+  request: "Add ConstraintRole value REPEAT_UNTIL (a constraint that terminates a repetition)."
+  cq: [CQ-PR-02, CQ-PR-04]
+  failingCase: "NICE CG185 1.10.15 'weekly until the levels are stable' is stored only as repeatUntilText (fixture 03); an evaluator cannot tell when the repetition ends"
+  proposedRuling: "add REPEAT_UNTIL; repeatUntilText stays for the verbatim span"
+- id: W16-SR-09
+  targetOwner: W00 with W09
+  request: "Route vocabulary shared by StepDoseProperties.route and StudyIntervention route (enum or code-system string such as EDQM Standard Terms)."
+  cq: [CQ-PR-01]
+  failingCase: "applicability ROUTE dimension (W10) cannot compare 'oral' (W16) with an un-normalized study route"
+  proposedRuling: "one shared enum owned by W09 or W00; W16 switches route to it"
+- id: W16-SR-10
+  targetOwner: W09
+  request: "Confirm CL-007: ProtocolVersion stays study-scoped (InformationArtifact). No 'same PDF is both' case was found; the nearest pair is the FMD regimen of NCT02158897/PMID 28202779 (StudyIntervention) versus a public protocol step that cites it (fixture 09)."
+  cq: [CQ-PR-06]
+  failingCase: "none failing; documents the minimal pair"
+  proposedRuling: "RULED stays; a document that is both is two nodes (a ProtocolVersion for the study, a ProtocolEdition for the public workflow) sharing one Source"
+- id: W16-SR-11
+  targetOwner: W23
+  request: "Private-store contract: ProtocolAdoptionVersion.adoptedEditionUid (exactly one ProtocolEdition uid), ProtocolDeviation.stepKey must exist in the adopted edition, deviations never written to the shared graph; private evaluation of conditional steps uses W16 CNF semantics (conditionGroup OR, groups AND, negated, three-valued with UNKNOWN on missing facts) and opens PendingItems, never edits shared nodes."
+  cq: [CQ-PR-03, CQ-PR-04, CQ-PR-05, CQ-AX-22]
+  failingCase: "fixture 07 leak probe (V-113, V-520, V-521, V-524, V-534p rows); fixture 04 Q-W16-04b/c evaluation semantics"
+  proposedRuling: "W23 adopts these fields and semantics in its external contract"
+- id: W16-SR-12
+  targetOwner: W02
+  request: "Identity for substance classes used in co-intervention constraints ('beta blockers', 'drugs that interact with lithium', 'NSAIDs')."
+  cq: [CQ-PR-03, CQ-RC-06]
+  failingCase: "fixtures 04/05: CO_INTERVENTION constraints are TEXT_ONLY_FACT; BASED_ON cannot target a class"
+  proposedRuling: "if W02 defines a class/group identity, add it to ConstraintBasisTarget via the ledger"
+- id: W16-SR-13
+  targetOwner: W10
+  request: "Allow EvidenceApplicability with evidence target a step-citation Assertion and use target ProtocolStep or ProtocolEdition (ApplicabilityUseTarget); register forbidden implication [STEP_COMPONENT_EVIDENCE, PROTOCOL_EFFICACY]."
+  cq: [CQ-PR-06]
+  failingCase: "fixture 09: the FMD step cites Wei 2017 but applicability to the public step is unassessed; V-538p catches a calculated protocol-level efficacy claim"
+  proposedRuling: "add both union members; register the forbidden implication with V-538p as its validator"
+- id: W16-SR-14
+  targetOwner: Fable (validators)
+  request: "Adopt V-525p/V-526p (catalog V-525/V-526 restated on HAS_PROTOCOL_STEP) and new V-527p..V-542p; register forbidden implication [PRACTICE_REPORT_STEP, RECOMMENDED_STEP] (contract A10 'a practice report is not a recommendation') for ProtocolStep.speechAct."
+  cq: [CQ-PR-01, CQ-PR-02, CQ-PR-04, CQ-PR-06, CQ-PC-08]
+  failingCase: "catalog V-525/V-526 match HAS_STEP and return zero rows on D-004 data even when violated; fixtures 02-12 negatives"
+  proposedRuling: "replace V-525/V-526 and add the proposals with final ids"
+- id: W16-SR-15
+  targetOwner: W08
+  request: "Confirm Device vs ToolOrInstrument for chambers, centrifuges and sample tubes (both are in StepInstrumentTarget); register a device uid token."
+  cq: [CQ-PR-01]
+  failingCase: "fixtures 01 and 08 use ToolOrInstrument for a CPT tube and a hyperbaric chamber"
+  proposedRuling: "W08 states the boundary; W16 union unchanged"
+- id: W16-SR-16
+  targetOwner: W05
+  request: "Confirm FoodItem, FoodProduct, Exposure and Lifestyle survive in the final schema (members of StepSubstanceTarget, StepInstrumentTarget, ProtocolResultMentionTarget)."
+  cq: [CQ-PR-02]
+  failingCase: "a retired member breaks the union at merge"
+  proposedRuling: "W05 confirms or names replacements; W16 updates unions"
+- id: W16-SR-17
+  targetOwner: W04
+  request: "Confirm USES may target FormulationVersion (pinned) and ProductVariant/Product (floating, resolved as-of through HAS_FORMULATION_VERSION); protocols are not studies so INV-201 does not apply."
+  cq: [CQ-PR-C05]
+  failingCase: "fixture 08 Q-W16-08a"
+  proposedRuling: "accept"
+- id: W16-SR-18
+  targetOwner: W00 with W20
+  request: "MENTIONS relationship type reuse for ProtocolResult -> ProtocolResultMentionTarget (structural extraction aid) or a rename (RESULT_MENTIONS)."
+  cq: [CQ-PC-08]
+  failingCase: "one relationship type, one meaning: W00 MENTIONS (identity_resolution) and W20 chunk MENTIONS may have other semantics"
+  proposedRuling: "keep MENTIONS if W00's meaning is 'artifact mentions entity'; otherwise rename on W16 side"
+- id: W16-SR-19
+  targetOwner: W17
+  request: "Boundary between protocol-stated contraindications (Constraint with CONTRAINDICATED_WHEN on a step) and safety-module ContraindicationAssertion/UseConstraint; a link if both exist for the same fact."
+  cq: [CQ-RC-06]
+  failingCase: "fixture 05: Blueprint sauna 'Avoid or skip sauna if you … are taking … beta blockers' is protocol payload, not a safety assertion"
+  proposedRuling: "keep separate; W17 may cite the Constraint uid"
+- id: W16-SR-20
+  targetOwner: W10
+  request: "Confirm the rename of the live rule edge TRIGGERED_BY to RULE_TRIGGERED_BY (catalog) so TRIGGERED_BY keeps one meaning (W10)."
+  cq: [CQ-PR-04]
+  failingCase: "live ProtocolAdjustmentRule.triggeredByMetrics uses TRIGGERED_BY"
+  proposedRuling: "accept"

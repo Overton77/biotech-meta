@@ -1,0 +1,113 @@
+# W12 migration map (run-2026-10-04-fable51-01, worker W12, Opus 5.5).
+# The live schema has no quality type, relationship or enum. The entries below are (a) live fields owned by other
+# workers whose meaning lands partly in the quality module (seams: W12 states the target, the owner decides the field),
+# and (b) catalog quality types with no live predecessor (live: null), listed so the migration table is complete.
+# No live data is rewritten by W12; no relabel statement is needed.
+
+- live: ManufacturingProcess.qualitySystemKind
+  final: null
+  action: move
+  note: >
+    Owner W11. Values such as "cGMP" are claims, not certifications. Migrate each non-null value to an Assertion
+    {predicate: CLAIMS_CGMP_COMPLIANCE, valueString: <verbatim>} attributed to the organization that made it (W01
+    predicate) or, when a certifier listing exists, to CertificationScope -[:COVERS]-> Facility under a FACILITY
+    programme (NSF/ANSI 455-2). Never to CERTIFIED_UNDER on a product (V-332, V-W12-06). Seam W12-SR-08.
+- live: LocationType.GMP_FACILITY
+  final: null
+  action: retire
+  note: >
+    Owner W01 (CL-015). "GMP facility" is a certification or a claim about a Facility, not a location type. Migrate
+    to CertificationListing (FACILITY programme) COVERS Facility when a listing is captured, else to a
+    CLAIMS_CGMP_COMPLIANCE assertion; the location keeps a neutral facility kind (MANUFACTURING_SITE). Seam W12-SR-08.
+- live: Material.traceabilityCode
+  final: ProductLot.lotCode
+  action: split
+  note: >
+    Owners W02/W11 (CL-005). A finished-product lot code moves to ProductLot.lotCode (plus an Identifier record with
+    scheme LOT_CODE and the issuer); an ingredient or process-material lot code has no W12 home yet (CANDIDATE
+    material lot). Values whose meaning cannot be told apart stay on the legacy property until reviewed.
+- live: LabelRegionType.LOT_NUMBER
+  final: LabelRegionType.LOT_NUMBER
+  action: keep
+  note: >
+    Owner W22. A ProductLabelRegion of this type may back an IMAGE_REGION SourceLocator that supports a LOT_OF or
+    UNIT_FROM_LOT assertion (D-010). The region is evidence for the printed code, never the lot identity.
+- live: LabelRegionType.EXPIRATION_DATE
+  final: LabelRegionType.EXPIRATION_DATE
+  action: keep
+  note: Owner W22. Supports ProductLot.expiryDate (+ precision, dateTextVerbatim) through a locator; "expired" is computed.
+- live: LabelRegionType.CERTIFICATION
+  final: LabelRegionType.CERTIFICATION
+  action: keep
+  note: >
+    Owner W22. A printed certification mark supports at most an Assertion that the mark is printed; it never creates
+    COVERS or CERTIFIED_UNDER (only the certifier's listing does; V-332).
+- live: EventCategory.RECALL_EVENT
+  final: EventCategory.RECALL_EVENT
+  action: keep
+  note: >
+    Owner W18 (with W13 for agency recall records). Recall is linked to the lots it names by that record; W12 adds no
+    recall property to ProductLot (OPEN-QUESTIONS P2 quality 5 boundary; seam W12-SR-06).
+- live: Product.status
+  final: Product.status
+  action: keep
+  note: >
+    Owner W04/W13. Listed only to state that no certification value (for example "NSF certified") may be written into
+    it; product-level certification is the derived CERTIFIED_UNDER edge and exists only when a scope covers the
+    product itself.
+- live: null
+  final: ProductLot
+  action: keep
+  note: Catalog quality type, first full SDL definition; labels ["ProductLot","Entity"]; proposed token lot.
+- live: null
+  final: TestSample
+  action: keep
+  note: Catalog type; token test-sample (proposed).
+- live: null
+  final: TestExecution
+  action: keep
+  note: Catalog type (Occurrence); token test-execution (proposed).
+- live: null
+  final: TestMethod
+  action: keep
+  note: Catalog type; token test-method (proposed).
+- live: null
+  final: TestingLaboratory
+  action: keep
+  note: Catalog type; labels ["TestingLaboratory","Organization","Entity"]; registered token org.
+- live: null
+  final: MeasuredResult
+  action: keep
+  note: Catalog type (InformationArtifact); token measured-result (proposed); qualifier becomes enum ResultQualifier.
+- live: null
+  final: SpecificationCriterion
+  action: keep
+  note: Catalog type (VersionedState); token spec-criterion (proposed); CRITERION_OF_SPECIFICATION to W11 SpecificationVersion.
+- live: null
+  final: PassFailInterpretation
+  action: keep
+  note: Catalog type (EvidenceAssessment); token pass-fail (proposed).
+- live: null
+  final: LotTestSummary
+  action: keep
+  note: Catalog type; token lot-test-summary (proposed).
+- live: null
+  final: CertificateOfAnalysis
+  action: keep
+  note: Catalog type; token coa (proposed); one node per report revision.
+- live: null
+  final: CertificationProgram
+  action: keep
+  note: Catalog type; token cert-program (proposed); + certifiedObjectKind.
+- live: null
+  final: CertificationListing
+  action: keep
+  note: Catalog type; token cert-listing (proposed).
+- live: null
+  final: CertificationScope
+  action: keep
+  note: Catalog type; token cert-scope (proposed); HAS_CERTIFICATION_SCOPE carries StateEpisodeProperties.
+- live: null
+  final: CERTIFIED_UNDER
+  action: derive
+  note: Catalog derived edge; rule w12-certified-under/v1 (direct COVERS only); read-only in SDL.

@@ -1,0 +1,2 @@
+{"calibratedRatioMethods": [], "calibratedCompositeMethods": [],
+ "useProfileAllowedKeys": ["uid","id","name","description","mongoResearchRunId","createdAt","updatedAt","privacyClass","maturity","schemaVersion","entityType","populationDescriptor","doseDescriptor","durationDescriptor","servingsPerDay","intendedDurationIso"]}

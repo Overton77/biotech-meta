@@ -1,0 +1,146 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/04-uid-redirect.cypher",
+ "uri": "bolt://127.0.0.1:38819/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 5,
+ "ok": 5,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "V-432",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 8,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 218,
+   "sample": [],
+   "header": "// W23 fixture 04: uid redirect after a shared identity merge, read from a private record's stored uid (load 00 first).\n// CQ-RC-04, CQ-ID-01 (identity), OPEN-QUESTIONS P0 item 8. The private snapshot (decided 2026-04-10) holds the uid that\n// existed then; the shared graph merges the duplicate on 2"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 2,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 13,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 167,
+   "sample": [],
+   "header": ""
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 328,
+   "sample": [
+    {
+     "heldUid": "hu:product-variant:w23-sleepwell-capsule-listing-dup",
+     "heldUidResolvable": true,
+     "resolvedUid": "hu:product-variant:w23-sleepwell-capsule-listing-dup",
+     "redirectRecord": null,
+     "redirectRecordedAt": null
+    }
+   ],
+   "header": "// Q-RD-1: resolve the uid a private snapshot holds, as of the decision viewpoint R = 2026-04-10T09:00Z.\n// Expected: one row; heldUidResolvable true; resolvedUid = the duplicate uid itself; redirectRecord null (merge recorded later)."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 27,
+   "sample": [
+    {
+     "heldUid": "hu:product-variant:w23-sleepwell-capsule-listing-dup",
+     "heldUidResolvable": true,
+     "resolvedUid": "hu:product-variant:w23-sleepwell-us-capsule",
+     "redirectRecord": "hu:assessment:w23-merge-capsule-dup",
+     "redirectRecordedAt": {
+      "year": 2026,
+      "month": 5,
+      "day": 1,
+      "hour": 12,
+      "minute": 0,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    }
+   ],
+   "header": "// Q-RD-2: the same uid resolved at R = now (2026-10-04). Expected: one row; heldUidResolvable true (old node kept);\n// resolvedUid = hu:product-variant:w23-sleepwell-us-capsule; redirectRecord hu:assessment:w23-merge-capsule-dup."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 78,
+   "sample": [],
+   "header": "// Q-RD-3: redirect chains terminate and never point at a private uid (the private store follows at most 5 hops).\n// Expected: zero rows."
+  }
+ ]
+}

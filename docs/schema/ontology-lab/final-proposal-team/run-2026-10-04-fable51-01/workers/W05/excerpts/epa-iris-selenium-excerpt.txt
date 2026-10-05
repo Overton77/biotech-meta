@@ -1,0 +1,10 @@
+SOURCE A: https://iris.epa.gov/ChemicalLanding/&substance_nmbr=472 (Firecrawl markdown, maxAge 0, 2026-10-04)
+"Selenium and Compounds" "CASRN 7782-49-2 | DTXSID9021261"
+"Reference Dose for Oral Exposure (RfD) ... Last Updated: 06/01/1991"
+"| Nervous, Hematologic, Dermal | 5 x 10 -3 | Clinical selenosis | NOAEL : 1.5 x 10-2 mg/kg-day | 3 | High |"
+"Reference Concentration for Inhalation Exposure (RfC) ... Not assessed under the IRIS Program."
+SOURCE B: https://iris.epa.gov/static/pdfs/0472_summary.pdf (Firecrawl PDF parser, first 6 of 23 pages, query directQuote mode)
+"I.A. Reference Dose for Chronic Oral Exposure (RfD)"
+"| Clinical selenosis | NOAEL: 0.015 mg/kg/day | 3 | 1 | 5E-3 mg/kg/day | Human Epidemiological Study | LOAEL: 0.023 mg/kg/day | Yang et al., 1989b |"
+"Conversion Factors: NOAEL (0.853 mg/day) and LOAEL (1.261 mg/day) calculated from regression analysis (log Y = 0.767log X - 2.248, where Y = blood selenium and X = selenium intake) ... based upon an average adult body weight of 55 kg (Yang et al., 1989b)."
+"studied a population of approximately 400 individuals living in an area of China with unusually high environmental concentrations of selenium (Se). The daily average Se intakes, based on lifetime exposure, 70, 195 and 1438 ug for adult males and 62, 198 and 1238 ug for adult females in the low-, medium- and high-selenium areas, respectively."

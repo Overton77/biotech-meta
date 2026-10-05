@@ -1,0 +1,185 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/03-decision-replay-after-correction.cypher",
+ "uri": "bolt://127.0.0.1:38819/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 5,
+ "ok": 5,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "QS-2b",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 211,
+   "sample": [
+    {
+     "subjectUid": "hu:product-variant:w23-sleepwell-us-capsule",
+     "heldAtViewpoint": "hu:formulation:w23-sleepwell-fv-a1",
+     "authorizedBy": "hu:assertion:w23-a1-variant-fv-a1",
+     "reproduced": true
+    }
+   ],
+   "header": "// W23 fixture 03: decision replay at the decision's viewpoint after a later correction (QUERIES ONLY).\n// Load 00-shared-base.cypher first; run with --params replay-params.json. CQ-RC-02, CQ-RC-04, CQ-RC-07, CQ-PC-08.\n// The private RecommendationSnapshot is NOT in the graph: it is the private-stor"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 74,
+   "sample": [
+    {
+     "subjectUid": "hu:product-variant:w23-sleepwell-us-capsule",
+     "heldNow": "hu:formulation:w23-sleepwell-fv-a1c",
+     "authorizedBy": "hu:assertion:w23-a2-variant-fv-a1c",
+     "matchesSnapshot": false
+    }
+   ],
+   "header": "// Q-DR-2 (CQ-RC-07 comparison): the same valid instant read at the current recorded viewpoint. Expected: one row;\n// heldNow fv-a1c (120 mg) authorized by A2; matchesSnapshot false. The snapshot itself is never edited."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 81,
+   "sample": [
+    {
+     "supersededEvidence": "hu:assertion:w23-a1-variant-fv-a1",
+     "supersededBy": "hu:assertion:w23-a2-variant-fv-a1c",
+     "supersessionKind": "SOURCE_CORRECTION",
+     "learnedAt": {
+      "year": 2026,
+      "month": 6,
+      "day": 15,
+      "hour": 8,
+      "minute": 10,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     }
+    }
+   ],
+   "header": "// Q-DR-3 (CQ-RC-07): evidence uids of the snapshot superseded after its viewpoint. Expected: one row; A1 superseded by A2,\n// SOURCE_CORRECTION, learnedAt 2026-06-15T08:10Z. The private store opens PendingItem {pendingKind: EVIDENCE_REVIEW}."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 30,
+   "sample": [
+    {
+     "adjudicationUid": "hu:adjudication:w23-cf-a1",
+     "kind": "CAPTURE_FIDELITY",
+     "verdict": "SUPPORTED",
+     "reviewedAt": {
+      "year": 2026,
+      "month": 3,
+      "day": 2,
+      "hour": 10,
+      "minute": 20,
+      "second": 0,
+      "nanosecond": 0,
+      "timeZoneOffsetSeconds": 0
+     },
+     "visibleAtViewpoint": true
+    }
+   ],
+   "header": "// Q-DR-4 (CQ-RC-02): adjudication verdicts as held at the viewpoint. Expected: one row; cf-a1 CAPTURE_FIDELITY SUPPORTED\n// reviewed 2026-03-02T10:20Z, visibleAtViewpoint true."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 146,
+   "sample": [
+    {
+     "policyKey": "sleep-support-ranking",
+     "versionLabel": "v3",
+     "payloadHash": "sha256:0c84db663c120839f2c56107184599fc3a5c1695250bb465a0aecda4488948be",
+     "criteria": [
+      "WEAKEST_APPLICABILITY_DIMENSION@applicability-0.3",
+      "SAFETY_BLOCK@safety-block-0.1"
+     ],
+     "requiredFactKeys": [
+      "BASELINE_SERUM_MAGNESIUM",
+      "CURRENT_INTAKE_DECLARED",
+      "PREGNANCY_STATUS_DECLARED"
+     ],
+     "effectiveAtDecision": true,
+     "recordedBeforeDecision": true
+    }
+   ],
+   "header": "// Q-DR-5 (CQ-RC-02, CQ-RC-03; OWNER_PRIVATE explanation support): identity fields of the policy version the snapshot\n// names, its declared criteria and required fact keys. Read by the private-store service only (INTERNAL); the subset test\n// snapshot.missingFactKeys <= requiredFactKeys runs inside"
+  }
+ ]
+}

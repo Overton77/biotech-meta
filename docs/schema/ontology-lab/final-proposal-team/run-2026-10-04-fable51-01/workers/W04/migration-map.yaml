@@ -1,0 +1,316 @@
+# W04 migration map: live current_biotech_schema.graphql (sha256 86b5e0b5...f112) and catalog 0.2.0 -> final proposal.
+# action: keep | rename | move | split | merge | derive | retire
+worker: W04
+liveSchemaDigest: 86b5e0b5d11d203bd75b69b4507b0aad97d5df2495d3897ca64272068ea5f112
+catalogDigest: 8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0
+entries:
+- live: Product
+  final: Product
+  action: keep
+  note: '@node(labels: [Product, Entity]); backfill MATCH (n:Product) SET n:Entity, n.entityType = ''Product''; uid hu:product:<id> where missing (V-117/V-118)'
+- live: Product.id
+  final: Product.id
+  action: keep
+  note: equals opaque segment of uid
+- live: Product.name
+  final: Product.name
+  action: keep
+  note: String! -> String (D-013)
+- live: Product.description
+  final: Product.description
+  action: keep
+- live: Product.mongoResearchRunId
+  final: Product.mongoResearchRunId
+  action: keep
+  note: maps to Activity.externalRunId
+- live: Product.createdAt
+  final: Product.createdAt
+  action: keep
+- live: Product.updatedAt
+  final: Product.updatedAt
+  action: keep
+- live: Product.searchText
+  final: Product.searchText
+  action: keep
+- live: Product.searchFields
+  final: Product.searchFields
+  action: keep
+- live: Product.embeddingModel
+  final: Product.embeddingModel
+  action: keep
+- live: Product.embeddingDimensions
+  final: Product.embeddingDimensions
+  action: keep
+- live: Product.searchEmbedding
+  final: Product.searchEmbedding
+  action: keep
+  note: '@vector(ProductSearchEmbedding) re-added by Fable without provider (D-014); QS-8 candidate lookup justification'
+- live: Product @fulltext ProductSearch
+  final: Product @fulltext ProductSearch
+  action: keep
+  note: same index name, fields and queryName (D-015)
+- live: Product.primaryRegulatoryIdentifier
+  final: Product.primaryRegulatoryIdentifier
+  action: derive
+  note: read-only display of the primary Identifier (HAS_IDENTIFIER); data migrates into Identifier records with scheme/issuer; field kept for ProductSearch
+- live: Product.productType
+  final: Product.productKind
+  action: merge
+  note: map known strings to ProductKind (supplement -> DIETARY_SUPPLEMENT, test/kit -> DIAGNOSTIC_TEST_SERVICE, ...); productType kept deprecated for ProductSearch until clients move
+- live: Product.applicationContext
+  final: Product.applicationContext
+  action: keep
+  note: legacy display
+- live: Product.categories
+  final: Product.categories
+  action: keep
+  note: display tags
+- live: Product.launchYear
+  final: Product.launchYear
+  action: derive
+  note: not settable; YEAR-precision projection of earliest accepted MARKETS_PRODUCT validFrom; existing values become MIGRATION assertions with validFromPrecision YEAR, basis UNKNOWN unless a source is
+    found
+- live: Product.targetCustomer
+  final: Product.targetCustomer
+  action: keep
+  note: legacy display
+- live: Product.deliveryModel
+  final: Product.deliveryModel
+  action: keep
+  note: legacy display
+- live: Product.status
+  final: Product.status
+  action: derive
+  note: not settable; APPROVED requires APPROVAL RegulatoryStatus named in regulatoryProjectionStatusUids (V-322, V-W04-03); existing APPROVED values without backing are nulled and reported
+- live: Product.approvedYear
+  final: Product.approvedYear
+  action: derive
+  note: guarded like status
+- live: Product.productClass
+  final: Product.productClass
+  action: keep
+  note: legacy display (in ProductSearch)
+- live: Product.formulationSummary
+  final: Product.formulationSummary
+  action: derive
+  note: display text from the believed FormulationVersion(s); INV-005; not settable; existing text kept as display, never parsed into components
+- live: Product.indicationSummary
+  final: Product.indicationSummary
+  action: keep
+  note: legacy display; indications are W21 claims or W13 approvals
+- live: Product.modalitySummary
+  final: Product.modalitySummary
+  action: keep
+  note: legacy display
+- live: Product.regulatoryAuthorizationId
+  final: Product.regulatoryAuthorizationId
+  action: derive
+  note: display of Identifier on projected RegulatoryStatus/RegulatorySubmission (W13); values migrate to Identifier records
+- live: Product.currentAsOf
+  final: Product.currentAsOf
+  action: keep
+  note: materialization timestamp
+- live: null
+  final: Product.entityType
+  action: keep
+  note: new required archetype field; backfill 'Product'
+- live: null
+  final: Product.productKind
+  action: keep
+  note: catalog property (products_and_commerce)
+- live: null
+  final: Product.regulatoryProjectionStatusUids
+  action: derive
+  note: names the RegulatoryStatus records projected (V-322)
+- live: null
+  final: Product.privacyClass/maturity/schemaVersion
+  action: keep
+  note: contract B2
+- live: Product.snapshots (HAS_SNAPSHOT)
+  final: Product.snapshots (HAS_SNAPSHOT, read-only)
+  action: keep
+  note: round 0007 section 12 seam; W04-SR-06
+- live: Product.offeredBy (OFFERS, RoleMetadata)
+  final: Product.offeredBy (read-only, no properties)
+  action: retire
+  note: successor SELLS_PRODUCT derived from SELLER_OF_RECORD_FOR (W15); legacy edges readable as LEGACY_UNDATED until W15 migrates them; RoleMetadata dropped from the API (null non-null fields would break
+    reads)
+- live: Product.manufacturedBy (MANUFACTURES, RoleMetadata)
+  final: Product.manufacturedBy (read-only)
+  action: retire
+  note: successor asserted manufacturing predicate per W01/W11 (W04-SR-07)
+- live: Product.contractManufacturedBy (CONTRACTS_MANUFACTURING)
+  final: Product.contractManufacturedBy (read-only)
+  action: retire
+  note: W04-SR-07
+- live: Product.listedIn (LISTS_PRODUCT, RoleMetadata vs TemporalMetadata)
+  final: Product.listedIn (read-only); MerchantListing -LISTING_FOR-> ProductVariant|PackageConfiguration
+  action: move
+  note: W15 owns LISTING_FOR and the edge migration; live property-type mismatch resolved by retiring the edge
+- live: Product.containsCompoundForms (CONTAINS_COMPOUND_FORM, DoseMetadata)
+  final: Product.containsCompoundForms (CONTAINS_COMPOUND_FORM -> ChemicalForm, DerivedEdgeProperties, read-only)
+  action: derive
+  note: target CompoundForm -> ChemicalForm (D-002); regenerated by rule contains-form-v1; each legacy edge first becomes an IngredientComponent in a MIGRATION FormulationVersion with validFrom/validTo
+    null, basis UNKNOWN
+- live: DoseMetadata.dose
+  final: IngredientComponent.quantity
+  action: move
+- live: DoseMetadata.doseUnit
+  final: IngredientComponent.unitCode
+  action: move
+  note: normalize to UCUM
+- live: DoseMetadata.role
+  final: IngredientComponent.role
+  action: move
+- live: DoseMetadata.componentName
+  final: IngredientComponent.declaredAs
+  action: move
+- live: DoseMetadata.standardizedTo
+  final: 'IngredientComponent{amountReferent: MARKER_CONSTITUENT} + W02 standardization'
+  action: split
+  note: never a total amount
+- live: DoseMetadata.quantity
+  final: null
+  action: retire
+  note: undocumented meaning (round 0002 R11)
+- live: DoseMetadata.notes
+  final: StructuralEdgeProperties.notes on HAS_INGREDIENT_COMPONENT
+  action: move
+- live: null
+  final: IngredientComponent.massBasis/amountReferent/quantityBasis
+  action: keep
+  note: migrated components get massBasis UNSPECIFIED, amountReferent per label review or NOT_STATED-with-null-quantity; never guessed
+- live: Product.implementsPlatforms (IMPLEMENTS, UsageMetadata)
+  final: Product.implementsPlatforms (IMPLEMENTS_PLATFORM, UsageEdgeProperties)
+  action: rename
+  note: 'W08 owns type and properties; relationship type relabel in Cypher (no APOC needed: CREATE new, DELETE old)'
+- live: Product.classifiedAs (CLASSIFIED_AS -> union ProductClassification)
+  final: Product.classifiedAsDevices, Product.classifiedAsInstruments (read-only)
+  action: split
+  note: union has no owner; W04-SR-08
+- live: Product.implementsPanels (IMPLEMENTS_PANEL, RoleMetadata)
+  final: Product.implementsPanels (IMPLEMENTS_PANEL, AssertedEdgeProperties)
+  action: keep
+  note: W15 owns the type; legacy edges need assertionUid backfill (MIGRATION assertions) before the non-null fields can be read
+- live: Product.deliversLabTests (DELIVERS_LABTEST, RoleMetadata)
+  final: Product.deliversLabTests (DELIVERS_LABTEST, AssertedEdgeProperties)
+  action: keep
+  note: owner unassigned (W04-SR-09); same backfill
+- live: Product.followsRegulatoryPathways (FOLLOWS_PATHWAY)
+  final: Product.followsRegulatoryPathways (DerivedEdgeProperties, read-only)
+  action: derive
+  note: from RegulatorySubmission UNDER_PATHWAY (W13)
+- live: Product.hasRegulatoryStatuses (HAS_REGULATORY_STATUS)
+  final: Product.hasRegulatoryStatuses (DerivedEdgeProperties, read-only)
+  action: derive
+  note: projection of RegulatoryStatus STATUS_OF (W13)
+- live: Product.hasSafetySignals (HAS_SAFETY_SIGNAL, SafetyMetadata)
+  final: Product.hasSafetySignals (HAS_SAFETY_SIGNAL, SafetyEdgeProperties)
+  action: keep
+  note: W17
+- live: PhysicalLocation.hostsProducts (HOSTS_PRODUCT)
+  final: null
+  action: retire
+  note: 'recommendation to W01: ambiguous (manufacture site vs stock vs retail); W11 facility-process and W15 inventory edges replace it (W04-SR-07)'
+- live: Material.partOfProducts (PART_OF, DoseMetadata)
+  final: IngredientComponent -USES_MATERIAL-> IngredientMaterial
+  action: retire
+  note: INV-005; W02/W11 dispose Material (CL-005)
+- live: ProductLabelRegion.aboutProduct (ABOUT_PRODUCT)
+  final: W22 decides; W04 asks target ProductVariant|PackageConfiguration and a SourceLocator{IMAGE_REGION} link to LabelDeclaration
+  action: move
+  note: W04-SR-05
+- live: unions containing Product
+  final: union owners add ProductVariant where dose/composition matter
+  action: keep
+  note: W04-SR-10 lists them
+- live: ProductSnapshot
+  final: ProductSnapshot
+  action: keep
+  note: labels [ProductSnapshot, VersionedState]; read-only cache of the first episode; add stateType, payloadHash (sha256 over display payload), assertionUids
+- live: ProductSnapshot.validFrom/validTo/recordedFrom/recordedTo
+  final: same
+  action: keep
+  note: TemporalSnapshot cache; V-513
+- live: ProductSnapshot.snapshotType/productType/applicationContext/categories/launchYear/targetCustomer/deliveryModel/status/approvedYear/productClass/formulationSummary/indicationSummary/modalitySummary/regulatoryAuthorizationId/searchEmbedding
+  final: same
+  action: keep
+  note: frozen display payload; formulationSummary INV-005; status/approvedYear YEAR-precision projections
+- live: ProductSnapshot.product (HAS_SNAPSHOT IN)
+  final: same
+  action: keep
+  note: read-only
+- live: ProductSnapshot.supportedByDocuments/supportedByChunks (ExtractionMetadata)
+  final: same fields, DerivedSupportProperties (W20), read-only
+  action: rename
+  note: property type successor
+- live: ProductSnapshot @fulltext ProductSnapshotSearch, @vector ProductSnapshotSearchEmbedding
+  final: fulltext kept; vector only if Fable keeps a justification
+  action: keep
+- live: ProductStatus
+  final: ProductStatus
+  action: keep
+  note: values unchanged; APPROVED guarded
+- live: null
+  final: ProductKind
+  action: keep
+  note: catalog Product.productKind made an enum (DIETARY_SUPPLEMENT, CONVENTIONAL_FOOD, DRUG, BIOLOGIC, MEDICAL_DEVICE, CONSUMER_DEVICE, DIAGNOSTIC_TEST_SERVICE, COSMETIC, OTHER)
+- live: null
+  final: DeclarationKind
+  action: keep
+  note: catalog LabelDeclaration.declarationKind made an enum; 0.1.0 fixture value DIETARY_INGREDIENT retained
+- live: DoseMetadata
+  final: IngredientComponent fields + StructuralEdgeProperties
+  action: split
+- live: catalog ProductVariant
+  final: ProductVariant
+  action: keep
+- live: catalog PackageConfiguration
+  final: PackageConfiguration
+  action: keep
+  note: adds unitDescription; uid token package-configuration requested (W04-SR-01)
+- live: catalog FormulationVersion
+  final: FormulationVersion
+  action: keep
+- live: catalog IngredientComponent
+  final: IngredientComponent
+  action: keep
+- live: catalog LabelSnapshot
+  final: LabelSnapshot [LabelSnapshot, SourceSnapshot, InformationArtifact]
+  action: keep
+  note: same node as the SourceSnapshot capture; uid token snapshot (W04-SR-01)
+- live: catalog LabelDeclaration
+  final: LabelDeclaration
+  action: keep
+- live: catalog ServingDefinition
+  final: ServingDefinition
+  action: keep
+  note: adds servingStatementVerbatim; servingsPerContainer package-scoped (V-W04-07)
+- live: catalog QuantityDeclaration.basis
+  final: QuantityDeclaration.quantityBasis
+  action: rename
+  note: no stored data in 0.2.0 fixtures; uniform with IngredientComponent
+- live: null
+  final: QuantityDeclaration.dailyValueStatus
+  action: keep
+  note: new; ReportedStatus distinguishes printed %DV, 'not established', silent panel
+- live: catalog USES_SERVING_DEFINITION (LabelSnapshot -> ServingDefinition)
+  final: USES_SERVING_DEFINITION (LabelSnapshot | FormulationVersion -> ServingDefinition)
+  action: keep
+  note: domain extension W04-D07
+- live: catalog LABEL_FOR (-> ProductVariant|PackageConfiguration)
+  final: LabelSnapshot.labelForVariants + labelForPackages (one relationship type)
+  action: split
+  note: GraphQL field split, no union
+- live: catalog IDENTIFIED_BY (ProductVariant|PackageConfiguration|MerchantListing -> TradeItemIdentifier)
+  final: ProductVariant.tradeItemIdentifiers, PackageConfiguration.tradeItemIdentifiers (IdentifierLinkProperties); MerchantListing field written by W15
+  action: keep
+- live: catalog CONTAINS (Product|ProductVariant -> IngredientMaterial)
+  final: Product.containsMaterials, ProductVariant.containsMaterials (DerivedEdgeProperties, read-only)
+  action: derive
+- live: catalog HAS_FORMULATION_VERSION
+  final: ProductVariant.formulationVersions (FormulationEdgeProperties)
+  action: keep
+- live: 0.1.0 fixture elysium-basis.cypher
+  final: unchanged; fixtures/w04-06-elysium-basis-compat.cypher backfills archetype fields, bases, serving and projected episodes
+  action: keep

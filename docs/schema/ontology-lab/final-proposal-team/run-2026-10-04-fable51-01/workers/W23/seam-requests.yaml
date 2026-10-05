@@ -1,0 +1,134 @@
+# W23 seam requests (run-2026-10-04-fable51-01). Format: {id, targetOwner, request, cq, failingCase, proposedRuling}.
+- id: W23-SR-01
+  targetOwner: W00
+  request: >-
+    Register uid type tokens keyed by primary label: PolicyVersion: policy-version (only the alias key 'policy-version'
+    exists today), DecisionCriterion: decision-criterion (absent), and confirm AnswerRecord: answer-record. For information:
+    W23 fixtures also use observation, cohort-participant, experience-report, protocol-result, whose registration belongs
+    to W16, W01, W21.
+  cq: [CQ-RC-02, CQ-AX-03]
+  failingCase: "fixtures/00-shared-base.cypher writes hu:decision-criterion:w23-safety-block; INV-106 cannot be checked against a registered token"
+  proposedRuling: "add the three keys to conventions.uidTypeTokens"
+- id: W23-SR-02
+  targetOwner: W00
+  request: "Extend the catalog domain of WAS_GENERATED_BY (provenance) with AnswerRecord, so a published answer names its ANSWER_COMPOSITION Activity and through it the AUTHORIZED_BY {useKind} PolicyVersion."
+  cq: [CQ-AX-01, CQ-AX-C01]
+  failingCase: "without it, AnswerRecord -> Activity is not a catalog relationship and V-W23-03b can only be informational; fixture 12 records have no lineage and nothing fails"
+  proposedRuling: "WAS_GENERATED_BY.from adds AnswerRecord; V-W23-03b becomes a failing validator"
+- id: W23-SR-03
+  targetOwner: W00
+  request: "Add uid: String! (and id: ID!) to the contract B3 interfaces AssertionArchetype and EvidenceAssessmentArchetype (kernel change: contract B3)."
+  cq: [CQ-AX-01, CQ-AX-03]
+  failingCase: >-
+    checks/roundtrip-variant-a-contract-B3.json: with B3 as frozen, connecting AnswerRecord.citesAssessments by uid fails
+    ('Field "uid" is not defined by type "EvidenceAssessmentArchetypeWhere"'); reads need inline fragments per type.
+    checks/roundtrip-variant-b-uid-on-archetype.json: with uid on the interfaces, connect and read work under @neo4j/graphql 7.6.3.
+  proposedRuling: "add uid (and id) to both archetype interfaces; every implementer already has them through Entity"
+- id: W23-SR-04
+  targetOwner: Fable
+  request: "Register candidate structural relationship DECLARES_CRITERION (PolicyVersion -> DecisionCriterion, StructuralEdgeProperties.orderIndex) in recommendation_decisions."
+  cq: [CQ-RC-02, CQ-RC-03]
+  failingCase: "Q-DR-5 needs the criteria a policy version evaluates; without the edge DecisionCriterion floats unrelated to any policy and CQ-RC-02's 'which criteria' has no shared answer"
+  proposedRuling: "accept as CANDIDATE in the final schema"
+- id: W23-SR-05
+  targetOwner: Fable
+  request: "Register candidate enum PolicyKind {USE_AUTHORIZATION, RECOMMENDATION_RANKING, SAFETY_REVIEW, DATA_RETENTION}, owner W23."
+  cq: [CQ-AX-C01, CQ-RC-02, CQ-PC-05]
+  failingCase: "fixtures/13 N1: an ANSWER_COMPOSITION Activity AUTHORIZED_BY {QUOTE_IN_ANSWER} a ranking policy passes V-429; V-W23-07 reports POLICY_KIND_NOT_USE_AUTHORIZATION (run)"
+  proposedRuling: "accept as CANDIDATE; W16's V-533p additionally checks policyKind SAFETY_REVIEW (W23-SR-11)"
+- id: W23-SR-06
+  targetOwner: W00
+  request: >-
+    Define the identity-merge redirect record (OPEN-QUESTIONS P0 item 8): a directed record naming the surviving and the
+    retired uid with recordedAt, resolvable as of a recorded viewpoint, and an equivalenceKind (or separate kind) for two
+    records of one identity. EquivalenceAssessment is symmetric (COMPARES_IDENTITIES, exactly two) and its kinds
+    (SAME_WORK_DIFFERENT_NAME ...) do not name a duplicate record.
+  cq: [CQ-RC-04, CQ-ID-01]
+  failingCase: "fixtures/04-uid-redirect.cypher must use requested properties redirectKind/survivingUid/retiredUid; Q-RD-1/Q-RD-2 resolve correctly only with them (run)"
+  proposedRuling: "add survivingUid, retiredUid and supersessionKind DUPLICATE_MERGE semantics to the merge record; private records are never rewritten"
+- id: W23-SR-07
+  targetOwner: W00
+  request: "V-432 matches (e:EquivalenceAssessment)-[:COMPARES]->(n) but the catalog edge is COMPARES_IDENTITIES (COMPARES belongs to ComparabilityAssessment)."
+  cq: [CQ-ID-01]
+  failingCase: "fixtures/04 (catalog-conformant COMPARES_IDENTITIES): V-432 returns hu:assessment:w23-merge-capsule-dup with comparedCount 0 (run, S2)"
+  proposedRuling: "V-432 matches COMPARES_IDENTITIES"
+- id: W23-SR-08
+  targetOwner: W00
+  request: >-
+    Rule the stored casing of PrivacyClass ('PUBLIC'/'INTERNAL', the enum names @neo4j/graphql writes) and amend the validators
+    and shapes that compare with catalog lower-case spellings: V-313 (accepts ['public','internal','private-personal','synthetic']),
+    V-521 class branch (= 'private-personal' only), QS-5b and QS-6 private tests; adopt V-W23-09 and V-W23-10. Also note for the
+    source registry: SRC-NEO4J-PBAC/-RBAC-LIMITATIONS cite 'current' pages; at the 5.x pin the 'sharded property databases'
+    sentence and vector-index filtering are not on the pages (03 S-1, S-2).
+  cq: [CQ-PC-08, CQ-AX-12]
+  failingCase: "fixtures/10 2e: hu:product:w23-leak-class-upper with privacyClass 'PRIVATE_PERSONAL' and no private uid is not reported by V-521 (run, S3); V-W23-09 reports it. Stored value from the API is 'INTERNAL' (checks/roundtrip-*.json storedNode)"
+  proposedRuling: "stored values are 'PUBLIC'/'INTERNAL'; any other value is a violation (V-W23-09); relabel legacy lower-case values"
+- id: W23-SR-09
+  targetOwner: Fable
+  request: >-
+    Number and adopt V-W23-01a/01b (successors of V-121), V-W23-02, V-W23-03 (+03b informational until SR-02), V-W23-04,
+    V-W23-05, V-W23-06, V-W23-07, V-W23-08, V-W23-09, V-W23-10 (fixtures/validation-w23.cypher). Decide whether AccessTier keeps
+    OWNER_PRIVATE in the GraphQL enum (W23 recommends keeping it; alternative: drop it so the API cannot write it).
+  cq: [CQ-AX-03, CQ-AX-12, CQ-PC-08, CQ-AX-C01, CQ-AX-C02]
+  failingCase: "S3, S3a, S4, S5, S6 rows in 06-fixtures-and-queries.md that no existing V-query reports"
+  proposedRuling: "adopt with V-1xx/V-5xx numbers"
+- id: W23-SR-10
+  targetOwner: W00
+  request: >-
+    Field-level privacy classes on kernel types for the tier closure (04 section 6): Activity instances INTERNAL; Agent identity
+    (uid, name, agentKind) PUBLIC with model, promptVersion, toolVersion INTERNAL; Adjudication PUBLIC with humanReviewPending
+    and reviewer identity edges INTERNAL; ResolutionHypothesis INTERNAL; mongoResearchRunId, agentRunUid, extractionConfidence,
+    extractionMethod INTERNAL fields.
+  cq: [CQ-AX-01, CQ-AX-09, CQ-AX-13, CQ-AX-15]
+  failingCase: "Q-PP-1 must cut A1 <-USED- Activity -AUTHORIZED_BY-> PolicyVersion; with Activity PUBLIC the public projection reaches the use policy in two hops (Q-PP-2 shows the path, run)"
+  proposedRuling: "adopt the classes; W23 owns the closure table, W00 owns the field classes"
+- id: W23-SR-11
+  targetOwner: W16
+  request: "V-533p: when ruleBasis = BELLLABS_SAFETY_POLICY, the referenced PolicyVersion (policyVersionUid) must exist, be INTERNAL and have policyKind SAFETY_REVIEW. RECORDS/POSTS_RESULT public-person rule is shared with V-W23-05 (same conditions as V-532p plus endpoint PUBLIC and source attribution of the assertion)."
+  cq: [CQ-PR-04, CQ-PC-08]
+  failingCase: "a ProtocolAdjustmentRule naming the use-authorization policy v1 passes V-533p today"
+  proposedRuling: "extend V-533p; keep one rule text for RECORDS/POSTS_RESULT across V-532p and V-W23-05"
+- id: W23-SR-12
+  targetOwner: W01
+  request: >-
+    Confirm: HAS_PARTICIPANT_TOKEN live edges are deleted with a logged count, NOT exported to the private store (no consenting
+    owner exists for a third-party link); CohortParticipant nodes derived from BellLabs users are exported only into the owner's
+    own PCS record when the mapping to a UserContext is known, then deleted, else deleted. Answer to W01-SR-11: agree to retire
+    Person birth date and place fields.
+  cq: [CQ-PC-08, CQ-PC-05]
+  failingCase: "fixtures/11 N5 (inferred person-to-participant link) reported by V-W23-05 RETIRED_REIDENTIFICATION_EDGE (run)"
+  proposedRuling: "as stated"
+- id: W23-SR-13
+  targetOwner: W21
+  request: >-
+    With ExperienceReport and REPORTS retired, define the shared record shape for a consented de-identified contribution
+    (private-store-interface 8.3): ClaimOccurrence asserted by an AnonymousActor in a contribution Source (a SourceKind value is
+    W00's), carrying contributionToken; never a Person-linked Observation or ProtocolResult, never a persistent CohortParticipant token.
+  cq: [CQ-PC-05, CQ-AX-28]
+  failingCase: "the round 0008 pipeline names ExperienceReport as the contribution target; the final schema retires it"
+  proposedRuling: "W21 names the record; W00 adds a SourceKind for consented contributions if needed"
+- id: W23-SR-14
+  targetOwner: W07
+  request: >-
+    Keep DiagnosticResult implementable by a non-graph record (private-store-interface section 3 maps every field; relationship
+    fields become uid columns). Amend V-313's accepted list to the final privacy values. Note for Fable: W07 and W12 both define an
+    enum named ResultQualifier with different values (W07: NUMERIC, BELOW_DETECTION, ...; W12: QUANTIFIED, NOT_DETECTED, ...).
+  cq: [CQ-DX-08, CQ-AX-21, CQ-PC-06]
+  failingCase: "V-313 reports every DiagnosticResult whose privacyClass is 'PUBLIC' (the stored enum name) as invalid"
+  proposedRuling: "W07 keeps the interface scalar-mappable; V-313 list ['PUBLIC','INTERNAL']; Fable resolves the ResultQualifier name collision"
+- id: W23-SR-15
+  targetOwner: W00
+  request: "UseKind has no value for displaying or reproducing a media asset in an answer (W22 MediaRightsRecord feeds a BellLabs use decision). Add a candidate value (for example DISPLAY_MEDIA_IN_ANSWER) or rule that QUOTE_IN_ANSWER covers images; extend USED range to MediaAsset/MediaRightsRecord if the composing Activity must cite them."
+  cq: [CQ-AX-C01, CQ-PV-06]
+  failingCase: "an answer showing a CC BY-SA image can only cite QUOTE_IN_ANSWER, which names text quotation"
+  proposedRuling: "W00 decides with W22; W23's PolicyVersion.permittedUseKinds follows UseKind"
+- id: W23-SR-16
+  targetOwner: Fable
+  request: >-
+    Runtime findings for the final build: (1) DateTime reads through @neo4j/graphql 7.6.3 call apoc.date.convertFormat (APOC
+    required; Community test instance without APOC fails reads); (2) relationship targets that are interfaces or unions whose
+    member label sets nest return nodes twice (W00 D-W00-05 agrees); (3) PUBLIC_ANSWER should be served by compiled queries or a
+    generated tier sub-schema (checks/public-subset.mjs builds), not by the operator schema.
+  cq: [CQ-AX-13, CQ-AX-12]
+  failingCase: "checks/roundtrip-*.json readDateTime error; checks/label-overlap-probe-result.json"
+  proposedRuling: "pin APOC in the validation report or test reads with an APOC-enabled instance; keep the parent-only target rule; generate tier sub-schemas"

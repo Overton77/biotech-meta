@@ -1,0 +1,138 @@
+# W16 migration map: live current_biotech_schema.graphql lines 1756-2040 (+176-187 OrderingMetadata, 217-226 DoseMetadata as used by
+# protocol edges) and neo4j/proposed-delta.graphql Lane 5 protocol additions -> final W16 elements.
+# action: keep | rename | move | split | merge | derive | retire. Data note: live Protocol nodes become Protocol + one ProtocolEdition
+# (changeProvenance SNAPSHOT_DIFF unless versionLabel is set -> SOURCE_VERSIONED; editionLabel = versionLabel) attached by a
+# MIGRATION assertion with validFrom null/basis UNKNOWN (or lastUpdatedAt as PUBLICATION_PROXY), recordedFrom = migration commit.
+- {live: Protocol, final: Protocol, action: keep, note: "enduring identity; labels Protocol:Entity; uid backfilled hu:protocol:<id>"}
+- {live: Protocol.id, final: Protocol.id, action: keep, note: "opaque segment of uid"}
+- {live: Protocol.name, final: Protocol.name, action: keep, note: "nullable (D-013)"}
+- {live: Protocol.description, final: Protocol.description, action: keep, note: ""}
+- {live: Protocol.mongoResearchRunId, final: Protocol.mongoResearchRunId, action: keep, note: "internal tier"}
+- {live: Protocol.createdAt, final: Protocol.createdAt, action: keep, note: ""}
+- {live: Protocol.updatedAt, final: Protocol.updatedAt, action: keep, note: ""}
+- {live: Protocol.searchText, final: Protocol.searchText, action: keep, note: "derived; regenerate"}
+- {live: Protocol.searchFields, final: Protocol.searchFields, action: keep, note: ""}
+- {live: Protocol.embeddingModel, final: Protocol.embeddingModel, action: keep, note: ""}
+- {live: Protocol.embeddingDimensions, final: Protocol.embeddingDimensions, action: keep, note: ""}
+- {live: Protocol.searchEmbedding, final: Protocol.searchEmbedding, action: keep, note: "@vector added by Fable only, without provider (D-014)"}
+- {live: Protocol.protocolType, final: Protocol.protocolType, action: keep, note: ""}
+- {live: Protocol.versionLabel, final: ProtocolEdition.editionLabel, action: move, note: "only when the source printed it; never invented"}
+- {live: Protocol.lastUpdatedAt, final: ProtocolEdition.sourceVersionDate, action: move, note: "date part if source-stated; otherwise becomes HAS_PROTOCOL_EDITION.validFrom with PUBLICATION_PROXY basis"}
+- {live: Protocol.authorName, final: "Assertion AUTHORED_PROTOCOL / AUTHORED_PROTOCOL_EDITION", action: retire, note: "string kept in a MIGRATION assertion valueString until resolved to Person/Organization (W01)"}
+- {live: Protocol.publicUrl, final: Protocol.publicUrl, action: keep, note: "display; Source.canonicalUri is authoritative"}
+- {live: Protocol.scheduleText, final: ProtocolEdition.scheduleText, action: move, note: ""}
+- {live: Protocol.cadence, final: ProtocolEdition.scheduleText, action: merge, note: "free text appended to scheduleText"}
+- {live: Protocol.schedulePattern, final: ProtocolEdition.schedulePattern, action: move, note: ""}
+- {live: Protocol.cadenceUnit, final: ProtocolEdition.cadenceUnit, action: move, note: ""}
+- {live: Protocol.cadenceInterval, final: "ProtocolEdition.cadenceIntervalMin + cadenceIntervalMax", action: split, note: "both = old value"}
+- {live: Protocol.occurrencesPerDay, final: "ProtocolEdition.occurrencesPerPeriodMin/Max + occurrencePeriodUnit DAY", action: merge, note: ""}
+- {live: Protocol.occurrencesPerWeek, final: "ProtocolEdition.occurrencesPerPeriodMin/Max + occurrencePeriodUnit WEEK", action: merge, note: "if several per-period fields are set, keep the most specific and record the rest in scheduleText"}
+- {live: Protocol.occurrencesPerMonth, final: "ProtocolEdition.occurrencesPerPeriodMin/Max + occurrencePeriodUnit MONTH", action: merge, note: ""}
+- {live: Protocol.durationDaysMin, final: ProtocolEdition.durationDaysMin, action: move, note: ""}
+- {live: Protocol.durationDaysMax, final: ProtocolEdition.durationDaysMax, action: move, note: ""}
+- {live: Protocol.cycleLengthDays, final: "ProtocolEdition.cycleLengthDaysMin + cycleLengthDaysMax", action: split, note: "both = old value"}
+- {live: Protocol.timeOfDay, final: ProtocolEdition.timeOfDay, action: move, note: ""}
+- {live: Protocol.daysOfWeek, final: ProtocolEdition.daysOfWeek, action: move, note: ""}
+- {live: Protocol.isContinuous, final: ProtocolEdition.isContinuous, action: move, note: ""}
+- {live: Protocol.isAsNeeded, final: ProtocolEdition.isAsNeeded, action: move, note: ""}
+- {live: Protocol.isCyclic, final: "ProtocolEdition.schedulePattern = CYCLIC", action: retire, note: "derivable; true without pattern -> pattern CYCLIC"}
+- {live: Protocol.requiresFasting, final: ProtocolEdition.requiresFasting, action: move, note: ""}
+- {live: Protocol.requiresMonitoring, final: ProtocolEdition.requiresMonitoring, action: move, note: ""}
+- {live: "Protocol.hasSteps (HAS_STEP, OrderingMetadata)", final: "ProtocolEdition.steps (HAS_PROTOCOL_STEP, StepOrderProperties) + Protocol.currentSteps (HAS_CURRENT_PROTOCOL_STEP, derived)", action: derive, note: "D-004/CL-013: relabel edge per migrated edition; HAS_STEP stays only for ManufacturingProcess (W11)"}
+- {live: "Protocol.hasConstraints (HAS_CONSTRAINT, RoleMetadata)", final: "ProtocolEdition.constraints (HAS_CONSTRAINT, ConstraintRoleProperties)", action: move, note: "RoleMetadata.role -> constraintRole when it holds APPLIES_WHEN/CONTRAINDICATED_WHEN/REQUIRES_BEFORE, else APPLIES_WHEN + review"}
+- {live: "Protocol.hasMeasurementPlans (HAS_MEASUREMENT_PLAN, RoleMetadata)", final: "ProtocolEdition.measurementPlans (StructuralEdgeProperties)", action: move, note: ""}
+- {live: "Protocol.hasTargets (HAS_TARGET, RoleMetadata)", final: "ProtocolEdition.targets (StructuralEdgeProperties)", action: move, note: ""}
+- {live: "Protocol.hasFunctionalGoals (HAS_FUNCTIONAL_GOAL, RoleMetadata)", final: "ProtocolEdition.functionalGoals (AssertedEdgeProperties)", action: move, note: "needs a MIGRATION assertion per edge (asserted class)"}
+- {live: "Protocol.hasAdjustmentRules (HAS_ADJUSTMENT_RULE, RoleMetadata)", final: "ProtocolEdition.adjustmentRules (StructuralEdgeProperties)", action: move, note: ""}
+- {live: "Protocol.targets (TARGETS, RoleMetadata)", final: "ProtocolEdition.therapeuticTargets (TARGETS, StructuralEdgeProperties)", action: move, note: ""}
+- {live: "Protocol.includesProtocols (INCLUDES_PROTOCOL, OrderingMetadata)", final: "ProtocolEdition.includedEditions (INCLUDES_PROTOCOL -> ProtocolEdition)", action: move, note: "only when the source names the version; else becomes HAS_SUBPROTOCOL (floating)"}
+- {live: "Protocol.hasSubprotocols (HAS_SUBPROTOCOL, OrderingMetadata)", final: "ProtocolEdition.subprotocols (HAS_SUBPROTOCOL -> Protocol)", action: move, note: "floating binding; resolved as-of"}
+- {live: "Protocol.results (FOR_PROTOCOL IN, RoleMetadata)", final: "Protocol.results (FOR_PROTOCOL IN, AssertedEdgeProperties)", action: keep, note: "MIGRATION assertion per edge"}
+- {live: ProtocolStep, final: ProtocolStep, action: keep, note: "labels ProtocolStep:Entity; immutable once attached; stepKey assigned by alignment (W16-STEPKEY-1)"}
+- {live: ProtocolStep.name, final: ProtocolStep.name, action: keep, note: ""}
+- {live: ProtocolStep.stepKind, final: ProtocolStep.stepKind, action: keep, note: ""}
+- {live: ProtocolStep.stepKindRaw, final: ProtocolStep.stepKindRaw, action: keep, note: ""}
+- {live: ProtocolStep.stepDescription, final: ProtocolStep.stepDescription, action: keep, note: ""}
+- {live: ProtocolStep.frequencyText, final: ProtocolStep.frequencyText, action: keep, note: ""}
+- {live: ProtocolStep.timingText, final: ProtocolStep.timingText, action: keep, note: ""}
+- {live: ProtocolStep.durationText, final: ProtocolStep.durationText, action: keep, note: ""}
+- {live: ProtocolStep.scheduleText, final: ProtocolStep.scheduleText, action: keep, note: ""}
+- {live: ProtocolStep.schedulePattern, final: ProtocolStep.schedulePattern, action: keep, note: ""}
+- {live: ProtocolStep.cadenceUnit, final: ProtocolStep.cadenceUnit, action: keep, note: ""}
+- {live: ProtocolStep.cadenceInterval, final: "ProtocolStep.cadenceIntervalMin + cadenceIntervalMax", action: split, note: "both = old value; V-529b flags verbatim ranges collapsed to one value"}
+- {live: ProtocolStep.timeOfDay, final: ProtocolStep.timeOfDay, action: keep, note: ""}
+- {live: ProtocolStep.daysOfWeek, final: ProtocolStep.daysOfWeek, action: keep, note: ""}
+- {live: ProtocolStep.durationMinutesMin, final: ProtocolStep.durationMinutesMin, action: keep, note: "per occurrence"}
+- {live: ProtocolStep.durationMinutesMax, final: ProtocolStep.durationMinutesMax, action: keep, note: ""}
+- {live: ProtocolStep.durationDaysMin, final: ProtocolStep.durationDaysMin, action: keep, note: "whole course"}
+- {live: ProtocolStep.durationDaysMax, final: ProtocolStep.durationDaysMax, action: keep, note: ""}
+- {live: ProtocolStep.isOptional, final: "ProtocolStep.requirementLevel + requirementBasis", action: retire, note: "true -> OPTIONAL/STATED_BY_SOURCE only if the source says optional, else EDITORIAL_INFERENCE; false/null -> NOT_STATED (never ESSENTIAL)"}
+- {live: ProtocolStep.isRepeatable, final: "schedule ranges (cadence*, occurrencesPerPeriod*, totalOccurrences*, cycle*)", action: retire, note: "true with no schedule data -> scheduleText note + review"}
+- {live: "ProtocolStep.dependsOn (DEPENDS_ON, OrderingMetadata)", final: "ProtocolStep.dependsOn (DEPENDS_ON, StepDependencyProperties)", action: keep, note: "dependencyKind required: default REQUIRES_PRIOR_COMPLETION with dependencyBasis EDITORIAL_INFERENCE + review; orderIndex kept"}
+- {live: "ProtocolStep.hasConstraints (HAS_CONSTRAINT, RoleMetadata)", final: "ProtocolStep.constraints (ConstraintRoleProperties)", action: keep, note: "RoleMetadata.role -> constraintRole"}
+- {live: "ProtocolStep.uses (USES, DoseMetadata)", final: "ProtocolStep.uses (USES, StepDoseProperties)", action: keep, note: "see DoseMetadata rows; Compound/CompoundForm targets re-pointed to ChemicalSubstance/ChemicalForm/IngredientMaterial per W02 map"}
+- {live: "ProtocolStep.employs (EMPLOYS, RoleMetadata)", final: "ProtocolStep.employs (StructuralEdgeProperties)", action: keep, note: "RoleMetadata.role -> notes"}
+- {live: "ProtocolStep.targets (TARGETS, RoleMetadata)", final: "ProtocolStep.targets (StructuralEdgeProperties)", action: keep, note: ""}
+- {live: Constraint, final: Constraint, action: keep, note: "labels Constraint:Entity"}
+- {live: Constraint.constraintType, final: "Constraint.constraintKind + constraintText", action: retire, note: "mapped by vocabulary; unmapped -> constraintKind null + constraintText (review queue)"}
+- {live: "Constraint.basedOn (BASED_ON, RoleMetadata)", final: "Constraint.basedOn (StructuralEdgeProperties)", action: keep, note: ""}
+- {live: MeasurementPlan, final: MeasurementPlan, action: keep, note: "labels MeasurementPlan:Entity"}
+- {live: MeasurementPlan.planType, final: MeasurementPlan.planTiming, action: retire, note: "mapped; unmapped -> null + scheduleText"}
+- {live: "MeasurementPlan.tracksMetrics (TRACKS_METRIC, RoleMetadata)", final: "MeasurementPlan.tracksMetrics (StructuralEdgeProperties)", action: keep, note: ""}
+- {live: Target, final: Target, action: keep, note: ""}
+- {live: Target.targetType, final: Target.targetType, action: keep, note: ""}
+- {live: "Target.forMetrics (FOR_METRIC, RoleMetadata)", final: "Target.forMetrics (StructuralEdgeProperties)", action: keep, note: ""}
+- {live: "Target.comparedToRanges (COMPARED_TO_REFERENCE, AssociationMetadata)", final: null, action: retire, note: "targets carry their own bounds; reference intervals are W07 ReferenceIntervalVersion; existing edges exported to a MIGRATION assertion"}
+- {live: FunctionalGoal, final: FunctionalGoal, action: keep, note: ""}
+- {live: FunctionalGoal.goalType, final: FunctionalGoal.goalType, action: keep, note: ""}
+- {live: "FunctionalGoal.operationalizedByTargets (OPERATIONALIZED_BY, AssociationMetadata)", final: "FunctionalGoal.operationalizedBy (StructuralEdgeProperties)", action: rename, note: "field renamed; type kept"}
+- {live: Observation, final: Observation, action: keep, note: "labels Observation:InformationArtifact; implements DiagnosticResult; public only; any row lacking public attribution is quarantined, not migrated (CL-018)"}
+- {live: Observation.observedAt, final: Observation.observedAt, action: keep, note: ""}
+- {live: Observation.observationType, final: Observation.observationType, action: keep, note: ""}
+- {live: Observation.observedPopulation, final: Observation.observedPopulation, action: keep, note: ""}
+- {live: "Observation.measuresMetrics (MEASURES_METRIC, MeasurementMetadata)", final: "Observation.measuresMetrics (StructuralEdgeProperties)", action: keep, note: "MeasurementMetadata.unit -> Observation.unitCode; method/sampleType -> W07 AssayVersion/Specimen if resolvable, else notes"}
+- {live: "Observation.partOfPlans (PART_OF_PLAN, RoleMetadata)", final: "Observation.partOfPlans", action: keep, note: ""}
+- {live: "Observation.fromLabTests (FROM_LAB_TEST, MeasurementMetadata)", final: "Observation.fromLabTests", action: keep, note: ""}
+- {live: "Observation.fromDevices (FROM_DEVICE, MeasurementMetadata)", final: "Observation.fromDevices", action: keep, note: ""}
+- {live: "Observation.aboutConditions (ABOUT_CONDITION, RoleMetadata)", final: "Observation.aboutConditions (AssertedEdgeProperties)", action: keep, note: "class becomes asserted; MIGRATION assertion per edge; V-536p"}
+- {live: "Observation.aboutProtocols (ABOUT_PROTOCOL, RoleMetadata)", final: "Observation.aboutProtocols / aboutEditions", action: split, note: "edition-bound when the source names the version"}
+- {live: ProtocolAdjustmentRule, final: ProtocolAdjustmentRule, action: keep, note: ""}
+- {live: ProtocolAdjustmentRule.ruleType, final: "triggerKind, comparator, thresholdValue, thresholdUnitCode, triggerAction, ruleBasis, ruleText", action: split, note: "ruleType text -> ruleText; structured fields by review"}
+- {live: "ProtocolAdjustmentRule.triggeredByMetrics (TRIGGERED_BY)", final: "ProtocolAdjustmentRule.triggeredByMetrics (RULE_TRIGGERED_BY)", action: rename, note: "relationship type renamed; TRIGGERED_BY is W10's"}
+- {live: "ProtocolAdjustmentRule.modifiesSteps (MODIFIES_STEP)", final: "ProtocolAdjustmentRule.modifiesSteps", action: keep, note: ""}
+- {live: "ProtocolAdjustmentRule.modifiesTargets (MODIFIES_TARGET)", final: "ProtocolAdjustmentRule.modifiesTargets", action: keep, note: ""}
+- {live: "ProtocolAdjustmentRule.requiresConditions (REQUIRES_CONDITION -> Condition)", final: "ProtocolAdjustmentRule.constraints (HAS_CONSTRAINT {APPLIES_WHEN}) -> Constraint{CONDITION_PRESENT} -[:BASED_ON]-> Condition", action: retire, note: "one Constraint per Condition"}
+- {live: ProtocolResult, final: ProtocolResult, action: keep, note: "labels ProtocolResult:InformationArtifact"}
+- {live: ProtocolResult.resultSummary, final: ProtocolResult.resultSummary, action: keep, note: ""}
+- {live: "ProtocolResult.forProtocols (FOR_PROTOCOL, RoleMetadata)", final: "ProtocolResult.forProtocols / forEditions (AssertedEdgeProperties)", action: keep, note: "asserted"}
+- {live: "ProtocolResult.includesObservations (INCLUDES_OBSERVATION)", final: "ProtocolResult.includesObservations", action: keep, note: ""}
+- {live: "ProtocolResult.claimsOutcomes (CLAIMS_OUTCOME, AssociationMetadata)", final: "ProtocolResult.claimsOutcomes (AssertedEdgeProperties)", action: keep, note: "asserted"}
+- {live: "ProtocolResult.mentions (MENTIONS, ExtractionMetadata)", final: "ProtocolResult.mentions (StructuralEdgeProperties)", action: keep, note: "ExtractionMetadata -> Activity lineage (W00)"}
+- {live: "ProtocolResult.supportedBy (SUPPORTED_BY -> ProvenanceSource)", final: "Assertion -[:SUPPORTED_BY]-> SourceLocator (W00)", action: retire, note: "Chunk/Document targets re-expressed as locators (INV-404)"}
+- {live: "ProtocolResult.postedBy (POSTS_RESULT IN)", final: "ProtocolResult.postedBy (AssertedEdgeProperties)", action: keep, note: "public persons only"}
+- {live: "Person.recordsObservations (RECORDS)", final: "Person.recordsObservations (W01 field; AssertedEdgeProperties)", action: keep, note: "restricted to published self-reports of public persons (CL-018); seam W16-SR-05"}
+- {live: "Person.postsResults (POSTS_RESULT)", final: "Person.postsResults (W01 field)", action: keep, note: "seam W16-SR-05"}
+- {live: "union StepSubstance", final: StepSubstanceTarget, action: rename, note: "Compound->ChemicalSubstance, CompoundForm->ChemicalForm/IngredientMaterial (D-002); + ProductVariant, FormulationVersion"}
+- {live: "union StepInstrument", final: StepInstrumentTarget, action: rename, note: "+ AssayVersion, ToolOrInstrument"}
+- {live: "union TherapeuticTarget", final: TherapeuticTargetTarget, action: rename, note: ""}
+- {live: "union ConstraintBasis", final: ConstraintBasisTarget, action: rename, note: ""}
+- {live: "union ProtocolResultMention", final: ProtocolResultMentionTarget, action: rename, note: "Compound -> ChemicalSubstance; + IngredientMaterial, ProductVariant"}
+- {live: "union ProvenanceSource (as range of ProtocolResult.supportedBy)", final: null, action: retire, note: "W16 no longer uses it; ownership W00/W20"}
+- {live: enum ProtocolType, final: ProtocolType, action: keep, note: ""}
+- {live: enum SchedulePattern, final: SchedulePattern, action: keep, note: ""}
+- {live: enum CadenceUnit, final: CadenceUnit, action: keep, note: "YEAR, MINUTE requested (W16-SR-07)"}
+- {live: enum TimeOfDay, final: TimeOfDay, action: keep, note: ""}
+- {live: enum DayOfWeek, final: DayOfWeek, action: keep, note: ""}
+- {live: enum ProtocolStepType, final: ProtocolStepType, action: keep, note: ""}
+- {live: "OrderingMetadata (on HAS_STEP, DEPENDS_ON, INCLUDES_PROTOCOL, HAS_SUBPROTOCOL)", final: "StepOrderProperties | StepDependencyProperties | StructuralEdgeProperties", action: split, note: "orderIndex kept; sequenceIndex -> sourceStepLabel when it is the source number; publishedAt/startTime/endTime/rhetoricalRole unused on protocol edges (dropped)"}
+- {live: "DoseMetadata (on USES)", final: StepDoseProperties, action: split, note: "dose->quantity; doseUnit->unitCode (UCUM normalized, raw kept in verbatimDoseText); role->notes; standardizedTo->standardizedToText; quantity(Int count)->quantity with unitCode '{unit}' when dose is null; componentName->dropped (target identity)"}
+- {live: "RoleMetadata (on protocol edges)", final: "ConstraintRoleProperties | AssertedEdgeProperties | StructuralEdgeProperties", action: split, note: "per edge class"}
+- {live: "MeasurementMetadata / AssociationMetadata / ExtractionMetadata (on protocol edges)", final: null, action: retire, note: "facts moved to Observation fields, W07 types or Activity lineage"}
+- {live: "delta ProtocolEdition (catalogUid, editionLabel, payloadHash, edges)", final: ProtocolEdition, action: keep, note: "catalogUid -> uid; steps edge HAS_STEP -> HAS_PROTOCOL_STEP; StateEpisodeMetadata on HAS_PROTOCOL_EDITION -> AssertedEdgeProperties (asserted class)"}
+- {live: "delta Protocol.editions / catalogUid", final: "Protocol.editions / uid", action: rename, note: ""}
+- {live: "delta ProtocolStep.{catalogUid, stepKey, requirementLevel, requirementBasis, notReportedFields, payloadHash}", final: "ProtocolStep.{uid, stepKey, requirementLevel, requirementBasis, notReportedFields, payloadHash}", action: keep, note: "stepKey, requirementLevel, requirementBasis, payloadHash become non-null"}
+- {live: "delta OrderingMetadata.dependencyKind", final: StepDependencyProperties.dependencyKind, action: move, note: ""}
+- {live: "delta Constraint.constraintKind", final: Constraint.constraintKind, action: keep, note: ""}
+- {live: "delta MeasurementPlan.{planTiming, requiredForEvaluation, maxBaselineAgeDays, cadenceMinDays, cadenceMaxDays}", final: same, action: keep, note: ""}
+- {live: "delta ProtocolAdjustmentRule.{triggerKind, comparator, thresholdValue, thresholdUnitCode, triggerAction, ruleBasis}", final: same, action: keep, note: ""}
+- {live: "delta enums RequirementLevel, RequirementBasis, StepDependencyKind, ConstraintKind, MeasurementPlanTiming, ReviewTriggerKind, ThresholdComparator, ReviewTriggerAction, ReviewRuleBasis", final: same, action: keep, note: "+ ConstraintRole and ProtocolChangeProvenance from catalog"}

@@ -1,0 +1,15 @@
+Source: https://www.illumina.com/products/by-type/microarray-kits/infinium-methylation-epic.html
+Retrieved: 2026-10-04 via Firecrawl scrape (cacheState: miss; onlyMainContent).
+Capture: PARTIAL_EXCERPT (specifications table and FAQ passages).
+---
+Infinium MethylationEPIC v2.0 Kit
+| Assay type | Infinium HD Methylation |
+| Description | ... The kit is processed on the iScan or NextSeq 550 Systems and follows a straightforward, user-friendly workflow that does not require sample pooling and indexing. |
+| Instruments | NextSeq 550 System, NextSeq 550Dx in Research Mode, iScan System |
+| Method | Methylation array |
+| Technology | Microarray |
+| Sample throughput | 3024 samples per week on a single iSCAN |
+Inf MethylationEPIC V2.0 Kit (8 Spl) 20087706
+How long does it take to scan a MethylationEPIC v2.0 array on the iScan System? The scan takes ~18–37 minutes per BeadChip.
+Are the Infinium MethylationEPIC v1.0 and HumanMethylation450 BeadChip kits discontinued? Yes, ... The Infinium MethylationEPIC v2.0 Kit, built upon the same reliable Infinium chemistry foundation, ... is the recommended replacement for both kits.
+Page facet metadata: regulatory-status/ruo; technologies/illumina_array; systems/iscan; systems/nextseq-550-desktop-sequencer

@@ -1,0 +1,63 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/fixtures/validation-w23.cypher",
+ "total": 12,
+ "ok": 12,
+ "failed": 0,
+ "rowsByStatement": [
+  {
+   "n": 9,
+   "id": "V-429",
+   "title": "V-W23-07: a use authorization names a USE_AUTHORIZATION policy version that permits tha",
+   "status": "ok",
+   "rows": 3,
+   "error": null,
+   "sample": [
+    {
+     "activityUid": "hu:activity:w23-bad-ranking-policy-use",
+     "useKind": "QUOTE_IN_ANSWER",
+     "policyVersionUid": "hu:policy-version:w23-sleep-support-ranking-v3",
+     "violations": [
+      "POLICY_KIND_NOT_USE_AUTHORIZATION",
+      "USE_KIND_NOT_PERMITTED"
+     ]
+    },
+    {
+     "activityUid": "hu:activity:w23-bad-expired-policy-use",
+     "useKind": "QUOTE_IN_ANSWER",
+     "policyVersionUid": "hu:policy-version:w23-use-quote-summarize-v1",
+     "violations": [
+      "OUTSIDE_EFFECTIVE_PERIOD"
+     ]
+    },
+    {
+     "activityUid": "hu:activity:w23-bad-unpermitted-use",
+     "useKind": "SHARE_EXTERNALLY",
+     "policyVersionUid": "hu:policy-version:w23-use-quote-summarize-v1",
+     "violations": [
+      "USE_KIND_NOT_PERMITTED"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 10,
+   "id": null,
+   "title": "V-W23-08: INTERNAL policy layer hygiene. PolicyVersion and DecisionCriterion are INTERN",
+   "status": "ok",
+   "rows": 2,
+   "error": null,
+   "sample": [
+    {
+     "violation": "POLICY_LAYER_NOT_INTERNAL",
+     "item": "hu:policy-version:w23-unclassified-draft",
+     "detail": null
+    },
+    {
+     "violation": "POLICY_VERSIONS_POSSIBLY_OVERLAP",
+     "item": "hu:policy-version:w23-use-quote-summarize-v1 / hu:policy-version:w23-use-quote-summarize-v2-overlap",
+     "detail": "answer-use-authorization"
+    }
+   ]
+  }
+ ]
+}

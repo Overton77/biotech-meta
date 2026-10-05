@@ -1,0 +1,2095 @@
+{
+ "engine": "Neo4j 5.26.31 Community (embedded neo4j-harness 5.26.31, OpenJDK 21), neo4j-driver 6.2.0, Node 22.22.0, @neo4j/graphql 7.6.3",
+ "executedAt": "2026-10-04, final full re-run ended 01:43Z UTC wall clock",
+ "runs": {
+  "operations-run1": {
+   "statements": 28,
+   "ok": 28,
+   "errors": 0,
+   "nonZeroRows": null
+  },
+  "operations-run2-idempotence": {
+   "statements": 28,
+   "ok": 28,
+   "errors": 0,
+   "nonZeroRows": null
+  },
+  "positive-load": {
+   "statements": 428,
+   "ok": 428,
+   "errors": 0,
+   "nonZeroRows": null
+  },
+  "baseline-suite-on-w12-positive": {
+   "statements": 174,
+   "ok": 174,
+   "errors": 0,
+   "nonZeroRows": [
+    {
+     "file": "validation.cypher",
+     "n": 34,
+     "id": "V-118",
+     "status": "ok",
+     "rows": 7,
+     "sample": [
+      {
+       "label": "Entity",
+       "nodes": 40,
+       "withUid": 40,
+       "missingUid": 0
+      },
+      {
+       "label": "TestExecution",
+       "nodes": 9,
+       "withUid": 9,
+       "missingUid": 0
+      },
+      {
+       "label": "SpecificationVersion",
+       "nodes": 4,
+       "withUid": 4,
+       "missingUid": 0
+      },
+      {
+       "label": "VersionedState",
+       "nodes": 22,
+       "withUid": 22,
+       "missingUid": 0
+      },
+      {
+       "label": "InformationArtifact",
+       "nodes": 12,
+       "withUid": 12,
+       "missingUid": 0
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 117,
+     "id": "V-401b",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "acceptedAssertionsWithOnlyCoarseLocators": 35
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 166,
+     "id": "V-514b",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "assertionsWithoutContentHash": 0
+      }
+     ]
+    }
+   ]
+  },
+  "w12-validation-on-positive": {
+   "statements": 13,
+   "ok": 13,
+   "errors": 0,
+   "nonZeroRows": [
+    {
+     "file": "w12-validation.cypher",
+     "n": 13,
+     "id": "V-W12-13",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "scope": "hu:cert-scope:nsfsport-1463170-as-observed-2026-10-04",
+       "unresolvedPrintedValue": "R1110-01"
+      }
+     ]
+    }
+   ]
+  },
+  "w12-queries-on-positive": {
+   "statements": 10,
+   "ok": 10,
+   "errors": 0,
+   "nonZeroRows": [
+    {
+     "file": "w12-queries.cypher",
+     "n": 1,
+     "id": "Q-PF-03a",
+     "status": "ok",
+     "rows": 4,
+     "sample": [
+      {
+       "program": "ISO/IEC 17025 laboratory accreditation (synthetic accreditation body)",
+       "certifies": "LABORATORY",
+       "listing": "hu:cert-listing:synthetic-17025-lab-z",
+       "facilityQualifier": null,
+       "coveredKind": "TestingLaboratory",
+       "covered": [
+        "Synthetic Lab Z (fixture only)"
+       ],
+       "printedValues": null
+      },
+      {
+       "program": "NSF Certified for Sport",
+       "certifies": "LOT",
+       "listing": "1463170",
+       "facilityQualifier": "Windsor, Ontario, Canada",
+       "coveredKind": "ProductLot",
+       "covered": [
+        "M062-01",
+        "M259-01",
+        "M099-01",
+        "R173-01"
+       ],
+       "printedValues": [
+        "R173-01",
+        "M099-01",
+        "R1110-01",
+        "M259-01",
+        "M062-01"
+       ]
+      },
+      {
+       "program": "NSF Certified for Sport",
+       "certifies": "LOT",
+       "listing": "1786167",
+       "facilityQualifier": "Chester, NY",
+       "coveredKind": "ProductLot",
+       "covered": [
+        "P120-01",
+        "70064",
+        "70969",
+        "70918",
+        "70579",
+        "P098-01"
+       ],
+       "printedValues": [
+        "P098-01",
+        "70579",
+        "70918",
+        "70969",
+        "70064",
+        "P120-01"
+       ]
+      },
+      {
+       "program": "NSF/ANSI 455-2 dietary supplement GMP certification",
+       "certifies": "FACILITY",
+       "listing": "hu:cert-listing:synthetic-nsf-455-2-synthetic-plant",
+       "facilityQualifier": null,
+       "coveredKind": "Facility",
+       "covered": [
+        "Synthetic dietary supplement plant"
+       ],
+       "printedValues": null
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 2,
+     "id": "Q-PF-03b",
+     "status": "ok",
+     "rows": 7,
+     "sample": [
+      {
+       "itemUid": "hu:facility:synthetic-supplement-plant",
+       "kind": "Facility",
+       "certifiedUnder": [],
+       "directlyCoveredBy": [
+        "NSF/ANSI 455-2"
+       ],
+       "testDocuments": []
+      },
+      {
+       "itemUid": "hu:lot:elysium-basis-70969",
+       "kind": "ProductLot",
+       "certifiedUnder": [
+        "NSF Certified for Sport #1786167"
+       ],
+       "directlyCoveredBy": [
+        "NSF Certification Guideline 306"
+       ],
+       "testDocuments": []
+      },
+      {
+       "itemUid": "hu:lot:elysium-basis-p098-01",
+       "kind": "ProductLot",
+       "certifiedUnder": [
+        "NSF Certified for Sport #1786167"
+       ],
+       "directlyCoveredBy": [
+        "NSF Certification Guideline 306"
+       ],
+       "testDocuments": [
+        "CertificateOfAnalysis LZ-2026-0412-01",
+        "CertificateOfAnalysis LZ-2026-0412-00",
+        "LotTestSummary Label Claims & Testing"
+       ]
+      },
+      {
+       "itemUid": "hu:lot:elysium-basis-r110-01",
+       "kind": "ProductLot",
+       "certifiedUnder": [],
+       "directlyCoveredBy": [],
+       "testDocuments": []
+      },
+      {
+       "itemUid": "hu:lot:truniagen-pro-500-t25189001",
+       "kind": "ProductLot",
+       "certifiedUnder": [],
+       "directlyCoveredBy": [],
+       "testDocuments": [
+        "CertificateOfAnalysis CDXA-RSS-11207-00"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 3,
+     "id": "Q-MF-06",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "facility": "Synthetic dietary supplement plant",
+       "gmpCertifications": [
+        "NSF/ANSI 455-2"
+       ],
+       "registrations": [],
+       "organizationCgmpClaims": [
+        "This product meet or exceeds the standards and expectations of the cGMP guidelines."
+       ],
+       "inspections": "NOT_CAPTURED (inspections are expansion)",
+       "facilityCertificationProjectedToItems": false
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 4,
+     "id": "Q-AX-19-early",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "lot": "P098-01",
+       "measured": 263,
+       "expandedU": 11,
+       "k": 2,
+       "unit": "mg/{serving}",
+       "purpose": "SURVEILLANCE",
+       "laboratory": "Synthetic Lab Z (fixture only)",
+       "labAffiliations": [],
+       "labAccreditationListed": true,
+       "declared": 250,
+       "declaredUnit": "mg",
+       "comparable": true,
+       "position": "ABOVE_DECLARED"
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 5,
+     "id": "Q-AX-19-late",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "lot": "P098-01",
+       "measured": 236,
+       "expandedU": 10,
+       "declared": 250,
+       "comparable": true,
+       "position": "BELOW_DECLARED"
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 6,
+     "id": "Q-AX-19-unattributed",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "analyte": "NR",
+       "measured": 261,
+       "unit": "mg/{serving}",
+       "massBasis": "UNSPECIFIED",
+       "amountReferent": "NOT_STATED",
+       "purpose": "SURVEILLANCE",
+       "performer": "Niagen Bioscience, Inc. conducted an analysis of fifty non-Niagen® NR products.",
+       "sources": [
+        "Quantitative Analysis of Nicotinamide Riboside Consumer Products and Counterfeit Tru Niagen Products (June 2025)"
+       ],
+       "attribution": "LOT_UNKNOWN_NOT_ATTRIBUTED"
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 7,
+     "id": "Q-QA-C01",
+     "status": "ok",
+     "rows": 5,
+     "sample": [
+      {
+       "kind": "CertificateOfAnalysis",
+       "document": "CDXA-RSS-11207-00",
+       "lots": [
+        "T25189001"
+       ],
+       "issuers": [
+        "ChromaDex Analytics, Inc."
+       ],
+       "executions": 4,
+       "withMethod": 4,
+       "withNamedLab": 1,
+       "withValue": 1,
+       "passWithoutValue": 3,
+       "signature": "NOT_CAPTURED",
+       "reportDate": {
+        "year": 2025,
+        "month": 9,
+        "day": 3,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "kind": "CertificateOfAnalysis",
+       "document": "LZ-2026-0412-00",
+       "lots": [
+        "P098-01"
+       ],
+       "issuers": [
+        "Synthetic Lab Z (fixture only)"
+       ],
+       "executions": 2,
+       "withMethod": 2,
+       "withNamedLab": 2,
+       "withValue": 2,
+       "passWithoutValue": 0,
+       "signature": "SIGNATURE_PRESENT",
+       "reportDate": {
+        "year": 2026,
+        "month": 4,
+        "day": 20,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "kind": "CertificateOfAnalysis",
+       "document": "LZ-2026-0412-01",
+       "lots": [
+        "P098-01"
+       ],
+       "issuers": [
+        "Synthetic Lab Z (fixture only)"
+       ],
+       "executions": 1,
+       "withMethod": 1,
+       "withNamedLab": 1,
+       "withValue": 1,
+       "passWithoutValue": 0,
+       "signature": "SIGNATURE_PRESENT",
+       "reportDate": {
+        "year": 2026,
+        "month": 5,
+        "day": 2,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "kind": "CertificateOfAnalysis",
+       "document": "LZ-2026-0415-00",
+       "lots": [
+        "70579"
+       ],
+       "issuers": [
+        "Synthetic Lab Z (fixture only)"
+       ],
+       "executions": 1,
+       "withMethod": 1,
+       "withNamedLab": 1,
+       "withValue": 1,
+       "passWithoutValue": 0,
+       "signature": "ELECTRONIC_APPROVAL_STATEMENT",
+       "reportDate": {
+        "year": 2026,
+        "month": 4,
+        "day": 22,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "kind": "LotTestSummary",
+       "document": "Label Claims & Testing",
+       "lots": [
+        "P098-01"
+       ],
+       "issuers": [],
+       "executions": 0,
+       "withMethod": 0,
+       "withNamedLab": 0,
+       "withValue": 0,
+       "passWithoutValue": 4,
+       "signature": null,
+       "reportDate": null
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 8,
+     "id": "Q-QA-C02",
+     "status": "ok",
+     "rows": 4,
+     "sample": [
+      {
+       "lot": "70579",
+       "state": [
+        "BELOW_DETECTION LOD 10.0 [CFU]/g"
+       ],
+       "groupCriteriaOnly": []
+      },
+      {
+       "lot": "70918",
+       "state": [
+        "NOT_MEASURED_IN_CAPTURED_RECORDS"
+       ],
+       "groupCriteriaOnly": []
+      },
+      {
+       "lot": "P098-01",
+       "state": [
+        "QUALITATIVE_ABSENT in 10.0 g"
+       ],
+       "groupCriteriaOnly": [
+        "Objectionable USP Organisms"
+       ]
+      },
+      {
+       "lot": "T25189001",
+       "state": [
+        "NOT_REPORTED (source-stated CONFORMS)"
+       ],
+       "groupCriteriaOnly": []
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 9,
+     "id": "Q-QA-C03",
+     "status": "ok",
+     "rows": 5,
+     "sample": [
+      {
+       "value": 236,
+       "U": 10,
+       "criterion": "NLT 250 mg/serving",
+       "purpose": "RELEASE_AND_SHELF_LIFE",
+       "basis": "INTERNAL",
+       "testPurpose": "SURVEILLANCE",
+       "decisionRule": "GUARD_BAND_EXPANDED_U",
+       "verdict": "DOES_NOT_CONFORM",
+       "status": "ACCEPTED",
+       "supersededBy": null
+      },
+      {
+       "value": 263,
+       "U": 11,
+       "criterion": "NLT 250 mg/serving",
+       "purpose": "RELEASE_AND_SHELF_LIFE",
+       "basis": "INTERNAL",
+       "testPurpose": "SURVEILLANCE",
+       "decisionRule": "GUARD_BAND_EXPANDED_U",
+       "verdict": "CONFORMS",
+       "status": "SUPERSEDED",
+       "supersededBy": "SOURCE_CORRECTION"
+      },
+      {
+       "value": 555,
+       "U": null,
+       "criterion": "NLT 500 mg/capsule",
+       "purpose": "NOT_STATED",
+       "basis": "NOT_STATED",
+       "testPurpose": "NOT_STATED",
+       "decisionRule": "SIMPLE_ACCEPTANCE",
+       "verdict": "CONFORMS",
+       "status": "ACCEPTED",
+       "supersededBy": null
+      },
+      {
+       "value": 258,
+       "U": 9,
+       "criterion": "Shelf-life: NLT 250 mg/serving",
+       "purpose": "SHELF_LIFE",
+       "basis": "INTERNAL",
+       "testPurpose": "STABILITY",
+       "decisionRule": "GUARD_BAND_EXPANDED_U",
+       "verdict": "INDETERMINATE",
+       "status": "ACCEPTED",
+       "supersededBy": null
+      },
+      {
+       "value": 258,
+       "U": 9,
+       "criterion": "Shelf-life: NLT 250 mg/serving",
+       "purpose": "SHELF_LIFE",
+       "basis": "INTERNAL",
+       "testPurpose": "STABILITY",
+       "decisionRule": "SIMPLE_ACCEPTANCE",
+       "verdict": "CONFORMS",
+       "status": "ACCEPTED",
+       "supersededBy": null
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 10,
+     "id": "Q-QA-C04",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "recordedAsOf": "2026-10-04T02:30:00Z",
+       "coveredLots": [
+        "70064",
+        "70579",
+        "70918",
+        "70969",
+        "P098-01"
+       ]
+      },
+      {
+       "recordedAsOf": "2026-10-04T04:00:00Z",
+       "coveredLots": [
+        "70064",
+        "70579",
+        "70918",
+        "70969",
+        "P098-01",
+        "P120-01"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "negatives-load": {
+   "statements": 20,
+   "ok": 20,
+   "errors": 0,
+   "nonZeroRows": null
+  },
+  "baseline-suite-after-negatives": {
+   "statements": 174,
+   "ok": 174,
+   "errors": 0,
+   "nonZeroRows": [
+    {
+     "file": "validation.cypher",
+     "n": 10,
+     "id": "V-008",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "orphanCertificate": "hu:lot-test-summary:w12-neg-collapsed"
+      },
+      {
+       "orphanCertificate": "hu:coa:w12-neg-orphan"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 11,
+     "id": "V-009",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "listingWithoutScope": "hu:cert-listing:w12-neg-no-scope"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 13,
+     "id": "V-011",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "collapsedDeclarationAndMeasurement": "hu:label-declaration:w12-neg-declared-as-measured"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 28,
+     "id": "V-112",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "edgeType": "CERTIFIED_UNDER",
+       "startUid": "hu:product:elysium-basis",
+       "endUid": "hu:cert-listing:nsfsport-1786167",
+       "violations": [
+        "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 29,
+     "id": "V-113",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "sharedLabels": [
+        "Entity",
+        "ProductLot"
+       ],
+       "sharedUid": "hu:lot:elysium-basis-p098-01",
+       "relType": "PURCHASED_BY",
+       "privateUid": "hu:private-purchase:w12-neg-person-bought-lot"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 30,
+     "id": "V-114",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "privateUid": "hu:private-purchase:w12-neg-person-bought-lot",
+       "relType": "RECEIVED_LOT",
+       "sharedUid": "hu:lot:elysium-basis-p098-01"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 34,
+     "id": "V-118",
+     "status": "ok",
+     "rows": 7,
+     "sample": [
+      {
+       "label": "Entity",
+       "nodes": 40,
+       "withUid": 40,
+       "missingUid": 0
+      },
+      {
+       "label": "TestExecution",
+       "nodes": 9,
+       "withUid": 9,
+       "missingUid": 0
+      },
+      {
+       "label": "SpecificationVersion",
+       "nodes": 4,
+       "withUid": 4,
+       "missingUid": 0
+      },
+      {
+       "label": "VersionedState",
+       "nodes": 23,
+       "withUid": 23,
+       "missingUid": 0
+      },
+      {
+       "label": "InformationArtifact",
+       "nodes": 21,
+       "withUid": 21,
+       "missingUid": 0
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 39,
+     "id": "V-124",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "violation": "MEASURED_RESULT_NULL_WITHOUT_QUALIFIER",
+       "item": "hu:measured-result:w12-neg-no-qualifier"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 113,
+     "id": "V-332",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "itemUid": "hu:product:elysium-basis",
+       "listingUid": "hu:cert-listing:nsfsport-1786167"
+      },
+      {
+       "itemUid": "hu:lot:elysium-basis-p098-01",
+       "listingUid": "hu:cert-listing:synthetic-nsf-455-2-synthetic-plant"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 117,
+     "id": "V-401b",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "acceptedAssertionsWithOnlyCoarseLocators": 35
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 166,
+     "id": "V-514b",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "assertionsWithoutContentHash": 0
+      }
+     ]
+    }
+   ]
+  },
+  "w12-validation-after-negatives": {
+   "statements": 13,
+   "ok": 13,
+   "errors": 0,
+   "nonZeroRows": [
+    {
+     "file": "w12-validation.cypher",
+     "n": 1,
+     "id": "V-W12-01",
+     "status": "ok",
+     "rows": 3,
+     "sample": [
+      {
+       "certificate": "hu:coa:w12-neg-lot-page-as-coa",
+       "violations": [
+        "ISSUER_COUNT_0",
+        "NO_CERTIFIED_EXECUTION",
+        "NO_REPORT_NUMBER_OR_DATE"
+       ]
+      },
+      {
+       "certificate": "hu:lot-test-summary:w12-neg-collapsed",
+       "violations": [
+        "ISSUER_COUNT_0",
+        "NO_LOT",
+        "NO_CERTIFIED_EXECUTION",
+        "NO_REPORT_NUMBER_OR_DATE"
+       ]
+      },
+      {
+       "certificate": "hu:coa:w12-neg-orphan",
+       "violations": [
+        "ISSUER_COUNT_0",
+        "NO_LOT",
+        "NO_CERTIFIED_EXECUTION"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 2,
+     "id": "V-W12-02",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "collapsedQualityIdentity": "hu:lot-test-summary:w12-neg-collapsed",
+       "labels": [
+        "InformationArtifact",
+        "CertificateOfAnalysis",
+        "LotTestSummary"
+       ]
+      },
+      {
+       "collapsedQualityIdentity": "hu:label-declaration:w12-neg-declared-as-measured",
+       "labels": [
+        "InformationArtifact",
+        "MeasuredResult",
+        "LabelDeclaration"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 3,
+     "id": "V-W12-03",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "result": "hu:measured-result:w12-neg-invented-from-summary",
+       "producers": 0,
+       "hasLocator": true
+      },
+      {
+       "result": "hu:label-declaration:w12-neg-declared-as-measured",
+       "producers": 0,
+       "hasLocator": false
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 4,
+     "id": "V-W12-04",
+     "status": "ok",
+     "rows": 4,
+     "sample": [
+      {
+       "result": "hu:measured-result:w12-neg-nd-as-zero",
+       "violations": [
+        "VALUE_WITH_NON_NUMERIC_QUALIFIER"
+       ]
+      },
+      {
+       "result": "hu:measured-result:w12-neg-quantified-null",
+       "violations": [
+        "NUMERIC_WITHOUT_VALUE"
+       ]
+      },
+      {
+       "result": "hu:measured-result:w12-neg-no-qualifier",
+       "violations": [
+        "QUALIFIER_MISSING"
+       ]
+      },
+      {
+       "result": "hu:measured-result:w12-neg-not-measured-record",
+       "violations": [
+        "NOT_MEASURED_WRITTEN_AS_A_RESULT"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 5,
+     "id": "V-W12-05",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "interpretation": "hu:pass-fail:truniagen-t25189001-lead-source",
+       "violations": [
+        "NOT_REPORTED_VERDICT_LINKED_TO_A_VALUE"
+       ]
+      },
+      {
+       "interpretation": "hu:pass-fail:w12-neg-evaluated-without-result",
+       "violations": [
+        "EVALUATED_WITHOUT_EXACTLY_ONE_RESULT",
+        "EVALUATED_WITHOUT_DECISION_RULE"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 6,
+     "id": "V-W12-06",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "program": "hu:cert-program:nsf-ansi-455-2-gmp",
+       "certifies": "FACILITY",
+       "listing": "hu:cert-listing:synthetic-nsf-455-2-synthetic-plant",
+       "coveredItem": "hu:lot:elysium-basis-70579",
+       "coveredLabels": [
+        "Entity",
+        "ProductLot"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 7,
+     "id": "V-W12-07",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "item": "hu:product:elysium-basis",
+       "listing": "hu:cert-listing:nsfsport-1786167",
+       "violations": [
+        "UNKNOWN_DERIVATION_RULE",
+        "NO_DIRECT_COVERS_INPUT"
+       ]
+      },
+      {
+       "item": "hu:lot:elysium-basis-p098-01",
+       "listing": "hu:cert-listing:synthetic-nsf-455-2-synthetic-plant",
+       "violations": [
+        "NO_DIRECT_COVERS_INPUT",
+        "FACILITY_PROGRAMME_PROJECTED_TO_ITEM"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 8,
+     "id": "V-W12-08",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "violation": "SAMPLE_SOURCE_COUNT",
+       "item": "hu:test-sample:niagen-survey-elysium-basis",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 10,
+     "id": "V-W12-10",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "scope": "hu:cert-scope:nsfsport-1463170-as-observed-2026-10-04",
+       "episode": "hu:rel:w12-has-scope-1463170-v1",
+       "validTo": {
+        "year": 2026,
+        "month": 10,
+        "day": 4,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       },
+       "validToBasis": "OBSERVATION_ONLY"
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 11,
+     "id": "V-W12-11",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "interpretation": "hu:pass-fail:w12-neg-survey-attributed-to-lot",
+       "testPurpose": "SURVEILLANCE",
+       "criterionPurpose": "RELEASE_AND_SHELF_LIFE",
+       "resultUnit": "mg/{serving}",
+       "criterionUnit": "mg/{serving}",
+       "resultBasis": "PER_SERVING",
+       "criterionBasis": "PER_SERVING"
+      },
+      {
+       "interpretation": "hu:pass-fail:w12-neg-stability-vs-release",
+       "testPurpose": "STABILITY",
+       "criterionPurpose": "RELEASE",
+       "resultUnit": "mg/{serving}",
+       "criterionUnit": "mg/{serving}",
+       "resultBasis": "PER_SERVING",
+       "criterionBasis": "PER_SERVING"
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 12,
+     "id": "V-W12-12",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "valueFromSummary": "hu:measured-result:w12-neg-invented-from-summary"
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 13,
+     "id": "V-W12-13",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "scope": "hu:cert-scope:nsfsport-1463170-as-observed-2026-10-04",
+       "unresolvedPrintedValue": "R1110-01"
+      }
+     ]
+    }
+   ]
+  },
+  "w12-validation-after-negatives-without-N17": {
+   "statements": 13,
+   "ok": 13,
+   "errors": 0,
+   "nonZeroRows": [
+    {
+     "file": "w12-validation.cypher",
+     "n": 1,
+     "id": "V-W12-01",
+     "status": "ok",
+     "rows": 3,
+     "sample": [
+      {
+       "certificate": "hu:coa:w12-neg-lot-page-as-coa",
+       "violations": [
+        "ISSUER_COUNT_0",
+        "NO_CERTIFIED_EXECUTION",
+        "NO_REPORT_NUMBER_OR_DATE"
+       ]
+      },
+      {
+       "certificate": "hu:lot-test-summary:w12-neg-collapsed",
+       "violations": [
+        "ISSUER_COUNT_0",
+        "NO_LOT",
+        "NO_CERTIFIED_EXECUTION",
+        "NO_REPORT_NUMBER_OR_DATE"
+       ]
+      },
+      {
+       "certificate": "hu:coa:w12-neg-orphan",
+       "violations": [
+        "ISSUER_COUNT_0",
+        "NO_LOT",
+        "NO_CERTIFIED_EXECUTION"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 2,
+     "id": "V-W12-02",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "collapsedQualityIdentity": "hu:lot-test-summary:w12-neg-collapsed",
+       "labels": [
+        "InformationArtifact",
+        "CertificateOfAnalysis",
+        "LotTestSummary"
+       ]
+      },
+      {
+       "collapsedQualityIdentity": "hu:label-declaration:w12-neg-declared-as-measured",
+       "labels": [
+        "InformationArtifact",
+        "MeasuredResult",
+        "LabelDeclaration"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 3,
+     "id": "V-W12-03",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "result": "hu:measured-result:w12-neg-invented-from-summary",
+       "producers": 0,
+       "hasLocator": true
+      },
+      {
+       "result": "hu:label-declaration:w12-neg-declared-as-measured",
+       "producers": 0,
+       "hasLocator": false
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 4,
+     "id": "V-W12-04",
+     "status": "ok",
+     "rows": 4,
+     "sample": [
+      {
+       "result": "hu:measured-result:w12-neg-nd-as-zero",
+       "violations": [
+        "VALUE_WITH_NON_NUMERIC_QUALIFIER"
+       ]
+      },
+      {
+       "result": "hu:measured-result:w12-neg-quantified-null",
+       "violations": [
+        "NUMERIC_WITHOUT_VALUE"
+       ]
+      },
+      {
+       "result": "hu:measured-result:w12-neg-no-qualifier",
+       "violations": [
+        "QUALIFIER_MISSING"
+       ]
+      },
+      {
+       "result": "hu:measured-result:w12-neg-not-measured-record",
+       "violations": [
+        "NOT_MEASURED_WRITTEN_AS_A_RESULT"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 5,
+     "id": "V-W12-05",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "interpretation": "hu:pass-fail:truniagen-t25189001-lead-source",
+       "violations": [
+        "NOT_REPORTED_VERDICT_LINKED_TO_A_VALUE"
+       ]
+      },
+      {
+       "interpretation": "hu:pass-fail:w12-neg-evaluated-without-result",
+       "violations": [
+        "EVALUATED_WITHOUT_EXACTLY_ONE_RESULT",
+        "EVALUATED_WITHOUT_DECISION_RULE"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 6,
+     "id": "V-W12-06",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "program": "hu:cert-program:nsf-ansi-455-2-gmp",
+       "certifies": "FACILITY",
+       "listing": "hu:cert-listing:synthetic-nsf-455-2-synthetic-plant",
+       "coveredItem": "hu:lot:elysium-basis-70579",
+       "coveredLabels": [
+        "Entity",
+        "ProductLot"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 7,
+     "id": "V-W12-07",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "item": "hu:product:elysium-basis",
+       "listing": "hu:cert-listing:nsfsport-1786167",
+       "violations": [
+        "UNKNOWN_DERIVATION_RULE",
+        "NO_DIRECT_COVERS_INPUT"
+       ]
+      },
+      {
+       "item": "hu:lot:elysium-basis-p098-01",
+       "listing": "hu:cert-listing:synthetic-nsf-455-2-synthetic-plant",
+       "violations": [
+        "NO_DIRECT_COVERS_INPUT",
+        "FACILITY_PROGRAMME_PROJECTED_TO_ITEM"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 9,
+     "id": "V-W12-09",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "violation": "INTERPRETATION_TARGET_NOT_TESTED",
+       "item": "hu:pass-fail:w12-neg-survey-attributed-to-lot",
+       "target": "hu:lot:elysium-basis-p098-01"
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 10,
+     "id": "V-W12-10",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "scope": "hu:cert-scope:nsfsport-1463170-as-observed-2026-10-04",
+       "episode": "hu:rel:w12-has-scope-1463170-v1",
+       "validTo": {
+        "year": 2026,
+        "month": 10,
+        "day": 4,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       },
+       "validToBasis": "OBSERVATION_ONLY"
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 11,
+     "id": "V-W12-11",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "interpretation": "hu:pass-fail:w12-neg-survey-attributed-to-lot",
+       "testPurpose": "SURVEILLANCE",
+       "criterionPurpose": "RELEASE_AND_SHELF_LIFE",
+       "resultUnit": "mg/{serving}",
+       "criterionUnit": "mg/{serving}",
+       "resultBasis": "PER_SERVING",
+       "criterionBasis": "PER_SERVING"
+      },
+      {
+       "interpretation": "hu:pass-fail:w12-neg-stability-vs-release",
+       "testPurpose": "STABILITY",
+       "criterionPurpose": "RELEASE",
+       "resultUnit": "mg/{serving}",
+       "criterionUnit": "mg/{serving}",
+       "resultBasis": "PER_SERVING",
+       "criterionBasis": "PER_SERVING"
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 12,
+     "id": "V-W12-12",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "valueFromSummary": "hu:measured-result:w12-neg-invented-from-summary"
+      }
+     ]
+    },
+    {
+     "file": "w12-validation.cypher",
+     "n": 13,
+     "id": "V-W12-13",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "scope": "hu:cert-scope:nsfsport-1463170-as-observed-2026-10-04",
+       "unresolvedPrintedValue": "R1110-01"
+      }
+     ]
+    }
+   ]
+  },
+  "combined-load-six-examples-plus-w12": {
+   "statements": 873,
+   "ok": 873,
+   "errors": 0,
+   "nonZeroRows": null
+  },
+  "combined-baseline-suite": {
+   "statements": 174,
+   "ok": 174,
+   "errors": 0,
+   "nonZeroRows": [
+    {
+     "file": "validation.cypher",
+     "n": 25,
+     "id": "V-110",
+     "status": "ok",
+     "rows": 3,
+     "sample": [
+      {
+       "assertionUid": "hu:assertion:basis-has-us-variant-2026-07-10",
+       "status": "ACCEPTED",
+       "captureFidelityAdjudications": 1
+      },
+      {
+       "assertionUid": "hu:assertion:basis-variant-current-formulation-2026-07-10",
+       "status": "ACCEPTED",
+       "captureFidelityAdjudications": 1
+      },
+      {
+       "assertionUid": "hu:assertion:basis-current-nr-component-uses-nr-e",
+       "status": "ACCEPTED",
+       "captureFidelityAdjudications": 1
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 27,
+     "id": "V-111b",
+     "status": "ok",
+     "rows": 7,
+     "sample": [
+      {
+       "snapshotWithoutHashBasis": "hu:snapshot:synthetic-sleepwell-label-2026-06-15"
+      },
+      {
+       "snapshotWithoutHashBasis": "hu:snapshot:synthetic-sleepwell-label-archive-2019-05-10"
+      },
+      {
+       "snapshotWithoutHashBasis": "hu:snapshot:synthetic-calmroot-label-2026-06-20"
+      },
+      {
+       "snapshotWithoutHashBasis": "hu:snapshot:synthetic-nightcue-label-2026-03-02"
+      },
+      {
+       "snapshotWithoutHashBasis": "hu:snapshot:synthetic-sleepwell-label-2026-03-02"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 34,
+     "id": "V-118",
+     "status": "ok",
+     "rows": 7,
+     "sample": [
+      {
+       "label": "Entity",
+       "nodes": 40,
+       "withUid": 40,
+       "missingUid": 0
+      },
+      {
+       "label": "TestExecution",
+       "nodes": 9,
+       "withUid": 9,
+       "missingUid": 0
+      },
+      {
+       "label": "SpecificationVersion",
+       "nodes": 4,
+       "withUid": 4,
+       "missingUid": 0
+      },
+      {
+       "label": "VersionedState",
+       "nodes": 22,
+       "withUid": 22,
+       "missingUid": 0
+      },
+      {
+       "label": "InformationArtifact",
+       "nodes": 12,
+       "withUid": 12,
+       "missingUid": 0
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 53,
+     "id": "V-212",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "study": "hu:study:nct02678611-basis-nrpt",
+       "observedAt": {
+        "year": 2026,
+        "month": 10,
+        "day": 3,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       },
+       "resultsArticle": "29184669"
+      },
+      {
+       "study": "hu:study:nct02712593-niagen",
+       "observedAt": {
+        "year": 2026,
+        "month": 10,
+        "day": 3,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       },
+       "resultsArticle": "31278280"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 69,
+     "id": "V-223",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "outcome": "hu:outcome:nct02678611-nad-whole-blood",
+       "priorities": [
+        "SECONDARY",
+        "PRIMARY"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 112,
+     "id": "V-331",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "submissionUid": "hu:reg-submission:us-fda-ndi-882",
+       "responseUid": "hu:reg-response:us-fda-ndi-882"
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 117,
+     "id": "V-401b",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "acceptedAssertionsWithOnlyCoarseLocators": 110
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 166,
+     "id": "V-514b",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "assertionsWithoutContentHash": 92
+      }
+     ]
+    },
+    {
+     "file": "validation.cypher",
+     "n": 169,
+     "id": "V-522",
+     "status": "ok",
+     "rows": 100,
+     "sample": [
+      {
+       "labels": [
+        "VersionedState",
+        "FormulationVersion"
+       ],
+       "nodeWithoutPrivacyClass": "hu:formulation:basis-us-current-2026-07-10"
+      },
+      {
+       "labels": [
+        "Entity",
+        "IngredientMaterial",
+        "BrandedIngredientMaterial"
+       ],
+       "nodeWithoutPrivacyClass": "hu:material:elysium-nr-e"
+      },
+      {
+       "labels": [
+        "Entity",
+        "ChemicalSubstance"
+       ],
+       "nodeWithoutPrivacyClass": "hu:substance:nicotinamide-riboside-chloride"
+      },
+      {
+       "labels": [
+        "Entity",
+        "IngredientMaterial"
+       ],
+       "nodeWithoutPrivacyClass": "hu:material:pterostilbene-unspecified-current-basis"
+      },
+      {
+       "labels": [
+        "Entity",
+        "Source"
+       ],
+       "nodeWithoutPrivacyClass": "hu:source:elysium-basis-supplement-facts"
+      }
+     ]
+    }
+   ]
+  },
+  "combined-w12-validation": {
+   "statements": 13,
+   "ok": 13,
+   "errors": 0,
+   "nonZeroRows": [
+    {
+     "file": "w12-validation.cypher",
+     "n": 13,
+     "id": "V-W12-13",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "scope": "hu:cert-scope:nsfsport-1463170-as-observed-2026-10-04",
+       "unresolvedPrintedValue": "R1110-01"
+      }
+     ]
+    }
+   ]
+  },
+  "combined-w12-queries": {
+   "statements": 10,
+   "ok": 10,
+   "errors": 0,
+   "nonZeroRows": [
+    {
+     "file": "w12-queries.cypher",
+     "n": 1,
+     "id": "Q-PF-03a",
+     "status": "ok",
+     "rows": 4,
+     "sample": [
+      {
+       "program": "ISO/IEC 17025 laboratory accreditation (synthetic accreditation body)",
+       "certifies": "LABORATORY",
+       "listing": "hu:cert-listing:synthetic-17025-lab-z",
+       "facilityQualifier": null,
+       "coveredKind": "TestingLaboratory",
+       "covered": [
+        "Synthetic Lab Z (fixture only)"
+       ],
+       "printedValues": null
+      },
+      {
+       "program": "NSF Certified for Sport",
+       "certifies": "LOT",
+       "listing": "1463170",
+       "facilityQualifier": "Windsor, Ontario, Canada",
+       "coveredKind": "ProductLot",
+       "covered": [
+        "M062-01",
+        "M259-01",
+        "M099-01",
+        "R173-01"
+       ],
+       "printedValues": [
+        "R173-01",
+        "M099-01",
+        "R1110-01",
+        "M259-01",
+        "M062-01"
+       ]
+      },
+      {
+       "program": "NSF Certified for Sport",
+       "certifies": "LOT",
+       "listing": "1786167",
+       "facilityQualifier": "Chester, NY",
+       "coveredKind": "ProductLot",
+       "covered": [
+        "P120-01",
+        "70064",
+        "70969",
+        "70918",
+        "70579",
+        "P098-01"
+       ],
+       "printedValues": [
+        "P098-01",
+        "70579",
+        "70918",
+        "70969",
+        "70064",
+        "P120-01"
+       ]
+      },
+      {
+       "program": "NSF/ANSI 455-2 dietary supplement GMP certification",
+       "certifies": "FACILITY",
+       "listing": "hu:cert-listing:synthetic-nsf-455-2-synthetic-plant",
+       "facilityQualifier": null,
+       "coveredKind": "Facility",
+       "covered": [
+        "Synthetic dietary supplement plant"
+       ],
+       "printedValues": null
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 2,
+     "id": "Q-PF-03b",
+     "status": "ok",
+     "rows": 7,
+     "sample": [
+      {
+       "itemUid": "hu:facility:synthetic-supplement-plant",
+       "kind": "Facility",
+       "certifiedUnder": [],
+       "directlyCoveredBy": [
+        "NSF/ANSI 455-2"
+       ],
+       "testDocuments": []
+      },
+      {
+       "itemUid": "hu:lot:elysium-basis-70969",
+       "kind": "ProductLot",
+       "certifiedUnder": [
+        "NSF Certified for Sport #1786167"
+       ],
+       "directlyCoveredBy": [
+        "NSF Certification Guideline 306"
+       ],
+       "testDocuments": []
+      },
+      {
+       "itemUid": "hu:lot:elysium-basis-p098-01",
+       "kind": "ProductLot",
+       "certifiedUnder": [
+        "NSF Certified for Sport #1786167"
+       ],
+       "directlyCoveredBy": [
+        "NSF Certification Guideline 306"
+       ],
+       "testDocuments": [
+        "CertificateOfAnalysis LZ-2026-0412-01",
+        "CertificateOfAnalysis LZ-2026-0412-00",
+        "LotTestSummary Label Claims & Testing"
+       ]
+      },
+      {
+       "itemUid": "hu:lot:elysium-basis-r110-01",
+       "kind": "ProductLot",
+       "certifiedUnder": [],
+       "directlyCoveredBy": [],
+       "testDocuments": []
+      },
+      {
+       "itemUid": "hu:lot:truniagen-pro-500-t25189001",
+       "kind": "ProductLot",
+       "certifiedUnder": [],
+       "directlyCoveredBy": [],
+       "testDocuments": [
+        "CertificateOfAnalysis CDXA-RSS-11207-00"
+       ]
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 3,
+     "id": "Q-MF-06",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "facility": "Synthetic dietary supplement plant",
+       "gmpCertifications": [
+        "NSF/ANSI 455-2"
+       ],
+       "registrations": [
+        "ESTABLISHMENT_REGISTRATION"
+       ],
+       "organizationCgmpClaims": [
+        "This product meet or exceeds the standards and expectations of the cGMP guidelines."
+       ],
+       "inspections": "NOT_CAPTURED (inspections are expansion)",
+       "facilityCertificationProjectedToItems": false
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 4,
+     "id": "Q-AX-19-early",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "lot": "P098-01",
+       "measured": 263,
+       "expandedU": 11,
+       "k": 2,
+       "unit": "mg/{serving}",
+       "purpose": "SURVEILLANCE",
+       "laboratory": "Synthetic Lab Z (fixture only)",
+       "labAffiliations": [],
+       "labAccreditationListed": true,
+       "declared": 250,
+       "declaredUnit": "mg",
+       "comparable": true,
+       "position": "ABOVE_DECLARED"
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 5,
+     "id": "Q-AX-19-late",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "lot": "P098-01",
+       "measured": 236,
+       "expandedU": 10,
+       "declared": 250,
+       "comparable": true,
+       "position": "BELOW_DECLARED"
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 6,
+     "id": "Q-AX-19-unattributed",
+     "status": "ok",
+     "rows": 1,
+     "sample": [
+      {
+       "analyte": "NR",
+       "measured": 261,
+       "unit": "mg/{serving}",
+       "massBasis": "UNSPECIFIED",
+       "amountReferent": "NOT_STATED",
+       "purpose": "SURVEILLANCE",
+       "performer": "Niagen Bioscience, Inc. conducted an analysis of fifty non-Niagen® NR products.",
+       "sources": [
+        "Quantitative Analysis of Nicotinamide Riboside Consumer Products and Counterfeit Tru Niagen Products (June 2025)"
+       ],
+       "attribution": "LOT_UNKNOWN_NOT_ATTRIBUTED"
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 7,
+     "id": "Q-QA-C01",
+     "status": "ok",
+     "rows": 5,
+     "sample": [
+      {
+       "kind": "CertificateOfAnalysis",
+       "document": "CDXA-RSS-11207-00",
+       "lots": [
+        "T25189001"
+       ],
+       "issuers": [
+        "ChromaDex Analytics, Inc."
+       ],
+       "executions": 4,
+       "withMethod": 4,
+       "withNamedLab": 1,
+       "withValue": 1,
+       "passWithoutValue": 3,
+       "signature": "NOT_CAPTURED",
+       "reportDate": {
+        "year": 2025,
+        "month": 9,
+        "day": 3,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "kind": "CertificateOfAnalysis",
+       "document": "LZ-2026-0412-00",
+       "lots": [
+        "P098-01"
+       ],
+       "issuers": [
+        "Synthetic Lab Z (fixture only)"
+       ],
+       "executions": 2,
+       "withMethod": 2,
+       "withNamedLab": 2,
+       "withValue": 2,
+       "passWithoutValue": 0,
+       "signature": "SIGNATURE_PRESENT",
+       "reportDate": {
+        "year": 2026,
+        "month": 4,
+        "day": 20,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "kind": "CertificateOfAnalysis",
+       "document": "LZ-2026-0412-01",
+       "lots": [
+        "P098-01"
+       ],
+       "issuers": [
+        "Synthetic Lab Z (fixture only)"
+       ],
+       "executions": 1,
+       "withMethod": 1,
+       "withNamedLab": 1,
+       "withValue": 1,
+       "passWithoutValue": 0,
+       "signature": "SIGNATURE_PRESENT",
+       "reportDate": {
+        "year": 2026,
+        "month": 5,
+        "day": 2,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "kind": "CertificateOfAnalysis",
+       "document": "LZ-2026-0415-00",
+       "lots": [
+        "70579"
+       ],
+       "issuers": [
+        "Synthetic Lab Z (fixture only)"
+       ],
+       "executions": 1,
+       "withMethod": 1,
+       "withNamedLab": 1,
+       "withValue": 1,
+       "passWithoutValue": 0,
+       "signature": "ELECTRONIC_APPROVAL_STATEMENT",
+       "reportDate": {
+        "year": 2026,
+        "month": 4,
+        "day": 22,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "kind": "LotTestSummary",
+       "document": "Label Claims & Testing",
+       "lots": [
+        "P098-01"
+       ],
+       "issuers": [],
+       "executions": 0,
+       "withMethod": 0,
+       "withNamedLab": 0,
+       "withValue": 0,
+       "passWithoutValue": 4,
+       "signature": null,
+       "reportDate": null
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 8,
+     "id": "Q-QA-C02",
+     "status": "ok",
+     "rows": 4,
+     "sample": [
+      {
+       "lot": "70579",
+       "state": [
+        "BELOW_DETECTION LOD 10.0 [CFU]/g"
+       ],
+       "groupCriteriaOnly": []
+      },
+      {
+       "lot": "70918",
+       "state": [
+        "NOT_MEASURED_IN_CAPTURED_RECORDS"
+       ],
+       "groupCriteriaOnly": []
+      },
+      {
+       "lot": "P098-01",
+       "state": [
+        "QUALITATIVE_ABSENT in 10.0 g"
+       ],
+       "groupCriteriaOnly": [
+        "Objectionable USP Organisms"
+       ]
+      },
+      {
+       "lot": "T25189001",
+       "state": [
+        "NOT_REPORTED (source-stated CONFORMS)"
+       ],
+       "groupCriteriaOnly": []
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 9,
+     "id": "Q-QA-C03",
+     "status": "ok",
+     "rows": 5,
+     "sample": [
+      {
+       "value": 236,
+       "U": 10,
+       "criterion": "NLT 250 mg/serving",
+       "purpose": "RELEASE_AND_SHELF_LIFE",
+       "basis": "INTERNAL",
+       "testPurpose": "SURVEILLANCE",
+       "decisionRule": "GUARD_BAND_EXPANDED_U",
+       "verdict": "DOES_NOT_CONFORM",
+       "status": "ACCEPTED",
+       "supersededBy": null
+      },
+      {
+       "value": 263,
+       "U": 11,
+       "criterion": "NLT 250 mg/serving",
+       "purpose": "RELEASE_AND_SHELF_LIFE",
+       "basis": "INTERNAL",
+       "testPurpose": "SURVEILLANCE",
+       "decisionRule": "GUARD_BAND_EXPANDED_U",
+       "verdict": "CONFORMS",
+       "status": "SUPERSEDED",
+       "supersededBy": "SOURCE_CORRECTION"
+      },
+      {
+       "value": 555,
+       "U": null,
+       "criterion": "NLT 500 mg/capsule",
+       "purpose": "NOT_STATED",
+       "basis": "NOT_STATED",
+       "testPurpose": "NOT_STATED",
+       "decisionRule": "SIMPLE_ACCEPTANCE",
+       "verdict": "CONFORMS",
+       "status": "ACCEPTED",
+       "supersededBy": null
+      },
+      {
+       "value": 258,
+       "U": 9,
+       "criterion": "Shelf-life: NLT 250 mg/serving",
+       "purpose": "SHELF_LIFE",
+       "basis": "INTERNAL",
+       "testPurpose": "STABILITY",
+       "decisionRule": "GUARD_BAND_EXPANDED_U",
+       "verdict": "INDETERMINATE",
+       "status": "ACCEPTED",
+       "supersededBy": null
+      },
+      {
+       "value": 258,
+       "U": 9,
+       "criterion": "Shelf-life: NLT 250 mg/serving",
+       "purpose": "SHELF_LIFE",
+       "basis": "INTERNAL",
+       "testPurpose": "STABILITY",
+       "decisionRule": "SIMPLE_ACCEPTANCE",
+       "verdict": "CONFORMS",
+       "status": "ACCEPTED",
+       "supersededBy": null
+      }
+     ]
+    },
+    {
+     "file": "w12-queries.cypher",
+     "n": 10,
+     "id": "Q-QA-C04",
+     "status": "ok",
+     "rows": 2,
+     "sample": [
+      {
+       "recordedAsOf": "2026-10-04T02:30:00Z",
+       "coveredLots": [
+        "70064",
+        "70579",
+        "70918",
+        "70969",
+        "P098-01"
+       ]
+      },
+      {
+       "recordedAsOf": "2026-10-04T04:00:00Z",
+       "coveredLots": [
+        "70064",
+        "70579",
+        "70918",
+        "70969",
+        "P098-01",
+        "P120-01"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

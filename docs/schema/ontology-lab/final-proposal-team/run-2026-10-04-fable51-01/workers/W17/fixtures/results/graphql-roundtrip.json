@@ -1,0 +1,192 @@
+{
+ "data": {
+  "safetySignals": [
+   {
+    "uid": "hu:safety-signal:w17-nrpt-gi-tolerability-v2",
+    "methodVersion": "bl-safety-signal/0.2",
+    "signalStatus": "INSUFFICIENT_DATA",
+    "severity": "MODERATE",
+    "legacyEvidenceStrengthHint": null,
+    "subjectsConnection": {
+     "edges": [
+      {
+       "properties": {
+        "subjectRole": "CO_EXPOSURE",
+        "doseText": null
+       },
+       "node": {
+        "__typename": "IngredientMaterial",
+        "uid": "hu:material:grapefruit-juice",
+        "name": "grapefruit juice"
+       }
+      },
+      {
+       "properties": {
+        "subjectRole": "PRIMARY",
+        "doseText": "NRPT 1X and 2X: 250-500 mg NR + 50-100 mg PT daily"
+       },
+       "node": {
+        "__typename": "IngredientMaterial",
+        "uid": "hu:material:nct02678611-nrpt-as-supplied",
+        "name": "NRPT capsule material as supplied in NCT02678611 (125 mg NR + 25 mg PT per capsule)"
+       }
+      }
+     ]
+    },
+    "relatesToEffects": [
+     {
+      "uid": "hu:adverse-effect:gastrointestinal-intolerance",
+      "name": "gastrointestinal intolerance (nausea, dyspepsia, abdominal discomfort, diarrhea)",
+      "affectsOrgans": []
+     }
+    ],
+    "basedOnConnection": {
+     "edges": [
+      {
+       "properties": {
+        "aeReportedStatus": "REPORTED",
+        "inputRole": "INDEX_ARM"
+       },
+       "node": {
+        "__typename": "StudyResult",
+        "uid": "hu:study-result:synthetic-w17-systematic-gi-zero"
+       }
+      },
+      {
+       "properties": {
+        "aeReportedStatus": "REPORTED",
+        "inputRole": "COMPARATOR_ARM"
+       },
+       "node": {
+        "__typename": "StudyResult",
+        "uid": "hu:study-result:nct02678611-ae-related-placebo"
+       }
+      },
+      {
+       "properties": {
+        "aeReportedStatus": "REPORTED",
+        "inputRole": "INDEX_ARM"
+       },
+       "node": {
+        "__typename": "StudyResult",
+        "uid": "hu:study-result:nct02678611-ae-related-nrpt-1x"
+       }
+      },
+      {
+       "properties": {
+        "aeReportedStatus": "REPORTED",
+        "inputRole": "INDEX_ARM"
+       },
+       "node": {
+        "__typename": "StudyResult",
+        "uid": "hu:study-result:nct02678611-ae-related-nrpt-2x"
+       }
+      },
+      {
+       "properties": {
+        "aeReportedStatus": "NOT_REPORTED",
+        "inputRole": "NOT_REPORTED_STUDY"
+       },
+       "node": {
+        "__typename": "Study",
+        "uid": "hu:study:synthetic-w17-no-ae-report"
+       }
+      }
+     ]
+    },
+    "supersedes": [
+     {
+      "uid": "hu:safety-signal:w17-nrpt-gi-tolerability-v1",
+      "signalStatus": "POTENTIAL"
+     }
+    ]
+   }
+  ],
+  "useConstraints": [
+   {
+    "uid": "hu:use-constraint:simvastatin-with-niacin-1g-chinese",
+    "identityKeyVersion": "uc-key/v1",
+    "constrainsUseOf": [
+     {
+      "__typename": "ChemicalSubstance",
+      "uid": "hu:substance:simvastatin"
+     }
+    ],
+    "scopeConnection": {
+     "edges": [
+      {
+       "properties": {
+        "scopeRole": "POPULATION",
+        "doseComparator": null,
+        "doseValue": null,
+        "doseUnitCode": null,
+        "doseQuantityBasis": null
+       },
+       "node": {
+        "__typename": "UseContextProfile",
+        "uid": "hu:use-profile:patients-of-chinese-descent"
+       }
+      },
+      {
+       "properties": {
+        "scopeRole": "CO_EXPOSURE",
+        "doseComparator": "GTE",
+        "doseValue": 1,
+        "doseUnitCode": "g",
+        "doseQuantityBasis": "PER_DAY"
+       },
+       "node": {
+        "__typename": "ChemicalSubstance",
+        "uid": "hu:substance:nicotinic-acid"
+       }
+      }
+     ]
+    },
+    "contraindicationAssertions": [
+     {
+      "uid": "hu:assertion:w17-zocor-niacin-chinese",
+      "constraintLevel": "NOT_RECOMMENDED",
+      "levelVerbatim": "is not recommended in Chinese patients",
+      "populationScopeText": "Chinese patients"
+     }
+    ]
+   }
+  ],
+  "interactionAssertions": [
+   {
+    "uid": "hu:assertion:w17-afp-kava-warfarin-interaction",
+    "polarity": "UNKNOWN",
+    "basisKind": "CITED_FROM_PRIOR_WORK",
+    "interactionMechanism": "CYP2C9_INHIBITION",
+    "useConstraint": [
+     {
+      "uid": "hu:use-constraint:kava-with-warfarin"
+     }
+    ],
+    "subject": [
+     {
+      "__typename": "IngredientMaterial",
+      "uid": "hu:material:kava-preparation-unspecified"
+     }
+    ],
+    "object": [
+     {
+      "__typename": "ChemicalSubstance",
+      "uid": "hu:substance:warfarin"
+     }
+    ]
+   }
+  ],
+  "searchSafetySignals": {
+   "edges": [
+    {
+     "score": 0.693284809589386,
+     "node": {
+      "uid": "hu:safety-signal:w17-fda-aems-daptomycin-hyperkalemia",
+      "signalStatus": "CONFIRMED_ASSOCIATION"
+     }
+    }
+   ]
+  }
+ }
+}

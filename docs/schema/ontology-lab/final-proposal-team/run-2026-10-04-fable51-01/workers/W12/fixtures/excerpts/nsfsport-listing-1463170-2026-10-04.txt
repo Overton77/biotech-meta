@@ -1,0 +1,5 @@
+SOURCE: https://www.nsfsport.com/certified-products/listing-detail.php?id=1463170
+CAPTURE: Firecrawl scrape (directQuote query, maxAge 0), 2026-10-04T01:10Z; PARTIAL_EXCERPT (Product Details table as quoted by the extraction)
+EXCERPT (verbatim as returned; cell separators lost in extraction):
+| Brand | Elysium Health | | Country of Sale | United States | | Product Type | Vegetarian/Vitamin | | Purpose / Goal | Energy EnhancementPre-WorkoutPost-WorkoutSleep Aid | | Lot # | R173-01M099-01R1110-01M259-01M062-01 | | Product Form | Capsule | | Flavor | Unflavored | | Package Size | 60 | | Serving Size | 1 capsule |
+NOTE: info.nsf.org lists the same five codes under Facility Windsor, Ontario, Canada with "2 capsules" as the serving size; this nsfsport rendition says "1 capsule".

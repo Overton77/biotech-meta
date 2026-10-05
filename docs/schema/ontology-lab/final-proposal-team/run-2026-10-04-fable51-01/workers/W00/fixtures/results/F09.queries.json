@@ -1,0 +1,126 @@
+[
+ {
+  "n": 1,
+  "status": "ok",
+  "rows": 1,
+  "result": [
+   {
+    "q": "Q09-a",
+    "state1_captureStatus": "ACCEPTED",
+    "state1_asserters": [],
+    "state2_supports": [
+     {
+      "retrievedAt": "2009-06-01T00:00:00Z",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/9500320/",
+      "locator": "hu:locator:w00-9500320-abstract-onset",
+      "snapshot": "hu:snapshot:w00-pubmed-9500320-synthetic-2009",
+      "quoteHash": "sha256:31d6d50a8a6a971f9a0c240f246acd85946a9be29a1792c81de08a040e91e480"
+     }
+    ],
+    "state3_broaderConclusion": [
+     {
+      "adjudication": "hu:adjudication:w00-9500320-support-2026",
+      "verdict": "INSUFFICIENT"
+     }
+    ],
+    "state4_agentUsed": [
+     {
+      "agent": "hu:agent:w00-answer-composer",
+      "activity": "hu:activity:w00-answer-composition-1",
+      "kind": "ANSWER_COMPOSITION"
+     }
+    ],
+    "state5_policyAllows": [
+     {
+      "useKind": "SUMMARIZE_IN_ANSWER",
+      "policy": "hu:policy-version:w00-synthetic-policy-v0"
+     }
+    ]
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 2,
+  "status": "ok",
+  "rows": 1,
+  "result": [
+   {
+    "q": "Q09-b",
+    "revisionKind": "RETRACTION",
+    "issuedAt": "2010-02-06T00:00:00Z",
+    "learnedAt": "2026-10-04T01:05:00Z",
+    "affectedAssertion": "hu:assertion:w00-9500320-reports-parental-association",
+    "captureStatusUnchanged": "ACCEPTED",
+    "adjudications": [
+     {
+      "adj": "w00-9500320-cf",
+      "recordedAt": "2009-06-01T02:00:00Z",
+      "kind": "CAPTURE_FIDELITY",
+      "verdict": "SUPPORTED",
+      "supersededBy": []
+     },
+     {
+      "adj": "w00-9500320-support-2009",
+      "recordedAt": "2009-06-01T03:00:00Z",
+      "kind": "SUPPORT",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "supersededBy": [
+       "w00-9500320-support-2026"
+      ]
+     },
+     {
+      "adj": "w00-9500320-support-2026",
+      "recordedAt": "2026-10-04T01:20:00Z",
+      "kind": "SUPPORT",
+      "verdict": "INSUFFICIENT",
+      "supersededBy": []
+     }
+    ]
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 3,
+  "status": "ok",
+  "rows": 2,
+  "result": [
+   {
+    "q": "Q09-c",
+    "recordedAsOf": "2026-10-05T00:00:00Z",
+    "captureStatus": "ACCEPTED",
+    "supportVerdictAsOfR": "INSUFFICIENT",
+    "verdictRecordKind": "Adjudication"
+   },
+   {
+    "q": "Q09-c",
+    "recordedAsOf": "2026-01-01T00:00:00Z",
+    "captureStatus": "ACCEPTED",
+    "supportVerdictAsOfR": "PARTIALLY_SUPPORTED",
+    "verdictRecordKind": "Adjudication"
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 4,
+  "status": "ok",
+  "rows": 2,
+  "result": [
+   {
+    "q": "Q09-d",
+    "work": "hu:publication:w00-pmid-20137807",
+    "renditionEndpoint": "https://pubmed.ncbi.nlm.nih.gov/20137807/",
+    "sourceKind": "RETRACTION_NOTICE"
+   },
+   {
+    "q": "Q09-d",
+    "work": "hu:publication:w00-pmid-9500320",
+    "renditionEndpoint": "https://pubmed.ncbi.nlm.nih.gov/9500320/",
+    "sourceKind": "PEER_REVIEWED_PUBLICATION"
+   }
+  ],
+  "error": null
+ }
+]

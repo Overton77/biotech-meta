@@ -1,0 +1,10 @@
+Source: https://www.whoop.com/us/en/thelocker/a-look-behind-the-data-how-whoop-measures-heart-rate/
+Retrieved: 2026-10-04 via Firecrawl scrape (cacheState: hit; cachedAt 2026-10-03T17:50:48Z). Page dateline: July 21, 2026.
+Capture: PARTIAL_EXCERPT.
+---
+Updates are delivered through firmware, meaning you benefit automatically without purchasing new hardware.
+What's new — as of July 2026?
+WHOOP just delivered another across-the-board improvement to heart rate accuracy. The biggest gains are in the activities that are hardest for any wrist-worn sensor to measure like weightlifting and functional fitness, along with HIIT, cycling, and golf. Everyday activities like walking got more accurate too.
+This update does not impact sleep, including Heart Rate Variability (HRV) and Resting Heart Rate (RHR).
+WHOOP measures heart rate using advanced optical sensors with photoplethysmography (PPG) technology.
+While raw data is captured using the sensor hardware, an algorithm is required to estimate heart rate.

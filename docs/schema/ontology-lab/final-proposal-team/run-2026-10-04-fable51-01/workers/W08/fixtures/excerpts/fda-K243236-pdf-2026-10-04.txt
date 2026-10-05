@@ -1,0 +1,14 @@
+Source: https://www.accessdata.fda.gov/cdrh_docs/pdf24/K243236.pdf (10 pages: FDA SE letter, Indications for Use form, applicant-prepared 510(k) Summary)
+Retrieved: 2026-10-04 via Firecrawl scrape with PDF parser (cacheState: miss, numPages 10).
+Capture: PARTIAL_EXCERPT (quoted passages only; page numbers are the PDF page index of the parsed file).
+---
+[p1] April 4, 2025 ... Re: K243236 Trade/Device Name: WHOOP ECG (electrocardiogram) Feature (1.0) Regulation Number: 21 CFR 870.2345 ... Regulatory Class: Class II Product Code: QDA Dated: March 3, 2025 Received: March 5, 2025
+[p1] ... have determined the device is substantially equivalent (for the indications for use stated in the enclosure) to legally marketed predicate devices ... that do not require approval of a premarket approval application (PMA).
+[p2] Please be advised that FDA's issuance of a substantial equivalence determination does not mean that FDA has made a determination that your device complies with other requirements of the Act
+[p4] The WHOOP ECG Feature is a software-only mobile medical application intended for use with the WHOOP Strap to create, record, store, transfer, and display a single-channel electrocardiogram (ECG) qualitatively similar to a Lead I ECG.
+[p5] 510(k) Summary – K243236 ... Date Prepared March 3, 2025 ... Predicate K201525 Apple Inc. ECG App (2.0) QDA
+[p5] The WHOOP ECG Feature is a software-only medical mobile application integrated into the consumer (non-device) WHOOP System. It consists of three medical device modules: ECG Strap Module, ECG Phone Module, and ECG Cloud Module.
+[p5] The ECG Strap Module firmware is integrated within the WHOOP Strap’s firmware. The ECG Strap Module firmware contains the FDA-cleared B-Secur HeartKey Software Library (K200884)
+[p8] Compatibility with Intended Platform | WHOOP Strap version - WHOOP MG Apple iPhone with minimum iOS version 18.0 Android Phones compatible with minimum Android version 12.0
+[p9] The ECG feature demonstrated 96.2% sensitivity in classifying AFib (HR 50-150 bpm) and 99.4% specificity in classifying sinus rhythm (HR 50-150 bpm) in classifiable recordings.
+[p9] During this study, the WHOOP ECG Feature determined 11% of recordings were inconclusive.

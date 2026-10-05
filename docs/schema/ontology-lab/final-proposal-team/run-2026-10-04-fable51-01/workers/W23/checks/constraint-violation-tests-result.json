@@ -1,0 +1,131 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/checks/constraint-violation-tests.cypher",
+ "uri": "bolt://127.0.0.1:39915/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 8,
+ "ok": 4,
+ "failed": 4,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "error",
+   "error": "Node(2) already exists with label `PolicyVersion` and properties `policyKey` = 'answer-use-authorization', `versionLabel` = 'v1'",
+   "header": "// W23 constraint violation tests (run after operations.cypher and fixtures/00-shared-base.cypher on a disposable DB).\n// Expected outcome per statement is in the comment; \"ERROR\" means the database must reject the write.\n// T-1 duplicate (policyKey, versionLabel): ERROR (policy_version_key_label)",
+   "bodyHead": "CREATE (:PolicyVersion:VersionedState {uid: 'hu:policy-version:w23-test-dup-label', id: 'w23-test-dup-label', stateType: 'POLICY_VERSION',\n  policyKey: 'answer-use-authorization', versionLabel: 'v1', "
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 8,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 34,
+   "sample": [],
+   "header": "// T-2 missing versionLabel: ACCEPTED on Community (uniqueness does not require presence) -> caught by V-W23-08"
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "error",
+   "error": "Node(5) already exists with label `DecisionCriterion` and properties `criterionKey` = 'SAFETY_BLOCK', `methodVersion` = 'safety-block-0.1'",
+   "header": "// T-3 duplicate (criterionKey, methodVersion): ERROR (decision_criterion_key_method)",
+   "bodyHead": "CREATE (:DecisionCriterion:Entity {uid: 'hu:decision-criterion:w23-test-dup', id: 'w23-test-dup', entityType: 'DECISION_CRITERION',\n  criterionKey: 'SAFETY_BLOCK', criterionKind: 'SAFETY_BLOCK', metho"
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "error",
+   "error": "Node(9) already exists with label `AnswerRecord` and property `id` = 'w23-ar1'",
+   "header": "// T-4 duplicate live id on AnswerRecord: ERROR (answer_record_id)",
+   "bodyHead": "CREATE (:AnswerRecord:Occurrence {uid: 'hu:answer-record:w23-test-other-uid', id: 'w23-ar1', occurrenceType: 'ANSWER_PUBLICATION',\n  recordedAsOf: datetime('2026-04-10T09:00:00Z'), schemaDigest: 'sha2"
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "error",
+   "error": "Node(9) already exists with label `Occurrence` and property `uid` = 'hu:answer-record:w23-ar1'",
+   "header": "// T-5 duplicate uid across archetypes (AnswerRecord uid reused on another Occurrence): ERROR (occurrence_uid)",
+   "bodyHead": "CREATE (:Activity:Occurrence {uid: 'hu:answer-record:w23-ar1', id: 'w23-ar1-clash', occurrenceType: 'ACTIVITY', createdAt: datetime()})"
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 10,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 36,
+   "sample": [],
+   "header": "// T-6 wrong type: recordedAsOf stored as a string: ACCEPTED on Community (type constraints are Enterprise) -> service rejects"
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 10,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 60,
+   "sample": [],
+   "header": "// T-7 wrong enum value: accessTier 'PUBLIC' (not an AccessTier name): ACCEPTED by the database -> V-W23-01a reports it"
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 3,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 132,
+   "sample": [],
+   "header": "// T-8 cleanup of the accepted test nodes"
+  }
+ ]
+}

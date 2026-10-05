@@ -1,0 +1,33 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/98-capture-fidelity-adjudications.cypher",
+ "uri": "bolt://127.0.0.1:40297/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 1,
+ "ok": 1,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 35,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 35,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 420,
+    "labelsAdded": 70,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 374,
+   "sample": [],
+   "header": "// =====================================================================================================================\n// W06 fixture 98: CAPTURE_FIDELITY adjudications backing every ACCEPTED W06 fixture assertion (INV-103). An ACCEPTED\n// status means \"accurately records what the source said\", ne"
+  }
+ ]
+}

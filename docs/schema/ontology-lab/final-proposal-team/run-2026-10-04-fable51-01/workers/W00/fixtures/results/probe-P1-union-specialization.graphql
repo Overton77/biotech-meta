@@ -1,0 +1,12 @@
+type Source @node(labels: ["Source", "Entity"]) { uid: String! name: String }
+type Document @node(labels: ["Document", "Source", "Entity"]) { uid: String! name: String documentType: String }
+type Person @node(labels: ["Person", "Entity"]) { uid: String! name: String }
+union SubjectTarget = Source | Document | Person
+union SubjectTargetParentOnly = Source | Person
+type Assertion @node(labels: ["Assertion"]) {
+  uid: String!
+  predicate: String!
+  subject: [SubjectTarget!]! @relationship(type: "HAS_SUBJECT", direction: OUT)
+  subjectParentOnly: [SubjectTargetParentOnly!]! @relationship(type: "HAS_SUBJECT", direction: OUT)
+}
+type ClaimOccurrence @node(labels: ["ClaimOccurrence", "Assertion"]) { uid: String! predicate: String! }

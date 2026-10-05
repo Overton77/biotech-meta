@@ -1,0 +1,537 @@
+# =====================================================================================================
+# W18 Communities, events and narrative arcs -- sdl-fragment.graphql (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W18 (Opus 5.5)   Coordinator/synthesizer: Fable 5.1
+# Catalog: docs/schema/catalog/schema.yaml 0.2.0, digest 8fb50ff0…84f0. Live schema read: 86b5e0b5…f112
+#   (lines 498, 569-570, 1103-1104, 2042-2179).
+# Canonical module: events_and_narrative (catalog maturity: future; this packet proposes PROVISIONAL for
+#   Event/Conference and CANDIDATE for Community, NarrativeArc, EventImpactAssessment).
+# CQs served: CQ-TM-03, CQ-PV-01, CQ-EC-01 (qualified), CQ-EV-01 (REPORTED_IN derived), CQ-CL-01 (speaker
+#   vs presenting company); candidates CQ-EN-C01..C06 (see 02-cq-coverage.md).
+# Imports (never redefined here): Entity, SearchIndexable, EntityArchetype, OccurrenceArchetype,
+#   EvidenceAssessmentArchetype, PrivacyClass, NodeMaturity, TimePrecision, ValidTimeBasis, BasisKind,
+#   AssertionBasis, SpeechAct, AssessmentStatus, AssertedEdgeProperties, DerivedEdgeProperties,
+#   StructuralEdgeProperties, SupersessionProperties, Source, SourceLocator, Activity (W00);
+#   Organization, Person, ConsumerBrand (W01); ChemicalSubstance (W02); Condition (W03); Product (W04);
+#   Lifestyle (W05); Treatment, Procedure (W06); TechnologyPlatform (W08); Study, Publication,
+#   RegistrationVersion (W09); RegulatorySubmission, RegulatoryResponse, DrugApproval (W13);
+#   Protocol (W16); SafetySignal, AdverseEffect (W17); Document, Chunk, DerivedSupportProperties (W20);
+#   Channel, Series, Episode (W21).
+# Elements pending registry admission (seam-requests.yaml): EventRecordTarget, EventRoleEdgeProperties,
+#   CausalEdgeProperties, RecordingEdgeProperties, EventImpactAssessment, relationship types EVENT_ABOUT,
+#   ARC_ABOUT, ARC_INCLUDES_EVENT, DOCUMENTED_BY_RECORD, RECORDING_OF, PRESENTED_AT, ASSESSES_EVENT,
+#   IMPACT_ON; uid tokens community, conference, event, narrative-arc, event-impact (W18-SR-01..).
+# Retired live elements (absent here, mapped in migration-map.yaml): EventPhase (enum and field),
+#   Event.impactLevel, Event.sourceUrl, Event.happenedAt/happenedAtEnd/effectiveAt (renamed),
+#   NarrativeArc.arcStatus/startedAt/endedAt/reportedIn/supportedBy, NarrativeArc HAS_EVENT and ABOUT
+#   (renamed), live unions EventParticipant/EventSubject/Sponsorable (renamed with new member sets).
+# @vector is deliberately absent (D-014: Fable adds it at merge, without provider).
+# Relationship class and cardinality are written in field descriptions and enforced by the
+#   operations/validation layer (07-operations.md, operations.cypher), never assumed from SDL.
+# =====================================================================================================
+
+# -----------------------------------------------------------------------------------------------------
+# Enums (owner W18)
+# -----------------------------------------------------------------------------------------------------
+
+"""
+Coarse category of a public occurrence for timelines and facets. A category says what kind of occurrence was
+reported; it is never a truth, impact or status value. Live values kept unchanged; finer kinds (FILING, APPROVAL,
+LAUNCH, TOPLINE_READOUT, PRESENTATION, SHARE_PRICE_MOVE ...) go in Event.eventType (controlled string). Owner W18;
+new values only by ledger request.
+"""
+enum EventCategory {
+  CORPORATE_EVENT
+  FINANCING_EVENT
+  MNA_EVENT
+  PARTNERSHIP_EVENT
+  LICENSING_EVENT
+  REGULATORY_EVENT
+  CLINICAL_EVENT
+  RESEARCH_EVENT
+  PRODUCT_EVENT
+  MANUFACTURING_EVENT
+  FACILITY_EVENT
+  HIRING_EVENT
+  LEADERSHIP_EVENT
+  BOARD_EVENT
+  LEGAL_EVENT
+  LITIGATION_EVENT
+  POLICY_EVENT
+  MARKET_EVENT
+  COMMERCIAL_EVENT
+  CONFERENCE_EVENT
+  MEDIA_EVENT
+  SAFETY_EVENT
+  RECALL_EVENT
+  DATA_READOUT_EVENT
+  OTHER
+  UNKNOWN
+}
+
+"""
+Ordinal impact level. Used only as the value of an EventImpactAssessment (method-versioned, scoped to one event and
+optionally one affected subject). It is never a bare property of an Event (the live Event.impactLevel is retired:
+one stored value cannot say who judged, for whom, or by which method). UNKNOWN = assessed but undeterminable; an
+event with no assessment is NOT_ASSESSED by absence, never UNKNOWN. Live values kept. Owner W18.
+"""
+enum ImpactLevel {
+  LOW
+  MODERATE
+  HIGH
+  CRITICAL
+  UNKNOWN
+}
+
+"""
+Reported lifecycle of an occurrence, materialized from the event's assertions (EVENT_SCHEDULED, EVENT_OCCURRED,
+EVENT_CANCELLED, EVENT_EFFECTIVE) as recorded; it is capture of what sources said, never truth. PLANNED: only a
+future-tense scheduling statement exists. ANNOUNCED: legacy value -- an intention was disclosed without a schedule
+(new writes use PLANNED with a null or coarse date). IN_PROGRESS: a source states the occurrence has started and not
+ended. COMPLETED: an EVENT_OCCURRED assertion exists. CANCELLED, DELAYED: stated by a source. UNKNOWN: no lifecycle
+statement captured. A PLANNED event never becomes COMPLETED by the passage of its planned date (W18-V13). Owner W18.
+"""
+enum EventStatus {
+  PLANNED
+  ANNOUNCED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DELAYED
+  UNKNOWN
+}
+
+# -----------------------------------------------------------------------------------------------------
+# Unions (owner W18)
+# -----------------------------------------------------------------------------------------------------
+
+"""
+Range of INVOLVES: the parties that took part in an occurrence (applicant, decision maker, presenter, acquirer,
+counterparty, host). Things an event concerns (a product, a study, a substance) are subjects (EventSubjectTarget),
+not participants. Replaces the live union EventParticipant, whose members Product, Compound, Study,
+TechnologyPlatform, Treatment and Procedure move to EventSubjectTarget. Agencies are Organization nodes
+(["RegulatoryAgency","Organization","Entity"]) and resolve through Organization.
+"""
+union EventParticipantTarget = Organization | Person | Community
+
+"""
+Range of EVENT_ABOUT (Event) and ARC_ABOUT, IMPACT_ON (assessments): what an occurrence or an arc concerns. Replaces
+the live union EventSubject (Compound -> ChemicalSubstance per D-002; Conference and Publication added because a
+conference can be the subject of a cancellation event and a publication of a publication event).
+"""
+union EventSubjectTarget =
+    Organization | Person | Product | ChemicalSubstance | Study | Condition | TechnologyPlatform | Protocol
+  | Treatment | Procedure | SafetySignal | AdverseEffect | Lifestyle | Conference | Publication
+
+"""
+Range of SPONSORS_CONTENT (relationship type owned and written by W21; catalog round 0006:
+Organization|ConsumerBrand -> Episode|Series|Channel|Document|Conference). Defined here because it is the conference
+seam; W21 and W01 consume it for Organization.sponsorsContent / ConsumerBrand.sponsorsContent. Replaces live union
+Sponsorable (Conference | Channel | Episode), adding Series and Document. Sponsorship is a FINANCIAL_INTEREST
+member and never implies endorsement by the sponsor, by the host, or of any product shown (catalog
+forbiddenImplications [SPONSORS_CONTENT, ENDORSES_PRODUCT]; W18 adds [SPONSORS_CONTENT, HOSTS_EVENT]).
+"""
+union SponsorableTarget = Conference | Channel | Episode | Series | Document
+
+"""
+Range of DOCUMENTED_BY_RECORD: the domain record that is the authoritative representation of the same occurrence
+(the agency response for an approval, the publication record for a publication event, the registry version for a
+registry change). The record keeps its owner's semantics (W13, W09); the Event is the timeline occurrence and never
+duplicates the record's fields. Registry admission requested (W18-SR-03).
+"""
+union EventRecordTarget = RegulatoryResponse | RegulatorySubmission | DrugApproval | Publication | RegistrationVersion
+
+# -----------------------------------------------------------------------------------------------------
+# Relationship-property types (owner W18; each contains every field of the frozen W00 type it specializes)
+# -----------------------------------------------------------------------------------------------------
+
+"""
+Properties of the asserted role edges INVOLVES (Event -> participant), SPEAKS_AT (Person -> Event), ATTENDS
+(Person -> Conference) and EXHIBITS_AT (Organization -> Conference). Contains every field of the frozen
+AssertedEdgeProperties (W00) and adds the event role. Successor of live RoleMetadata on these edges. A role at an
+event is not an organizational role: "Bill Sibold, CEO" in a speaker listing is roleTitleVerbatim here and never
+creates EMPLOYED_BY (W01).
+"""
+type EventRoleEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  """Controlled string: PRESENTER, SPEAKER, MODERATOR, PANELIST, HOST, ORGANIZER, EXHIBITOR, ATTENDEE, APPLICANT, DECISION_MAKER, MARKETING_AUTHORIZATION_HOLDER, ANNOUNCER, ACQUIRER, TARGET, LICENSOR, LICENSEE, COUNTERPARTY, OTHER."""
+  participantRole: String!
+  """Role or title exactly as printed in the source (never normalized by guesswork)."""
+  roleTitleVerbatim: String
+}
+
+"""
+Properties of the asserted edge CAUSED_BY (effect Event -> cause Event). Contains every field of the frozen
+AssertedEdgeProperties (W00) and copies three kernel fields of the authorizing Assertion so that the edge cannot be
+read without its epistemic basis: basisKind (required; W18-V01), assertionBasis, speechAct. A CAUSED_BY edge exists
+only as the projection of one Assertion with predicate CAUSED_BY and polarity POSITIVE; temporal order
+(FOLLOWED_BY), membership in a narrative arc, or a regulatory "based on" statement is never its premise
+(forbidden implications [FOLLOWED_BY, CAUSED_BY], [ARC_INCLUDES_EVENT, CAUSED_BY]). The edge carries no truth: support
+is a SUPPORT Adjudication on the assertion.
+"""
+type CausalEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  """Epistemic basis of the causal claim in the source (equals the assertion's basisKind)."""
+  basisKind: BasisKind!
+  """On what basis the asserter presents it (equals the assertion's assertionBasis)."""
+  assertionBasis: AssertionBasis
+  """Speech act of the authorizing assertion (STATES vs SPECULATES matters for causal claims)."""
+  speechAct: SpeechAct
+}
+
+"""
+Properties of the asserted edge RECORDING_OF (Episode -> Event): the publisher or host states that this published
+audio/video work records that occurrence. Contains every field of AssertedEdgeProperties and adds coverage. A
+recording is a separate work (W21 Episode); its renditions, transcripts and media times belong to W21/W00. A slide
+deck shown at the same occurrence is PRESENTED_AT the Event and is never RENDITION_OF the recording (CL-003 R4).
+"""
+type RecordingEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  """Controlled string: FULL, PARTIAL, EXCERPT, UNKNOWN (how much of the occurrence the recording is stated to cover)."""
+  recordingCoverage: String!
+}
+
+# -----------------------------------------------------------------------------------------------------
+# Node types
+# -----------------------------------------------------------------------------------------------------
+
+"""
+A self-identified group without its own legal identity whose members share a field, condition or practice (a
+patient community, an online forum, a scientific interest group). It is an Entity. It is NOT an Organization (a
+society with legal identity such as AASLD is an Organization, W01), NOT a Channel or Series (W21) and NOT a
+membership roster: membership of persons is private behaviour data and is never stored in the shared graph
+(contract A9). Its only shared-graph role is hosting events and appearing as an event participant. Serves
+CQ-EN-C04 (who hosted the occurrence). Module events_and_narrative; archetype Entity; uid token `community`
+(requested, W18-SR-01). Maturity CANDIDATE: kept as the live seam; no failing case requires more.
+"""
+type Community implements Entity & EntityArchetype
+  @node(labels: ["Community", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Community'."
+  entityType: String!
+  """Controlled string: PATIENT_COMMUNITY, ONLINE_FORUM, SCIENTIFIC_INTEREST_GROUP, PROFESSIONAL_NETWORK, OTHER."""
+  communityType: String
+  """class: asserted (AssertedEdgeProperties); cardinality: many; catalog: HOSTS_EVENT (live Community.hostsEvents)"""
+  hostsEvents: [Event!]! @relationship(type: "HOSTS_EVENT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted (AssertedEdgeProperties); cardinality: many; catalog: HOSTS_EVENT"""
+  hostsConferences: [Conference!]! @relationship(type: "HOSTS_EVENT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted (EventRoleEdgeProperties); cardinality: many; catalog: INVOLVES (inverse view)"""
+  involvedInEvents: [Event!]! @relationship(type: "INVOLVES", direction: IN, properties: "EventRoleEdgeProperties")
+}
+
+"""
+One edition of an organized meeting as announced by its organizer: "44th Annual J.P. Morgan Healthcare Conference"
+(San Francisco, 2026-01-12 to 2026-01-15), "The Liver Meeting 2026" (Denver, 2026-11-05 to 2026-11-09). It is an
+Entity: the edition identity exists before, and independently of, its holding (it is announced, sponsored and
+exhibited at, and it can be postponed, moved online or cancelled -- those are Events EVENT_ABOUT the Conference). It
+is NOT the recurring series (seriesName is presentation only; a series identity is CANDIDATE, see model cards), NOT a
+session (a talk is an Event HAS_EVENT from the conference), NOT a recording (W21 Episode) and NOT an Organization
+(the host is HOSTS_EVENT; a conference named after a bank is not thereby hosted by it). startDate/endDate are the
+organizer-stated local calendar dates (inclusive, as printed), not valid-time bounds. Serves CQ-EN-C04, CQ-EC-01
+(qualified participation). Module events_and_narrative; archetype Entity; uid token `conference` (requested).
+"""
+type Conference implements Entity & EntityArchetype
+  @node(labels: ["Conference", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Conference'."
+  entityType: String!
+  """Controlled string: SCIENTIFIC_CONGRESS, INVESTOR_CONFERENCE, TRADE_SHOW, PATIENT_MEETING, REGULATORY_MEETING, WEBINAR_PROGRAM, OTHER."""
+  conferenceType: String
+  """Name of the recurring series as printed (e.g. 'The Liver Meeting'); presentation only, never identity."""
+  seriesName: String
+  """Edition label as printed (e.g. '44th Annual', 'TLM 2026')."""
+  editionLabel: String
+  """First day as stated by the organizer (local calendar date). Live DateTime retyped to Date (migration-map)."""
+  startDate: Date
+  """Last day as stated by the organizer (local calendar date, inclusive as printed)."""
+  endDate: Date
+  """IANA time zone of the venue (e.g. America/Los_Angeles); session instants are stored in UTC on Event."""
+  timeZone: String
+  """Venue/city text as printed; presentation only (venue Facility deferred, CL-015)."""
+  location: String
+  """Controlled string: IN_PERSON, VIRTUAL, HYBRID, UNKNOWN."""
+  attendanceMode: String
+  """Organizer page URL; presentation only. The page is a Source with snapshots; this string is never a locator."""
+  websiteUrl: String
+  """class: asserted (AssertedEdgeProperties); cardinality: many (usually one); catalog: HOSTS_EVENT"""
+  hostedByOrganizations: [Organization!]! @relationship(type: "HOSTS_EVENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (AssertedEdgeProperties); cardinality: many; catalog: HOSTS_EVENT"""
+  hostedByCommunities: [Community!]! @relationship(type: "HOSTS_EVENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural (StructuralEdgeProperties, orderIndex = program order); cardinality: many; catalog: HAS_EVENT (live Conference.hasEvents)"""
+  hasEvents: [Event!]! @relationship(type: "HAS_EVENT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted (EventRoleEdgeProperties); cardinality: many; catalog: EXHIBITS_AT (live Organization.exhibitsAt, inverse view)"""
+  exhibitors: [Organization!]! @relationship(type: "EXHIBITS_AT", direction: IN, properties: "EventRoleEdgeProperties")
+  """class: asserted (EventRoleEdgeProperties); cardinality: many; catalog: ATTENDS (public persons only; live Person.attends, inverse view)"""
+  attendees: [Person!]! @relationship(type: "ATTENDS", direction: IN, properties: "EventRoleEdgeProperties")
+  """class: asserted (FINANCIAL_INTEREST member; asserted_edge); cardinality: many; catalog: SPONSORS_CONTENT (type owned by W21)"""
+  sponsoringOrganizations: [Organization!]! @relationship(type: "SPONSORS_CONTENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (FINANCIAL_INTEREST member; asserted_edge); cardinality: many; catalog: SPONSORS_CONTENT (type owned by W21)"""
+  sponsoringBrands: [ConsumerBrand!]! @relationship(type: "SPONSORS_CONTENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (AssertedEdgeProperties); cardinality: many; catalog: EVENT_ABOUT (inverse view: events about this edition, e.g. a postponement)"""
+  subjectOfEvents: [Event!]! @relationship(type: "EVENT_ABOUT", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A dated public occurrence reported by sources: a filing, a data readout (the public disclosure of results), an
+approval, a launch, a recall, a financing, a conference session, a share-price move. Archetype Occurrence. Three
+clocks are kept apart (CQ-TM-03): startedAt/endedAt = when it happened (valid time; live happenedAt/happenedAtEnd);
+announcedAt = when it was first publicly announced by a party to it (publication time of the announcing snapshot);
+effectiveFrom = when a legal, regulatory or contractual effect begins (live effectiveAt). The recorded clock lives on
+the assertions (recordedAt) and edges (recordedFrom), never on the Event. Every time on this node is a
+materialization of an Assertion named in timeAssertionUid / announcementAssertionUid / effectiveAssertionUid; the
+assertions are the history (late arrivals and corrections are new assertions; the materialization is recomputed).
+An Event is NOT the regulatory or publication record that documents it (DOCUMENTED_BY_RECORD -> W13/W09 records),
+NOT a source (it is REPORTED_IN sources), NOT evidence for anything it is about, and temporal order between events
+(FOLLOWED_BY) never implies cause (CAUSED_BY needs its own assertion with basisKind). Serves CQ-TM-03, CQ-EV-01,
+CQ-EN-C01..C04, CQ-EN-C06. Module events_and_narrative; archetype Occurrence; uid token `event` (requested).
+"""
+type Event implements Entity & OccurrenceArchetype & SearchIndexable
+  @node(labels: ["Event", "Occurrence"])
+  @fulltext(indexes: [{indexName: "EventSearch", fields: ["name", "description", "summaryText"], queryName: "searchEvents"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'Event'."
+  occurrenceType: String!
+  """When it happened (valid-time start; first instant of its precision period). Materialized from the assertion named in timeAssertionUid. Live happenedAt."""
+  startedAt: DateTime
+  """When it ended, for durative occurrences (valid-time end, half-open). Null = unknown or instantaneous, never 'ongoing'. Live happenedAtEnd."""
+  endedAt: DateTime
+  startedAtPrecision: TimePrecision
+  startedAtBasis: ValidTimeBasis
+  endedAtPrecision: TimePrecision
+  endedAtBasis: ValidTimeBasis
+  """uid of the EVENT_OCCURRED (or, while PLANNED, EVENT_SCHEDULED) Assertion whose validFrom/validTo this node materializes."""
+  timeAssertionUid: String
+  """Publication instant of the first announcement by a party to the occurrence (SourceSnapshot.publishedAt behind the announcing assertion's locator); null when no first-party announcement was captured."""
+  announcedAt: DateTime
+  announcedAtPrecision: TimePrecision
+  """uid of the Assertion whose supporting snapshot gives announcedAt."""
+  announcementAssertionUid: String
+  """When the occurrence's legal/regulatory/contractual effect begins (live effectiveAt). Only from an EVENT_EFFECTIVE assertion; never proxied from announcedAt or startedAt (W18-V04)."""
+  effectiveFrom: DateTime
+  effectiveFromPrecision: TimePrecision
+  effectiveFromBasis: ValidTimeBasis
+  """uid of the EVENT_EFFECTIVE Assertion that licenses effectiveFrom."""
+  effectiveAssertionUid: String
+  """IANA time zone in which the source stated a local time (sessions); instants are stored in UTC."""
+  localTimeZone: String
+  """Jurisdiction of a regulatory or legal occurrence (ISO 3166 / 'EU'); mandatory qualifier for REGULATORY_EVENT (contract A11)."""
+  jurisdiction: String
+  eventCategory: EventCategory
+  """Controlled string, finer than eventCategory: FILING, APPROVAL, CONDITIONAL_APPROVAL, LAUNCH, TOPLINE_READOUT, PUBLICATION, PRESENTATION, SHARE_PRICE_MOVE, RECALL_INITIATED, RECALL_CLASSIFIED, POSTPONEMENT, CANCELLATION, OTHER."""
+  eventType: String
+  """Materialized lifecycle (EventStatus semantics); never truth."""
+  eventStatus: EventStatus
+  summaryText: String
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """Derived retrieval vector (INV-107); @vector is added only by Fable at merge, without provider."""
+  searchEmbedding: [Float!]
+  """class: structural; cardinality: zero_or_one; catalog: HAS_EVENT (the conference edition whose program contains this session)"""
+  conference: [Conference!]! @relationship(type: "HAS_EVENT", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted (AssertedEdgeProperties); cardinality: many; catalog: HOSTS_EVENT"""
+  hostedByOrganizations: [Organization!]! @relationship(type: "HOSTS_EVENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (AssertedEdgeProperties); cardinality: many; catalog: HOSTS_EVENT (live Community.hostsEvents)"""
+  hostedByCommunities: [Community!]! @relationship(type: "HOSTS_EVENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (EventRoleEdgeProperties, participantRole required); cardinality: many; catalog: INVOLVES (live Event.involves)"""
+  involves: [EventParticipantTarget!]! @relationship(type: "INVOLVES", direction: OUT, properties: "EventRoleEdgeProperties")
+  """class: asserted (AssertedEdgeProperties); cardinality: one_or_more; catalog: EVENT_ABOUT (live Event.about, ABOUT renamed: W20 ABOUT is derived retrieval aboutness)"""
+  about: [EventSubjectTarget!]! @relationship(type: "EVENT_ABOUT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted (AssertedEdgeProperties); cardinality: zero_or_one per record kind; catalog: DOCUMENTED_BY_RECORD (new)"""
+  documentedBy: [EventRecordTarget!]! @relationship(type: "DOCUMENTED_BY_RECORD", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived (DerivedSupportProperties: locatorUid of an event assertion's supporting locator in a snapshot of this Source); cardinality: many; catalog: REPORTED_IN (live Event.reportedIn -> Document; range widened to Source)"""
+  reportedIn: [Source!]! @relationship(type: "REPORTED_IN", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (DerivedSupportProperties, segmentationHash required); cardinality: many; catalog: SUPPORTED_BY_CHUNK (type owned by W20; live Event.supportedBy -> Chunk renamed)"""
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+  """class: asserted (CausalEdgeProperties; projection of one CAUSED_BY assertion with basisKind); cardinality: many; catalog: CAUSED_BY (this event is the effect)"""
+  causedBy: [Event!]! @relationship(type: "CAUSED_BY", direction: OUT, properties: "CausalEdgeProperties")
+  """class: asserted (CausalEdgeProperties); cardinality: many; catalog: CAUSED_BY (inverse view: this event is the stated cause)"""
+  causes: [Event!]! @relationship(type: "CAUSED_BY", direction: IN, properties: "CausalEdgeProperties")
+  """class: derived (DerivedEdgeProperties: rule valid-time-order-v1 over the two time assertions, or projectionOfAssertionUid of a source-stated order); cardinality: many; catalog: FOLLOWED_BY. Never implies CAUSED_BY."""
+  followedBy: [Event!]! @relationship(type: "FOLLOWED_BY", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (inverse view); catalog: FOLLOWED_BY"""
+  precededBy: [Event!]! @relationship(type: "FOLLOWED_BY", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: asserted (EventRoleEdgeProperties); cardinality: many; catalog: SPEAKS_AT (live Person.speaksAt, inverse view)"""
+  speakers: [Person!]! @relationship(type: "SPEAKS_AT", direction: IN, properties: "EventRoleEdgeProperties")
+  """class: asserted (RecordingEdgeProperties); cardinality: many; catalog: RECORDING_OF (new; Episode -> Event)"""
+  recordings: [Episode!]! @relationship(type: "RECORDING_OF", direction: IN, properties: "RecordingEdgeProperties")
+  """class: asserted (AssertedEdgeProperties); cardinality: many; catalog: PRESENTED_AT (new; slide deck or poster Document -> Event; never RENDITION_OF the recording)"""
+  presentedDocuments: [Document!]! @relationship(type: "PRESENTED_AT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural (inverse view); catalog: ARC_INCLUDES_EVENT"""
+  includedInArcs: [NarrativeArc!]! @relationship(type: "ARC_INCLUDES_EVENT", direction: IN, properties: "StructuralEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (inverse view); catalog: ASSESSES_EVENT"""
+  impactAssessments: [EventImpactAssessment!]! @relationship(type: "ASSESSES_EVENT", direction: IN) @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A curated interpretation that selects and orders events into a story about one or more subjects ("from the
+MAESTRO-NASH topline readout to the first approved MASH therapy"). Archetype EvidenceAssessment (decision W18-D04):
+it is a dated, method-versioned, immutable judgment by an assessor (BellLabs curator or agent, WAS_GENERATED_BY an
+Activity), revised only by a new arc that SUPERSEDES it, reproducible from eventsRecordedAsOf. It is NOT a source
+(nothing may be SUPPORTED_BY it, cite it in derivedFromAssessmentUids, or CONSIDERS_ASSESSMENT it -- W18-V03), NOT a
+provenance-state-3 warrant (assessmentType NARRATIVE_ARC is excluded from "evidence warrants a broader conclusion",
+CQ-PV-01), carries NO truth or score (overallScore and confidence stay null), and its ordering never implies cause
+([ARC_INCLUDES_EVENT, CAUSED_BY]). A third party's published narrative is source content (W21 assertions), not a
+NarrativeArc. NOT a W21 Series/Channel/Episode container. Serves CQ-EN-C05, CQ-PV-01. Module events_and_narrative;
+uid token `narrative-arc` (requested). Maturity CANDIDATE.
+"""
+type NarrativeArc implements Entity & EvidenceAssessmentArchetype & SearchIndexable
+  @node(labels: ["NarrativeArc", "EvidenceAssessment"])
+  @fulltext(indexes: [{indexName: "NarrativeArcSearch", fields: ["name", "description", "themeSummary", "searchText"], queryName: "searchNarrativeArcs"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'NARRATIVE_ARC'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  """Curation method and version (e.g. 'arc-curation-v0.1'); required."""
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  """Service-assigned commit time."""
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  """Written once, from null, when a newer arc supersedes this one."""
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  """Must stay null: an arc carries no score (W18-V03)."""
+  overallScore: Float @settable(onCreate: false, onUpdate: false)
+  """Must stay null (deprecated generic confidence)."""
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  """Recorded-time viewpoint at which member events were selected (reproducibility of the arc)."""
+  eventsRecordedAsOf: DateTime! @settable(onCreate: true, onUpdate: false)
+  """Controlled string: COMPANY_MILESTONE_PATH, THERAPEUTIC_AREA_HISTORY, REGULATORY_SAGA, CONTROVERSY, MARKET_NARRATIVE, OTHER."""
+  arcType: String @settable(onCreate: true, onUpdate: false)
+  themeSummary: String @settable(onCreate: true, onUpdate: false)
+  """Presentation facet (live impactDomain); not an impact assessment."""
+  impactDomain: String @settable(onCreate: true, onUpdate: false)
+  """Earliest member-event startedAt at creation (computed; live NarrativeArc.startedAt renamed: an arc is not an occurrence)."""
+  periodStart: DateTime @settable(onCreate: true, onUpdate: false)
+  periodStartPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  """Latest member-event time at creation (computed); null = unknown, never 'ongoing'."""
+  periodEnd: DateTime @settable(onCreate: true, onUpdate: false)
+  periodEndPrecision: TimePrecision @settable(onCreate: true, onUpdate: false)
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """Derived retrieval vector (INV-107); @vector is added only by Fable at merge, without provider."""
+  searchEmbedding: [Float!]
+  """class: structural (StructuralEdgeProperties, orderIndex = narrative order, notes = inclusion rationale); cardinality: one_or_more; catalog: ARC_INCLUDES_EVENT (live NarrativeArc.hasEvents / HAS_EVENT renamed: one type, one meaning)"""
+  includesEvents: [Event!]! @relationship(type: "ARC_INCLUDES_EVENT", direction: OUT, properties: "StructuralEdgeProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: one_or_more; catalog: ARC_ABOUT (live NarrativeArc.about / ABOUT renamed)"""
+  about: [EventSubjectTarget!]! @relationship(type: "ARC_ABOUT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (NarrativeArc -> NarrativeArc, same label; newer.recordedAt >= older.recordedAt)"""
+  supersedes: [NarrativeArc!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural (inverse); catalog: SUPERSEDES"""
+  supersededBy: [NarrativeArc!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural; cardinality: exactly_one for new writes; catalog: WAS_GENERATED_BY (the curation Activity, which names its agent)"""
+  wasGeneratedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+}
+
+"""
+A method-versioned judgment of how significant one Event was, in one domain (MARKET, CLINICAL_PRACTICE, REGULATORY,
+SCIENTIFIC, COMMERCIAL, PATIENT_ACCESS), optionally for one affected subject. Archetype EvidenceAssessment; replaces
+the live bare Event.impactLevel (decision W18-D05). It is NOT a truth verdict about the event, NOT a causal claim
+(that an event moved a share price is a CAUSED_BY assertion, which an impact assessment may cite via SUPPORTED_BY its
+locator, never replace), and a company's self-description ("a historic moment") is source content, not an
+assessment. Immutable; re-assessment SUPERSEDES. Serves CQ-EN-C06. Module events_and_narrative; uid token
+`event-impact` (requested). Maturity CANDIDATE (included because fixture 02 needs two conflicting judgments).
+"""
+type EventImpactAssessment implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["EventImpactAssessment", "EvidenceAssessment"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'EVENT_IMPACT'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  """Assessment method and version (required; W18-V12)."""
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  overallScore: Float @settable(onCreate: true, onUpdate: false)
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  impactLevel: ImpactLevel! @settable(onCreate: true, onUpdate: false)
+  """Controlled string: MARKET, CLINICAL_PRACTICE, REGULATORY, SCIENTIFIC, COMMERCIAL, PATIENT_ACCESS, OTHER."""
+  impactDomain: String! @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: exactly_one; catalog: ASSESSES_EVENT (new)"""
+  assessesEvent: [Event!]! @relationship(type: "ASSESSES_EVENT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: IMPACT_ON (new) -- the subject for whom the impact is judged"""
+  impactOn: [EventSubjectTarget!]! @relationship(type: "IMPACT_ON", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: SUPPORTED_BY (EvidenceAssessment -> SourceLocator)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES"""
+  supersedes: [EventImpactAssessment!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: exactly_one for new writes; catalog: WAS_GENERATED_BY"""
+  wasGeneratedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+}

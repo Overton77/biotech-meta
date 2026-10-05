@@ -1,0 +1,734 @@
+# =====================================================================================================================
+# W02 Substances and materials - SDL fragment (run run-2026-10-04-fable51-01; worker W02, Opus 5.5; synthesizer Fable 5.1)
+# Canonical module: substances_and_materials (catalog 0.2.0, digest 8fb50ff0…84f0). Contract: 01-shared-contract.md B1-B7.
+# CQs: CQ-ID-03, CQ-ID-04, CQ-ID-05 (material side), CQ-ID-06, CQ-ST-01 (material side), CQ-ST-02, CQ-PF-01;
+#      candidates CQ-ID-C01..C04 (02-cq-coverage.md).
+# Rulings applied: D-001 (archetype label stored), D-002 (ChemicalSubstance replaces Compound; CompoundForm split),
+#      D-008 (IngredientMaterial is the canonical material identity; live Material retired unless W11 shows a case),
+#      D-011, D-013, D-015 (live fulltext names CompoundSearch/searchCompounds and IngredientSearch/searchIngredients kept).
+# Defines only W02-owned elements. References (not defined here): W00 Entity, EntityArchetype, SearchIndexable,
+#      PrivacyClass, NodeMaturity, AssertedEdgeProperties, DerivedEdgeProperties, IdentifierLinkProperties, ValidTimeBasis,
+#      TimePrecision, MassBasis, Identifier; W03 Mechanism, MolecularEntity; W11 SpecificationVersion, ManufacturingProcess;
+#      W14 Trademark. Fields for relationship types owned by W00/W03/W11/W14 appear here only because their source node
+#      is a W02 type; their class/property type is the owner's and is confirmed through seam-requests.yaml.
+# No extend, no @cypher, no @unique, no @vector (Fable adds @vector at merge; retrieval justification in 07-operations.md).
+# =====================================================================================================================
+
+"""
+The canonical identity of an actual material that can be used as an ingredient, administered in a study, or consumed or
+produced by a process: a chemically defined material (a supplier's or generic grade of one substance in one form), a
+branded material governed by a specification, a botanical preparation, a microbial preparation, or a mixture with nested
+materials. It is NOT a chemical substance (structure identity: ChemicalSubstance), NOT a solid-state form (ChemicalForm),
+NOT a dosage form or product (ProductVariant/StudyIntervention), NOT a contextual component with an amount
+(IngredientComponent/InterventionComponent), and NOT a lot (ProductLot). Same substance never establishes same material
+(INV-008). Live Ingredient and Material nodes migrate here keeping their opaque id (D-008). Serves CQ-ID-03, CQ-ID-06,
+CQ-ST-01, CQ-ST-02, CQ-PF-01. Module substances_and_materials; archetype Entity; uid token material (also for every
+specialization below, so reclassifying a material never changes its uid; W02-SR-03).
+"""
+type IngredientMaterial implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["IngredientMaterial", "Entity"])
+  @fulltext(indexes: [{indexName: "IngredientSearch", fields: ["name", "description", "searchText"], queryName: "searchIngredients"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """What kind of material identity this is (W02 enum). Null = not yet classified (migration); UNRESOLVED_MATERIAL = a
+  material known only as what a source says was used. Branding is the BrandedIngredientMaterial label, not a kind."""
+  materialKind: MaterialKind
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """class: asserted; cardinality: many; catalog: REALIZES_SUBSTANCE; owner: W02; target is the exact substance the source states (a salt when stated; the active moiety when only the moiety is named)"""
+  realizesSubstances: [ChemicalSubstance!]! @relationship(type: "REALIZES_SUBSTANCE", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_CHEMICAL_FORM; owner: W02"""
+  chemicalForms: [ChemicalForm!]! @relationship(type: "HAS_CHEMICAL_FORM", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PROVIDES_CONSTITUENT; owner: W02; non-quantitative; never implies QUANTITATIVELY_CONTAINS (forbidden implication, V-W02-01)"""
+  providesConstituents: [MaterialContentTarget!]! @relationship(type: "PROVIDES_CONSTITUENT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS; owner: W02; requires quantity shape, unitCode, basis (V-006 / proposed V-006r); spec limits are W12 SpecificationCriterion, lot results W12 MeasuredResult"""
+  quantitativelyContains: [MaterialContentTarget!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: OUT, properties: "QuantitativeContentProperties")
+  """class: asserted; cardinality: many; catalog: HAS_MIXTURE_COMPONENT (inverse); owner: W02"""
+  componentOfMixtures: [MaterialMixture!]! @relationship(type: "HAS_MIXTURE_COMPONENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER; owner: W00"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: GOVERNED_BY_SPECIFICATION; owner: W11; a specification change is a new SpecificationVersion, never a new material (W02 D-06)"""
+  governedBySpecifications: [SpecificationVersion!]! @relationship(type: "GOVERNED_BY_SPECIFICATION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PRODUCED_BY_PROCESS; owner: W11"""
+  producedByProcesses: [ManufacturingProcess!]! @relationship(type: "PRODUCED_BY_PROCESS", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived; cardinality: many; catalog: AFFECTS_MECHANISM; owner: W03; regenerable projection of ACCEPTED DIRECT_MEASUREMENT mechanism assertions (INV-211)"""
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; catalog: MODULATES; owner: W03; regenerable projection of mechanism assertions"""
+  modulates: [MolecularEntity!]! @relationship(type: "MODULATES", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+An IngredientMaterial marketed under a brand by a specification owner (for example NIAGEN, a crystal form of
+nicotinamide riboside chloride per Conze et al. 2019). One node per brand and owner across specification versions: a
+specification change is a new SpecificationVersion (W11) attached by GOVERNED_BY_SPECIFICATION, not a new material
+(V-W02-05). Branding is orthogonal to kind: a node may also carry BotanicalPreparation or MicrobialPreparation.
+NOT a product brand (ConsumerBrand) and NOT a trademark (Trademark, W14). Serves CQ-ID-05, CQ-ID-06, CQ-ST-02.
+Module substances_and_materials; archetype Entity; uid token material.
+"""
+type BrandedIngredientMaterial implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["BrandedIngredientMaterial", "IngredientMaterial", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """What kind of material identity this is (W02 enum). Null = not yet classified (migration); UNRESOLVED_MATERIAL = a
+  material known only as what a source says was used. Branding is the BrandedIngredientMaterial label, not a kind."""
+  materialKind: MaterialKind
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """class: asserted; cardinality: many; catalog: REALIZES_SUBSTANCE; owner: W02; target is the exact substance the source states (a salt when stated; the active moiety when only the moiety is named)"""
+  realizesSubstances: [ChemicalSubstance!]! @relationship(type: "REALIZES_SUBSTANCE", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_CHEMICAL_FORM; owner: W02"""
+  chemicalForms: [ChemicalForm!]! @relationship(type: "HAS_CHEMICAL_FORM", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PROVIDES_CONSTITUENT; owner: W02; non-quantitative; never implies QUANTITATIVELY_CONTAINS (forbidden implication, V-W02-01)"""
+  providesConstituents: [MaterialContentTarget!]! @relationship(type: "PROVIDES_CONSTITUENT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS; owner: W02; requires quantity shape, unitCode, basis (V-006 / proposed V-006r); spec limits are W12 SpecificationCriterion, lot results W12 MeasuredResult"""
+  quantitativelyContains: [MaterialContentTarget!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: OUT, properties: "QuantitativeContentProperties")
+  """class: asserted; cardinality: many; catalog: HAS_MIXTURE_COMPONENT (inverse); owner: W02"""
+  componentOfMixtures: [MaterialMixture!]! @relationship(type: "HAS_MIXTURE_COMPONENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER; owner: W00"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: GOVERNED_BY_SPECIFICATION; owner: W11; a specification change is a new SpecificationVersion, never a new material (W02 D-06)"""
+  governedBySpecifications: [SpecificationVersion!]! @relationship(type: "GOVERNED_BY_SPECIFICATION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PRODUCED_BY_PROCESS; owner: W11"""
+  producedByProcesses: [ManufacturingProcess!]! @relationship(type: "PRODUCED_BY_PROCESS", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived; cardinality: many; catalog: AFFECTS_MECHANISM; owner: W03; regenerable projection of ACCEPTED DIRECT_MEASUREMENT mechanism assertions (INV-211)"""
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; catalog: MODULATES; owner: W03; regenerable projection of mechanism assertions"""
+  modulates: [MolecularEntity!]! @relationship(type: "MODULATES", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """Brand of the material as used by its owner (presentation and lookup; never identity on its own)."""
+  brandName: String
+  """Materialized uid of the Organization that owns the material specification; the authoritative statement is the
+  specification attachment and its assertion. Null = unknown."""
+  specificationOwnerUid: String
+  """class: asserted; cardinality: many; catalog: MARKETED_UNDER_MARK; owner: W14"""
+  marketedUnderMarks: [Trademark!]! @relationship(type: "MARKETED_UNDER_MARK", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+An IngredientMaterial made from a plant (or alga or fungus treated as herbal substance): defined by source taxon
+(DERIVED_FROM_TAXON), plant part, preparation type, drug-extract ratio and extraction solvent. Standardization ("adjusted to
+22.0-27.0% flavone glycosides") is a QUANTITATIVELY_CONTAINS statement to a Constituent with its own source and valid
+time, because it differs between authorities and editions; it is not a property of the node. NOT the plant taxon, NOT a
+marker constituent, NOT a food item (W05). Serves CQ-ID-03, CQ-ID-C02, OPEN-QUESTIONS P1-4 (partial). Module
+substances_and_materials; archetype Entity; uid token material.
+"""
+type BotanicalPreparation implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["BotanicalPreparation", "IngredientMaterial", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """What kind of material identity this is (W02 enum). Null = not yet classified (migration); UNRESOLVED_MATERIAL = a
+  material known only as what a source says was used. Branding is the BrandedIngredientMaterial label, not a kind."""
+  materialKind: MaterialKind
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """class: asserted; cardinality: many; catalog: REALIZES_SUBSTANCE; owner: W02; target is the exact substance the source states (a salt when stated; the active moiety when only the moiety is named)"""
+  realizesSubstances: [ChemicalSubstance!]! @relationship(type: "REALIZES_SUBSTANCE", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_CHEMICAL_FORM; owner: W02"""
+  chemicalForms: [ChemicalForm!]! @relationship(type: "HAS_CHEMICAL_FORM", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PROVIDES_CONSTITUENT; owner: W02; non-quantitative; never implies QUANTITATIVELY_CONTAINS (forbidden implication, V-W02-01)"""
+  providesConstituents: [MaterialContentTarget!]! @relationship(type: "PROVIDES_CONSTITUENT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS; owner: W02; requires quantity shape, unitCode, basis (V-006 / proposed V-006r); spec limits are W12 SpecificationCriterion, lot results W12 MeasuredResult"""
+  quantitativelyContains: [MaterialContentTarget!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: OUT, properties: "QuantitativeContentProperties")
+  """class: asserted; cardinality: many; catalog: HAS_MIXTURE_COMPONENT (inverse); owner: W02"""
+  componentOfMixtures: [MaterialMixture!]! @relationship(type: "HAS_MIXTURE_COMPONENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER; owner: W00"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: GOVERNED_BY_SPECIFICATION; owner: W11; a specification change is a new SpecificationVersion, never a new material (W02 D-06)"""
+  governedBySpecifications: [SpecificationVersion!]! @relationship(type: "GOVERNED_BY_SPECIFICATION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PRODUCED_BY_PROCESS; owner: W11"""
+  producedByProcesses: [ManufacturingProcess!]! @relationship(type: "PRODUCED_BY_PROCESS", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived; cardinality: many; catalog: AFFECTS_MECHANISM; owner: W03; regenerable projection of ACCEPTED DIRECT_MEASUREMENT mechanism assertions (INV-211)"""
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; catalog: MODULATES; owner: W03; regenerable projection of mechanism assertions"""
+  modulates: [MolecularEntity!]! @relationship(type: "MODULATES", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """Plant part as stated (for example leaf, fruit, root). Null = not stated."""
+  plantPart: String
+  """Herbal preparation type (Ph. Eur./EMA vocabulary). Null = not stated."""
+  preparationType: BotanicalPreparationType
+  """Drug-extract ratio exactly as stated (for example 'DER 35-67:1', '50:1'). Null = not stated; never inferred."""
+  extractRatio: String
+  """Lower bound of the stated ratio (herbal substance : preparation); equals extractRatioHigh for a point ratio. Calculated
+  by parsing extractRatio; null when no ratio is stated."""
+  extractRatioLow: Float
+  """Upper bound of the stated ratio; calculated from extractRatio."""
+  extractRatioHigh: Float
+  """Extraction solvent with concentration as stated (for example 'acetone 60% m/m'). Null = not stated."""
+  solvent: String
+  """class: asserted; cardinality: one_or_more; catalog: DERIVED_FROM_TAXON; owner: W02"""
+  derivedFromTaxa: [BotanicalTaxon!]! @relationship(type: "DERIVED_FROM_TAXON", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+An IngredientMaterial consisting of microorganisms or their inactivated cells or fractions, defined by its strains
+(HAS_STRAIN, one or more for a consortium) and viability state. Counts (CFU or cells per capsule) are component amounts
+(IngredientComponent/InterventionComponent, unitCode such as '{CFU}'); a count without a stated unit or viability leaves
+viabilityState null. NOT a strain (MicrobialStrain) and NOT a species (MicrobialTaxon). Serves CQ-ID-C03, CQ-ST-01
+(material side), OPEN-QUESTIONS P1-5 (partial). Module substances_and_materials; archetype Entity; uid token material.
+"""
+type MicrobialPreparation implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["MicrobialPreparation", "IngredientMaterial", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """What kind of material identity this is (W02 enum). Null = not yet classified (migration); UNRESOLVED_MATERIAL = a
+  material known only as what a source says was used. Branding is the BrandedIngredientMaterial label, not a kind."""
+  materialKind: MaterialKind
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """class: asserted; cardinality: many; catalog: REALIZES_SUBSTANCE; owner: W02; target is the exact substance the source states (a salt when stated; the active moiety when only the moiety is named)"""
+  realizesSubstances: [ChemicalSubstance!]! @relationship(type: "REALIZES_SUBSTANCE", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_CHEMICAL_FORM; owner: W02"""
+  chemicalForms: [ChemicalForm!]! @relationship(type: "HAS_CHEMICAL_FORM", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PROVIDES_CONSTITUENT; owner: W02; non-quantitative; never implies QUANTITATIVELY_CONTAINS (forbidden implication, V-W02-01)"""
+  providesConstituents: [MaterialContentTarget!]! @relationship(type: "PROVIDES_CONSTITUENT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS; owner: W02; requires quantity shape, unitCode, basis (V-006 / proposed V-006r); spec limits are W12 SpecificationCriterion, lot results W12 MeasuredResult"""
+  quantitativelyContains: [MaterialContentTarget!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: OUT, properties: "QuantitativeContentProperties")
+  """class: asserted; cardinality: many; catalog: HAS_MIXTURE_COMPONENT (inverse); owner: W02"""
+  componentOfMixtures: [MaterialMixture!]! @relationship(type: "HAS_MIXTURE_COMPONENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER; owner: W00"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: GOVERNED_BY_SPECIFICATION; owner: W11; a specification change is a new SpecificationVersion, never a new material (W02 D-06)"""
+  governedBySpecifications: [SpecificationVersion!]! @relationship(type: "GOVERNED_BY_SPECIFICATION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PRODUCED_BY_PROCESS; owner: W11"""
+  producedByProcesses: [ManufacturingProcess!]! @relationship(type: "PRODUCED_BY_PROCESS", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived; cardinality: many; catalog: AFFECTS_MECHANISM; owner: W03; regenerable projection of ACCEPTED DIRECT_MEASUREMENT mechanism assertions (INV-211)"""
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; catalog: MODULATES; owner: W03; regenerable projection of mechanism assertions"""
+  modulates: [MolecularEntity!]! @relationship(type: "MODULATES", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """Preparation description as stated by the source (for example 'freeze-dried culture'). Free text: no closed authority
+  vocabulary was found; null = not stated."""
+  preparationType: String
+  """Viability of the organisms as stated. Null = not stated (never inferred from a count)."""
+  viabilityState: ViabilityState
+  """class: asserted; cardinality: one_or_more; catalog: HAS_STRAIN; owner: W02"""
+  strains: [MicrobialStrain!]! @relationship(type: "HAS_STRAIN", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+An IngredientMaterial that is itself a combination of other materials (HAS_MIXTURE_COMPONENT), for example the
+'Phytonutrient Carotenoid Complex' of tomato fruit extract and rosemary leaf extract. Nested amounts that the source does
+not state stay unknown (never divided out of a blend total). NOT a combination study intervention or product formulation
+such as NRPT (those are StudyIntervention/FormulationVersion with several components), and never a ChemicalSubstance.
+Serves CQ-ID-03, OPEN-QUESTIONS P1-6 (partial). Module substances_and_materials; archetype Entity; uid token material.
+"""
+type MaterialMixture implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["MaterialMixture", "IngredientMaterial", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """What kind of material identity this is (W02 enum). Null = not yet classified (migration); UNRESOLVED_MATERIAL = a
+  material known only as what a source says was used. Branding is the BrandedIngredientMaterial label, not a kind."""
+  materialKind: MaterialKind
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """class: asserted; cardinality: many; catalog: REALIZES_SUBSTANCE; owner: W02; target is the exact substance the source states (a salt when stated; the active moiety when only the moiety is named)"""
+  realizesSubstances: [ChemicalSubstance!]! @relationship(type: "REALIZES_SUBSTANCE", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_CHEMICAL_FORM; owner: W02"""
+  chemicalForms: [ChemicalForm!]! @relationship(type: "HAS_CHEMICAL_FORM", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PROVIDES_CONSTITUENT; owner: W02; non-quantitative; never implies QUANTITATIVELY_CONTAINS (forbidden implication, V-W02-01)"""
+  providesConstituents: [MaterialContentTarget!]! @relationship(type: "PROVIDES_CONSTITUENT", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS; owner: W02; requires quantity shape, unitCode, basis (V-006 / proposed V-006r); spec limits are W12 SpecificationCriterion, lot results W12 MeasuredResult"""
+  quantitativelyContains: [MaterialContentTarget!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: OUT, properties: "QuantitativeContentProperties")
+  """class: asserted; cardinality: many; catalog: HAS_MIXTURE_COMPONENT (inverse); owner: W02"""
+  componentOfMixtures: [MaterialMixture!]! @relationship(type: "HAS_MIXTURE_COMPONENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER; owner: W00"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: GOVERNED_BY_SPECIFICATION; owner: W11; a specification change is a new SpecificationVersion, never a new material (W02 D-06)"""
+  governedBySpecifications: [SpecificationVersion!]! @relationship(type: "GOVERNED_BY_SPECIFICATION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PRODUCED_BY_PROCESS; owner: W11"""
+  producedByProcesses: [ManufacturingProcess!]! @relationship(type: "PRODUCED_BY_PROCESS", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived; cardinality: many; catalog: AFFECTS_MECHANISM; owner: W03; regenerable projection of ACCEPTED DIRECT_MEASUREMENT mechanism assertions (INV-211)"""
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; catalog: MODULATES; owner: W03; regenerable projection of mechanism assertions"""
+  modulates: [MolecularEntity!]! @relationship(type: "MODULATES", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """Kind of mixture. Null = not stated."""
+  mixtureKind: MixtureKind
+  """class: asserted; cardinality: one_or_more; catalog: HAS_MIXTURE_COMPONENT; owner: W02"""
+  mixtureComponents: [IngredientMaterial!]! @relationship(type: "HAS_MIXTURE_COMPONENT", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+A chemical substance identified by its defining structure including counter-ions and stoichiometric solvates, at the
+granularity of the FDA GSRS substance record (UNII): nicotinamide riboside chloride (UNII 8XM2XT8VWI) and nicotinamide
+riboside (UNII 0I8H2M0L7N) are two ChemicalSubstances joined by HAS_ACTIVE_MOIETY. Endogenous metabolites (NAD+) are
+ChemicalSubstances whatever their role (measured analyte, ingredient, mechanism participant); gene-encoded entities
+(genes, proteins, enzymes) are MolecularEntity (W03; CL-002). NOT a material (IngredientMaterial), NOT a solid-state form
+(ChemicalForm), NOT a combination (NRPT is not a substance; V-W02-03, V-W02-04), NOT a class of constituents
+(Constituent). Replaces live Compound (D-002); identifiers are Identifier records, the keys below are materialized
+lookups only. Serves CQ-ID-03, CQ-ID-04, CQ-PF-01, CQ-ST-02, CQ-ID-C01, CQ-ID-C04. Module substances_and_materials;
+archetype Entity; uid token substance.
+"""
+type ChemicalSubstance implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["ChemicalSubstance", "Entity"])
+  @fulltext(indexes: [{indexName: "CompoundSearch", fields: ["name", "preferredName", "description", "commonName", "casNumber", "searchText"], queryName: "searchCompounds"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Preferred name (presentation; never identity)."""
+  preferredName: String
+  """Molecular formula as given by the structure authority cited by the substance's identifier assertions."""
+  molecularFormula: String
+  """Materialized PubChem CID (lookup key; the Identifier record is authoritative)."""
+  pubchemCid: String
+  """Materialized standard InChIKey (lookup key; the Identifier record is authoritative)."""
+  inchikey: String
+  """Legacy materialized CAS number kept for the live CompoundSearch index; the Identifier {scheme CAS} is authoritative."""
+  casNumber: String
+  """Legacy live common name (presentation)."""
+  commonName: String
+  """Legacy live class text; a classification is an assertion, this is a projection hint only."""
+  compoundClass: String
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  """class: asserted; cardinality: many; catalog: FORM_OF_SUBSTANCE (inverse; live Compound.forms); owner: W02"""
+  forms: [ChemicalForm!]! @relationship(type: "FORM_OF_SUBSTANCE", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: zero_or_one; catalog: HAS_ACTIVE_MOIETY; owner: W02; self-edge = is its own active moiety; no edge = unknown; target must be terminal (V-W02-07)"""
+  activeMoieties: [ChemicalSubstance!]! @relationship(type: "HAS_ACTIVE_MOIETY", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_ACTIVE_MOIETY (inverse); owner: W02"""
+  activeMoietyOf: [ChemicalSubstance!]! @relationship(type: "HAS_ACTIVE_MOIETY", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: REALIZES_SUBSTANCE (inverse); owner: W02"""
+  realizedByMaterials: [IngredientMaterial!]! @relationship(type: "REALIZES_SUBSTANCE", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: PROVIDES_CONSTITUENT (inverse); owner: W02"""
+  providedByMaterials: [IngredientMaterial!]! @relationship(type: "PROVIDES_CONSTITUENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS (inverse); owner: W02"""
+  quantifiedInMaterials: [IngredientMaterial!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: IN, properties: "QuantitativeContentProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER; owner: W00"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: derived; cardinality: many; catalog: MODULATES (live Compound.modulates); owner: W03"""
+  modulates: [MolecularEntity!]! @relationship(type: "MODULATES", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; cardinality: many; catalog: AFFECTS_MECHANISM; owner: W03"""
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A physical (solid-state or particle) form of exactly one ChemicalSubstance that the structure authority does not register
+as a separate substance: a crystal form or polymorph, an amorphous form, a particle-size grade. Salts and stoichiometric
+solvates registered with their own UNII are ChemicalSubstances, not forms. Example: the crystal form of nicotinamide
+riboside chloride described for NIAGEN. NOT a material (a supplier's material HAS_CHEMICAL_FORM it), NOT a dosage form
+(ProductVariant/StudyIntervention.dosageForm; V-222b). Replaces the chemical part of live CompoundForm (D-002). Serves
+CQ-ID-06, CQ-ST-02. Module substances_and_materials; archetype Entity; uid token form.
+"""
+type ChemicalForm implements Entity & EntityArchetype
+  @node(labels: ["ChemicalForm", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Kind of physical form. Null = not stated."""
+  formKind: ChemicalFormKind
+  """Hydration as stated where the authority does not register a separate hydrate substance (for example 'anhydrous')."""
+  hydrationState: String
+  """Polymorph designation as stated (for example 'Form I'). Null = not stated."""
+  polymorph: String
+  """Grade as stated (for example 'micronized', 'USP'). Null = not stated."""
+  grade: String
+  """class: asserted; cardinality: exactly_one; catalog: FORM_OF_SUBSTANCE (live CompoundForm.formOf); owner: W02; V-222"""
+  formOf: [ChemicalSubstance!]! @relationship(type: "FORM_OF_SUBSTANCE", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_CHEMICAL_FORM (inverse); owner: W02"""
+  materials: [IngredientMaterial!]! @relationship(type: "HAS_CHEMICAL_FORM", direction: IN, properties: "AssertedEdgeProperties")
+  """class: derived; cardinality: many; catalog: AFFECTS_MECHANISM (live CompoundForm.affectsMechanisms); owner: W03"""
+  affectsMechanisms: [Mechanism!]! @relationship(type: "AFFECTS_MECHANISM", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A plant (or alga/fungus used as herbal substance) taxon that botanical preparations derive from, identified by a taxonomy
+identifier where one is recorded; the scientific name is presentation and may change (Rosmarinus officinalis / Salvia
+rosmarinus). NOT a preparation and NOT the mechanism-module Species, although one taxon identity may carry both labels
+when it plays both roles (W02-SR-06 with W03). Serves CQ-ID-C02. Module substances_and_materials; archetype Entity; uid
+token botanical-taxon (proposed, W02-SR-03).
+"""
+type BotanicalTaxon implements Entity & EntityArchetype
+  @node(labels: ["BotanicalTaxon", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Scientific name with authority as stated (presentation)."""
+  scientificName: String
+  """Taxonomic rank. Null = not stated."""
+  taxonRank: TaxonRank
+  """Materialized taxonomy identifier (for example NCBI Taxonomy id); the Identifier record is authoritative."""
+  taxonomyId: String
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER; owner: W00"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: DERIVED_FROM_TAXON (inverse); owner: W02"""
+  preparations: [BotanicalPreparation!]! @relationship(type: "DERIVED_FROM_TAXON", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A microbial species (or higher taxon) to which strains belong, identified by a taxonomy identifier (Lacticaseibacillus
+rhamnosus, NCBI 47715); genus renaming (Lactobacillus -> Lacticaseibacillus) changes the name, not the identity. NOT a
+strain and NOT a preparation; shares identity with the mechanism-module Species when the same taxon plays both roles
+(W02-SR-06). Serves CQ-ID-C03. Module substances_and_materials; archetype Entity; uid token microbial-taxon (proposed).
+"""
+type MicrobialTaxon implements Entity & EntityArchetype
+  @node(labels: ["MicrobialTaxon", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Scientific name as stated (presentation)."""
+  scientificName: String
+  """Materialized taxonomy identifier; the Identifier record is authoritative."""
+  taxonomyId: String
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER; owner: W00"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: STRAIN_OF (inverse); owner: W02"""
+  strains: [MicrobialStrain!]! @relationship(type: "STRAIN_OF", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A microbial strain lineage identified by its culture-collection deposits (Identifier records; ATCC 53103 = CCUG 34291 =
+LMG 18243 for strain GG; ATCC BAA-3227 is accessioned progeny of 53103) and strain designation. Evidence about one
+strain does not transfer to another strain of the same species. NOT a preparation (MicrobialPreparation HAS_STRAIN it)
+and NOT a species; its species assignment is an asserted STRAIN_OF edge that can be re-assigned over time (the GG patent
+named L. acidophilus). Serves CQ-ID-C03, CQ-ST-01 (material side). Module substances_and_materials; archetype Entity; uid
+token microbial-strain (proposed).
+"""
+type MicrobialStrain implements Entity & EntityArchetype
+  @node(labels: ["MicrobialStrain", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Strain designation as stated (for example 'GG'); not unique on its own."""
+  strainDesignation: String
+  """Materialized primary deposit accession (for example 'ATCC 53103'); every deposit is an Identifier record."""
+  depositIdentifier: String
+  """class: asserted; cardinality: zero_or_one; catalog: STRAIN_OF; owner: W02; one current assignment per valid time (proposed EXCLUSIVE, W02-SR-05; V-W02-09)"""
+  strainOf: [MicrobialTaxon!]! @relationship(type: "STRAIN_OF", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER; owner: W00"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; catalog: HAS_STRAIN (inverse); owner: W02"""
+  preparations: [MicrobialPreparation!]! @relationship(type: "HAS_STRAIN", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+A named class of components or an analytical measurand that a material is said to provide or contain, where no single
+defined structure is meant: 'tocopherols', 'carotenoids', 'ginkgo flavonoids calculated as flavone glycosides'. A defined
+compound (lycopene, carnosic acid) is a ChemicalSubstance and is targeted directly (the catalog PROVIDES_CONSTITUENT range
+is widened to ChemicalSubstance; W02 D-05). NOT a nutrient (Nutrient) and NOT a measured result. Serves CQ-ID-03,
+CQ-ID-C02, CQ-PF-01 (MARKER_CONSTITUENT referent). Module substances_and_materials; archetype Entity; uid token
+constituent (proposed).
+"""
+type Constituent implements Entity & EntityArchetype
+  @node(labels: ["Constituent", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Kind of constituent. Null = not stated."""
+  constituentKind: ConstituentKind
+  """class: asserted; cardinality: many; catalog: PROVIDES_CONSTITUENT (inverse); owner: W02"""
+  providedByMaterials: [IngredientMaterial!]! @relationship(type: "PROVIDES_CONSTITUENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS (inverse); owner: W02"""
+  quantifiedInMaterials: [IngredientMaterial!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: IN, properties: "QuantitativeContentProperties")
+}
+
+"""
+A nutrient as a nutritional concept with its own declaration convention (vitamin A in mcg RAE, niacin, calcium): the
+referent of a NUTRIENT_AS_NUTRIENT label amount (21 CFR 101.36(b)(2)(ii)), distinct from its source substance or material
+(beta-carotene, calcium carbonate, nicotinamide riboside chloride as a source of vitamin B3). Nutrient-equivalent amounts
+are CALCULATED assertions. NOT a ChemicalSubstance. Serves CQ-PF-01, CQ-ID-03. Module substances_and_materials; archetype
+Entity; uid token nutrient (proposed).
+"""
+type Nutrient implements Entity & EntityArchetype
+  @node(labels: ["Nutrient", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """Kind of nutrient. Null = not stated."""
+  nutrientKind: NutrientKind
+  """class: asserted; cardinality: many; catalog: PROVIDES_CONSTITUENT (inverse); owner: W02"""
+  providedByMaterials: [IngredientMaterial!]! @relationship(type: "PROVIDES_CONSTITUENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; catalog: QUANTITATIVELY_CONTAINS (inverse); owner: W02"""
+  quantifiedInMaterials: [IngredientMaterial!]! @relationship(type: "QUANTITATIVELY_CONTAINS", direction: IN, properties: "QuantitativeContentProperties")
+}
+
+"""
+Range of PROVIDES_CONSTITUENT and QUANTITATIVELY_CONTAINS (W02 owner): what a material is said to provide or contain.
+"""
+union MaterialContentTarget = Constituent | Nutrient | ChemicalSubstance
+
+"""
+Properties of QUANTITATIVELY_CONTAINS (asserted_edge profile). Contains every field of the frozen AssertedEdgeProperties
+(W00) and adds the content qualifiers. One edge per recorded-time episode; valid bounds equal the authorizing assertion's.
+Quantity shape: comparator EQ, APPROX, GE, GT, LE or LT uses quantity; BETWEEN uses quantityLow and quantityHigh with
+quantity null (proposed V-006r, W02-SR-02; the frozen V-006 requires quantity). The authorizing assertion should carry the
+same number (requested kernel change W02-SR-01). Specification acceptance limits are W12 SpecificationCriterion and lot
+measurements are W12 MeasuredResult; they never become this edge.
+"""
+type QuantitativeContentProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  "Point value for EQ, APPROX, GE, GT, LE, LT; null for BETWEEN."
+  quantity: Float
+  "Lower bound for BETWEEN."
+  quantityLow: Float
+  "Upper bound for BETWEEN."
+  quantityHigh: Float
+  comparator: QuantityComparator!
+  "UCUM unit ('%', 'mg/g', '{CFU}/g')."
+  unitCode: String!
+  basis: ContentBasis!
+  "Mass basis of the quantity when it is a mass (SALT_FORM, ACTIVE_MOIETY, MATERIAL_AS_IS, UNSPECIFIED; W00 enum)."
+  massBasis: MassBasis
+  "How the measurand is expressed as stated (for example 'calculated as flavone glycosides')."
+  expressedAs: String
+  contentStatementKind: ContentStatementKind!
+  "Verbatim statement text."
+  verbatimText: String
+}
+
+"""What kind of material identity an IngredientMaterial is (W02). Branding is a label, not a kind."""
+enum MaterialKind {
+  "a material of one defined substance (any grade or supplier)"
+  CHEMICALLY_DEFINED_MATERIAL
+  "plant-derived preparation (BotanicalPreparation label)"
+  BOTANICAL_PREPARATION
+  "microorganism preparation (MicrobialPreparation label)"
+  MICROBIAL_PREPARATION
+  "combination of materials (MaterialMixture label)"
+  MATERIAL_MIXTURE
+  "protein, peptide or enzyme material whose gene-product identity is a MolecularEntity (CL-002 boundary)"
+  PROTEIN_OR_ENZYME_PREPARATION
+  "known only as what a source says was used; competing identities are ResolutionHypotheses"
+  UNRESOLVED_MATERIAL
+  "none of the above (for example gelatin, oils as other ingredients)"
+  OTHER_MATERIAL
+  "legacy 0.2.0 fixture value = CHEMICALLY_DEFINED_MATERIAL plus the BrandedIngredientMaterial label; not for new writes"
+  BRANDED_CHEMICAL_MATERIAL
+}
+
+"""Physical form kinds that a structure authority does not register as separate substances (W02)."""
+enum ChemicalFormKind {
+  "a crystalline form or polymorph"
+  CRYSTAL_FORM
+  "non-crystalline solid"
+  AMORPHOUS_FORM
+  "a particle-size or processing grade (micronized)"
+  PARTICLE_SIZE_GRADE
+  "other stated physical form"
+  OTHER_PHYSICAL_FORM
+}
+
+"""Herbal preparation types (EMA/Ph. Eur. vocabulary) (W02)."""
+enum BotanicalPreparationType {
+  POWDERED_HERBAL_SUBSTANCE
+  DRY_EXTRACT
+  SOFT_EXTRACT
+  LIQUID_EXTRACT
+  TINCTURE
+  ESSENTIAL_OIL
+  FATTY_OIL
+  EXPRESSED_JUICE
+  OTHER_PREPARATION
+}
+
+"""Stated viability of microorganisms in a preparation (W02). Null = not stated."""
+enum ViabilityState {
+  "live vegetative cells stated"
+  VIABLE
+  "live spores stated"
+  VIABLE_SPORES
+  "heat-killed or otherwise inactivated cells"
+  INACTIVATED
+  "cell fractions, lysates or metabolites without intact cells"
+  CELL_FRACTION_OR_LYSATE
+}
+
+"""Kind of material mixture (W02)."""
+enum MixtureKind {
+  "blend declared as proprietary"
+  PROPRIETARY_BLEND
+  "named complex of stated components (PC Complex)"
+  NAMED_COMPLEX
+  "supplier premix of several ingredients"
+  PREMIX
+  "materials processed together into one material"
+  CO_PROCESSED_MATERIAL
+}
+
+"""Kind of Constituent (W02)."""
+enum ConstituentKind {
+  "class of compounds (carotenoids, tocopherols, terpene lactones)"
+  CHEMICAL_CLASS
+  "measurand defined by a method ('flavonoids calculated as flavone glycosides')"
+  ANALYTICAL_MEASURAND
+  "undefined fraction ('phytonutrients')"
+  NON_SPECIFIC_FRACTION
+}
+
+"""Kind of Nutrient (W02)."""
+enum NutrientKind {
+  VITAMIN
+  MINERAL
+  MACRONUTRIENT
+  FATTY_ACID
+  AMINO_ACID
+  OTHER_NUTRIENT
+}
+
+"""Taxonomic rank (W02)."""
+enum TaxonRank {
+  GENUS
+  SPECIES
+  SUBSPECIES
+  VARIETY
+  FORMA
+  CULTIVAR
+  OTHER_RANK
+}
+
+"""What a material content quantity is relative to (W02)."""
+enum ContentBasis {
+  "mass of target per mass of material (% w/w)"
+  MASS_FRACTION_W_W
+  "% v/v"
+  VOLUME_FRACTION_V_V
+  "amount per mass of material (mg/g, {CFU}/g)"
+  AMOUNT_PER_MASS_OF_MATERIAL
+  "enzyme activity units per mass"
+  ACTIVITY_PER_MASS_OF_MATERIAL
+  "moles of target per mole of material substance"
+  MOLAR_RATIO
+}
+
+"""Shape of a content statement (W02)."""
+enum QuantityComparator {
+  EQ
+  APPROX
+  GE
+  GT
+  LE
+  LT
+  "uses quantityLow and quantityHigh"
+  BETWEEN
+}
+
+"""What kind of statement a QUANTITATIVELY_CONTAINS edge projects (W02). Specification limits and measurements are not here."""
+enum ContentStatementKind {
+  "the material is stated to be standardized/adjusted to this content"
+  STANDARDIZATION_CLAIM
+  "composition that defines the material in an authority record or monograph"
+  DEFINITIONAL_COMPOSITION
+  "typical composition reported by a source without a lot"
+  TYPICAL_COMPOSITION_REPORTED
+  "BellLabs calculation (assertion basisKind CALCULATED with derivationRule and inputs)"
+  CALCULATED
+}
+

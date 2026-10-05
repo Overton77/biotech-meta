@@ -1,0 +1,107 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W23/operations-enterprise.cypher",
+ "uri": "bolt://127.0.0.1:39915/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 12,
+ "ok": 0,
+ "failed": 12,
+ "results": [
+  {
+   "n": 1,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( type='NODE PROPERTY EXISTENCE', schema=(:AnswerRecord {recordedAsOf}) ):",
+   "header": "// W23 operations companion, ENTERPRISE EDITION ONLY (property existence and property type constraints).\n// Expected on Neo4j 5.26 Community: every statement rejected (Enterprise-only). Never counted as passing on Community;\n// the write service enforces the same rules there (07-operations.md, appli",
+   "bodyHead": "CREATE CONSTRAINT answer_record_recorded_as_of_exists IF NOT EXISTS FOR (n:AnswerRecord) REQUIRE n.recordedAsOf IS NOT NULL"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( type='NODE PROPERTY EXISTENCE', schema=(:AnswerRecord {schemaDigest}) ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT answer_record_schema_digest_exists IF NOT EXISTS FOR (n:AnswerRecord) REQUIRE n.schemaDigest IS NOT NULL"
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( type='NODE PROPERTY EXISTENCE', schema=(:AnswerRecord {queryShapeId}) ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT answer_record_query_shape_exists IF NOT EXISTS FOR (n:AnswerRecord) REQUIRE n.queryShapeId IS NOT NULL"
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( type='NODE PROPERTY EXISTENCE', schema=(:AnswerRecord {accessTier}) ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT answer_record_access_tier_exists IF NOT EXISTS FOR (n:AnswerRecord) REQUIRE n.accessTier IS NOT NULL"
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( type='NODE PROPERTY EXISTENCE', schema=(:AnswerRecord {privateContext}) ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT answer_record_private_context_exists IF NOT EXISTS FOR (n:AnswerRecord) REQUIRE n.privateContext IS NOT NULL"
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( name='answer_record_recorded_as_of_type', type='NODE PROPERTY TYPE', schema=(:AnswerRecord {recordedAsOf}), propertyType=ZONED DATETIME ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT answer_record_recorded_as_of_type IF NOT EXISTS FOR (n:AnswerRecord) REQUIRE n.recordedAsOf IS :: ZONED DATETIME"
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( type='NODE PROPERTY EXISTENCE', schema=(:PolicyVersion {payloadHash}) ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT policy_version_payload_hash_exists IF NOT EXISTS FOR (n:PolicyVersion) REQUIRE n.payloadHash IS NOT NULL"
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( type='NODE PROPERTY EXISTENCE', schema=(:PolicyVersion {policyKind}) ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT policy_version_kind_exists IF NOT EXISTS FOR (n:PolicyVersion) REQUIRE n.policyKind IS NOT NULL"
+  },
+  {
+   "n": 9,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( name='policy_version_permitted_use_kinds_type', type='NODE PROPERTY TYPE', schema=(:PolicyVersion {permittedUseKinds}), propertyType=LIST<STRING NOT NULL> ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT policy_version_permitted_use_kinds_type IF NOT EXISTS FOR (n:PolicyVersion) REQUIRE n.permittedUseKinds IS :: LIST<STRING NOT NULL>"
+  },
+  {
+   "n": 10,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( type='NODE PROPERTY EXISTENCE', schema=(:DecisionCriterion {methodVersion}) ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT decision_criterion_method_exists IF NOT EXISTS FOR (n:DecisionCriterion) REQUIRE n.methodVersion IS NOT NULL"
+  },
+  {
+   "n": 11,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( type='RELATIONSHIP PROPERTY EXISTENCE', schema=()-[:AUTHORIZED_BY {useKind}]-() ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT authorized_by_use_kind_exists IF NOT EXISTS FOR ()-[r:AUTHORIZED_BY]-() REQUIRE r.useKind IS NOT NULL"
+  },
+  {
+   "n": 12,
+   "id": null,
+   "status": "error",
+   "error": "Unable to create Constraint( name='privacy_class_type_answer_record', type='NODE PROPERTY TYPE', schema=(:AnswerRecord {privacyClass}), propertyType=STRING ):",
+   "header": "",
+   "bodyHead": "CREATE CONSTRAINT privacy_class_type_answer_record IF NOT EXISTS FOR (n:AnswerRecord) REQUIRE n.privacyClass IS :: STRING"
+  }
+ ]
+}

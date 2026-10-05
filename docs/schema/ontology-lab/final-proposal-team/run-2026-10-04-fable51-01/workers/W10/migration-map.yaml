@@ -1,0 +1,94 @@
+# W10 migration map: every live element in W10 scope (live schema 86b5e0b5…f112) plus proposed-delta (565d8a46…048a)
+# Lane 2 assessment types. action: keep | rename | move | split | merge | derive | retire.
+- live: "enum EvidenceStrength {LOW MODERATE HIGH}"
+  final: "enum EvidenceStrength (W10, legacy hint enum)"
+  action: keep
+  note: "values unchanged; used only by other owners' hint fields; never an assessment (INV-209)"
+- live: "Claim.evidenceStrength"
+  final: "W21 ClaimEvidenceAssessment.evidenceStrength (+ criteriaVersion) or EvidenceStrengthAssessment over the EvidenceSynthesis that ASSESSES_CLAIM the Claim"
+  action: move
+  note: "migrated values: methodVersion legacy-unspecified, status PROPOSED (W21 owns the Claim side)"
+- live: "AssociationMetadata.evidenceStrength"
+  final: "EvidenceStrengthAssessment {scheme: LEGACY_UNSPECIFIED}; edge copy keeps value only with assessmentUid (V-213b)"
+  action: derive
+  note: "edge owner W03 (AssociationProjectionProperties)"
+- live: "SafetyMetadata.evidenceStrength"
+  final: "EvidenceStrengthAssessment {scheme: LEGACY_UNSPECIFIED}; hint on W17 SafetyEdgeProperties"
+  action: derive
+  note: "edge owner W17"
+- live: "TreatmentTargetMetadata.evidenceStrength"
+  final: "W06 TreatmentTargetProperties.legacyEvidenceStrengthHint: EvidenceStrength"
+  action: derive
+  note: "hint only; ASSESSES_STRENGTH_OF does not accept Assertion (D-W10-11)"
+- live: "SafetySignal.evidenceStrength"
+  final: "EvidenceStrengthAssessment (LEGACY_UNSPECIFIED) ASSESSES_STRENGTH_OF the synthesis behind the signal; hint on W17 SafetySignal"
+  action: derive
+  note: "owner W17"
+- live: "Study.evidenceLevel"
+  final: "EvidenceStrengthAssessment {scheme, level, criteria, methodVersion} -[:ASSESSES_STRENGTH_OF]-> Study"
+  action: move
+  note: "free-text values -> scheme LEGACY_UNSPECIFIED, status PROPOSED; W09 retires the field (V-210)"
+- live: "OutcomeResult.isClinicallyMeaningful"
+  final: "Assertion RESULT_CLINICALLY_MEANINGFUL (author claim) + ResultInterpretation.meaningfulnessVerdict (BellLabs)"
+  action: split
+  note: "a live true with no source becomes a PROPOSED author-claim Assertion only if a locator exists; otherwise dropped to a review queue; never a BellLabs verdict (V-213)"
+- live: "Biomarker.clinicalSignificance"
+  final: "EndpointClassification (biomarkerCategory, endpointClass) in a context of use"
+  action: move
+  note: "W07 keeps a read-only display copy"
+- live: "Biomarker.biomarkerType"
+  final: "EndpointClassification.biomarkerCategory (BEST)"
+  action: move
+  note: "W07 keeps display; no surrogate status on Biomarker (V-214b)"
+- live: "Study.evaluates / EVALUATES (InterventionArmMetadata) to a current Product"
+  final: "EvidenceApplicability -[:HAS_EVIDENCE_TARGET]-> StudyIntervention; -[:ASSESSES_APPLICABILITY_TO]-> FormulationVersion|ProductVariant|Product"
+  action: retire
+  note: "W09 keeps Study.evaluates read-only (CL-017); each legacy edge becomes a PROPOSED EvidenceApplicability with all dimensions NOT_ASSESSED, never a MATCH"
+- live: "InterventionArmMetadata.confidence"
+  final: null
+  action: retire
+  note: "single confidence forbidden (INV-407)"
+- live: "ASSESSES_APPLICABILITY_TO -> UserContext (0.1.0 range)"
+  final: "private PersonalApplicabilityAssessment referencing the EvidenceApplicability uid (W23 store)"
+  action: move
+  note: "removed from the shared graph (round 0008, V-524)"
+- live: "proposed-delta EvidenceApplicability (status: String, evidenceTarget: [ArmIntervention], useTargetProduct: [Product])"
+  final: "EvidenceApplicability (status: AssessmentStatus!, evidenceTarget: [EvidenceTargetTarget!]!, useTarget: [ApplicabilityUseTarget!]!, forUseContext, basedOn* , flat derived *Match fields)"
+  action: keep
+  note: "ArmIntervention is renamed StudyIntervention (D-003); use target widened to the catalog range"
+- live: "proposed-delta ApplicabilityDimension (supportedByChunks: [Chunk])"
+  final: "ApplicabilityDimension (supportedBy: [SourceLocator]; considers; considersAssessments)"
+  action: keep
+  note: "a Chunk is never a locator (INV-404); SUPPORTED_BY targets SourceLocator"
+- live: "proposed-delta EndpointClassification.biomarkerCategory: String, contextMatch: String, outcomes: [OutcomeMeasure]"
+  final: "biomarkerCategory: BiomarkerCategory, contextMatch: ContextOfUseMatch, classifiesOutcome: [OutcomeDefinition]"
+  action: rename
+  note: "OutcomeMeasure -> OutcomeDefinition (D-007); string values map 1:1"
+- live: "proposed-delta EvidenceSynthesis.verdict: String; triggeredByResults/includesResults: [OutcomeResult]"
+  final: "verdict: AdjudicationVerdict!; triggeredBy{Results,Publications,RegistrationVersions,Assertions}; includes: [SynthesisInputTarget]"
+  action: rename
+  note: "OutcomeResult -> StudyResult (D-007)"
+- live: "proposed-delta EvidenceChangeMetadata {criterionCode, effectOnVerdict: String, evidencePublishedAt}"
+  final: "EvidenceChangeProperties {criterionCode, effectOnVerdict: EvidenceChangeEffect!, evidencePublishedAt}"
+  action: rename
+  note: "values unchanged"
+- live: "proposed-delta SynthesisInputMetadata {inputRole: String}"
+  final: "SynthesisInputProperties {inputRole: SynthesisInputRole!}"
+  action: rename
+  note: "values unchanged"
+- live: "proposed-delta ClaimEvidenceAssessment.assessesClaim @relationship(ASSESSES_CLAIM)"
+  final: "W21 ClaimEvidenceAssessment.claim @relationship(ASSESSES_CLAIM_EVIDENCE)"
+  action: rename
+  note: "ASSESSES_CLAIM is EvidenceSynthesis only (W10-SR-02)"
+- live: "catalog EvidenceApplicability derivedProperties identityMatch..outcomeMatch"
+  final: "EvidenceApplicability.*Match: ApplicabilityVerdict (read-only derived)"
+  action: derive
+  note: "regenerated from dimension nodes in the same transaction"
+- live: "catalog UseContextProfile {name, populationDescriptor, doseDescriptor, durationDescriptor}"
+  final: "UseContextProfile (+ CANDIDATE servingsPerDay, intendedDurationIso)"
+  action: keep
+  note: "archetype Entity"
+- live: "examples/study-vs-product-mismatch.cypher ApplicabilityDimension uids hu:applicability:<ea>-<dim_name>"
+  final: "hu:applicability-dimension:<ea-opaque>-<dim-name>"
+  action: rename
+  note: "fixture-only defect (W10-SR-08); production uids are opaque"

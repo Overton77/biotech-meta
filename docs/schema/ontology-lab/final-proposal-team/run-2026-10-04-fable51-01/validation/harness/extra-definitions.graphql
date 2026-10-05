@@ -1,0 +1,17 @@
+# ================================================================================================================
+# Seam-closure extra definitions (run-2026-10-04-fable51-01). Appended at assembly by Fable; not part of any worker fragment.
+# Each definition names the request that needs it and the sole writer Fable assigned (MR-01 applies: no member is listed
+# beside its own specialization; FoodItem resolves through IngredientMaterial, FoodProduct and Compound are retired).
+# ================================================================================================================
+
+# ---- RecommendableTarget ----------------------------------------------------------------------------------------
+# Requests: W21-SR-18 (union successor of live Recommendable), W21-SR-07 / W01-SR-20 (Person.recommends range),
+#           W05-SR-11(b) (IngredientMaterial, Product, Lifestyle; FoodProduct retired), W04-SR-10 (ProductVariant),
+#           W02-SR-22 (Compound -> ChemicalSubstance | IngredientMaterial), W06-SR-14 (Treatment, Procedure kept).
+# Sole writer: W21 (Fable decision report section C: "W21 ... ownership of RecommendableTarget").
+"""
+Range of the derived RECOMMENDS projection (Person -> target): what a person's own RECOMMENDS speech act names.
+A recommendation edge is never a BellLabs recommendation (INV-508) and never derived from a retelling (V-W21-06).
+Sole writer W21 (W21-SR-18); members as proposed in W21 04-model-cards.md.
+"""
+union RecommendableTarget = Protocol | ChemicalSubstance | IngredientMaterial | Organization | ConsumerBrand | Product | ProductVariant | Treatment | Lifestyle | Procedure

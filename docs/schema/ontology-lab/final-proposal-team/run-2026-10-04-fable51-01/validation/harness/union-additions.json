@@ -1,0 +1,24 @@
+[
+ {
+  "union": "TreatmentComponentTarget",
+  "add": [
+   "ProductVariant"
+  ],
+  "request": "W04-SR-10; W05-SR-14"
+ },
+ {
+  "union": "StepInstrumentTarget",
+  "add": [
+   "Procedure"
+  ],
+  "request": "W06-SR-04"
+ },
+ {
+  "union": "ApplicabilityUseTarget",
+  "add": [
+   "ProtocolStep",
+   "ProtocolEdition"
+  ],
+  "request": "W16-SR-13"
+ }
+]

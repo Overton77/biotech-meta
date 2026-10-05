@@ -1,0 +1,143 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/05-adverse-events-zero.cypher",
+ "uri": "bolt://127.0.0.1:35591/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 6,
+ "ok": 6,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "V-217",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 6,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 5,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 54,
+    "labelsAdded": 12,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 222,
+   "sample": [],
+   "header": "// =====================================================================================================================\n// W09 fixture 05: adverse-event results; reported zero vs not reported; collection method (INV-207, V-217, CQ-ST-06).\n// Real: Dellinger 2017 (PMID 29184669; PMC5701244 directQuo"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 3,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 30,
+    "labelsAdded": 6,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 108,
+   "sample": [],
+   "header": "// 2. Basis arms (names per paper) and analyzed (ITT) cohorts."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 5,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 27,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 95,
+    "labelsAdded": 15,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 193,
+   "sample": [],
+   "header": "// 3. Basis AE rows: any-AE counts per arm, and the serious-AE zeros (per-arm zero deduced from the study-level statement)."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 127,
+   "sample": [],
+   "header": "// 4. ENERGIZE serious-AE zeros (arm names per registry intervention labels; arm sizes not extracted -> participantsAtRisk null)."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 3,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 2,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 33,
+    "labelsAdded": 7,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 88,
+   "sample": [],
+   "header": "// 5. SYNTHETIC systematically collected zero (illustrative only; not from any source)."
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 12,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 38,
+   "sample": [],
+   "header": "// Quote hashes: NFC-WS1 normalization (catalog normalizationVersions) over the stored `exact` text, sha256 (computed by W09\n// with Python hashlib on 2026-10-04 over the quoted text only; the snapshot bytes were not hashed: SYNTHETIC_FIXTURE)."
+  }
+ ]
+}

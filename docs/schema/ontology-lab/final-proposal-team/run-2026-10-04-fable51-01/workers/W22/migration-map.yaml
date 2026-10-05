@@ -1,0 +1,178 @@
+# W22 migration map: live current_biotech_schema.graphql (86b5e0b5...f112) -> W22 proposal.
+# action: keep | rename | move | split | merge | derive | retire. "final: null" = no successor element (retired).
+# Relabel note: every media node gains its archetype label (D-001): MediaAsset/MediaVariant/MediaAnnotation/GraphView/
+# FigurePanel/ProductLabelRegion -> +InformationArtifact. uid backfill: hu:<token>:<live id> with the tokens of W22-SR-01.
+
+# ---------------- MediaAsset (live 2381-2443) ----------------
+- {live: MediaAsset, final: MediaAsset, action: keep, note: "labels [MediaAsset, InformationArtifact]; artifactType='MEDIA_ASSET'; uid backfill hu:media-asset:<id>"}
+- {live: MediaAsset.id, final: MediaAsset.id, action: keep, note: "opaque segment of uid"}
+- {live: MediaAsset.name, final: MediaAsset.name, action: keep, note: "String! -> String (D-013)"}
+- {live: MediaAsset.description, final: MediaAsset.description, action: keep}
+- {live: MediaAsset.mongoResearchRunId, final: MediaAsset.mongoResearchRunId, action: keep, note: "maps to Activity.externalRunId (V-430 analogue)"}
+- {live: MediaAsset.createdAt, final: MediaAsset.createdAt, action: keep}
+- {live: MediaAsset.updatedAt, final: MediaAsset.updatedAt, action: keep}
+- {live: MediaAsset.searchText, final: MediaAsset.searchText, action: keep}
+- {live: MediaAsset.searchFields, final: MediaAsset.searchFields, action: keep}
+- {live: MediaAsset.embeddingModel, final: MediaAsset.embeddingModel, action: keep}
+- {live: MediaAsset.embeddingDimensions, final: MediaAsset.embeddingDimensions, action: keep}
+- {live: MediaAsset.searchEmbedding, final: MediaAsset.searchEmbedding, action: keep, note: "@vector re-added by Fable without provider (D-014) if 07-operations R-3 accepted"}
+- {live: "MediaAsset @fulltext MediaAssetSearch", final: "MediaAsset @fulltext MediaAssetSearch", action: keep, note: "index and query names unchanged (D-015)"}
+- {live: "MediaAsset @vector MediaAssetSearchEmbedding (provider OPEN_AI)", final: null, action: retire, note: "dropped from fragment; Fable may re-add without provider (D-014)"}
+- {live: MediaAsset.assetType, final: MediaAsset.assetType, action: keep}
+- {live: MediaAsset.mediaFormat, final: MediaVariant.mediaFormat, action: move, note: "onto the ORIGINAL rendition created by migration"}
+- {live: MediaAsset.mediaPurpose, final: MediaAsset.mediaPurpose, action: keep, note: "EVIDENCE value never creates EVIDENCES"}
+- {live: MediaAsset.generationMode, final: MediaAsset.generationMode, action: keep}
+- {live: MediaAsset.canonicalUrl, final: MediaAsset.canonicalUrl, action: keep, note: "presentation only"}
+- {live: MediaAsset.storageUri, final: MediaVariant.storageUri, action: move, note: "ORIGINAL rendition"}
+- {live: MediaAsset.sourceUrl, final: "Source.canonicalUri via MediaAsset-DERIVED_FROM_SOURCE->SourceLocator<-HAS_LOCATOR-SourceSnapshot<-HAS_SNAPSHOT-Source", action: move, note: "create Source (sourceKind MEDIA_FILE, W22-SR-06) + snapshot (contentHashBasis RAW_BYTES only if bytes re-hashed; otherwise captureCompleteness UNKNOWN and no contentHash) + WHOLE_SNAPSHOT locator"}
+- {live: MediaAsset.thumbnailUrl, final: "MediaVariant{variantKind: THUMBNAIL}.url", action: move}
+- {live: MediaAsset.previewUrl, final: "MediaVariant{variantKind: PREVIEW}.url", action: move}
+- {live: MediaAsset.mimeType, final: MediaVariant.mimeType, action: move}
+- {live: MediaAsset.fileSizeBytes, final: MediaVariant.fileSizeBytes, action: move}
+- {live: MediaAsset.widthPx, final: MediaVariant.widthPx, action: move}
+- {live: MediaAsset.heightPx, final: MediaVariant.heightPx, action: move}
+- {live: MediaAsset.durationSeconds, final: MediaVariant.durationSeconds, action: move}
+- {live: MediaAsset.frameRate, final: MediaVariant.frameRate, action: move}
+- {live: MediaAsset.colorSpace, final: MediaVariant.colorSpace, action: move}
+- {live: MediaAsset.resolutionText, final: null, action: retire, note: "derived from MediaVariant.widthPx/heightPx"}
+- {live: MediaAsset.checksumSha256, final: "MediaAsset.contentHash + MediaVariant(ORIGINAL).contentHash", action: rename, note: "prefix 'sha256:' and lower-case hex; contentHashBasis RAW_BYTES only if the live value was computed over raw bytes by BellLabs (unknown for legacy rows -> re-hash or leave basis null and flag V-603)"}
+- {live: MediaAsset.perceptualHash, final: MediaVariant.perceptualHash, action: move, note: "perceptualHashAlgorithm unknown for legacy rows -> null; value kept but unusable for matching until algorithm known"}
+- {live: MediaAsset.title, final: MediaAsset.title, action: keep}
+- {live: MediaAsset.altText, final: MediaAsset.altText, action: keep}
+- {live: MediaAsset.caption, final: MediaAsset.caption, action: keep}
+- {live: MediaAsset.transcriptText, final: MediaAsset.transcriptText, action: keep, note: "derived search text"}
+- {live: MediaAsset.ocrText, final: MediaAsset.ocrText, action: keep, note: "derived search text"}
+- {live: MediaAsset.license, final: "MediaRightsRecord.licenseName / licenseUri", action: move, note: "one record per stated offer; HAS_RIGHTS_RECORD assertion with status EXTRACTED and no locator until re-captured (legacy strings have no locator)"}
+- {live: MediaAsset.attributionText, final: MediaRightsRecord.attributionText, action: move}
+- {live: MediaAsset.copyrightHolder, final: MediaRightsRecord.rightsHolderText, action: move}
+- {live: MediaAsset.usageRestrictions, final: MediaRightsRecord.restrictionsText, action: move, note: "rightsStatus set by curator review; never defaulted to OPEN_LICENSE"}
+- {live: MediaAsset.capturedAt, final: MediaAsset.capturedAt, action: keep, note: "capturedAtPrecision null for legacy rows"}
+- {live: MediaAsset.extractedAt, final: "Activity{activityKind: EXTRACTION}.endedAt", action: move, note: "asset WAS_GENERATED_BY that Activity"}
+- {live: MediaAsset.generatedAt, final: "Activity{activityKind: MEDIA_GENERATION}.endedAt", action: move, note: "activityKind proposed W22-SR-04"}
+- {live: MediaAsset.sourcePublishedAt, final: MediaAsset.publishedAt, action: rename}
+- {live: MediaAsset.qualityScore, final: "MediaSuitabilityAssessment{dimension: DISPLAY_QUALITY, methodVersion: 'legacy-unsourced', status: PROPOSED, verdict: UNKNOWN}.overallScore", action: move, note: "ignored by selection; V-610 reports leftover property"}
+- {live: MediaAsset.authenticityScore, final: "MediaSuitabilityAssessment{dimension: AUTHENTICITY, methodVersion: 'legacy-unsourced', status: PROPOSED, verdict: UNKNOWN}.overallScore", action: move}
+- {live: MediaAsset.isSynthetic, final: MediaAsset.isSynthetic, action: keep, note: "false-by-default rows become null unless the source disclosed"}
+- {live: MediaAsset.isEdited, final: MediaAsset.isEdited, action: keep, note: "plus editDisclosureText (new)"}
+- {live: MediaAsset.isPrimarySource, final: "MediaSourceProperties.captureRelation + MediaAsset.generationMode", action: retire, note: "document-level primary flag rejected (CQ-PV-05)"}
+- {live: "MediaAsset.variants (HAS_VARIANT)", final: "MediaAsset.variants (HAS_MEDIA_VARIANT)", action: rename, note: "CL-014; relabel relationship type"}
+- {live: "MediaAsset.annotations (HAS_ANNOTATION)", final: "MediaVariant.annotations (HAS_ANNOTATION)", action: move, note: "re-home each annotation onto the asset's ORIGINAL rendition; normalizationVersion null until confirmed"}
+- {live: "MediaAsset.sources (DERIVED_FROM_SOURCE -> MediaSource, MediaSourceMetadata)", final: "MediaAsset.sourceLocators (DERIVED_FROM_SOURCE -> SourceLocator, MediaSourceProperties)", action: move}
+- {live: "MediaAsset.figurePanels (PART_OF_MEDIA, OrderingMetadata)", final: "MediaAsset.figurePanels (PART_OF_MEDIA, StructuralEdgeProperties)", action: keep, note: "orderIndex kept; sequenceIndex->orderIndex if orderIndex null; startTime/endTime/episode fields dropped"}
+- {live: "MediaAsset.depicts (DEPICTS, MediaLinkMetadata)", final: "MediaAsset.depicts (DEPICTS, MediaLinkProperties)", action: keep, note: "class asserted: create one Assertion{predicate: DEPICTS, status: EXTRACTED} per edge; recordedFrom = migration time"}
+- {live: "MediaAsset.explains (EXPLAINS, MediaLinkMetadata)", final: "MediaAsset.explains (EXPLAINS, MediaLinkProperties)", action: keep, note: "asserted, as DEPICTS"}
+- {live: "MediaAsset.evidences (EVIDENCES -> MediaSubject)", final: "MediaAsset.evidences (derived EVIDENCES -> MediaVisualizableRelationshipTarget)", action: derive, note: "live edges to entities/concepts are NOT migrated as EVIDENCES; each becomes a review item: either an Assertion SUPPORTED_BY an IMAGE_REGION locator (then MEDIA-EV-1 regenerates EVIDENCES) or an EXPLAINS/DEPICTS link"}
+- {live: "MediaAsset.supportsClaims (SUPPORTS_CLAIM -> Claim)", final: "derived EVIDENCES -> Claim via ClaimOccurrence SUPPORTED_BY IMAGE_REGION locator", action: retire}
+- {live: "MediaAsset.supportsClaimOccurrences (SUPPORTS_CLAIM_OCCURRENCE)", final: "ClaimOccurrence-SUPPORTED_BY->SourceLocator{IMAGE_REGION|PDF_PAGE} + derived EVIDENCES", action: retire, note: "live-schema-alignment line 434"}
+- {live: "MediaAsset.visualizesRelationships (VISUALIZES -> MediaVisualizableRelationship)", final: "MediaAsset.visualizes (VISUALIZES -> MediaVisualizableRelationshipTarget)", action: rename, note: "asserted"}
+- {live: "MediaAsset.visualizesTraversal (VISUALIZES_TRAVERSAL, MediaLinkMetadata)", final: "MediaAsset.visualizesTraversal (StructuralEdgeProperties)", action: keep}
+# new on MediaAsset: privacyClass, maturity, schemaVersion, artifactType, publishedAtPrecision, observedAt, contentHashBasis, editDisclosureText, capturedAtPrecision, rightsRecords, suitabilityAssessments, generatedBy
+
+# ---------------- MediaVariant (live 2445-2463) ----------------
+- {live: MediaVariant, final: MediaVariant, action: keep, note: "labels [MediaVariant, InformationArtifact]"}
+- {live: MediaVariant.variantKind, final: MediaVariant.variantKind, action: keep}
+- {live: MediaVariant.mediaFormat, final: MediaVariant.mediaFormat, action: keep}
+- {live: MediaVariant.storageUri, final: MediaVariant.storageUri, action: keep}
+- {live: MediaVariant.url, final: MediaVariant.url, action: keep}
+- {live: MediaVariant.mimeType, final: MediaVariant.mimeType, action: keep}
+- {live: MediaVariant.fileSizeBytes, final: MediaVariant.fileSizeBytes, action: keep}
+- {live: MediaVariant.widthPx, final: MediaVariant.widthPx, action: keep}
+- {live: MediaVariant.heightPx, final: MediaVariant.heightPx, action: keep}
+- {live: MediaVariant.durationSeconds, final: MediaVariant.durationSeconds, action: keep}
+- {live: MediaVariant.checksumSha256, final: MediaVariant.contentHash, action: rename, note: "'sha256:' prefix; contentHashBasis as for MediaAsset"}
+- {live: "MediaVariant.derivedFrom (HAS_VARIANT IN)", final: "MediaVariant.asset (HAS_MEDIA_VARIANT IN)", action: rename, note: CL-014}
+- {live: "MediaVariant (implicit ORIGINAL)", final: "MediaVariant{variantKind: ORIGINAL}", action: split, note: "migration creates one ORIGINAL per asset that has bytes (from the asset's byte fields) if none exists (V-611)"}
+
+# ---------------- MediaAnnotation (live 2465-2491) ----------------
+- {live: MediaAnnotation, final: MediaAnnotation, action: keep, note: "labels [MediaAnnotation, InformationArtifact]"}
+- {live: MediaAnnotation.annotationType, final: MediaAnnotation.annotationType, action: keep}
+- {live: MediaAnnotation.label, final: MediaAnnotation.label, action: keep}
+- {live: MediaAnnotation.text, final: MediaAnnotation.text, action: keep}
+- {live: MediaAnnotation.confidence, final: "MediaSuitabilityAssessment{dimension: EXTRACTION_ACCURACY, methodVersion: 'legacy-unsourced'}", action: move, note: "bare confidence deprecated (A4)"}
+- {live: "MediaAnnotation.x/y/width/height/polygonJson/maskUri/startTimeSeconds/endTimeSeconds/frameStart/frameEnd/meshObjectName/vertexGroupName/volumeRegionJson", final: same, action: keep, note: "normalizationVersion (new) null for legacy rows; such annotations cannot back IMAGE_REGION locators until set (V-601)"}
+- {live: "MediaAnnotation.annotatesMedia (HAS_ANNOTATION IN from MediaAsset)", final: "MediaAnnotation.variant (HAS_ANNOTATION IN from MediaVariant)", action: move}
+- {live: "MediaAnnotation.annotatesSubjects (ANNOTATES_SUBJECT, MediaLinkMetadata)", final: "MediaAnnotation.annotatesSubjects (MediaLinkProperties)", action: keep, note: asserted}
+- {live: "MediaAnnotation.supportedByChunks (SUPPORTED_BY_CHUNK)", final: null, action: retire, note: "a chunk is never a locator (V-406)"}
+# new: normalizationVersion, contentHash, locatedBy (LOCATES_REGION IN, W00 edge), generatedBy
+
+# ---------------- MediaSource (live 2493-2510) -> retired ----------------
+- {live: MediaSource, final: null, action: retire, note: "every row becomes Source + SourceSnapshot + SourceLocator (W00) and a DERIVED_FROM_SOURCE edge from each derived asset"}
+- {live: MediaSource.sourceType, final: MediaSourceProperties.sourceType, action: move}
+- {live: MediaSource.sourceUrl, final: Source.canonicalUri, action: move}
+- {live: MediaSource.sourceIdentifier, final: "Identifier (W00) on the Source", action: move}
+- {live: MediaSource.sourcePageNumber, final: "SourceLocator{selectorKind: PDF_PAGE}.page", action: move, note: "PDF_PAGE also needs exact/quoteHash; until re-anchored use SECTION and flag V-401b"}
+- {live: MediaSource.sourceFigureLabel, final: "FigurePanel.figureNumber / SourceLocator{selectorKind: SECTION}.section", action: move}
+- {live: MediaSource.sourceTimestampSeconds, final: "SourceLocator{selectorKind: MEDIA_TIME}.mediaStartSeconds", action: move, note: "requires the rendition snapshot and a quote anchor (V-401); timestamps without rendition stay unresolved"}
+- {live: MediaSource.sourceAccessedAt, final: SourceSnapshot.retrievedAt, action: move}
+- {live: "MediaSource.derivedAssets (DERIVED_FROM_SOURCE IN)", final: "MediaAsset.sourceLocators", action: move}
+- {live: "MediaSource.sourceDocument (SOURCE_DOCUMENT -> Document)", final: "Source(Document) -HAS_SNAPSHOT-> snapshot -HAS_LOCATOR-> locator", action: retire}
+- {live: "MediaSource.sourceChunk (SOURCE_CHUNK -> Chunk)", final: null, action: retire, note: "chunk never a locator"}
+- {live: "MediaSource.sourceEpisode (SOURCE_EPISODE -> Episode)", final: "Source -RENDITION_OF-> Episode (W00/W21)", action: retire}
+- {live: "MediaSource.sourceListing (SOURCE_LISTING -> Listing)", final: "Source of the MerchantListing page (W15)", action: retire}
+
+# ---------------- GraphView (live 2512-2539) ----------------
+- {live: GraphView, final: GraphView, action: keep, note: "labels [GraphView, InformationArtifact]; @fulltext GraphViewSearch kept (D-015); @vector dropped (D-014)"}
+- {live: "GraphView.graphViewType/queryText/cypherQuery/graphqlQuery/traversalSpecJson/layoutSpecJson/renderedSvgUri/renderedImageUri/interactiveViewUri + SearchIndexable fields", final: same, action: keep}
+- {live: "GraphView.includesSubjects (INCLUDES_SUBJECT, MediaLinkMetadata)", final: "GraphView.includesSubjects (derived, DerivedEdgeProperties, read-only)", action: derive, note: "regenerate from spec; viewpointRecordedAt/viewpointValidAt (new) null for legacy rows = not reproducible"}
+- {live: "GraphView.hasMediaAssets (VISUALIZES_TRAVERSAL IN)", final: GraphView.renderings, action: rename}
+- {live: "GraphView.supportedByChunks (SUPPORTED_BY_CHUNK)", final: null, action: retire}
+
+# ---------------- FigurePanel (live 2541-2553) ----------------
+- {live: FigurePanel, final: FigurePanel, action: keep, note: "labels [FigurePanel, InformationArtifact]"}
+- {live: "FigurePanel.panelLabel/figureNumber/captionText", final: same, action: keep}
+- {live: "FigurePanel.partOfMedia (PART_OF_MEDIA, OrderingMetadata)", final: "FigurePanel.partOfMedia (StructuralEdgeProperties)", action: keep}
+- {live: "FigurePanel.fromAnnotations (FROM_ANNOTATION, AnnotationMetadata)", final: "FigurePanel.region (FROM_ANNOTATION, no properties)", action: rename, note: "zero_or_one"}
+- {live: "FigurePanel.depictsSubjects (DEPICTS)", final: FigurePanel.depicts, action: rename, note: asserted}
+- {live: "FigurePanel.supportsClaims (SUPPORTS_CLAIM)", final: "derived FigurePanel.evidences", action: retire}
+
+# ---------------- ProductLabelRegion (live 2555-2569) ----------------
+- {live: ProductLabelRegion, final: ProductLabelRegion, action: keep, note: "labels [ProductLabelRegion, InformationArtifact]"}
+- {live: ProductLabelRegion.labelRegionType, final: ProductLabelRegion.labelRegionType, action: keep}
+- {live: ProductLabelRegion.extractedText, final: ProductLabelRegion.extractedText, action: keep}
+- {live: ProductLabelRegion.confidence, final: "MediaSuitabilityAssessment{dimension: EXTRACTION_ACCURACY, methodVersion: 'legacy-unsourced'}", action: move}
+- {live: "ProductLabelRegion.fromAnnotation (FROM_ANNOTATION, AnnotationMetadata)", final: "ProductLabelRegion.region (exactly one)", action: rename}
+- {live: "ProductLabelRegion.aboutProduct (ABOUT_PRODUCT, ExtractionMetadata)", final: "ProductLabelRegion.aboutProduct (derived LABEL-REGION-PRODUCT-1)", action: derive, note: "authoritative fact is W04 LABEL_FOR on the LabelSnapshot"}
+- {live: "ProductLabelRegion.mentions (MENTIONS -> ProductLabelMention)", final: "ProductLabelRegion.declarations (REGION_HAS_DECLARATION -> LabelDeclaration) -> W04 DECLARATION_IDENTIFIES_MATERIAL", action: retire, note: "removes a third meaning of MENTIONS"}
+- {live: "ProductLabelRegion.assertsClaims (ASSERTS -> Claim)", final: "ClaimOccurrence (W21) SUPPORTED_BY SourceLocator{IMAGE_REGION} LOCATES_REGION the region annotation", action: retire}
+
+# ---------------- relationship-property types ----------------
+- {live: MediaLinkMetadata, final: MediaLinkProperties, action: rename, note: "adds AssertedEdgeProperties fields"}
+- {live: MediaLinkMetadata.role, final: MediaLinkProperties.role, action: keep}
+- {live: MediaLinkMetadata.confidence, final: null, action: retire, note: "A4; capture fidelity via Adjudication on the link's Assertion"}
+- {live: MediaLinkMetadata.salience, final: MediaLinkProperties.salience, action: keep, note: "salienceMethodVersion (new) null for legacy"}
+- {live: MediaLinkMetadata.isPrimary, final: MediaLinkProperties.isPrimary, action: keep, note: "meaning narrowed to the asserting source's designation"}
+- {live: MediaLinkMetadata.isRepresentative, final: null, action: retire, note: "curator judgement -> MediaSuitabilityAssessment DEPICTION_ACCURACY"}
+- {live: MediaLinkMetadata.isCanonical, final: null, action: retire, note: "duplicate of isPrimary"}
+- {live: MediaLinkMetadata.sourceText, final: MediaLinkProperties.sourceText, action: keep}
+- {live: MediaLinkMetadata.notes, final: null, action: retire}
+- {live: MediaLinkMetadata.mongoResearchRunId, final: MediaLinkProperties.mongoResearchRunId, action: keep}
+- {live: MediaSourceMetadata, final: MediaSourceProperties, action: rename}
+- {live: MediaSourceMetadata.sourceRole, final: MediaSourceProperties.captureRelation, action: rename, note: "free text -> enum MediaCaptureRelation; unmappable values -> curator review"}
+- {live: "MediaSourceMetadata.sourceConfidence/extractionMethod/extractedAt", final: "Activity (methodVersion, endedAt)", action: move}
+- {live: MediaSourceMetadata.sourceText, final: MediaSourceProperties.contextText, action: rename}
+- {live: MediaSourceMetadata.notes, final: null, action: retire}
+- {live: AnnotationMetadata, final: null, action: retire, note: "FROM_ANNOTATION carries no properties; annotationRole/label redundant with the annotation; confidence A4"}
+- {live: RenderingMetadata, final: "Activity{activityKind: MEDIA_GENERATION}.methodVersion + Agent.toolVersion", action: retire, note: "type unused by any live relationship"}
+- {live: BiologicalModelMetadata, final: "DEPICTS Species/AnatomicalContext; DERIVED_FROM_SOURCE to the model-database Source; Identifier", action: retire, note: "type unused by any live relationship"}
+- {live: MolecularRenderingMetadata, final: "DERIVED_FROM_SOURCE to the PDB record Source (pdbId as Identifier); DEPICTS MolecularEntity/ChemicalSubstance; Activity for software", action: retire, note: "type unused by any live relationship"}
+
+# ---------------- unions and enums ----------------
+- {live: MediaSubject, final: MediaSubjectTarget, action: rename, note: "member changes in 04-model-cards.md (renames to final names; removals: snapshots, CohortParticipant, AnonymousActor, ReferenceRange, retrieval units, propositions, media self-members)"}
+- {live: MediaVisualizableRelationship, final: MediaVisualizableRelationshipTarget, action: rename, note: "adds Assertion, ClaimOccurrence, Claim, StudyResult"}
+- {live: ProductLabelMention, final: null, action: retire}
+- {live: MediaRelationRole, final: MediaRelationRole, action: keep}
+- {live: MediaAssetType, final: MediaAssetType, action: keep}
+- {live: MediaFormat, final: MediaFormat, action: keep}
+- {live: MediaPurpose, final: MediaPurpose, action: keep}
+- {live: MediaGenerationMode, final: MediaGenerationMode, action: keep}
+- {live: MediaVariantKind, final: MediaVariantKind, action: keep}
+- {live: AnnotationType, final: AnnotationType, action: keep}
+- {live: MediaSourceType, final: MediaSourceType, action: keep, note: "now types MediaSourceProperties.sourceType"}
+- {live: GraphViewType, final: GraphViewType, action: keep}
+- {live: LabelRegionType, final: LabelRegionType, action: keep}
+
+# ---------------- other owners' live fields touching media (seams, not W22 writes) ----------------
+- {live: "RelationshipAssertion.visualizedBy (VISUALIZES IN)", final: "W21 RelationshipAssertion inverse of VISUALIZES", action: keep, note: "W21 field"}
+- {live: "RelationshipAssertion.subject/object ([MediaSubject])", final: "W00 HAS_SUBJECT/HAS_OBJECT", action: move, note: "W00/W21; MediaSubject no longer used as an assertion range (V-420)"}
+- {live: "Metric.mediaUrl, Metric.mediaType", final: "MediaAsset -EXPLAINS|DEPICTS-> Metric", action: move, note: "W07 field; seam request W22-SR-09"}
+- {live: "proposed-delta.graphql line 1152 compares: [MediaSubject]", final: "W07 ComparableVersionTarget", action: move, note: "delta reused MediaSubject as a convenience range; W07 owns the successor union"}

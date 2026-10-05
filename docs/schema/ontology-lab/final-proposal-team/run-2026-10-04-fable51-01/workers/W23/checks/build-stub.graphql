@@ -1,0 +1,46 @@
+# BUILD-CHECK STUB ONLY. NOT A FRAGMENT. Not read by merge-fragments.mjs (which reads sdl-fragment.graphql only).
+# Minimal copies of W00 contract shapes (01-shared-contract.md B3, B4, B5 subsets) and of a few other owners' node
+# types, written only so that W23's sdl-fragment.graphql can be built and round-tripped under @neo4j/graphql 7.6.3
+# before W00's fragment exists. Every definition here belongs to its registry owner; field sets are minimal.
+
+interface Entity { id: ID!  uid: String!  name: String  description: String  mongoResearchRunId: String }
+interface EntityArchetype { entityType: String! }
+interface VersionedStateArchetype { stateType: String!  payloadHash: String!  effectiveFrom: DateTime  effectiveTo: DateTime }
+interface OccurrenceArchetype { occurrenceType: String!  startedAt: DateTime  endedAt: DateTime }
+interface AssertionArchetype { predicate: String!  status: AssertionStatus!  recordedAt: DateTime!  recordedTo: DateTime  contentHash: String }
+interface EvidenceAssessmentArchetype { assessmentType: String!  methodVersion: String!  status: AssessmentStatus!  recordedAt: DateTime!  recordedTo: DateTime  summary: String }
+
+enum PrivacyClass { PUBLIC INTERNAL }
+enum NodeMaturity { CANDIDATE PROVISIONAL ACCEPTED DEPRECATED }
+enum AssertionStatus { EXTRACTED PROPOSED ACCEPTED REJECTED DISPUTED SUPERSEDED UNRESOLVED }
+enum AssessmentStatus { PROPOSED ACCEPTED SUPERSEDED WITHDRAWN }
+enum UseKind { QUOTE_IN_ANSWER SUMMARIZE_IN_ANSWER USE_AS_RECOMMENDATION_EVIDENCE SHARE_EXTERNALLY }
+enum ActivityKind { CAPTURE TRANSCRIPTION TEXT_EXTRACTION SEGMENTATION EXTRACTION RESOLUTION REANCHORING ADJUDICATION ANSWER_COMPOSITION }
+
+type StructuralEdgeProperties @relationshipProperties { orderIndex: Int  notes: String  mongoResearchRunId: String }
+type AuthorizationProperties @relationshipProperties { useKind: UseKind! }
+
+type Assertion implements Entity & AssertionArchetype @node(labels: ["Assertion"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String
+  predicate: String!  status: AssertionStatus!  recordedAt: DateTime!  recordedTo: DateTime  contentHash: String
+}
+type ClaimOccurrence implements Entity & AssertionArchetype @node(labels: ["ClaimOccurrence", "Assertion"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String
+  predicate: String!  status: AssertionStatus!  recordedAt: DateTime!  recordedTo: DateTime  contentHash: String
+}
+type Adjudication implements Entity & EvidenceAssessmentArchetype @node(labels: ["Adjudication", "EvidenceAssessment"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String
+  assessmentType: String!  methodVersion: String!  status: AssessmentStatus!  recordedAt: DateTime!  recordedTo: DateTime  summary: String
+  verdict: String
+}
+type EvidenceApplicability implements Entity & EvidenceAssessmentArchetype @node(labels: ["EvidenceApplicability", "EvidenceAssessment"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String
+  assessmentType: String!  methodVersion: String!  status: AssessmentStatus!  recordedAt: DateTime!  recordedTo: DateTime  summary: String
+}
+type Activity implements Entity & OccurrenceArchetype @node(labels: ["Activity", "Occurrence"]) {
+  id: ID! @id  uid: String!  name: String  description: String  mongoResearchRunId: String
+  occurrenceType: String!  startedAt: DateTime  endedAt: DateTime
+  activityKind: ActivityKind!
+  authorizedBy: [PolicyVersion!]! @relationship(type: "AUTHORIZED_BY", direction: OUT, properties: "AuthorizationProperties")
+  usedAssertions: [Assertion!]! @relationship(type: "USED", direction: OUT)
+}

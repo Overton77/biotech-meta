@@ -1,0 +1,736 @@
+{
+ "CQ-AX-01": {
+  "question": "For each factual sentence in a public answer, which assertion, locator and adjudication stands behind it, and which sentences have none?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-02": {
+  "question": "Does the answer state the scope of the evidence (population, dose, outcome, jurisdiction, time) and avoid turning public evidence into a personal medical conclusion?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-AX-03": {
+  "question": "Can a published answer be reproduced later from its recorded-as-of date, valid-at date, schema digest and query shape?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-AX-04": {
+  "question": "When the graph returns nothing, is that unknown to BellLabs, not reported by a source, measured absent, or out of scope?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-05": {
+  "question": "How many independent evidence lines support a claim, once shared datasets, common sponsors or authors, and retellings are accounted for?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-AX-06": {
+  "question": "For a current-state question (price, availability, label, status), when was it last observed, and is the open end verified?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-07": {
+  "question": "Which accepted assertions lack a locator, a reproducible snapshot, or an adjudication?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-08": {
+  "question": "Which derived edges cannot be regenerated, or cite a withdrawn or mismatched assertion?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-09": {
+  "question": "Who or what produced each assertion, status change and adjudication, under which method and run?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-AX-10": {
+  "question": "Which adjudications predate a newer snapshot or correction of their source and need re-review?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-AX-11": {
+  "question": "Which published answers depend on assertion A, so a correction's reach can be assessed?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-AX-12": {
+  "question": "Can any shared-graph path, index or answer reach private user context?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-13": {
+  "question": "For an intent, which schema elements and data may an agent read and write, within what budgets, with private context excluded?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-AX-14": {
+  "question": "For free text, which candidate identities match, and is the choice kept as a hypothesis instead of resolved silently?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-15": {
+  "question": "Can an agent tell its own uncommitted candidates from committed assertions, and are candidates kept out of answers?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-16": {
+  "question": "Does a proposed write pass the forbidden-implication and citation guard before commit?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-17": {
+  "question": "Can I buy, today and in my jurisdiction, the product that was studied, at the studied amount per serving?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-AX-18": {
+  "question": "Was the speaker's relationship with the manufacturer in force on the date of the statement?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-AX-19": {
+  "question": "For the lot I bought, what do independent measurements say compared with its label?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-AX-20": {
+  "question": "Given a described mechanism for an ingredient, does it follow that the commercial formulation delivers the exposure that mechanism needs?",
+  "priority": "Research frontier",
+  "answerability": "X"
+ },
+ "CQ-AX-21": {
+  "question": "Can the shared graph say whether two assay methods are comparable without receiving the person's results?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-AX-22": {
+  "question": "Is the public protocol version I follow the one a published result used, without the shared graph learning my own deviations?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-AX-23": {
+  "question": "Is product or ingredient X approved or cleared?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-24": {
+  "question": "How strong is the evidence for claim C?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-25": {
+  "question": "Which products contain compound C?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-AX-26": {
+  "question": "What did a named speaker say about X?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-AX-27": {
+  "question": "Which papers did this person write?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-AX-28": {
+  "question": "What works for people like me?",
+  "priority": "Research frontier",
+  "answerability": "X"
+ },
+ "CQ-CL-01": {
+  "question": "What did named speaker S say in container E, in which rendition, and at which exact span?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-CL-02": {
+  "question": "On what basis was it presented (personal experience, manufacturer claim, mechanism reasoning, study result, expert opinion, anecdote) and as what speech act (statement, practice report, recommendation, caution)?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-CL-03": {
+  "question": "Which qualifications did the speaker attach, where, and of what kind?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-CL-04": {
+  "question": "Did a later retelling drop a qualification, change the speech act or basis, broaden the scope, change the amount or attribution, or ignore a correction?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-CL-05": {
+  "question": "Which financial relationships (sponsorship, affiliate, investment, equity, board, advisory, employment, founding, IP, compensation) did the speaker or the channel have, valid at the time of the statement, that are relevant to this statement, and where were they disclosed?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-CL-06": {
+  "question": "Which assertions by different asserters instantiate the same proposition, and how many are independent rather than retellings?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-CL-07": {
+  "question": "Who is the speaker when only a handle or no identity is known, and what links (if any) are hypotheses rather than identities?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-CL-08": {
+  "question": "Was a statement part of a sponsor read or of editorial conversation, and who read it?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-CL-09": {
+  "question": "Which experience reports (live `ExperienceReport`) describe an outcome for an intervention, by whom, and with what basis?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-CM-01": {
+  "question": "Who hosts the listing, who placed the offer, who is seller of record, who fulfills, and who earns affiliate compensation, as observed when?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-CM-02": {
+  "question": "Which offers existed for a product variant on date D, and is the listing-to-variant identity resolved or only proposed?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-CM-03": {
+  "question": "What price and availability were observed, of which price kind (list, one-time, subscription, coupon-adjusted, per unit), at what time?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-CM-04": {
+  "question": "Which media recommendations carry an affiliate link to which offer?",
+  "priority": "Expansion",
+  "answerability": null
+ },
+ "CQ-CM-05": {
+  "question": "When an offer is no longer observed, did it end, or did observation stop?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-DX-01": {
+  "question": "What does a test measure (measurand, specimen type, method principle, instrument), as distinct from what it infers?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-DX-02": {
+  "question": "Is a result measured, calculated from measured values, or inferred by a model, and which assay version or algorithm version produced it?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-DX-03": {
+  "question": "Can two similarly named tests, or one lab's test before and after a method change, share a trend axis, and with which conversion rule?",
+  "priority": "Essential now",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-DX-04": {
+  "question": "Which algorithm or model version produced a score, and is the version stated by the source, inferred from a publication, or unknown?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-DX-05": {
+  "question": "Is a difference between two scores within one algorithm version larger than the documented technical noise for that version?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-DX-06": {
+  "question": "Which reference interval applied when the result was reported (kind, partition, derivation, version), and is it a reference interval or a decision limit?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-DX-07": {
+  "question": "What can a model-derived feature service establish about its cohort, feature definition, unit, and model version, and what can it not?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-DX-08": {
+  "question": "Is a diagnostic result synthetic, public aggregate, or private personal, and can a query over public evidence return a private result?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-DX-09": {
+  "question": "Which device firmware or app version produced a wearable metric?",
+  "priority": "Expansion",
+  "answerability": null
+ },
+ "CQ-EC-01": {
+  "question": "Which organizations, people, funders, suppliers, patents, and studies form the neighbourhood of X, valid at V and as recorded at R?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-EC-02": {
+  "question": "Where does similar work appear under different names (brand versus legal entity, ingredient trade names, programme names), without merging identities?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-EC-03": {
+  "question": "Through which time-bounded asserted ties is a speaker connected to the organizations, products, or substances in a statement's neighbourhood?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-EC-04": {
+  "question": "Which studies have authors affiliated with organizations that sell the studied ingredient, and is that affiliation distinct from funding or sponsorship?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-EV-01": {
+  "question": "What exact proposition does a source make, and which span supports it?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-EV-02": {
+  "question": "Is the proposition a source assertion, a BellLabs adjudication, or a derived retrieval shortcut?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-EV-03": {
+  "question": "Which trials, case reports, observational studies, or marketing testimonials support or contradict the proposition?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-EV-04": {
+  "question": "Does evidence apply to the current formulation, dose, route, schedule, duration, population, comparator, and outcome?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-EV-05": {
+  "question": "Has a result been corrected, retracted, superseded, or contradicted without deleting the historical assertion?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-ID-01": {
+  "question": "Is the marketed product in a study the same enduring product, variant, formulation version, or merely a similarly named product?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-ID-02": {
+  "question": "Which label or formulation was effective when a study intervention was administered?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-ID-03": {
+  "question": "Does a label declare a chemical substance, a material that realizes it, or a constituent the material is said to provide?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-ID-04": {
+  "question": "Which external identifiers support a substance match, and at what authority/version?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-ID-05": {
+  "question": "Did a packaging-only change, formulation change, supplier/specification change, or product-identity change occur?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-ID-06": {
+  "question": null,
+  "priority": null,
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-MF-01": {
+  "question": "Who manufactures, supplies, contract-manufactures, or only markets a material or product, according to which source and when?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-MF-02": {
+  "question": "What regulatory status does X have in jurisdiction J at time T, which submission and response produced it, and is it approval, clearance, De Novo authorization, designation, notification on file, establishment registration, or enforcement discretion?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-MF-03": {
+  "question": "Does a company's characterization of an agency action (wording, conditions, scope) match the agency record?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-MF-04": {
+  "question": "Which manufacturing capabilities are operating, piloting, planned, suspended, or discontinued, asserted by whom, over which valid time?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-MF-05": {
+  "question": "What did a specific filing disclose versus what the same company promoted elsewhere in the same period?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-MF-06": {
+  "question": "Does a facility registration, a cGMP claim, a GMP certification, or an inspection outcome support a quality conclusion, for which facility and period?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-MX-01": {
+  "question": "For a mechanism story, which steps were directly measured, inferred, cited, or hypothesized, and by which source?",
+  "priority": "Essential now",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-MX-02": {
+  "question": "For each measured step: species and model, tissue, cell or compartment, setting, tested material, exposure amount, unit, basis, route, duration?",
+  "priority": "Essential now",
+  "answerability": null
+ },
+ "CQ-MX-03": {
+  "question": "Has a step measured in one species or compartment been measured in humans, with what direction (including null)?",
+  "priority": "Foundational",
+  "answerability": "A"
+ },
+ "CQ-MX-04": {
+  "question": "Does a commercial formulation plausibly deliver the exposure under which an ingredient-level effect was observed (dose ratio on matched bases, human exposure data for the target material and form)?",
+  "priority": "Essential now",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-MX-05": {
+  "question": "Which mechanism shortcuts in the live graph rest on hypotheses, citations, or retracted sources rather than measurements?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-MX-06": {
+  "question": "Where does an effect reverse direction with dose, and over what tested range?",
+  "priority": "Expansion",
+  "answerability": null
+ },
+ "CQ-PC-01": {
+  "question": "(new) What was the person trying to improve at time `T`, as recorded then?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-PC-02": {
+  "question": "(new) Which personal-context version (goals, measurements, declared conditions and intake, preferences) was in force for a given decision, and what changed since?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-PC-03": {
+  "question": "(new) What is the person waiting on (lab result, delivery, protocol period end, evidence update, clinician input), since when, until when expected, and what will resolve it?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-PC-04": {
+  "question": "(new) What may be shared, with whom, for what purpose, and until when, and what was actually disclosed under which grant?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-PC-05": {
+  "question": "(new) After an erasure request or a grant revocation, which private records, derived projections, and shared contributions must be deleted or withdrawn, and has propagation completed?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-PC-06": {
+  "question": "(new) Which of a person's measurements are comparable over time (same `Metric`, `LabTest` or method, unit, and reference-range basis)?",
+  "priority": "Expansion",
+  "answerability": null
+ },
+ "CQ-PC-07": {
+  "question": "(new) What is the purchase and use lifecycle of a chosen option (intended, ordered, delivered, started, stopped), and which lot did the person receive?",
+  "priority": "Expansion",
+  "answerability": null
+ },
+ "CQ-PC-08": {
+  "question": "(new) Can any public query, API, or agent traversal reach private-personal data?",
+  "priority": "Essential now",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-PF-01": {
+  "question": "Is a declared amount the listed ingredient as named, a nutrient (not its source), a blend total, an extract mass, or a marker constituent, and which calculated amounts (active moiety, nutrient equivalent) follow from it with which rule?",
+  "priority": "Essential now",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-PF-02": {
+  "question": "Does an amount shown in a listing title or marketing claim match the label declaration observed for the same variant?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-PF-03": {
+  "question": "Does a certification, lot test summary, or regulatory status attach to a product, a variant, a lot, a listed product ID, or a facility?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-PF-04": {
+  "question": "Do the conditions of use in a notification response (dose, food category, level) cover the material form and dose in a given formulation?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-PR-01": {
+  "question": "(new) What changed between two versions of a public protocol, and is each change source-versioned, inferred from a snapshot diff, or reported by a third party?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-PR-02": {
+  "question": "(new) Which steps are essential, conditional (on what), optional, or not stated, and which steps depend on others and how?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-PR-03": {
+  "question": "(new) What is missing before a person can evaluate the protocol: unreported step details, missing measurement plans or stop rules, missing baseline measurements, undeclared constraint facts?",
+  "priority": "Expansion",
+  "answerability": "Q"
+ },
+ "CQ-PR-04": {
+  "question": "(new) Which observations or measurements should trigger review, pausing, stopping, or clinician contact under the adopted edition?",
+  "priority": "Expansion",
+  "answerability": null
+ },
+ "CQ-PR-05": {
+  "question": "(new) Which public protocol edition did a person adopt, with which deviations, during which interval?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-PR-06": {
+  "question": "(new) What evidence supports each step of a protocol, as opposed to the protocol as a whole?",
+  "priority": "Research frontier",
+  "answerability": null
+ },
+ "CQ-PV-01": {
+  "question": "For each assertion in an answer, show the five provenance states: who said it, which captured span supports it, which assessment (if any) warrants a broader conclusion, which agent activity used it, and which policy allowed this use.",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-PV-02": {
+  "question": "Can the cited span be found again after the page, transcript, or media rendition changed, and which captured version was used?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-PV-03": {
+  "question": "Which capture, transcription, segmentation, and extraction activities (and agent versions) produced this assertion, and which research run?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-PV-04": {
+  "question": "Could a conversion, transcription, unit, quantity-basis, or attribution error change the conclusion?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-PV-05": {
+  "question": "Is this source the primary source of the statement or a retelling or aggregator?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-PV-06": {
+  "question": "Which downstream uses of a source (quote, summarize, use as recommendation evidence, share) does policy version P allow?",
+  "priority": "Foundational",
+  "answerability": "X",
+  "hasTrace": true
+ },
+ "CQ-RC-01": {
+  "question": "Why was one product preferred over another for a stated goal and decision context?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-RC-02": {
+  "question": "Which evidence, applicability assessments, constraints, price/availability observations, and policy version affected the decision?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-RC-03": {
+  "question": "Which missing or disputed facts could change the ranking?",
+  "priority": "Essential now",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-RC-04": {
+  "question": "Can a decision be replayed as of both its domain-time and system-time viewpoint?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-RC-05": {
+  "question": "Can the system distinguish \"evidence favors,\" \"BellLabs recommends,\" \"a source recommends,\" and \"a user selected\"?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-RC-06": {
+  "question": "Can contraindications or interaction uncertainty block a recommendation rather than merely lower a score?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-RC-07": {
+  "question": "(new) Which past recommendations relied on evidence or context that has since been corrected, superseded, re-adjudicated, or extended by new measurements, and would the decision differ now?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-ST-01": {
+  "question": "For each arm, what was administered: material, chemical form, amount with quantity and mass basis, dosage form, route, schedule, duration; and who provided the investigational product?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-ST-02": {
+  "question": "Which commercial products share a substance or material with a study intervention, and through what path (same lot, formulation, branded material, substance only)?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-ST-03": {
+  "question": "Which outcomes are biomarkers, surrogate endpoints (in which context of use and at what validation level), intermediate clinical endpoints, or clinical outcomes, and who classified them?",
+  "priority": "Essential now",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-ST-04": {
+  "question": "What were the registered primary outcomes in the earliest registration version, and does any publication relabel priority?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-ST-05": {
+  "question": "When the primary result is null, which favorable findings are secondary, subgroup, within-arm, or post hoc, and does any synthesis or claim rely on them as confirmatory?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-ST-06": {
+  "question": "Which adverse events were systematically collected and reported per arm, which were not reported, and how do safety findings compare across studies of different materials and doses?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-ST-07": {
+  "question": "Which publications share a study population or dataset, and so are not independent evidence?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-ST-08": {
+  "question": "As of an observation date, what does the registry establish (status, enrollment actual or estimated, results posted), and where do registry and publication disagree?",
+  "priority": "Foundational",
+  "answerability": null,
+  "hasTrace": true
+ },
+ "CQ-ST-09": {
+  "question": "Which findings published, or recorded by BellLabs, in a stated period changed a claim-level synthesis, by which criteria, with what effect, and with which provenance?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-ST-10": {
+  "question": "Is a result \"clinically meaningful\" according to the authors, according to a BellLabs criterion (threshold and its source), or neither?",
+  "priority": "Expansion",
+  "answerability": null
+ },
+ "CQ-TM-01": {
+  "question": "What did BellLabs believe on recorded date `R` about facts valid on domain date `V`?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-TM-02": {
+  "question": "When a late historical source arrives, can the system add past valid time without pretending BellLabs knew it earlier?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-TM-03": {
+  "question": "Can the system distinguish publication time, observation time, study time, effective time, and ingestion time?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-TM-04": {
+  "question": "Are unknown temporal bounds preserved as unknown rather than replaced with the current time?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-TM-05": {
+  "question": "Can two nonexclusive assertions overlap while mutually exclusive states are rejected for overlapping intervals?",
+  "priority": "Foundational",
+  "answerability": "Q",
+  "hasTrace": true
+ },
+ "CQ-TM-06": {
+  "question": "(new) Which assertions, adjudications, and recommendation snapshots relied on a source version that was later corrected, retracted, or superseded, and when did BellLabs learn of the revision?",
+  "priority": "Foundational",
+  "answerability": "A",
+  "hasTrace": true
+ },
+ "CQ-TM-07": {
+  "question": "(new) Did a change mean the fact ended in the world, or that BellLabs corrected its record of a fact that never held?",
+  "priority": "Essential now",
+  "answerability": "A",
+  "hasTrace": true
+ }
+}

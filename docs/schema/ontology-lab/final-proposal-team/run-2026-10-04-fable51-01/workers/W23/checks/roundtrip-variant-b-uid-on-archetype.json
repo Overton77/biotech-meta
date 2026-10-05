@@ -1,0 +1,126 @@
+{
+ "parse": "ok",
+ "build": "ok",
+ "rootFields": {
+  "AnswerRecord": {
+   "queries": [
+    "answerRecordsConnection",
+    "answerRecords"
+   ],
+   "mutations": [
+    "createAnswerRecords"
+   ]
+  },
+  "PolicyVersion": {
+   "queries": [
+    "policyVersionsConnection",
+    "policyVersions"
+   ],
+   "mutations": [
+    "createPolicyVersions"
+   ]
+  },
+  "DecisionCriterion": {
+   "queries": [
+    "decisionCriteriaConnection",
+    "decisionCriteria"
+   ],
+   "mutations": [
+    "createDecisionCriteria"
+   ]
+  }
+ },
+ "roundTrip": {
+  "create": {
+   "createAnswerRecords": {
+    "answerRecords": [
+     {
+      "uid": "hu:answer-record:w23-rt-ar1",
+      "accessTier": "PUBLIC_ANSWER",
+      "privateContext": "EXCLUDED"
+     }
+    ]
+   }
+  },
+  "connectAssessmentByUidThroughInterface": {
+   "createAnswerRecords": {
+    "answerRecords": [
+     {
+      "uid": "hu:answer-record:w23-rt-ar2"
+     }
+    ]
+   }
+  },
+  "read": {
+   "answerRecords": [
+    {
+     "uid": "hu:answer-record:w23-rt-ar1",
+     "accessTier": "PUBLIC_ANSWER",
+     "privateContext": "EXCLUDED",
+     "traceDepth": "ADJUDICATION",
+     "citesAssertions": [
+      {
+       "__typename": "Assertion",
+       "uid": "hu:assertion:w23-rt-a1",
+       "predicate": "HAS_FORMULATION_VERSION"
+      },
+      {
+       "__typename": "Assertion",
+       "uid": "hu:claim-occurrence:w23-rt-co1",
+       "predicate": "RECOMMENDS"
+      }
+     ],
+     "citesAssertionsConnection": {
+      "edges": [
+       {
+        "properties": {
+         "orderIndex": 0
+        },
+        "node": {
+         "__typename": "Assertion",
+         "uid": "hu:assertion:w23-rt-a1"
+        }
+       },
+       {
+        "properties": {
+         "orderIndex": 1
+        },
+        "node": {
+         "__typename": "Assertion",
+         "uid": "hu:claim-occurrence:w23-rt-co1"
+        }
+       }
+      ]
+     },
+     "citesAssessments": [
+      {
+       "__typename": "Adjudication",
+       "assessmentType": "ADJUDICATION",
+       "uid": "hu:adjudication:w23-rt-adj1",
+       "verdict": "SUPPORTED"
+      }
+     ]
+    }
+   ]
+  },
+  "readDateTime": [
+   "Unknown function 'apoc.date.convertFormat' (line 4, column 29 (offset: 99))"
+  ],
+  "updateAttempt": [
+   "Cannot query field \"updateAnswerRecords\" on type \"Mutation\". Did you mean \"createAnswerRecords\" or \"updateAssertions\"?"
+  ],
+  "storedNode": [
+   {
+    "labels": [
+     "Occurrence",
+     "AnswerRecord"
+    ],
+    "accessTier": "PUBLIC_ANSWER",
+    "privacyClass": "INTERNAL",
+    "privateContext": "EXCLUDED",
+    "hasId": true,
+    "hasCreatedAt": true
+   }
+  ]
+ }
+}

@@ -1,0 +1,406 @@
+# =====================================================================================================
+# W20 Documents, text versions and chunks -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W20 (Opus 5.5)   Coordinator/synthesizer: Fable 5.1
+# Catalog: docs/schema/catalog/schema.yaml 0.2.0, digest 8fb50ff0…84f0
+# Canonical modules: claims_and_documents (Document, Segmentation, Chunk, DocumentType, DocumentDomain,
+#   RESOLVES_TO_CHUNK, SUPPORTED_BY_CHUNK); provenance (DocumentTextVersion; T-003: no transfer proposed).
+# CQs served: CQ-PV-02, CQ-PV-03, CQ-PV-04, CQ-PV-05, CQ-EV-01, CQ-EV-05, CQ-AX-07, CQ-AX-14, CQ-CL-08;
+#   candidates CQ-PV-C01..C03 (see 02-cq-coverage.md).
+# Imports (never redefined here): Entity, SearchIndexable, EntityArchetype, InformationArtifactArchetype,
+#   PrivacyClass, NodeMaturity, SourceKind, DerivedEdgeProperties, AssertedEdgeProperties,
+#   AssertionSubjectTarget (W00); SourceSnapshot, SourceLocator, Activity (W00); Episode, EpisodeSegment,
+#   Claim (W21); Publication (W09); Person, Organization (W01).
+# Elements pending registry confirmation (seam-requests.yaml): DocumentAuthorTarget (W20-SR-03),
+#   RetrievalEdgeProperties (W20-SR-04). @vector is deliberately absent (D-014: Fable adds it at merge).
+# Relationship classes and cardinalities are stated in field descriptions and enforced by the
+#   operations/validation layer (07-operations.md, operations.cypher), never assumed from SDL.
+# =====================================================================================================
+
+"""
+Genre of a captured document endpoint, for retrieval and display. It is never a truth, review or
+revision state: a retracted article stays SCIENTIFIC_ARTICLE; the retraction is a separate
+RETRACTION_NOTICE document plus a SourceRevisionEvent (W00). Live values kept; round 0006 adds the
+notice kinds and the media/text endpoint kinds. Owner W20; frozen at these values (new values via ledger).
+"""
+enum DocumentType {
+  SCIENTIFIC_ARTICLE
+  REVIEW_ARTICLE
+  PREPRINT
+  CLINICAL_TRIAL_RECORD
+  CLINICAL_TRIAL_PROTOCOL
+  TRIAL_RESULT
+  CASE_REPORT
+  META_ANALYSIS
+  SYSTEMATIC_REVIEW
+  WHITE_PAPER
+  TECHNICAL_REPORT
+  REGULATORY_FILING
+  SEC_FILING
+  ANNUAL_REPORT
+  QUARTERLY_REPORT
+  INVESTOR_PRESENTATION
+  EARNINGS_TRANSCRIPT
+  PRESS_RELEASE
+  PATENT
+  PATENT_APPLICATION
+  PRODUCT_LABEL
+  PACKAGE_INSERT
+  SAFETY_COMMUNICATION
+  SAFETY_DATA_SHEET
+  SOP
+  POLICY
+  GUIDELINE
+  WEBPAGE
+  BLOG_POST
+  NEWS_ARTICLE
+  CONFERENCE_ABSTRACT
+  CONFERENCE_POSTER
+  CONFERENCE_PRESENTATION
+  DATASET
+  DATABASE_RECORD
+  MANUAL
+  CORRECTION_NOTICE
+  RETRACTION_NOTICE
+  EXPRESSION_OF_CONCERN
+  REINSTATEMENT_NOTICE
+  TRANSCRIPT_PAGE
+  VIDEO_PAGE
+  AUDIO_FEED_ITEM
+  NEWSLETTER_ISSUE
+  UNKNOWN
+}
+
+"""
+Broad subject domain of a document, used as a retrieval partition key and facet. Not an authority
+scope (authority lives on sources and assessments, W19/W00). Live values kept unchanged. Owner W20.
+"""
+enum DocumentDomain {
+  BIOMEDICAL_RESEARCH
+  CLINICAL
+  REGULATORY
+  COMMERCIAL
+  PATENT_IP
+  NEWS_MEDIA
+  EDUCATION
+  TECHNICAL
+  LEGAL
+  OTHER
+  UNKNOWN
+}
+
+"""
+Range of AUTHORED_BY from a Document: the parties a byline or document header names as authors.
+Replaces the live union DocumentAuthor (same members). Registry addition requested (W20-SR-03).
+"""
+union DocumentAuthorTarget = Person | Organization
+
+"""
+Properties of the derived edge SourceLocator -[:RESOLVES_TO_CHUNK]-> Chunk (catalog claims_and_documents).
+Contains every field of the frozen DerivedEdgeProperties (W00) and specializes it: derivationRule and
+segmentationHash are required. The edge says only that the locator's span overlaps the chunk's span in
+the same DocumentTextVersion under the named segmentation; it is regenerated whenever segmentation
+changes and is never evidence. Rule-only derivation (no assertion input): requested ruleOnly: true (W20-SR-01).
+"""
+type ChunkResolutionProperties @relationshipProperties {
+  projectionOfAssertionUid: String
+  "Rule that computed the overlap, e.g. 'offset-overlap-v1' or 'quote-search-nfcws1-v1'."
+  derivationRule: String!
+  derivedFromAssertionUids: [String!]
+  derivedFromAssessmentUids: [String!]
+  derivedAt: DateTime
+  mongoResearchRunId: String
+  "Segmentation.segmentationHash of the chunk's segmentation (sha256:<hex> over the segmentation configuration)."
+  segmentationHash: String!
+  "True when the whole locator span lies inside the chunk; false when the span straddles a chunk boundary."
+  coversWholeSpan: Boolean
+  "uid of the SEGMENTATION or REANCHORING Activity that generated the edge (lineage only)."
+  activityUid: String
+}
+
+"""
+Properties of the derived support shortcuts X -[:SUPPORTED_BY_CHUNK]-> Chunk and X -[:SUPPORTED_BY_DOCUMENT]-> Document
+(live on Claim, ClaimOccurrence, ExperienceReport, mechanisms, studies, products, safety, media and event types).
+Contains every field of the frozen DerivedEdgeProperties (W00). A shortcut exists only because an Assertion is
+SUPPORTED_BY the SourceLocator named in locatorUid and (for a chunk) that locator RESOLVES_TO_CHUNK the target
+under segmentationHash. A chunk or document similarity match is never an input (forbidden CHUNK_MATCH -> SOURCE_SUPPORT).
+"""
+type DerivedSupportProperties @relationshipProperties {
+  projectionOfAssertionUid: String
+  "Derivation rule, e.g. 'support-via-locator-chunk-v1', 'support-via-locator-document-v1', 'legacy-chunk-span-migration-v1'."
+  derivationRule: String!
+  "The Assertion(s) whose structural SUPPORTED_BY -> locatorUid licenses this shortcut (the start node itself when it is an Assertion)."
+  derivedFromAssertionUids: [String!]!
+  derivedFromAssessmentUids: [String!]
+  derivedAt: DateTime
+  mongoResearchRunId: String
+  "uid of the SourceLocator this shortcut projects. Required (KCR-4.5, V-407)."
+  locatorUid: String!
+  "Required when the target is a Chunk (equals the RESOLVES_TO_CHUNK segmentationHash); null for a Document target."
+  segmentationHash: String
+  activityUid: String
+}
+
+"""
+Properties of the derived retrieval edges ABOUT (Document/Chunk -> subject) and MENTIONS (Chunk -> subject).
+Contains every field of the frozen DerivedEdgeProperties (W00). salience and aboutness are ranking features of
+the named extraction rule (round 0006 D9); they are not confidence, not evidence and not endorsement.
+Registry addition requested (W20-SR-04).
+"""
+type RetrievalEdgeProperties @relationshipProperties {
+  projectionOfAssertionUid: String
+  "Extraction model/rule and version that produced the edge, e.g. 'ner-linker-v3.2'."
+  derivationRule: String!
+  derivedFromAssertionUids: [String!]
+  derivedFromAssessmentUids: [String!]
+  derivedAt: DateTime
+  mongoResearchRunId: String
+  "Rule-local ranking feature in [0,1]; comparable only within one derivationRule."
+  salience: Float
+  "Rule-local ranking feature in [0,1]; comparable only within one derivationRule."
+  aboutness: Float
+  "For chunk-level edges: the segmentation the chunk belongs to (edges are regenerated with the chunks)."
+  segmentationHash: String
+  activityUid: String
+}
+
+"""
+A document endpoint: one retrievable document identity at one canonical URI (a web page, PDF, transcript
+page, registry record page, filing, label page or feed item). It is the live Document carried as a
+specialization of the provenance Source (D-005): stored labels Document, Source, Entity. It is NOT the
+scholarly work (Publication, W09), NOT the audio/video work (Episode, W21), NOT a capture (SourceSnapshot)
+and NOT a text rendering (DocumentTextVersion). Captures hang from it by HAS_SNAPSHOT; renditions point
+RENDITION_OF their work. documentType is genre, never truth or revision status.
+CQs: CQ-PV-02, CQ-PV-05, CQ-EV-01, CQ-EV-05, CQ-AX-14. Module: claims_and_documents (parent provenance.Source).
+Archetype: Entity. uid token: document (a Source later recognised as a Document keeps its hu:source: uid).
+"""
+type Document implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Document", "Source", "Entity"])
+  @fulltext(indexes: [{indexName: "DocumentSearch", fields: ["name", "sourceUrl", "searchText"], queryName: "searchDocuments"}]) {
+  "Live projection identity, stored as documentId; equals the opaque segment of uid."
+  id: ID! @id @alias(property: "documentId")
+  uid: String!
+  "Title as displayed by the source; stored as title (shared with Source.title). Presentation only."
+  name: String @alias(property: "title")
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype field; 'Document' for nodes whose primary label is Document."
+  entityType: String!
+  "Derived search text (SearchIndexable); built from public fields named in searchFields; never evidence."
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Derived embedding; computed outside the API; dimension must equal embeddingDimensions (V-119)."
+  searchEmbedding: [Float!]
+  "Source.canonicalUri (W00) of this endpoint; unique across Source. Written together with url (sourceUrl) and equal to it."
+  canonicalUri: String
+  "Source.sourceKind (W00). Provenance genre used for authority scope; documentType is the finer display genre."
+  sourceKind: SourceKind
+  "Source.publisherUid (W00): uid of the publishing Organization when resolved."
+  publisherUid: String
+  "Legacy natural key written by the live pipeline. Not identity (uid is). Nullable in the final schema (was String!)."
+  documentKey: String
+  "Genre, stored as type. Never a revision or truth state."
+  documentType: DocumentType! @alias(property: "type")
+  "Live URL field, stored as url; mirror of canonicalUri (validator W20-V05)."
+  sourceUrl: String @alias(property: "url")
+  documentDomain: DocumentDomain
+  "Publisher name as printed (verbatim display); resolved identity is publisherUid."
+  publisher: String
+  publicationVenue: String
+  "Publication time as first stated by the source (materialized cache). Per-capture stated time is SourceSnapshot.publishedAt."
+  publishedAt: DateTime
+  "Media type of the endpoint as served (e.g. application/pdf, text/html). Per-capture mimeType lives on SourceSnapshot."
+  fileFormat: String
+  "BCP 47 language tag of the endpoint's primary language."
+  languageCode: String
+  "Venue fact (peer-reviewed journal). A retraction does not change it."
+  isPeerReviewed: Boolean
+  """
+  Advisory deprecated, read-only legacy value. Primary versus retelling is a property of each assertion
+  (no outgoing RETELLS; CQ-PV-05), not of a whole document. New writes do not set it.
+  """
+  isPrimarySource: Boolean @settable(onCreate: false, onUpdate: false)
+  isRegulatorySource: Boolean
+  isFinancialDisclosure: Boolean
+  """class: structural; cardinality: many; catalog: HAS_SNAPSHOT (W00). Immutable captures of this endpoint."""
+  snapshots: [SourceSnapshot!]! @relationship(type: "HAS_SNAPSHOT", direction: OUT)
+  """class: structural; cardinality: many; catalog: HAS_TEXT_VERSION (W00). Each text version is TEXT_OF_SNAPSHOT exactly one of this document's snapshots."""
+  hasTextVersions: [DocumentTextVersion!]! @relationship(type: "HAS_TEXT_VERSION", direction: OUT)
+  """class: structural; cardinality: many; catalog: RENDITION_OF (W00). Replaces live SOURCE_OF (sourceForEpisodes)."""
+  renditionOfEpisodes: [Episode!]! @relationship(type: "RENDITION_OF", direction: OUT)
+  """class: structural; cardinality: many; catalog: RENDITION_OF (W00). The scholarly work this endpoint renders."""
+  renditionOfPublications: [Publication!]! @relationship(type: "RENDITION_OF", direction: OUT)
+  """class: derived (rule-only: chunk FROM_TEXT_VERSION a text version of this document); cardinality: many; catalog: HAS_CHUNK. Read-only."""
+  hasChunks: [Chunk!]! @relationship(type: "HAS_CHUNK", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (retrieval; aboutness is a ranking feature, never evidence); cardinality: many; catalog: ABOUT (document)."""
+  about: [AssertionSubjectTarget!]! @relationship(type: "ABOUT", direction: OUT, properties: "RetrievalEdgeProperties")
+  """class: asserted (byline statement in a snapshot); cardinality: many; catalog: AUTHORED_BY. Authorship is not attribution of every sentence (quoted speakers are ASSERTED_BY on their occurrences)."""
+  authoredBy: [DocumentAuthorTarget!]! @relationship(type: "AUTHORED_BY", direction: OUT, properties: "AssertedEdgeProperties")
+}
+
+"""
+A text rendering of exactly one SourceSnapshot produced by one named Activity (TEXT_EXTRACTION of HTML/PDF/XML,
+OCR, or TRANSCRIPTION of a media rendition). Character offsets (Unicode code points, start inclusive, end
+exclusive) are defined only relative to this text as stored. Two extractors over one capture yield two text
+versions; a corrected capture yields a new snapshot and a new text version, never an edit. It is NOT the capture,
+NOT a locator and NOT a chunk. CQs: CQ-PV-02, CQ-PV-03, CQ-PV-04. Module: provenance (canonical; SDL written by
+W20, T-003 no transfer). Archetype: InformationArtifact. uid token: text-version.
+"""
+type DocumentTextVersion implements Entity & InformationArtifactArchetype
+  @node(labels: ["DocumentTextVersion", "InformationArtifact"]) {
+  "Live projection identity, stored as documentTextVersionId."
+  id: ID! @id @alias(property: "documentTextVersionId")
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype field; 'DocumentTextVersion'."
+  artifactType: String!
+  "Set only when the text itself is a published artifact (a publisher transcript); null for extractor output."
+  publishedAt: DateTime
+  "When the underlying content was known to be displayed; copied from the snapshot's observedAt."
+  observedAt: DateTime
+  "Equals textVersionHash (sha256:<hex>); written for archetype-level checks (validator W20-V09)."
+  contentHash: String
+  "Human label, e.g. 'pmc-jats-mcp-text', 'pdf-firecrawl-md', 'youtube-caption-track-en'."
+  versionLabel: String
+  "sha256:<hex> over the UTF-8 bytes of text exactly as stored (no further normalization)."
+  textVersionHash: String!
+  "Live display label of the producing method; authoritative lineage is WAS_GENERATED_BY Activity (methodVersion). Was String!."
+  source: String
+  "The full text as produced; offsets count Unicode code points in this string."
+  text: String!
+  "Normalization already applied to text by the producer (registered id such as NFC-WS1), or null for producer output kept as emitted."
+  normalizationVersion: String
+  "BCP 47 tag of the text (a caption track language or a translation)."
+  languageCode: String
+  """class: structural; cardinality: exactly_one; catalog: TEXT_OF_SNAPSHOT (W00; V-405)."""
+  textOfSnapshot: [SourceSnapshot!]! @relationship(type: "TEXT_OF_SNAPSHOT", direction: OUT)
+  """class: structural; cardinality: exactly_one (inverse of HAS_TEXT_VERSION); catalog: HAS_TEXT_VERSION."""
+  documents: [Document!]! @relationship(type: "HAS_TEXT_VERSION", direction: IN)
+  """class: structural; cardinality: one_or_more for new writes; catalog: WAS_GENERATED_BY (W00). Activity kind TEXT_EXTRACTION or TRANSCRIPTION."""
+  wasGeneratedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; cardinality: many; catalog: HAS_SEGMENTATION. One Segmentation per segmentationHash."""
+  hasSegmentations: [Segmentation!]! @relationship(type: "HAS_SEGMENTATION", direction: OUT)
+  """class: structural; cardinality: many (inverse of LOCATOR_IN_TEXT_VERSION, W00). Locators whose offsets count in this text."""
+  locators: [SourceLocator!]! @relationship(type: "LOCATOR_IN_TEXT_VERSION", direction: IN)
+  """class: structural; cardinality: many (inverse of FROM_TEXT_VERSION). All chunks of all segmentations of this text."""
+  chunks: [Chunk!]! @relationship(type: "FROM_TEXT_VERSION", direction: IN)
+}
+
+"""
+The configuration and run output envelope of one chunking of one DocumentTextVersion (operational, not evidence).
+segmentationHash = sha256:<hex> over the canonical JSON {strategy, chunkSize, overlap, methodVersion}; it is
+text-independent, so (text version, segmentationHash) identifies a Segmentation and re-running the same
+configuration is idempotent. A new configuration is a new Segmentation and new chunks; locators never change.
+CQs: CQ-PV-03, CQ-PV-C02. Module: claims_and_documents. Archetype: InformationArtifact.
+uid token: segmentation (registration requested, W20-SR-02).
+"""
+type Segmentation implements Entity & InformationArtifactArchetype
+  @node(labels: ["Segmentation", "InformationArtifact"]) {
+  "Live projection identity, stored as segmentationId."
+  id: ID! @id @alias(property: "segmentationId")
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype field; 'Segmentation'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  segmentationHash: String!
+  "Chunk size in the unit named by methodVersion (code points or tokens of a named tokenizer)."
+  chunkSize: Int!
+  "Overlap between consecutive chunks, same unit as chunkSize."
+  overlap: Int!
+  "Live strategy name, stored as strategy (e.g. 'fixed-window', 'paragraph', 'speaker-turn')."
+  segmentationStrategy: String! @alias(property: "strategy")
+  "Segmenter and tokenizer version and size unit, e.g. 'w20-window-v1;unit=CODE_POINT'. Part of the hash input."
+  methodVersion: String
+  """class: structural; cardinality: exactly_one (inverse of HAS_SEGMENTATION)."""
+  textVersion: [DocumentTextVersion!]! @relationship(type: "HAS_SEGMENTATION", direction: IN)
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (domain extension to Segmentation requested, W20-SR-05). Activity kind SEGMENTATION."""
+  wasGeneratedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+}
+
+"""
+A derived retrieval unit: a span [charStart, charEnd) of one DocumentTextVersion produced by one Segmentation
+(segmentationHash). Regenerated whenever segmentation changes; its text, index and boundaries are not stable
+citations. A Chunk is never a SourceLocator (INV-404, V-406) and a chunk match is never source support. Support
+and claims reach a chunk only through derived shortcuts naming a locator (RESOLVES_TO_CHUNK, SUPPORTED_BY_CHUNK).
+CQs: CQ-AX-14 (retrieval), CQ-PV-02 (resolution), CQ-PV-C02. Module: claims_and_documents.
+Archetype: InformationArtifact. uid token: chunk.
+"""
+type Chunk implements Entity & InformationArtifactArchetype & SearchIndexable
+  @node(labels: ["Chunk", "InformationArtifact"])
+  @fulltext(indexes: [{indexName: "ChunkSearch", fields: ["text", "searchText"], queryName: "searchChunks"}]) {
+  "Live projection identity, stored as chunkId."
+  id: ID! @id @alias(property: "chunkId")
+  uid: String!
+  "Live chunk key, stored as chunkKey. Presentation and idempotence aid only; never identity or a citation."
+  name: String @alias(property: "chunkKey")
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Archetype field; 'Chunk'."
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  "sha256:<hex> over the UTF-8 bytes of text."
+  contentHash: String
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Derived embedding; computed outside the API; never evidence."
+  searchEmbedding: [Float!]
+  "Position within its segmentation (0-based), stored as index."
+  chunkIndex: Int! @alias(property: "index")
+  "Equals substring of the text version over [charStart, charEnd) (validator W20-V06)."
+  text: String!
+  "Segmentation.segmentationHash of the producing segmentation. Required for new writes (service-enforced; legacy rows may lack it)."
+  segmentationHash: String
+  "Start offset in the text version, Unicode code points, inclusive."
+  charStart: Int
+  "End offset in the text version, Unicode code points, exclusive."
+  charEnd: Int
+  """class: structural; cardinality: exactly_one; catalog: FROM_TEXT_VERSION."""
+  fromTextVersions: [DocumentTextVersion!]! @relationship(type: "FROM_TEXT_VERSION", direction: OUT)
+  """class: structural; cardinality: zero_or_one (within one segmentation); catalog: NEXT_CHUNK."""
+  nextChunks: [Chunk!]! @relationship(type: "NEXT_CHUNK", direction: OUT)
+  """class: structural; inverse read of NEXT_CHUNK (the live PREV_CHUNK relationship type is retired); cardinality: zero_or_one."""
+  previousChunks: [Chunk!]! @relationship(type: "NEXT_CHUNK", direction: IN)
+  """class: derived (inverse of HAS_CHUNK); read-only."""
+  documents: [Document!]! @relationship(type: "HAS_CHUNK", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (retrieval); cardinality: many; catalog: MENTIONS (chunk). A mention is not an endorsement and not a resolved identity claim."""
+  mentions: [AssertionSubjectTarget!]! @relationship(type: "MENTIONS", direction: OUT, properties: "RetrievalEdgeProperties")
+  """class: derived (retrieval); cardinality: many; catalog: ABOUT (chunk)."""
+  about: [AssertionSubjectTarget!]! @relationship(type: "ABOUT", direction: OUT, properties: "RetrievalEdgeProperties")
+  """class: derived; read-only inverse of Claim -[:SUPPORTED_BY_CHUNK]-> Chunk (replaces live Chunk -[:ASSERTS]-> Claim). A chunk asserts nothing; an asserter does."""
+  assertsClaims: [Claim!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: IN, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived; read-only inverse of RESOLVES_TO_CHUNK (catalog claims_and_documents; V-408)."""
+  resolvedFromLocators: [SourceLocator!]! @relationship(type: "RESOLVES_TO_CHUNK", direction: IN, properties: "ChunkResolutionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (rule-only: chunk span overlaps the segment's rendition-bound time range via its text version); catalog: OCCURS_IN_SEGMENT (chunk). Read-only."""
+  inEpisodeSegments: [EpisodeSegment!]! @relationship(type: "OCCURS_IN_SEGMENT", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}

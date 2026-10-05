@@ -1,0 +1,17 @@
+{
+  "uriFile": "<bolt.uri of a FRESH embedded Neo4j 5.26.31 Community instance with APOC core>",
+  "steps": [
+    {"name": "operations baseline", "file": "docs/schema/neo4j/final_biotech_schema_operations.cypher", "expect": "all-ok"},
+    {"name": "operations enterprise companion (expected rejections on Community)", "file": "docs/schema/neo4j/final_biotech_schema_operations.enterprise.cypher", "expect": "errors-ok"},
+    {"name": "translated 0.2.0 fixtures x6 + backfill", "file": "validation/fixtures-final/<each>.cypher", "expect": "all-ok"},
+    {"name": "0.2.0 validation suite on translated fixtures", "file": "docs/schema/neo4j/validation.cypher", "params": "validation/validation-params.json", "expect": "zero-rows", "informational": ["V-111b","V-118","V-120","V-212","V-223","V-331","V-401b","V-514b","V-522"]},
+    {"name": "validator corrections (W00 reconciliation)", "file": "workers/W00/validation-corrections.cypher", "params": "validation/validation-params.json", "expect": "zero-rows"},
+    {"name": "worker positive fixtures (per packet, documented order)", "file": "workers/Wxx/fixtures/<positives>", "expect": "all-ok"},
+    {"name": "worker validators on all positives", "file": "workers/Wxx/fixtures/<validation>.cypher", "expect": "zero-rows"},
+    {"name": "mandatory media minimal pairs (W21 fx01..fx07, W22 mp1..mp6)", "file": "...", "expect": "all-ok"},
+    {"name": "mandatory protocol cases (W16 01..13)", "file": "...", "expect": "all-ok"},
+    {"name": "worker negatives (each must be caught)", "file": "workers/Wxx/fixtures/<negatives>", "expect": "rows:<validator>=<n>"},
+    {"name": "QS-1..QS-8 EXPLAIN", "file": "validation/query-shapes-extracted.cypher", "explain": true, "expect": "all-ok"},
+    {"name": "GraphQL round trips", "file": "(roundtrip.mjs with validation/harness/roundtrip-ops.json)", "expect": "all-ok"}
+  ]
+}

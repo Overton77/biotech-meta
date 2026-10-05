@@ -1,0 +1,39 @@
+SOURCE: https://transparency.truniagen.com/assets/Sample-CoA-202511.pdf
+CAPTURE: Firecrawl scrape (pdf parser), 2026-10-04T01:01Z, 2 pages; text extraction only (images, marks and any signature image not captured)
+EXCERPT (verbatim text extraction, both pages):
+## Certificate of Analysis
+| PRODUCT NAME | TRU NIAGEN® PRO 500mg 30ct |
+| PART NUMBER | CTNUS5002030200 |
+| LOT NUMBER | T25189001 |
+| REPORT NUMBER | CDXA-RSS-11207-00 |
+| DATE OF MANUFACTURE | 08Jul2025 |
+| COUNTRY OF ORIGIN | USA |
+| DATE OF REPORT | 03Sep2025 |
+### ASSAY RESULTS
+| TEST | METHOD | ANALYTE | TEST REQUIREMENTS | RESULT |
+| Potency | HPLC | Nicotinamide Riboside Chloride | NLT 500 mg/capsule | ☑ 555 mg/capsule |
+| Capsule Uniformity of Weight | USP 2091 | N/A | 828 mg/capsule ±10% | ☑ Pass |
+| Microbial* | USP 61/2021 | Total Plate Count | NMT 10,000 CFU/g | ☑ Pass |
+| Microbial* | USP 2021 | Yeast and Mold | NMT 200 CFU/g | ☑ Pass |
+| Microbial* | USP 2022 | E. coli | Absent/10g | ☑ Pass |
+| Heavy Metals* | ICP-MS | Arsenic | NMT 1.0 ppm | ☑ Pass |
+| Heavy Metals* | ICP-MS | Cadmium | NMT 1.0 ppm | ☑ Pass |
+| Heavy Metals* | ICP-MS | Lead | NMT 0.5 ppm | ☑ Pass |
+| Heavy Metals* | ICP-MS | Mercury | NMT 1.0 ppm | ☑ Pass |
+| Certified for Sport at NSF International† | NSF 306 | Banned Substances Panel | Pass | ☑ Pass |
+| Appearance† | Visual | N/A | Clear capsule, blend of white and light tan to brown powders visible inside with minimal void space | ☑ Pass |
+*Testing performed at ISO 17025 accredited subcontracted laboratories.
+†Test not in the scope of accreditation to ISO/IEC 17025:2017
+NMT = Not More Than; NLT = Not Less Than; ppm = parts per million; CFU/g = Colony forming units/gram
+NSF CERTIFIED SPORT CONTENTS CERTIFIED NSF M K
+The product contents and absence of banned substances are certified by NSF International. This product is certified as halal and kosher.
+### STORAGE CONDITIONS
+STORAGE Store in original container in a cool, dry place.
+EXPIRATION DATE 07/2028 under the above conditions.
+ChromaDex Analytics, Inc. is an ISO/IEC 17025:2017 accredited Chemical Testing Laboratory.
+# Certificate of Analysis
+## REVISION HISTORY
+| Revision History | Date of Revision | Document/Changes |
+| 00 | 03Sep2025 | New report |
+10900 Wilshire Blvd., Suite 600, Los Angeles, CA 90024 | ... | www.niagenbioscience.com | www.truniagen.com ChromaDex Analytics, Inc. is an affiliate of Niagen Bioscience, Inc. ChromaDex Analytics laboratory address: 1751 S. Fordham St., Suite 350, Longmont, CO 80503 Page 2 of 2
+NOTES: the PDF is published as "Sample Certificate Of Analysis" on the transparency page (https://transparency.truniagen.com/, captured 2026-10-04T01:00Z). The text extraction shows no signer name, signature line or approval statement; whether a signature image exists was not established.

@@ -1,0 +1,187 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W09/fixtures/01-registry-versions.cypher",
+ "uri": "bolt://127.0.0.1:35591/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 8,
+ "ok": 8,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "V-210",
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 9,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 6,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 78,
+    "labelsAdded": 18,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 259,
+   "sample": [],
+   "header": "// =====================================================================================================================\n// W09 fixture 01: registry identity vs registry versions; registered-not-completed vs results-posted.\n// Real records: NCT02678611, NCT00938340, NCT04985630, retrieved 2026-10-04"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 2,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 2,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 34,
+    "labelsAdded": 4,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 125,
+   "sample": [],
+   "header": "// 2. NCT02678611: completed, results NOT posted on the registry (a results paper exists: fixture 07). versionDate unknown."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 4,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 16,
+    "labelsAdded": 1,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 127,
+   "sample": [],
+   "header": "// 3. REGISTERED_AS for NCT02678611 (asserted edge = projection of one assertion)."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 4,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 6,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 57,
+    "labelsAdded": 7,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 148,
+   "sample": [],
+   "header": "// 4. NCT00938340: completed, results POSTED (resultsFirstPostedDate not returned by the tool: null, not invented)."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 4,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 6,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 56,
+    "labelsAdded": 7,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 170,
+   "sample": [],
+   "header": "// 5. NCT04985630: registered, NOT completed (RECRUITING on 2026-10-04 although the displayed primary completion date\n//    2026-07-31 has passed). The tool does not say whether dates are ACTUAL or ANTICIPATED: date types stay null."
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 3,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 3,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 56,
+    "labelsAdded": 6,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 138,
+   "sample": [],
+   "header": "// 6. SYNTHETIC registration with two observed versions (EXCLUSIVE episodes). v1 observed 2026-05-01 RECRUITING; v2 observed\n//    2026-09-01 COMPLETED with results posted; the registry history (synthetic) dates v2 to 2026-08-15. On 2026-09-01 the\n//    v1 episode is closed in recorded time and re-a"
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 3,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 36,
+   "sample": [],
+   "header": "// 7. Derived Study cache (INV-208): allowed only with projectionOfRegistrationVersionUid."
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 0,
+   "counters": {
+    "nodesCreated": 1,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 3,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 12,
+    "labelsAdded": 2,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 56,
+   "sample": [],
+   "header": "// 8. Capture-fidelity policy adjudication for this fixture's assertions (INV-103; says nothing about truth)."
+  }
+ ]
+}

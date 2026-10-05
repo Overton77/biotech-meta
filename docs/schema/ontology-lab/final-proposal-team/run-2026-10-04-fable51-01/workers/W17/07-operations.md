@@ -1,0 +1,50 @@
+# W17 operations recommendation
+
+Target: Neo4j 5.26.31 Community (tested), `@neo4j/graphql` 7.6.3. Enterprise behaviour unverified. `operations.cypher` (21 statements, all `IF NOT EXISTS`) ran cleanly after W00's `operations.cypher` on a fresh embedded instance (06 section 1). No Enterprise-only statement is required by W17; none is shipped.
+
+## 1. Uniqueness and indexes (stored property names)
+
+| Need | Statement (operations.cypher) | Why |
+|---|---|---|
+| uid / id per primary label | `adverse_effect_uid`, `adverse_effect_id`, `safety_signal_uid`, `safety_signal_id`, `use_constraint_uid`, `use_constraint_id`, `contraindication_assertion_uid`, `interaction_assertion_uid` | archetype-label constraints (W00 A) guarantee uniqueness; primary-label constraints give the planner an index for `MATCH (n:SafetySignal {uid: …})` and GraphQL `MATCH (this:SafetySignal:EvidenceAssessment) WHERE this.id = …` |
+| UseConstraint natural identity | `use_constraint_identity_key` on `identityKeyHash` | concurrent ingestion of the same label row from two snapshots must converge on one constraint (D-W17-04) |
+| subject attachment episodes | `has_safety_signal_relationship_uid` on `HAS_SAFETY_SIGNAL.relationshipUid` | MERGE key; relationship property uniqueness accepted by 5.26 Community |
+| signal filters | `safety_signal_status`, `safety_signal_method`, `safety_signal_recorded_at` | Q-W17-03/07/08; "current signal" = not superseded, ordered by recordedAt |
+| directive / interaction filters | `contraindication_level`, `contraindication_recorded (recordedAt, recordedTo)`, `interaction_polarity`, `interaction_recorded` | Q-W17-04/05/06 as-of filters |
+| relationship property filters | `signal_input_status` (`SIGNAL_BASED_ON.aeReportedStatus`), `constraint_scope_role` | Q-W17-02, Q-W17-04 |
+| full text | `AdverseEffectSearch`, `SafetySignalSearch` over stored `name, description, searchText, effectCategory` / `signalType, interactionSummary` | live index and query names kept (D-015); `@fulltext` in the fragment matches |
+
+No `@vector` is proposed for W17 types (no retrieval justification; D-014).
+
+## 2. Retrieval patterns
+
+- **Constraint evaluation (Q-W17-04)**: anchor on the option uid (primary-label index), expand `CONSTRAINS_USE_OF` in and `CONSTRAINT_SCOPE` in (option as co-exposure), filter scope members by the declared public uids and dose bands, then read live assertions through `RESOLVES_TO_CONSTRAINT` with the as-of predicate. Fan-out is bounded by the number of constraints on one subject (tens for a drug label). The query takes `R`/`V`; the private store passes its `evidenceRecordedAt` as `R` on replay.
+- **Signal trace (Q-W17-03)**: subject uid → `HAS_SAFETY_SIGNAL {subjectRole: PRIMARY}` → signal → `SIGNAL_BASED_ON` inputs; current = no incoming `SUPERSEDES`.
+- **QS-7 for pairs (Q-W17-05)**: subject/object uids → InteractionAssertions; covering sources via `SUPPORTED_BY` → locator → snapshot. Production should restrict "covering" to snapshots whose source kind covers interactions for the object (a drug label's section 7, a monograph's interaction section); the fixture uses "any snapshot with an interaction or directive about the object".
+
+## 3. Application validation (service-enforced on Community)
+
+Presence on Community: `SafetySignal.{assessmentType, methodVersion, status, recordedAt, signalStatus}`, `ContraindicationAssertion.{constraintLevel, polarity}`, `InteractionAssertion.polarity`, `UseConstraint.{identityKeyHash, identityKeyVersion}`, `SafetyEdgeProperties.{relationshipUid, subjectRole}`, `SignalInputProperties.aeReportedStatus`, `ConstraintScopeProperties.scopeRole` (GraphQL non-null fields enforce them for API writes; Cypher ingestion must enforce them; V-W17-01..13 audit). Write-time rules:
+
+1. A SafetySignal and all its structural edges (subjects, effect, conditions, inputs, WAS_GENERATED_BY) are written in **one transaction**; after commit nothing on it changes except `recordedTo` and `status` (to SUPERSEDED) in the superseding transaction (KCR-2a).
+2. `recordedAt` is the commit time (`datetime.transaction()` in Cypher ingestion), never earlier than the input records' `recordedAt` nor the supporting snapshots' `retrievedAt` (INV-502). `evidenceCutoff` ≤ `recordedAt`.
+3. `signalStatus NOT_EVALUATED` only with `methodVersion live-migration/*`; `legacyEvidenceStrengthHint` only on migrated rows (V-W17-02).
+4. UseConstraint creation: compute `identityKeyHash` from the canonical tuple (uc-key/v1: subject uid; subject dose band normalized to UCUM unit and quantity basis; route; jurisdiction; scope members sorted by role then uid with their dose bands) and `MERGE` on it; scope edges are created only when the node is created (`ON CREATE`). A scope correction creates a new UseConstraint and moves derived `RESOLVES_TO_CONSTRAINT` edges; the old one stays resolvable (redirect via EquivalenceAssessment if it was a duplicate).
+5. `RESOLVES_TO_CONSTRAINT` is regenerated by the `uc-match/v1` job from live assertions; it is never the only record (the assertions are) and carries `derivationRule` + `derivedFromAssertionUids` (INV-004, V-W17-06).
+6. No W17 node is created from private context; requests that would need one return a missing-fact key to the private store instead (D-W17-06; V-W17-12).
+7. Dose band units: compare only after UCUM conversion within one quantity basis; a band and an option dose with different `quantityBasis` (per dose vs per day) do not compare — the case is reported as scope unknown, never as "below threshold" (INV-203 analogue).
+
+Concurrency: two ingestion jobs extracting the same label snapshot converge through the uid and `identityKeyHash` constraints; the supersession write (set `recordedTo` on the old assertion or signal, create `SUPERSEDES`) must lock the old node (`SET` in the same transaction) so two superseders cannot both close it — the second sees `recordedTo IS NOT NULL` and aborts.
+
+## 4. Capability and edition conditions
+
+- Community 5.26: node and relationship-property uniqueness constraints and range/full-text indexes used here are supported (verified). Property existence/type constraints are Enterprise-only and are **not** proposed; presence is service-enforced.
+- Enterprise (unverified): the same file runs unchanged; optional existence constraints for `SafetySignal.signalStatus` and `UseConstraint.identityKeyHash` could be added in an Enterprise companion by Fable; W17 does not need them.
+- `CALL (…) { … }` scoped subquery syntax in Q-W17-04 requires Neo4j 5.23+ (ran on 5.26.31).
+
+## 5. Idempotence, lifecycle, migration, ingestion overhead
+
+- Fixtures and operations are idempotent (`MERGE` on uid, `ON CREATE SET`; `IF NOT EXISTS`).
+- Lifecycle: AdverseEffect editable display fields only; SafetySignal immutable (supersede); Contraindication/InteractionAssertion immutable (kernel); UseConstraint immutable identity.
+- Migration (migration-map.yaml): live SafetySignal nodes gain the `EvidenceAssessment` label and `live-migration/0` fields in one batch per 10k nodes; `HAS_SAFETY_SIGNAL` edges gain `relationshipUid` and `subjectRole`, lose `evidenceStrength`/`confidence` after the hint is copied; `SafetySignal -AFFECTS_ORGAN->` edges are copied to the effect and removed. GraphQL compatibility: `searchSafetySignals`, `searchAdverseEffects`, `safetySignals`, `adverseEffects`, `hasSafetySignals` remain; `SafetySignal.evidenceStrength` is renamed (breaking for clients reading it; the value is available as `legacyEvidenceStrengthHint`); `SafetySignal.affectsOrgans` is removed (read `relatesToEffects { affectsOrgans }`).
+- Ingestion overhead: one label (≈ 15 directive/interaction rows for ZOCOR sections 4, 2.5, 7) produces ≈ 15 assertions, ≈ 10 UseConstraints (shared across label revisions) and ≈ 15 derived edges; a signal evaluation writes 1 node + (subjects + inputs + 1) edges.

@@ -1,0 +1,1285 @@
+{
+ "run": "run-2026-10-04-fable51-01",
+ "worker": "W22",
+ "executedAt": "2026-10-04",
+ "engine": "Neo4j 5.26.31 community (embedded, org.neo4j.test:neo4j-harness 5.26.31, OpenJDK 21)",
+ "driver": "neo4j-driver 6.2.0 via validation/harness/run-cypher.mjs (one transaction per statement)",
+ "sequence": "combined: wipe; mp1..mp6; v-media-validation; docs/schema/neo4j/validation.cypher (params harness validation-params.json). solo: wipe; <fixture>; v-media-validation (for mp3, mp5, mp6)",
+ "files": {
+  "all-mp1-product-asset-selection": {
+   "statements": 78,
+   "ok": 78,
+   "errors": 0,
+   "results": [
+    {
+     "id": "Q-MP1-1",
+     "rows": 4,
+     "sample": [
+      {
+       "asset": "hu:media-asset:belllabs-photo-basis-jar-synthetic",
+       "role": "PRODUCT_PHOTO",
+       "rights": [
+        "HELD_BY_OPERATOR"
+       ],
+       "displayVerdict": "SUITABLE",
+       "displayScore": 0.82,
+       "method": "bl-media-display-quality-v1",
+       "decision": "ELIGIBLE"
+      },
+      {
+       "asset": "hu:media-asset:legacy-basis-marketplace-image-synthetic",
+       "role": "PRODUCT_PHOTO",
+       "rights": [],
+       "displayVerdict": null,
+       "displayScore": null,
+       "method": null,
+       "decision": "EXCLUDED_RIGHTS_NOT_CHECKED"
+      },
+      {
+       "asset": "hu:media-asset:elysium-basis-carousel-supplement-facts",
+       "role": "SUPPLEMENT_FACTS_LABEL",
+       "rights": [
+        "RESTRICTED_TERMS"
+       ],
+       "displayVerdict": null,
+       "displayScore": null,
+       "method": null,
+       "decision": "EXCLUDED_RIGHTS_NOT_PERMITTED"
+      },
+      {
+       "asset": "hu:media-asset:elysium-basis-carousel-hero",
+       "role": "PRODUCT_PHOTO",
+       "rights": [
+        "RESTRICTED_TERMS"
+       ],
+       "displayVerdict": "SUITABLE",
+       "displayScore": 0.93,
+       "method": "bl-media-display-quality-v1",
+       "decision": "EXCLUDED_RIGHTS_NOT_PERMITTED"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP1-2",
+     "rows": 1,
+     "sample": [
+      {
+       "naivePick": "hu:media-asset:legacy-basis-marketplace-image-synthetic",
+       "unsourcedScore": 0.97
+      }
+     ]
+    },
+    {
+     "id": "Q-MP1-3",
+     "rows": 4,
+     "sample": [
+      {
+       "asset": "hu:media-asset:belllabs-photo-basis-jar-synthetic",
+       "status": "HELD_BY_OPERATOR",
+       "kind": "OPERATOR_RECORD",
+       "scope": "THIS_ASSET",
+       "statedTerms": null,
+       "capturedAt": {
+        "year": 2026,
+        "month": 10,
+        "day": 4,
+        "hour": 1,
+        "minute": 31,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "asset": "hu:media-asset:elysium-basis-carousel-hero",
+       "status": "RESTRICTED_TERMS",
+       "kind": "SITE_TERMS",
+       "scope": "ENTIRE_SITE",
+       "statedTerms": "Elysium Health grants you a limited, non-exclusive, non-transferable, non-sublicensable license to view, display and print the Content solely in connection with your permitted use of the Services and solely for your personal and non-commercial purposes.",
+       "capturedAt": {
+        "year": 2026,
+        "month": 10,
+        "day": 4,
+        "hour": 0,
+        "minute": 54,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "asset": "hu:media-asset:elysium-basis-carousel-supplement-facts",
+       "status": "RESTRICTED_TERMS",
+       "kind": "SITE_TERMS",
+       "scope": "ENTIRE_SITE",
+       "statedTerms": "Elysium Health grants you a limited, non-exclusive, non-transferable, non-sublicensable license to view, display and print the Content solely in connection with your permitted use of the Services and solely for your personal and non-commercial purposes.",
+       "capturedAt": {
+        "year": 2026,
+        "month": 10,
+        "day": 4,
+        "hour": 0,
+        "minute": 54,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       }
+      },
+      {
+       "asset": "hu:media-asset:legacy-basis-marketplace-image-synthetic",
+       "status": null,
+       "kind": null,
+       "scope": null,
+       "statedTerms": null,
+       "capturedAt": null
+      }
+     ]
+    }
+   ]
+  },
+  "all-mp2-concept-asset-selection": {
+   "statements": 78,
+   "ok": 78,
+   "errors": 0,
+   "results": [
+    {
+     "id": "Q-MP2-1",
+     "rows": 3,
+     "sample": [
+      {
+       "asset": "hu:media-asset:belllabs-generated-mtor-explainer-synthetic",
+       "generationMode": "GENERATED",
+       "mustLabelAsGenerated": true,
+       "rights": [
+        "HELD_BY_OPERATOR"
+       ],
+       "licences": [],
+       "attributions": [],
+       "displayVerdict": "SUITABLE",
+       "displayScore": 0.88,
+       "decision": "ELIGIBLE"
+      },
+      {
+       "asset": "hu:media-asset:commons-mtor-signal-pathway",
+       "generationMode": "UNKNOWN",
+       "mustLabelAsGenerated": false,
+       "rights": [
+        "OPEN_LICENSE"
+       ],
+       "licences": [
+        "GFDL (version not stated in the retrieved metadata)",
+        "CC BY-SA 3.0"
+       ],
+       "attributions": [
+        "Lybbar12"
+       ],
+       "displayVerdict": "MARGINAL",
+       "displayScore": 0.55,
+       "decision": "EXCLUDED_NOT_SUITABLE"
+      },
+      {
+       "asset": "hu:media-asset:legacy-concept-diagram-unsourced-synthetic",
+       "generationMode": null,
+       "mustLabelAsGenerated": false,
+       "rights": [],
+       "licences": [],
+       "attributions": [],
+       "displayVerdict": null,
+       "displayScore": null,
+       "decision": "EXCLUDED_RIGHTS_NOT_CHECKED"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP2-2",
+     "rows": 2,
+     "sample": [
+      {
+       "role": "MECHANISM_DIAGRAM",
+       "verdict": "MARGINAL",
+       "score": 0.55,
+       "licences": [
+        "GFDL (version not stated in the retrieved metadata)",
+        "CC BY-SA 3.0"
+       ],
+       "attribution": [
+        "Lybbar12"
+       ]
+      },
+      {
+       "role": "THUMBNAIL",
+       "verdict": "SUITABLE",
+       "score": 0.8,
+       "licences": [
+        "GFDL (version not stated in the retrieved metadata)",
+        "CC BY-SA 3.0"
+       ],
+       "attribution": [
+        "Lybbar12"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "Q-MP2-3",
+     "rows": 2,
+     "sample": [
+      {
+       "asset": "hu:media-asset:belllabs-generated-nad-metric-explainer-synthetic",
+       "rights": [
+        "HELD_BY_OPERATOR"
+       ],
+       "verdict": "SUITABLE",
+       "legacyUnsourcedScore": null,
+       "decision": "ELIGIBLE"
+      },
+      {
+       "asset": "hu:media-asset:legacy-concept-diagram-unsourced-synthetic",
+       "rights": [],
+       "verdict": null,
+       "legacyUnsourcedScore": 0.95,
+       "decision": "EXCLUDED_RIGHTS_NOT_CHECKED"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP2-4",
+     "rows": 0,
+     "sample": []
+    }
+   ]
+  },
+  "all-mp3-illustration-vs-microscopy-evidence": {
+   "statements": 50,
+   "ok": 50,
+   "errors": 0,
+   "results": [
+    {
+     "id": "Derivation MEDIA-EV-1",
+     "rows": 1,
+     "sample": [
+      {
+       "evidencingAsset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "evidencedAssertion": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP3-1",
+     "rows": 2,
+     "sample": [
+      {
+       "assertion": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context",
+       "asset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "generationMode": "CAPTURED",
+       "variantKind": "ORIGINAL",
+       "snapshot": "hu:snapshot:bia-s-biad807-confocal-file-synthetic",
+       "sameBytes": true,
+       "rights": [
+        "PUBLIC_DOMAIN"
+       ],
+       "verdict": "EVIDENCE_PATH_OK"
+      },
+      {
+       "assertion": "hu:assertion:bad-mtdna-release-supported-by-generated-image",
+       "asset": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic",
+       "generationMode": "GENERATED",
+       "variantKind": "ORIGINAL",
+       "snapshot": "hu:snapshot:bad-generated-illustration-as-source",
+       "sameBytes": true,
+       "rights": [],
+       "verdict": "REJECTED_GENERATED_ASSET"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP3-2",
+     "rows": 1,
+     "sample": [
+      {
+       "explanatoryAsset": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic",
+       "generationMode": "GENERATED",
+       "isSynthetic": true,
+       "role": "MECHANISM_DIAGRAM"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP3-3",
+     "rows": 2,
+     "sample": [
+      {
+       "asset": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic",
+       "evidenced": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context",
+       "rule": null,
+       "generationMode": "GENERATED"
+      },
+      {
+       "asset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "evidenced": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context",
+       "rule": "MEDIA-EV-1",
+       "generationMode": "CAPTURED"
+      }
+     ]
+    }
+   ]
+  },
+  "all-mp4-rights-excellent-vs-licensed": {
+   "statements": 81,
+   "ok": 81,
+   "errors": 0,
+   "results": [
+    {
+     "id": "Q-MP4-1",
+     "rows": 4,
+     "sample": [
+      {
+       "asset": "hu:media-asset:reactome-r-hsa-196807-diagram",
+       "displayScore": 0.78,
+       "rights": [
+        "OPEN_LICENSE"
+       ],
+       "requiredAttribution": [
+        "Reactome, Nicotinate metabolism (R-HSA-196807.8), CC BY 4.0"
+       ],
+       "mustIndicateChanges": true,
+       "decision": "ELIGIBLE"
+      },
+      {
+       "asset": "hu:media-asset:unchecked-nad-diagram-synthetic",
+       "displayScore": 0.92,
+       "rights": [],
+       "requiredAttribution": [],
+       "mustIndicateChanges": false,
+       "decision": "EXCLUDED_RIGHTS_NOT_CHECKED"
+      },
+      {
+       "asset": "hu:media-asset:cambronne-kraus-2020-figure-i",
+       "displayScore": 0.96,
+       "rights": [
+        "ALL_RIGHTS_RESERVED"
+       ],
+       "requiredAttribution": [],
+       "mustIndicateChanges": null,
+       "decision": "EXCLUDED_RIGHTS_NOT_PERMITTED"
+      },
+      {
+       "asset": "hu:media-asset:covarrubias-2021-figure-placeholder",
+       "displayScore": 0.9,
+       "rights": [
+        "NO_STATEMENT_FOUND"
+       ],
+       "requiredAttribution": [],
+       "mustIndicateChanges": null,
+       "decision": "EXCLUDED_RIGHTS_NOT_PERMITTED"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP4-2",
+     "rows": 1,
+     "sample": [
+      {
+       "asset": "hu:media-asset:cambronne-kraus-2020-figure-i",
+       "freelyReadableAt": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7502477/",
+       "retrievedAt": {
+        "year": 2026,
+        "month": 10,
+        "day": 4,
+        "hour": 1,
+        "minute": 2,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       },
+       "rightsStatus": "ALL_RIGHTS_RESERVED",
+       "displayPermittedByRights": false
+      }
+     ]
+    },
+    {
+     "id": "Q-MP4-3",
+     "rows": 3,
+     "sample": [
+      {
+       "activity": "hu:activity:w22-display-nad-answer-bad-rights-synthetic",
+       "asset": "hu:media-asset:cambronne-kraus-2020-figure-i",
+       "useKind": "DISPLAY_MEDIA",
+       "policy": "hu:policy-version:media-display-v0",
+       "rights": [
+        "ALL_RIGHTS_RESERVED"
+       ],
+       "state5": "AUTHORIZED_WITHOUT_PERMITTING_RIGHTS_RECORD"
+      },
+      {
+       "activity": "hu:activity:w22-display-nad-answer-bad-unauthorized-synthetic",
+       "asset": "hu:media-asset:cambronne-kraus-2020-figure-i",
+       "useKind": null,
+       "policy": null,
+       "rights": [
+        "ALL_RIGHTS_RESERVED"
+       ],
+       "state5": "UNAUTHORIZED_USE"
+      },
+      {
+       "activity": "hu:activity:w22-display-nad-answer-ok-synthetic",
+       "asset": "hu:media-asset:reactome-r-hsa-196807-diagram",
+       "useKind": "DISPLAY_MEDIA",
+       "policy": "hu:policy-version:media-display-v0",
+       "rights": [
+        "OPEN_LICENSE"
+       ],
+       "state5": "OK"
+      }
+     ]
+    }
+   ]
+  },
+  "all-mp5-label-crop-region-provenance": {
+   "statements": 40,
+   "ok": 40,
+   "errors": 0,
+   "results": [
+    {
+     "id": "Derivation LABEL-REGION-PRODUCT-1",
+     "rows": 1,
+     "sample": [
+      {
+       "region": "hu:label-region:basis-supplement-facts-panel",
+       "product": "hu:product:elysium-basis"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP5-1",
+     "rows": 1,
+     "sample": [
+      {
+       "crop": "hu:media-variant:basis-supplement-facts-panel-crop",
+       "cropMethod": "bl-crop-v1",
+       "fromRendition": "hu:media-variant:elysium-basis-supplement-facts-w1946",
+       "originalEqualsCapture": true,
+       "regionPx": [
+        310,
+        240,
+        1320,
+        1180
+       ],
+       "frame": "IMG-PX1",
+       "cropMatchesRegion": true,
+       "locator": "hu:locator:basis-supplement-facts-panel-image-region",
+       "snapshot": "hu:snapshot:elysium-cdn-basis-supplement-facts-w1946-synthetic",
+       "retrievedAt": {
+        "year": 2026,
+        "month": 10,
+        "day": 4,
+        "hour": 1,
+        "minute": 5,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       },
+       "source": "https://www.elysiumhealth.com/cdn/shop/files/5_Basis_Carousel_SupplementFacts_SEP26_1_1_33f99ab8-54b6-4178-b1fd-12c206b8064f.jpg?v=1790519922&width=1946",
+       "regionType": "SUPPLEMENT_FACTS"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP5-2",
+     "rows": 3,
+     "sample": [
+      {
+       "rendition": "hu:media-variant:elysium-basis-supplement-facts-w1946",
+       "kind": "ORIGINAL",
+       "widthPx": 1946,
+       "regionDefinedHere": true
+      },
+      {
+       "rendition": "hu:media-variant:basis-supplement-facts-panel-crop",
+       "kind": "CROPPED",
+       "widthPx": 1320,
+       "regionDefinedHere": false
+      },
+      {
+       "rendition": "hu:media-variant:elysium-basis-supplement-facts-w416",
+       "kind": "RESIZED",
+       "widthPx": 416,
+       "regionDefinedHere": false
+      }
+     ]
+    },
+    {
+     "id": "Q-MP5-3",
+     "rows": 1,
+     "sample": [
+      {
+       "region": "hu:label-region:basis-supplement-facts-panel",
+       "declaration": "Elysium NR (Nicotinamide Riboside Chloride) 250 mg",
+       "citeAs": "hu:locator:basis-supplement-facts-panel-image-region",
+       "aboutProduct": "hu:product:elysium-basis",
+       "derivedBy": "LABEL-REGION-PRODUCT-1"
+      }
+     ]
+    }
+   ]
+  },
+  "all-mp6-edited-figure-vs-original-capture": {
+   "statements": 46,
+   "ok": 46,
+   "errors": 0,
+   "results": [
+    {
+     "id": "Q-MP6-1",
+     "rows": 1,
+     "sample": [
+      {
+       "edited": "hu:media-variant:bia-s-biad807-confocal-callouts-synthetic",
+       "kind": "ANNOTATED",
+       "activityKind": "MEDIA_TRANSFORMATION",
+       "method": "bl-callout-overlay-v1",
+       "original": "hu:media-variant:bia-s-biad807-confocal-original",
+       "originalMode": "CAPTURED",
+       "captureWithSameBytes": "hu:snapshot:bia-s-biad807-confocal-file-synthetic"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP6-2",
+     "rows": 3,
+     "sample": [
+      {
+       "asset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "rendition": "hu:media-variant:bia-s-biad807-confocal-callouts-synthetic",
+       "kind": "ANNOTATED",
+       "bytesEqualACapture": false,
+       "assetIsEdited": null,
+       "evidenceUse": "NOT_FOR_EVIDENCE_EDITED_RENDITION"
+      },
+      {
+       "asset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "rendition": "hu:media-variant:bia-s-biad807-confocal-original",
+       "kind": "ORIGINAL",
+       "bytesEqualACapture": true,
+       "assetIsEdited": null,
+       "evidenceUse": "RAW_CAPTURE_OK"
+      },
+      {
+       "asset": "hu:media-asset:mills-2016-figure-6",
+       "rendition": "hu:media-variant:mills-2016-figure-6-original",
+       "kind": "ORIGINAL",
+       "bytesEqualACapture": true,
+       "assetIsEdited": true,
+       "evidenceUse": "PUBLISHED_COMPOSITE_CITE_AS_FIGURE"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP6-3",
+     "rows": 0,
+     "sample": []
+    }
+   ]
+  },
+  "all-v-media-validation": {
+   "statements": 16,
+   "ok": 16,
+   "errors": 0,
+   "results": [
+    {
+     "id": "V-601",
+     "rows": 1,
+     "sample": [
+      {
+       "imageRegionLocator": "hu:locator:bad-dangling-image-region",
+       "locatedAnnotations": 0,
+       "namedAnnotation": "hu:media-annotation:does-not-exist"
+      }
+     ]
+    },
+    {
+     "id": "V-602",
+     "rows": 2,
+     "sample": [
+      {
+       "locator": "hu:locator:bad-nr-line-region-on-original-snapshot",
+       "annotatedRendition": "hu:media-variant:basis-supplement-facts-panel-crop",
+       "kind": "CROPPED"
+      },
+      {
+       "locator": "hu:locator:bad-region-on-edited-callouts",
+       "annotatedRendition": "hu:media-variant:bia-s-biad807-confocal-callouts-synthetic",
+       "kind": "ANNOTATED"
+      }
+     ]
+    },
+    {
+     "id": "V-603",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-604",
+     "rows": 1,
+     "sample": [
+      {
+       "evidencingAsset": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic",
+       "evidenced": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context",
+       "rule": null
+      }
+     ]
+    },
+    {
+     "id": "V-605",
+     "rows": 1,
+     "sample": [
+      {
+       "generatedAssetUsedAsEvidence": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic"
+      }
+     ]
+    },
+    {
+     "id": "V-606",
+     "rows": 2,
+     "sample": [
+      {
+       "assertion": "hu:assertion:bad-claim-cited-on-edited-rendition",
+       "locator": "hu:locator:bad-region-on-edited-callouts",
+       "derivedRendition": "hu:media-variant:bia-s-biad807-confocal-callouts-synthetic",
+       "kind": "ANNOTATED"
+      },
+      {
+       "assertion": "hu:assertion:bad-nr-declaration-cited-on-crop-region",
+       "locator": "hu:locator:bad-nr-line-region-on-original-snapshot",
+       "derivedRendition": "hu:media-variant:basis-supplement-facts-panel-crop",
+       "kind": "CROPPED"
+      }
+     ]
+    },
+    {
+     "id": "V-607",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-608",
+     "rows": 1,
+     "sample": [
+      {
+       "unauthorizedMediaUse": "hu:activity:w22-display-nad-answer-bad-unauthorized-synthetic",
+       "usedRendition": "hu:media-variant:cambronne-kraus-2020-figure-i-original"
+      }
+     ]
+    },
+    {
+     "id": "V-608b",
+     "rows": 1,
+     "sample": [
+      {
+       "authorizedDisplayNeedsDecision": "hu:activity:w22-display-nad-answer-bad-rights-synthetic",
+       "asset": "hu:media-asset:cambronne-kraus-2020-figure-i",
+       "rights": [
+        "ALL_RIGHTS_RESERVED"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "V-609",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-610",
+     "rows": 2,
+     "sample": [
+      {
+       "nodeWithRetiredMediaProperty": "hu:media-asset:legacy-basis-marketplace-image-synthetic",
+       "retiredKeys": [
+        "qualityScore",
+        "authenticityScore"
+       ]
+      },
+      {
+       "nodeWithRetiredMediaProperty": "hu:media-asset:legacy-concept-diagram-unsourced-synthetic",
+       "retiredKeys": [
+        "qualityScore"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "V-611",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-612",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-613",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-614",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-615",
+     "rows": 0,
+     "sample": []
+    }
+   ]
+  },
+  "kernel-validation": {
+   "statements": 174,
+   "ok": 174,
+   "errors": 0,
+   "results": [
+    {
+     "id": "V-401b",
+     "rows": 1,
+     "sample": [
+      {
+       "acceptedAssertionsWithOnlyCoarseLocators": 5
+      }
+     ]
+    },
+    {
+     "id": "V-514b",
+     "rows": 1,
+     "sample": [
+      {
+       "assertionsWithoutContentHash": 33
+      }
+     ]
+    }
+   ]
+  },
+  "solo-mp3-illustration-vs-microscopy-evidence-validation": {
+   "statements": 16,
+   "ok": 16,
+   "errors": 0,
+   "results": [
+    {
+     "id": "V-601",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-602",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-603",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-604",
+     "rows": 1,
+     "sample": [
+      {
+       "evidencingAsset": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic",
+       "evidenced": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context",
+       "rule": null
+      }
+     ]
+    },
+    {
+     "id": "V-605",
+     "rows": 1,
+     "sample": [
+      {
+       "generatedAssetUsedAsEvidence": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic"
+      }
+     ]
+    },
+    {
+     "id": "V-606",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-607",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-608",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-608b",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-609",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-610",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-611",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-612",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-613",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-614",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-615",
+     "rows": 0,
+     "sample": []
+    }
+   ]
+  },
+  "solo-mp3-illustration-vs-microscopy-evidence": {
+   "statements": 50,
+   "ok": 50,
+   "errors": 0,
+   "results": [
+    {
+     "id": "Derivation MEDIA-EV-1",
+     "rows": 1,
+     "sample": [
+      {
+       "evidencingAsset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "evidencedAssertion": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP3-1",
+     "rows": 2,
+     "sample": [
+      {
+       "assertion": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context",
+       "asset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "generationMode": "CAPTURED",
+       "variantKind": "ORIGINAL",
+       "snapshot": "hu:snapshot:bia-s-biad807-confocal-file-synthetic",
+       "sameBytes": true,
+       "rights": [
+        "PUBLIC_DOMAIN"
+       ],
+       "verdict": "EVIDENCE_PATH_OK"
+      },
+      {
+       "assertion": "hu:assertion:bad-mtdna-release-supported-by-generated-image",
+       "asset": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic",
+       "generationMode": "GENERATED",
+       "variantKind": "ORIGINAL",
+       "snapshot": "hu:snapshot:bad-generated-illustration-as-source",
+       "sameBytes": true,
+       "rights": [],
+       "verdict": "REJECTED_GENERATED_ASSET"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP3-2",
+     "rows": 1,
+     "sample": [
+      {
+       "explanatoryAsset": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic",
+       "generationMode": "GENERATED",
+       "isSynthetic": true,
+       "role": "MECHANISM_DIAGRAM"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP3-3",
+     "rows": 2,
+     "sample": [
+      {
+       "asset": "hu:media-asset:belllabs-generated-mtdna-pyroptosis-illustration-synthetic",
+       "evidenced": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context",
+       "rule": null,
+       "generationMode": "GENERATED"
+      },
+      {
+       "asset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "evidenced": "hu:assertion:w22-mtdna-release-observed-in-s-biad807-context",
+       "rule": "MEDIA-EV-1",
+       "generationMode": "CAPTURED"
+      }
+     ]
+    }
+   ]
+  },
+  "solo-mp5-label-crop-region-provenance-validation": {
+   "statements": 16,
+   "ok": 16,
+   "errors": 0,
+   "results": [
+    {
+     "id": "V-601",
+     "rows": 1,
+     "sample": [
+      {
+       "imageRegionLocator": "hu:locator:bad-dangling-image-region",
+       "locatedAnnotations": 0,
+       "namedAnnotation": "hu:media-annotation:does-not-exist"
+      }
+     ]
+    },
+    {
+     "id": "V-602",
+     "rows": 1,
+     "sample": [
+      {
+       "locator": "hu:locator:bad-nr-line-region-on-original-snapshot",
+       "annotatedRendition": "hu:media-variant:basis-supplement-facts-panel-crop",
+       "kind": "CROPPED"
+      }
+     ]
+    },
+    {
+     "id": "V-603",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-604",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-605",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-606",
+     "rows": 1,
+     "sample": [
+      {
+       "assertion": "hu:assertion:bad-nr-declaration-cited-on-crop-region",
+       "locator": "hu:locator:bad-nr-line-region-on-original-snapshot",
+       "derivedRendition": "hu:media-variant:basis-supplement-facts-panel-crop",
+       "kind": "CROPPED"
+      }
+     ]
+    },
+    {
+     "id": "V-607",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-608",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-608b",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-609",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-610",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-611",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-612",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-613",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-614",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-615",
+     "rows": 0,
+     "sample": []
+    }
+   ]
+  },
+  "solo-mp5-label-crop-region-provenance": {
+   "statements": 40,
+   "ok": 40,
+   "errors": 0,
+   "results": [
+    {
+     "id": "Derivation LABEL-REGION-PRODUCT-1",
+     "rows": 1,
+     "sample": [
+      {
+       "region": "hu:label-region:basis-supplement-facts-panel",
+       "product": "hu:product:elysium-basis"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP5-1",
+     "rows": 1,
+     "sample": [
+      {
+       "crop": "hu:media-variant:basis-supplement-facts-panel-crop",
+       "cropMethod": "bl-crop-v1",
+       "fromRendition": "hu:media-variant:elysium-basis-supplement-facts-w1946",
+       "originalEqualsCapture": true,
+       "regionPx": [
+        310,
+        240,
+        1320,
+        1180
+       ],
+       "frame": "IMG-PX1",
+       "cropMatchesRegion": true,
+       "locator": "hu:locator:basis-supplement-facts-panel-image-region",
+       "snapshot": "hu:snapshot:elysium-cdn-basis-supplement-facts-w1946-synthetic",
+       "retrievedAt": {
+        "year": 2026,
+        "month": 10,
+        "day": 4,
+        "hour": 1,
+        "minute": 5,
+        "second": 0,
+        "nanosecond": 0,
+        "timeZoneOffsetSeconds": 0
+       },
+       "source": "https://www.elysiumhealth.com/cdn/shop/files/5_Basis_Carousel_SupplementFacts_SEP26_1_1_33f99ab8-54b6-4178-b1fd-12c206b8064f.jpg?v=1790519922&width=1946",
+       "regionType": "SUPPLEMENT_FACTS"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP5-2",
+     "rows": 3,
+     "sample": [
+      {
+       "rendition": "hu:media-variant:elysium-basis-supplement-facts-w1946",
+       "kind": "ORIGINAL",
+       "widthPx": 1946,
+       "regionDefinedHere": true
+      },
+      {
+       "rendition": "hu:media-variant:basis-supplement-facts-panel-crop",
+       "kind": "CROPPED",
+       "widthPx": 1320,
+       "regionDefinedHere": false
+      },
+      {
+       "rendition": "hu:media-variant:elysium-basis-supplement-facts-w416",
+       "kind": "RESIZED",
+       "widthPx": 416,
+       "regionDefinedHere": false
+      }
+     ]
+    },
+    {
+     "id": "Q-MP5-3",
+     "rows": 1,
+     "sample": [
+      {
+       "region": "hu:label-region:basis-supplement-facts-panel",
+       "declaration": "Elysium NR (Nicotinamide Riboside Chloride) 250 mg",
+       "citeAs": "hu:locator:basis-supplement-facts-panel-image-region",
+       "aboutProduct": "hu:product:elysium-basis",
+       "derivedBy": "LABEL-REGION-PRODUCT-1"
+      }
+     ]
+    }
+   ]
+  },
+  "solo-mp6-edited-figure-vs-original-capture-validation": {
+   "statements": 16,
+   "ok": 16,
+   "errors": 0,
+   "results": [
+    {
+     "id": "V-601",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-602",
+     "rows": 1,
+     "sample": [
+      {
+       "locator": "hu:locator:bad-region-on-edited-callouts",
+       "annotatedRendition": "hu:media-variant:bia-s-biad807-confocal-callouts-synthetic",
+       "kind": "ANNOTATED"
+      }
+     ]
+    },
+    {
+     "id": "V-603",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-604",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-605",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-606",
+     "rows": 1,
+     "sample": [
+      {
+       "assertion": "hu:assertion:bad-claim-cited-on-edited-rendition",
+       "locator": "hu:locator:bad-region-on-edited-callouts",
+       "derivedRendition": "hu:media-variant:bia-s-biad807-confocal-callouts-synthetic",
+       "kind": "ANNOTATED"
+      }
+     ]
+    },
+    {
+     "id": "V-607",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-608",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-608b",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-609",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-610",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-611",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-612",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-613",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-614",
+     "rows": 0,
+     "sample": []
+    },
+    {
+     "id": "V-615",
+     "rows": 0,
+     "sample": []
+    }
+   ]
+  },
+  "solo-mp6-edited-figure-vs-original-capture": {
+   "statements": 46,
+   "ok": 46,
+   "errors": 0,
+   "results": [
+    {
+     "id": "Q-MP6-1",
+     "rows": 1,
+     "sample": [
+      {
+       "edited": "hu:media-variant:bia-s-biad807-confocal-callouts-synthetic",
+       "kind": "ANNOTATED",
+       "activityKind": "MEDIA_TRANSFORMATION",
+       "method": "bl-callout-overlay-v1",
+       "original": "hu:media-variant:bia-s-biad807-confocal-original",
+       "originalMode": "CAPTURED",
+       "captureWithSameBytes": "hu:snapshot:bia-s-biad807-confocal-file-synthetic"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP6-2",
+     "rows": 3,
+     "sample": [
+      {
+       "asset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "rendition": "hu:media-variant:bia-s-biad807-confocal-callouts-synthetic",
+       "kind": "ANNOTATED",
+       "bytesEqualACapture": false,
+       "assetIsEdited": null,
+       "evidenceUse": "NOT_FOR_EVIDENCE_EDITED_RENDITION"
+      },
+      {
+       "asset": "hu:media-asset:bia-s-biad807-confocal-image-synthetic-file",
+       "rendition": "hu:media-variant:bia-s-biad807-confocal-original",
+       "kind": "ORIGINAL",
+       "bytesEqualACapture": true,
+       "assetIsEdited": null,
+       "evidenceUse": "RAW_CAPTURE_OK"
+      },
+      {
+       "asset": "hu:media-asset:mills-2016-figure-6",
+       "rendition": "hu:media-variant:mills-2016-figure-6-original",
+       "kind": "ORIGINAL",
+       "bytesEqualACapture": true,
+       "assetIsEdited": true,
+       "evidenceUse": "PUBLISHED_COMPOSITE_CITE_AS_FIGURE"
+      }
+     ]
+    },
+    {
+     "id": "Q-MP6-3",
+     "rows": 0,
+     "sample": []
+    }
+   ]
+  }
+ }
+}

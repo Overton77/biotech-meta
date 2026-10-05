@@ -1,0 +1,5275 @@
+[
+ {
+  "set": "W00-F01",
+  "files": [
+   "W00/fixtures/01-correction-vs-validity-bounded.cypher"
+  ],
+  "load": {
+   "ok": 18,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {}
+ },
+ {
+  "set": "W00-F02",
+  "files": [
+   "W00/fixtures/02-late-arriving-fact.cypher"
+  ],
+  "load": {
+   "ok": 11,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {}
+ },
+ {
+  "set": "W00-F03",
+  "files": [
+   "W00/fixtures/03-year-precision.cypher"
+  ],
+  "load": {
+   "ok": 10,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {}
+ },
+ {
+  "set": "W00-F04",
+  "files": [
+   "W00/fixtures/00-common-base.cypher",
+   "W00/fixtures/04-two-asserters-must-fail.cypher"
+  ],
+  "load": {
+   "ok": 9,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {}
+ },
+ {
+  "set": "W00-F05",
+  "files": [
+   "W00/fixtures/00-common-base.cypher",
+   "W00/fixtures/05-claim-occurrence-without-container-must-fail.cypher"
+  ],
+  "load": {
+   "ok": 9,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {}
+ },
+ {
+  "set": "W00-F06",
+  "files": [
+   "W00/fixtures/00-common-base.cypher",
+   "W00/fixtures/06-two-archetype-labels-must-fail.cypher"
+  ],
+  "load": {
+   "ok": 7,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {}
+ },
+ {
+  "set": "W00-F07",
+  "files": [
+   "W00/fixtures/00-common-base.cypher",
+   "W00/fixtures/07-derived-edge-forbidden-premise-must-fail.cypher"
+  ],
+  "load": {
+   "ok": 14,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-112": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:w00-marketplace",
+      "endUid": "hu:product-variant:w00-derived-variant",
+      "violations": [
+       "FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:w00-marketplace",
+      "endUid": "hu:product-variant:w00-derived-variant",
+      "violations": [
+       "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "FORBIDDEN_IMPLICATION_USED_AS_PREMISE"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "ENDORSES_PRODUCT",
+      "startUid": "hu:person:w00-cohost-1",
+      "endUid": "hu:product:w00-derived-product",
+      "violations": [
+       "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "FORBIDDEN_IMPLICATION_USED_AS_PREMISE"
+      ]
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-112r": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-112r",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:w00-marketplace",
+      "endUid": "hu:product-variant:w00-derived-variant",
+      "violations": [
+       "FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"
+      ]
+     },
+     {
+      "check": "V-112r",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:w00-marketplace",
+      "endUid": "hu:product-variant:w00-derived-variant",
+      "violations": [
+       "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "FORBIDDEN_IMPLICATION_USED_AS_PREMISE"
+      ]
+     },
+     {
+      "check": "V-112r",
+      "edgeType": "ENDORSES_PRODUCT",
+      "startUid": "hu:person:w00-cohost-1",
+      "endUid": "hu:product:w00-derived-product",
+      "violations": [
+       "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "FORBIDDEN_IMPLICATION_USED_AS_PREMISE"
+      ]
+     }
+    ]
+   },
+   "V-505r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-505r",
+      "relType": "ENDORSES_PRODUCT",
+      "episode": "hu:rel:w00-endorses-from-advises",
+      "violations": [
+       "PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "OBJECT_IS_NOT_EDGE_END"
+      ]
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W00-F08",
+  "files": [
+   "W00/fixtures/08-identifier-across-issuers.cypher"
+  ],
+  "load": {
+   "ok": 8,
+   "err": 1,
+   "errs": [
+    "08-identifier-across-issuers.cypher: Node(237) already exists with label `Identifier` and properties `scheme` = 'SUPPLIER_CATALOG_NUMBER', `issuer` = 'Synthetic Supplier A Inc.', `value` = 'NR-100'"
+   ]
+  },
+  "original": {
+   "V-432": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-432",
+      "malformedEquivalenceAssessment": "hu:assessment:w00-supplier-a-vs-b-nr-100",
+      "comparedCount": 0
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-505i": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:w00-a-has-catno",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:w00-b-has-catno",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W00-F09",
+  "files": [
+   "W00/fixtures/09-retraction-and-provenance-states.cypher"
+  ],
+  "load": {
+   "ok": 15,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {
+   "V-235r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-235r",
+      "acceptedAssertionOnlyOnRetractedSources": "hu:assertion:w00-9500320-reports-parental-association"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W00-F10",
+  "files": [
+   "W00/fixtures/00-common-base.cypher",
+   "W00/fixtures/10-locator-kinds.cypher"
+  ],
+  "load": {
+   "ok": 14,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {}
+ },
+ {
+  "set": "W00-F12",
+  "files": [
+   "W00/fixtures/00-common-base.cypher",
+   "W00/fixtures/12-legacy-shapes-graphql-readability.cypher"
+  ],
+  "load": {
+   "ok": 10,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {
+   "V-521r": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:assertion:w00-legacy-shape",
+      "privacyClass": "public"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:adjudication:w00-legacy-final",
+      "privacyClass": "internal"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:locator:w00-legacy-section",
+      "privacyClass": "public"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W00-F13",
+  "files": [
+   "W00/fixtures/00-common-base.cypher",
+   "W00/fixtures/13-reconciliation-rulings.cypher"
+  ],
+  "load": {
+   "ok": 30,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-003": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w00-moiety-amount",
+      "objects": 1,
+      "literals": 1
+     },
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w00-role-with-literal",
+      "objects": 1,
+      "literals": 1
+     }
+    ]
+   },
+   "V-101": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-101",
+      "relType": "IDENTIFIED_BY",
+      "edgeId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:378",
+      "recordedFrom": null,
+      "assertionUid": null
+     }
+    ]
+   },
+   "V-432": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-432",
+      "malformedEquivalenceAssessment": "hu:assessment:w00-merge-acme",
+      "comparedCount": 0
+     },
+     {
+      "check": "V-432",
+      "malformedEquivalenceAssessment": "hu:assessment:w00-merge-bad",
+      "comparedCount": 0
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-003r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w00-role-with-literal",
+      "predicateClass": "ROLE",
+      "objects": 1,
+      "literals": 1
+     }
+    ]
+   },
+   "V-432r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-432r",
+      "malformedEquivalenceAssessment": "hu:assessment:w00-merge-bad",
+      "comparedCount": 2,
+      "equivalenceKind": "SAME_IDENTITY_MERGED"
+     }
+    ]
+   },
+   "V-503r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503r",
+      "kind": "ASSERTION",
+      "item": "hu:assertion:w00-holding-as-of-no-precision"
+     }
+    ]
+   },
+   "V-505r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-505r",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:w00-acme-b-has-reg",
+      "violations": [
+       "QUALIFIER_DIFFERS:isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-521r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:person:w00-r13-leak-class",
+      "privacyClass": "PRIVATE_PERSONAL"
+     }
+    ]
+   },
+   "V-W00-13": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-13",
+      "redirect": "hu:assessment:w00-merge-bad",
+      "retiredUid": null,
+      "retiredMaturity": null,
+      "cycleWith": null
+     }
+    ]
+   },
+   "V-W00-15": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-W00-15",
+      "relType": "HAS_SNAPSHOT",
+      "fromLabel": "Entity",
+      "toLabel": "VersionedState",
+      "edges": 1,
+      "fix": "USE_HAS_STATE"
+     },
+     {
+      "check": "V-W00-15",
+      "relType": "MENTIONS",
+      "fromLabel": "InformationArtifact",
+      "toLabel": "Entity",
+      "edges": 1,
+      "fix": "USE_MENTIONS_ENTITY"
+     },
+     {
+      "check": "V-W00-15",
+      "relType": "IDENTIFIED_BY",
+      "fromLabel": "Entity",
+      "toLabel": "Entity",
+      "edges": 1,
+      "fix": "USE_HAS_IDENTIFIER"
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "Product",
+      "token": "widget",
+      "registered": [
+       "product"
+      ],
+      "nodes": 1,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     }
+    ]
+   },
+   "V-W00-17": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-17",
+      "sourceWithoutKindNote": "hu:source:w00-r13-other-no-note"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:w00-r13-doi-resolver",
+      "canonicalUri": "https://doi.org/10.0000/w00-synthetic"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W02-pos+91",
+  "files": [
+   "W02/fixtures/fx-01-nr-salt-vs-moiety.cypher",
+   "W02/fixtures/fx-02-mosaic-provides-not-contains.cypher",
+   "W02/fixtures/fx-03-niagen-two-spec-versions.cypher",
+   "W02/fixtures/fx-04-botanical-ginkgo-preparation.cypher",
+   "W02/fixtures/fx-05-lgg-strain-deposits.cypher",
+   "W02/fixtures/fx-06-nrpt-not-a-substance.cypher",
+   "W02/fixtures/fx-07-nad-chemical-vs-molecular-entity.cypher",
+   "W02/fixtures/fx-91-kernel-quantity-failing-cases.cypher"
+  ],
+  "load": {
+   "ok": 277,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-003": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w02-sr01-calc-nr-cation-with-object",
+      "objects": 1,
+      "literals": 1
+     }
+    ]
+   },
+   "V-006": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-006",
+      "r": {
+       "identity": 215,
+       "start": 376,
+       "end": 378,
+       "type": "QUANTITATIVELY_CONTAINS",
+       "properties": {
+        "recordedFrom": {
+         "year": 2026,
+         "month": 10,
+         "day": 4,
+         "hour": 2,
+         "minute": 0,
+         "second": 0,
+         "nanosecond": 0,
+         "timeZoneOffsetSeconds": 0
+        },
+        "contentStatementKind": "STANDARDIZATION_CLAIM",
+        "relationshipUid": "hu:rel:w02-sr02-ph-eur-10-ginkgo-ginkgo-flavone-glycosides",
+        "quantityLow": 22,
+        "validFrom": {
+         "year": 2020,
+         "month": 1,
+         "day": 1,
+         "hour": 0,
+         "minute": 0,
+         "second": 0,
+         "nanosecond": 0,
+         "timeZoneOffsetSeconds": 0
+        },
+        "basis": "MASS_FRACTION_W_W",
+        "assertionUid": "hu:assertion:w02-sr02-ph-eur-10-ginkgo-ginkgo-flavone-glycosides",
+        "comparator": "BETWEEN",
+        "quantityHigh": 27,
+        "expressedAs": "ginkgo flavonoids calculated as ginkgo flavone glycosides",
+        "validToBasis": "UNKNOWN",
+        "validFromPrecision": "YEAR",
+        "validFromBasis": "STATED_BY_SOURCE",
+        "unitCode": "%",
+        "verbatimText": "22.0%-27.0% ginkgo flavonoids calculated as ginkgo flavone glycosides"
+       },
+       "elementId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:215",
+       "startNodeElementId": "4:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:376",
+       "endNodeElementId": "4:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:378"
+      }
+     },
+     {
+      "check": "V-006",
+      "r": {
+       "identity": 219,
+       "start": 376,
+       "end": 75,
+       "type": "QUANTITATIVELY_CONTAINS",
+       "properties": {
+        "recordedFrom": {
+         "year": 2026,
+         "month": 10,
+         "day": 4,
+         "hour": 2,
+         "minute": 0,
+         "second": 0,
+         "nanosecond": 0,
+         "timeZoneOffsetSeconds": 0
+        },
+        "contentStatementKind": "STANDARDIZATION_CLAIM",
+        "relationshipUid": "hu:rel:w02-sr02-ph-eur-10-ginkgo-ginkgo-terpene-lactones",
+        "quantityLow": 5.4,
+        "validFrom": {
+         "year": 2020,
+         "month": 1,
+         "day": 1,
+         "hour": 0,
+         "minute": 0,
+         "second": 0,
+         "nanosecond": 0,
+         "timeZoneOffsetSeconds": 0
+        },
+        "basis": "MASS_FRACTION_W_W",
+        "assertionUid": "hu:assertion:w02-sr02-ph-eur-10-ginkgo-ginkgo-terpene-lactones",
+        "comparator": "BETWEEN",
+        "quantityHigh": 6.6,
+        "expressedAs": "terpene lactones (ginkgolides A, B, C and bilobalide)",
+        "validToBasis": "UNKNOWN",
+        "validFromPrecision": "YEAR",
+        "validFromBasis": "STATED_BY_SOURCE",
+        "unitCode": "%",
+        "verbatimText": "5.4%-6.6% terpene lactones (ginkgolides A, B, C and bilobalide)"
+       },
+       "elementId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:219",
+       "startNodeElementId": "4:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:376",
+       "endNodeElementId": "4:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:75"
+      }
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-505i": {
+    "rows": 16,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:w02-chebi-15846-identifies-nad-plus",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "QUANTITATIVELY_CONTAINS",
+      "episode": "hu:rel:w02-sr02-ph-eur-10-ginkgo-ginkgo-flavone-glycosides",
+      "edgeOnly": [
+       "contentStatementKind",
+       "basis",
+       "verbatimText",
+       "quantityHigh",
+       "comparator",
+       "quantityLow",
+       "expressedAs",
+       "unitCode"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "QUANTITATIVELY_CONTAINS",
+      "episode": "hu:rel:w02-sr02-ph-eur-10-ginkgo-ginkgo-terpene-lactones",
+      "edgeOnly": [
+       "contentStatementKind",
+       "basis",
+       "verbatimText",
+       "quantityHigh",
+       "comparator",
+       "quantityLow",
+       "expressedAs",
+       "unitCode"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:w02-unii-8XM2XT8VWI-identifies-nicotinamide-riboside-chloride",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "SpecificationVersion",
+      "token": "spec-version",
+      "registered": [
+       "specification-version"
+      ],
+      "nodes": 2,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     },
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyIntervention",
+      "token": "study-intervention",
+      "registered": [
+       "intervention"
+      ],
+      "nodes": 2,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     },
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "ChemicalForm",
+      "token": "chemical-form",
+      "registered": [
+       "form"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41598-019-46120-z",
+      "canonicalUri": "https://doi.org/10.1038/s41598-019-46120-z"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41514-017-0016-9",
+      "canonicalUri": "https://doi.org/10.1038/s41514-017-0016-9"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W02-all+90",
+  "files": [
+   "W02/fixtures/fx-01-nr-salt-vs-moiety.cypher",
+   "W02/fixtures/fx-02-mosaic-provides-not-contains.cypher",
+   "W02/fixtures/fx-03-niagen-two-spec-versions.cypher",
+   "W02/fixtures/fx-04-botanical-ginkgo-preparation.cypher",
+   "W02/fixtures/fx-05-lgg-strain-deposits.cypher",
+   "W02/fixtures/fx-06-nrpt-not-a-substance.cypher",
+   "W02/fixtures/fx-07-nad-chemical-vs-molecular-entity.cypher",
+   "W02/fixtures/fx-90-negative-violations.cypher"
+  ],
+  "load": {
+   "ok": 303,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-006": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-006",
+      "r": {
+       "identity": 16,
+       "start": 23,
+       "end": 25,
+       "type": "QUANTITATIVELY_CONTAINS",
+       "properties": {
+        "recordedFrom": {
+         "year": 2026,
+         "month": 10,
+         "day": 4,
+         "hour": 2,
+         "minute": 0,
+         "second": 0,
+         "nanosecond": 0,
+         "timeZoneOffsetSeconds": 0
+        },
+        "assertionUid": "hu:assertion:neg-qc-no-basis",
+        "contentStatementKind": "STANDARDIZATION_CLAIM",
+        "comparator": "EQ",
+        "relationshipUid": "hu:rel:neg-qc-no-basis",
+        "quantity": 2,
+        "validToBasis": "UNKNOWN",
+        "validFromBasis": "UNKNOWN",
+        "unitCode": "%"
+       },
+       "elementId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:16",
+       "startNodeElementId": "4:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:23",
+       "endNodeElementId": "4:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:25"
+      }
+     }
+    ]
+   },
+   "V-112": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "QUANTITATIVELY_CONTAINS",
+      "startUid": "hu:material:neg-tomato-extract",
+      "endUid": "hu:substance:lycopene",
+      "violations": [
+       "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "FORBIDDEN_IMPLICATION_USED_AS_PREMISE"
+      ]
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-006r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-006r",
+      "material": "hu:material:neg-tomato-extract",
+      "target": "hu:substance:neg-marker",
+      "comparator": "EQ",
+      "quantity": 2,
+      "basis": null
+     }
+    ]
+   },
+   "V-108r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-108r",
+      "relType": "STRAIN_OF",
+      "subjectUid": "hu:microbial-strain:neg-two-species",
+      "objectUid1": "hu:microbial-taxon:neg-a",
+      "objectUid2": "hu:microbial-taxon:neg-b",
+      "action": "REVIEW_QUEUE"
+     }
+    ]
+   },
+   "V-509r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-509r",
+      "subjectUid": "hu:microbial-strain:neg-two-species",
+      "relType": "STRAIN_OF",
+      "state1": "hu:microbial-taxon:neg-a",
+      "state2": "hu:microbial-taxon:neg-b",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     }
+    ]
+   },
+   "V-112r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-112r",
+      "edgeType": "QUANTITATIVELY_CONTAINS",
+      "startUid": "hu:material:neg-tomato-extract",
+      "endUid": "hu:substance:lycopene",
+      "violations": [
+       "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "FORBIDDEN_IMPLICATION_USED_AS_PREMISE"
+      ]
+     }
+    ]
+   },
+   "V-505r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-505r",
+      "relType": "QUANTITATIVELY_CONTAINS",
+      "episode": "hu:rel:neg-tomato-qc-lycopene-from-provides",
+      "violations": [
+       "PREDICATE_DIFFERS_FROM_EDGE_TYPE"
+      ]
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 16,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "QUANTITATIVELY_CONTAINS",
+      "episode": "hu:rel:neg-tomato-qc-lycopene-from-provides",
+      "edgeOnly": [
+       "contentStatementKind",
+       "basis",
+       "comparator",
+       "quantity",
+       "unitCode"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "QUANTITATIVELY_CONTAINS",
+      "episode": "hu:rel:neg-qc-no-basis",
+      "edgeOnly": [
+       "contentStatementKind",
+       "quantity",
+       "comparator",
+       "unitCode"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:w02-unii-8XM2XT8VWI-identifies-nicotinamide-riboside-chloride",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:w02-cas-23111-00-4-identifies-nicotinamide-riboside-chloride",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyIntervention",
+      "token": "study-intervention",
+      "registered": [
+       "intervention"
+      ],
+      "nodes": 2,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     },
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "ChemicalForm",
+      "token": "chemical-form",
+      "registered": [
+       "form"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     },
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "SpecificationVersion",
+      "token": "spec-version",
+      "registered": [
+       "specification-version"
+      ],
+      "nodes": 2,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41598-019-46120-z",
+      "canonicalUri": "https://doi.org/10.1038/s41598-019-46120-z"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41514-017-0016-9",
+      "canonicalUri": "https://doi.org/10.1038/s41514-017-0016-9"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W03-pos",
+  "files": [
+   "W03/fixtures/w03-positive.cypher",
+   "W03/fixtures/w03-projection-job.cypher"
+  ],
+  "load": {
+   "ok": 302,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-233": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-233",
+      "fromUid": "hu:substance:nicotinamide-riboside",
+      "rel": "AFFECTS_MECHANISM",
+      "toUid": "hu:mechanism:nad-plus-biosynthetic-flux",
+      "projectedBasis": null
+     },
+     {
+      "check": "V-233",
+      "fromUid": "hu:substance:nicotinamide-riboside",
+      "rel": "AFFECTS_MECHANISM",
+      "toUid": "hu:mechanism:mitochondrial-oxidative-function",
+      "projectedBasis": null
+     },
+     {
+      "check": "V-233",
+      "fromUid": "hu:mechanism:nad-plus-biosynthetic-flux",
+      "rel": "APPLIES_TO_SPECIES",
+      "toUid": "hu:species:mus-musculus",
+      "projectedBasis": null
+     },
+     {
+      "check": "V-233",
+      "fromUid": "hu:mechanism:mitochondrial-oxidative-function",
+      "rel": "APPLIES_TO_SPECIES",
+      "toUid": "hu:species:mus-musculus",
+      "projectedBasis": null
+     }
+    ]
+   },
+   "V-234": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-234",
+      "mechanism": "hu:mechanism:nad-plus-biosynthetic-flux",
+      "speciesWithoutMeasuredContext": "hu:species:mus-musculus"
+     },
+     {
+      "check": "V-234",
+      "mechanism": "hu:mechanism:mitochondrial-oxidative-function",
+      "speciesWithoutMeasuredContext": "hu:species:mus-musculus"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-505i": {
+    "rows": 10,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-insulin-resistance-icd10cm-e88-81",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-insulin-resistance-icd10cm-e88-819",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-insulin-resistance-hpo-hp-0000855",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-insulin-resistance-syndrome-type-a-mondo-0012520",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyArm",
+      "token": "study-arm",
+      "registered": [
+       "arm"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     },
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyIntervention",
+      "token": "study-intervention",
+      "registered": [
+       "intervention"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 5,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10-1038-s41514-017-0016-9",
+      "canonicalUri": "https://doi.org/10.1038/s41514-017-0016-9"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10-1038-ncomms12948",
+      "canonicalUri": "https://doi.org/10.1038/ncomms12948"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10-1016-j-cmet-2018-03-018",
+      "canonicalUri": "https://doi.org/10.1016/j.cmet.2018.03.018"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10-1016-j-celrep-2019-07-043",
+      "canonicalUri": "https://doi.org/10.1016/j.celrep.2019.07.043"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W03-pos+neg",
+  "files": [
+   "W03/fixtures/w03-positive.cypher",
+   "W03/fixtures/w03-projection-job.cypher",
+   "W03/fixtures/w03-negative.cypher"
+  ],
+  "load": {
+   "ok": 322,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-003": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:negative-n14-inferred-without-premise",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-112": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "AFFECTS_MECHANISM",
+      "startUid": "hu:substance:nicotinamide-riboside",
+      "endUid": "hu:mechanism:mitochondrial-oxidative-function",
+      "violations": [
+       "NO_CITATION"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "AFFECTS_MECHANISM",
+      "startUid": "hu:material:liu-2018-labeled-nr",
+      "endUid": "hu:mechanism:nad-plus-biosynthetic-flux",
+      "violations": [
+       "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE"
+      ]
+     }
+    ]
+   },
+   "V-233": {
+    "rows": 8,
+    "sample": [
+     {
+      "check": "V-233",
+      "fromUid": "hu:substance:nicotinamide-riboside",
+      "rel": "AFFECTS_MECHANISM",
+      "toUid": "hu:mechanism:nad-plus-biosynthetic-flux",
+      "projectedBasis": null
+     },
+     {
+      "check": "V-233",
+      "fromUid": "hu:substance:nicotinamide-riboside",
+      "rel": "AFFECTS_MECHANISM",
+      "toUid": "hu:mechanism:mitochondrial-oxidative-function",
+      "projectedBasis": null
+     },
+     {
+      "check": "V-233",
+      "fromUid": "hu:mechanism:nad-plus-biosynthetic-flux",
+      "rel": "APPLIES_TO_SPECIES",
+      "toUid": "hu:species:mus-musculus",
+      "projectedBasis": null
+     },
+     {
+      "check": "V-233",
+      "fromUid": "hu:mechanism:mitochondrial-oxidative-function",
+      "rel": "APPLIES_TO_SPECIES",
+      "toUid": "hu:species:mus-musculus",
+      "projectedBasis": null
+     }
+    ]
+   },
+   "V-234": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-234",
+      "mechanism": "hu:mechanism:nad-plus-biosynthetic-flux",
+      "speciesWithoutMeasuredContext": "hu:species:mus-musculus"
+     },
+     {
+      "check": "V-234",
+      "mechanism": "hu:mechanism:mitochondrial-oxidative-function",
+      "speciesWithoutMeasuredContext": "hu:species:mus-musculus"
+     },
+     {
+      "check": "V-234",
+      "mechanism": "hu:mechanism:mitochondrial-oxidative-function",
+      "speciesWithoutMeasuredContext": "hu:species:homo-sapiens"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-003r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:negative-n14-inferred-without-premise",
+      "predicateClass": "MECHANISM",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-112r": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-112r",
+      "edgeType": "AFFECTS_MECHANISM",
+      "startUid": "hu:substance:nicotinamide-riboside",
+      "endUid": "hu:mechanism:mitochondrial-oxidative-function",
+      "violations": [
+       "NO_CITATION"
+      ]
+     },
+     {
+      "check": "V-112r",
+      "edgeType": "AFFECTS_MECHANISM",
+      "startUid": "hu:material:liu-2018-labeled-nr",
+      "endUid": "hu:mechanism:nad-plus-biosynthetic-flux",
+      "violations": [
+       "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE"
+      ]
+     }
+    ]
+   },
+   "V-233r": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-233r",
+      "rel": "AFFECTS_MECHANISM",
+      "fromUid": "hu:substance:nicotinamide-riboside",
+      "toUid": "hu:mechanism:mitochondrial-oxidative-function",
+      "violations": [
+       "NO_CITATION",
+       "UNKNOWN_DERIVATION_RULE"
+      ]
+     },
+     {
+      "check": "V-233r",
+      "rel": "AFFECTS_MECHANISM",
+      "fromUid": "hu:substance:nicotinamide-riboside",
+      "toUid": "hu:mechanism:nad-plus-biosynthetic-flux",
+      "violations": [
+       "NON_MEASURED_INPUT",
+       "INPUT_WITHOUT_SINGLE_CONTEXT"
+      ]
+     },
+     {
+      "check": "V-233r",
+      "rel": "APPLIES_TO_SPECIES",
+      "fromUid": "hu:mechanism:mitochondrial-oxidative-function",
+      "toUid": "hu:species:homo-sapiens",
+      "violations": [
+       "NON_POSITIVE_INPUT"
+      ]
+     }
+    ]
+   },
+   "V-234r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-234r",
+      "subjectUid": "hu:mechanism:mitochondrial-oxidative-function",
+      "speciesWithoutPositiveMeasuredContext": "hu:species:homo-sapiens",
+      "cited": [
+       "hu:assertion:elhassan-nr-mito-function-no-change-muscle"
+      ]
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 10,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-insulin-resistance-icd10cm-e88-81",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-insulin-resistance-icd10cm-e88-819",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-insulin-resistance-hpo-hp-0000855",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-insulin-resistance-syndrome-type-a-mondo-0012520",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyArm",
+      "token": "study-arm",
+      "registered": [
+       "arm"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     },
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyIntervention",
+      "token": "study-intervention",
+      "registered": [
+       "intervention"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     },
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "ApplicabilityDimension",
+      "token": "applicability",
+      "registered": [
+       "assessment",
+       "applicability-dimension"
+      ],
+      "nodes": 1,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 5,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10-1038-s41514-017-0016-9",
+      "canonicalUri": "https://doi.org/10.1038/s41514-017-0016-9"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10-1038-ncomms12948",
+      "canonicalUri": "https://doi.org/10.1038/ncomms12948"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10-1016-j-cmet-2018-03-018",
+      "canonicalUri": "https://doi.org/10.1016/j.cmet.2018.03.018"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10-1016-j-celrep-2019-07-043",
+      "canonicalUri": "https://doi.org/10.1016/j.celrep.2019.07.043"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W04-pos",
+  "files": [
+   "W04/fixtures/w04-01-correction-vs-fact-ending.cypher",
+   "W04/fixtures/w04-02-package-vs-formulation-change.cypher",
+   "W04/fixtures/w04-03-declared-calculated-measured.cypher",
+   "W04/fixtures/w04-04-basis-history-and-trial.cypher",
+   "W04/fixtures/w04-06-elysium-basis-compat.cypher"
+  ],
+  "load": {
+   "ok": 117,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-108": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-108",
+      "relType": "HAS_FORMULATION_VERSION",
+      "subjectUid": "hu:product-variant:basis-us-capsule-standard",
+      "objectUid1": "hu:formulation:basis-us-current-2026-07-10",
+      "objectUid2": "hu:formulation:basis-us-declared-nr-e-crystalline",
+      "edge1": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:705",
+      "edge2": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:706"
+     }
+    ]
+   },
+   "V-509": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-509",
+      "subjectUid": "hu:product-variant:basis-us-capsule-standard",
+      "relType": "HAS_FORMULATION_VERSION",
+      "state1": "hu:formulation:basis-us-current-2026-07-10",
+      "state2": "hu:formulation:basis-us-declared-nr-e-crystalline",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     }
+    ]
+   },
+   "V-409": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:basis-sf-pt-line-20260717140606",
+      "oldLocator": "hu:locator:basis-sf-pt-line-20260305072454"
+     },
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:basis-sf-serving-20260717140606",
+      "oldLocator": "hu:locator:basis-sf-serving-20260305072454"
+     },
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:basis-sf-nr-line-20260717140606",
+      "oldLocator": "hu:locator:basis-sf-nr-line-20260305072454"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-108r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-108r",
+      "relType": "HAS_FORMULATION_VERSION",
+      "subjectUid": "hu:product-variant:basis-us-capsule-standard",
+      "objectUid1": "hu:formulation:basis-us-current-2026-07-10",
+      "objectUid2": "hu:formulation:basis-us-declared-nr-e-crystalline",
+      "action": "REVIEW_QUEUE"
+     }
+    ]
+   },
+   "V-509r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-509r",
+      "subjectUid": "hu:product-variant:basis-us-capsule-standard",
+      "relType": "HAS_FORMULATION_VERSION",
+      "state1": "hu:formulation:basis-us-current-2026-07-10",
+      "state2": "hu:formulation:basis-us-declared-nr-e-crystalline",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "IDENTIFIED_BY",
+      "episode": "hu:rel:pkg-30-identified-by-gtin",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "IDENTIFIED_BY",
+      "episode": "hu:rel:pkg-30-identified-by-sku",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "IDENTIFIED_BY",
+      "episode": "hu:rel:pkg-90-identified-by-gtin",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "IDENTIFIED_BY",
+      "episode": "hu:rel:pkg-90-identified-by-sku",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-W00-15": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-15",
+      "relType": "IDENTIFIED_BY",
+      "fromLabel": "VersionedState",
+      "toLabel": "Entity",
+      "edges": 4,
+      "fix": "USE_HAS_IDENTIFIER"
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyIntervention",
+      "token": "study-intervention",
+      "registered": [
+       "intervention"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     },
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "MeasuredResult",
+      "token": "result",
+      "registered": [
+       "measured-result"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W04-04-alone",
+  "files": [
+   "W04/fixtures/w04-04-basis-history-and-trial.cypher"
+  ],
+  "load": {
+   "ok": 33,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-108": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-108",
+      "relType": "HAS_FORMULATION_VERSION",
+      "subjectUid": "hu:product-variant:basis-us-capsule-standard",
+      "objectUid1": "hu:formulation:basis-us-current-2026-07-10",
+      "objectUid2": "hu:formulation:basis-us-declared-nr-e-crystalline",
+      "edge1": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:306",
+      "edge2": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:307"
+     }
+    ]
+   },
+   "V-509": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-509",
+      "subjectUid": "hu:product-variant:basis-us-capsule-standard",
+      "relType": "HAS_FORMULATION_VERSION",
+      "state1": "hu:formulation:basis-us-current-2026-07-10",
+      "state2": "hu:formulation:basis-us-declared-nr-e-crystalline",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     }
+    ]
+   },
+   "V-409": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:basis-sf-nr-line-20260717140606",
+      "oldLocator": "hu:locator:basis-sf-nr-line-20260305072454"
+     },
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:basis-sf-pt-line-20260717140606",
+      "oldLocator": "hu:locator:basis-sf-pt-line-20260305072454"
+     },
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:basis-sf-serving-20260717140606",
+      "oldLocator": "hu:locator:basis-sf-serving-20260305072454"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-108r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-108r",
+      "relType": "HAS_FORMULATION_VERSION",
+      "subjectUid": "hu:product-variant:basis-us-capsule-standard",
+      "objectUid1": "hu:formulation:basis-us-current-2026-07-10",
+      "objectUid2": "hu:formulation:basis-us-declared-nr-e-crystalline",
+      "action": "REVIEW_QUEUE"
+     }
+    ]
+   },
+   "V-509r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-509r",
+      "subjectUid": "hu:product-variant:basis-us-capsule-standard",
+      "relType": "HAS_FORMULATION_VERSION",
+      "state1": "hu:formulation:basis-us-current-2026-07-10",
+      "state2": "hu:formulation:basis-us-declared-nr-e-crystalline",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyIntervention",
+      "token": "study-intervention",
+      "registered": [
+       "intervention"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W07-pos",
+  "files": [
+   "W07/fixtures/w07-00-sources.cypher",
+   "W07/fixtures/w07-01-measurands-tests-assays.cypher",
+   "W07/fixtures/w07-02-reference-intervals.cypher",
+   "W07/fixtures/w07-03-algorithms.cypher",
+   "W07/fixtures/w07-04-results-and-comparability.cypher"
+  ],
+  "load": {
+   "ok": 39,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-112": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-lab-a-hba1c-2025-09-10",
+      "endUid": "hu:result:synthetic-lab-a-hba1c-2026-02-10",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-grimage2-2025-03-01",
+      "endUid": "hu:result:synthetic-grimage2-2025-09-01",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     }
+    ]
+   },
+   "V-303": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-303",
+      "resultUid": "hu:result:synthetic-everlywell-hba1c-2025-06-01",
+      "resultKind": "MEASURED"
+     }
+    ]
+   },
+   "V-313": {
+    "rows": 15,
+    "sample": [
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-mayo-hba1c-2025-03-14"
+     },
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-labcorp-hba1c-2025-04-02"
+     },
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-lab-a-hba1c-2025-01-10"
+     },
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-lab-a-hba1c-2025-09-10"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-505i": {
+    "rows": 8,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-hba1c-mfr-bld-loinc-4548-4",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-hba1c-ifcc-sfr-bld-loinc-59261-8",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "MEASURES_METRIC",
+      "episode": "hu:rel:measures-metric-mayo-hba1c-hba1c-mfr-bld",
+      "edgeOnly": [
+       "unit"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "MEASURES_METRIC",
+      "episode": "hu:rel:measures-metric-labcorp-001453-hba1c-mfr-bld",
+      "edgeOnly": [
+       "unit"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "Observation",
+      "token": "result",
+      "registered": [
+       "observation"
+      ],
+      "nodes": 15,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-35029144",
+      "canonicalUri": "https://doi.org/10.7554/eLife.73420"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-30669119",
+      "canonicalUri": "https://doi.org/10.18632/aging.101684"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-36516495",
+      "canonicalUri": "https://doi.org/10.18632/aging.204434"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-36277076",
+      "canonicalUri": "https://doi.org/10.1038/s43587-022-00248-2"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W07-pos+90",
+  "files": [
+   "W07/fixtures/w07-00-sources.cypher",
+   "W07/fixtures/w07-01-measurands-tests-assays.cypher",
+   "W07/fixtures/w07-02-reference-intervals.cypher",
+   "W07/fixtures/w07-03-algorithms.cypher",
+   "W07/fixtures/w07-04-results-and-comparability.cypher",
+   "W07/fixtures/w07-90-negative-overlays.cypher"
+  ],
+  "load": {
+   "ok": 53,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-231": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-231",
+      "assertion": "hu:assertion:neg-grimage2-measured-change",
+      "basisKind": "DIRECT_MEASUREMENT",
+      "contexts": 0
+     }
+    ]
+   },
+   "V-112": {
+    "rows": 6,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-lab-a-hba1c-2025-09-10",
+      "endUid": "hu:result:synthetic-lab-a-hba1c-2026-02-10",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-grimage2-2025-03-01",
+      "endUid": "hu:result:synthetic-grimage2-2025-09-01",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-mayo-hba1c-2025-03-14",
+      "endUid": "hu:result:synthetic-labcorp-hba1c-2025-04-02",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-grimage-v1-2024-03-01",
+      "endUid": "hu:result:synthetic-grimage2-2025-03-01",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     }
+    ]
+   },
+   "V-302": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-302",
+      "result1": "hu:result:synthetic-mayo-hba1c-2025-03-14",
+      "result2": "hu:result:synthetic-labcorp-hba1c-2025-04-02",
+      "assay1": "hu:assay-version:mayo-hba1c-biorad-d100",
+      "assay2": "hu:assay-version:labcorp-001453-tina-quant"
+     }
+    ]
+   },
+   "V-303": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-303",
+      "resultUid": "hu:result:synthetic-neg-hba1c-no-assay-version",
+      "resultKind": "MEASURED"
+     },
+     {
+      "check": "V-303",
+      "resultUid": "hu:result:synthetic-everlywell-hba1c-2025-06-01",
+      "resultKind": "MEASURED"
+     }
+    ]
+   },
+   "V-304": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-304",
+      "result1": "hu:result:synthetic-grimage-v1-2024-03-01",
+      "result2": "hu:result:synthetic-grimage2-2025-03-01",
+      "algorithmVersion1": "hu:algorithm-version:grimage-v1-lu-2019",
+      "algorithmVersion2": "hu:algorithm-version:grimage2-lu-2022"
+     },
+     {
+      "check": "V-304",
+      "result1": "hu:result:synthetic-owkin-density-slide-s1-2026-10-03",
+      "result2": "hu:result:synthetic-owkin-density-slide-s1-2026-10-04",
+      "algorithmVersion1": "hu:algorithm-version:owkin-he-cell-detection-endpoint-2026-10-03",
+      "algorithmVersion2": "hu:algorithm-version:owkin-he-cell-detection-endpoint-2026-10-04"
+     }
+    ]
+   },
+   "V-313": {
+    "rows": 19,
+    "sample": [
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-neg-labcorp-hba1c-shared-interval"
+     },
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-neg-hba1c-no-assay-version"
+     },
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-neg-grimage2-as-measured"
+     },
+     {
+      "check": "V-313",
+      "resultUid": "hu:private-result:neg-person-hba1c"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-112r": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-112r",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-mayo-hba1c-2025-03-14",
+      "endUid": "hu:result:synthetic-labcorp-hba1c-2025-04-02",
+      "violations": [
+       "RULE_ONLY_ACROSS_VERSIONS"
+      ]
+     },
+     {
+      "check": "V-112r",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-grimage-v1-2024-03-01",
+      "endUid": "hu:result:synthetic-grimage2-2025-03-01",
+      "violations": [
+       "RULE_ONLY_ACROSS_VERSIONS"
+      ]
+     },
+     {
+      "check": "V-112r",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-owkin-density-slide-s1-2026-10-03",
+      "endUid": "hu:result:synthetic-owkin-density-slide-s1-2026-10-04",
+      "violations": [
+       "RULE_ONLY_ACROSS_VERSIONS"
+      ]
+     },
+     {
+      "check": "V-112r",
+      "edgeType": "SAME_TEST_AS",
+      "startUid": "hu:lab-test:labcorp-001453",
+      "endUid": "hu:lab-test:synthetic-lab-c-hba1c",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     }
+    ]
+   },
+   "V-302r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-302r",
+      "result1": "hu:result:synthetic-mayo-hba1c-2025-03-14",
+      "result2": "hu:result:synthetic-labcorp-hba1c-2025-04-02",
+      "assay1": "hu:assay-version:mayo-hba1c-biorad-d100",
+      "assay2": "hu:assay-version:labcorp-001453-tina-quant"
+     }
+    ]
+   },
+   "V-303r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-303r",
+      "resultUid": "hu:result:synthetic-neg-hba1c-no-assay-version",
+      "resultKind": "MEASURED"
+     }
+    ]
+   },
+   "V-304r": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-304r",
+      "result1": "hu:result:synthetic-grimage-v1-2024-03-01",
+      "result2": "hu:result:synthetic-grimage2-2025-03-01",
+      "algorithmVersion1": "hu:algorithm-version:grimage-v1-lu-2019",
+      "algorithmVersion2": "hu:algorithm-version:grimage2-lu-2022"
+     },
+     {
+      "check": "V-304r",
+      "result1": "hu:result:synthetic-owkin-density-slide-s1-2026-10-03",
+      "result2": "hu:result:synthetic-owkin-density-slide-s1-2026-10-04",
+      "algorithmVersion1": "hu:algorithm-version:owkin-he-cell-detection-endpoint-2026-10-03",
+      "algorithmVersion2": "hu:algorithm-version:owkin-he-cell-detection-endpoint-2026-10-04"
+     }
+    ]
+   },
+   "V-305c": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-305c",
+      "intervalUid": "hu:ri-version:neg-hba1c-shared-by-two-assays",
+      "assays": [
+       "hu:assay-version:mayo-hba1c-biorad-d100",
+       "hu:assay-version:labcorp-001453-tina-quant"
+      ]
+     }
+    ]
+   },
+   "V-313r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-313r",
+      "resultUid": "hu:private-result:neg-person-hba1c",
+      "privacyClass": "PRIVATE_PERSONAL"
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 8,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-hba1c-mfr-bld-loinc-4548-4",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:has-identifier-hba1c-ifcc-sfr-bld-loinc-59261-8",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "MEASURES_METRIC",
+      "episode": "hu:rel:measures-metric-mayo-hba1c-hba1c-mfr-bld",
+      "edgeOnly": [
+       "unit"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "MEASURES_METRIC",
+      "episode": "hu:rel:measures-metric-labcorp-001453-hba1c-mfr-bld",
+      "edgeOnly": [
+       "unit"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "Observation",
+      "token": "result",
+      "registered": [
+       "observation"
+      ],
+      "nodes": 18,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-35029144",
+      "canonicalUri": "https://doi.org/10.7554/eLife.73420"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-30669119",
+      "canonicalUri": "https://doi.org/10.18632/aging.101684"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-36516495",
+      "canonicalUri": "https://doi.org/10.18632/aging.204434"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-36277076",
+      "canonicalUri": "https://doi.org/10.1038/s43587-022-00248-2"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W07-pos+91",
+  "files": [
+   "W07/fixtures/w07-00-sources.cypher",
+   "W07/fixtures/w07-01-measurands-tests-assays.cypher",
+   "W07/fixtures/w07-02-reference-intervals.cypher",
+   "W07/fixtures/w07-03-algorithms.cypher",
+   "W07/fixtures/w07-04-results-and-comparability.cypher",
+   "W07/fixtures/w07-91-negative-masking.cypher"
+  ],
+  "load": {
+   "ok": 40,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-112": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-lab-a-hba1c-2025-09-10",
+      "endUid": "hu:result:synthetic-lab-a-hba1c-2026-02-10",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "COMPARED_TO",
+      "startUid": "hu:result:synthetic-grimage2-2025-03-01",
+      "endUid": "hu:result:synthetic-grimage2-2025-09-01",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     }
+    ]
+   },
+   "V-303": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-303",
+      "resultUid": "hu:result:synthetic-everlywell-hba1c-2025-06-01",
+      "resultKind": "MEASURED"
+     }
+    ]
+   },
+   "V-313": {
+    "rows": 15,
+    "sample": [
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-mayo-hba1c-2025-03-14"
+     },
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-labcorp-hba1c-2025-04-02"
+     },
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-lab-a-hba1c-2025-01-10"
+     },
+     {
+      "check": "V-313",
+      "resultUid": "hu:result:synthetic-lab-a-hba1c-2025-09-10"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-505i": {
+    "rows": 8,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "MEASURES_METRIC",
+      "episode": "hu:rel:measures-metric-mayo-hba1c-hba1c-mfr-bld",
+      "edgeOnly": [
+       "unit"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "MEASURES_METRIC",
+      "episode": "hu:rel:measures-metric-labcorp-001453-hba1c-mfr-bld",
+      "edgeOnly": [
+       "unit"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "MEASURES_METRIC",
+      "episode": "hu:rel:measures-metric-quest-496-hba1c-mfr-bld",
+      "edgeOnly": [
+       "unit"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "MEASURES_METRIC",
+      "episode": "hu:rel:measures-metric-synthetic-lab-a-hba1c-hba1c-mfr-bld",
+      "edgeOnly": [
+       "unit"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "Observation",
+      "token": "result",
+      "registered": [
+       "observation"
+      ],
+      "nodes": 15,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-35029144",
+      "canonicalUri": "https://doi.org/10.7554/eLife.73420"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-30669119",
+      "canonicalUri": "https://doi.org/10.18632/aging.101684"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-36516495",
+      "canonicalUri": "https://doi.org/10.18632/aging.204434"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:pmid-36277076",
+      "canonicalUri": "https://doi.org/10.1038/s43587-022-00248-2"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W09-pos",
+  "files": [
+   "W09/fixtures/01-registry-versions.cypher",
+   "W09/fixtures/02-null-primary-favorable-secondary.cypher",
+   "W09/fixtures/03-shared-dataset-vs-replication.cypher",
+   "W09/fixtures/04-cross-domain-interventions.cypher",
+   "W09/fixtures/05-adverse-events-zero.cypher",
+   "W09/fixtures/06-publication-correction.cypher",
+   "W09/fixtures/07-historical-label-gap.cypher"
+  ],
+  "load": {
+   "ok": 70,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-211": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-211",
+      "registrationVersion": "hu:registration-version:synthetic-demo-001-v1",
+      "owners": 2
+     }
+    ]
+   },
+   "V-217": {
+    "rows": 5,
+    "sample": [
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     },
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     },
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct03283462-ae-serious-ua",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     },
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct03283462-ae-serious-placebo",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     }
+    ]
+   },
+   "V-221": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-221",
+      "intervention": "hu:intervention:nct02582593-real",
+      "incompleteComponent": "hu:intervention-component:nct02582593-real"
+     },
+     {
+      "check": "V-221",
+      "intervention": "hu:intervention:nct02582593-sham",
+      "incompleteComponent": "hu:intervention-component:nct02582593-sham"
+     },
+     {
+      "check": "V-221",
+      "intervention": "hu:intervention:synthetic-sauna-demo-sauna",
+      "incompleteComponent": null
+     },
+     {
+      "check": "V-221",
+      "intervention": "hu:intervention:nct04985630-pomegranate-juice",
+      "incompleteComponent": "hu:intervention-component:nct04985630-pomegranate-juice"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-217i": {
+    "rows": 5,
+    "sample": [
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+      "sourceWording": "self-reported AEs"
+     },
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+      "sourceWording": "self-reported AEs"
+     },
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct03283462-ae-serious-ua",
+      "sourceWording": "recorded and coded according to the Medical Dictionary for Regulatory Activities"
+     },
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct03283462-ae-serious-placebo",
+      "sourceWording": "recorded and coded according to the Medical Dictionary for Regulatory Activities"
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 19,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "ANALYZES_DATASET",
+      "episode": "hu:rel:analyzes-29184669-ds",
+      "edgeOnly": [
+       "analysisRole"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "USES_INTERVENTION_MATERIAL",
+      "episode": "hu:rel:uses-material-nct02678611-1x-nr",
+      "edgeOnly": [
+       "asReportedName"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "USES_INTERVENTION_MATERIAL",
+      "episode": "hu:rel:uses-material-nct02678611-1x-pt",
+      "edgeOnly": [
+       "asReportedName"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "USES_INTERVENTION_MATERIAL",
+      "episode": "hu:rel:uses-material-atlas-ua-500",
+      "edgeOnly": [
+       "asReportedName"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "OutcomeDefinition",
+      "token": "outcome",
+      "registered": [
+       "outcome-definition"
+      ],
+      "nodes": 7,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41514-017-0016-9",
+      "canonicalUri": "https://doi.org/10.1038/s41514-017-0016-9"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41514-018-0027-1",
+      "canonicalUri": "https://doi.org/10.1038/s41514-018-0027-1"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W09-pos+90",
+  "files": [
+   "W09/fixtures/01-registry-versions.cypher",
+   "W09/fixtures/02-null-primary-favorable-secondary.cypher",
+   "W09/fixtures/03-shared-dataset-vs-replication.cypher",
+   "W09/fixtures/04-cross-domain-interventions.cypher",
+   "W09/fixtures/05-adverse-events-zero.cypher",
+   "W09/fixtures/06-publication-correction.cypher",
+   "W09/fixtures/07-historical-label-gap.cypher",
+   "W09/fixtures/90-negative-cases.cypher"
+  ],
+  "load": {
+   "ok": 93,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-003": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:neg-erratum-as-fact-ending",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-101": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-101",
+      "relType": "REPORTS_ON",
+      "edgeId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:283",
+      "recordedFrom": null,
+      "assertionUid": null
+     }
+    ]
+   },
+   "V-108": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-108",
+      "relType": "HAS_REGISTRATION_VERSION",
+      "subjectUid": "hu:trial-registration:ctgov-nct02678611",
+      "objectUid1": "hu:registration-version:neg-shared-unobserved",
+      "objectUid2": "hu:registration-version:nct02678611-observed-2026-10-04",
+      "edge1": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:269",
+      "edge2": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:63"
+     },
+     {
+      "check": "V-108",
+      "relType": "HAS_REGISTRATION_VERSION",
+      "subjectUid": "hu:trial-registration:ctgov-nct00938340",
+      "objectUid1": "hu:registration-version:neg-shared-unobserved",
+      "objectUid2": "hu:registration-version:nct00938340-observed-2026-10-04",
+      "edge1": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:270",
+      "edge2": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:69"
+     }
+    ]
+   },
+   "V-509": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-509",
+      "subjectUid": "hu:trial-registration:ctgov-nct02678611",
+      "relType": "HAS_REGISTRATION_VERSION",
+      "state1": "hu:registration-version:neg-shared-unobserved",
+      "state2": "hu:registration-version:nct02678611-observed-2026-10-04",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     },
+     {
+      "check": "V-509",
+      "subjectUid": "hu:trial-registration:ctgov-nct00938340",
+      "relType": "HAS_REGISTRATION_VERSION",
+      "state1": "hu:registration-version:neg-shared-unobserved",
+      "state2": "hu:registration-version:nct00938340-observed-2026-10-04",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     }
+    ]
+   },
+   "V-211": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-211",
+      "registrationVersion": "hu:registration-version:synthetic-demo-001-v1",
+      "owners": 2
+     },
+     {
+      "check": "V-211",
+      "registrationVersion": "hu:registration-version:neg-shared-unobserved",
+      "owners": 2
+     }
+    ]
+   },
+   "V-215": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-215",
+      "synthesis": "hu:synthesis:neg-secondary-as-confirmatory",
+      "nonPrimaryConfirmatory": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+      "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120"
+     }
+    ]
+   },
+   "V-217": {
+    "rows": 6,
+    "sample": [
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct02678611-ae-serious-placebo",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     },
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     },
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     },
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct03283462-ae-serious-ua",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     }
+    ]
+   },
+   "V-221": {
+    "rows": 5,
+    "sample": [
+     {
+      "check": "V-221",
+      "intervention": "hu:intervention:nct02582593-real",
+      "incompleteComponent": "hu:intervention-component:nct02582593-real"
+     },
+     {
+      "check": "V-221",
+      "intervention": "hu:intervention:nct02582593-sham",
+      "incompleteComponent": "hu:intervention-component:nct02582593-sham"
+     },
+     {
+      "check": "V-221",
+      "intervention": "hu:intervention:synthetic-sauna-demo-sauna",
+      "incompleteComponent": null
+     },
+     {
+      "check": "V-221",
+      "intervention": "hu:intervention:nct04985630-pomegranate-juice",
+      "incompleteComponent": "hu:intervention-component:nct04985630-pomegranate-juice"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-003r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:neg-erratum-as-fact-ending",
+      "predicateClass": null,
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-101r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-101r",
+      "relType": "REPORTS_ON",
+      "edgeId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:283",
+      "recordedFrom": null,
+      "assertionUid": null
+     }
+    ]
+   },
+   "V-108r": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-108r",
+      "relType": "HAS_REGISTRATION_VERSION",
+      "subjectUid": "hu:trial-registration:ctgov-nct02678611",
+      "objectUid1": "hu:registration-version:neg-shared-unobserved",
+      "objectUid2": "hu:registration-version:nct02678611-observed-2026-10-04",
+      "action": "REVIEW_QUEUE"
+     },
+     {
+      "check": "V-108r",
+      "relType": "HAS_REGISTRATION_VERSION",
+      "subjectUid": "hu:trial-registration:ctgov-nct00938340",
+      "objectUid1": "hu:registration-version:neg-shared-unobserved",
+      "objectUid2": "hu:registration-version:nct00938340-observed-2026-10-04",
+      "action": "REVIEW_QUEUE"
+     }
+    ]
+   },
+   "V-509r": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-509r",
+      "subjectUid": "hu:trial-registration:ctgov-nct02678611",
+      "relType": "HAS_REGISTRATION_VERSION",
+      "state1": "hu:registration-version:neg-shared-unobserved",
+      "state2": "hu:registration-version:nct02678611-observed-2026-10-04",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     },
+     {
+      "check": "V-509r",
+      "subjectUid": "hu:trial-registration:ctgov-nct00938340",
+      "relType": "HAS_REGISTRATION_VERSION",
+      "state1": "hu:registration-version:neg-shared-unobserved",
+      "state2": "hu:registration-version:nct00938340-observed-2026-10-04",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     }
+    ]
+   },
+   "V-211r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-211r",
+      "registrationVersion": "hu:registration-version:neg-shared-unobserved",
+      "owners": 2
+     }
+    ]
+   },
+   "V-215r": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-215r",
+      "synthesis": "hu:synthesis:neg-within-arm-as-replication",
+      "nonPrimaryInput": "hu:study-result:atlas-hamstring-ua500-within-arm",
+      "role": "INDEPENDENT_REPLICATION",
+      "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120"
+     },
+     {
+      "check": "V-215r",
+      "synthesis": "hu:synthesis:neg-secondary-as-replication",
+      "nonPrimaryInput": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+      "role": "INDEPENDENT_REPLICATION",
+      "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120"
+     },
+     {
+      "check": "V-215r",
+      "synthesis": "hu:synthesis:neg-secondary-as-confirmatory",
+      "nonPrimaryInput": "hu:study-result:atlas-hamstring-ua500-vs-placebo",
+      "role": "CONFIRMATORY",
+      "nullPrimary": "hu:study-result:atlas-power-ua-vs-placebo-d120"
+     }
+    ]
+   },
+   "V-217r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-217r",
+      "aeResultWithoutCollectionMethod": "hu:study-result:neg-silence-as-zero",
+      "eventCount": 0,
+      "affected": 0
+     }
+    ]
+   },
+   "V-217i": {
+    "rows": 5,
+    "sample": [
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-placebo",
+      "sourceWording": "self-reported AEs"
+     },
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-1x",
+      "sourceWording": "self-reported AEs"
+     },
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+      "sourceWording": "self-reported AEs"
+     },
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct03283462-ae-serious-ua",
+      "sourceWording": "recorded and coded according to the Medical Dictionary for Regulatory Activities"
+     }
+    ]
+   },
+   "V-221r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-221r",
+      "intervention": "hu:intervention:neg-missing-mass-basis",
+      "incompleteComponent": "hu:intervention-component:neg-missing-mass-basis"
+     }
+    ]
+   },
+   "V-503r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503r",
+      "kind": "EDGE:OPERATED_BY",
+      "item": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:284"
+     }
+    ]
+   },
+   "V-505r": {
+    "rows": 5,
+    "sample": [
+     {
+      "check": "V-505r",
+      "relType": "USES_INTERVENTION_MATERIAL",
+      "episode": "hu:rel:neg-variant-without-name",
+      "violations": [
+       "ASSERTION_MISSING"
+      ]
+     },
+     {
+      "check": "V-505r",
+      "relType": "USES_INTERVENTION_MATERIAL",
+      "episode": "hu:rel:neg-two-targets",
+      "violations": [
+       "ASSERTION_MISSING"
+      ]
+     },
+     {
+      "check": "V-505r",
+      "relType": "CORRECTS",
+      "episode": "hu:rel:neg-corrects",
+      "violations": [
+       "ASSERTION_MISSING"
+      ]
+     },
+     {
+      "check": "V-505r",
+      "relType": "OPERATED_BY",
+      "episode": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:284",
+      "violations": [
+       "ASSERTION_MISSING"
+      ]
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 19,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "USES_INTERVENTION_DEVICE",
+      "episode": "hu:rel:uses-device-nct02582593-real",
+      "edgeOnly": [
+       "asReportedName"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "USES_INTERVENTION_DEVICE",
+      "episode": "hu:rel:uses-device-nct02582593-sham",
+      "edgeOnly": [
+       "asReportedName"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "USES_INTERVENTION_MATERIAL",
+      "episode": "hu:rel:uses-material-nct04985630-pomegranate-juice",
+      "edgeOnly": [
+       "asReportedName"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "CORRECTS",
+      "episode": "hu:rel:corrects-30155270-29184669",
+      "edgeOnly": [
+       "sourceRevisionEventUid"
+      ]
+     }
+    ]
+   },
+   "V-W00-15": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-15",
+      "relType": "EVALUATES",
+      "fromLabel": "Entity",
+      "toLabel": "Entity",
+      "edges": 1,
+      "fix": "USE_LEGACY_EVALUATES"
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "OutcomeDefinition",
+      "token": "outcome",
+      "registered": [
+       "outcome-definition"
+      ],
+      "nodes": 7,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41514-017-0016-9",
+      "canonicalUri": "https://doi.org/10.1038/s41514-017-0016-9"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41514-018-0027-1",
+      "canonicalUri": "https://doi.org/10.1038/s41514-018-0027-1"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W11-pos",
+  "files": [
+   "W11/fixtures/01-capability-promotion-filing-operating.cypher",
+   "W11/fixtures/02-capacity-basis-nameplate-vs-utilized.cypher",
+   "W11/fixtures/03-specification-versions-and-process-inputs.cypher",
+   "W11/fixtures/04-cgmp-claim-vs-certification-registration-inspection.cypher"
+  ],
+  "load": {
+   "ok": 62,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {
+   "V-505i": {
+    "rows": 9,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "INPUTS",
+      "episode": "hu:rel:inputs-nrc-grn-635-step-1-d-ribofuranose-tetraacetate",
+      "edgeOnly": [
+       "ioRole",
+       "orderIndex",
+       "asReportedName"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "INPUTS",
+      "episode": "hu:rel:inputs-nrc-grn-635-step-1-acetonitrile",
+      "edgeOnly": [
+       "orderIndex",
+       "asReportedName",
+       "ioRole"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "INPUTS",
+      "episode": "hu:rel:inputs-nrc-grn-635-step-1-hydrogen-chloride",
+      "edgeOnly": [
+       "ioRole",
+       "asReportedName",
+       "orderIndex"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "INPUTS",
+      "episode": "hu:rel:inputs-nrc-grn-635-step-1-nicotinamide-usp-grade",
+      "edgeOnly": [
+       "orderIndex",
+       "asReportedName",
+       "ioRole"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "SpecificationCriterion",
+      "token": "specification-criterion",
+      "registered": [
+       "spec-criterion"
+      ],
+      "nodes": 8,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:efsa-journal-2019-5775",
+      "canonicalUri": "https://doi.org/10.2903/j.efsa.2019.5775"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W11-pos+05",
+  "files": [
+   "W11/fixtures/01-capability-promotion-filing-operating.cypher",
+   "W11/fixtures/02-capacity-basis-nameplate-vs-utilized.cypher",
+   "W11/fixtures/03-specification-versions-and-process-inputs.cypher",
+   "W11/fixtures/04-cgmp-claim-vs-certification-registration-inspection.cypher",
+   "W11/fixtures/05-negative-mutations.cypher"
+  ],
+  "load": {
+   "ok": 74,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {
+   "V-505i": {
+    "rows": 9,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "INPUTS",
+      "episode": "hu:rel:inputs-nrc-grn-635-step-1-d-ribofuranose-tetraacetate",
+      "edgeOnly": [
+       "ioRole",
+       "orderIndex",
+       "asReportedName"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "INPUTS",
+      "episode": "hu:rel:inputs-nrc-grn-635-step-1-acetonitrile",
+      "edgeOnly": [
+       "orderIndex",
+       "asReportedName",
+       "ioRole"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "INPUTS",
+      "episode": "hu:rel:inputs-nrc-grn-635-step-1-hydrogen-chloride",
+      "edgeOnly": [
+       "ioRole",
+       "asReportedName",
+       "orderIndex"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "INPUTS",
+      "episode": "hu:rel:inputs-nrc-grn-635-step-1-nicotinamide-usp-grade",
+      "edgeOnly": [
+       "orderIndex",
+       "asReportedName",
+       "ioRole"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "SpecificationCriterion",
+      "token": "specification-criterion",
+      "registered": [
+       "spec-criterion"
+      ],
+      "nodes": 8,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:efsa-journal-2019-5775",
+      "canonicalUri": "https://doi.org/10.2903/j.efsa.2019.5775"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W12-pos",
+  "files": [
+   "W12/fixtures/w12-00-base.cypher",
+   "W12/fixtures/w12-10-coa-vs-summary.cypher",
+   "W12/fixtures/w12-20-lot-measured-vs-label.cypher",
+   "W12/fixtures/w12-30-certification-scope.cypher",
+   "W12/fixtures/w12-40-missingness-and-spec.cypher",
+   "W12/fixtures/w12-90-capture-fidelity.cypher"
+  ],
+  "load": {
+   "ok": 428,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "SpecificationVersion",
+      "token": "spec-version",
+      "registered": [
+       "specification-version"
+      ],
+      "nodes": 4,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W12-pos+neg",
+  "files": [
+   "W12/fixtures/w12-00-base.cypher",
+   "W12/fixtures/w12-10-coa-vs-summary.cypher",
+   "W12/fixtures/w12-20-lot-measured-vs-label.cypher",
+   "W12/fixtures/w12-30-certification-scope.cypher",
+   "W12/fixtures/w12-40-missingness-and-spec.cypher",
+   "W12/fixtures/w12-90-capture-fidelity.cypher",
+   "W12/fixtures/w12-negatives.cypher"
+  ],
+  "load": {
+   "ok": 448,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-112": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "CERTIFIED_UNDER",
+      "startUid": "hu:product:elysium-basis",
+      "endUid": "hu:cert-listing:nsfsport-1786167",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-112r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-112r",
+      "edgeType": "CERTIFIED_UNDER",
+      "startUid": "hu:product:elysium-basis",
+      "endUid": "hu:cert-listing:nsfsport-1786167",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     }
+    ]
+   },
+   "V-503r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503r",
+      "kind": "EDGE:HAS_CERTIFICATION_SCOPE",
+      "item": "hu:rel:w12-has-scope-1463170-v1"
+     }
+    ]
+   },
+   "V-505r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-505r",
+      "relType": "SAMPLE_FROM",
+      "episode": "hu:rel:w12-neg-guessed-lot",
+      "violations": [
+       "OBJECT_IS_NOT_EDGE_END"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "SpecificationVersion",
+      "token": "spec-version",
+      "registered": [
+       "specification-version"
+      ],
+      "nodes": 4,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W13-pos",
+  "files": [
+   "W13/fixtures/w13-regulatory-kinds.cypher",
+   "W13/fixtures/w13-jurisdiction-and-pending-values.cypher",
+   "W13/fixtures/w13-inspection.cypher"
+  ],
+  "load": {
+   "ok": 519,
+   "err": 1,
+   "errs": [
+    "w13-regulatory-kinds.cypher: Node(297) already exists with label `Source` and property `canonicalUri` = 'https://www.federalregister.gov/documents/2024/05/06/2024-08935/medical-devices-labo"
+   ]
+  },
+  "original": {
+   "V-333": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-333",
+      "statusUid": "hu:regulatory-status:us-synthetic-ldt-ed-v2",
+      "statusKind": "ENFORCEMENT_DISCRETION",
+      "subjects": 2
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-505i": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:identifier-us-fda-grn-000635",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:identifier-us-fda-510k-k234070",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "MaterialMixture",
+      "token": "mixture",
+      "registered": [
+       "material"
+      ],
+      "nodes": 1,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W13-pos+neg",
+  "files": [
+   "W13/fixtures/w13-regulatory-kinds.cypher",
+   "W13/fixtures/w13-jurisdiction-and-pending-values.cypher",
+   "W13/fixtures/w13-inspection.cypher",
+   "W13/fixtures/w13-negative.cypher"
+  ],
+  "load": {
+   "ok": 608,
+   "err": 1,
+   "errs": [
+    "w13-regulatory-kinds.cypher: Node(95) already exists with label `Source` and property `canonicalUri` = 'https://www.federalregister.gov/documents/2024/05/06/2024-08935/medical-devices-labor"
+   ]
+  },
+  "original": {
+   "V-333": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-333",
+      "statusUid": "hu:regulatory-status:us-synthetic-ldt-ed-v2",
+      "statusKind": "ENFORCEMENT_DISCRETION",
+      "subjects": 2
+     },
+     {
+      "check": "V-333",
+      "statusUid": "hu:regulatory-status:us-synthetic-plant-ffr",
+      "statusKind": "ESTABLISHMENT_REGISTRATION",
+      "subjects": 2
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-108r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-108r",
+      "relType": "HAS_PATHWAY_VERSION",
+      "subjectUid": "hu:reg-pathway:us-fda-gras-notice",
+      "objectUid1": "hu:reg-pathway-version:us-fda-gras-subpart-e",
+      "objectUid2": "hu:reg-pathway-version:us-fda-gras-proposed-170-36",
+      "action": "REVIEW_QUEUE"
+     }
+    ]
+   },
+   "V-509r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-509r",
+      "subjectUid": "hu:reg-pathway:us-fda-gras-notice",
+      "relType": "HAS_PATHWAY_VERSION",
+      "state1": "hu:reg-pathway-version:us-fda-gras-subpart-e",
+      "state2": "hu:reg-pathway-version:us-fda-gras-proposed-170-36",
+      "action": "POSSIBLE_OVERLAP_REVIEW"
+     }
+    ]
+   },
+   "V-322r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-322r",
+      "productWithUnbackedApproval": "hu:product:tru-niagen-300-capsules"
+     }
+    ]
+   },
+   "V-333r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-333r",
+      "statusUid": "hu:regulatory-status:us-synthetic-plant-ffr",
+      "statusKind": "ESTABLISHMENT_REGISTRATION",
+      "subjects": 2,
+      "currentEpisodes": 2
+     }
+    ]
+   },
+   "V-334r": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-334r",
+      "statusUid": "hu:regulatory-status:neg-version-from-other-pathway",
+      "versionUid": "hu:reg-pathway-version:us-fda-ldt-rule-2024",
+      "statusFrom": {
+       "year": 2016,
+       "month": 8,
+       "day": 3,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "statusTo": null,
+      "basisFrom": {
+       "year": 2024,
+       "month": 7,
+       "day": 5,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "basisTo": {
+       "year": 2025,
+       "month": 3,
+       "day": 31,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      }
+     },
+     {
+      "check": "V-334r",
+      "statusUid": "hu:regulatory-status:neg-ldt-outlives-vacatur",
+      "versionUid": "hu:reg-pathway-version:us-fda-ldt-rule-2024",
+      "statusFrom": {
+       "year": 2024,
+       "month": 7,
+       "day": 5,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "statusTo": {
+       "year": 2025,
+       "month": 9,
+       "day": 19,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "basisFrom": {
+       "year": 2024,
+       "month": 7,
+       "day": 5,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "basisTo": {
+       "year": 2025,
+       "month": 3,
+       "day": 31,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      }
+     }
+    ]
+   },
+   "V-505r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-505r",
+      "relType": "HAS_PATHWAY_VERSION",
+      "episode": "hu:rel:neg-gras-v2-overlap",
+      "violations": [
+       "VALID_TIME_DIFFERS"
+      ]
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:identifier-us-fda-grn-000635",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:identifier-us-fda-510k-k234070",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "MaterialMixture",
+      "token": "mixture",
+      "registered": [
+       "material"
+      ],
+      "nodes": 1,
+      "violation": "TOKEN_NOT_REGISTERED_FOR_LABEL"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W15-pos",
+  "files": [
+   "W15/fixtures/w15-00-common.cypher",
+   "W15/fixtures/w15-01-amazon-host-seller-fulfiller.cypher",
+   "W15/fixtures/w15-02-listing-merge-four-offers.cypher",
+   "W15/fixtures/w15-03-dtc-subscription-and-bundles.cypher",
+   "W15/fixtures/w15-04-walmart-price-conflict-open-end-unresolved.cypher",
+   "W15/fixtures/w15-05-affiliate-and-title-amounts.cypher",
+   "W15/fixtures/w15-06-recall-and-unauthorized-channel-candidates.cypher",
+   "W15/fixtures/w15-08-legacy-listing-migration.cypher"
+  ],
+  "load": {
+   "ok": 839,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {
+   "V-505i": {
+    "rows": 6,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "IDENTIFIED_BY",
+      "episode": "hu:rel:amazon-b0fs82b35k-identified-by-asin",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:tru-niagen-account-has-merchant-id",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "IDENTIFIED_BY",
+      "episode": "hu:rel:truniagen-41905353850949-identified-by-variant-id",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "IDENTIFIED_BY",
+      "episode": "hu:rel:truniagen-41905353883717-identified-by-variant-id",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-W00-15": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-15",
+      "relType": "IDENTIFIED_BY",
+      "fromLabel": "Entity",
+      "toLabel": "Entity",
+      "edges": 6,
+      "fix": "USE_HAS_IDENTIFIER"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W15-pos+07",
+  "files": [
+   "W15/fixtures/w15-00-common.cypher",
+   "W15/fixtures/w15-01-amazon-host-seller-fulfiller.cypher",
+   "W15/fixtures/w15-02-listing-merge-four-offers.cypher",
+   "W15/fixtures/w15-03-dtc-subscription-and-bundles.cypher",
+   "W15/fixtures/w15-04-walmart-price-conflict-open-end-unresolved.cypher",
+   "W15/fixtures/w15-05-affiliate-and-title-amounts.cypher",
+   "W15/fixtures/w15-06-recall-and-unauthorized-channel-candidates.cypher",
+   "W15/fixtures/w15-07-negatives-must-fail.cypher"
+  ],
+  "load": {
+   "ok": 843,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-101": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-101",
+      "relType": "SELLER_OF_RECORD_FOR",
+      "edgeId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:261",
+      "recordedFrom": {
+       "year": 2026,
+       "month": 10,
+       "day": 4,
+       "hour": 2,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "assertionUid": null
+     },
+     {
+      "check": "V-101",
+      "relType": "LISTING_FOR",
+      "edgeId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:267",
+      "recordedFrom": {
+       "year": 2026,
+       "month": 10,
+       "day": 4,
+       "hour": 2,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "assertionUid": null
+     }
+    ]
+   },
+   "V-112": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:amazon-marketplace-us",
+      "endUid": "hu:product-variant:tru-niagen-beauty-us-30ct",
+      "violations": [
+       "FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:amazon-marketplace-us",
+      "endUid": "hu:product-variant:tru-niagen-300mg-us-capsule",
+      "violations": [
+       "FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:walmart-marketplace-us",
+      "endUid": "hu:product-variant:tru-niagen-300mg-us-capsule",
+      "violations": [
+       "NO_CITATION"
+      ]
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-101r": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-101r",
+      "relType": "SELLER_OF_RECORD_FOR",
+      "edgeId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:261",
+      "recordedFrom": {
+       "year": 2026,
+       "month": 10,
+       "day": 4,
+       "hour": 2,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "assertionUid": null
+     },
+     {
+      "check": "V-101r",
+      "relType": "LISTING_FOR",
+      "edgeId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:267",
+      "recordedFrom": {
+       "year": 2026,
+       "month": 10,
+       "day": 4,
+       "hour": 2,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "assertionUid": null
+     },
+     {
+      "check": "V-101r",
+      "relType": "ENDORSES_PRODUCT",
+      "edgeId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:268",
+      "recordedFrom": null,
+      "assertionUid": null
+     }
+    ]
+   },
+   "V-112r": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-112r",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:amazon-marketplace-us",
+      "endUid": "hu:product-variant:tru-niagen-beauty-us-30ct",
+      "violations": [
+       "FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"
+      ]
+     },
+     {
+      "check": "V-112r",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:amazon-marketplace-us",
+      "endUid": "hu:product-variant:tru-niagen-300mg-us-capsule",
+      "violations": [
+       "FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"
+      ]
+     },
+     {
+      "check": "V-112r",
+      "edgeType": "SELLS_PRODUCT",
+      "startUid": "hu:org:walmart-marketplace-us",
+      "endUid": "hu:product-variant:tru-niagen-300mg-us-capsule",
+      "violations": [
+       "NO_CITATION"
+      ]
+     },
+     {
+      "check": "V-112r",
+      "edgeType": "ENDORSES_PRODUCT",
+      "startUid": "hu:person:john-alexander-fastlifehacks",
+      "endUid": "hu:product-variant:tru-niagen-pro-1000mg-us-capsule",
+      "violations": [
+       "FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"
+      ]
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 6,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "IDENTIFIED_BY",
+      "episode": "hu:rel:truniagen-41905353916485-identified-by-variant-id",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:sports-med-has-walmart-seller-id",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "IDENTIFIED_BY",
+      "episode": "hu:rel:amazon-b0fs82b35k-identified-by-asin",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "HAS_IDENTIFIER",
+      "episode": "hu:rel:tru-niagen-account-has-merchant-id",
+      "edgeOnly": [
+       "isPrimary"
+      ]
+     }
+    ]
+   },
+   "V-W00-15": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-15",
+      "relType": "IDENTIFIED_BY",
+      "fromLabel": "Entity",
+      "toLabel": "Entity",
+      "edges": 6,
+      "fix": "USE_HAS_IDENTIFIER"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W16-01",
+  "files": [
+   "W16/fixtures/01-edition-diff-by-stepkey.cypher"
+  ],
+  "load": {
+   "ok": 51,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-503": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503",
+      "assertionWithInconsistentTimeQualifiers": "hu:assertion:protocolsio-pbmc-cpt-has-v1"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-503r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503r",
+      "kind": "ASSERTION",
+      "item": "hu:assertion:protocolsio-pbmc-cpt-has-v1"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W16-04",
+  "files": [
+   "W16/fixtures/04-conditional-branch-missing-condition.cypher"
+  ],
+  "load": {
+   "ok": 71,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-525": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-525",
+      "violation": "CONDITIONAL_STEP_WITHOUT_CONDITION",
+      "item": "hu:protocol-step:blueprint-neg-mole-check-annual-v1"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-525r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-525r",
+      "violation": "CONDITIONAL_STEP_WITHOUT_CONDITION",
+      "item": "hu:protocol-step:blueprint-neg-mole-check-annual-v1",
+      "detail": "mole-check-annual"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W16-12",
+  "files": [
+   "W16/fixtures/12-mutually-exclusive-steps.cypher"
+  ],
+  "load": {
+   "ok": 25,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {}
+ },
+ {
+  "set": "W19-pos",
+  "files": [
+   "W19/fixtures/01-cl003-work-rendition-identity.cypher",
+   "W19/fixtures/02-primary-vs-retelling.cypher",
+   "W19/fixtures/03-partial-capture-not-found.cypher",
+   "W19/fixtures/04-source-revision-reanchor.cypher",
+   "W19/fixtures/05-coverage-discovery-authority.cypher"
+  ],
+  "load": {
+   "ok": 128,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-409": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:nature-html-2026-10-04-nrpt-2x-bottles",
+      "oldLocator": "hu:locator:nature-html-2018-01-nrpt-2x-bottles"
+     }
+    ]
+   },
+   "V-512": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-512",
+      "violation": "REVISION_ORDER",
+      "item": "hu:source-revision:nature-s41514-017-0016-9-html-author-correction-2018"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "SourceCoverageRequirement",
+      "token": "policy",
+      "registered": [
+       "coverage-requirement"
+      ],
+      "nodes": 2,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W19-pos+90",
+  "files": [
+   "W19/fixtures/01-cl003-work-rendition-identity.cypher",
+   "W19/fixtures/02-primary-vs-retelling.cypher",
+   "W19/fixtures/03-partial-capture-not-found.cypher",
+   "W19/fixtures/04-source-revision-reanchor.cypher",
+   "W19/fixtures/05-coverage-discovery-authority.cypher",
+   "W19/fixtures/90-negative-mutations.cypher"
+  ],
+  "load": {
+   "ok": 142,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-409": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:nature-html-2026-10-04-nrpt-2x-bottles",
+      "oldLocator": "hu:locator:nature-html-2018-01-nrpt-2x-bottles"
+     },
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:nature-html-2026-10-04-nrpt-2x-bottles",
+      "oldLocator": "hu:locator:nature-html-2018-01-nrpt-2x-bottles"
+     },
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:pmc-PMC5701244-2026-10-04-elysium-provided-ip",
+      "oldLocator": "hu:locator:nature-html-2018-01-nrpt-2x-bottles"
+     },
+     {
+      "check": "V-409",
+      "newLocator": "hu:locator:pmc-PMC5701244-2026-10-04-elysium-provided-ip",
+      "oldLocator": "hu:locator:nature-html-2018-01-nrpt-2x-bottles"
+     }
+    ]
+   },
+   "V-512": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-512",
+      "violation": "REVISION_ORDER",
+      "item": "hu:source-revision:nature-s41514-017-0016-9-html-author-correction-2018"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-409r": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-409r",
+      "newLocator": "hu:locator:nature-html-2026-10-04-nrpt-2x-bottles",
+      "oldLocator": "hu:locator:nature-html-2018-01-nrpt-2x-bottles"
+     },
+     {
+      "check": "V-409r",
+      "newLocator": "hu:locator:pmc-PMC5701244-2026-10-04-elysium-provided-ip",
+      "oldLocator": "hu:locator:nature-html-2018-01-nrpt-2x-bottles"
+     },
+     {
+      "check": "V-409r",
+      "newLocator": "hu:locator:pmc-PMC5701244-2026-10-04-elysium-provided-ip",
+      "oldLocator": "hu:locator:nature-html-2018-01-nrpt-2x-bottles"
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "SourceCoverageRequirement",
+      "token": "policy",
+      "registered": [
+       "coverage-requirement"
+      ],
+      "nodes": 2,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:bad-doi-as-source",
+      "canonicalUri": "https://doi.org/10.1038/s41514-017-0016-9"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W20-01+04",
+  "files": [
+   "W20/fixtures/w20-01-resegmentation-vs-correction.cypher",
+   "W20/fixtures/w20-04-text-version-pairs.cypher"
+  ],
+  "load": {
+   "ok": 96,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-112": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "RESOLVES_TO_CHUNK",
+      "startUid": "hu:locator:w20f01-l1-nmn-gram",
+      "endUid": "hu:chunk:w20f01-g2-c0",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "RESOLVES_TO_CHUNK",
+      "startUid": "hu:locator:w20f01-l1-nmn-gram",
+      "endUid": "hu:chunk:w20f01-g2-c1",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "RESOLVES_TO_CHUNK",
+      "startUid": "hu:locator:w20f01-l2-nmn-gram-reanchored",
+      "endUid": "hu:chunk:w20f01-g3-c0",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "RESOLVES_TO_CHUNK",
+      "startUid": "hu:locator:w20f01-l2-nmn-gram-reanchored",
+      "endUid": "hu:chunk:w20f01-g3-c1",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     }
+    ]
+   }
+  },
+  "revised": {}
+ },
+ {
+  "set": "W20-01+02",
+  "files": [
+   "W20/fixtures/w20-01-resegmentation-vs-correction.cypher",
+   "W20/fixtures/w20-02-negative-chunk-support.cypher"
+  ],
+  "load": {
+   "ok": 71,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-112": {
+    "rows": 5,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "RESOLVES_TO_CHUNK",
+      "startUid": "hu:locator:w20f01-l1-nmn-gram",
+      "endUid": "hu:chunk:w20f01-g2-c0",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "RESOLVES_TO_CHUNK",
+      "startUid": "hu:locator:w20f01-l1-nmn-gram",
+      "endUid": "hu:chunk:w20f01-g2-c1",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "RESOLVES_TO_CHUNK",
+      "startUid": "hu:locator:w20f01-l2-nmn-gram-reanchored",
+      "endUid": "hu:chunk:w20f01-g3-c0",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     },
+     {
+      "check": "V-112",
+      "edgeType": "RESOLVES_TO_CHUNK",
+      "startUid": "hu:locator:w20f01-l2-nmn-gram-reanchored",
+      "endUid": "hu:chunk:w20f01-g3-c1",
+      "violations": [
+       "DERIVATION_WITHOUT_SOURCE_ASSERTIONS"
+      ]
+     }
+    ]
+   },
+   "V-407": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-407",
+      "assertionUid": "hu:assertion:w20f02-n1-chunk-only-support",
+      "chunkWithoutLocator": "hu:chunk:w20f01-g2-c0"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-112r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-112r",
+      "edgeType": "SUPPORTED_BY_DOCUMENT",
+      "startUid": "hu:study-arm:w20f02-n11-arm",
+      "endUid": "hu:document:w20f01-transcript-page",
+      "violations": [
+       "NO_CITATION"
+      ]
+     }
+    ]
+   },
+   "V-407r": {
+    "rows": 4,
+    "sample": [
+     {
+      "check": "V-407r",
+      "relType": "SUPPORTED_BY_CHUNK",
+      "startUid": "hu:assertion:w20f01-a1-nmn-gram-daily",
+      "startLabel": "Assertion",
+      "chunkUid": "hu:chunk:w20f01-g2-c2",
+      "violations": [
+       "LOCATOR_DOES_NOT_RESOLVE_TO_CHUNK"
+      ]
+     },
+     {
+      "check": "V-407r",
+      "relType": "SUPPORTED_BY_CHUNK",
+      "startUid": "hu:assertion:w20f02-n1-chunk-only-support",
+      "startLabel": "Assertion",
+      "chunkUid": "hu:chunk:w20f01-g2-c0",
+      "violations": [
+       "NO_LOCATOR_UID"
+      ]
+     },
+     {
+      "check": "V-407r",
+      "relType": "SUPPORTED_BY",
+      "startUid": "hu:assertion:w20f02-n1-chunk-only-support",
+      "startLabel": "Assertion",
+      "chunkUid": "hu:chunk:w20f01-g2-c0",
+      "violations": [
+       "LEGACY_SUPPORTED_BY_TO_CHUNK",
+       "NO_LOCATOR_UID",
+       "NO_DERIVATION_RULE"
+      ]
+     },
+     {
+      "check": "V-407r",
+      "relType": "SUPPORTED_BY",
+      "startUid": "hu:mechanism:w20f02-nad-salvage",
+      "startLabel": "Entity",
+      "chunkUid": "hu:chunk:w20f01-g2-c0",
+      "violations": [
+       "LEGACY_SUPPORTED_BY_TO_CHUNK",
+       "NO_LOCATOR_UID",
+       "NO_DERIVATION_RULE"
+      ]
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyArm",
+      "token": "study-arm",
+      "registered": [
+       "arm"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W21-pos",
+  "files": [
+   "W21/fixtures/fx01-dynamic-ads-renditions.cypher",
+   "W21/fixtures/fx02a-transcript-correction-cosmetic.cypher",
+   "W21/fixtures/fx02b-transcript-correction-substantive.cypher",
+   "W21/fixtures/fx03-sponsor-read-vs-practice-report.cypher",
+   "W21/fixtures/fx04-practice-qualified-vs-recommends-retelling.cypher",
+   "W21/fixtures/fx05-two-speakers-one-utterance.cypher",
+   "W21/fixtures/fx06-presentation-slide-vs-talk.cypher",
+   "W21/fixtures/fx07-recommends-derived-projection.cypher"
+  ],
+  "load": {
+   "ok": 238,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-423": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-423",
+      "recommenderUid": "hu:person:synthetic-podcast-guest",
+      "recommendedUid": "hu:substance:synthetic-compound-x"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-521r": {
+    "rows": 6,
+    "sample": [
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:adjudication:w21-fx01-capture-fidelity-policy",
+      "privacyClass": "internal"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:adjudication:w21-fx02-capture-fidelity-2026-10-03",
+      "privacyClass": "internal"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:adjudication:w21-fx02b-capture-fidelity-2026-11-15",
+      "privacyClass": "internal"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:adjudication:w21-fx03-capture-fidelity-policy",
+      "privacyClass": "internal"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W21-pos+fx04neg",
+  "files": [
+   "W21/fixtures/fx01-dynamic-ads-renditions.cypher",
+   "W21/fixtures/fx02a-transcript-correction-cosmetic.cypher",
+   "W21/fixtures/fx02b-transcript-correction-substantive.cypher",
+   "W21/fixtures/fx03-sponsor-read-vs-practice-report.cypher",
+   "W21/fixtures/fx04-practice-qualified-vs-recommends-retelling.cypher",
+   "W21/fixtures/fx05-two-speakers-one-utterance.cypher",
+   "W21/fixtures/fx06-presentation-slide-vs-talk.cypher",
+   "W21/fixtures/fx07-recommends-derived-projection.cypher",
+   "W21/fixtures/fx04-practice-qualified-vs-recommends-retelling.neg.cypher"
+  ],
+  "load": {
+   "ok": 241,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-423": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-423",
+      "recommenderUid": "hu:person:synthetic-podcast-guest",
+      "recommendedUid": "hu:substance:synthetic-compound-x"
+     },
+     {
+      "check": "V-423",
+      "recommenderUid": "hu:person:david-a-sinclair",
+      "recommendedUid": "hu:substance:nicotinamide-mononucleotide"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-423r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-423r",
+      "recommenderUid": "hu:person:david-a-sinclair",
+      "recommendedUid": "hu:substance:nicotinamide-mononucleotide",
+      "cited": [
+       "hu:claim-occurrence:synthetic-digest-says-sinclair-recommends-nmn"
+      ]
+     }
+    ]
+   },
+   "V-521r": {
+    "rows": 6,
+    "sample": [
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:adjudication:w21-fx01-capture-fidelity-policy",
+      "privacyClass": "internal"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:adjudication:w21-fx02-capture-fidelity-2026-10-03",
+      "privacyClass": "internal"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:adjudication:w21-fx02b-capture-fidelity-2026-11-15",
+      "privacyClass": "internal"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:adjudication:w21-fx03-capture-fidelity-policy",
+      "privacyClass": "internal"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W23-00+04",
+  "files": [
+   "W23/fixtures/00-shared-base.cypher",
+   "W23/fixtures/04-uid-redirect.cypher"
+  ],
+  "load": {
+   "ok": 28,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-432": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-432",
+      "malformedEquivalenceAssessment": "hu:assessment:w23-merge-capsule-dup",
+      "comparedCount": 0
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-432r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-432r",
+      "malformedEquivalenceAssessment": "hu:assessment:w23-merge-capsule-dup",
+      "comparedCount": 2,
+      "equivalenceKind": "SAME_WORK_DIFFERENT_NAME"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W23-00+10",
+  "files": [
+   "W23/fixtures/00-shared-base.cypher",
+   "W23/fixtures/10-leak-probe-qs6.cypher"
+  ],
+  "load": {
+   "ok": 37,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-521": {
+    "rows": 7,
+    "sample": [
+     {
+      "check": "V-521",
+      "kind": "NODE",
+      "item": "hu:private-user-context:w23-leak-0001"
+     },
+     {
+      "check": "V-521",
+      "kind": "NODE",
+      "item": "hu:product:w23-calmroot"
+     },
+     {
+      "check": "V-521",
+      "kind": "NODE",
+      "item": "hu:private-personal-measurement:w23-leak-m1"
+     },
+     {
+      "check": "V-521",
+      "kind": "NODE",
+      "item": "hu:product-variant:w23-calmroot-us-powder"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-505r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-505r",
+      "relType": "HAS_VARIANT",
+      "episode": "hu:rel:w23-leak-calmroot-variant",
+      "violations": [
+       "ASSERTION_MISSING"
+      ]
+     }
+    ]
+   },
+   "V-521r": {
+    "rows": 9,
+    "sample": [
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:private-user-context:w23-leak-0001",
+      "privacyClass": "private-personal"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:product:w23-calmroot",
+      "privacyClass": "PUBLIC"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:private-personal-measurement:w23-leak-m1",
+      "privacyClass": "PRIVATE_PERSONAL"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:product-variant:w23-calmroot-us-powder",
+      "privacyClass": "PUBLIC"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W10-pos",
+  "files": [
+   "W10/fixtures/w10-01-applicability-basis-13dim.cypher",
+   "W10/fixtures/w10-02-dose-ratio-minimal-pair.cypher",
+   "W10/fixtures/w10-03-surrogate-context.cypher",
+   "W10/fixtures/w10-04-null-primary-synthesis.cypher",
+   "W10/fixtures/w10-05-synthesis-versioning.cypher"
+  ],
+  "load": {
+   "ok": 68,
+   "err": 0,
+   "errs": []
+  },
+  "original": {},
+  "revised": {
+   "V-W00-16": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "OutcomeDefinition",
+      "token": "outcome",
+      "registered": [
+       "outcome-definition"
+      ],
+      "nodes": 5,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 6,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1016-s2213-8587-21-00051-6",
+      "canonicalUri": "https://doi.org/10.1016/S2213-8587(21)00051-6"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1016-s2213-8587-24-00348-6",
+      "canonicalUri": "https://doi.org/10.1016/S2213-8587(24)00348-6"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1016-j.cmet.2022.02.001",
+      "canonicalUri": "https://doi.org/10.1016/j.cmet.2022.02.001"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41514-017-0016-9",
+      "canonicalUri": "https://doi.org/10.1038/s41514-017-0016-9"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W10-pos+90",
+  "files": [
+   "W10/fixtures/w10-01-applicability-basis-13dim.cypher",
+   "W10/fixtures/w10-02-dose-ratio-minimal-pair.cypher",
+   "W10/fixtures/w10-03-surrogate-context.cypher",
+   "W10/fixtures/w10-04-null-primary-synthesis.cypher",
+   "W10/fixtures/w10-05-synthesis-versioning.cypher",
+   "W10/fixtures/w10-90-negatives.cypher"
+  ],
+  "load": {
+   "ok": 112,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-231": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-231",
+      "assertion": "hu:assertion:w10-n16-mech",
+      "basisKind": "DIRECT_MEASUREMENT",
+      "contexts": 0
+     }
+    ]
+   },
+   "V-003": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w10-n16-mech",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-215": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-215",
+      "synthesis": "hu:synthesis:w10-n10-syn",
+      "nonPrimaryConfirmatory": "hu:study-result:w10-n10-subgroup",
+      "nullPrimary": "hu:study-result:w10-n10-primary"
+     }
+    ]
+   },
+   "V-521": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-521",
+      "kind": "NODE",
+      "item": "hu:private-user-context:w10-n02"
+     },
+     {
+      "check": "V-521",
+      "kind": "NODE",
+      "item": "hu:use-profile:w10-n21-up"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-003r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w10-n16-mech",
+      "predicateClass": "MECHANISM",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-215r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-215r",
+      "synthesis": "hu:synthesis:w10-n10-syn",
+      "nonPrimaryInput": "hu:study-result:w10-n10-subgroup",
+      "role": "CONFIRMATORY",
+      "nullPrimary": "hu:study-result:w10-n10-primary"
+     }
+    ]
+   },
+   "V-231r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-231r",
+      "assertion": "hu:assertion:w10-n16-mech",
+      "basisKind": "DIRECT_MEASUREMENT",
+      "predicateClass": "MECHANISM",
+      "contexts": 0
+     }
+    ]
+   },
+   "V-521r": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:private-user-context:w10-n02",
+      "privacyClass": "private-personal"
+     },
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:use-profile:w10-n21-up",
+      "privacyClass": "PUBLIC"
+     }
+    ]
+   },
+   "V-504a": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-504a",
+      "assessmentUid": "hu:applicability:w10-n22-ea",
+      "laterSnapshot": "hu:snapshot:w10-n22-snap",
+      "recordedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 4,
+       "hour": 2,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      },
+      "retrievedAt": {
+       "year": 2026,
+       "month": 10,
+       "day": 5,
+       "hour": 0,
+       "minute": 0,
+       "second": 0,
+       "nanosecond": 0,
+       "timeZoneOffsetSeconds": 0
+      }
+     }
+    ]
+   },
+   "V-W00-15": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-W00-15",
+      "relType": "EVALUATES",
+      "fromLabel": "Entity",
+      "toLabel": "Entity",
+      "edges": 1,
+      "fix": "USE_LEGACY_EVALUATES"
+     }
+    ]
+   },
+   "V-W00-16": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "StudyIntervention",
+      "token": "study-intervention",
+      "registered": [
+       "intervention"
+      ],
+      "nodes": 1,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     },
+     {
+      "check": "V-W00-16",
+      "primaryLabel": "OutcomeDefinition",
+      "token": "outcome",
+      "registered": [
+       "outcome-definition"
+      ],
+      "nodes": 8,
+      "violation": "FIXTURE_ALIAS_TOKEN"
+     }
+    ]
+   },
+   "V-W00-19": {
+    "rows": 6,
+    "sample": [
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41514-017-0016-9",
+      "canonicalUri": "https://doi.org/10.1038/s41514-017-0016-9"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1038-s41598-019-46120-z",
+      "canonicalUri": "https://doi.org/10.1038/s41598-019-46120-z"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1016-j.cmet.2022.02.001",
+      "canonicalUri": "https://doi.org/10.1016/j.cmet.2022.02.001"
+     },
+     {
+      "check": "V-W00-19",
+      "sourceWithResolverUri": "hu:source:doi-10.1016-s2213-8587-21-00051-6",
+      "canonicalUri": "https://doi.org/10.1016/S2213-8587(21)00051-6"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W17-pos",
+  "files": [
+   "W17/fixtures/00-w17-base.cypher",
+   "W17/fixtures/01-ae-zero-vs-not-reported.cypher",
+   "W17/fixtures/02-safety-signal-assessments.cypher",
+   "W17/fixtures/03-constraints-block-vs-lower.cypher",
+   "W17/fixtures/04-interactions-unknown-blocks.cypher",
+   "W17/fixtures/05-statin-pregnancy-validity-bounded.cypher"
+  ],
+  "load": {
+   "ok": 397,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-217": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-217i": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+      "sourceWording": "self-reported AEs"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W17-pos+90",
+  "files": [
+   "W17/fixtures/00-w17-base.cypher",
+   "W17/fixtures/01-ae-zero-vs-not-reported.cypher",
+   "W17/fixtures/02-safety-signal-assessments.cypher",
+   "W17/fixtures/03-constraints-block-vs-lower.cypher",
+   "W17/fixtures/04-interactions-unknown-blocks.cypher",
+   "W17/fixtures/05-statin-pregnancy-validity-bounded.cypher",
+   "W17/fixtures/90-negative-must-fail.cypher"
+  ],
+  "load": {
+   "ok": 434,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-217": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     },
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:neg-w17-n2-zero-no-method",
+      "affected": 0,
+      "method": null
+     },
+     {
+      "check": "V-217",
+      "aeResult": "hu:study-result:neg-w17-n3-fabricated-zero",
+      "affected": 0,
+      "method": "NOT_DESCRIBED"
+     }
+    ]
+   },
+   "V-521": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-521",
+      "kind": "NODE",
+      "item": "hu:use-constraint:neg-w17-n10-personal"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-217r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-217r",
+      "aeResultWithoutCollectionMethod": "hu:study-result:neg-w17-n2-zero-no-method",
+      "eventCount": 0,
+      "affected": 0
+     }
+    ]
+   },
+   "V-217i": {
+    "rows": 2,
+    "sample": [
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:nct02678611-ae-serious-nrpt-2x",
+      "sourceWording": "self-reported AEs"
+     },
+     {
+      "check": "V-217i",
+      "zeroWithUndescribedCollection": "hu:study-result:neg-w17-n3-fabricated-zero",
+      "sourceWording": "no AE section in the publication (fabricated zero)"
+     }
+    ]
+   },
+   "V-503r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503r",
+      "kind": "EDGE:HAS_SAFETY_SIGNAL",
+      "item": "hu:rel:neg-w17-n4"
+     }
+    ]
+   },
+   "V-505r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-505r",
+      "relType": "HAS_SAFETY_SIGNAL",
+      "episode": "hu:rel:neg-w17-n4",
+      "violations": [
+       "PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "OBJECT_IS_NOT_EDGE_END"
+      ]
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "HAS_SAFETY_SIGNAL",
+      "episode": "hu:rel:neg-w17-n4",
+      "edgeOnly": [
+       "subjectRole"
+      ]
+     }
+    ]
+   },
+   "V-521r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-521r",
+      "kind": "NODE",
+      "item": "hu:use-constraint:neg-w17-n10-personal",
+      "privacyClass": "PUBLIC"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W18-pos",
+  "files": [
+   "W18/fixtures/w18-01-rezdiffra-milestone-clocks.cypher",
+   "W18/fixtures/w18-02-readout-causal-retelling.cypher",
+   "W18/fixtures/w18-03-conference-sessions-sponsorship.cypher",
+   "W18/fixtures/w18-04-narrative-arc.cypher"
+  ],
+  "load": {
+   "ok": 485,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-003": {
+    "rows": 18,
+    "sample": [
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w18-e10-scheduled-pr",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w18-e10-occurred-ir",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w18-e11-occurred-merck",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w18-e12-scheduled",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-503": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503",
+      "assertionWithInconsistentTimeQualifiers": "hu:assertion:w18-e7-occurred-mb"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-003r": {
+    "rows": 18,
+    "sample": [
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w18-e10-scheduled-pr",
+      "predicateClass": "OTHER",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w18-e10-occurred-ir",
+      "predicateClass": "OTHER",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w18-e11-occurred-merck",
+      "predicateClass": "OTHER",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w18-e12-scheduled",
+      "predicateClass": "OTHER",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-503r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503r",
+      "kind": "ASSERTION",
+      "item": "hu:assertion:w18-e7-occurred-mb"
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 15,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "INVOLVES",
+      "episode": "hu:rel:w18-f03-involves-01",
+      "edgeOnly": [
+       "participantRole"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "RECORDING_OF",
+      "episode": "hu:rel:w18-f03-recording-of-02",
+      "edgeOnly": [
+       "recordingCoverage"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "INVOLVES",
+      "episode": "hu:rel:w18-f03-involves-04",
+      "edgeOnly": [
+       "participantRole"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "SPEAKS_AT",
+      "episode": "hu:rel:w18-f03-speaks-at-05",
+      "edgeOnly": [
+       "participantRole"
+      ]
+     }
+    ]
+   }
+  }
+ },
+ {
+  "set": "W18-pos+90",
+  "files": [
+   "W18/fixtures/w18-01-rezdiffra-milestone-clocks.cypher",
+   "W18/fixtures/w18-02-readout-causal-retelling.cypher",
+   "W18/fixtures/w18-03-conference-sessions-sponsorship.cypher",
+   "W18/fixtures/w18-04-narrative-arc.cypher",
+   "W18/fixtures/w18-90-negatives.cypher"
+  ],
+  "load": {
+   "ok": 524,
+   "err": 0,
+   "errs": []
+  },
+  "original": {
+   "V-003": {
+    "rows": 20,
+    "sample": [
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w18-e1-occurred-mdgl",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w18-e6-occurred-pubmed",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w18-e2-occurred-fda",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003",
+      "assertionUid": "hu:assertion:w18-e2-occurred-mdgl",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-112": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-112",
+      "edgeType": "ENDORSES_PRODUCT",
+      "startUid": "hu:org:aasld",
+      "endUid": "hu:product:rezdiffra",
+      "violations": [
+       "FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"
+      ]
+     }
+    ]
+   },
+   "V-503": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503",
+      "assertionWithInconsistentTimeQualifiers": "hu:assertion:w18-e7-occurred-mb"
+     }
+    ]
+   }
+  },
+  "revised": {
+   "V-003r": {
+    "rows": 20,
+    "sample": [
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w18-e1-occurred-mdgl",
+      "predicateClass": "OTHER",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w18-e6-occurred-pubmed",
+      "predicateClass": "OTHER",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w18-e2-occurred-fda",
+      "predicateClass": "OTHER",
+      "objects": 0,
+      "literals": 0
+     },
+     {
+      "check": "V-003r",
+      "assertionUid": "hu:assertion:w18-e2-occurred-mdgl",
+      "predicateClass": "OTHER",
+      "objects": 0,
+      "literals": 0
+     }
+    ]
+   },
+   "V-101r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-101r",
+      "relType": "ENDORSES_PRODUCT",
+      "edgeId": "5:ed02a0ad-abf4-402f-ade7-6ccd80aeb72a:386",
+      "recordedFrom": null,
+      "assertionUid": null
+     }
+    ]
+   },
+   "V-112r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-112r",
+      "edgeType": "ENDORSES_PRODUCT",
+      "startUid": "hu:org:aasld",
+      "endUid": "hu:product:rezdiffra",
+      "violations": [
+       "FORBIDDEN_IMPLICATION_AMONG_DERIVATION_INPUTS"
+      ]
+     }
+    ]
+   },
+   "V-503r": {
+    "rows": 1,
+    "sample": [
+     {
+      "check": "V-503r",
+      "kind": "ASSERTION",
+      "item": "hu:assertion:w18-e7-occurred-mb"
+     }
+    ]
+   },
+   "V-505r": {
+    "rows": 3,
+    "sample": [
+     {
+      "check": "V-505r",
+      "relType": "CAUSED_BY",
+      "episode": "hu:rel:w18-n2",
+      "violations": [
+       "PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "SUBJECT_IS_NOT_EDGE_START",
+       "OBJECT_IS_NOT_EDGE_END"
+      ]
+     },
+     {
+      "check": "V-505r",
+      "relType": "CAUSED_BY",
+      "episode": "hu:rel:w18-n4",
+      "violations": [
+       "PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+       "OBJECT_IS_NOT_EDGE_END"
+      ]
+     },
+     {
+      "check": "V-505r",
+      "relType": "ATTENDS",
+      "episode": "hu:rel:w18-n11",
+      "violations": [
+       "ASSERTION_MISSING"
+      ]
+     }
+    ]
+   },
+   "V-505i": {
+    "rows": 16,
+    "sample": [
+     {
+      "check": "V-505i",
+      "relType": "INVOLVES",
+      "episode": "hu:rel:w18-involves-14",
+      "edgeOnly": [
+       "participantRole"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "INVOLVES",
+      "episode": "hu:rel:w18-f03-involves-01",
+      "edgeOnly": [
+       "participantRole"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "RECORDING_OF",
+      "episode": "hu:rel:w18-f03-recording-of-02",
+      "edgeOnly": [
+       "recordingCoverage"
+      ]
+     },
+     {
+      "check": "V-505i",
+      "relType": "INVOLVES",
+      "episode": "hu:rel:w18-f03-involves-04",
+      "edgeOnly": [
+       "participantRole"
+      ]
+     }
+    ]
+   }
+  }
+ }
+]

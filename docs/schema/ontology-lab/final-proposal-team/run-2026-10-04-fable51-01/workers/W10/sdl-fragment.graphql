@@ -1,0 +1,762 @@
+# =====================================================================================================================
+# W10 Evidence assessment, applicability and synthesis -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01. Worker: W10 (Opus 5.5). Synthesizer: Fable 5.1.
+# Canonical module: studies_and_evidence (catalog/schema.yaml 0.2.0, digest 8fb50ff0...84f0
+#   = 8fb50ff06f80621d460813118f739d7c4d3902a0ea631c16952e11d3815f84f0). Archetype contract: baseArchetypes.EvidenceAssessment.
+# CQs served: CQ-EV-02, CQ-EV-03 (input roles), CQ-EV-04, CQ-EV-05 (synthesis triggers), CQ-EV-06, CQ-ST-03, CQ-ST-05,
+#   CQ-ST-09, CQ-ST-10, CQ-AX-05 (INDEPENDENT_REPLICATION), CQ-AX-20 (EXPOSURE), CQ-AX-24, CQ-RC-03, CQ-MX-04;
+#   candidate CQ-EV-C01 (use-profile-normalized dose ratio) and CQ-EV-C02 (surrogate context transfer audit).
+# Invariants: INV-008, INV-201..INV-206, INV-209, INV-212, INV-506 (V-201, V-203..V-209, V-213..V-216, V-218, V-219*,
+#   V-237, V-113, V-520, V-521, V-524; candidates W10-V01..W10-V16 in operations.cypher).
+# Contract: section B of 01-shared-contract.md. No `extend`. Only W10-owned node types, enums, unions and relationship-
+# property types are defined here. Imported by name: Entity, EntityArchetype, EvidenceAssessmentArchetype, PrivacyClass,
+# NodeMaturity, AssessmentStatus, AdjudicationVerdict, QuantityBasis, MassBasis, SupersessionProperties, SourceLocator,
+# Assertion, Activity, Agent, ResolutionHypothesis (W00); Person (W01); IngredientMaterial (W02); Product, ProductVariant,
+# FormulationVersion (W04); Biomarker (W07); Study, StudyIntervention, OutcomeDefinition, StudyResult, Publication,
+# RegistrationVersion (W09); ProductLot (W12); Claim (W21).
+# Kernel relationship types used on W10 nodes and owned by W00: SUPPORTED_BY, SUPERSEDES, WAS_GENERATED_BY, ASSESSED_BY,
+# CONSIDERS_ASSESSMENT. Class and cardinality are in each field description and are enforced by operations/validation.
+# Immutability (baseArchetypes.EvidenceAssessment): @mutation(operations: [CREATE, UPDATE]) removes delete; every
+# judgement field is @settable(onCreate: true, onUpdate: false); only status (workflow) and recordedTo (one write from
+# null) change after commit. A re-assessment is a new node linked SUPERSEDES.
+# Calibration (ratio bands, composite scoring) is DEFERRED (OPEN-QUESTIONS evidence applicability 2): nothing here
+# encodes a threshold, band or weight.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# 1. Enums (W10 sole writer). Values frozen at catalog `conventions` unless marked CANDIDATE.
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Per-dimension applicability verdict (catalog conventions.applicabilityVerdict; round 0002 R4). UNKNOWN = assessed and the
+deciding facts are missing (missingFacts non-empty, V-209); NOT_ASSESSED = nobody assessed it (explicit node, INV-202);
+NOT_APPLICABLE = the dimension does not apply to this evidence/use pair; NOT_SCORED = explanation-only dimension that never
+enters a composite (INV-204). These are never merged with each other or with null.
+"""
+enum ApplicabilityVerdict {
+  MATCH
+  PARTIAL
+  MISMATCH
+  UNKNOWN
+  NOT_ASSESSED
+  NOT_APPLICABLE
+  NOT_SCORED
+}
+
+"""
+Applicability dimensions (catalog conventions.applicabilityDimension). Required set for a StudyIntervention evidence
+target: MATERIAL_IDENTITY, ACTIVE_COMPOSITION, DOSE, DOSAGE_FORM, ROUTE, SCHEDULE, DURATION, POPULATION, COMPARATOR,
+OUTCOME_RELEVANCE, STUDY_DESIGN_AND_QUALITY (V-204). For a mechanism Assertion target: MATERIAL_IDENTITY, EXPOSURE, ROUTE,
+DURATION, POPULATION, OUTCOME_RELEVANCE, STUDY_DESIGN_AND_QUALITY (V-204, INV-212). BACKGROUND_CONTEXT and
+RECENCY_AND_CORRECTIONS are explanation-only and optional.
+"""
+enum ApplicabilityDimensionKind {
+  MATERIAL_IDENTITY
+  ACTIVE_COMPOSITION
+  DOSE
+  DOSAGE_FORM
+  ROUTE
+  SCHEDULE
+  DURATION
+  POPULATION
+  COMPARATOR
+  OUTCOME_RELEVANCE
+  STUDY_DESIGN_AND_QUALITY
+  EXPOSURE
+  BACKGROUND_CONTEXT
+  RECENCY_AND_CORRECTIONS
+}
+
+"""
+Class of a dimension, fixed per dimension by the method (OPEN-QUESTIONS P1 evidence applicability 1, CLOSED): CATEGORICAL
+(MATERIAL_IDENTITY ordered, ACTIVE_COMPOSITION, DOSAGE_FORM, ROUTE, POPULATION, COMPARATOR, OUTCOME_RELEVANCE,
+STUDY_DESIGN_AND_QUALITY); CONTINUOUS with a basis-matched ratio (DOSE, SCHEDULE, DURATION, EXPOSURE); EXPLANATION_ONLY
+(BACKGROUND_CONTEXT, RECENCY_AND_CORRECTIONS). W10-V02 checks the mapping.
+"""
+enum DimensionClass {
+  CATEGORICAL
+  CONTINUOUS
+  EXPLANATION_ONLY
+}
+
+"""
+Ordered identity path between the evidence material and the use target (catalog conventions.materialIdentityLevel),
+strongest first. Mapping to verdict (method applicability-v0.1, V-208b): SAME_LOT, SAME_FORMULATION_VERSION -> MATCH;
+SAME_VARIANT_FORMULATION_UNRESOLVED, SAME_BRANDED_MATERIAL_SAME_SPEC, SAME_BRANDED_MATERIAL_SPEC_UNRESOLVED,
+SAME_SUBSTANCE_SAME_FORM_DIFFERENT_MATERIAL -> PARTIAL; SAME_SUBSTANCE_MATERIAL_UNRESOLVED -> UNKNOWN;
+SAME_SUBSTANCE_DIFFERENT_FORM, RELATED_SUBSTANCE, DIFFERENT -> MISMATCH (PARTIAL only with linked bridging PK evidence).
+A shared name never establishes a level (INV-008, V-208).
+"""
+enum MaterialIdentityLevel {
+  SAME_LOT
+  SAME_FORMULATION_VERSION
+  SAME_VARIANT_FORMULATION_UNRESOLVED
+  SAME_BRANDED_MATERIAL_SAME_SPEC
+  SAME_BRANDED_MATERIAL_SPEC_UNRESOLVED
+  SAME_SUBSTANCE_SAME_FORM_DIFFERENT_MATERIAL
+  SAME_SUBSTANCE_MATERIAL_UNRESOLVED
+  SAME_SUBSTANCE_DIFFERENT_FORM
+  RELATED_SUBSTANCE
+  DIFFERENT
+}
+
+"""
+Role of an outcome in an inference (catalog conventions.endpointClass; FDA-NIH BEST glossary terms). It is an assessment
+in a context of use, never a property of the measured Biomarker (INV-205). "Patient-important" is derived: CLINICAL_OUTCOME,
+or INTERMEDIATE_CLINICAL_ENDPOINT measuring how a person feels, functions or survives.
+"""
+enum EndpointClass {
+  BIOMARKER_NOT_SURROGATE
+  SURROGATE_ENDPOINT
+  INTERMEDIATE_CLINICAL_ENDPOINT
+  CLINICAL_OUTCOME
+}
+
+"""
+BEST glossary biomarker categories (catalog conventions.biomarkerCategory). Confirmed against FDA "About Biomarkers and
+Qualification" (2026-10-04): "susceptibility/risk, diagnostic, monitoring, prognostic, predictive,
+pharmacodynamic/response, and safety". The category is assigned per use in a study, not per analyte (LDL-C is SAFETY in
+the NRPT trial and the measured surrogate in FDA's lipid-lowering context).
+"""
+enum BiomarkerCategory {
+  SUSCEPTIBILITY_RISK
+  DIAGNOSTIC
+  MONITORING
+  PROGNOSTIC
+  PREDICTIVE
+  PHARMACODYNAMIC_RESPONSE
+  SAFETY
+}
+
+"""
+Surrogate validation level within the classification's context of use (catalog conventions.surrogateValidationLevel).
+VALIDATED, REASONABLY_LIKELY and CANDIDATE are the three BEST glossary categories (NCBI Bookshelf BEST "Reasonably Likely
+Surrogate Endpoint" entry, search extract 2026-10-04); FD&C Act 507(e)(9) ties "known to predict" to traditional and
+"reasonably likely" to accelerated approval (FDA surrogate endpoint table page, 2026-04-29 revision). NOT_ESTABLISHED is
+a BellLabs value: no context of use in the evidence packet establishes the endpoint as a surrogate at any level.
+"""
+enum SurrogateValidationLevel {
+  VALIDATED
+  REASONABLY_LIKELY
+  CANDIDATE
+  NOT_ESTABLISHED
+}
+
+"""
+CANDIDATE (property-card vocabulary EndpointClassification.contextMatch; registry request W10-SR-03). How the classified
+outcome's context (disease or use, population, intervention mechanism) matches the nearest context of use it is
+COMPARED_WITH_CONTEXT. Only FULL permits copying a surrogate validation level (W10-V08; forbidden implication
+[SURROGATE_IN_CONTEXT, SURROGATE_IN_OTHER_CONTEXT]).
+"""
+enum ContextOfUseMatch {
+  FULL
+  PARTIAL
+  NONE
+}
+
+"""
+BellLabs reading of one result (catalog conventions.resultInterpretation). NOT_SIGNIFICANT is never read as no effect:
+it is INCONCLUSIVE unless a stated margin (equivalence or non-inferiority bound, or an MCID with its source) supports
+EVIDENCE_OF_NO_MEANINGFUL_EFFECT (W10-V09).
+"""
+enum ResultInterpretationKind {
+  EFFECT_DETECTED
+  INCONCLUSIVE
+  EVIDENCE_OF_NO_MEANINGFUL_EFFECT
+}
+
+"""
+CANDIDATE (property card ResultInterpretation.meaningfulnessVerdict; values MEANINGFUL, NOT_MEANINGFUL, UNDETERMINED).
+BellLabs' verdict against a stated threshold with a source (USES_THRESHOLD_SOURCE). No threshold -> UNDETERMINED. An
+author's "clinically meaningful" is an Assertion (RESULT_CLINICALLY_MEANINGFUL), never this value (CQ-ST-10).
+"""
+enum MeaningfulnessVerdict {
+  MEANINGFUL
+  NOT_MEANINGFUL
+  UNDETERMINED
+}
+
+"""
+Role of a result or assertion inside one synthesis version (catalog conventions.synthesisInputRole). INV-206: after a
+NOT_SIGNIFICANT primary prespecified result, the same study's secondary, subgroup, within-arm or post hoc results enter
+only as SUPPORTIVE or HYPOTHESIS_GENERATING (V-215, W10-V11); within-arm changes are never CONFIRMATORY or
+INDEPENDENT_REPLICATION (V-216); two INDEPENDENT_REPLICATION inputs never share a study or dataset (V-218).
+"""
+enum SynthesisInputRole {
+  CONFIRMATORY
+  SUPPORTIVE
+  HYPOTHESIS_GENERATING
+  CONTRADICTING
+  SAFETY
+  INDEPENDENT_REPLICATION
+}
+
+"""
+What one triggering finding did to a synthesis verdict (catalog conventions.evidenceChangeEffect). WEAKENED may leave the
+verdict label unchanged (round 0002 F, CQ-ST-09); REVERSED means the verdict moved to the opposite side.
+"""
+enum EvidenceChangeEffect {
+  STRENGTHENED
+  WEAKENED
+  REVERSED
+  NO_CHANGE
+}
+
+"""
+LEGACY HINT enum (live `enum EvidenceStrength`, live lines on Claim, SafetySignal, AssociationMetadata, SafetyMetadata,
+TreatmentTargetMetadata). A value without scheme, criteria and method is not interpretable (INV-209): it is kept only as an
+extraction-time hint on other owners' fields (W06 legacyEvidenceStrengthHint, W21 ClaimEvidenceAssessment) and migrated
+into EvidenceStrengthAssessment {scheme: LEGACY_UNSPECIFIED, methodVersion: legacy-unspecified, status: PROPOSED}.
+New writes never use it as an assessment.
+"""
+enum EvidenceStrength {
+  LOW
+  MODERATE
+  HIGH
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# 2. Unions (W10 sole writer; contract B6 <Role>Target naming; parent-only rule: no member's labels are a superset of
+#    another member's labels, so BrandedIngredientMaterial is covered by IngredientMaterial and ClaimOccurrence /
+#    RelationshipAssertion by Assertion).
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Range of ASSESSES_APPLICABILITY_TO (catalog 0.2.0, round 0008 range change). Exactly one per EvidenceApplicability.
+UserContext is NOT a member and never will be: a shared assessment never points at a private record (INV-506, V-524);
+person-specific applicability is a PersonalApplicabilityAssessment in the private store referencing this assessment's uid.
+"""
+union ApplicabilityUseTarget = Product | ProductVariant | FormulationVersion | ProductLot | IngredientMaterial | UseContextProfile
+
+"""
+Range of HAS_EVIDENCE_TARGET (catalog: StudyIntervention|Assertion). Exactly one per EvidenceApplicability. An Assertion
+target must be a mechanism-class Assertion (predicateClass MECHANISM), which makes the EXPOSURE dimension required (INV-212).
+"""
+union EvidenceTargetTarget = StudyIntervention | Assertion
+
+"""
+Range of INCLUDES_RESULT (catalog: StudyResult|Assertion). StudyResult covers AdverseEventResult (parent-only rule).
+An Assertion input is used for findings that are not a StudyResult (a pooled estimate stated in a review, a mechanism
+measurement).
+"""
+union SynthesisInputTarget = StudyResult | Assertion
+
+# ---------------------------------------------------------------------------------------------------------------------
+# 3. Relationship-property types (W10 sole writer)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+INCLUDES_RESULT qualifier (catalog qualifiers [inputRole]; property card INCLUDES_RESULT.inputRole). Immutable per
+synthesis version: a different role is a new synthesis version, never an edit. Replaces proposed-delta
+SynthesisInputMetadata (inputRole was a String there).
+"""
+type SynthesisInputProperties @relationshipProperties {
+  "Role of the input in this synthesis version (V-215, V-216, V-218, W10-V11)."
+  inputRole: SynthesisInputRole!
+}
+
+"""
+TRIGGERED_BY qualifiers (catalog requiredQualifiers [criterionCode, effectOnVerdict]; property card TRIGGERED_BY.*).
+`criterionCode` is a code from the synthesis method's criteria list (synthesis-v0.1 list in 04-model-cards.md, e.g.
+NEW_RANDOMIZED_PRIMARY_RESULT, HUMAN_DIRECT_MEASUREMENT_NULL, CORRECTION_OR_RETRACTION, REGISTRY_RESULTS_POSTED,
+OUTCOME_PRIORITY_DISCREPANCY, SYSTEMATIC_REVIEW_UPDATE). `evidencePublishedAt` is the trigger's publication date (domain
+clock, null = unknown); the synthesis version's recordedAt is when BellLabs learned it (system clock). CQ-ST-09 filters on
+either and the two answers differ when evidence arrives late. Replaces proposed-delta EvidenceChangeMetadata.
+"""
+type EvidenceChangeProperties @relationshipProperties {
+  "Criterion code from the method's criteria list (V-219b)."
+  criterionCode: String!
+  "Effect of this trigger on the verdict (V-219b)."
+  effectOnVerdict: EvidenceChangeEffect!
+  "Publication date of the triggering evidence; null = unknown (never the recorded date)."
+  evidencePublishedAt: Date
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# 4. Node types (W10 sole writer)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+BellLabs' method-versioned judgement of whether ONE evidence target (a StudyIntervention, or a mechanism Assertion)
+transfers to ONE use target (Product, ProductVariant, FormulationVersion, ProductLot, IngredientMaterial or a non-personal
+UseContextProfile), decomposed into one ApplicabilityDimension node per required dimension with NOT_ASSESSED explicit
+(INV-202, V-203..V-205). It is the ONLY path from study evidence to a commercial identity (INV-201, V-201): no Study,
+StudyArm, StudyIntervention, StudyResult or Publication links to a product. It is NOT a truth verdict on the study, NOT
+formulation continuity, NOT evidence strength, and never targets a private UserContext (V-524). The flat per-dimension
+fields are a derived read-only projection of the dimension nodes for filtering; a composite `overallScore` is allowed only
+with a calibrated composite method and every required dimension present and assessed (INV-204, V-207b, W10-V05); while
+calibration is DEFERRED it stays null. Immutable; a re-assessment is a new node SUPERSEDES {RE_REVIEW} the old one.
+CQs: CQ-EV-04, CQ-EV-06, CQ-RC-03, CQ-AX-20, CQ-MX-04. Module studies_and_evidence. Archetype EvidenceAssessment.
+uid token `applicability`.
+"""
+type EvidenceApplicability implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["EvidenceApplicability", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'EvidenceApplicability'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  "Applicability method version (applicability-v0.1 inherited; applicability-v0.2-candidate adds W02-SR-09 identity inputs and use-profile normalization). Required (V-207b)."
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  "Workflow state of this record; never the verdict."
+  status: AssessmentStatus!
+  "Service-assigned commit time (KCR-2a); never backdated, never earlier than the cited snapshots' retrievedAt (INV-502)."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  "Written once from null when superseded; equals the superseding node's recordedAt."
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  "Human-readable summary naming the weakest dimension; never a verdict field."
+  summary: String @settable(onCreate: true, onUpdate: false)
+  "Composite score. Null while composite calibration is DEFERRED; when present requires a calibrated method and all required dimensions assessed (INV-204, V-207b, W10-V05)."
+  overallScore: Float @settable(onCreate: true, onUpdate: false)
+  "DEPRECATED generic confidence (INV-407); never written."
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "DERIVED read-only projection of the MATERIAL_IDENTITY dimension verdict (catalog derivedProperties)."
+  identityMatch: ApplicabilityVerdict @settable(onCreate: false, onUpdate: false)
+  "DERIVED read-only projection of the DOSE dimension verdict."
+  doseMatch: ApplicabilityVerdict @settable(onCreate: false, onUpdate: false)
+  "DERIVED read-only projection of the ROUTE dimension verdict."
+  routeMatch: ApplicabilityVerdict @settable(onCreate: false, onUpdate: false)
+  "DERIVED read-only projection of the SCHEDULE dimension verdict."
+  scheduleMatch: ApplicabilityVerdict @settable(onCreate: false, onUpdate: false)
+  "DERIVED read-only projection of the DURATION dimension verdict."
+  durationMatch: ApplicabilityVerdict @settable(onCreate: false, onUpdate: false)
+  "DERIVED read-only projection of the POPULATION dimension verdict."
+  populationMatch: ApplicabilityVerdict @settable(onCreate: false, onUpdate: false)
+  "DERIVED read-only projection of the OUTCOME_RELEVANCE dimension verdict."
+  outcomeMatch: ApplicabilityVerdict @settable(onCreate: false, onUpdate: false)
+
+  """class: structural; cardinality: exactly_one; catalog: HAS_EVIDENCE_TARGET (V-203)"""
+  evidenceTarget: [EvidenceTargetTarget!]! @relationship(type: "HAS_EVIDENCE_TARGET", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: exactly_one; catalog: ASSESSES_APPLICABILITY_TO (V-203; never UserContext, V-524)"""
+  useTarget: [ApplicabilityUseTarget!]! @relationship(type: "ASSESSES_APPLICABILITY_TO", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: FOR_USE_CONTEXT (the non-personal use profile assumed, separate from the use target)"""
+  forUseContext: [UseContextProfile!]! @relationship(type: "FOR_USE_CONTEXT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: BASED_ON_EVIDENCE (Study range)"""
+  basedOnStudies: [Study!]! @relationship(type: "BASED_ON_EVIDENCE", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: BASED_ON_EVIDENCE (StudyResult range; human exposure results for INV-212 / V-237)"""
+  basedOnResults: [StudyResult!]! @relationship(type: "BASED_ON_EVIDENCE", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: BASED_ON_EVIDENCE (Publication range)"""
+  basedOnPublications: [Publication!]! @relationship(type: "BASED_ON_EVIDENCE", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: BASED_ON_EVIDENCE (Assertion range)"""
+  basedOnAssertions: [Assertion!]! @relationship(type: "BASED_ON_EVIDENCE", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: one_per_dimension (each required dimension exactly once, V-204/V-205; a dimension node has exactly one parent, W10-V01); catalog: HAS_DIMENSION"""
+  dimensions: [ApplicabilityDimension!]! @relationship(type: "HAS_DIMENSION", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00; EvidenceApplicability -> EvidenceApplicability with the same evidence and use target, W10-V07)"""
+  supersedes: [EvidenceApplicability!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural (inverse); catalog: SUPERSEDES"""
+  supersededBy: [EvidenceApplicability!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: WAS_GENERATED_BY (W00; ADJUDICATION Activity carrying methodVersion)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: ASSESSED_BY (W00, -> Agent)"""
+  assessedByAgent: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; cardinality: zero_or_one; catalog: ASSESSED_BY (W00, -> Person; a public assessor only)"""
+  assessedByPerson: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+}
+
+"""
+One dimension of one EvidenceApplicability: its class, verdict, compared values with quantity and mass bases, a ratio
+computed only when quantity basis, mass basis and unit match on both sides (INV-203, V-206, W10-V03), the missing facts
+that keep it UNKNOWN or PARTIAL (V-209; CQ-EV-06), and its own provenance (SUPPORTED_BY locators, CONSIDERS assertions,
+CONSIDERS_ASSESSMENT for EndpointClassification, EvidenceStrengthAssessment or ResolutionHypothesis inputs).
+EXPLANATION_ONLY dimensions are NOT_SCORED with a rationale (V-207). It is NOT a free-standing assessment: it belongs to
+exactly one EvidenceApplicability and shares its methodVersion (W10-V01, W10-V06). Values are frozen copies at assessment
+time; they never update when the source states change (a re-assessment re-creates all dimensions). No ratio band is
+encoded: a non-identity ratio never yields MATCH until a calibrated method exists (W10-V04).
+CQs: CQ-EV-04, CQ-EV-06, CQ-RC-03, CQ-MX-04. Module studies_and_evidence. Archetype EvidenceAssessment.
+uid token `applicability-dimension`.
+"""
+type ApplicabilityDimension implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["ApplicabilityDimension", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'ApplicabilityDimension'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  "Equals the parent EvidenceApplicability.methodVersion (W10-V06)."
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  "Never set on a dimension (composites live on the parent only)."
+  overallScore: Float @settable(onCreate: false, onUpdate: false)
+  "DEPRECATED (INV-407); never written."
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "Which dimension this node judges."
+  dimension: ApplicabilityDimensionKind! @settable(onCreate: true, onUpdate: false)
+  "Fixed by dimension (W10-V02)."
+  dimensionClass: DimensionClass! @settable(onCreate: true, onUpdate: false)
+  "Verdict; NOT_ASSESSED is explicit, UNKNOWN requires missingFacts (V-209)."
+  verdict: ApplicabilityVerdict! @settable(onCreate: true, onUpdate: false)
+  "MATERIAL_IDENTITY only: strongest established identity path (V-208, V-208b)."
+  identityLevel: MaterialIdentityLevel @settable(onCreate: true, onUpdate: false)
+  "Evidence-side category from the dimension's method vocabulary (dosage form, route, comparator, endpoint class, composition or population relation)."
+  evidenceCategory: String @settable(onCreate: true, onUpdate: false)
+  "Target-side category from the same vocabulary."
+  targetCategory: String @settable(onCreate: true, onUpdate: false)
+  "Evidence-side amount (copied, frozen); null = not extracted or not numeric."
+  evidenceValue: Float @settable(onCreate: true, onUpdate: false)
+  "Target-side amount (copied, normalized by the FOR_USE_CONTEXT profile when one is linked); null = unknown."
+  targetValue: Float @settable(onCreate: true, onUpdate: false)
+  "UCUM unit shared by evidenceValue and targetValue (mg/d, mg, /d, d); a ratio needs one unit for both."
+  unitCode: String @settable(onCreate: true, onUpdate: false)
+  "Quantity basis of evidenceValue; null = unknown (ratio must be null)."
+  evidenceQuantityBasis: QuantityBasis @settable(onCreate: true, onUpdate: false)
+  "Quantity basis of targetValue; null = unknown (ratio must be null)."
+  targetQuantityBasis: QuantityBasis @settable(onCreate: true, onUpdate: false)
+  "DOSE/EXPOSURE: mass basis of evidenceValue; UNSPECIFIED blocks the ratio."
+  evidenceMassBasis: MassBasis @settable(onCreate: true, onUpdate: false)
+  "DOSE/EXPOSURE: mass basis of targetValue."
+  targetMassBasis: MassBasis @settable(onCreate: true, onUpdate: false)
+  "CALCULATED targetValue / evidenceValue, only when both quantity bases, both mass bases (none UNSPECIFIED) and the unit match; otherwise null and the verdict is at most PARTIAL (INV-203, V-206, W10-V03)."
+  ratio: Float @settable(onCreate: true, onUpdate: false)
+  "Specific facts whose absence keeps the verdict UNKNOWN or PARTIAL; non-empty when UNKNOWN (V-209). Never 'more data needed'."
+  missingFacts: [String!] @settable(onCreate: true, onUpdate: false)
+  "Why; required for EXPLANATION_ONLY (V-207)."
+  rationale: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural (inverse); cardinality: exactly_one; catalog: HAS_DIMENSION"""
+  applicability: [EvidenceApplicability!]! @relationship(type: "HAS_DIMENSION", direction: IN) @settable(onCreate: false, onUpdate: false)
+  """class: structural; cardinality: many; catalog: CONSIDERS (assertions weighed, incl. CALCULATED amount conversions, INV-307)"""
+  considers: [Assertion!]! @relationship(type: "CONSIDERS", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: CONSIDERS_ASSESSMENT (W00; EndpointClassification for OUTCOME_RELEVANCE, EvidenceStrengthAssessment for STUDY_DESIGN_AND_QUALITY, ResolutionHypothesis for MATERIAL_IDENTITY; W10-V16)"""
+  considersAssessments: [EvidenceAssessmentArchetype!]! @relationship(type: "CONSIDERS_ASSESSMENT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: SUPPORTED_BY (W00; V-209)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+}
+
+"""
+A non-personal description of how a product or material is used, which an applicability assessment assumes: population
+descriptor, dose descriptor (with the servings per day that normalizes a per-serving label amount to a per-day amount),
+intended duration. It is the shared-graph replacement of UserContext as an applicability target (round 0008). It is NOT
+a person, a user context, a goal, an adoption or a recommendation, and it carries no person-level attribute (W10-V14,
+V-521): person-specific applicability is a private PersonalApplicabilityAssessment that references an EvidenceApplicability
+uid. A profile that restates label directions cites the label through the dimension that uses it, not through itself.
+CQs: CQ-EV-04, CQ-EV-C01 (candidate), CQ-AX-20. Module studies_and_evidence. Archetype Entity. uid token `use-profile`.
+"""
+type UseContextProfile implements Entity & EntityArchetype
+  @node(labels: ["UseContextProfile", "Entity"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'UseContextProfile'."
+  entityType: String! @settable(onCreate: true, onUpdate: false)
+  "Population the use assumes, as a non-personal descriptor (e.g. 'healthy adults, label population')."
+  populationDescriptor: String @settable(onCreate: true, onUpdate: false)
+  "Dose as used, verbatim or normalized (e.g. 'label directions: 2 capsules (1 serving) every morning')."
+  doseDescriptor: String @settable(onCreate: true, onUpdate: false)
+  "Duration descriptor (e.g. 'open-ended daily use')."
+  durationDescriptor: String @settable(onCreate: true, onUpdate: false)
+  "CANDIDATE (CQ-EV-C01): servings per day assumed by the profile; normalizes a PER_SERVING label amount to PER_DAY. Null = not stated (ratio stays null)."
+  servingsPerDay: Float @settable(onCreate: true, onUpdate: false)
+  "CANDIDATE (CQ-EV-C01): intended duration as ISO 8601 duration; null = open-ended or unknown (durationDescriptor says which)."
+  intendedDurationIso: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural (inverse); catalog: FOR_USE_CONTEXT"""
+  assumedBy: [EvidenceApplicability!]! @relationship(type: "FOR_USE_CONTEXT", direction: IN) @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+BellLabs' classification of the role an outcome or biomarker plays in an inference, in a stated context of use:
+endpoint class, BEST biomarker category, surrogate validation level and the context columns of FDA's surrogate endpoint
+table (disease or use, patient population, drug mechanism of action, type of approval). Surrogate status lives ONLY here,
+never on Biomarker (INV-205, V-214b), and never transfers to another context (forbidden implication
+[SURROGATE_IN_CONTEXT, SURROGATE_IN_OTHER_CONTEXT]): a study-specific classification (CLASSIFIES_OUTCOME) may carry a
+VALIDATED or REASONABLY_LIKELY level only when its COMPARED_WITH_CONTEXT match is FULL (W10-V08). A general context-of-use
+classification (CLASSIFIES_BIOMARKER) restates a regulatory table row with a SUPPORTED_BY locator (V-214). It is NOT the
+measurement kind (OutcomeDefinition.measureKind, W09) and NOT priority (DECLARES_OUTCOME_PRIORITY assertions).
+CQs: CQ-ST-03, CQ-EV-04 (OUTCOME_RELEVANCE), CQ-EV-C02 (candidate). Module studies_and_evidence. Archetype EvidenceAssessment.
+uid token `endpoint-classification`.
+"""
+type EndpointClassification implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["EndpointClassification", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'EndpointClassification'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  "Classification method (endpoint-class-v0.1)."
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  "Never set (no composite)."
+  overallScore: Float @settable(onCreate: false, onUpdate: false)
+  "DEPRECATED (INV-407); never written."
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "Role in the inference in this context."
+  endpointClass: EndpointClass! @settable(onCreate: true, onUpdate: false)
+  "BEST category for this use; null when the endpoint is not a biomarker."
+  biomarkerCategory: BiomarkerCategory @settable(onCreate: true, onUpdate: false)
+  "Required for SURROGATE_ENDPOINT (V-214) and BIOMARKER_NOT_SURROGATE (NOT_ESTABLISHED); null for clinical outcomes."
+  surrogateValidationLevel: SurrogateValidationLevel @settable(onCreate: true, onUpdate: false)
+  "Context of use: disease or use (FDA table column 'Disease or Use')."
+  contextDiseaseOrUse: String @settable(onCreate: true, onUpdate: false)
+  "Context of use: patient population (FDA column 'Patient Population')."
+  contextPopulation: String @settable(onCreate: true, onUpdate: false)
+  "Context of use: intervention mechanism (FDA column 'Drug Mechanism of Action')."
+  contextInterventionMechanism: String @settable(onCreate: true, onUpdate: false)
+  "Context of use: approval type the endpoint is appropriate for (FDA column 'Type of Approval Appropriate for'): controlled string TRADITIONAL | ACCELERATED."
+  contextApprovalType: String @settable(onCreate: true, onUpdate: false)
+  "Study-specific classification: match against the COMPARED_WITH_CONTEXT classification (W10-V08)."
+  contextMatch: ContextOfUseMatch @settable(onCreate: true, onUpdate: false)
+  "Why."
+  rationale: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural; cardinality: zero_or_one (study-specific classification); catalog: CLASSIFIES_OUTCOME"""
+  classifiesOutcome: [OutcomeDefinition!]! @relationship(type: "CLASSIFIES_OUTCOME", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one (general context-of-use classification); catalog: CLASSIFIES_BIOMARKER"""
+  classifiesBiomarker: [Biomarker!]! @relationship(type: "CLASSIFIES_BIOMARKER", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: COMPARED_WITH_CONTEXT (study-specific -> general context classification)"""
+  comparedWithContext: [EndpointClassification!]! @relationship(type: "COMPARED_WITH_CONTEXT", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: one_or_more for SURROGATE_ENDPOINT (V-214); catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: SUPERSEDES (W00)"""
+  supersedes: [EndpointClassification!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: WAS_GENERATED_BY (W00)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00, -> Agent)"""
+  assessedByAgent: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00, -> Person)"""
+  assessedByPerson: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+}
+
+"""
+BellLabs' reading of exactly one StudyResult: EFFECT_DETECTED, INCONCLUSIVE, or EVIDENCE_OF_NO_MEANINGFUL_EFFECT (the last
+only with a stated margin and its source); and, separately, whether the effect is clinically meaningful against a
+threshold (MCID or margin) whose source is a SourceLocator (USES_THRESHOLD_SOURCE). It replaces live
+OutcomeResult.isClinicallyMeaningful together with the author Assertion RESULT_CLINICALLY_MEANINGFUL (INV-209, V-213). It
+is NOT the result's statisticalConclusion (observed, W09) and NOT an author's claim; NOT_SIGNIFICANT never becomes "no
+effect" here without a margin (forbidden implication [NOT_STATISTICALLY_SIGNIFICANT, NO_EFFECT]; W10-V09, W10-V10);
+significance never becomes meaningfulness ([STATISTICALLY_SIGNIFICANT, CLINICALLY_MEANINGFUL]).
+CQs: CQ-ST-05, CQ-ST-10. Module studies_and_evidence. Archetype EvidenceAssessment. uid token `assessment` (dedicated token
+`result-interpretation` requested, W10-SR-01).
+"""
+type ResultInterpretation implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["ResultInterpretation", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'ResultInterpretation'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  "Interpretation method (result-interpretation-v0.1)."
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  "Never set."
+  overallScore: Float @settable(onCreate: false, onUpdate: false)
+  "DEPRECATED (INV-407); never written."
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "What the result shows, given its conclusion and any margin."
+  interpretation: ResultInterpretationKind! @settable(onCreate: true, onUpdate: false)
+  "Meaningfulness against thresholdValue; UNDETERMINED (or null = not assessed) when no threshold source exists (W10-V09)."
+  meaningfulnessVerdict: MeaningfulnessVerdict @settable(onCreate: true, onUpdate: false)
+  "MCID or equivalence/non-inferiority margin; null = none stated."
+  thresholdValue: Float @settable(onCreate: true, onUpdate: false)
+  "UCUM unit of thresholdValue (the outcome's unit)."
+  thresholdUnit: String @settable(onCreate: true, onUpdate: false)
+  "Why; names the threshold kind (MCID, NI margin) when one is used."
+  rationale: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural; cardinality: exactly_one; catalog: INTERPRETS_RESULT_OF"""
+  interpretsResultOf: [StudyResult!]! @relationship(type: "INTERPRETS_RESULT_OF", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one (required when thresholdValue is set or interpretation is EVIDENCE_OF_NO_MEANINGFUL_EFFECT, W10-V09); catalog: USES_THRESHOLD_SOURCE"""
+  usesThresholdSource: [SourceLocator!]! @relationship(type: "USES_THRESHOLD_SOURCE", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: SUPERSEDES (W00)"""
+  supersedes: [ResultInterpretation!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: WAS_GENERATED_BY (W00)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00, -> Agent)"""
+  assessedByAgent: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00, -> Person)"""
+  assessedByPerson: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+}
+
+"""
+One VERSION of BellLabs' claim-level synthesis: a verdict (kernel AdjudicationVerdict) about one claim (ASSESSES_CLAIM ->
+an Assertion or a Claim), the inputs it weighed with their roles (INCLUDES_RESULT {inputRole}; INV-206, V-215, V-216,
+V-218), the latest publication date considered (evidenceCutoff), and, for every version after the first, SUPERSEDES the
+prior version plus TRIGGERED_BY {criterionCode, effectOnVerdict, evidencePublishedAt} to each StudyResult, Publication
+(including corrections and retraction notices), RegistrationVersion or Assertion that caused it (V-219, V-219b, V-219c).
+Versions are never overwritten, so "which findings published in P changed the picture" (filter evidencePublishedAt) and
+"what BellLabs learned in P" (filter recordedAt) are both answerable (CQ-ST-09). It is NOT a Claim attribute: Claim carries
+no truth or strength (contract A3). Its strength grade is a separate EvidenceStrengthAssessment ASSESSES_STRENGTH_OF it.
+W21's ClaimEvidenceAssessment follows the same method contract (see 05-decision-seam-ledger.md D-W10-12) and uses its own
+relationship types ASSESSES_CLAIM_EVIDENCE / CLAIM_EVIDENCE_BASED_ON; ASSESSES_CLAIM belongs to this type only.
+CQs: CQ-ST-05, CQ-ST-09, CQ-EV-03, CQ-EV-05, CQ-AX-05, CQ-AX-24. Module studies_and_evidence. Archetype EvidenceAssessment.
+uid token `synthesis`.
+"""
+type EvidenceSynthesis implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["EvidenceSynthesis", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'EvidenceSynthesis'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  "Synthesis method (synthesis-v0.1); weighting rules live in the method, not the schema."
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  "When BellLabs recorded this version (system clock; V-219 orders versions by it)."
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  "Never set (strength is an EvidenceStrengthAssessment)."
+  overallScore: Float @settable(onCreate: false, onUpdate: false)
+  "DEPRECATED (INV-407); never written."
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "Display copy of the claim text; identity is the ASSESSES_CLAIM target."
+  claimText: String @settable(onCreate: true, onUpdate: false)
+  "Claim-level verdict (kernel enum; reused, no synthesis-specific verdict enum)."
+  verdict: AdjudicationVerdict! @settable(onCreate: true, onUpdate: false)
+  "Latest publication date considered (domain clock)."
+  evidenceCutoff: Date @settable(onCreate: true, onUpdate: false)
+  "Why the verdict is what it is."
+  rationale: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural; cardinality: zero_or_one (exactly one of the two ASSESSES_CLAIM fields); catalog: ASSESSES_CLAIM (Assertion range)"""
+  assessesAssertion: [Assertion!]! @relationship(type: "ASSESSES_CLAIM", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: ASSESSES_CLAIM (Claim range)"""
+  assessesClaim: [Claim!]! @relationship(type: "ASSESSES_CLAIM", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many; catalog: INCLUDES_RESULT {inputRole}"""
+  includes: [SynthesisInputTarget!]! @relationship(type: "INCLUDES_RESULT", direction: OUT, properties: "SynthesisInputProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: many (one_or_more when supersedes is non-empty, V-219c); catalog: TRIGGERED_BY (StudyResult range)"""
+  triggeredByResults: [StudyResult!]! @relationship(type: "TRIGGERED_BY", direction: OUT, properties: "EvidenceChangeProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: TRIGGERED_BY (Publication range: articles, corrections, retraction notices, reviews)"""
+  triggeredByPublications: [Publication!]! @relationship(type: "TRIGGERED_BY", direction: OUT, properties: "EvidenceChangeProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: TRIGGERED_BY (RegistrationVersion range)"""
+  triggeredByRegistrationVersions: [RegistrationVersion!]! @relationship(type: "TRIGGERED_BY", direction: OUT, properties: "EvidenceChangeProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: TRIGGERED_BY (Assertion range)"""
+  triggeredByAssertions: [Assertion!]! @relationship(type: "TRIGGERED_BY", direction: OUT, properties: "EvidenceChangeProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: SUPERSEDES (W00; same claim, forward in recorded time, V-219, W10-V13)"""
+  supersedes: [EvidenceSynthesis!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural (inverse); catalog: SUPERSEDES"""
+  supersededBy: [EvidenceSynthesis!]! @relationship(type: "SUPERSEDES", direction: IN, properties: "SupersessionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (inverse); catalog: ASSESSES_STRENGTH_OF"""
+  strengthAssessments: [EvidenceStrengthAssessment!]! @relationship(type: "ASSESSES_STRENGTH_OF", direction: IN) @settable(onCreate: false, onUpdate: false)
+  """class: structural; catalog: WAS_GENERATED_BY (W00)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00, -> Agent)"""
+  assessedByAgent: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00, -> Person)"""
+  assessedByPerson: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+}
+
+"""
+A graded strength of evidence under a NAMED scheme (GRADE, OCEBM-2011, or LEGACY_UNSPECIFIED for migrated live values)
+with its level, the criteria applied and the method version, about one Study, StudyResult or EvidenceSynthesis
+(ASSESSES_STRENGTH_OF). It replaces live Study.evidenceLevel and every live EvidenceStrength value on nodes and edges
+(INV-209, V-213b): those values survive only as hints or as derived projections carrying assessmentUid. A level copied
+from an author's own grading (for example a review's GRADE rating) is recorded with methodVersion naming the copy rule and
+the author's locator. The STUDY_DESIGN_AND_QUALITY applicability dimension cites (CONSIDERS_ASSESSMENT) one of these and
+never recomputes it. It is NOT a truth verdict and NOT confidence. CQs: CQ-AX-24, CQ-EV-02, CQ-EV-04
+(STUDY_DESIGN_AND_QUALITY). Module studies_and_evidence. Archetype EvidenceAssessment. uid token `assessment` (dedicated
+token `strength-assessment` requested, W10-SR-01).
+"""
+type EvidenceStrengthAssessment implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["EvidenceStrengthAssessment", "EvidenceAssessment"])
+  @mutation(operations: [CREATE, UPDATE]) {
+  id: ID! @id
+  uid: String! @settable(onCreate: true, onUpdate: false)
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  "Always 'EvidenceStrengthAssessment'."
+  assessmentType: String! @settable(onCreate: true, onUpdate: false)
+  "Grading method version; 'legacy-unspecified' only for migrated live values (status PROPOSED, W10-V15)."
+  methodVersion: String! @settable(onCreate: true, onUpdate: false)
+  status: AssessmentStatus!
+  recordedAt: DateTime! @timestamp(operations: [CREATE]) @settable(onCreate: false, onUpdate: false)
+  recordedTo: DateTime @settable(onCreate: false, onUpdate: true)
+  summary: String @settable(onCreate: true, onUpdate: false)
+  "Never set (the level is categorical under its scheme)."
+  overallScore: Float @settable(onCreate: false, onUpdate: false)
+  "DEPRECATED (INV-407); never written."
+  confidence: Float @settable(onCreate: false, onUpdate: false)
+  "Named grading scheme (GRADE, OCEBM-2011, LEGACY_UNSPECIFIED)."
+  scheme: String! @settable(onCreate: true, onUpdate: false)
+  "Level in the scheme's own vocabulary (GRADE 'moderate'; OCEBM '2'; legacy 'MODERATE')."
+  level: String! @settable(onCreate: true, onUpdate: false)
+  "Criteria applied (GRADE domains, downgrade reasons); empty only for LEGACY_UNSPECIFIED."
+  criteria: [String!] @settable(onCreate: true, onUpdate: false)
+  "Why."
+  rationale: String @settable(onCreate: true, onUpdate: false)
+
+  """class: structural; cardinality: zero_or_one (exactly one of the three ASSESSES_STRENGTH_OF fields); catalog: ASSESSES_STRENGTH_OF (Study range)"""
+  assessesStudy: [Study!]! @relationship(type: "ASSESSES_STRENGTH_OF", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: ASSESSES_STRENGTH_OF (StudyResult range)"""
+  assessesResult: [StudyResult!]! @relationship(type: "ASSESSES_STRENGTH_OF", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: ASSESSES_STRENGTH_OF (EvidenceSynthesis range)"""
+  assessesSynthesis: [EvidenceSynthesis!]! @relationship(type: "ASSESSES_STRENGTH_OF", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: SUPPORTED_BY (W00)"""
+  supportedBy: [SourceLocator!]! @relationship(type: "SUPPORTED_BY", direction: OUT) @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: SUPERSEDES (W00)"""
+  supersedes: [EvidenceStrengthAssessment!]! @relationship(type: "SUPERSEDES", direction: OUT, properties: "SupersessionProperties") @settable(onCreate: true, onUpdate: false)
+  """class: structural; catalog: WAS_GENERATED_BY (W00)"""
+  generatedBy: [Activity!]! @relationship(type: "WAS_GENERATED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00, -> Agent)"""
+  assessedByAgent: [Agent!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+  """class: structural; catalog: ASSESSED_BY (W00, -> Person)"""
+  assessedByPerson: [Person!]! @relationship(type: "ASSESSED_BY", direction: OUT)
+}

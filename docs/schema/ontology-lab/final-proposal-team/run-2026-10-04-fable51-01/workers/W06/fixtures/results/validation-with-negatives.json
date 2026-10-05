@@ -1,0 +1,398 @@
+{
+ "file": "/home/user/biotech-meta/docs/schema/ontology-lab/final-proposal-team/run-2026-10-04-fable51-01/workers/W06/fixtures/w06-validation.cypher",
+ "uri": "bolt://127.0.0.1:40297/",
+ "db": "neo4j",
+ "explain": false,
+ "total": 11,
+ "ok": 11,
+ "failed": 0,
+ "results": [
+  {
+   "n": 1,
+   "id": "V-322",
+   "status": "ok",
+   "rows": 3,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 174,
+   "sample": [
+    {
+     "check": "V-W06-01",
+     "treatmentUid": "hu:treatment:edaravone-als",
+     "stageText": "Approved",
+     "reason": "APPROVAL_ONLY_FROM_UNACCEPTED_CAPTURE"
+    },
+    {
+     "check": "V-W06-01",
+     "treatmentUid": "hu:treatment:neg-designation-read-as-approval",
+     "stageText": "Approved (orphan drug)",
+     "reason": "DESIGNATION_ONLY"
+    },
+    {
+     "check": "V-W06-01",
+     "treatmentUid": "hu:treatment:neg-stage-approved-no-status",
+     "stageText": "FDA Approved",
+     "reason": "NO_APPROVAL_STATUS"
+    }
+   ],
+   "header": "// =====================================================================================================================\n// W06 proposed validators V-W06-01 .. V-W06-08b (zero rows = valid, except V-W06-02 and V-W06-07i which are\n// informational reports). Static Cypher for Neo4j 5.26; no APOC. Expe"
+  },
+  {
+   "n": 2,
+   "id": null,
+   "status": "ok",
+   "rows": 3,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 7,
+   "sample": [
+    {
+     "check": "V-W06-02",
+     "treatmentUid": "hu:treatment:edaravone-als",
+     "unbackedDisplayFields": [
+      "developmentStage",
+      "orphanDrugDesignation"
+     ]
+    },
+    {
+     "check": "V-W06-02",
+     "treatmentUid": "hu:treatment:neg-designation-read-as-approval",
+     "unbackedDisplayFields": [
+      "developmentStage",
+      "orphanDrugDesignation"
+     ]
+    },
+    {
+     "check": "V-W06-02",
+     "treatmentUid": "hu:treatment:neg-stage-approved-no-status",
+     "unbackedDisplayFields": [
+      "developmentStage"
+     ]
+    }
+   ],
+   "header": "// V-W06-02 (informational): display projections without a named source (migrated legacy text)."
+  },
+  {
+   "n": 3,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 6,
+   "sample": [
+    {
+     "check": "V-W06-03",
+     "treatmentUid": "hu:treatment:neg-designation-read-as-approval",
+     "designationText": "Orphan designation granted",
+     "stageText": "Approved (orphan drug)"
+    }
+   ],
+   "header": "// V-W06-03: orphan designation text read as approval: designation text present, stage text reads approved, and only\n// DESIGNATION states (no APPROVAL state of any capture status) are reachable."
+  },
+  {
+   "n": 4,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 52,
+   "sample": [
+    {
+     "check": "V-W06-04",
+     "fromUid": "hu:intervention:nct03745287-exa-cel",
+     "edgeType": "EVIDENCE_APPLIES_TO",
+     "productUid": "hu:product:casgevy",
+     "citedPredicates": [
+      "USES_COMPONENT",
+      "FOLLOWS_INTERVENTION_DEFINITION"
+     ],
+     "viaTreatmentConcept": true
+    }
+   ],
+   "header": "// V-W06-04: INV-201 through the concept: any edge from a study-side record to a commercial identity, or any edge whose\n// derivation cites FOLLOWS_INTERVENTION_DEFINITION / USES_COMPONENT assertions and ends at a Product."
+  },
+  {
+   "n": 5,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 6,
+   "sample": [
+    {
+     "check": "V-W06-05",
+     "treatmentUid": "hu:treatment:neg-combination-single-component",
+     "components": 0
+    }
+   ],
+   "header": "// V-W06-05: COMBINATION requires at least two USES_COMPONENT edges."
+  },
+  {
+   "n": 6,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 8,
+   "sample": [
+    {
+     "check": "V-W06-06",
+     "treatmentUid": "hu:treatment:delandistrogene-moxeparvovec",
+     "role": "PREPARATORY_PROCEDURE",
+     "componentUid": "hu:procedure:therapeutic-plasma-exchange",
+     "sources": [
+      "https://clinicaltrials.gov/study/NCT06597656"
+     ]
+    }
+   ],
+   "header": "// V-W06-06 (warning): a preparatory/collection/co-intervention component whose authorizing assertion rests only on\n// trial-registration locators (a study-specific regimen promoted to the concept)."
+  },
+  {
+   "n": 7,
+   "id": null,
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 46,
+   "sample": [
+    {
+     "check": "V-W06-07",
+     "assessmentUid": "hu:assessment:neg-tpe-same-as-donation",
+     "leftUid": "hu:procedure:plasma-donation-plasmapheresis",
+     "rightUid": "hu:procedure:therapeutic-plasma-exchange"
+    }
+   ],
+   "header": "// V-W06-07: procedure or treatment identities equated on a shared classification code alone."
+  },
+  {
+   "n": 8,
+   "id": null,
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 6,
+   "sample": [
+    {
+     "check": "V-W06-07i",
+     "scheme": "ICD-10-PCS",
+     "code": "6A550Z3",
+     "procedures": [
+      "hu:procedure:therapeutic-plasma-exchange",
+      "hu:procedure:plasma-donation-plasmapheresis"
+     ]
+    },
+    {
+     "check": "V-W06-07i",
+     "scheme": "ICD-10-PCS",
+     "code": "6A551Z3",
+     "procedures": [
+      "hu:procedure:therapeutic-plasma-exchange",
+      "hu:procedure:plasma-donation-plasmapheresis"
+     ]
+    }
+   ],
+   "header": "// V-W06-07i (informational): classification codes shared by more than one Procedure (never an identity signal)."
+  },
+  {
+   "n": 9,
+   "id": "QS-4a",
+   "status": "ok",
+   "rows": 2,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 61,
+   "sample": [
+    {
+     "check": "V-W06-08",
+     "edgeType": "OFFERS_PROCEDURE",
+     "startUid": "hu:org:geekwire",
+     "endUid": "hu:procedure:therapeutic-plasma-exchange",
+     "relationshipUid": "hu:rel:neg-offers-from-listing",
+     "violations": [
+      "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+      "CITED_SUBJECT_IS_NOT_EDGE_START"
+     ]
+    },
+    {
+     "check": "V-W06-08",
+     "edgeType": "TARGETS_CONDITION",
+     "startUid": "hu:treatment:neg-stage-approved-no-status",
+     "endUid": "hu:condition:beta-thalassemia",
+     "relationshipUid": "hu:rel:neg-uncited-targets",
+     "violations": [
+      "NO_ASSERTION_UID",
+      "NO_RECORDED_FROM",
+      "NO_VALID_TIME_BASIS"
+     ]
+    }
+   ],
+   "header": "// V-W06-08: W06 asserted edges must cite a live assertion of the same predicate, subject and object (INV-101, QS-4a core)."
+  },
+  {
+   "n": 10,
+   "id": "V-113",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 7,
+   "sample": [
+    {
+     "check": "V-W06-08b",
+     "uid": "hu:private-treatment:neg-my-tpe-course",
+     "privacyClass": "PRIVATE_PERSONAL"
+    }
+   ],
+   "header": "// V-W06-08b: no private-personal content on W06 shared types (INV-506; companion of V-113..V-116)."
+  },
+  {
+   "n": 11,
+   "id": "QS-4a",
+   "status": "ok",
+   "rows": 1,
+   "counters": {
+    "nodesCreated": 0,
+    "nodesDeleted": 0,
+    "relationshipsCreated": 0,
+    "relationshipsDeleted": 0,
+    "propertiesSet": 0,
+    "labelsAdded": 0,
+    "labelsRemoved": 0,
+    "indexesAdded": 0,
+    "indexesRemoved": 0,
+    "constraintsAdded": 0,
+    "constraintsRemoved": 0
+   },
+   "ms": 5,
+   "sample": [
+    {
+     "check": "QS-4a/W06",
+     "edgeType": "OFFERS_PROCEDURE",
+     "startUid": "hu:org:geekwire",
+     "endUid": "hu:procedure:therapeutic-plasma-exchange",
+     "violations": [
+      "CITED_PREDICATE_DIFFERS_FROM_EDGE_TYPE",
+      "FORBIDDEN_IMPLICATION_USED_AS_PREMISE"
+     ]
+    }
+   ],
+   "header": "// QS-4a instantiated with W06 forbidden-implication pairs (zero rows = valid)."
+  }
+ ]
+}

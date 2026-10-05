@@ -1,0 +1,79 @@
+# W04 seam requests (run-2026-10-04-fable51-01). Fable copies them into 03-conflict-ledger.md.
+- id: W04-SR-01
+  targetOwner: W00
+  request: "Register uid type tokens package-configuration (PackageConfiguration), serving-definition (ServingDefinition), quantity-declaration (QuantityDeclaration), product-snapshot (ProductSnapshot); map LabelSnapshot to the existing token snapshot (a label is a SourceSnapshot specialization on the same node)."
+  cq: [CQ-ID-05, CQ-PF-01, CQ-AX-17]
+  failingCase: "fixtures w04-02 and w04-04 create PackageConfiguration/ServingDefinition/QuantityDeclaration nodes whose tokens are not in conventions.uidTypeTokens (INV-106); every 0.2.0 fixture already writes LabelSnapshot nodes with hu:snapshot: uids."
+  proposedRuling: "Add the four tokens; LabelSnapshot: snapshot."
+- id: W04-SR-02
+  targetOwner: W00
+  request: "V-409 orders re-anchored snapshots by retrievedAt; for archive captures it must order by observedAt (coalesce(observedAt, retrievedAt))."
+  cq: [CQ-EV-01, CQ-TM-02]
+  failingCase: "fixture w04-04: Wayback capture 2026-07-17 was retrieved (00:50) before capture 2026-03-05 (00:52:30); the correct newer->older REANCHORS 20260717 -> 20260305 is reported by V-409 (3 rows)."
+  proposedRuling: "Replace sNew.retrievedAt <= sOld.retrievedAt with coalesce(sNew.observedAt, sNew.retrievedAt) <= coalesce(sOld.observedAt, sOld.retrievedAt)."
+- id: W04-SR-03
+  targetOwner: W00
+  request: "V-108 (illustrative) flags POSSIBLE overlaps of exclusive attachments that round 0007 sends to the review queue (V-509); keep V-508 (DEFINITE, error) and V-509 (POSSIBLE, informational) and retire V-108 or mark it informational. Also make V-508/V-509 partition on coalesce(r.jurisdiction, t.jurisdiction) so FormulationEdgeProperties.jurisdiction is the partition key."
+  cq: [CQ-TM-05, CQ-ID-05]
+  failingCase: "fixture w04-04: Basis variant has two as-declared formulation versions, both OBSERVATION_ONLY with null bounds (the transition date between captures 2025-09-10 and 2026-03-05 is unknown). V-108 reports it as a violation; V-509 reports it as POSSIBLE_OVERLAP_REVIEW, which is the correct reading."
+  proposedRuling: "V-108 informational (or retired); partition key from the edge with target fallback."
+- id: W04-SR-04
+  targetOwner: W00
+  request: "Register asserted predicate ACTIVE_MOIETY_AMOUNT (and NUTRIENT_EQUIVALENT_AMOUNT) as a CALCULATED literal predicate whose subject is an IngredientComponent and whose moiety identity is carried by a DERIVED_FROM_ASSERTION input HAS_ACTIVE_MOIETY; alternatively rule whether a QUANTITY-class assertion may carry an object plus valueNumber/unitCode qualifiers (today V-003 forbids object + literal)."
+  cq: [CQ-PF-01, CQ-AX-25]
+  failingCase: "fixture w04-03: 300 mg NIAGEN (nicotinamide riboside chloride) -> 263.42 mg NR cation (PubChem CIDs 90480033, 439924). As an object assertion (component -> NR cation, valueNumber 263.42) it fails V-003; as a literal it needs the registered predicate. The catalog forbidden pair [LISTED_INGREDIENT_AMOUNT, ACTIVE_MOIETY_AMOUNT] already names it."
+  proposedRuling: "Register ACTIVE_MOIETY_AMOUNT as literal CALCULATED predicate (V-W04-04 enforces inputs); no kernel change."
+- id: W04-SR-05
+  targetOwner: W22
+  request: "ProductLabelRegion.aboutProduct (ABOUT_PRODUCT) should target ProductVariant or PackageConfiguration (labels belong to variants/packages), and a region that shows a declaration should back that declaration's assertion through SourceLocator{IMAGE_REGION, mediaAnnotationUid} (D-010), never replace the LabelDeclaration."
+  cq: [CQ-PF-01, CQ-ID-03]
+  failingCase: "Basis 2021-12-08 capture shows the Supplement Facts image (Shopify v=1626110517) and the text panel; the 2026-07-17 capture shows the text panel with a no-image placeholder. A region-only declaration would lose the 2026 declaration; a Product-level region cannot say which package's label (30 vs 90 servings, Tru Niagen) it shows."
+  proposedRuling: "ABOUT_PRODUCT target widened to ProductVariant|PackageConfiguration; LabelDeclaration stays the declaration record."
+- id: W04-SR-06
+  targetOwner: W00
+  request: "HAS_SNAPSHOT carries two meanings (Source -> SourceSnapshot capture; Product/Organization/Listing -> *Snapshot state cache). Confirm the live state-cache use stays read-only under the same type name, or rename the legacy use (e.g. HAS_LEGACY_SNAPSHOT) at migration."
+  cq: [CQ-TM-01]
+  failingCase: "A traversal (p)-[:HAS_SNAPSHOT]->(s) from a Document (a Source specialization, D-005) and from a Product returns different archetypes (InformationArtifact vs VersionedState) under one type; CL-014 ruled one type, one meaning."
+  proposedRuling: "Keep for compatibility, read-only, documented as legacy; new writes use HAS_STATE."
+- id: W04-SR-07
+  targetOwner: W01
+  request: "Name the asserted successors of live MANUFACTURES / CONTRACTS_MANUFACTURING (Organization -> Product) and decide their endpoint (Product, ProductVariant or ProductLot); retire PhysicalLocation.HOSTS_PRODUCT (ambiguous: manufacture site, storage, retail stock) in favour of W11 facility/process edges and W15 inventory."
+  cq: [CQ-MF-01, CQ-PF-03]
+  failingCase: "Round 0002 R3 / C&EN: ChromaDex says it sold Elysium the NR used in Basis until mid-2016; Elysium states it provided the trial capsules. A Product-level MANUFACTURES edge cannot say which formulation era or lot a manufacturer made."
+  proposedRuling: "Asserted MANUFACTURES_PRODUCT with endpoint ProductVariant|ProductLot plus validity; W04 keeps the live fields read-only until then."
+- id: W04-SR-08
+  targetOwner: W08
+  request: "Dispose live Product.CLASSIFIED_AS -> union ProductClassification (ToolOrInstrument | Device). W04 exposes it read-only as two fields because no union owner exists."
+  cq: [CQ-DX-01]
+  failingCase: "A consumer wearable sold as a Product and identified as a Device model would be two identities joined by CLASSIFIED_AS with RoleMetadata (no assertion, no time)."
+  proposedRuling: "Product.productKind CONSUMER_DEVICE/MEDICAL_DEVICE plus an asserted Product/Variant -> DeviceModel realization edge owned by W08 when DeviceModel is admitted."
+- id: W04-SR-09
+  targetOwner: Fable
+  request: "Assign a sole writer for relationship type DELIVERS_LABTEST (live Product -> LabTest); W04 currently defines the Product-side field with AssertedEdgeProperties."
+  cq: [CQ-DX-01]
+  failingCase: "Registry lists IMPLEMENTS_PANEL under W15 but DELIVERS_LABTEST under nobody; the merge would have a relationship type without an owner."
+  proposedRuling: "W04 (domain endpoint Product) or W07 (LabTest); either is fine if recorded."
+- id: W04-SR-10
+  targetOwner: "W06, W16, W17, W18, W21, W22 (union owners)"
+  request: "Where a live union lists Product and the use depends on dose or composition (TreatmentComponent, StepSubstance, ProtocolResultMention, SafetySubject), add ProductVariant (and, for steps, allow FormulationVersion). Controlled vocabularies requested from W02 for ProductVariant.dosageForm and IngredientComponent.role (kept as String here)."
+  cq: [CQ-PR-03, CQ-ID-01]
+  failingCase: "A protocol step 'take Tru Niagen' cannot say 150 mg x2 versus 300 mg x1 (different variants, same per-serving amount)."
+  proposedRuling: "Union owners add ProductVariant; W02 publishes the dosage-form list (EDQM Standard Terms candidate)."
+- id: W04-SR-11
+  targetOwner: W15
+  request: "Allow BundleComponent -COMPONENT_PRODUCT-> PackageConfiguration (catalog range is Product|ProductVariant)."
+  cq: [CQ-CM-02, CQ-ID-05]
+  failingCase: "Tru Niagen 300mg size '180' is SKU CTNUS3006090010-KIT (barcode 850064273106), a kit of two 90-count bottles; without PackageConfiguration in the range it must be modelled as a third package configuration, which double-counts composition and misstates unit count."
+  proposedRuling: "Extend COMPONENT_PRODUCT range with PackageConfiguration."
+- id: W04-SR-12
+  targetOwner: W00
+  request: "Baseline fixture elysium-basis.cypher writes Assertion.recordedAt = datetime() but its capture-fidelity Adjudication has a fixed reviewedAt 2026-10-04T00:00:00Z, so V-110 fails whenever the fixture is loaded after that instant (observed on this run, 3 rows, fixture loaded alone)."
+  cq: [CQ-TM-01]
+  failingCase: "Load elysium-basis.cypher alone on 2026-10-04 after 00:00 UTC: V-110 returns hu:assertion:basis-has-us-variant-2026-07-10, ...current-formulation-2026-07-10, ...current-nr-component-uses-nr-e."
+  proposedRuling: "Fix the fixture with literal recordedAt values (W04 does not edit it; compatibility companion w04-06 does not touch these fields)."
+- id: W04-SR-13
+  targetOwner: Fable
+  request: "Neo4j 5.26.31 Community returns a wrong result for `NOT any(x IN l WHERE x IN [..]) OR NOT any(x IN l WHERE x IN [..])` when both list predicates reuse one iteration variable name: `WITH ['A','B'] AS ip RETURN (NOT any(x IN ip WHERE x IN ['A']) OR NOT any(x IN ip WHERE x IN ['B']))` returns true (expected false); with distinct variable names it returns false; equality (x = 'A') instead of IN returns false. Lint all validation queries for reused list-predicate variables."
+  cq: [all validators]
+  failingCase: "First draft of V-W04-04 reported the valid calculated assertion of fixture w04-03 as a violation."
+  proposedRuling: "Validator style rule: unique iteration variable per list predicate in one expression; re-test on the deployment minor."

@@ -1,0 +1,880 @@
+registry: Predicate and relationship-class registrations ruled by W00 (reconciliation pass, run-2026-10-04-fable51-01)
+rulingId: W00-R-07 (predicates, exclusivity, implication pairs); per-type rulings named on each relationship row
+conventions:
+  status: REGISTERED = enters the owner module assertedPredicates at merge; CANDIDATE = usable, assertions stay PROPOSED-eligible only, catalog
+    maturity CANDIDATE; CONFIRMED = class confirmed, no change; DEFERRED = no failing case or no owner
+  predicateClass: kernel enum PredicateClass (no new value requested or added)
+  quantityRule: 'W00-R-02: a QUANTITY-class assertion may carry one HAS_OBJECT plus one numeric literal (valueNumber + unitCode, with quantityBasis/massBasis/amountReferent);
+    every other class keeps INV-003 literal-xor-object (V-003r)'
+assertedPredicates:
+- predicate: HAS_MOLECULAR_WEIGHT
+  predicateClass: QUANTITY
+  ownerModule: substances_and_materials
+  ownerWorker: W02
+  form: literal valueNumber + unitCode g/mol
+  subject: ChemicalSubstance|ChemicalForm
+  object: '-'
+  status: REGISTERED
+  requestedBy: W02-SR-04
+  note: 'fx-01: MW 290.70 / 255.25 are citable PubChem-snapshot inputs of the NR cation calculation'
+- predicate: QUANTITATIVELY_CONTAINS
+  predicateClass: QUANTITY
+  ownerModule: substances_and_materials
+  ownerWorker: W02
+  form: asserted edge projection (relationship type of the same name); QUANTITY object + quantity qualifiers (W00-R-02)
+  subject: IngredientMaterial|IngredientComponent (CALCULATED allowed)
+  object: ChemicalSubstance|ChemicalForm|Constituent|Nutrient
+  status: REGISTERED (catalog 0.2.0; subject range confirmed)
+  requestedBy: W02-SR-04, W02-SR-01
+  note: V-006r governs the edge quantity shape
+- predicate: INCREASES_RISK_FOR
+  predicateClass: MECHANISM
+  ownerModule: mechanisms
+  ownerWorker: W03
+  form: assertion-only (no edge projection) unless W03 registers a projection; basisKind required (INV-210)
+  subject: Mechanism|MolecularEntity|Exposure|RiskFactor|Condition
+  object: Condition|Outcome|Mechanism
+  status: REGISTERED
+  requestedBy: W03-SR-12
+- predicate: MEDIATES_RISK_THROUGH
+  predicateClass: MECHANISM
+  ownerModule: mechanisms
+  ownerWorker: W03
+  form: assertion-only (no edge projection) unless W03 registers a projection; basisKind required (INV-210)
+  subject: Mechanism|MolecularEntity|Exposure|RiskFactor|Condition
+  object: Condition|Outcome|Mechanism
+  status: REGISTERED
+  requestedBy: W03-SR-12
+- predicate: ASSOCIATED_WITH_CONDITION
+  predicateClass: MECHANISM
+  ownerModule: mechanisms
+  ownerWorker: W03
+  form: assertion-only (no edge projection) unless W03 registers a projection; basisKind required (INV-210)
+  subject: Mechanism|MolecularEntity|Exposure|RiskFactor|Condition
+  object: Condition|Outcome|Mechanism
+  status: REGISTERED
+  requestedBy: W03-SR-12
+- predicate: ASSOCIATED_WITH_OUTCOME
+  predicateClass: MECHANISM
+  ownerModule: mechanisms
+  ownerWorker: W03
+  form: assertion-only (no edge projection) unless W03 registers a projection; basisKind required (INV-210)
+  subject: Mechanism|MolecularEntity|Exposure|RiskFactor|Condition
+  object: Condition|Outcome|Mechanism
+  status: REGISTERED
+  requestedBy: W03-SR-12
+- predicate: ACTIVE_MOIETY_AMOUNT
+  predicateClass: QUANTITY
+  ownerModule: products_and_formulations
+  ownerWorker: W04
+  form: assertion-only (no edge projection); object = moiety (ChemicalSubstance) + valueNumber/unitCode (W00-R-02); basisKind CALCULATED with
+    DERIVED_FROM_ASSERTION inputs (V-W04-04, V-W00-07)
+  subject: IngredientComponent
+  object: ChemicalSubstance
+  status: REGISTERED
+  requestedBy: W04-SR-04
+  note: 'w04-03: 300 mg NR chloride -> 263.42 mg NR cation; the literal-only form with a HAS_ACTIVE_MOIETY input stays valid but is not preferred'
+- predicate: NUTRIENT_EQUIVALENT_AMOUNT
+  predicateClass: QUANTITY
+  ownerModule: products_and_formulations
+  ownerWorker: W04
+  form: as ACTIVE_MOIETY_AMOUNT
+  subject: IngredientComponent
+  object: Nutrient|ChemicalSubstance
+  status: REGISTERED
+  requestedBy: W04-SR-04
+  note: fx-91 nicotinamide molar equivalent (W02)
+- predicate: CHARACTERIZES_EXPOSURE_IN_POPULATION
+  predicateClass: OTHER
+  ownerModule: exposures
+  ownerWorker: W05
+  form: literal
+  subject: Exposure|Lifestyle
+  object: '-'
+  status: DEFERRED
+  requestedBy: W05-SR-13
+  note: no failing case for the predicate itself; route to W10 UseContextProfile first (W10 has published no seam file)
+- predicate: TARGETS_CONDITION
+  predicateClass: OTHER
+  ownerModule: interventions
+  ownerWorker: W06
+  form: asserted edge projection (relationship type of the same name)
+  subject: Treatment|Procedure
+  object: Condition|IngredientMaterial|Device
+  status: REGISTERED
+  requestedBy: W06-SR-12
+- predicate: USES_COMPONENT
+  predicateClass: OTHER
+  ownerModule: interventions
+  ownerWorker: W06
+  form: asserted edge projection (relationship type of the same name)
+  subject: Treatment|Procedure
+  object: Condition|IngredientMaterial|Device
+  status: REGISTERED
+  requestedBy: W06-SR-12
+- predicate: DECLARES_DEVELOPMENT_STAGE
+  predicateClass: REGULATORY
+  ownerModule: interventions
+  ownerWorker: W06
+  form: literal valueString + jurisdiction
+  subject: Treatment
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W06-SR-12
+- predicate: HAS_TREATMENT_MODALITY
+  predicateClass: OTHER
+  ownerModule: interventions
+  ownerWorker: W06
+  form: literal valueString in TreatmentModality
+  subject: Treatment
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W06-SR-12
+- predicate: REPORTS_PROCEDURE_VOLUME
+  predicateClass: QUANTITY
+  ownerModule: interventions
+  ownerWorker: W06
+  form: literal valueNumber
+  subject: Procedure|Facility|Organization
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W06-SR-12
+- predicate: CHANGED_BETWEEN
+  predicateClass: QUANTITY
+  ownerModule: diagnostics
+  ownerWorker: W07
+  form: assertion-only (no edge projection); object = earlier result; the stated delta may now ride as valueNumber + unitCode (W00-R-02)
+  subject: DiagnosticResult (later)
+  object: DiagnosticResult (earlier)
+  status: CANDIDATE
+  requestedBy: W07-SR-13
+  note: V-314 guards basisKind
+- predicate: DEVELOPS_PLATFORM
+  predicateClass: OTHER
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: asserted edge projection (relationship type of the same name) (add to $assertedTypes)
+  subject: Organization|Device|TechnologyPlatform|FirmwareVersion
+  object: TechnologyPlatform|ToolOrInstrument|Modality|Sensor|Device
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: USES_PLATFORM
+  predicateClass: OTHER
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: asserted edge projection (relationship type of the same name) (add to $assertedTypes)
+  subject: Organization|Device|TechnologyPlatform|FirmwareVersion
+  object: TechnologyPlatform|ToolOrInstrument|Modality|Sensor|Device
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: USES_EQUIPMENT
+  predicateClass: OTHER
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: asserted edge projection (relationship type of the same name) (add to $assertedTypes)
+  subject: Organization|Device|TechnologyPlatform|FirmwareVersion
+  object: TechnologyPlatform|ToolOrInstrument|Modality|Sensor|Device
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: IMPLEMENTS_PLATFORM
+  predicateClass: OTHER
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: asserted edge projection (relationship type of the same name) (add to $assertedTypes)
+  subject: Organization|Device|TechnologyPlatform|FirmwareVersion
+  object: TechnologyPlatform|ToolOrInstrument|Modality|Sensor|Device
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: USES_MODALITY
+  predicateClass: OTHER
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: asserted edge projection (relationship type of the same name) (add to $assertedTypes)
+  subject: Organization|Device|TechnologyPlatform|FirmwareVersion
+  object: TechnologyPlatform|ToolOrInstrument|Modality|Sensor|Device
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: HAS_SENSOR
+  predicateClass: OTHER
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: asserted edge projection (relationship type of the same name) (add to $assertedTypes)
+  subject: Organization|Device|TechnologyPlatform|FirmwareVersion
+  object: TechnologyPlatform|ToolOrInstrument|Modality|Sensor|Device
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: EMBODIES_MODEL
+  predicateClass: OTHER
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: asserted edge projection (relationship type of the same name) (add to $assertedTypes)
+  subject: Organization|Device|TechnologyPlatform|FirmwareVersion
+  object: TechnologyPlatform|ToolOrInstrument|Modality|Sensor|Device
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: RUNS_ON_DEVICE
+  predicateClass: OTHER
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: asserted edge projection (relationship type of the same name) (add to $assertedTypes)
+  subject: Organization|Device|TechnologyPlatform|FirmwareVersion
+  object: TechnologyPlatform|ToolOrInstrument|Modality|Sensor|Device
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: RELEASE_NOTE_STATES
+  predicateClass: OTHER
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: literal valueString
+  subject: FirmwareVersion
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: REPORTS_SENSITIVITY
+  predicateClass: QUANTITY
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: literal valueNumber + unitCode (%)
+  subject: Device|FirmwareVersion|TechnologyPlatform
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: REPORTS_SPECIFICITY
+  predicateClass: QUANTITY
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: literal valueNumber + unitCode (%)
+  subject: Device|FirmwareVersion|TechnologyPlatform
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: REPORTS_INCONCLUSIVE_RATE
+  predicateClass: QUANTITY
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: literal valueNumber + unitCode (%)
+  subject: Device|FirmwareVersion|TechnologyPlatform
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: REPORTS_ACCURACY
+  predicateClass: QUANTITY
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: literal valueNumber + unitCode (%)
+  subject: Device|FirmwareVersion|TechnologyPlatform
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: CLAIMS_ACCURACY_IMPROVEMENT
+  predicateClass: CLAIM
+  ownerModule: devices_and_platforms
+  ownerWorker: W08
+  form: literal
+  subject: FirmwareVersion|Device
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W08-SR-06
+- predicate: CITES_AS_REFERENCE
+  predicateClass: OTHER
+  ownerModule: studies_and_publications
+  ownerWorker: W09
+  form: literal valueString (citation as printed)
+  subject: Publication
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W09-SR-16
+  note: used for SOURCE_CORRECTION of reference lists
+- predicate: EVALUATES_RISK_FACTOR
+  predicateClass: OTHER
+  ownerModule: studies_and_publications
+  ownerWorker: W09
+  form: asserted edge projection (relationship type of the same name)
+  subject: Study
+  object: RiskFactor
+  status: CANDIDATE
+  requestedBy: W09-SR-16
+  note: migration target of the retired live edge
+- predicate: CLAIMS_THIRD_PARTY_CERTIFICATION
+  predicateClass: CLAIM
+  ownerModule: organizations
+  ownerWorker: W11 (with W01)
+  form: literal valueString; never projects to COVERS or CERTIFIED_UNDER
+  subject: Organization|Facility
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W11-SR-09
+  note: NAI FY2025 10-K Carlsbad statement
+- predicate: SPECIFICATION_EFFECTIVE_FROM
+  predicateClass: REGULATORY
+  ownerModule: products_and_formulations
+  ownerWorker: W11
+  form: literal (announced effective date as valueString; the bound is never inferred from it)
+  subject: SpecificationVersion
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W11-SR-09
+- predicate: CONFORMS_TO_SPECIFICATION
+  predicateClass: CLAIM
+  ownerModule: quality
+  ownerWorker: W12
+  form: assertion-only (no edge projection); polarity NEGATIVE for "does not conform"
+  subject: ProductLot|TestExecution
+  object: SpecificationCriterion
+  status: REGISTERED
+  requestedBy: W12-SR-04
+  note: S1/S3 pass rows
+- predicate: INSPECTION_PERIOD
+  predicateClass: OTHER
+  ownerModule: regulatory_and_ip
+  ownerWorker: W13
+  form: literal
+  subject: RegulatoryInspection
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W13-SR-07
+- predicate: INSPECTION_FOUND_VIOLATION
+  predicateClass: REGULATORY
+  ownerModule: regulatory_and_ip
+  ownerWorker: W13
+  form: literal
+  subject: RegulatoryInspection
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W13-SR-07
+- predicate: INSPECTION_CLASSIFIED_AS
+  predicateClass: REGULATORY
+  ownerModule: regulatory_and_ip
+  ownerWorker: W13
+  form: literal valueString NAI|VAI|OAI + project area
+  subject: RegulatoryInspection
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W13-SR-07
+- predicate: PATENT_CLAIMS
+  predicateClass: OTHER
+  ownerModule: regulatory_and_ip
+  ownerWorker: W14
+  form: assertion-only (no edge projection)
+  subject: PatentClaim|GrantedPatent|PatentApplication|PatentFamily
+  object: IngredientMaterial|ChemicalSubstance|ChemicalForm|Product|ProductVariant|StudyIntervention
+  status: REGISTERED
+  requestedBy: W14-SR-04
+  note: premise of [PATENT_CLAIMS, PROVES_EFFICACY]; W10 confirms the efficacy predicate list
+- predicate: OWNS_TRADEMARK
+  predicateClass: COMMERCIAL
+  ownerModule: regulatory_and_ip
+  ownerWorker: W14
+  form: as registered by W14 (class confirmed)
+  subject: '-'
+  object: '-'
+  status: CONFIRMED
+  requestedBy: W14-SR-08
+- predicate: ASSIGNED_PATENT
+  predicateClass: COMMERCIAL
+  ownerModule: regulatory_and_ip
+  ownerWorker: W14
+  form: as registered by W14 (class confirmed)
+  subject: '-'
+  object: '-'
+  status: CONFIRMED
+  requestedBy: W14-SR-08
+- predicate: LICENSES_PATENT
+  predicateClass: COMMERCIAL
+  ownerModule: regulatory_and_ip
+  ownerWorker: W14
+  form: as registered by W14 (class confirmed)
+  subject: '-'
+  object: '-'
+  status: CONFIRMED
+  requestedBy: W14-SR-08
+- predicate: GRANTS_PATENT_LICENSE
+  predicateClass: COMMERCIAL
+  ownerModule: regulatory_and_ip
+  ownerWorker: W14
+  form: as registered by W14 (class confirmed)
+  subject: '-'
+  object: '-'
+  status: CONFIRMED
+  requestedBy: W14-SR-08
+- predicate: LICENSE_COVERS
+  predicateClass: COMMERCIAL
+  ownerModule: regulatory_and_ip
+  ownerWorker: W14
+  form: as registered by W14 (class confirmed)
+  subject: '-'
+  object: '-'
+  status: CONFIRMED
+  requestedBy: W14-SR-08
+- predicate: MARKETED_UNDER_MARK
+  predicateClass: COMMERCIAL
+  ownerModule: regulatory_and_ip
+  ownerWorker: W14
+  form: as registered by W14 (class confirmed)
+  subject: '-'
+  object: '-'
+  status: CONFIRMED
+  requestedBy: W14-SR-08
+- predicate: APPLICATION_GRANTED_AS
+  predicateClass: REGULATORY
+  ownerModule: regulatory_and_ip
+  ownerWorker: W14
+  form: as registered by W14 (class confirmed)
+  subject: '-'
+  object: '-'
+  status: CONFIRMED
+  requestedBy: W14-SR-08
+- predicate: IP_STATUS_OF
+  predicateClass: REGULATORY
+  ownerModule: regulatory_and_ip
+  ownerWorker: W14
+  form: as registered by W14 (class confirmed)
+  subject: '-'
+  object: '-'
+  status: CONFIRMED
+  requestedBy: W14-SR-08
+- predicate: LISTING_TITLE_AMOUNT
+  predicateClass: QUANTITY
+  ownerModule: products_and_commerce
+  ownerWorker: W15
+  form: literal valueNumber + unitCode
+  subject: MerchantListing
+  object: '-'
+  status: REGISTERED
+  requestedBy: W15-SR-11
+  note: premise of [LISTING_TITLE_AMOUNT, LABEL_DECLARED_AMOUNT]
+- predicate: AUTHORED_PROTOCOL
+  predicateClass: ROLE
+  ownerModule: protocols
+  ownerWorker: W16
+  form: assertion-only (no edge projection)
+  subject: Person|Organization|Protocol|ProtocolEdition|ProtocolStep
+  object: Protocol|ProtocolEdition|ProtocolStep|Observation|IngredientMaterial
+  status: REGISTERED
+  requestedBy: W16-SR-02
+- predicate: AUTHORED_PROTOCOL_EDITION
+  predicateClass: ROLE
+  ownerModule: protocols
+  ownerWorker: W16
+  form: assertion-only (no edge projection)
+  subject: Person|Organization|Protocol|ProtocolEdition|ProtocolStep
+  object: Protocol|ProtocolEdition|ProtocolStep|Observation|IngredientMaterial
+  status: REGISTERED
+  requestedBy: W16-SR-02
+- predicate: REQUIRES_PERFORMER_ROLE
+  predicateClass: ROLE
+  ownerModule: protocols
+  ownerWorker: W16
+  form: assertion-only (no edge projection)
+  subject: Person|Organization|Protocol|ProtocolEdition|ProtocolStep
+  object: Protocol|ProtocolEdition|ProtocolStep|Observation|IngredientMaterial
+  status: REGISTERED
+  requestedBy: W16-SR-02
+- predicate: CITES_EVIDENCE_FOR_STEP
+  predicateClass: CLAIM
+  ownerModule: protocols
+  ownerWorker: W16
+  form: assertion-only (no edge projection)
+  subject: Person|Organization|Protocol|ProtocolEdition|ProtocolStep
+  object: Protocol|ProtocolEdition|ProtocolStep|Observation|IngredientMaterial
+  status: REGISTERED
+  requestedBy: W16-SR-02
+- predicate: PROTOCOL_INCLUDES_SUBSTANCE
+  predicateClass: OTHER
+  ownerModule: protocols
+  ownerWorker: W16
+  form: assertion-only (no edge projection)
+  subject: Person|Organization|Protocol|ProtocolEdition|ProtocolStep
+  object: Protocol|ProtocolEdition|ProtocolStep|Observation|IngredientMaterial
+  status: REGISTERED
+  requestedBy: W16-SR-02
+- predicate: REPORTS_PRACTICE_OF_STEP
+  predicateClass: OTHER
+  ownerModule: protocols
+  ownerWorker: W16
+  form: assertion-only (no edge projection)
+  subject: Person|Organization|Protocol|ProtocolEdition|ProtocolStep
+  object: Protocol|ProtocolEdition|ProtocolStep|Observation|IngredientMaterial
+  status: REGISTERED
+  requestedBy: W16-SR-02
+- predicate: PROTOCOL_EFFECTIVE_FOR
+  predicateClass: CLAIM
+  ownerModule: protocols
+  ownerWorker: W16
+  form: assertion-only (no edge projection)
+  subject: Person|Organization|Protocol|ProtocolEdition|ProtocolStep
+  object: Protocol|ProtocolEdition|ProtocolStep|Observation|IngredientMaterial
+  status: REGISTERED
+  requestedBy: W16-SR-02
+- predicate: STEP_SCHEDULE_REPORTED
+  predicateClass: QUANTITY
+  ownerModule: protocols
+  ownerWorker: W16
+  form: literal valueNumber + UCUM rate unit (e.g. /wk); replaces the narrower STEP_OCCURRENCES_PER_WEEK
+  subject: ProtocolStep
+  object: '-'
+  status: REGISTERED
+  requestedBy: W16-SR-02
+  note: W16 offered the generic form; one predicate with a unit beats one predicate per unit
+- predicate: SELF_REPORTED_PRACTICE
+  predicateClass: OTHER
+  ownerModule: narrative_and_claims
+  ownerWorker: W21
+  form: assertion-only (no edge projection); speechAct REPORTS_PRACTICE; subject the practice entity when resolved, else the asserter Person with
+    a literal description
+  subject: Lifestyle|Exposure|Person
+  object: '-'
+  status: REGISTERED
+  requestedBy: W21-SR-15 (W05-SR-11 form)
+- predicate: OPERATES_CHANNEL
+  predicateClass: ROLE
+  ownerModule: narrative_and_claims
+  ownerWorker: W21
+  form: asserted edge projection (relationship type of the same name)
+  subject: Person|Organization
+  object: Channel
+  status: REGISTERED
+  requestedBy: W21-SR-15
+- predicate: ACCOMPANIES_TALK
+  predicateClass: OTHER
+  ownerModule: narrative_and_claims
+  ownerWorker: W21
+  form: asserted edge projection (relationship type of the same name)
+  subject: Source (PRESENTATION_SLIDES)
+  object: Episode
+  status: REGISTERED
+  requestedBy: W21-SR-15
+  note: a deck accompanies a talk; it is never RENDITION_OF it
+- predicate: FORECASTS_COMMERCIAL_OPPORTUNITY
+  predicateClass: '-'
+  ownerModule: '-'
+  ownerWorker: (no owner named)
+  form: '-'
+  subject: '-'
+  object: '-'
+  status: DEFERRED
+  requestedBy: W21-SR-15
+  note: fixture placeholders; no owner and no failing case of their own
+- predicate: REPORTS_LIFESPAN_EFFECT
+  predicateClass: '-'
+  ownerModule: '-'
+  ownerWorker: (no owner named)
+  form: '-'
+  subject: '-'
+  object: '-'
+  status: DEFERRED
+  requestedBy: W21-SR-15
+  note: fixture placeholders; no owner and no failing case of their own
+- predicate: REPORTS_POOLED_ESTIMATE
+  predicateClass: QUANTITY
+  ownerModule: evidence_assessment
+  ownerWorker: W10 (with W09)
+  form: literal valueNumber + unitCode (pooled effect as stated)
+  subject: Publication
+  object: '-'
+  status: CANDIDATE
+  requestedBy: W10-SR-06
+  note: W10 fixtures use it 4 times; whether INV-206 applies to pooled estimates is W09/W10 business
+- predicate: USE_CONSTRAINED_IN
+  predicateClass: REGULATORY
+  ownerModule: safety_and_constraints
+  ownerWorker: W17
+  form: as W17 registers (asserted)
+  subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
+  object: Condition|ChemicalSubstance|AdverseEffect|UseContextProfile
+  status: CANDIDATE
+  requestedBy: W17-SR-03
+  note: 'fixtures 03-05: 23 assertions; candidate while the safety_and_constraints module is candidate (W17 proposal); predicateClass OTHER/REGULATORY/CLAIM
+    as listed, candidate value SAFETY not added (no failing case)'
+- predicate: USE_CONSTRAINED_WITH
+  predicateClass: REGULATORY
+  ownerModule: safety_and_constraints
+  ownerWorker: W17
+  form: as W17 registers (asserted)
+  subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
+  object: Condition|ChemicalSubstance|AdverseEffect|UseContextProfile
+  status: CANDIDATE
+  requestedBy: W17-SR-03
+  note: 'fixtures 03-05: 23 assertions; candidate while the safety_and_constraints module is candidate (W17 proposal); predicateClass OTHER/REGULATORY/CLAIM
+    as listed, candidate value SAFETY not added (no failing case)'
+- predicate: INTERACTS_WITH
+  predicateClass: CLAIM
+  ownerModule: safety_and_constraints
+  ownerWorker: W17
+  form: as W17 registers (asserted)
+  subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
+  object: Condition|ChemicalSubstance|AdverseEffect|UseContextProfile
+  status: CANDIDATE
+  requestedBy: W17-SR-03
+  note: 'fixtures 03-05: 23 assertions; candidate while the safety_and_constraints module is candidate (W17 proposal); predicateClass OTHER/REGULATORY/CLAIM
+    as listed, candidate value SAFETY not added (no failing case)'
+- predicate: IDENTIFIES_POTENTIAL_SAFETY_SIGNAL
+  predicateClass: CLAIM
+  ownerModule: safety_and_constraints
+  ownerWorker: W17
+  form: as W17 registers (asserted)
+  subject: IngredientMaterial|ChemicalSubstance|Product|UseConstraint|AdverseEffect
+  object: Condition|ChemicalSubstance|AdverseEffect|UseContextProfile
+  status: CANDIDATE
+  requestedBy: W17-SR-03
+  note: 'fixtures 03-05: 23 assertions; candidate while the safety_and_constraints module is candidate (W17 proposal); predicateClass OTHER/REGULATORY/CLAIM
+    as listed, candidate value SAFETY not added (no failing case)'
+relationshipClassUpdates:
+- type: HAS_SNAPSHOT
+  class: structural
+  domainRange: Source -> SourceSnapshot ONLY
+  ruling: W00-R-16
+- type: HAS_STATE
+  class: asserted (bitemporal_attachment, StateEpisodeProperties)
+  domainRange: Organization -> OrganizationSnapshot; Product -> ProductSnapshot; MerchantListing -> ListingSnapshot (state caches, relabelled
+    from live HAS_SNAPSHOT)
+  ruling: W00-R-16
+- type: EVALUATES
+  class: structural
+  domainRange: Adjudication -> Assertion ONLY
+  ruling: W00-R-17
+- type: LEGACY_EVALUATES
+  class: legacy (read-only; Study.evaluates, LegacyInterventionArmProperties)
+  domainRange: Study -> LegacyEvaluatedIntervention
+  ruling: W00-R-17
+- type: MENTIONS
+  class: structural
+  domainRange: SourceLocator -> Mention ONLY
+  ruling: W00-R-19
+- type: MENTIONS_ENTITY
+  class: derived, ruleOnly (RetrievalEdgeProperties, W20 sole writer)
+  domainRange: Chunk|Episode|ProtocolResult|ProductLabelRegion -> entity (AssertionSubjectTarget or the owner union)
+  ruling: W00-R-19
+- type: HAS_IDENTIFIER
+  class: asserted (IdentifierLinkProperties)
+  domainRange: Entity|VersionedState|InformationArtifact -> Identifier (TradeItemIdentifier included)
+  ruling: W00-R-20
+- type: IDENTIFIED_BY
+  class: retired; relabelled HAS_IDENTIFIER at migration
+  domainRange: '-'
+  ruling: W00-R-20
+- type: RESOLVES_TO_CHUNK
+  class: derived, ruleOnly
+  domainRange: SourceLocator -> Chunk
+  ruling: W00-R-23
+- type: HAS_CHUNK
+  class: derived, ruleOnly
+  domainRange: (W20)
+  ruling: W00-R-23
+- type: OCCURS_IN_SEGMENT
+  class: structural (W21)
+  domainRange: ClaimOccurrence|Assertion -> EpisodeSegment ONLY
+  ruling: W00-R-23
+- type: CHUNK_IN_SEGMENT
+  class: derived, ruleOnly (W20; rename of the chunk use of OCCURS_IN_SEGMENT)
+  domainRange: Chunk -> EpisodeSegment
+  ruling: W00-R-23
+- type: ABOUT
+  class: derived, ruleOnly (RetrievalEdgeProperties)
+  domainRange: (W20)
+  ruling: W00-R-23
+- type: SUPPORTED_BY_CHUNK
+  class: derived, NOT ruleOnly (needs derivedFromAssertionUids; W20-V01)
+  domainRange: (W20)
+  ruling: W00-R-23
+- type: SUPPORTED_BY_DOCUMENT
+  class: derived, NOT ruleOnly (W20-V02)
+  domainRange: (W20)
+  ruling: W00-R-23
+- type: HAS_CURRENT_PROTOCOL_STEP
+  class: derived, ruleOnly (rule protocol-current-steps-v1)
+  domainRange: Protocol -> ProtocolStep
+  ruling: W00-R-23
+- type: COMPARED_TO
+  class: derived; ruleOnly only for the same-version clause (derivationRule INV-301 same AssayVersion|AlgorithmVersion); cross-version needs derivedFromAssessmentUids
+  domainRange: DiagnosticResult -> DiagnosticResult
+  ruling: W00-R-23
+- type: RECOMMENDS
+  class: 'derived, rule mode: derivationRule + exactly one derivedFromAssertionUids (speechAct RECOMMENDS); never assertionUid'
+  domainRange: Person -> RecommendableTarget
+  ruling: W00-R-25
+- type: AFFECTS_MECHANISM|MODULATES|APPLIES_TO_SPECIES|INFLUENCES_OUTCOME|ACTS_IN
+  class: derived, rule mode mx-proj/v1 (or 1:1 projectionOfAssertionUid)
+  domainRange: (W03)
+  ruling: W00-R-26
+- type: DELIMITED_BY
+  class: structural (W21)
+  domainRange: EpisodeSegment -> SourceLocator (at most one per rendition)
+  ruling: W00-R-29
+- type: WAS_GENERATED_BY
+  class: structural
+  domainRange: adds Segmentation, AnswerRecord, MediaAsset, MediaVariant, MediaAnnotation, MediaSuitabilityAssessment (EvidenceAssessment), PriceObservation,
+    Offer, AffiliateLink -> Activity
+  ruling: W00-R-18
+- type: USED
+  class: structural
+  domainRange: Activity -> adds MediaAsset, MediaVariant, MediaAnnotation (MediaRightsRecord DEFERRED)
+  ruling: W00-R-18
+- type: SUPPORTED_BY
+  class: structural
+  domainRange: adds StudyResult, RegistrationVersion, ProtocolVersion, MeasuredResult, LotTestSummary, CertificateOfAnalysis, PriceObservation,
+    AffiliateLink -> SourceLocator
+  ruling: W00-R-22
+- type: HAS_PATHWAY_VERSION
+  class: asserted (bitemporal_attachment, StateEpisodeProperties; assertionUid expected)
+  domainRange: RegulatoryPathway -> RegulatoryPathwayVersion
+  ruling: W00-R-07
+predicateExclusivity:
+  STRAIN_OF:
+    mode: EXCLUSIVE
+    scope: subject
+    requestedBy: W02-SR-05
+    ruling: W00-R-07
+  HAS_PATHWAY_VERSION:
+    mode: EXCLUSIVE
+    scope: subject
+    requestedBy: W13-SR-05
+    ruling: W00-R-07
+  HAS_CAPABILITY_STATE:
+    mode: EXCLUSIVE
+    scope: subject
+    partitionByPath:
+    - CAPABILITY_FOR_PROCESS target
+    - CAPABILITY_FOR_MATERIAL target
+    requestedBy: W11-SR-04
+    ruling: W00-R-07
+    enforcement: ingestion service in the write transaction; audited by V-W11-02/07; excluded from the generic $exclusiveTypes checks (V-108r/V-508r/V-509r
+      cannot evaluate a path partition)
+  GOVERNED_BY_SPECIFICATION:
+    mode: EXCLUSIVE
+    scope: subject
+    partitionByPath:
+    - VERSION_OF_SPECIFICATION target
+    requestedBy: W11-SR-04
+    ruling: W00-R-07
+    enforcement: as HAS_CAPABILITY_STATE
+  IP_STATUS_OF:
+    mode: NONEXCLUSIVE
+    note: per right and per claim; V-W14-14 audits
+    requestedBy: W14 ledger U-6
+    ruling: W00-R-07
+forbiddenImplications:
+- pairs:
+  - - AFFILIATE_FOR_OFFER
+    - ENDORSES_PRODUCT
+  - - AFFILIATE_FOR_OFFER
+    - SELLS_PRODUCT
+  requestedBy: W15-SR-11(c)
+  ruling: W00-R-07
+  addToImplicationPairs: true
+- pairs:
+  - - PATENT_CLAIMS
+    - PROVES_EFFICACY
+  - - PATENT_CLAIMS
+    - IMPROVES_OUTCOME
+  - - PATENT_CLAIMS
+    - HAS_EFFECT_ON
+  - - PATENT_CLAIMS
+    - SUPPORTS_EFFICACY
+  - - PATENT_CLAIMS
+    - AFFECTS_MECHANISM
+  - - PATENT_CLAIMS
+    - INFLUENCES_OUTCOME
+  requestedBy: W14-SR-04
+  ruling: W00-R-07
+  addToImplicationPairs: true
+- pairs:
+  - - FACILITY_GMP_CERTIFIED
+    - CERTIFIED_UNDER
+  - - LOT_COVERED
+    - PRODUCT_CERTIFIED
+  - - CONFORMS_TO_SPECIFICATION
+    - MEASURED_VALUE
+  - - LOT_TEST_SUMMARY
+    - CERTIFICATE_OF_ANALYSIS
+  - - CLAIMS_THIRD_PARTY_TESTING
+    - INDEPENDENT_LABORATORY
+  - - LISTING_ABSENT_IN_LATER_CAPTURE
+    - LISTING_WITHDRAWN
+  requestedBy: W12-SR-07
+  ruling: W00-R-07
+  addToImplicationPairs: true
+  note: quality module; validators V-332, V-W12-*
+- pairs:
+  - - DEPICTS
+    - SUPPORTED_BY
+  - - MEDIA_PURPOSE_EVIDENCE
+    - EVIDENCES
+  - - GENERATED_ILLUSTRATION
+    - SOURCE_SUPPORT
+  - - PUBLICLY_ACCESSIBLE
+    - REUSE_PERMITTED
+  - - NO_STATEMENT_FOUND
+    - PERMISSION
+  - - PERCEPTUAL_HASH_MATCH
+    - SAME_BYTES
+  requestedBy: W22-SR-08
+  ruling: W00-R-07
+  addToImplicationPairs: true
+  note: media section of provenance; validators V-601..V-615 (W22)
+- pairs:
+  - - INSPECTION_CLASSIFIED_NAI
+    - CGMP_COMPLIANT
+  - - NO_INSPECTION_RECORD
+    - NOT_INSPECTED
+  requestedBy: W13-SR-07
+  ruling: W00-R-07
+  status: CANDIDATE
+  addToImplicationPairs: true
+  note: V-W13-12
+- pairs:
+  - - REGISTRY_RESULTS_NOT_POSTED
+    - RESULTS_UNPUBLISHED
+  requestedBy: W09-SR-16
+  ruling: W00-R-07
+  addToImplicationPairs: true
+  note: registry-only inference (V-W09-05); premise name as in W09 fixtures/80-queries.cypher V-W09-05
+- pairs:
+  - - PATENT_CLAIMS
+    - SYNTHESIS_INPUT
+  requestedBy: W10-SR-11
+  ruling: W00-R-07
+  addToImplicationPairs: true
+  note: W14 N-2
+- pairs:
+  - - INSTANTIATES_TREATMENT + USES_COMPONENT(ADMINISTERED_PRODUCT)
+    - EVIDENCE_APPLIES_TO_PRODUCT
+  requestedBy: W10-SR-11
+  ruling: W00-R-07
+  addToImplicationPairs: false
+  note: composite premise (W06 N3); enforced by V-201, not by the pairwise V-112 parameter
+- pairs:
+  - - NO_INTERACTION_RECORD
+    - NO_INTERACTION
+  - - NO_AE_REPORT
+    - NO_EVENTS
+  - - USE_WITH_CAUTION
+    - CONTRAINDICATED
+  - - CONTRAINDICATED
+    - USE_WITH_CAUTION
+  - - CONTRAINDICATION_REMOVED
+    - SAFE_IN_POPULATION
+  - - POTENTIAL_SIGNAL_LISTED
+    - CAUSAL_ASSOCIATION
+  - - POTENTIAL_SIGNAL_LISTED
+    - STOP_USE_ADVICE
+  - - SIGNAL_CLOSED_NO_ACTION
+    - NO_RISK
+  - - REPORTED_EVIDENCE_GRADE
+    - EVIDENCE_STRENGTH_ASSESSMENT
+  - - SHARED_SUBSTANCE_FAMILY
+    - USE_CONSTRAINT_APPLIES
+  - - LEGACY_EVIDENCE_STRENGTH_HINT
+    - SIGNAL_VERDICT
+  - - STUDY_EXCLUDED_CO_EXPOSURE
+    - NO_INTERACTION_WITH_CO_EXPOSURE
+  requestedBy: W17-SR-03 (FI-W17-01..09, 02-cq-coverage.md section 3)
+  ruling: W00-R-07
+  addToImplicationPairs: true
+  note: safety_and_constraints; validators V-W17-*
+- pairs:
+  - - NOT_FOUND_IN_PARTIAL_CAPTURE
+    - NOT_DISCLOSED
+  requestedBy: W19-SR-02
+  ruling: W00-R-15
+  note: already in the catalog; extended to COMPLETE captures of PARTIAL renditions (renditionCoverage)

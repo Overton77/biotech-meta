@@ -1,0 +1,763 @@
+# =====================================================================================================================
+# W07 Diagnostics and measurement -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W07 (Opus 5.5)   Coordinator/synthesizer: Fable 5.1
+# Canonical catalog module: diagnostics (catalog 0.2.0, digest 8fb50ff0...84f0; live schema digest 86b5e0b5...f112)
+# Competency questions: CQ-DX-01..08 (CQ-DX-09 only through the AssayVersion.softwareVersion seam), CQ-AX-21,
+#   CQ-MX-02 (compartment seam with W03); candidates CQ-DX-C01..C04 (02-cq-coverage.md)
+# Invariants: INV-301, INV-302, INV-303 (+ INV-007 missingness, INV-506 privacy); validators V-301a..V-313 and the
+#   proposed V-305c, V-314, V-303r, V-313r (fixtures/w07-validation.cypher)
+#
+# Owned here (sole writer): node types Biomarker, Metric, LabTest, PanelDefinition, MeasurementMethod, Specimen,
+#   ReferenceSystem, AssayVersion, Algorithm, AlgorithmVersion, ReferenceIntervalVersion, ComparabilityAssessment,
+#   ReferenceRange (legacy read-only); interface DiagnosticResult (contract; implemented by W16 Observation);
+#   enums DiagnosticResultKind, AlgorithmOutputKind, AlgorithmVersionBasis, ReferenceIntervalKind,
+#   ReferenceIntervalDerivation, ComparabilityVerdict, ResultQualifier (registry addition requested, W07-SR-03);
+#   union ComparableVersionTarget; relationship-property type MeasurementEdgeProperties.
+# Referenced by name only (other owners):
+#   W00: Entity, SearchIndexable, EntityArchetype, VersionedStateArchetype, InformationArtifactArchetype,
+#        EvidenceAssessmentArchetype, PrivacyClass, NodeMaturity, AssessmentStatus, ReportedStatus, TimePrecision,
+#        ValidTimeBasis, Identifier, AssertedEdgeProperties, StructuralEdgeProperties, DerivedEdgeProperties,
+#        IdentifierLinkProperties
+#   W01: Organization      W03: AnatomicalContext, Condition, Mechanism, Pathway, Organ, MolecularEntity,
+#        MechanismLinkProperties, AssociationProjectionProperties
+#   W08: ToolOrInstrument, TechnologyPlatform      W20: Chunk, DerivedSupportProperties
+# MEASURED_IN_MATRIX: W03 owns the relationship meaning and the AnatomicalContext type; the outgoing field
+#   Biomarker.measuredInMatrix is written here because W07 is the sole writer of Biomarker (W03 writes the inverse view).
+# Relationship class and cardinality are stated in each field description and enforced by the operations/validation
+# layer, never by SDL. Derived and legacy fields are read-only (@settable false).
+# @declareRelationship is not in contract B1's allowed list; it exists in @neo4j/graphql 7.6.3 (verified in the
+# installed build: args nestedOperations, aggregate; no type/direction args) and is requested in W07-SR-01.
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Enums (values frozen at catalog 0.2.0 conventions)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""Whether a diagnostic result was measured, calculated from measured values by a fixed rule, or inferred by a model
+(catalog conventions.resultKind). Forbidden implication [INFERRED_RESULT, MEASURED_RESULT]. INV-303, V-303."""
+enum DiagnosticResultKind {
+  MEASURED
+  CALCULATED
+  INFERRED
+}
+
+"""What kind of quantity an AlgorithmVersion returns (catalog conventions.algorithmOutputKind). A PACE is never
+differenced against an AGE_ESTIMATE. CQ-DX-04."""
+enum AlgorithmOutputKind {
+  AGE_ESTIMATE
+  PACE
+  RISK_SCORE
+  FEATURE_MEASURE
+  CLASSIFICATION
+  CALCULATED_QUANTITY
+}
+
+"""Basis on which an AlgorithmVersion is pinned (catalog conventions.algorithmVersionBasis). VENDOR_VERSION_STRING:
+the implementer of the software states a version string (also used for an authors' reference package such as
+DunedinPACE R package 0.99.0); PUBLICATION_VERSION: pinned only by a publication; SERVICE_ENDPOINT_UNVERSIONED: a
+service output pinned only by retrievedAt (never trendable, V-312); UNKNOWN: unresolved. INV-303, V-308."""
+enum AlgorithmVersionBasis {
+  VENDOR_VERSION_STRING
+  PUBLICATION_VERSION
+  SERVICE_ENDPOINT_UNVERSIONED
+  UNKNOWN
+}
+
+"""Meaning of the bounds of a ReferenceIntervalVersion (catalog conventions.referenceIntervalKind). Labs print a
+reference interval and guideline decision limits in the same "reference values" field (Mayo HBA1C, Labcorp 001453);
+each is a separate ReferenceIntervalVersion. Forbidden implication [OUTSIDE_REFERENCE_INTERVAL, INDICATES_CONDITION]."""
+enum ReferenceIntervalKind {
+  REFERENCE_INTERVAL
+  DECISION_LIMIT
+  GUIDELINE_TARGET
+}
+
+"""How the laboratory obtained the interval (catalog conventions.referenceIntervalDerivation; CLSI EP28-A3c
+establishment (>= 120 reference individuals per partition), transference (method comparison) and verification
+(as few as 20 reference individuals)). NOT_REPORTED when the source is silent. A value for guideline-sourced limits
+is requested in W07-SR-06 (candidate ADOPTED_FROM_GUIDELINE), not added here."""
+enum ReferenceIntervalDerivation {
+  ESTABLISHED
+  TRANSFERRED
+  VERIFIED
+  ADOPTED_FROM_MANUFACTURER
+  NOT_REPORTED
+}
+
+"""Verdict of a ComparabilityAssessment (catalog conventions.comparabilityVerdict). Only COMPARABLE and
+COMPARABLE_WITH_CONVERSION license a shared axis (INV-301, V-302, V-304)."""
+enum ComparabilityVerdict {
+  COMPARABLE
+  COMPARABLE_WITH_CONVERSION
+  NOT_COMPARABLE
+  UNKNOWN
+}
+
+"""Value state of a diagnostic result (catalog private_context.resultQualifier values, reused for the shared contract
+per contract A7 so that belowDetection, unmeasured and invalid specimen stay distinct). Registry addition requested
+(W07-SR-03); a NOT_REPORTED value for source-attributed public results is requested there, not added here."""
+enum ResultQualifier {
+  NUMERIC
+  BELOW_DETECTION
+  ABOVE_QUANTIFICATION
+  NOT_MEASURED
+  INVALID_SPECIMEN
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Union and relationship-property type
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""Range of COMPARES: exactly two versions of the same kind (V-311). Defined once here (contract B6)."""
+union ComparableVersionTarget = AssayVersion | AlgorithmVersion | ReferenceIntervalVersion
+
+"""
+asserted_edge profile for MEASURES_METRIC (LabTest, Device, Sensor -> Metric). Successor of live MeasurementMetadata.
+Contains every field of the frozen AssertedEdgeProperties (W00) plus the live measurement qualifiers, kept as verbatim
+extraction text (role, method, methodRole, unit, sampleType, referenceRangeText, notes) or device signal descriptors
+(signalType, samplingRateHz, rangeMin, rangeMax, accuracy). The qualifiers are never authoritative: method, instrument,
+specimen type and software version live on AssayVersion; the interval printed on a report is a
+ReferenceIntervalVersion. Reused by W08 (Device/Sensor MEASURES_METRIC). Structural result payload edges
+(Observation -> Metric) use StructuralEdgeProperties, not this type (W07-SR-04).
+"""
+type MeasurementEdgeProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  role: String
+  method: String
+  methodRole: String
+  unit: String
+  sampleType: String
+  signalType: String
+  samplingRateHz: Float
+  rangeMin: Float
+  rangeMax: Float
+  accuracy: Float
+  referenceRangeText: String
+  notes: String
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# DiagnosticResult contract (interface; no node type of its own)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+The contract every diagnostic result store meets (catalog diagnostics.DiagnosticResult, interfaceOnly; round 0004;
+CL-008). A result is a reported value of one measurand from one specimen or one computation, with its result kind,
+value state, collection (observedAt) and report (reportedAt) times, the AssayVersion that measured it or the
+AlgorithmVersion that computed it, and the ReferenceIntervalVersion(s) printed with it at report time. It is NOT an
+assay, NOT a measurand, NOT a trend and NOT a condition. Implemented in the shared graph only by W16's public,
+source-attributed Observation (labels ["Observation", "DiagnosticResult", "InformationArtifact"], W07-SR-02); the
+private PersonalMeasurement implements the same contract in the private store and never appears here (INV-506, D-012).
+Rules: MEASURED needs producedByAssayVersion; CALCULATED/INFERRED need computedByAlgorithmVersion (INV-303, V-303);
+two results share an axis only per INV-301 (V-302, V-304, V-312); the interval is the one printed at report time and
+belongs to the same AssayVersion (INV-302, V-306). CQ-DX-02, CQ-DX-03, CQ-DX-05, CQ-DX-06, CQ-DX-08, CQ-AX-21.
+Module diagnostics. Archetype InformationArtifact.
+"""
+interface DiagnosticResult implements Entity & InformationArtifactArchetype {
+  id: ID!
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  artifactType: String!
+  publishedAt: DateTime
+  "Specimen collection time (or computation input time for CALCULATED/INFERRED). Null when unknown; ingestion time never substitutes."
+  observedAt: DateTime
+  contentHash: String
+  privacyClass: PrivacyClass
+  resultKind: DiagnosticResultKind!
+  valueNumber: Float
+  valueString: String
+  "UCUM unit as reported (never converted in place; conversion is a ComparabilityAssessment rule)."
+  unitCode: String
+  valueStatus: ResultQualifier
+  "When the issuing lab or service reported the value (report date)."
+  reportedAt: DateTime
+  """class: structural; cardinality: exactly_one when resultKind = MEASURED, else zero_or_one; catalog: PRODUCED_BY_ASSAY_VERSION"""
+  producedByAssayVersion: [AssayVersion!]! @declareRelationship
+  """class: structural; cardinality: exactly_one when resultKind in (CALCULATED, INFERRED) unless an UNRESOLVED assertion is pending; catalog: COMPUTED_BY_ALGORITHM_VERSION"""
+  computedByAlgorithmVersion: [AlgorithmVersion!]! @declareRelationship
+  """class: structural; cardinality: many (one per printed interval or limit, each of the producing AssayVersion); catalog: INTERPRETED_WITH_REFERENCE_INTERVAL_VERSION"""
+  interpretedWithReferenceIntervalVersion: [ReferenceIntervalVersion!]! @declareRelationship
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Entities: referent, measurand, orderable test, method, specimen type, reference system, algorithm family
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+The biological referent a measurement is about ("glycated hemoglobin", "lymphocyte", "NAD+"). One Biomarker, many
+Metrics (HbA1c: LOINC 4548-4 MFr and 59261-8 SFr). It is NOT a measurand (Metric), NOT a test (LabTest), NOT an
+assay, and NOT an endpoint role: biomarker category and surrogate status live on EndpointClassification (INV-205).
+Compartment is the structural MEASURED_IN_MATRIX edge to W03's AnatomicalContext (blood NAD+ and muscle NAD+ are two
+Biomarkers or two matrices, never one). Live display fields biomarkerType, specimenMatrix, commonUnits,
+measurementDirectness, clinicalSignificance and agingHallmark are read-only legacy text. CQ-DX-01, CQ-MX-02.
+Module diagnostics. Archetype Entity.
+"""
+type Biomarker implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Biomarker", "Entity"])
+  @fulltext(indexes: [{indexName: "BiomarkerSearch", fields: ["name", "description", "searchText"], queryName: "searchBiomarkers"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  "Kind of biological referent (catalog biomarkerKind; open vocabulary, e.g. PROTEIN_MODIFICATION, METABOLITE, CELL_TYPE)."
+  biomarkerKind: String
+  "Display only (molecule class as sources name it)."
+  moleculeClass: String
+  "Legacy display; category is an EndpointClassification (INV-205)."
+  biomarkerType: String @settable(onCreate: false, onUpdate: false)
+  "Legacy display; compartment is measuredInMatrix, specimen type is AssayVersion.acceptsSpecimenTypes."
+  specimenMatrix: String @settable(onCreate: false, onUpdate: false)
+  "Legacy display; units belong to Metric.canonicalUnitCode and reported results."
+  commonUnits: [String!] @settable(onCreate: false, onUpdate: false)
+  "Legacy display; measured versus inferred is DiagnosticResult.resultKind."
+  measurementDirectness: String @settable(onCreate: false, onUpdate: false)
+  "Legacy display; significance is an assessment (W10)."
+  clinicalSignificance: String @settable(onCreate: false, onUpdate: false)
+  "Legacy display; mechanism classification is W03's."
+  agingHallmark: String @settable(onCreate: false, onUpdate: false)
+  """class: structural; cardinality: zero_or_one; catalog: MEASURED_IN_MATRIX (meaning owned by W03; Metric.systemKind is the LOINC-side counterpart)"""
+  measuredInMatrix: [AnatomicalContext!]! @relationship(type: "MEASURED_IN_MATRIX", direction: OUT)
+  """class: structural (inverse view of Metric.quantifiesBiomarkers); cardinality: many; catalog: QUANTIFIES"""
+  quantifiedByMetrics: [Metric!]! @relationship(type: "QUANTIFIES", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural (curated reference; W03 meaning); cardinality: many; catalog: REFLECTS_MECHANISM"""
+  reflectsMechanisms: [Mechanism!]! @relationship(type: "REFLECTS_MECHANISM", direction: OUT, properties: "MechanismLinkProperties")
+  """class: structural (curated reference; inverse view of W03 MolecularEntity.encodesBiomarkers); cardinality: many; catalog: ENCODES"""
+  encodedByGenes: [MolecularEntity!]! @relationship(type: "ENCODES", direction: IN, properties: "MechanismLinkProperties")
+  """class: structural (curated reference, legacy IN_PATHWAY); cardinality: many; read-only until W03 rules (W07-SR-07)"""
+  inPathways: [Pathway!]! @relationship(type: "IN_PATHWAY", direction: OUT, properties: "MechanismLinkProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (curated reference, legacy EXPRESSED_IN_CONTEXT); cardinality: many; read-only until W03 rules (W07-SR-07)"""
+  expressedInContexts: [AnatomicalContext!]! @relationship(type: "EXPRESSED_IN_CONTEXT", direction: OUT, properties: "MechanismLinkProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (curated reference, legacy EXPRESSED_IN to Organ); cardinality: many; read-only legacy (W07-SR-07)"""
+  expressedInOrgans: [Organ!]! @relationship(type: "EXPRESSED_IN", direction: OUT, properties: "MechanismLinkProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (one-to-one projection of an INDICATES assertion; never derived from a result outside an interval); cardinality: many; legacy INDICATES"""
+  indicatesConditions: [Condition!]! @relationship(type: "INDICATES", direction: OUT, properties: "AssociationProjectionProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (legacy projection of ReferenceIntervalVersion; V-305a); cardinality: many; catalog: HAS_REFERENCE_RANGE"""
+  hasReferenceRanges: [ReferenceRange!]! @relationship(type: "HAS_REFERENCE_RANGE", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (support shortcut via a SourceLocator; W20); cardinality: many; replaces live SUPPORTED_BY -> Chunk"""
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+The measurand or feature definition: what is measured, as a terminology concept (LOINC when one exists) or a BellLabs
+definition with definition text. A LOINC code identifies this level only, never an assay, a lab or a method actually
+used (forbidden [SHARES_LOINC_CODE, SAME_ASSAY_VERSION]; LOINC 4548-4 has Method part NULL). The LOINC part model is
+materialized: propertyKind (MFr, SFr ...), systemKind (Bld, Ser/Plas ...), scaleKind (Qn, Ord ...). Two metrics for one
+analyte under two standardization protocols (4548-4 NGSP %, 59261-8 IFCC mmol/mol) are two Metrics; cross-metric
+comparison needs a ComparabilityAssessment. A similar test name never establishes a shared Metric (forbidden
+[SIMILAR_TEST_NAME, SAME_METRIC]). Identity: loincCode when present (unique, `^[0-9]{1,7}-[0-9]$`, V-310a/b), else uid
+with definitionText. CQ-DX-01, CQ-DX-03, CQ-DX-07. Module diagnostics. Archetype Entity.
+"""
+type Metric implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Metric", "Entity"])
+  @fulltext(indexes: [{indexName: "MetricSearch", fields: ["name", "description", "searchText"], queryName: "searchMetrics"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  "MEASURAND, ALGORITHM_OUTPUT, MODEL_FEATURE, CALCULATED_QUANTITY (open vocabulary; live metricType)."
+  metricKind: String
+  "Materialized LOINC key; normalized `^[0-9]{1,7}-[0-9]$`; unique across Metrics; release on the Identifier record."
+  loincCode: String
+  "LOINC Property part as published (MFr, SFr, MCnc ...); null when no LOINC concept."
+  propertyKind: String
+  "LOINC System part as published (Bld, Ser/Plas ...); compartment counterpart of Biomarker.measuredInMatrix."
+  systemKind: String
+  "LOINC Scale part as published (Qn, Ord, Nom ...)."
+  scaleKind: String
+  "Canonical UCUM unit code (merges live canonicalUnit and ucumUnit). Null with unitStatus NOT_REPORTED is never filled by assumption."
+  canonicalUnitCode: String
+  "Whether the defining source states a unit. Required for new writes (service-enforced); nullable for unmigrated legacy reads."
+  unitStatus: ReportedStatus
+  "Verbatim definition for non-LOINC metrics and model features."
+  definitionText: String
+  "Legacy display; an executable formula is an AlgorithmVersion (CALCULATED_QUANTITY) with REQUIRES_INPUT_METRIC."
+  formulaExpression: String @settable(onCreate: false, onUpdate: false)
+  "Legacy display (see formulaExpression)."
+  formulaVariables: String @settable(onCreate: false, onUpdate: false)
+  "Legacy display; media links move to W22 (media module)."
+  mediaUrl: String @settable(onCreate: false, onUpdate: false)
+  "Legacy display; media links move to W22."
+  mediaType: String @settable(onCreate: false, onUpdate: false)
+  """class: structural (definitional: the LOINC component names the referent); cardinality: one_or_more when metricKind = MEASURAND, else many (algorithm outputs and model features may name no referent); catalog: QUANTIFIES"""
+  quantifiesBiomarkers: [Biomarker!]! @relationship(type: "QUANTIFIES", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted (W00 HAS_IDENTIFIER; LOINC Identifier with release); cardinality: many"""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: structural (curated reference; W03 meaning); cardinality: many; catalog: REFLECTS_MECHANISM"""
+  reflectsMechanisms: [Mechanism!]! @relationship(type: "REFLECTS_MECHANISM", direction: OUT, properties: "MechanismLinkProperties")
+  """class: derived (legacy projection of ReferenceIntervalVersion FOR_METRIC; V-305a); cardinality: many; catalog: HAS_REFERENCE_RANGE"""
+  hasReferenceRanges: [ReferenceRange!]! @relationship(type: "HAS_REFERENCE_RANGE", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (inverse view); cardinality: many; catalog: ASSAY_FOR_METRIC"""
+  assayVersions: [AssayVersion!]! @relationship(type: "ASSAY_FOR_METRIC", direction: IN, properties: "StructuralEdgeProperties")
+  """class: structural (inverse view); cardinality: many; catalog: OUTPUTS_METRIC"""
+  outputOfAlgorithmVersions: [AlgorithmVersion!]! @relationship(type: "OUTPUTS_METRIC", direction: IN, properties: "StructuralEdgeProperties")
+  """class: derived (support shortcut via a SourceLocator; W20); cardinality: many; replaces live SUPPORTED_BY -> Chunk"""
+  supportedBy: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+The orderable test as a laboratory or consumer-test vendor offers it (Labcorp 001453 "Hemoglobin (Hb) A1c", Mayo
+HBA1C, Quest 496). Identity: issuer + localTestCode; the local name is never identity (two "HbA1c" tests are linked
+only by a ResolutionHypothesis, and SAME_TEST_AS is a projection of an accepted one, V-307). It is NOT the assay: how
+the test was run over time is PERFORMED_WITH_ASSAY_VERSION (asserted, bitemporal), because one LabTest changes
+analyzer, kit or software. The live LabTest.usesMethods, requiresSpecimens and usesPlatforms edges move to the
+AssayVersion payload (migration-map.yaml). CQ-DX-01, CQ-DX-03. Module diagnostics. Archetype Entity.
+"""
+type LabTest implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["LabTest", "Entity"])
+  @fulltext(indexes: [{indexName: "LabTestSearch", fields: ["name", "description", "searchText"], queryName: "searchLabTests"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  searchEmbedding: [Float!]
+  "Issuer's own test code (Labcorp '001453', Mayo 'HBA1C', Quest '496')."
+  localTestCode: String
+  "uid of the issuing Organization (lab or vendor offering the test); part of identity with localTestCode."
+  issuerUid: String
+  "Display only (free text for search)."
+  testType: String
+  """class: asserted (asserted_edge profile); cardinality: one_or_more; catalog: MEASURES_METRIC"""
+  measuresMetrics: [Metric!]! @relationship(type: "MEASURES_METRIC", direction: OUT, properties: "MeasurementEdgeProperties")
+  """class: asserted (asserted_edge profile; one edge per recorded-time episode); cardinality: many; catalog: PERFORMED_WITH_ASSAY_VERSION"""
+  assayVersions: [AssayVersion!]! @relationship(type: "PERFORMED_WITH_ASSAY_VERSION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: derived (regenerable from MEASURES_METRIC + QUANTIFIES); cardinality: many; legacy MEASURES"""
+  measuresBiomarkers: [Biomarker!]! @relationship(type: "MEASURES", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (projection of an accepted ResolutionHypothesis; V-307); cardinality: many; catalog: SAME_TEST_AS"""
+  sameTestAs: [LabTest!]! @relationship(type: "SAME_TEST_AS", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+  """class: structural (inverse view); cardinality: many; catalog: INCLUDES_LABTEST"""
+  includedInPanels: [PanelDefinition!]! @relationship(type: "INCLUDES_LABTEST", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+One version of a panel's composition (which LabTests a lab or vendor bundles under one panel name over an effective
+period). A changed composition is a new PanelDefinition node; the panel name is never identity. It is NOT a product
+(consumer test products are W04 Products that IMPLEMENTS_PANEL) and NOT an assay. Identity: issuer + panel code +
+versionLabel (uid opaque). CQ-DX-03 (which tests were in the panel at report time). Module diagnostics.
+Archetype VersionedState.
+"""
+type PanelDefinition implements Entity & VersionedStateArchetype
+  @node(labels: ["PanelDefinition", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  "sha256:<hex> over the canonical payload (issuer, panel code, versionLabel, ordered LabTest uids)."
+  payloadHash: String!
+  "Source-stated start of this composition (payload; query validity comes from the attachment episode)."
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Display only (live panelType)."
+  panelType: String
+  "Version label as the issuer states it; null when not stated."
+  versionLabel: String
+  """class: structural (composition within this version); cardinality: one_or_more; catalog: INCLUDES_LABTEST"""
+  includesLabTests: [LabTest!]! @relationship(type: "INCLUDES_LABTEST", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: derived (regenerable via INCLUDES_LABTEST -> MEASURES_METRIC -> QUANTIFIES); cardinality: many; legacy INCLUDES_BIOMARKER"""
+  includesBiomarkers: [Biomarker!]! @relationship(type: "INCLUDES_BIOMARKER", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+The method principle (ion-exchange HPLC, turbidimetric inhibition immunoassay, Illumina methylation array). It is NOT
+an instrument model (W08 ToolOrInstrument), NOT a kit, and NOT an assay version. A method principle is shared across
+labs; comparability never flows through it. CQ-DX-01. Module diagnostics. Archetype Entity.
+"""
+type MeasurementMethod implements Entity & EntityArchetype
+  @node(labels: ["MeasurementMethod", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Method principle (renames live methodClass), e.g. HPLC, IMMUNOASSAY, METHYLATION_ARRAY."
+  methodPrinciple: String
+  """class: structural (generic capability of a method; never used for comparability); cardinality: many; W08 relationship type RUNS_ON_PLATFORM (W07-SR-08)"""
+  runsOnPlatforms: [TechnologyPlatform!]! @relationship(type: "RUNS_ON_PLATFORM", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural (inverse view); cardinality: many; catalog: USES_METHOD"""
+  usedByAssayVersions: [AssayVersion!]! @relationship(type: "USES_METHOD", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+A specimen TYPE (whole blood EDTA, dried blood spot, saliva). Specimen instances (a person's draw) are private and
+never in the shared graph (INV-506). It is NOT an anatomical compartment (W03 AnatomicalContext) and NOT a container
+(tube colour is collection text). CQ-DX-01, CQ-DX-08. Module diagnostics. Archetype Entity.
+"""
+type Specimen implements Entity & EntityArchetype
+  @node(labels: ["Specimen", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "Specimen type code (renames live specimenType), e.g. WHOLE_BLOOD_EDTA, CAPILLARY_WHOLE_BLOOD, SALIVA."
+  specimenTypeCode: String
+  "Collection setting text (venipuncture, at-home fingerstick)."
+  collectionSetting: String
+  """class: structural (inverse view); cardinality: many; catalog: ACCEPTS_SPECIMEN_TYPE"""
+  acceptedByAssayVersions: [AssayVersion!]! @relationship(type: "ACCEPTS_SPECIMEN_TYPE", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+A metrological reference a calibration claims traceability to: a standardization program (NGSP), a reference
+measurement procedure (IFCC RMP for HbA1c) or a reference material. It is NOT a certification (NGSP certification of
+a lab or method is a time-bounded W12 CertificationListing) and NOT a conversion rule (that lives on a
+ComparabilityAssessment). CQ-DX-03. Module diagnostics. Archetype Entity.
+"""
+type ReferenceSystem implements Entity & EntityArchetype
+  @node(labels: ["ReferenceSystem", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  "STANDARDIZATION_PROGRAM, REFERENCE_MEASUREMENT_PROCEDURE, REFERENCE_MATERIAL (open vocabulary)."
+  referenceSystemKind: String
+  """class: structural (inverse view); cardinality: many; catalog: CALIBRATION_TRACEABLE_TO"""
+  traceableAssayVersions: [AssayVersion!]! @relationship(type: "CALIBRATION_TRACEABLE_TO", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+"""
+An algorithm family as sources name it ("GrimAge", "DunedinPACE", "Owkin H&E cell detection"). A retrieval
+convenience only: comparability never flows through the family (forbidden [SAME_ALGORITHM_FAMILY,
+SAME_ALGORITHM_VERSION]). CQ-DX-04. Module diagnostics. Archetype Entity.
+"""
+type Algorithm implements Entity & EntityArchetype
+  @node(labels: ["Algorithm", "Entity"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  """class: structural (inverse view); cardinality: many; catalog: VERSION_OF_ALGORITHM"""
+  versions: [AlgorithmVersion!]! @relationship(type: "VERSION_OF_ALGORITHM", direction: IN, properties: "StructuralEdgeProperties")
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Versioned states: assay version, algorithm version, reference interval version
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+How one laboratory ran one measurement procedure: performing lab (exactly one), method principle, instrument model,
+reagent kit, software version, specimen types, measured metrics and calibration traceability. Two labs with the same
+kit on the same analyzer have two AssayVersions; a change of instrument model, kit version, software version,
+calibrator traceability or method principle creates a new AssayVersion (round 0004). Unknown fields stay unknown
+(softwareVersionStatus NOT_REPORTED); two NOT_REPORTED assay versions never merge by default. Payload edges are
+structural; which LabTest ran with this version, and when, is the asserted PERFORMED_WITH_ASSAY_VERSION edge.
+Device firmware is softwareVersion until W08 opens FirmwareVersion (CQ-DX-09). Identity: payloadHash over (operator
+uid, method uid, instrument uid, assayKitIdentifier, softwareVersion, sorted metric/specimen/reference-system uids).
+CQ-DX-01, CQ-DX-02, CQ-DX-03, CQ-DX-06, CQ-AX-21. Module diagnostics. Archetype VersionedState.
+"""
+type AssayVersion implements Entity & VersionedStateArchetype
+  @node(labels: ["AssayVersion", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  "Source-stated start (payload only; query validity comes from PERFORMED_WITH_ASSAY_VERSION episodes)."
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Manufacturer reagent kit or application as the source names it (e.g. 'Tina-quant Hemoglobin A1c Gen.3'); never a lot."
+  assayKitIdentifier: String
+  "Instrument or analysis software version (e.g. Tosoh G8 '5.24'); identity-defining."
+  softwareVersion: String
+  "REPORTED, NOT_REPORTED or NOT_APPLICABLE for softwareVersion (required)."
+  softwareVersionStatus: ReportedStatus!
+  "UCUM unit this assay version reports in."
+  reportedUnitCode: String
+  """class: structural; cardinality: exactly_one (V-301b); catalog: ASSAY_OPERATED_BY"""
+  operatedBy: [Organization!]! @relationship(type: "ASSAY_OPERATED_BY", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one (V-301a); catalog: USES_METHOD"""
+  usesMethod: [MeasurementMethod!]! @relationship(type: "USES_METHOD", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: zero_or_one (V-301a); catalog: RUNS_ON_INSTRUMENT"""
+  runsOnInstrument: [ToolOrInstrument!]! @relationship(type: "RUNS_ON_INSTRUMENT", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: one_or_more (an HbA1c analyzer may report NGSP % and IFCC mmol/mol); catalog: ASSAY_FOR_METRIC"""
+  forMetrics: [Metric!]! @relationship(type: "ASSAY_FOR_METRIC", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: ACCEPTS_SPECIMEN_TYPE"""
+  acceptsSpecimenTypes: [Specimen!]! @relationship(type: "ACCEPTS_SPECIMEN_TYPE", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: many; catalog: CALIBRATION_TRACEABLE_TO"""
+  traceableTo: [ReferenceSystem!]! @relationship(type: "CALIBRATION_TRACEABLE_TO", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted (inverse view); cardinality: many; catalog: PERFORMED_WITH_ASSAY_VERSION"""
+  usedByLabTests: [LabTest!]! @relationship(type: "PERFORMED_WITH_ASSAY_VERSION", direction: IN, properties: "AssertedEdgeProperties")
+  """class: structural (inverse view); cardinality: many; catalog: FOR_ASSAY_VERSION"""
+  referenceIntervalVersions: [ReferenceIntervalVersion!]! @relationship(type: "FOR_ASSAY_VERSION", direction: IN, properties: "StructuralEdgeProperties")
+  """class: asserted (inverse view); cardinality: many; catalog: COMPATIBLE_WITH_ASSAY_VERSION"""
+  compatibleAlgorithmVersions: [AlgorithmVersion!]! @relationship(type: "COMPATIBLE_WITH_ASSAY_VERSION", direction: IN, properties: "AssertedEdgeProperties")
+}
+
+"""
+One fixed algorithm realization: coefficients, inputs, training reference, output kind and unit. A retrain, a new
+input, a coefficient change, a training-range change, or a vendor reimplementation on another array (TruDiagnostic
+"custom algorithms trained directly on our arrays") creates a new AlgorithmVersion linked by
+DERIVED_FROM_ALGORITHM_VERSION. versionBasis is required (INV-303, V-308); an unversioned service endpoint is pinned by
+retrievedAt and is never trendable (V-312). A score labelled only with a family name stays unresolved (competing
+ResolutionHypotheses), never defaulted to the latest version. CQ-DX-02, CQ-DX-04, CQ-DX-05, CQ-DX-07.
+Module diagnostics. Archetype VersionedState.
+"""
+type AlgorithmVersion implements Entity & VersionedStateArchetype
+  @node(labels: ["AlgorithmVersion", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  "Version string as the source states it; null when none is stated."
+  versionLabel: String
+  versionBasis: AlgorithmVersionBasis!
+  outputKind: AlgorithmOutputKind!
+  "UCUM unit of the output (a = years; a/a = years per year); null when the source states none."
+  outputUnitCode: String
+  "Training population as the source states it (e.g. 'trained on individuals aged between 40 and 92')."
+  trainingPopulationText: String
+  "Retrieval pin; required when versionBasis = SERVICE_ENDPOINT_UNVERSIONED (one AlgorithmVersion per retrieval pin)."
+  retrievedAt: DateTime
+  """class: structural; cardinality: exactly_one; catalog: VERSION_OF_ALGORITHM"""
+  versionOf: [Algorithm!]! @relationship(type: "VERSION_OF_ALGORITHM", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: asserted (asserted_edge profile); cardinality: many; catalog: DERIVED_FROM_ALGORITHM_VERSION"""
+  derivedFrom: [AlgorithmVersion!]! @relationship(type: "DERIVED_FROM_ALGORITHM_VERSION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted (asserted_edge profile); cardinality: many; catalog: REQUIRES_INPUT_METRIC"""
+  requiresInputMetrics: [Metric!]! @relationship(type: "REQUIRES_INPUT_METRIC", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: asserted (asserted_edge profile); cardinality: many; catalog: COMPATIBLE_WITH_ASSAY_VERSION"""
+  compatibleWithAssayVersions: [AssayVersion!]! @relationship(type: "COMPATIBLE_WITH_ASSAY_VERSION", direction: OUT, properties: "AssertedEdgeProperties")
+  """class: structural; cardinality: one_or_more; catalog: OUTPUTS_METRIC"""
+  outputsMetrics: [Metric!]! @relationship(type: "OUTPUTS_METRIC", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+"""
+One interval or limit a laboratory applies for one Metric on one AssayVersion and one population partition, with its
+kind (reference interval, decision limit, guideline target) and derivation (CLSI EP28: established, transferred,
+verified; adopted from manufacturer; not reported). Replaces live ReferenceRange as the authoritative record; bound to
+exactly one AssayVersion (INV-302, V-305b, V-305c). A new bound, partition, derivation or assay creates a new version;
+a result keeps the version printed at report time even after the lab changes its interval (V-306). Null partition
+fields mean "not stated", never "all". One-sided limits ("<5.7 %") carry lowerBoundStatus NOT_APPLICABLE, never a
+null that would read as unknown. Being outside an interval never indicates a condition (V-309). CQ-DX-06.
+Module diagnostics. Archetype VersionedState.
+"""
+type ReferenceIntervalVersion implements Entity & VersionedStateArchetype
+  @node(labels: ["ReferenceIntervalVersion", "VersionedState"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  stateType: String!
+  payloadHash: String!
+  "Lab-stated effective start of this interval version."
+  effectiveFrom: DateTime
+  effectiveTo: DateTime
+  lowerBound: Float
+  upperBound: Float
+  "REPORTED; NOT_APPLICABLE for a one-sided interval; NOT_REPORTED when the source omits it."
+  lowerBoundStatus: ReportedStatus
+  upperBoundStatus: ReportedStatus
+  "True for >= / closed bound; null when the source does not show the comparator."
+  lowerBoundInclusive: Boolean
+  upperBoundInclusive: Boolean
+  "UCUM unit of the bounds."
+  unitCode: String
+  "Interval exactly as printed (e.g. '4.8 - 5.6', '<5.7 %', 'Diabetes: >6.4')."
+  intervalText: String
+  intervalKind: ReferenceIntervalKind!
+  derivationKind: ReferenceIntervalDerivation!
+  "Sex partition as stated (e.g. FEMALE, MALE, ALL); null = not stated."
+  sexPartition: String
+  ageMinYears: Float
+  ageMaxYears: Float
+  fastingStatus: String
+  pregnancyStatus: String
+  "Verbatim partition wording (live stratifiersText / populationNotes)."
+  partitionText: String
+  """class: structural; cardinality: exactly_one (INV-302; V-305b, V-305c); catalog: FOR_ASSAY_VERSION"""
+  forAssayVersion: [AssayVersion!]! @relationship(type: "FOR_ASSAY_VERSION", direction: OUT, properties: "StructuralEdgeProperties")
+  """class: structural; cardinality: exactly_one; catalog: FOR_METRIC (shared name with W16 Target.forMetric, W07-SR-05)"""
+  forMetric: [Metric!]! @relationship(type: "FOR_METRIC", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Evidence assessment
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+BellLabs' judgment whether outputs of two versions (two AssayVersions, two AlgorithmVersions or two
+ReferenceIntervalVersions) may share an axis, with the conversion rule and the evidence dimensions (measurand,
+traceability, interference profile, reference interval, replicate noise). It is NOT a property of either version, NOT
+a numeric similarity score, and NOT a statement that a change between two results is biological: a within-version
+difference becomes a change only with a cited replicateNoiseBasis (forbidden [WITHIN_VERSION_SCORE_DIFFERENCE,
+MEASURED_BIOLOGICAL_CHANGE]). Immutable; a re-assessment is a new node linked by SUPERSEDES. COMPARES exactly two
+(V-311). No assessment means separate series. Public projection (CQ-AX-21: the private store sends only version uids).
+CQ-DX-03, CQ-DX-05, CQ-AX-21. Module diagnostics. Archetype EvidenceAssessment.
+"""
+type ComparabilityAssessment implements Entity & EvidenceAssessmentArchetype
+  @node(labels: ["ComparabilityAssessment", "EvidenceAssessment"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  assessmentType: String!
+  methodVersion: String!
+  status: AssessmentStatus!
+  recordedAt: DateTime!
+  recordedTo: DateTime
+  summary: String
+  overallScore: Float
+  "Deprecated (contract A4); never written by this assessment."
+  confidence: Float
+  verdict: ComparabilityVerdict!
+  "SAME_METRIC, SAME_BIOMARKER_DIFFERENT_METRIC, DIFFERENT (text dimension)."
+  measurandMatch: String
+  "Conversion rule with citation, e.g. 'NGSP(%) = 0.09148 * IFCC(mmol/mol) + 2.152'; required for COMPARABLE_WITH_CONVERSION."
+  unitConversionRule: String
+  traceabilityMatch: String
+  interferenceProfileMatch: String
+  referenceIntervalMatch: String
+  "Reliability source licensing a within-version difference (e.g. a test-retest study for this version); null = no license."
+  replicateNoiseBasis: String
+  rationale: String
+  """class: structural; cardinality: exactly_two, same kind (V-311); catalog: COMPARES"""
+  compares: [ComparableVersionTarget!]! @relationship(type: "COMPARES", direction: OUT, properties: "StructuralEdgeProperties")
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Legacy projection (read-only)
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Legacy live reference range: a captured range text attached to a Biomarker or Metric without an assay version. Kept
+read-only so existing records stay readable; it is never authoritative and receives no new writes (V-305a). New
+ranges are ReferenceIntervalVersions; a regenerated projection names its source in projectionOfReferenceIntervalVersionUid.
+Live `sex` is read as sexPartition and `unit` as text. CQ-DX-06 (legacy reads). Module diagnostics.
+Archetype InformationArtifact (a captured record, not a state of an assay).
+"""
+type ReferenceRange implements Entity & InformationArtifactArchetype
+  @node(labels: ["ReferenceRange", "InformationArtifact"]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  artifactType: String!
+  publishedAt: DateTime
+  observedAt: DateTime
+  contentHash: String
+  lowerBound: Float @settable(onCreate: false, onUpdate: false)
+  upperBound: Float @settable(onCreate: false, onUpdate: false)
+  unit: String @settable(onCreate: false, onUpdate: false)
+  populationNotes: String @settable(onCreate: false, onUpdate: false)
+  stratifiersText: String @settable(onCreate: false, onUpdate: false)
+  sex: String @settable(onCreate: false, onUpdate: false)
+  ageMinYears: Float @settable(onCreate: false, onUpdate: false)
+  ageMaxYears: Float @settable(onCreate: false, onUpdate: false)
+  fastingStatus: String @settable(onCreate: false, onUpdate: false)
+  pregnancyStatus: String @settable(onCreate: false, onUpdate: false)
+  "uid of the ReferenceIntervalVersion this range was regenerated from; null for unmigrated legacy ranges."
+  projectionOfReferenceIntervalVersionUid: String @settable(onCreate: false, onUpdate: false)
+}

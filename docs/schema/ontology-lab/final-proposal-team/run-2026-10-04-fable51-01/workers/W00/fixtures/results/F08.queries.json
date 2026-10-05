@@ -1,0 +1,67 @@
+[
+ {
+  "n": 1,
+  "status": "ok",
+  "rows": 0,
+  "result": [],
+  "error": null
+ },
+ {
+  "n": 2,
+  "status": "ok",
+  "rows": 1,
+  "result": [
+   {
+    "q": "Q08-b",
+    "material1": "hu:material:w00-supplier-a-nr",
+    "material2": "hu:material:w00-supplier-b-nr",
+    "issuer1": "Synthetic Supplier A Inc.",
+    "issuer2": "Synthetic Supplier B GmbH",
+    "note": "FORBIDDEN_IMPLICATION_IF_MERGED"
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 3,
+  "status": "ok",
+  "rows": 2,
+  "result": [
+   {
+    "q": "Q08-c",
+    "surfaceForm": "NR-100",
+    "candidate": "hu:material:w00-supplier-a-nr",
+    "hypothesisOutcome": "UNRESOLVED",
+    "recordStatus": "PROPOSED",
+    "identifierIssuer": "Synthetic Supplier A Inc.",
+    "lexicalScoreOnly": 0.2615291476249695
+   },
+   {
+    "q": "Q08-c",
+    "surfaceForm": "NR-100",
+    "candidate": "hu:material:w00-supplier-b-nr",
+    "hypothesisOutcome": "UNRESOLVED",
+    "recordStatus": "PROPOSED",
+    "identifierIssuer": "Synthetic Supplier B GmbH",
+    "lexicalScoreOnly": 0.2615291476249695
+   }
+  ],
+  "error": null
+ },
+ {
+  "n": 4,
+  "status": "ok",
+  "rows": 1,
+  "result": [
+   {
+    "q": "Q08-d",
+    "identifierNodes": 2,
+    "issuers": [
+     "Synthetic Supplier A Inc.",
+     "Synthetic Supplier B GmbH"
+    ]
+   }
+  ],
+  "error": null
+ }
+]

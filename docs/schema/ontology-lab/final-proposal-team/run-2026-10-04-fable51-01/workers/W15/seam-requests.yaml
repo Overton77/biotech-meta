@@ -1,0 +1,164 @@
+# W15 seam requests (run-2026-10-04-fable51-01). Fable copies them into 03-conflict-ledger.md and assigns resolvers.
+# Field texts are given verbatim for insertion by the type owner / Fable (W01-SR-20 slot procedure).
+
+- id: W15-SR-01
+  targetOwner: W01
+  request: |
+    (a) Ruling on W01-SR-15b: seller display accounts are W01 Organizations WITHOUT the LegalEntity label (organizationType
+    RETAILER, MARKETPLACE or UNKNOWN), carrying the marketplace merchant id as an Identifier (scheme AMAZON_MERCHANT_ID /
+    WALMART_SELLER_ID, issuer = marketplace) through HAS_IDENTIFIER, and a ResolutionHypothesis
+    (resolutionType SELLER_ACCOUNT_OPERATED_BY_LEGAL_ENTITY) to a LegalEntity. No commerce-account node type.
+    (b) W01-SR-15a accepted: AVAILABLE_IN re-ranged to Facility (W15 owns the edge).
+    (c) Insert into Organization (W01-SR-20 slots):
+      """class: asserted; cardinality: many; catalog: HOSTS_LISTING (W15). Never implies SELLS_PRODUCT."""
+      hostsListings: [MerchantListing!]! @relationship(type: "HOSTS_LISTING", direction: OUT, properties: "AssertedEdgeProperties")
+      """class: asserted; cardinality: many; catalog: LISTS_OFFER (W15). Never implies SELLS_PRODUCT."""
+      listsOffers: [Offer!]! @relationship(type: "LISTS_OFFER", direction: OUT, properties: "AssertedEdgeProperties")
+      """class: asserted; cardinality: many; catalog: SELLER_OF_RECORD_FOR (W15); sole premise of SELLS_PRODUCT."""
+      sellerOfRecordFor: [Offer!]! @relationship(type: "SELLER_OF_RECORD_FOR", direction: OUT, properties: "AssertedEdgeProperties")
+      """class: asserted; cardinality: many; catalog: FULFILLS_OFFER (W15). Never implies SELLS_PRODUCT."""
+      fulfillsOffers: [Offer!]! @relationship(type: "FULFILLS_OFFER", direction: OUT, properties: "AssertedEdgeProperties")
+      """class: asserted; cardinality: many; catalog: AFFILIATE_FOR_OFFER (W15; FINANCIAL_INTEREST)."""
+      affiliateForOffers: [Offer!]! @relationship(type: "AFFILIATE_FOR_OFFER", direction: OUT, properties: "AssertedEdgeProperties")
+      """class: derived read-only; cardinality: many; catalog: SELLS_PRODUCT (W15) from ACCEPTED SELLER_OF_RECORD_FOR only (INV-306, V-326a/b/c, V-W15-01)."""
+      sellsProductVariants: [ProductVariant!]! @relationship(type: "SELLS_PRODUCT", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+      """class: derived read-only; cardinality: many; catalog: SELLS_PRODUCT (W15) -> Product."""
+      sellsProducts: [Product!]! @relationship(type: "SELLS_PRODUCT", direction: OUT, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+    Insert into Person:
+      """class: asserted; cardinality: many; catalog: AFFILIATE_FOR_OFFER (W15; FINANCIAL_INTEREST). Public persons only."""
+      affiliateForOffers: [Offer!]! @relationship(type: "AFFILIATE_FOR_OFFER", direction: OUT, properties: "AssertedEdgeProperties")
+    Insert into Facility:
+      """class: asserted (inverse view); cardinality: many; live AVAILABLE_IN (W15) re-ranged from PhysicalLocation."""
+      availableListings: [MerchantListing!]! @relationship(type: "AVAILABLE_IN", direction: IN, properties: "ListingEdgeProperties")
+  cq: [CQ-CM-01, CQ-EC-02, CQ-AX-14]
+  failingCase: "Walmart 1038593372 exposes one seller id E4E44D0D801E45C8A50F187A7AB1A8B0 with display name 'Sports-Med' and legal name 'BLUE PEAK DISTRIBUTOR INC' (S8); Amazon B0FS82B35K shows 'TRU NIAGEN' (merchant A1W0QC6JE0QLDF) whose legal entity is not displayed (S1). A LegalEntity per display name would assert legal identity the page does not state."
+  proposedRuling: "Accept (a)-(c); W01 stays sole writer of the type text and inserts the fields verbatim."
+
+- id: W15-SR-02
+  targetOwner: W04
+  request: |
+    Insert into ProductVariant:
+      """class: asserted (inverse view); cardinality: many; catalog: LISTING_FOR (W15). A listing is never the variant's identity."""
+      listedIn: [MerchantListing!]! @relationship(type: "LISTING_FOR", direction: IN, properties: "AssertedEdgeProperties")
+      """class: asserted (inverse view); cardinality: many; catalog: INVENTORY_INSTANCE_OF (W15)."""
+      inventoryItems: [InventoryItem!]! @relationship(type: "INVENTORY_INSTANCE_OF", direction: IN, properties: "AssertedEdgeProperties")
+      """class: asserted (inverse view); cardinality: many; catalog: COMPONENT_PRODUCT (W15)."""
+      bundleComponents: [BundleComponent!]! @relationship(type: "COMPONENT_PRODUCT", direction: IN, properties: "AssertedEdgeProperties")
+      """class: derived read-only (inverse view); cardinality: many; catalog: SELLS_PRODUCT (W15)."""
+      soldBy: [Organization!]! @relationship(type: "SELLS_PRODUCT", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+      """class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM (W15)."""
+      commerceMatches: [CommerceMatch!]! @relationship(type: "MATCHES_COMMERCE_ITEM", direction: IN)
+    Insert into PackageConfiguration: listedIn, inventoryItems, bundleComponents, commerceMatches (same text, same property types).
+    Insert into Product:
+      """class: asserted (inverse view); cardinality: many; catalog: COMPONENT_PRODUCT (W15; product-level kit component)."""
+      bundleComponents: [BundleComponent!]! @relationship(type: "COMPONENT_PRODUCT", direction: IN, properties: "AssertedEdgeProperties")
+      """class: derived read-only (inverse view); catalog: SELLS_PRODUCT (W15)."""
+      soldBy: [Organization!]! @relationship(type: "SELLS_PRODUCT", direction: IN, properties: "DerivedEdgeProperties") @settable(onCreate: false, onUpdate: false)
+    Confirm the package/bundle boundary already written in W04's PackageConfiguration description ("A multi-bottle kit offered as a
+    'size' is a Bundle of configurations (W15)"). Keep W04 Product.listedIn (LISTS_PRODUCT, no properties, read-only): W15's
+    MerchantListing.legacyListsProducts is its other side.
+  cq: [CQ-CM-02, CQ-AX-17]
+  failingCase: "truniagen.com '180' = SKU CTNUS3006090010-KIT, barcode 850064273106, component count not stated (S6): not a third PackageConfiguration of the 300mg variant."
+  proposedRuling: "Accept; W04 inserts verbatim."
+
+- id: W15-SR-03
+  targetOwner: W12
+  request: |
+    Insert into ProductLot:
+      """class: asserted (inverse view); cardinality: many; catalog: UNIT_FROM_LOT (W15). A printed code is not lot identity."""
+      units: [IndividualUnit!]! @relationship(type: "UNIT_FROM_LOT", direction: IN, properties: "AssertedEdgeProperties")
+      """class: structural (inverse view); cardinality: many; catalog: MATCHES_COMMERCE_ITEM (W15 RECALL_SCOPE candidates)."""
+      commerceMatches: [CommerceMatch!]! @relationship(type: "MATCHES_COMMERCE_ITEM", direction: IN)
+    W12's boundary note (recalled / expired / counterfeit inventory is W15's) is answered by CommerceMatch candidates
+    (matchKind RECALL_SCOPE) and V-W15-07; W12 keeps no recall property on ProductLot either.
+  cq: [CQ-AX-19, CQ-CM-C03]
+  failingCase: "FDA notice S11: lot codes print as '1356' + lot + '-1/-2'; unit code '13565040273-1' needs a parsing rule before it can be linked to lot 5040273."
+  proposedRuling: "Accept."
+
+- id: W15-SR-04
+  targetOwner: W07
+  request: |
+    Insert into PanelDefinition:
+      """class: asserted (inverse view); cardinality: many; live IMPLEMENTS_PANEL (W15) from MerchantListing."""
+      implementedByListings: [MerchantListing!]! @relationship(type: "IMPLEMENTS_PANEL", direction: IN, properties: "AssertedEdgeProperties")
+    (W04 inserts the Product side the same way; both use AssertedEdgeProperties.)
+  cq: [CQ-DX-01]
+  failingCase: "Live Listing.implementsPanels (IMPLEMENTS_PANEL, RoleMetadata) would otherwise lose its inverse in the final API."
+  proposedRuling: "Accept."
+
+- id: W15-SR-05
+  targetOwner: "W06, W22"
+  request: "Informational. W06 Procedure.listedIn already references MerchantListing with ListingEdgeProperties: kept unchanged. W22 MediaSource.sourceListing (SOURCE_LISTING) and MediaSubjectTarget must name MerchantListing (not Listing); W22's fragment already does."
+  cq: [CQ-CM-01]
+  failingCase: "A merged schema with both Listing and MerchantListing would hold two types for one identity (D-007)."
+  proposedRuling: "No change needed; confirm at merge."
+
+- id: W15-SR-07
+  targetOwner: "W00 (catalog), Fable"
+  request: "Catalog range extensions for W15-owned relationships: LISTING_FOR and INVENTORY_INSTANCE_OF also -> Bundle; COMPONENT_PRODUCT also -> PackageConfiguration; MATCHES_COMMERCE_ITEM also -> Offer, IndividualUnit, PackageConfiguration, Bundle, ProductLot, Organization (unions ListingTarget, CommerceItemTarget)."
+  cq: [CQ-CM-02, CQ-CM-C02, CQ-CM-C03]
+  failingCase: "Amazon B07Y2ZGM48 'Two-bottle supply' and truniagen.com '180' kit are listings for bundles, not variants or packages (S2, S6); an AUTHORIZED_CHANNEL check compares an Offer and its seller with a brand statement (S11); a RECALL_SCOPE check compares a unit with a lot."
+  proposedRuling: "Accept as catalog 0.3 ranges; no new relationship type."
+
+- id: W15-SR-08
+  targetOwner: W00
+  request: "Register uid type tokens for primary labels: MerchantListing -> listing, Offer -> offer, PriceObservation -> price-obs (already fixture tokens), SubscriptionPlan -> subscription-plan, Bundle -> bundle, BundleComponent -> bundle-component, InventoryItem -> inventory-item, IndividualUnit -> individual-unit, AffiliateLink -> affiliate-link, CommerceMatch -> commerce-match."
+  cq: [CQ-AX-14]
+  failingCase: "INV-106 / V-000a cannot check uids of seven W15 types whose tokens are not in conventions.uidTypeTokens."
+  proposedRuling: "Accept."
+
+- id: W15-SR-09
+  targetOwner: W00
+  request: "Kernel provenance for commerce occurrences and artifacts: (a) extend the catalog domain of WAS_GENERATED_BY to PriceObservation, Offer and AffiliateLink (PROV-O wasGeneratedBy applies to any entity); (b) accept the string reference `sourceLocatorUid` on PriceObservation and AffiliateLink (same pattern as SourceLocator.mediaAnnotationUid) as the reproducibility link, checked by V-W15-08; or rule a structural OBSERVED_AT_LOCATOR edge instead."
+  cq: [CQ-CM-03, CQ-AX-06, CQ-AX-07]
+  failingCase: "SUPPORTED_BY is catalog-limited to Assertion|Adjudication|EvidenceAssessment and WAS_GENERATED_BY to Assertion|SourceSnapshot|DocumentTextVersion|SourceLocator|EvidenceAssessment: the Walmart $19.90 (LLM quote) and $45.00 (structured data) observations (S8) cannot otherwise name the span that showed them."
+  proposedRuling: "Accept (a) and (b); the edge form only if a second consumer needs traversal."
+
+- id: W15-SR-10
+  targetOwner: "W00 (enum registry), Fable"
+  request: "Register W15 enums and vocabularies: OfferKind {PURCHASE, SUBSCRIPTION_ONLY, PREORDER, SERVICE_BOOKING, UNKNOWN}; ObservedAvailability {IN_STOCK, LIMITED_STOCK, OUT_OF_STOCK, BACKORDER, PREORDER, CURRENTLY_UNAVAILABLE, DISCONTINUED_AS_DISPLAYED, NOT_DISPLAYED, UNKNOWN}; candidate enums CommerceMatchKind {LISTING_TO_ITEM, INVENTORY_TO_ITEM, RECALL_SCOPE, AUTHORIZED_CHANNEL} and CommerceMatchOutcome {SAME_ITEM, DIFFERENT_ITEM, IN_SCOPE, OUT_OF_SCOPE, NO_AUTHORIZATION_FOUND, AUTHORIZED, NOT_DETERMINABLE, UNRESOLVED} (kept as controlled Strings in the fragment until ruled)."
+  cq: [CQ-CM-03, CQ-CM-05, CQ-CM-C03]
+  failingCase: "Existing fixture values 'NEW_ONE_TIME', 'IN_STOCK_AS_DISPLAYED', 'DELIVERY_DATE_DISPLAYED' (examples/filing-vs-capability.cypher) mix condition, availability and delivery promise in free strings."
+  proposedRuling: "Accept OfferKind and ObservedAvailability; decide the two CommerceMatch enums at merge."
+
+- id: W15-SR-11
+  targetOwner: W00
+  request: "(a) Register predicate LISTING_TITLE_AMOUNT (predicateClass QUANTITY; subject MerchantListing; literal valueNumber + unitCode) in products_and_commerce.assertedPredicates; the catalog uses the name only as the premise of the forbidden implication [LISTING_TITLE_AMOUNT, LABEL_DECLARED_AMOUNT]. (b) Add W15 asserted types (LISTING_FOR, FULFILLS_OFFER, AFFILIATE_FOR_OFFER, USES_SUBSCRIPTION_PLAN, COMPONENT_PRODUCT, INVENTORY_INSTANCE_OF, UNIT_FROM_LOT, LISTS_PROCEDURE, IMPLEMENTS_PANEL, AVAILABLE_IN) to the hard-coded V-101 / V-W00-02 lists, or adopt V-W15-02. (c) Add [AFFILIATE_FOR_OFFER, ENDORSES_PRODUCT] and [AFFILIATE_FOR_OFFER, SELLS_PRODUCT] (expansions of the FINANCIAL_INTEREST rule and the commerce forbiddenImplications) to validation-params implicationPairs, or adopt V-W15-06."
+  cq: [CQ-AX-16, CQ-AX-17]
+  failingCase: "Run 2026-10-04: negative N10 (ENDORSES_PRODUCT derived from the fastlifehacks AFFILIATE_FOR_OFFER assertion) returned zero V-112 rows (caught only by V-007/V-422/V-W15-06); N9 (silent LISTING_FOR) was caught by the catalog V-101 but not by W00's V-101 list."
+  proposedRuling: "Accept (a)-(c)."
+
+- id: W15-SR-12
+  targetOwner: W23
+  request: "Private-store purchase and subscription records (P-15 PurchaseEvent and any private subscription) reference shared uids only: offerUid, listingUid, priceObservationUid (the observed price at decision time), subscriptionPlanUid, bundleUid, packageConfigurationUid, lotUid. A unit a person bought is never an IndividualUnit in the shared graph (V-W15-10)."
+  cq: [CQ-AX-12, CQ-AX-19]
+  failingCase: "IndividualUnit and PriceObservation are natural places for a 'my bottle' or 'my price' leak; V-W15-10 rejects purchaser/user keys and non-public acquisition contexts."
+  proposedRuling: "Accept; W23 lists subscriptionPlanUid and bundleUid in the external contract."
+
+- id: W15-SR-13
+  targetOwner: W13
+  request: "Recall events: CommerceMatch RECALL_SCOPE currently cites the recall notice locator (FDA company announcement, S11). If W13 introduces a recall record (event or status), RECALL_SCOPE matches will add it to MATCHES_COMMERCE_ITEM; W15 needs only its uid and lot scope. No recall property on Offer, Listing, InventoryItem, IndividualUnit or ProductLot."
+  cq: [CQ-CM-C03, CQ-MF-02]
+  failingCase: "Ambrosia Brands recall of 2026-02-13 lists 48 lots and states 'we do not have any authorized resellers on Amazon.com' (S11): the recall scope (lots) and the channel statement are two different facts with two different consequences."
+  proposedRuling: "W13 decides whether a recall record is in scope; W15 works with locators until then."
+
+- id: W15-SR-14
+  targetOwner: W21
+  request: "AffiliateLink is found in a container by its sourceLocatorUid (Document/Episode snapshots); W21 owns the speaker attribution of claims made next to the link (e.g. 'Tru Niagen Pro which is 500 mg per capsule' is a retelling, while the listing title says 1000mg per 30 servings) and RECOMMENDS. The affiliate party is the tag holder, not the speaker or subject; W15 asks W21 to keep ConflictRelevanceAssessment able to cite an AFFILIATE_FOR_OFFER assertion."
+  cq: [CQ-CM-04, CQ-CL-05]
+  failingCase: "fastlifehacks.com (S9): 'She has no affiliation with the brands mentioned' (subject) next to the author's Amazon Associates links (tag partnerid1275-20)."
+  proposedRuling: "Accept."
+
+- id: W15-SR-15
+  targetOwner: "W19, W00 (SourceKind owner)"
+  request: "SourceKind has no value for a third-party blog/review page with affiliate links or for a storefront's structured-data endpoint (Shopify products/*.js, products.json). Fixtures used THIRD_PARTY_PROFILE_PAGE and MARKETING_PAGE. Consider BLOG_OR_REVIEW_PAGE and STOREFRONT_STRUCTURED_DATA."
+  cq: [CQ-CM-04, CQ-CM-03]
+  failingCase: "S6 (selling-plan JSON) and S7 (rendered page) are the same publisher in two renditions that disagree on the subscription price; the kind should say which rendition."
+  proposedRuling: "W19 proposes, W00 rules."
+
+- id: W15-SR-16
+  targetOwner: "W00 (runtime), Fable"
+  request: "Runtime fact for the operations/deployment notes: with @neo4j/graphql 7.6.3 on Neo4j 5.26.31 Community WITHOUT APOC, any GraphQL read that selects a DateTime field fails with \"Unknown function 'apoc.date.convertFormat'\" (observed 2026-10-04 reading MerchantListing.lastObservedAt, PriceObservation.observedAt, CommerceMatch.recordedAt); reads without DateTime fields succeed (union relationship fields with properties included). APOC core is therefore a deployment prerequisite of the final API."
+  cq: [CQ-AX-06]
+  failingCase: "W15 GraphQL read round-trip (07-operations.md section 6)."
+  proposedRuling: "Record in the final operations file; verify on the deployed edition."

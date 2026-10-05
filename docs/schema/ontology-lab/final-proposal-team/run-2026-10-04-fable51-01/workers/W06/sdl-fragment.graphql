@@ -1,0 +1,346 @@
+# =====================================================================================================================
+# W06 Treatments, procedures and intervention modalities -- SDL fragment (recommendation, not the merged schema)
+# Run: run-2026-10-04-fable51-01   Worker: W06 (Opus 5.5)   Coordinator/synthesizer: Fable 5.1
+# Canonical catalog module: none (live seam types Treatment, Procedure; catalog conventions.liveSeamTypes).
+#   Proposed home: candidate module `interventions` (registry T-005); catalog digest 8fb50ff0...84f0,
+#   live schema digest 86b5e0b5...f112.
+# Competency questions: CQ-ST-01 (concept link of an administered intervention), CQ-EV-04 (guard: a treatment concept
+#   is never an applicability shortcut), CQ-MF-02 / CQ-AX-23 (developmentStage and orphanDrugDesignation are display
+#   projections; approval lives on W13 RegulatoryStatus{APPROVAL}); candidates CQ-IV-C01..C05 (02-cq-coverage.md).
+# Invariants and validators: INV-004, INV-009, INV-010, INV-101, INV-106, INV-107, INV-201, INV-209, INV-304;
+#   V-322 (pattern reused), proposed V-W06-01..V-W06-08 (fixtures/w06-validation.cypher).
+#
+# Meaning in one line: a Treatment is a therapeutic intervention CONCEPT (what kind of thing it is); a Procedure is a
+#   procedure DEFINITION. Neither is an administered intervention (W09 StudyIntervention), a marketed product (W04
+#   Product), a regulatory standing (W13 RegulatoryStatus / OrphanDesignation / DrugApproval), a performance or
+#   encounter (not modeled: there is no shared patient or care-record graph, architecture.md section 15), or a result
+#   (W09 StudyResult). Treatment intent (TARGETS_CONDITION) is never a result or an approval.
+#
+# Owned here (sole writer per registry row W06): node types Treatment, Procedure; enum TreatmentModality; union
+#   TreatmentComponentTarget; relationship-property type TreatmentComponentProperties; relationship types
+#   TARGETS_CONDITION, USES_COMPONENT, DEVELOPS_TREATMENT, OFFERS_TREATMENT, OFFERS_PROCEDURE.
+# Requested additions to the W06 row (seam request W06-SR-01; included so the fragment is complete, Fable rules):
+#   enums TreatmentComponentRole, TreatmentIntentKind, TreatmentIntentBasis; relationship-property type
+#   TreatmentTargetProperties (successor of live TreatmentTargetMetadata, used only by TARGETS_CONDITION).
+# The study-side concept link is W09's candidate relationship FOLLOWS_INTERVENTION_DEFINITION (StudyIntervention ->
+#   InterventionDefinitionTarget = Procedure | Treatment | ProtocolEdition | Lifestyle); W06 declares only inverse views
+#   of it on Treatment and Procedure (W06 withdrew its own earlier proposal of two separate relationship types).
+#
+# Referenced by name only (other owners): W00 Entity, EntityArchetype, SearchIndexable, PrivacyClass, NodeMaturity,
+#   TimePrecision, ValidTimeBasis, Identifier, IdentifierLinkProperties, AssertedEdgeProperties (fields embedded below
+#   are copied verbatim as contract B4 requires); W01 Organization; W02 ChemicalSubstance, ChemicalForm,
+#   IngredientMaterial; W03 Condition; W04 Product; W05 Lifestyle; W08 Device; W09 StudyIntervention;
+#   W10 EvidenceStrength; W15 MerchantListing, ListingEdgeProperties; W16 Protocol; W17 SafetySignal,
+#   SafetyEdgeProperties; W20 Document, Chunk, DerivedSupportProperties.
+# Relationship class and cardinality are stated in each field description and enforced by the operations/validation
+# layer, never by SDL. Read-only fields (@settable false) are written only by migration or projection jobs.
+# No `extend`, no @cypher, no @vector (Fable adds @vector at merge; see 07-operations.md for the justification).
+# =====================================================================================================================
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Enums
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Modality classification of a Treatment concept (live enum, values kept verbatim; owner W06). A Treatment carries a
+LIST of modalities (Treatment.modalities) because one concept can be several at once: the FDA label for CASGEVY
+(exagamglogene autotemcel) calls it "an autologous genome edited hematopoietic stem cell-based gene therapy" and "a
+cellular gene therapy", which is CELL_THERAPY and GENE_THERAPY together, not COMBINATION. COMBINATION means a regimen
+concept whose components are of different modalities (for example plasma exchange plus albumin plus immunoglobulin)
+and requires at least two USES_COMPONENT edges (V-W06-05). UNKNOWN means the source does not allow classification;
+OTHER means classified but no value fits; a null list means not recorded. A modality is a classification of the
+concept, never a regulatory product class and never a registry intervention type (ClinicalTrials.gov InterventionType
+such as BIOLOGICAL or GENETIC is a W09 StudyIntervention field and is not mapped onto this enum).
+"""
+enum TreatmentModality {
+  SMALL_MOLECULE
+  BIOLOGIC
+  GENE_THERAPY
+  CELL_THERAPY
+  RNA_THERAPY
+  PROCEDURE
+  DEVICE_BASED
+  NUTRITIONAL
+  LIFESTYLE
+  COMBINATION
+  OTHER
+  UNKNOWN
+}
+
+"""
+Role of a component in a Treatment concept (successor of live TreatmentComponentMetadata.role free text; requested
+owner W06, W06-SR-01). ADMINISTERED_PRODUCT links the concept to a marketed or investigational Product that embodies
+it; the link never transfers study evidence, approval or designation to the Product (INV-201, INV-010).
+STARTING_MATERIAL_COLLECTION is a procedure that collects the patient's own starting material (CASGEVY label:
+"prepared from the patient's own HSCs, which are obtained via apheresis procedure(s)"). PREPARATORY_PROCEDURE covers
+conditioning or depletion steps that are part of the concept as defined by an authoritative description (label,
+guideline); a step used only in one trial (HORIZON NCT06597656 plasmapheresis) belongs to that StudyIntervention, not
+to the concept (V-W06-06). NOT_STATED means the source names the component without a role.
+"""
+enum TreatmentComponentRole {
+  ACTIVE_COMPONENT
+  ADMINISTERED_PRODUCT
+  STARTING_MATERIAL_COLLECTION
+  PREPARATORY_PROCEDURE
+  DELIVERY_PROCEDURE
+  DELIVERY_DEVICE
+  CO_INTERVENTION
+  REGIMEN_DEFINITION
+  OTHER
+  NOT_STATED
+}
+
+"""
+What a TARGETS_CONDITION edge says the concept is intended to do for the condition (requested owner W06,
+W06-SR-01). Intent only: never effectiveness, never an approved indication, never a result.
+"""
+enum TreatmentIntentKind {
+  TREATMENT
+  PREVENTION
+  SYMPTOM_RELIEF
+  SUPPORTIVE
+  NOT_STATED
+}
+
+"""
+Kind of statement a TARGETS_CONDITION edge projects (successor of live TreatmentTargetMetadata.indicationType;
+requested owner W06, W06-SR-01). REGULATORY_LABEL_RESTATEMENT is a restatement of a labeled indication on the concept:
+the authoritative, jurisdiction- and time-bound indication stays on W13 DrugApproval.indication and is never read from
+this edge. PRACTICE_OFFERING is what a clinic or service says it offers the concept for; it establishes what the
+offerer says, not intent recognized by any authority.
+"""
+enum TreatmentIntentBasis {
+  DEVELOPER_PIPELINE
+  REGULATORY_LABEL_RESTATEMENT
+  TRIAL_REGISTRATION
+  PRACTICE_OFFERING
+  LITERATURE
+  NOT_STATED
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Union
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+Range of USES_COMPONENT (successor of live union TreatmentComponent). Live Compound -> ChemicalSubstance and live
+CompoundForm -> ChemicalForm or IngredientMaterial (D-002); Product, Device, Procedure, Protocol, Lifestyle kept; live
+FoodProduct is dropped because W05 retires it into W04 Product (productKind CONVENTIONAL_FOOD), which is already a
+member (W06-SR-07). Treatment is deliberately not a member: a regimen of named treatments is modeled with each treatment's own
+components until a CQ needs nesting (scope candidate SC-W06-03).
+"""
+union TreatmentComponentTarget = ChemicalSubstance | ChemicalForm | IngredientMaterial | Product | Device | Procedure | Protocol | Lifestyle
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Relationship-property types
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+USES_COMPONENT edge (class: asserted; profile asserted_edge). Successor of live TreatmentComponentMetadata. Contains
+every field of the frozen AssertedEdgeProperties (W00) plus component qualifiers. doseText, routeText, frequencyText
+and durationText are verbatim display strings from the authorizing source; they are never dose authority (dose with
+quantity and mass basis lives on W09 InterventionComponent, W16 ProtocolStep dose, or W04 IngredientComponent) and
+are never inputs to an applicability ratio (INV-203). Live `confidence` and `notes` are not carried (INV-407).
+"""
+type TreatmentComponentProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  componentRole: TreatmentComponentRole!
+  "Role wording exactly as the source states it (for example 'obtained via apheresis procedure(s)')."
+  roleTextVerbatim: String
+  "Verbatim dose text for display only; null = not stated in the authorizing source."
+  doseText: String
+  routeText: String
+  frequencyText: String
+  durationText: String
+  "Order of the component within the concept's description when the source orders it."
+  orderIndex: Int
+}
+
+"""
+TARGETS_CONDITION edge (class: asserted; profile asserted_edge). Successor of live TreatmentTargetMetadata
+(requested owner W06, W06-SR-01). Contains every field of the frozen AssertedEdgeProperties (W00) plus intent
+qualifiers. The edge records a source-stated INTENT (developer, label restatement, registry, offerer, literature).
+It is never effectiveness (W09 StudyResult, W10 assessments), never an approved indication (W13 DrugApproval), and its
+legacy evidence-strength value is an extraction-time hint, not an assessment (INV-209; QS-1b labels it).
+"""
+type TreatmentTargetProperties @relationshipProperties {
+  relationshipUid: String!
+  assertionUid: String!
+  validFrom: DateTime
+  validTo: DateTime
+  validFromPrecision: TimePrecision
+  validToPrecision: TimePrecision
+  validFromBasis: ValidTimeBasis!
+  validToBasis: ValidTimeBasis!
+  recordedFrom: DateTime!
+  recordedTo: DateTime
+  mongoResearchRunId: String
+  intentKind: TreatmentIntentKind!
+  intentBasis: TreatmentIntentBasis!
+  "Indication wording exactly as the authorizing source states it."
+  indicationTextVerbatim: String
+  "Population or subset wording as stated (for example 'patients aged 2 years and older'); display, not a StudyPopulation."
+  patientSubsetText: String
+  "Legacy live evidenceStrength, migrated as an extraction-time hint only (never written by new ingestion; W10-SR)."
+  legacyEvidenceStrengthHint: EvidenceStrength
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Node types
+# ---------------------------------------------------------------------------------------------------------------------
+
+"""
+A therapeutic intervention CONCEPT: a named kind of intervention (an investigational or approved therapy known by its
+nonproprietary or development names, such as exagamglogene autotemcel / exa-cel / CTX001; a practice concept such as
+therapeutic plasma exchange with albumin replacement as a longevity offering; a regimen such as plasmapheresis with
+albumin and IVIG) whose modality, components, stated intent (targeted conditions) and developer or offerer roles are
+recorded. Identity is the concept, keyed by uid; nonproprietary names, development codes and other names are Identifier
+records or display text, never identity. It is NOT: the intervention administered in a study arm (W09
+StudyIntervention, linked by W09's FOLLOWS_INTERVENTION_DEFINITION), a marketed or investigational product (W04 Product such as
+CASGEVY, linked by USES_COMPONENT{ADMINISTERED_PRODUCT}), a chemical substance or material (W02; a single small
+molecule needs a Treatment node only when a concept-level fact such as a regimen, a developer program or an offering is
+recorded), a regulatory standing (W13: approval, designation and indication are per product, sponsor, jurisdiction and
+time), a performance, encounter or patient record (not modeled), or a result. developmentStage and
+orphanDrugDesignation are read-only display projections; they never answer "is it approved" (V-W06-01, V-W06-03).
+CQs: CQ-ST-01 (concept link), CQ-EV-04 (guard), CQ-MF-02, CQ-AX-23 (guards), CQ-IV-C01..C04. Canonical module: none
+(live seam; candidate `interventions`). Archetype Entity.
+"""
+type Treatment implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Treatment", "Entity"])
+  @fulltext(indexes: [{indexName: "TreatmentSearch", fields: ["name", "description", "searchText", "treatmentClass", "orphanDrugDesignation"], queryName: "searchTreatments"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Regenerable embedding of searchText (INV-107); never evidence. @vector is added by Fable at merge without provider."
+  searchEmbedding: [Float!]
+  "Modality classifications of the concept (a list: CASGEVY is CELL_THERAPY and GENE_THERAPY). Null = not recorded."
+  modalities: [TreatmentModality!]
+  "Legacy single-value projection: equals the only element of modalities when it has exactly one, else null (never COMBINATION by default)."
+  modality: TreatmentModality @settable(onCreate: false, onUpdate: false)
+  "Display class wording (for example 'CRISPR/Cas9-edited autologous CD34+ HSC therapy'); not an enum, not identity."
+  treatmentClass: String
+  "Concept-level typical route category for display (for example 'intravenous infusion'); never an applicability input."
+  routeCategory: String
+  "Display summary of a typical regimen; never dose authority (see TreatmentComponentProperties)."
+  regimenSummary: String
+  "Display wording of the population the concept is described for; not a StudyPopulation and not an approved indication."
+  targetedPopulation: String
+  """
+  Legacy display projection (read-only). Written only by the projection job from the latest live DECLARES_DEVELOPMENT_STAGE
+  assertion (candidate predicate; developer- or registry-stated, jurisdiction-qualified) or migrated verbatim. It is never
+  regulatory status: a value reading approved/marketed/licensed requires a reachable W13 RegulatoryStatus with statusKind
+  APPROVAL (V-W06-01, the V-322 pattern), and answers about approval never read this field.
+  """
+  developmentStage: String @settable(onCreate: false, onUpdate: false)
+  "uid of the assertion the developmentStage display projects; null for migrated legacy text (reported by V-W06-02)."
+  developmentStageAssertionUid: String @settable(onCreate: false, onUpdate: false)
+  """
+  Legacy display projection (read-only) of W13 OrphanDesignation states reachable through
+  USES_COMPONENT{ADMINISTERED_PRODUCT} -> Product <- DESIGNATION_FOR. A designation is sponsor-, indication- and
+  jurisdiction-specific and is never approval (forbidden implication HAS_ORPHAN_DESIGNATION -> IS_APPROVED; V-W06-03).
+  Kept in TreatmentSearch for lookup compatibility; a hit is a candidate, never an answer.
+  """
+  orphanDrugDesignation: String @settable(onCreate: false, onUpdate: false)
+  "uids of the OrphanDesignation states the orphanDrugDesignation display projects; empty/null for migrated legacy text."
+  orphanDesignationStatusUids: [String!] @settable(onCreate: false, onUpdate: false)
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00). Nonproprietary names (FDA proper name, USAN/INN), sponsor development codes (CTX001). A shared code across issuers never establishes identity."""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; W06 TARGETS_CONDITION (live kept). Source-stated intent only; never a result or an approved indication."""
+  targetsConditions: [Condition!]! @relationship(type: "TARGETS_CONDITION", direction: OUT, properties: "TreatmentTargetProperties")
+  """class: asserted; cardinality: many; W06 USES_COMPONENT (live kept, range renamed TreatmentComponentTarget). componentRole is required."""
+  usesComponents: [TreatmentComponentTarget!]! @relationship(type: "USES_COMPONENT", direction: OUT, properties: "TreatmentComponentProperties")
+  """class: asserted; cardinality: many; W06 DEVELOPS_TREATMENT (live kept; Organization field owned by W01). Developing is not marketing, manufacturing or holding an approval."""
+  developedBy: [Organization!]! @relationship(type: "DEVELOPS_TREATMENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many; W06 OFFERS_TREATMENT (live kept). An offer is what the offerer says it provides; it is not performance, approval, recommendation or evidence."""
+  offeredBy: [Organization!]! @relationship(type: "OFFERS_TREATMENT", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted; cardinality: many (inverse view of W09 StudyIntervention.definitions); W09 FOLLOWS_INTERVENTION_DEFINITION (candidate, CQ-ST-C02 / CQ-IV-C01). The administered StudyIntervention is the evidence target; this link never licenses evidence transfer to any Product (INV-201, V-W06-04)."""
+  instantiatedByStudyInterventions: [StudyIntervention!]! @relationship(type: "FOLLOWS_INTERVENTION_DEFINITION", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (W17 owns the relationship type); cardinality: many; catalog: HAS_SAFETY_SIGNAL (live kept)."""
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyEdgeProperties")
+  """class: derived (W20 shortcut naming a locator; read-only); catalog: SUPPORTED_BY_DOCUMENT."""
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (W20 shortcut naming a locator; read-only); catalog: SUPPORTED_BY_CHUNK."""
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+}
+
+"""
+A procedure DEFINITION: a named kind of act performed on or for a person with equipment or by hand (therapeutic
+plasma exchange; mobilized hematopoietic stem cell apheresis; plasma donation by plasmapheresis), with display
+characterization of its typical setting, invasiveness, duration, preparation and recovery. Identity is the definition,
+keyed by uid; classification codes (ICD-10-PCS 6A550Z3 "Pheresis of Plasma, Single", which covers both donation
+plasmapheresis and therapeutic plasma exchange and encodes Single versus Multiple performances) are Identifier records
+that never establish identity (V-W06-07). It is NOT: a performance, session or encounter (occurrences are not modeled;
+a reported count such as "more than 1,000 treatments" is an assertion literal about the reporting organization), an
+offering (W01-role OFFERS_PROCEDURE, W15 MerchantListing/Offer/price), a protocol step that employs it (W16
+ProtocolStep), a study arm's administered intervention (W09 StudyIntervention, linked by W09's FOLLOWS_INTERVENTION_DEFINITION), a
+device (W08), or a claim about benefits (W21 ClaimOccurrence). Display summaries are definition-level and
+source-attributed through assertions; they are not performance records. CQs: CQ-IV-C02, CQ-IV-C03, CQ-ST-01 (concept
+link). Canonical module: none (live seam; candidate `interventions`). Archetype Entity.
+"""
+type Procedure implements Entity & EntityArchetype & SearchIndexable
+  @node(labels: ["Procedure", "Entity"])
+  @fulltext(indexes: [{indexName: "ProcedureSearch", fields: ["name", "description", "searchText", "procedureType", "setting"], queryName: "searchProcedures"}]) {
+  id: ID! @id
+  uid: String!
+  name: String
+  description: String
+  mongoResearchRunId: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+  privacyClass: PrivacyClass
+  maturity: NodeMaturity
+  schemaVersion: String
+  entityType: String!
+  searchText: String
+  searchFields: [String!]
+  embeddingModel: String
+  embeddingDimensions: Int
+  "Display class wording (for example 'apheresis', 'surgical', 'injection-based'); not identity."
+  procedureType: String
+  "Typical setting of the definition for display (for example 'outpatient clinic'); not where a given performance occurred."
+  setting: String
+  deliveryRoute: String
+  invasiveness: String
+  "Definition-level display summaries; null = not recorded (never 'none')."
+  durationSummary: String
+  preparationSummary: String
+  recoverySummary: String
+  """class: asserted; cardinality: many; catalog: HAS_IDENTIFIER (W00). ICD-10-PCS, SNOMED CT and similar classification codes carry code-set validity; a code shared by two definitions never merges them."""
+  identifiers: [Identifier!]! @relationship(type: "HAS_IDENTIFIER", direction: OUT, properties: "IdentifierLinkProperties")
+  """class: asserted; cardinality: many; W06 OFFERS_PROCEDURE (live kept; Organization field owned by W01). Offering is not performing, hosting, listing, selling or recommending."""
+  offeredBy: [Organization!]! @relationship(type: "OFFERS_PROCEDURE", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (W15 owns LISTS_PROCEDURE); cardinality: many; inverse view of MerchantListing -[:LISTS_PROCEDURE]->. A listing page is never procedure identity and never an offer by itself."""
+  listedIn: [MerchantListing!]! @relationship(type: "LISTS_PROCEDURE", direction: IN, properties: "ListingEdgeProperties")
+  """class: asserted; cardinality: many (inverse view); W06 USES_COMPONENT from Treatment."""
+  componentOfTreatments: [Treatment!]! @relationship(type: "USES_COMPONENT", direction: IN, properties: "TreatmentComponentProperties")
+  """class: asserted; cardinality: many (inverse view of W09 StudyIntervention.definitions); W09 FOLLOWS_INTERVENTION_DEFINITION: a study arm's administered intervention that follows this procedure definition."""
+  instantiatedByStudyInterventions: [StudyIntervention!]! @relationship(type: "FOLLOWS_INTERVENTION_DEFINITION", direction: IN, properties: "AssertedEdgeProperties")
+  """class: asserted (W17 owns the relationship type); cardinality: many; catalog: HAS_SAFETY_SIGNAL (live kept)."""
+  hasSafetySignals: [SafetySignal!]! @relationship(type: "HAS_SAFETY_SIGNAL", direction: OUT, properties: "SafetyEdgeProperties")
+  """class: derived (W20 shortcut naming a locator; read-only); catalog: SUPPORTED_BY_DOCUMENT."""
+  supportedByDocuments: [Document!]! @relationship(type: "SUPPORTED_BY_DOCUMENT", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+  """class: derived (W20 shortcut naming a locator; read-only); catalog: SUPPORTED_BY_CHUNK."""
+  supportedByChunks: [Chunk!]! @relationship(type: "SUPPORTED_BY_CHUNK", direction: OUT, properties: "DerivedSupportProperties") @settable(onCreate: false, onUpdate: false)
+}
